@@ -1,11 +1,12 @@
 classdef pop_limoresults < handle
     
     %class properties - access is private so nothing else can access these
-    properties (Access = private)
+    properties (Access = public)
         gui_h;
         study;
         limofiles_path;
-        limofiles_filename;
+        limofiles_level1;
+        limofiles_level2;
         regnames;
         catvarnames;
         datorica_indx;
@@ -34,13 +35,14 @@ classdef pop_limoresults < handle
             level_tmp       = get(obj.gui_h.popupmenu_level         ,'Value');
             m2plot_tmp      = get(obj.gui_h.popupmenu_measure2plot  ,'Value');
             var2plot_indx   = get(obj.gui_h.popupmenu_modelvar2plot ,'Value');
-            [var2plot_list,filespath,limoindx] = getmeasures2plot(obj.study,level_tmp-1,m2plot_tmp,obj.datorica_indx);
+            [var2plot,filespath] = getmeasures2plot(obj.study,level_tmp-1,m2plot_tmp,obj.datorica_indx);
            
             % Detecting Measure and updating limofiles_path and
             %--------------------------------------------------------------
-            obj.limofiles_path     = filespath;
-            obj.limofiles_filename = var2plot_list{var2plot_indx};
-            
+            obj.limofiles_path            = filespath;
+            obj.limofiles_level1.index    = var2plot_indx;
+            obj.limofiles_level1.guiname  = var2plot.guiname;
+            obj.limofiles_level1.pathname = var2plot.pathname;
             % Updating Electrode list
             %--------------------------------------------------------------
             try
@@ -208,14 +210,9 @@ classdef pop_limoresults < handle
         % =================================================================
         function obj = callback_popupmenu_level(obj,~,~)
             
-            % Getting value (subject from level)
-            val_level = get(obj.gui_h.popupmenu_level,'Value');
-            
-            % Getting value from popupmenu_measure2plot
-            val_mplot = get(obj.gui_h.popupmenu_measure2plot,'Value');
-            
-            % Getting value from popupmenu_dataorresult
-            val_dor = get(obj.gui_h.popupmenu_dataorresult,'Value');
+            val_level = get(obj.gui_h.popupmenu_level,'Value');        % Getting value (subject from level)
+            val_mplot = get(obj.gui_h.popupmenu_measure2plot,'Value'); % Getting value from popupmenu_measure2plot
+            val_dor = get(obj.gui_h.popupmenu_dataorresult,'Value');   % Getting value from popupmenu_dataorresult
             
             % Getting values popupmenu_modelvar2plot
             string_vplot  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
@@ -223,11 +220,11 @@ classdef pop_limoresults < handle
             val_typeplot  = get(obj.gui_h.popupmenu_plottype      ,'Value' );
             string_elec   = get(obj.gui_h.listbox_elect2plot      ,'String');
             val_elec      = get(obj.gui_h.listbox_elect2plot      ,'Value' );
-            
-            
+             
+            % Single subject level
             if val_level ~= 1
    
-                [var2plot_list,filespath] = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
+                [var2plot,filespath] = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
                 
                 if strcmp(get(obj.gui_h.popupmenu_measure2plot,'String'),{' '})
                     set(obj.gui_h.popupmenu_measure2plot  ,'String', obj.string_mplot);
@@ -237,7 +234,7 @@ classdef pop_limoresults < handle
                 % Updating Electrode list
                 % =========================================================
                 
-                if ~strcmp('No Variables Computed',var2plot_list{1})
+                if ~strcmp('No Variables Computed',var2plot.guiname{1})
                     
                     load(fullfile(filespath,'LIMO.mat'),'LIMO');
                     electoplot_list = ['All Channels';{LIMO.data.chanlocs.labels}'];
@@ -255,29 +252,29 @@ classdef pop_limoresults < handle
                          % the sub (case of Results only)
                          %-------------------------------------------------
                          if val_dor == 2 
-                            if ~ismember(string_vplot(val_vplot),var2plot_list)
+                            if ~ismember(string_vplot(val_vplot),var2plot.guiname)
                                 % Getting index of  'Condition_effect_1.mat' for default value
                                 % 1 st pass
-                                var2plot_indx = find(strcmp(var2plot_list,'Condition_effect_1.mat'), 1);
+                                var2plot_indx = find(strcmp(var2plot.guiname,'Condition_effect_1'), 1);
                                 % 2nd pass
                                 if isempty(var2plot_indx)
-                                    var2plot_indx = find(strcmp(var2plot_list,'Covariate_effect_1.mat'),1);
+                                    var2plot_indx = find(strcmp(var2plot.guiname,'Covariate_effect_1'),1);
                                 end
                                 % Setting to 1 if all fails
                                 if isempty(var2plot_indx)
                                     var2plot_indx = 1;
                                 end
-                                set(obj.gui_h.popupmenu_modelvar2plot,'String',var2plot_list);
+                                set(obj.gui_h.popupmenu_modelvar2plot,'String',var2plot.guiname);
                                 set(obj.gui_h.popupmenu_modelvar2plot,'Value',var2plot_indx);
                             else
-                                var2plot_indx = find(strcmp(string_vplot(val_vplot),var2plot_list));
-                                set(obj.gui_h.popupmenu_modelvar2plot,'String',var2plot_list);
+                                var2plot_indx = find(strcmp(string_vplot(val_vplot),var2plot.guiname));
+                                set(obj.gui_h.popupmenu_modelvar2plot,'String',var2plot.guiname);
                                 set(obj.gui_h.popupmenu_modelvar2plot,'Value',var2plot_indx);
                             end
                          end
                         %--------------------------------------------------
                     elseif val_typeplot == 3
-                        var2plot_list = string_vplot;
+                        %var2plot_list = string_vplot;
 
                         % Updating electrode list val
                         %--------------------------------------------------
@@ -296,6 +293,7 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_plottype      ,'Enable','on');
                     set(obj.gui_h.pushbutton_plot         ,'Enable','on');
                     set(obj.gui_h.checkbox_stats	      ,'Enable','on');
+                    set(obj.gui_h.edit_pval               ,'Enable','on');
                 else
                     % Enabling off GUI features
                     %------------------------------------------------------
@@ -307,25 +305,29 @@ classdef pop_limoresults < handle
                     eeglab_warning('Make sure to compute the model for this measure');
                 end
 
-                % Updating limofiles_path and limofiles_filename
+                % Updating limofiles_level1 structure
                 %----------------------------------------------------------
-                obj.limofiles_path     = filespath;
                 if strcmp(get(obj.gui_h.popupmenu_modelvar2plot,'Enable'),'off')
-                    obj.limofiles_filename = [];
+                    obj.limofiles_level1.guiname = [];
                 else
-                    obj.limofiles_filename = var2plot_list{get(obj.gui_h.popupmenu_modelvar2plot,'Value')};
+                    obj.limofiles_path          = filespath;
+                    obj.limofiles_level1.guiname  = var2plot.guiname;
+                    obj.limofiles_level1.pathname = var2plot.pathname;
+                    obj.limofiles_level1.index    = get(obj.gui_h.popupmenu_modelvar2plot,'Value');
                 end
                 
-            else % Case of group level selected
+            % Group level   
+            else 
                 measure_list  = {'erp','spec'};
                 datorica_list = {'dat', 'ica'};
                 datatype = [datorica_list{obj.datorica_indx} measure_list{get(obj.gui_h.popupmenu_measure2plot,'Value')}];
                 
-                obj.limostruct_indx = find(~cellfun(@isempty,strfind({obj.study(obj.study.currentdesign).design.limo.datatype},datatype)));
-                
-                if isfield(obj.study(obj.study.currentdesign).design.limo, 'l2files') && ~isempty(obj.study(obj.study.currentdesign).design.limo(obj.limostruct_indx).l2files)
-                    groupfiles = obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).l2files(:,2);
-                    set(obj.gui_h.popupmenu_modelvar2plot,'String',groupfiles);
+                obj.limostruct_indx = find(~cellfun(@isempty,strfind({obj.study.design(obj.study.currentdesign).limo.datatype},datatype)));  
+                if ~isempty(obj.limostruct_indx) && isfield(obj.study.design(obj.study.currentdesign).limo, 'groupmodel') && ~isempty(obj.study(obj.study.currentdesign).design.limo(obj.limostruct_indx).groupmodel)
+                    obj.limofiles_level2.guiname  = {obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel.guiname}';
+                    obj.limofiles_level2.pathname = {obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel.filename}';
+                    obj.limofiles_level2.index = 1;
+                    set(obj.gui_h.popupmenu_modelvar2plot,'String',obj.limofiles_level2.guiname);
                     set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
                     
                     % Loading expected electrodes
@@ -357,9 +359,6 @@ classdef pop_limoresults < handle
                     
                     % Enabling on/off GUI features
                     %------------------------------------------------------
-%                     set(obj.gui_h.popupmenu_measure2plot  ,'String', {' '} );
-%                     set(obj.gui_h.popupmenu_measure2plot  ,'Value',1);
-%                     set(obj.gui_h.popupmenu_measure2plot  ,'Enable', 'off' );
                     set(obj.gui_h.popupmenu_dataorresult  ,'Value', 2);
                     set(obj.gui_h.popupmenu_dataorresult  ,'Enable','off');
                     set(obj.gui_h.popupmenu_modelvar2plot ,'Enable','on');
@@ -368,45 +367,56 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_mcc	          ,'Enable','off');
                     set(obj.gui_h.popupmenu_compmethod    ,'Enable','off');
                     set(obj.gui_h.checkbox_stats	      ,'Enable','off');
+                    set(obj.gui_h.edit_pval               ,'Enable','on');
+                    set(obj.gui_h.pushbutton_designadd    ,'Enable','on');% Check this
                 else
+                    % Disabling GUI features
+                    %------------------------------------------------------
+                    set(obj.gui_h.popupmenu_dataorresult  ,'Enable','off');
+                    set(obj.gui_h.popupmenu_modelvar2plot ,'Enable','off');
+                    set(obj.gui_h.popupmenu_plottype      ,'Enable','off');
+                    set(obj.gui_h.pushbutton_plot         ,'Enable','off');
+                    set(obj.gui_h.pushbutton_designadd    ,'Enable','off');
+                    set(obj.gui_h.edit_pval               ,'Enable','off');
                     eeglab_warning('No group level results founded');
-                    set(obj.gui_h.popupmenu_level,'Value',2);
-                    obj = callback_popupmenu_level(obj);
                 end
             end
         end
         % =================================================================
         function obj = callback_popupmenu_modelvar2plot(obj,~,~)
             
-            stringtmp  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
-            valtmp     = get(obj.gui_h.popupmenu_modelvar2plot ,'Value');
-            
-            obj.limofiles_filename = stringtmp{valtmp};
-            
+            var2plot_indx = get(obj.gui_h.popupmenu_modelvar2plot ,'Value');
+            if get(obj.gui_h.popupmenu_level,'Value') ~= 1
+                obj.limofiles_level1.index = var2plot_indx;
+            else
+                obj.limofiles_level2.index = var2plot_indx;
+            end 
         end
         % =================================================================
         function obj = callback_popupmenu_plottype(obj,~,~)
-            val_ptype = get( obj.gui_h.popupmenu_plottype    ,'Value');
-            val_dor   = get(obj.gui_h.popupmenu_dataorresult ,'Value');
-            val_level = get( obj.gui_h.popupmenu_level       ,'Value');
             
-            if (val_ptype == 1 || val_ptype == 2) 
+            val_typeplot = get( obj.gui_h.popupmenu_plottype    ,'Value');
+            val_dor      = get(obj.gui_h.popupmenu_dataorresult ,'Value');
+            val_level    = get( obj.gui_h.popupmenu_level       ,'Value');
+            
+            if (val_typeplot == 1 || val_typeplot == 2) 
                 if val_level ~= 1
                     % Call callback_popupmenu_level
                     obj = callback_popupmenu_level(obj);
                 end
                 
-                % Updating listbox_elect2plot
+                % Updating listbox_elect2plot and disabling it
                 set(obj.gui_h.listbox_elect2plot   ,'Value',1);
                 set(obj.gui_h.listbox_elect2plot   ,'Enable','off');
-                     
+                
+                % Disabling 'Add design' button
                 if  val_dor == 1
                     set(obj.gui_h.pushbutton_designadd ,'Enable','off');
                 else
                     set(obj.gui_h.pushbutton_designadd ,'Enable','on');
                 end
                 
-            elseif val_ptype == 3
+            elseif val_typeplot == 3
                 
                 if val_level ~= 1
                     if val_dor == 2
@@ -428,6 +438,7 @@ classdef pop_limoresults < handle
             val_ptype = get( obj.gui_h.popupmenu_plottype   ,'Value');
             val_dor   = get(obj.gui_h.popupmenu_dataorresult,'Value');
             
+            % Case for data
             if val_dor == 1
                 
                 if val_ptype == 1 || val_ptype == 2
@@ -438,15 +449,16 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
                 end
                 
-                % Add design disable
+                % 'Add design' disable
                 set(obj.gui_h.pushbutton_designadd ,'Enable','off');
                 
+            % Case for results    
             elseif val_dor == 2
                 if val_ptype == 1 || val_ptype == 2
                     % Call callback_popupmenu_level
                     obj = callback_popupmenu_level(obj);
                     
-                % Add design enable
+                % 'Add design' enable
                 set(obj.gui_h.pushbutton_designadd ,'Enable','on');
                     
                 elseif val_ptype == 3
@@ -456,7 +468,7 @@ classdef pop_limoresults < handle
                     % Call callback_popupmenu_level
                     obj = callback_popupmenu_level(obj);
                     
-                    % Add design disable
+                    % 'Add design' disable
                     set(obj.gui_h.pushbutton_designadd ,'Enable','off');
                     
                 end
@@ -489,8 +501,20 @@ classdef pop_limoresults < handle
         % =================================================================
         function obj = callback_plot(obj,~, ~)
             
-            level = get(obj.gui_h.popupmenu_level,'Value');
-            % --- EEGLAB ADDED ---
+             % Prepare inputs for std_limoresults
+            level       = get(obj.gui_h.popupmenu_level,'Value');
+            if level == 1        
+                levelval = 2;
+                testindxval = obj.limofiles_level2.index;
+            else
+                subjindxval = level - 1;
+                levelval    = 1;
+                testindxval = obj.limofiles_level1.index;
+            end
+            measure_list  = {'erp','spec'};
+            datorica_list = {'dat', 'ica'};
+            measure_val = [datorica_list{obj.datorica_indx} measure_list{get(obj.gui_h.popupmenu_measure2plot,'Value')}];
+            
             % DEFS
             checkbox_stat_status = get(obj.gui_h.checkbox_stats,'Value');
             if checkbox_stat_status
@@ -512,296 +536,58 @@ classdef pop_limoresults < handle
                 handles.bootstrap = 0;
                 handles.tfce      = 0;
             end
-            
-            % Loading files
-            if level == 1
-                files                   = obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).l2files(:,3);
-                [PathName,  tmp1, tmp2] = fileparts(files{get(obj.gui_h.popupmenu_modelvar2plot,'Value')});
-                FileName                = [tmp1 tmp2]; clear tmp1 tmp2;
+                     
+            % Determine if 'Original Data' or 'Results'            
+            if get(obj.gui_h.popupmenu_dataorresult,'Value') == 1
+                flagdataval = 1;
             else
-                PathName = obj.limofiles_path;
-                FileName = obj.limofiles_filename;
+                flagdataval = 0 ;
             end
-            
-            % Determine if 'Original Data' or 'Results'
-            flag_DataResult   = get(obj.gui_h.popupmenu_dataorresult,'Value');
-            
+                
             % Getting the plot type
-            ptype_val   = get(obj.gui_h.popupmenu_plottype,'Value');
+            plottypeval   = get(obj.gui_h.popupmenu_plottype,'Value');
+            if plottypeval == 3
+                chanindxval = get( obj.gui_h.listbox_elect2plot,'Value')-1;
+                if chanindxval == 0,
+                    eeglab_warning('Must select a valid electrode');
+                    return;
+                end
+            end
             % ---------------------
-
-            switch ptype_val
-                % --------------------------------------------------------
-                %             IMAGE ALL (COMBINED PLOT)
-                % --------------------------------------------------------
-                case 1                    
-                    if flag_DataResult == 2
-                    handles.LIMO = load(fullfile(PathName,'LIMO.mat'));% eeglab mod
-                    
-                    % check if bootstrap or tfce should be computed
-                    % ---------------------------------------------
-                    % 1st level
-                    if handles.LIMO.LIMO.Level == 1;
-                        if handles.bootstrap == 1 && ~exist(sprintf('H0%sH0_%s', filesep, FileName), 'file') ...
-                                && strncmp(FileName,'con',3) == 0 && strncmp(FileName,'ess',3) ==0
-                            if strcmp(questdlg('Level 1: compute all bootstraps?','bootstrap turned on','Yes','No','No'),'Yes');
-                                LIMO = handles.LIMO.LIMO;
-                                LIMO.design.bootstrap = 1;
-                                if handles.tfce == 1
-                                    LIMO.design.tfce = 1;
-                                end
-                                save LIMO LIMO
-                                if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency')
-                                    limo_eeg_tf(4);
-                                else
-                                    limo_eeg(4);
-                                end
-                            end
-                        end
-                        
-                        if handles.tfce == 1 && ~exist(sprintf('TFCE%stfce_%s', filesep, FileName), 'file') ...
-                                && exist(sprintf('H0%sH0_%s', filesep, FileName), 'file') && strncmp(FileName,'con',3) == 0 ...
-                                && strncmp(FileName,'ess',3) ==0
-                            if strcmp(questdlg('Level 1: compute all tfce?','tfce turned on','Yes','No','No'),'Yes');
-                                LIMO = handles.LIMO.LIMO;
-                                LIMO.design.tfce = 1;
-                                save LIMO LIMO
-                                if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency')
-                                    limo_eeg_tf(4);
-                                else
-                                    limo_eeg(4);
-                                end
-                            end
-                        end
-                    end
-                    
-                    % contrasts stuff
-                    if handles.bootstrap == 1 && ~exist(sprintf('H0%sH0_%s', filesep, FileName), 'file')
-                        if strncmp(FileName,'con',3)
-                            load Yr; cd H0; H0_Betas.mat;
-                            result = limo_contrast(Yr, H0_Betas, handles.LIMO.LIMO, 0,3); clear Yr H0_Betas
-                        elseif strncmp(FileName,'ess',3)
-                            load Yr; cd H0; H0_Betas.mat;
-                            result = limo_contrast(Yr, H0_Betas, handles.LIMO.LIMO, 1,3); clear Yr H0_Betas
-                        end
-                    end
-                    
-                    if handles.tfce == 1 && ~exist(sprintf('TFCE%stfce_%s', filesep, FileName), 'file') ...
-                            && exist(sprintf('H0%sH0_%s', filesep, FileName), 'file')
-                        if strncmp(FileName,'con',3)
-                            load(FileName);
-                            if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency'); x = 3;
-                            else [x,y,z] = size(con); if x~=1; x=2; end
-                            end
-                            tfce_score = limo_tfce(x,squeeze(con(:,:,2)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                            cd TFCE; filename2 = sprintf('tfce_%s',FileName); save ([filename2], 'tfce_score'); clear con tfce_score
-                            cd ..; cd H0; filename = sprintf('H0_%s',FileName); load(filename);
-                            tfce_H0_score = limo_tfce(x,squeeze(H0_ess(:,:,2,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                            filename2 = sprintf('tfce_%s',filename); save ([filename2], 'tfce_H0_score'); clear H0_con tfce_score
-                        elseif strncmp(FileName,'ess',3)
-                            load(FileName);
-                            if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency'); x = 3;
-                            else [x,y,z] = size(ess); if x~=1; x=2; end
-                            end
-                            tfce_score = limo_tfce(x,squeeze(ess(:,:,2)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                            cd TFCE; filename2 = sprintf('tfce_%s',FileName); save ([filename2], 'tfce_score'); clear ess tfce_score
-                            cd ..; cd H0; filename = sprintf('H0_%s',FileName); load(filename);
-                            tfce_H0_score = limo_tfce(x,squeeze(H0_ess(:,:,2,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                            filename2 = sprintf('tfce_%s',filename); save ([filename2], 'tfce_H0_score'); clear H0_ess tfce_score
-                        end
-                    end
-                    
-                    % 2nd level
-                    nboot = 1000;
-                    if handles.LIMO.LIMO.Level == 2;
-                        if handles.bootstrap == 1 && ~exist(sprintf('H0%sH0_%s', filesep, FileName), 'file')
-                            if strncmp(FileName,'one_sample',10)
-                                load Yr; limo_random_robust(1,Yr,eval(FileName(28:end-4)),nboot,handles.tfce); clear Yr;
-                                LIMO.design.bootstrap = 1; save LIMO LIMO
-                            elseif strncmp(FileName,'two_samples',11)
-                                load Y1r; load Y2r; limo_random_robust(2,Y1r,Y2r,eval(FileName(29:end-4)),nboot,handles.tfce); clear Y1r Y2r;
-                                LIMO.design.bootstrap = 1; save LIMO LIMO
-                            elseif strncmp(FileName,'paired_samples',14)
-                                load Y1r; load Y2r; limo_random_robust(3,Y1r,Y2r,eval(FileName(32:end-4)),nboot,handles.tfce); clear Y1r Y2r;
-                                LIMO.design.bootstrap = 1; save LIMO LIMO
-                            elseif strncmp(FileName,'Repeated_measures',17)
-                                warndlg2('repeated measure ANOVA bootstrap is not availbale at this stage, please use the random effect GUI','action not performed')
-                            else
-                                if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency')
-                                    limo_eeg_tf(4);
-                                else
-                                    limo_eeg(4);
-                                end
-                            end
-                        end
-                        
-                        if handles.tfce == 1 && ~exist(sprintf('TFCE%stfce_%s', filesep, FileName), 'file') ...
-                                && exist(sprintf('H0%sH0_%s', filesep, FileName), 'file')
-                            mkdir tfce; load(FileName); load(sprintf('H0%sH0_%s', filesep, FileName));
-                            if strncmp(FileName,'one_sample',10)
-                                parameter = eval(FileName(28:end-4));
-                                tfce_name = sprintf('tfce_one_sample_ttest_parameter_%g',parameter);
-                                tfce_H0_name = sprintf('tfce_H0_one_sample_ttest_parameter_%g',parameter);
-                                if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency');
-                                    x = size(one_sample,1);
-                                    if x==1
-                                        x=2; LIMO.LIMO.data.neighbouring_matrix = [];
-                                    else
-                                        x=3;
-                                    end
-                                    tfce_one_sample = limo_tfce(x,squeeze(one_sample(:,:,:,4)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['tfce', filesep, tfce_name], 'tfce_one_sample'); clear tfce_one_sample;
-                                    tfce_H0_one_sample = limo_tfce(x,squeeze(H0_one_sample(:,:,:,1,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['H0', filesep, tfce_H0_name],'tfce_H0_one_sample'); clear tfce_H0_one_sample;
-                                else
-                                    x = size(one_sample,1); if x~=1; x=2; end
-                                    tfce_one_sample = limo_tfce(x,squeeze(one_sample(:,:,4)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['tfce', filesep, tfce_name], 'tfce_one_sample'); clear tfce_one_sample;
-                                    tfce_H0_one_sample = limo_tfce(x,squeeze(H0_one_sample(:,:,1,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['H0', filesep, tfce_H0_name],'tfce_H0_one_sample'); clear tfce_H0_one_sample;
-                                end
-                            elseif strncmp(FileName,'two_samples',11)
-                                parameter = eval(FileName(29:end-4));
-                                tfce_name = sprintf('tfce_two_samples_ttest_parameter_%g',parameter);
-                                tfce_H0_name = sprintf('tfce_H0_two_samples_ttest_parameter_%g',parameter);
-                                if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency');
-                                    x = size(one_sample,1);
-                                    if x==1
-                                        x=2; LIMO.LIMO.data.neighbouring_matrix = [];
-                                    else
-                                        x=3;
-                                    end
-                                    tfce_two_samples = limo_tfce(x,squeeze(two_samples(:,:,:,4)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['tfce', filesep, tfce_name], 'tfce_two_samples'); clear tfce_two_samples;
-                                    tfce_H0_two_samples = limo_tfce(x,squeeze(H0_two_samples(:,:,:,1,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['H0', filesep, tfce_H0_name],'tfce_H0_two_samples'); clear tfce_H0_two_samples;
-                                else
-                                    x = size(two_samples,1); if x~=1; x=2; end
-                                    tfce_two_samples = limo_tfce(x,squeeze(two_samples(:,:,4)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['tfce', filesep, tfce_name], 'tfce_two_samples'); clear tfce_two_samples;
-                                    tfce_H0_two_samples = limo_tfce(x,squeeze(H0_two_samples(:,:,1,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['H0', filesep, tfce_H0_name],'tfce_H0_two_samples'); clear tfce_H0_two_samples;
-                                end
-                            elseif strncmp(FileName,'paired_samples',14)
-                                parameter = eval(FileName(32:end-4));
-                                tfce_name = sprintf('tfce_paired_samples_ttest_parameter_%g',parameter);
-                                tfce_H0_name = sprintf('tfce_H0_paired_samples_ttest_parameter_%g',parameter);
-                                if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency')
-                                    x = size(one_sample,1);
-                                    if x==1
-                                        x=2; LIMO.LIMO.data.neighbouring_matrix = [];
-                                    else
-                                        x=3;
-                                    end
-                                    tfce_paired_samples = limo_tfce(x,squeeze(paired_samples(:,:,:,4)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['tfce', filesep, tfce_name], 'tfce_paired_samples'); clear tfce_paired_samples;
-                                    tfce_H0_paired_samples = limo_tfce(x,squeeze(H0_paired_samples(:,:,:,1,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['H0', filesep, tfce_H0_name],'tfce_H0_paired_samples'); clear tfce_H0_paired_samples;
-                                else
-                                    x = size(paired_samples,1); if x~=1; x=2; end
-                                    tfce_paired_samples = limo_tfce(x,squeeze(paired_samples(:,:,4)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['tfce', filesep, tfce_name], 'tfce_paired_samples'); clear tfce_paired_samples;
-                                    tfce_H0_paired_samples = limo_tfce(x,squeeze(H0_paired_samples(:,:,1,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
-                                    save(['H0', filesep, tfce_H0_name],'tfce_H0_paired_samples'); clear tfce_H0_paired_samples;
-                                end
-                            elseif strncmp(FileName,'Repeated_measures',17)
-                                msgbox('repeated measure ANOVA tfce is not availbale at this stage, please use the random effect GUI','action not performed','warn')
-                            else
-                                if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency')
-                                    limo_eeg_tf(4);
-                                else
-                                    limo_eeg(4);
-                                end
-                            end
-                        end
-                    end
-                    
-                    % do the figure
-                    % -------------
-                    limo_display_results(1,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO);
-                    cd(handles.dir);
+            % --- Data ---
+            if flagdataval == 1
+                % Level 1
+                if levelval == 1
+                    if plottypeval ~= 3
+                        std_limoresults(obj.study,'plottype',plottypeval,'flagdata',flagdataval,'measure',measure_val,'level',1,'subjindx',subjindxval,'regressor',obj.cat_indx(get(obj.gui_h.popupmenu_modelvar2plot,'value')));
                     else
-                        eeglab_warning('Under construction');            
+                        std_limoresults(obj.study,'plottype',3,'flagdata',flagdataval,'measure',measure_val,'level',1,'subjindx',subjindxval,'regressor',obj.cat_indx(get(obj.gui_h.popupmenu_modelvar2plot,'value')),'chanindx',chanindxval);
                     end
+                    % Level 2
+                else
+                    fprintf('Under construction');
                     
-                % --------------------------------------------------------
-                %             TOPOPLOT (SCALP MAPS)
-                % --------------------------------------------------------
-                case 2
-                    if flag_DataResult == 2
-                        handles.LIMO = load(fullfile(PathName,'LIMO.mat')); % eeglab mod
-                        limo_display_results(2,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO);
-                        cd(handles.dir);
+                end
+            % --- Results ---
+            else
+                % Level 1
+                if levelval == 1
+                    if plottypeval ~= 3
+                    std_limoresults(obj.study,'plottype',plottypeval,'flagdata',0,'measure',measure_val,'level',1,'subjindx',subjindxval,'testindx',testindxval);
                     else
-                        eeglab_warning('Under construction');
+                        std_limoresults(obj.study,'plottype',3,'flagdata',0,'measure',measure_val,'level',1,'subjindx',subjindxval,'regressor',obj.reg_indx(get(obj.gui_h.popupmenu_modelvar2plot,'value')),'chanindx',chanindxval);
                     end
-
-                % --------------------------------------------------------
-                %             COURSE PLOT (TIME COURSE)
-                % --------------------------------------------------------    
-                case 3
-                    % --- EEGLAB ADDED ---
-                    FileName = 'LIMO.mat';
-                    
-                    % Getting Channels
-                    selected_chan = get(obj.gui_h.listbox_elect2plot,'Value')-1;
-                    
-                    % Getting Regressor
-                    selected_reg = get(obj.gui_h.popupmenu_modelvar2plot,'Value');
-                    %---------------------
-                    cd(PathName);
-                    try
-                        handles.LIMO = load('LIMO.mat');
-                        if strncmp(handles.LIMO.LIMO.design.name,'one sample',9)
-                            files = dir('*.mat');
-                            for i=1:length(files)
-                                if strncmp(files(i).name,'one_sample',10)
-                                    FileName = files(i).name;
-                                end
-                            end
-                        elseif strncmp(handles.LIMO.LIMO.design.name,'two samples',9)
-                            files = dir('*.mat');
-                            for i=1:length(files)
-                                if strncmp(files(i).name,'two_samples',11)
-                                    FileName = files(i).name;
-                                end
-                            end
-                        elseif strncmp(handles.LIMO.LIMO.design.name,'paired t-test',12)
-                            files = dir('*.mat');
-                            for i=1:length(files)
-                                if strncmp(files(i).name,'paired_sample',13)
-                                    FileName = files(i).name;
-                                end
-                            end
-                        elseif strncmp(handles.LIMO.LIMO.design.name,'Repeated measures ANOVA',22)
-                            if handles.LIMO.LIMO.design.nb_conditions == 1 &&  length(handles.LIMO.LIMO.design.repeated_measure) == 1
-                                FileName = 'Rep_ANOVA_Factor_1.mat';
-                            else
-                                [FileName,PathName,FilterIndex]=uigetfile('*.mat','Which Effect to plot?');
-                            end
-                        end
                         
-                    catch
-                        LIMO = []; handles.LIMO = LIMO;
+                % Level 2
+                else 
+                    if plottypeval ~= 3
+                    std_limoresults(obj.study,'plottype',plottypeval,'flagdata',0,'measure',measure_val,'level',2,'testindx',testindxval);   
+                    else
+                        std_limoresults(obj.study,'plottype',3,'flagdata',0,'measure',measure_val,'level',2,'testindx',testindxval,'chanindx',chanindxval);  
                     end
-                    if flag_DataResult == 1 && level ~= 1
-                        limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)}, 'regressor',obj.cat_indx(selected_reg),'plot3type','Original');
-                    elseif flag_DataResult == 2 && level ~= 1
-                        plot3type_val = questdlg('Plotting ERP','ERP Options','Modelled','Adjusted','Adjusted');
-                        limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)}, 'regressor',obj.reg_indx(selected_reg),'plot3type',plot3type_val);
-                    elseif level == 1
-                        limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)});
-                    end
-                    cd(handles.dir);
-                    
-                % --------------------------------------------------------
-                %             FrequenciesTime/Freq Plane
-                % --------------------------------------------------------     
-                case 4
-                    fprintf(2,'Still working on this......\n');
+                end
             end
         end
-        
         % =================================================================
         function obj = callback_pushbutton_designadd(obj,~,~)
             val_level  = get( obj.gui_h.popupmenu_level        ,'Value');
@@ -861,12 +647,12 @@ if ~logical(sum(measure_flag))
 else
     tmp = find(measure_flag);
     measure2plot_indx = tmp(1); % With this we are forcing to pick the first measure available
-    [var2plot_list] = getmeasures2plot(STUDY,1,measure2plot_indx,datorica);
-    
+    [var2plot] = getmeasures2plot(STUDY,1,measure2plot_indx,datorica);
+    var2plot_list = var2plot.guiname;
     % Getting index of  'Condition_effect_1.mat' for default value
-    var2plot_indx = find(strcmp(var2plot_list,'Condition_effect_1.mat'), 1);
+    var2plot_indx = find(strcmp(var2plot.guiname,'Condition_effect_1'), 1);
     if isempty(var2plot_indx)
-        var2plot_indx = find(strcmp(var2plot_list,'Covariate_effect_1.mat'),1);
+        var2plot_indx = find(strcmp(var2plot.guiname,'Covariate_effect_1'),1);
     end
 end
 
@@ -1055,16 +841,16 @@ handles.pushbutton_designadd = uicontrol('parent',handles.panel_1,...
 end
 
 %% =================================================================
-function [var2plot_list,filespath,limoindx] = getmeasures2plot(STUDY,subjN,measureindx,datoricaindx)
+function [var2plot,filespath,limoindx] = getmeasures2plot(STUDY,subjN,measureindx,datoricaindx)
 
 % measureindx  is the index to {'erp','spec'}
 % datoricaindx is the index to {'dat', 'ica'}
 
 % Init
-filespath = '';
-var2plot_list = {'No Variables Computed'};
-measure_list  = {'erp','spec'};
-datorica_list = {'dat', 'ica'};
+filespath = [];
+var2plot.guiname{1}  = {'No Variables Computed'};
+measure_list         = {'erp','spec'};
+datorica_list        = {'dat', 'ica'};
 
 requested_datatype = [datorica_list{datoricaindx} measure_list{measureindx}];
 measures_computed  = {STUDY.design(STUDY.currentdesign).limo.datatype};
@@ -1079,27 +865,12 @@ if ~logical(sum(measure_flag))
     eeglab_warning('No results have been found for this subject');
 end
 if ismember(requested_datatype,measures_computed)
-    
     limoindx  = find(strcmp(requested_datatype,measures_computed));
-    filespath = STUDY.design(STUDY.currentdesign).limo(limoindx).foldername{subjN};
-    
     % Generating list
     %----------------
-    
-    tmp = dir(filespath);
-    if ~isempty({tmp.name})
-        var2plot_list        = {tmp.name}';
-        
-        % Cleaning out the list
-        %----------------------
-        list2cleanout = {'Betas.mat','LIMO.mat','Yr.mat','Yhat.mat','Res.mat','.','..'};
-        for i = 1:length(list2cleanout)
-            ind2delete{i} = find(strcmp(var2plot_list,list2cleanout{i}));
-        end
-        nonemptyvals              = find(cellfun(@(x) ~isempty(x), ind2delete));
-        ind2delete                = [ind2delete{nonemptyvals}];
-        var2plot_list(ind2delete) = [];
-    end
+    var2plot.guiname  = (STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).guiname);
+    filespath         = STUDY.design(STUDY.currentdesign).limo(limoindx).basefolder_level1{subjN};
+    var2plot.pathname = (STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).filename);
 end
 end
 
