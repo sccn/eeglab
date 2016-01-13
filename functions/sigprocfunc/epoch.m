@@ -10,12 +10,12 @@
 %                3D array (chan, frames, epochs), epochs are extracted
 %                only if their time windows fall within existing 
 %                pre-existing epochs.
-%   events     - vector events (expressed in seconds or points)
-%   timelim    - [init end] in second or points centered
-%                on the events (i.e. [-1 2])
+%   events     - vector events (expressed in samples)
+%   timelim    - [init end] in second centered on the events (i.e. [-1 2])
 %
 % Optional inputs:
-%   'srate'      - sampling rate in Hz for events expressed in seconds
+%   'srate'      - sampling rate in Hz for events expressed in seconds.
+%                Required.
 %   'valuelim'   - [min max] data limits. If one positive value is given,
 %                the opposite value is used for lower bound. For example, 
 %                use [-50 50] to remove artifactual epoch. Default: none.
