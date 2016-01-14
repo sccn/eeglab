@@ -273,7 +273,7 @@ switch opt.plottype
                             save(['H0', filesep, tfce_H0_name],'tfce_H0_paired_samples'); clear tfce_H0_paired_samples;
                         end
                     elseif strncmp(FileName,'Repeated_measures',17)
-                        msgbox('repeated measure ANOVA tfce is not availbale at this stage, please use the random effect GUI','action not performed','warn')
+                        msgbox('repeated measure ANOVA tfce is not available at this stage, please use the random effect GUI','action not performed','warn')
                     else
                         if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency')
                             limo_eeg_tf(4);
