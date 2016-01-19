@@ -63,14 +63,14 @@ if nargin < 2
     return;
 end;
 
-if isstr(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}, 'datspec'))
+if isstr(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}, 'datspec') || strcmpi(varargin{1}, 'icaerp')|| strcmpi(varargin{1}, 'icaspec'))
     opt.measure  = varargin{1};
     opt.design   = varargin{2};
     opt.erase    = 'on';
     opt.method   = 'OSL';
 else
     opt = finputcheck( varargin, ...
-        { 'measure'        'string'  { 'daterp' 'datspec' } 'daterp'; ...
+        { 'measure'        'string'  { 'daterp' 'datspec' 'icaerp' 'icaspec'} 'daterp'; ...
           'method'         'string'  { 'OLS' 'WLS'        } 'OLS';
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
