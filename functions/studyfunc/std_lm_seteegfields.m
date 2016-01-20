@@ -149,7 +149,7 @@ end
 
 %% Components: update EEG.set file
 %  -------------------------------
-if strcmpi(opt.datatype,'ica')
+if strcmpi(opt.datatype,'components')
     if strcmp(opt.erp,'on')
         data = load('-mat',[name '.icaerp']);
         ALLEEG.etc.timeerp = data.times;
