@@ -1161,7 +1161,7 @@ function updatedipplot(fig)
    
    % middle of the brain
    % -------------------   
-   plotimgs( dat, [indx indy indz], dat.transform);
+   plotimgs( dat, [min(max([indx indy indz],1),size(dat.imgs)), dat.transform);
    %end;
    	
 % plot images (transmat is the uniform matrix MRI coords -> elec coords)
