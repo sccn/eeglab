@@ -222,7 +222,7 @@ if ~studywasempty
                 STUDY.design(inddes).variable(2).label = '';
                 STUDY.design(inddes).variable(2).value = [];
             end;
-            if ~isfield(STUDY.design(inddes), 'pairing')
+            if ~isfield(STUDY.design(inddes).variable, 'pairing')
                 STUDY.design(inddes).variable(1).pairing = 'on';
                 STUDY.design(inddes).variable(2).pairing = 'on';
             end;
