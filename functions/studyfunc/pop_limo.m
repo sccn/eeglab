@@ -33,16 +33,25 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY,com] = pop_limo(STUDY, ALLEEG, varargin)
+function [STUDY,com] = pop_limo(STUDY, ALLEEG, measureflag, varargin)
 
 if nargin < 2
     help pop_limo;
     return;
 end;
 com = '';
-if nargin < 3
+if strcmpi(measureflag,'dat')
+    measureflagindx = 1;
+elseif strcmpi(measureflag,'ica')
+    measureflagindx = 2;
+else
+    fprintf(2,'pop_limo error: Invalid '' measureflag '' input provided \n');
+    return;
+end
+    
+if nargin < 4
     dataMeasures = { 'ERP' 'Spectrum' };
-    fileMeasures = { 'daterp' 'datspec' };
+    fileMeasures = { 'daterp' 'datspec'; 'icaerp' 'icaspec' };
     methods      = { 'OLS' 'WLS' };
 
     uilist = { ...
@@ -63,7 +72,7 @@ if nargin < 3
                                             'title', 'LInear MOdeling of EEG data -- pop_limo()');
     if isempty(res), return; end;
     
-    options = { 'method' methods{res.method} 'measure' fileMeasures{res.measure} 'erase' fastif(res.erase, 'on', 'off') 'splitreg' 'off' };
+    options = { 'method' methods{res.method} 'measure' fileMeasures{measureflagindx,res.measure} 'erase' fastif(res.erase, 'on', 'off') 'splitreg' 'off' };
 else
     options = varargin;
 end;
