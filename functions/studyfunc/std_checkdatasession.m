@@ -64,8 +64,11 @@ end;
 try, g.session;    catch, g.session   = [];        end; % Index for sessions
 try, g.verbose;    catch, g.verbose    = 1;        end;   % By default verbose
 
-issession = ~(cellfun(@isempty, {STUDY.datasetinfo.session}));
-if sum(issession) == length(issession), return; end;
+isession = ~(cellfun(@isempty, {STUDY.datasetinfo.session}));
+if std(isession) == 0
+    flags = zeros(size(isession));
+    return; 
+end;
 
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
