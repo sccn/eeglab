@@ -58,6 +58,8 @@
 
 function [STUDY, LIMO_files] = std_limo(STUDY,ALLEEG,varargin)
 
+LIMO_files = [];
+
 if nargin < 2
     help std_limo;
     return;
@@ -82,6 +84,26 @@ end;
 Analysis     = opt.measure;
 design_index = opt.design;
 
+% Detecting type of analysis
+% -------------------------------------------------------------------------
+if strncmp(Analysis,'dat',3)
+    model.defaults.type = 'Channels';
+elseif strncmp(Analysis,'ica',3)
+    [STUDY,flags]=std_checkdatasession(STUDY,ALLEEG);
+    if sum(flags)>0
+        error('some subjects have data from different sessions - can''t do ICA');
+    end
+    model.defaults.type = 'Components';
+    model.defaults.icaclustering = 1;
+end
+
+% Checking if clusters
+% -------------------------------------------------------------------------
+if strcmp(model.defaults.type,'Components') && isempty(STUDY.cluster(1).child)
+    fprintf(2,'std_limo error: Unable to compute LIMO on unclustered component data \n');
+    return;
+end
+    
 % computing channel neighbox matrix
 % ---------------------------------
 if isfield(ALLEEG(1).chanlocs, 'theta')
@@ -89,6 +111,11 @@ if isfield(ALLEEG(1).chanlocs, 'theta')
         STUDY = pop_statparams(STUDY, 'default');
     end
     [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
+    if strcmp(model.defaults.type,'Components')
+        limostruct.channeighbstructmat = eye(size(STUDY.cluster(1).child,2));
+        limostruct.expected_chanlocs = limostruct.expected_chanlocs(1:size(STUDY.cluster(1).child,2));
+        model.defaults.chanlocs = limostruct.expected_chanlocs;
+    end
     limoChanlocs = fullfile(STUDY.filepath, 'limo_chanlocs_pval_correct.mat');
     save('-mat', limoChanlocs, '-struct', 'limostruct');
     fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoChanlocs);
@@ -125,18 +152,7 @@ for s = 1:nb_subjects
     order{s} = find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject}));
 end
 
-% Detecting type of analysis
-% -------------------------------------------------------------------------
-if strncmp(Analysis,'dat',3)
-    model.defaults.type = 'Channels';
-elseif strncmp(Analysis,'ica',3)
-    [STUDY,flags]=std_checkdatasession(STUDY,ALLEEG);
-    if sum(flags)>0
-        error('some subjects have data from different sessions - can''t do ICA');
-    end
-    model.defaults.type = 'Components';
-    model.defaults.icaclustering = 1;
-end
+
 
 % Cleaning old files from the current design (Cleaning ALL)
 % -------------------------------------------------------------------------
@@ -200,13 +216,24 @@ end
 
 % Check if the measures has been computed
 % -------------------------------------------------------------------------
+
 for nsubj = 1 : length(unique_subjects)
     inds     = find(strcmp(unique_subjects{nsubj},{STUDY.datasetinfo.subject}));
-    subjpath = fullfile(STUDY.datasetinfo(inds(1)).filepath, [unique_subjects{nsubj} '.' lower(Analysis)]);  % Check issue when relative path (remove comment)
+    
+    % Checking for relative path
+    pathtmp = STUDY.datasetinfo(inds(1)).filepath;
+    if strfind(pathtmp,'./')
+        study_fullpath = fullfile(STUDY.filepath,pathtmp(3:end));
+    else
+        study_fullpath = pathtmp;
+    end
+    %---
+    subjpath = fullfile(study_fullpath, [unique_subjects{nsubj} '.' lower(Analysis)]);  % Check issue when relative path (remove comment)
     if exist(subjpath,'file') ~= 2
         error('std_limo: Measures must be computed first');
     end
 end
+clear study_fullpath pathtmp;
  
 measureflags = struct('daterp','off',...
                      'datspec','off',...
@@ -238,12 +265,20 @@ for s = 1:nb_subjects
         index = STUDY.datasetinfo(order{s}).index;
         names{s} = STUDY.datasetinfo(order{s}).subject;
         
+        % Checking for relative path
+        pathtmp = ALLEEG(index).filepath;
+        if strfind(pathtmp,'./')
+            study_fullpath = fullfile(STUDY.filepath,pathtmp(3:end));
+        else
+            study_fullpath = pathtmp;
+        end
+        %---
+        
         % Creating fields for limo
         % ------------------------
         ALLEEG(index) = std_lm_seteegfields(STUDY,order{s},'datatype',model.defaults.type,'format', 'cell');
         
-        model.set_files{s} = fullfile(ALLEEG(index).filepath,ALLEEG(index).filename);
-        
+        model.set_files{s} = fullfile(study_fullpath,ALLEEG(index).filename);
     else
         index = [STUDY.datasetinfo(order{s}).index];
         tmp   = {STUDY.datasetinfo(order{s}).subject};
@@ -259,8 +294,17 @@ for s = 1:nb_subjects
             EEGTMP = std_lm_seteegfields(STUDY,index(sets),'datatype',model.defaults.type,'format', 'cell');
             ALLEEG = eeg_store(ALLEEG, EEGTMP, index(sets));
         end
- 
-        model.set_files{s} = [ALLEEG(index(1)).filepath filesep 'merged_datasets_design' num2str(design_index) '.set'];
+        
+        % Checking for relative path
+        pathtmp = ALLEEG(index(1)).filepath;
+        if strfind(pathtmp,'./')
+            study_fullpath = fullfile(STUDY.filepath,pathtmp(3:end));
+        else
+            study_fullpath = pathtmp;
+        end
+        %---
+        
+        model.set_files{s} = fullfile(study_fullpath , ['merged_datasets_design' num2str(design_index) '.set']);
         
         OUTEEG = pop_mergeset(ALLEEG,index,1);
         OUTEEG.filename = ['merged_datasets_design' num2str(design_index) '.set'];
@@ -531,6 +575,7 @@ folderpath = LIMO_files.LIMO;
 chanloc    = STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc ;
 
 filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                            ,'type'          ,model.defaults.type ...
                                                             ,'tfce'          ,tfceval...
                                                             ,'analysis_type' ,'fullchan'...
                                                             ,'parameters'    ,{[1:nparams]}...
@@ -553,11 +598,11 @@ for i = 1:size(ncomb,1)
     mkdir(LIMO_files.LIMO,tmpname);
     folderpath       = fullfile(LIMO_files.LIMO,tmpname);
     filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-                                                     ,'tfce'          ,tfceval...
-                                                     ,'analysis_type' ,'fullchan'...
-                                                     ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
-                                                     ,'limofiles'     ,limofiles...
-                                                     ,'folderpath'    ,folderpath);      
+                                                                        ,'tfce'          ,tfceval...
+                                                                        ,'analysis_type' ,'fullchan'...
+                                                                        ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
+                                                                        ,'limofiles'     ,limofiles...
+                                                                        ,'folderpath'    ,folderpath);      
     testype{end+1}      = 'p_ttest';
     testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
 end
