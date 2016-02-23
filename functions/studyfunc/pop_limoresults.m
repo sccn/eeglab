@@ -648,7 +648,11 @@ else
     tmp = find(measure_flag);
     measure2plot_indx = tmp(1); % With this we are forcing to pick the first measure available
     [var2plot] = getmeasures2plot(STUDY,1,measure2plot_indx,datorica);
-    var2plot_list = var2plot.guiname;
+    if ~iscell(var2plot)
+        var2plot_list = var2plot.guiname;
+    else
+        var2plot_list = var2plot;
+    end
     % Getting index of  'Condition_effect_1.mat' for default value
     var2plot_indx = find(strcmp(var2plot.guiname,'Condition_effect_1'), 1);
     if isempty(var2plot_indx)
@@ -848,7 +852,7 @@ function [var2plot,filespath,limoindx] = getmeasures2plot(STUDY,subjN,measureind
 
 % Init
 filespath = [];
-var2plot.guiname{1}  = {'No Variables Computed'};
+var2plot.guiname{1}  = 'No Variables Computed';
 measure_list         = {'erp','spec'};
 datorica_list        = {'dat', 'ica'};
 
