@@ -111,7 +111,7 @@ if isfield(ALLEEG(1).chanlocs, 'theta')
         STUDY = pop_statparams(STUDY, 'default');
     end
     [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-    if strcmp(model.defaults.type,'Components')
+    if strcmp(model.defaults.type,'Components') % CONSIDER REMOVE THIS
         limostruct.channeighbstructmat = eye(size(STUDY.cluster(1).child,2));
         limostruct.expected_chanlocs = limostruct.expected_chanlocs(1:size(STUDY.cluster(1).child,2));
         model.defaults.chanlocs = limostruct.expected_chanlocs;
@@ -265,20 +265,11 @@ for s = 1:nb_subjects
         index = STUDY.datasetinfo(order{s}).index;
         names{s} = STUDY.datasetinfo(order{s}).subject;
         
-        % Checking for relative path
-        pathtmp = ALLEEG(index).filepath;
-        if strfind(pathtmp,'./')
-            study_fullpath = fullfile(STUDY.filepath,pathtmp(3:end));
-        else
-            study_fullpath = pathtmp;
-        end
-        %---
-        
         % Creating fields for limo
         % ------------------------
         ALLEEG(index) = std_lm_seteegfields(STUDY,order{s},'datatype',model.defaults.type,'format', 'cell');
-        
-        model.set_files{s} = fullfile(study_fullpath,ALLEEG(index).filename);
+        file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
+        model.set_files{s} = fullfile(file_fullpath,ALLEEG(index).filename);
     else
         index = [STUDY.datasetinfo(order{s}).index];
         tmp   = {STUDY.datasetinfo(order{s}).subject};
@@ -295,16 +286,8 @@ for s = 1:nb_subjects
             ALLEEG = eeg_store(ALLEEG, EEGTMP, index(sets));
         end
         
-        % Checking for relative path
-        pathtmp = ALLEEG(index(1)).filepath;
-        if strfind(pathtmp,'./')
-            study_fullpath = fullfile(STUDY.filepath,pathtmp(3:end));
-        else
-            study_fullpath = pathtmp;
-        end
-        %---
-        
-        model.set_files{s} = fullfile(study_fullpath , ['merged_datasets_design' num2str(design_index) '.set']);
+        file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
+        model.set_files{s} = fullfile(file_fullpath , ['merged_datasets_design' num2str(design_index) '.set']);
         
         OUTEEG = pop_mergeset(ALLEEG,index,1);
         OUTEEG.filename = ['merged_datasets_design' num2str(design_index) '.set'];
@@ -325,33 +308,34 @@ for s = 1:nb_subjects
         
         % Filling fields
         if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
-            OUTEEG.etc.datafiles.daterp{1} = ALLEEG(index(1)).etc.datafiles.daterp;
+            OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
         end
         if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
-            OUTEEG.etc.datafiles.datspec{1} = ALLEEG(index(1)).etc.datafiles.datspec;
+            OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
         end
         if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
-            OUTEEG.etc.datafiles.datersp{1} = ALLEEG(index(1)).etc.datafiles.dattimef;
+            OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
         end
         if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
-            OUTEEG.etc.datafiles.datitc{1} = ALLEEG(index(1)).etc.datafiles.datitc;
+            OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
         end
         if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
-            OUTEEG.etc.datafiles.icaerp{1} = ALLEEG(index(1)).etc.datafiles.icaerp;
+            OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
         end
         if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
-            OUTEEG.etc.datafiles.icaspec{1} = ALLEEG(index(1)).etc.datafiles.icaspec;
+            OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
         end
         if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
-            OUTEEG.etc.datafiles.icaersp{1} = ALLEEG(index(1)).etc.datafiles.icatimef;
+            OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
         end
         if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
-            OUTEEG.etc.datafiles.icaitc{1} = ALLEEG(index(1)).etc.datafiles.icaitc;
+            OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
         end
         
+        filepath_tmp = rel2fullpath(STUDY.filepath,OUTEEG.filepath);
         % Save info
-        pop_saveset(OUTEEG, 'filename', OUTEEG.filename, 'filepath',OUTEEG.filepath,'savemode' ,'twofiles');
-        clear OUTEEG
+        pop_saveset(OUTEEG, 'filename', OUTEEG.filename, 'filepath',filepath_tmp,'savemode' ,'twofiles');
+        clear OUTEEG filepath_tmp
     end
     
     [catvar_matrix,tmp] = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cat'); clear tmp; %#ok<ASGLU>
@@ -482,7 +466,8 @@ STUDY.design_info = STUDY.design(design_index).variable;
 STUDY.design_index = design_index; % Limo batch have to be fixed to use the field STUDY.currentdesig
 STUDY.names = names;
 
-% contrast
+% Contrast
+% -------------------------------------------------------------------------
 if cont_var_flag && exist('categ','var')
     if strcmp(opt.splitreg,'on')
         limocontrast.mat = [zeros(1,max(categ)) ones(1,max(categ)) 0];
@@ -616,3 +601,27 @@ end
 
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
+end
+
+% -------------------------------------------------------------------------
+function file_fullpath = rel2fullpath(studypath,filepath)
+% Return full path if 'filepath' is a relative path. The output format will
+% fit the one of 'filepath'. That means that if 'filepath' is a cell array,
+% then the output will a cell array too, and the same if is a string.
+
+nit = 1; if iscell(filepath), nit = length(filepath);end
+
+for i = 1:nit
+    if iscell(filepath),pathtmp = filepath{i}; else pathtmp = filepath; end
+    if strfind(pathtmp(end),filesep), pathtmp = pathtmp(1:end-1); end % Getting rid of filesep at the end
+    if strfind(pathtmp,['.' filesep])
+        if iscell(filepath),
+            file_fullpath{i} = fullfile(studypath,pathtmp(3:end));
+        else
+            file_fullpath = fullfile(studypath,pathtmp(3:end));
+        end
+    else
+        file_fullpath = pathtmp;
+    end
+end
+end
