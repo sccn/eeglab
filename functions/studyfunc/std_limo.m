@@ -106,16 +106,11 @@ end
     
 % computing channel neighbox matrix
 % ---------------------------------
-if isfield(ALLEEG(1).chanlocs, 'theta')
+if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
     if  ~isfield(STUDY.etc,'statistic')
         STUDY = pop_statparams(STUDY, 'default');
     end
     [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-    if strcmp(model.defaults.type,'Components') % CONSIDER REMOVE THIS
-        limostruct.channeighbstructmat = eye(size(STUDY.cluster(1).child,2));
-        limostruct.expected_chanlocs = limostruct.expected_chanlocs(1:size(STUDY.cluster(1).child,2));
-        model.defaults.chanlocs = limostruct.expected_chanlocs;
-    end
     limoChanlocs = fullfile(STUDY.filepath, 'limo_chanlocs_pval_correct.mat');
     save('-mat', limoChanlocs, '-struct', 'limostruct');
     fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoChanlocs);
@@ -556,8 +551,6 @@ if exist('contvar','var'), nparams = nparams + size(contvar,2); end;
 foldername = [STUDY.filename(1:end-6) '_GLM' num2str(STUDY.currentdesign) '_' model.defaults.type '_' model.defaults.analysis '_'];
 nbootval   = 0;
 tfceval    = 0;
-folderpath = LIMO_files.LIMO;
-chanloc    = STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc ;
 
 filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
                                                             ,'type'          ,model.defaults.type ...
@@ -602,7 +595,7 @@ end
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
 end
-
+% -------------------------------------------------------------------------
 % -------------------------------------------------------------------------
 function file_fullpath = rel2fullpath(studypath,filepath)
 % Return full path if 'filepath' is a relative path. The output format will
