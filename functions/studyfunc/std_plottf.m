@@ -229,8 +229,8 @@ for c = 1:nc
                 else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
                 end;
             end;
-            if ~isempty(opt.events)
-                 tmpevents = mean(opt.events{c,g},2);
+            if ~isempty(opt.events{g,c}{1}) % NEED FIXING HERE // WARNING INVERTED c and g
+                 tmpevents = mean(opt.events{g,c},2);
             else tmpevents = [];
             end;
             tftopo( tmpplot, timevals, freqs, 'events', tmpevents, 'title', opt.titles{c,g}, options{:}); 
