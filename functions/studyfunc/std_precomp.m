@@ -52,24 +52,11 @@
 %                  single-trial statistics.
 %  'customfunc'  - [function_handle] execute a specific function on each
 %                  EEGLAB dataset of the selected STUDY design. The fist 
-%                  argument to the function is an EEGLAB dataset. Example is 
-%                  @(EEG)mean(EEG.data,3)
-%                  This will compute the ERP for the STUDY design. EEG is the
-%                  EEGLAB dataset corresponding to each cell design. It
-%                  corresponds to a dataset computed dynamically based on
-%                  the design selection. If 'rmclust', 'rmicacomps' or 'interp'
-%                  are being used, the channel data is affected
-%                  accordingly. Anonymous and non-anonymous functions may be 
-%                  used. The output is returned in CustomRes or saved on
-%                  disk. The output of the custom function may be an numerical 
-%                  array or a structure.
+%                  argument to the function is an EEGLAB dataset. The
+%                  function take the same list of argument as the std_erp
+%                  function. Note that the data is only returned in the
+%                  output of this function and is not saved in a data file.
 %  'customparams' - [cell array] Parameters for the custom function above.
-%  'customfileext' - [string] file extension for saving custom data. Use
-%                    function to read custom data. If left empty, the
-%                    result is returned in the customRes output. Note that
-%                    if the custom function does not return a structure,
-%                    the data is automatically saved in a variable named
-%                    'data'.
 %  'customclusters' - [integer array] load only specific clusters. This is
 %                    used with SIFT. chanorcomp 3rd input must be 'components'.
 % 
@@ -165,6 +152,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
     if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end;
+    if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end;
     
     % union of all channel structures
     % -------------------------------
@@ -218,47 +206,25 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     % compute custom measure
     % ----------------------
     if ~isempty(g.customfunc)
-        nc = max(length(STUDY.design(g.design).variable(1).value),1);
-        ng = max(length(STUDY.design(g.design).variable(2).value),1);
-        allinds = curstruct(1).allinds; % same for all channels and components (see std_selectdesign)
-        setinds = curstruct(1).setinds; % same for all channels and components (see std_selectdesign)
-        if ~isempty(g.customclusters)
-            allinds = curstruct(g.customclusters).allinds; % same for all channels and components (see std_selectdesign)
-            setinds = curstruct(g.customclusters).setinds; % same for all channels and components (see std_selectdesign)
-        end;
-        
-        for cInd = 1:nc
-            for gInd = 1:ng
-                if ~isempty(setinds{cInd,gInd})
-                    desset = STUDY.design(g.design).cell(setinds{cInd,gInd}(:));
-                    for iDes = 1:length(desset)
-                        if strcmpi(computewhat, 'channels')
-                             [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset(iDes).dataset, g);
-                             TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', setinds{cInd,gInd}(iDes), opts{:}); % trial indices included in cell selection
-                        else TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', setinds{cInd,gInd}(iDes), 'cluster', g.customclusters);
-                        end;
-                        addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute }; % not currently used
-                        
-                        tmpData = feval(g.customfunc, TMPEEG, g.customparams{:});
-                        if isempty(g.customfileext)
-                            resTmp(:,:,iDes) = tmpData;
-                        else
-                            fileName = [ desset(iDes).filebase '.' g.customfileext ];
-                            clear data;
-                            data.data = tmpData;
-                            data.datafile   = computeFullFileName( { ALLEEG(desset(iDes).dataset).filepath }, { ALLEEG(desset(iDes).dataset).filename });
-                            data.datatrials = desset(iDes).trials;
-                            data.datatype = upper(g.customfileext);
-                            if ~isempty(g.customparams) data.parameters = g.customparams; end;
-                            std_savedat(fileName, data);
-                        end;
-                    end;
-                    if isempty(g.customfileext)
-                        customRes{cInd,gInd} = resTmp;
-                    end;
-                    clear resTmp;
+        allSubjects = { STUDY.datasetinfo.subject };
+        uniqueSubjects = unique(allSubjects);
+        for iSubj = 1:length(uniqueSubjects)
+            inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+            filepath = STUDY.datasetinfo(inds(1)).filepath;
+            filebase = fullfile(filepath, uniqueSubjects{iSubj});
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+            
+            addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo };
+            if strcmpi(computewhat, 'channels')
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+                tmpData = feval(g.customfunc, ALLEEG(inds),  'channels', tmpchanlist, opts{:}, addopts{:}, g.customparams{:});
+            else
+                if length(inds)>1 && ~isequal(chanlist{inds})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                 end;
+                tmpData = feval(g.customfunc, ALLEEG(inds), 'components', chanlist{inds(1)}, opts{:}, addopts{:}, g.customparams{:});
             end;
+            customRes{iSubj} = resTmp;
         end;
     end;
 
@@ -331,6 +297,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     % compute spectrum
     % ----------------
     if strcmpi(g.erpim, 'on')
+        
         % check dataset consistency
         % -------------------------
         allPnts = [ALLEEG(:).pnts];
@@ -339,54 +306,37 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
         end;
 
-        % check consistency with parameters on disk
-        % -----------------------------------------
-        guimode = 'guion';
-        tmpparams = {};
-        tmpparams = g.erpimparams;
-        if strcmpi(g.recompute, 'off')
-            for index = 1:length(STUDY.design(g.design).cell)
-                desset = STUDY.design(g.design).cell(index);
-                if strcmpi(computewhat, 'channels')
-                     filename = [ desset.filebase '.daterpim'];
-                else filename = [ desset.filebase '.icaerpim'];
-                end;
-                [guimode, g.erpimparams] = std_filecheck(filename, g.erpimparams, guimode, { 'fileout' 'recompute', 'channels', 'components', 'trialindices'});
-                if strcmpi(guimode, 'cancel'), return; end;
-            end;
-            if strcmpi(guimode, 'usedisk') || strcmpi(guimode, 'same'), g.recompute = 'off';
-            else                                                        g.recompute = 'on';
-            end;
-            if ~isempty(g.erpimparams) && isstruct(g.erpimparams)
-                tmpparams      = fieldnames(g.erpimparams); tmpparams = tmpparams';
-                tmpparams(2,:) = struct2cell(g.erpimparams);
-            end;
+        if isempty(g.erpimparams), 
+            tmpparams = {};
+        elseif iscell(g.erpimparams), 
+            tmpparams = g.erpimparams; 
+        else
+            tmpparams      = fieldnames(g.erpimparams); tmpparams = tmpparams';
+            tmpparams(2,:) = struct2cell(g.erpimparams);
         end;
         
-        % set parameters in ERPimage parameters
-        % -------------------------------------
-        STUDY = pop_erpimparams(STUDY, tmpparams{:}); % a little trashy as the function pop_erpimparams does not check the fields
-        
-        % compute ERPimages
-        % -----------------
-        for index = 1:length(STUDY.design(g.design).cell)
-            if ~isempty(g.cell)
-                 desset = STUDY.design(g.design).cell(g.cell);
-            else desset = STUDY.design(g.design).cell(index);
-            end;
-            addopts = { 'recompute', g.recompute, 'fileout', desset.filebase, 'trialindices', desset.trials };
+        % loop accross subjects
+        allSubjects = { STUDY.datasetinfo.subject };
+        uniqueSubjects = unique(allSubjects);
+        for iSubj = 1:length(uniqueSubjects)
+            inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+            filepath = STUDY.datasetinfo(inds(1)).filepath;
+            filebase = fullfile(filepath, uniqueSubjects{iSubj});
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+            
+            addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
             if strcmpi(computewhat, 'channels')
-                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
-                std_erpimage(ALLEEG(desset.dataset), 'channels', tmpchanlist, opts{:}, addopts{:}, tmpparams{:});
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+                std_erpimage(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
             else
-                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
-                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
+                if length(inds)>1 && ~isequal(chanlist{inds})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                 end;
-                std_erpimage(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, tmpparams{:});
+                std_erpimage(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
             end;
-            if ~isempty(g.cell), break; end;
         end;
-        if isfield(curstruct, 'erpimdata')
+        
+       if isfield(curstruct, 'erpimdata')
             curstruct = rmfield(curstruct, 'erpimdata');
             curstruct = rmfield(curstruct, 'erpimtimes');
             curstruct = rmfield(curstruct, 'erpimtrials');
