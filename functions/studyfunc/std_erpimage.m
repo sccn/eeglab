@@ -94,20 +94,24 @@ allerpimage = [];
     'sortwin'        ''           {}                    [];
     'sortfield'      ''           {}                    'latency';
     'concatenate'   'string'      { 'on','off' }        'off';
+    'trialinfo'     'struct'      []                    struct([]);
+    'savetrials'    'string'      { 'on','off' }        'on'; % obsolete (never used)
     'erpimageopt'   'cell'        {}                    {}}, ...
     'std_erpimage', 'ignore');
 if isstr(opt), error(opt); end;
 if length(EEG) == 1 && isempty(opt.trialindices), opt.trialindices = { [1:EEG.trials] }; end;
 if isempty(opt.trialindices), opt.trialindices = cell(length(EEG)); end;
 if ~iscell(opt.trialindices), opt.trialindices = { opt.trialindices }; end;
-if isfield(EEG,'icaweights')
-    numc = size(EEG(1).icaweights,1);
-else
-    error('EEG.icaweights not found');
-end
-if isempty(opt.components)
-    opt.components = 1:numc;
-end
+if isempty(opt.channels)
+    if isfield(EEG,'icaweights')
+        numc = size(EEG(1).icaweights,1);
+    else
+        error('EEG.icaweights not found');
+    end
+    if isempty(opt.components)
+        opt.components = 1:numc;
+    end
+end;
 
 % filename
 % --------
@@ -139,7 +143,7 @@ filename = filenameshort;
 % ERP information found in datasets
 % ---------------------------------
 if exist(filename) && strcmpi(opt.recompute, 'off')
-    fprintf('File "%s" found on disk, no need to recompute\n', filenameshort);
+    fprintf('Use existing file for ERSP: %s; check the ''recompute checkbox'' to force recomputing.\n', filenameshort);
     return;
 end
 
@@ -196,7 +200,7 @@ if strcmpi(opt.concatenate, 'off')
     end;
     
     clear tmperpimage eventvals;
-    parfor index = 1:size(X,1)
+    for index = 1:size(X,1)
         [tmpX tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
         if isempty(events), tmpevents = []; end;
         eventvals{index}   = tmpevents;
@@ -233,6 +237,7 @@ allerpimage.parameters  = varargin;
 allerpimage.datatype    = 'ERPIMAGE';
 allerpimage.datafiles   = computeFullFileName( { EEG.filepath }, { EEG.filename });
 allerpimage.datatrials  = opt.trialindices;
+allerpimage.trialinfo   = opt.trialinfo;
 
 % Save ERPimages in file (all components or channels)
 % ----------------------------------------------
