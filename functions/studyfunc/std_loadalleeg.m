@@ -86,6 +86,8 @@ function ALLEEG = std_loadalleeg(varargin)
             if paths{dset}(2) == ':' & ~strcmpi(comp(1:2), 'PC') 
                 paths{dset} = [ filesep paths{dset}(4:end) ];
                 paths{dset}(find(paths{dset} == '\')) = filesep;
+                oldgenpath = [ filesep oldgenpath(4:end) ];
+                oldgenpath(find(oldgenpath == '\')) = filesep;
             end;
         end;
         
@@ -101,7 +103,19 @@ function ALLEEG = std_loadalleeg(varargin)
             else
                 disp('Important warning: relative path cannot calculated, make sure the correct data files are loaded');
                 relativePath = char(paths{dset});
-            end;                
+            end;   
+            
+            % fix issue when datasets are in a parent folder of the STUDY
+            if dset == 1
+                indCommon = 1;
+                while indCommon <= length(oldgenpath) && indCommon <= length(paths{1}) && paths{1}(indCommon) == oldgenpath(indCommon)
+                    indCommon = indCommon+1;
+                end;
+                indCommon = indCommon-1;
+                if indCommon > 0
+                    genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
+                end;
+            end;
         else
             relativePath = char(paths{dset});
         end;
