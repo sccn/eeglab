@@ -91,6 +91,8 @@ function ALLEEG = std_loadalleeg(varargin)
             if paths{dset}(2) == ':' && ~strcmpi(comp(1:2), 'PC') 
                 paths{dset} = [ filesep paths{dset}(4:end) ];
                 paths{dset}(find(paths{dset} == '\')) = filesep;
+                oldgenpath = [ filesep oldgenpath(4:end) ];
+                oldgenpath(find(oldgenpath == '\')) = filesep;
             end;
         end;
         
@@ -118,7 +120,7 @@ function ALLEEG = std_loadalleeg(varargin)
                     indCommon = indCommon+1;
                 end;
                 indCommon = indCommon-1;
-                if indCommon > 1 % do not change path if nothing in common between the two paths
+                if indCommon > 0
                     genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
                 end;
             end;
