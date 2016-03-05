@@ -867,11 +867,11 @@ if nargin > 6
                 end;
             end;
         elseif strcmp(Arg,'noplot') % elseif strcmp(Arg,'NoShow') % by Luca & Ramon
-            NoShowVar = YES;
+            NoShow = YES;
             if a < nargin,
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     NoShowVar = YES; a = a+1;
-                elseif strcmpi(Arg, 'off'), NoShowVar = NO;  a = a+1;
+                if strcmpi(Arg, 'on'),     NoShow = YES; a = a+1;
+                elseif strcmpi(Arg, 'off'), NoShow = NO;  a = a+1;
                 end;
             end;
         elseif strcmpi(Arg,'replace_ties')
