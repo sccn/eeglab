@@ -185,7 +185,11 @@ end;
 
 TMP = STUDY.datasetinfo;
 STUDYTMP = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
-sameTrialInfo = isequal( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
+if ~isfield(STUDYTMP.datasetinfo, 'trialinfo')
+    sameTrialInfo = false;
+else
+    sameTrialInfo = isequal( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
+end;
 clear STUDYTMP;
 if ~sameTrialInfo
     disp('STUDY Warning: the trial information collected from datasets has changed; use STUDY menu to reconcile if necessary');
