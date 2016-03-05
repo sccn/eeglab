@@ -52,7 +52,8 @@
 %                  dataset given as input.
 %  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
 %                  space (dataset space on disk times 10) but allow for refined
-%                  single-trial statistics.
+%                  single-trial statistics. This option is obsolete as
+%                  trials are now always saved.
 %  'savefile'    - ['on'|'off'] save file or simply return measures.
 %                  Default is to save files ('on').
 %  'getparams'   - ['on'|'off'] return optional parameters for the newtimef 
@@ -176,7 +177,7 @@ end;
                         'timelimits'    'real'                  []          [EEG(1).xmin EEG(1).xmax]*1000;
                         'cycles'        'real'                  []          [3 .5];
                         'padratio'      'real'                  []          1;
-                         'trialinfo'    'struct'                []          struct([]);
+                        'trialinfo'     'struct'                []          struct([]);
                         'freqs'         'real'                  []          [0 EEG(1).srate/2];
                         'rmcomps'       'cell'                  []          cell(1,length(EEG));
                         'interp'        'struct'                { }         struct([]);
@@ -242,7 +243,7 @@ end
 % Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
 if exist( filenameersp ) & strcmpi(g.recompute, 'off')
-    fprintf('Use existing file for ERSP: %s\n', filenameersp);
+    fprintf('Use existing file for ERSP: %s; check the ''recompute checkbox'' to force recomputing.\n', filenameersp);
     return;
 end;
 
