@@ -179,139 +179,108 @@ for ind = 1:length(finalinds)
         else                   newstruct(ind) = tmpstruct;
         end;
     else
+        % reserve arrays
+        % --------------
+        events   = {};
+        %ersp     = cell( nc, ng );
+        %erspinds = cell( nc, ng );
+        
         % reading options
         % ---------------
         fprintf([ 'Reading ' dtype ' data...\n' ]);
-        if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
-        else                      opts = { 'freqlimits', opt.freqrange };
+        if ~strcmpi(dtype, 'erpim')
+            opts = { 'measure', 'timef' 'freqlimits', opt.freqrange }; % 'timelimits', opt.timerange, (time is selected later to allow for baseline removal)
+        else
+            opts = { 'measure', 'erpim' 'triallimits', opt.trialrange 'timerange' opt.timerange };
         end;
         
-        if strcmpi(dtype, 'erpim') % ERP images
+        % read the data and select channels
+        % ---------------------------------
+        if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
+        if isempty(subjectList), subjectList = STUDY.design(STUDY.currentdesign).cases.value; end;
+        count = 1;
+        for iSubj = length(subjectList):-1:1
+            datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
             
-            if strcmpi(opt.singletrials, 'on')
-                error( [ 'Single trial loading option not supported with STUDY ERP-image' 10 '(there is no such thing as a single-trial ERPimage)' ]);
-            end;
-            % read the data and select channels
-            % ---------------------------------
-            setinfo = STUDY.design(opt.design).cell;
-            erpim    = cell( nc, ng );
-            events   = cell( nc, ng );
-            for c = 1:nc
-                for g = 1:ng
-                    if ~isempty(setinds{c,g})
-                        if ~isempty(opt.channels), opts = { 'channels',    allChangrp(allinds{c,g}(:)), 'timelimits', opt.timerange, 'triallimits', opt.trialrange, 'concatenate', opt.concatenate };
-                        else                       opts = { 'components',  allinds{c,g}(:), 'timelimits', opt.timerange, 'triallimits', opt.trialrange, 'concatenate', opt.concatenate };
-                        end;
-                        [erpim{c, g} tmpparams alltimes alltrials events{c,g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erpim', opts{:});
-                        fprintf('.');
-                    end;
-                end;
-            end;
-            if strcmpi(opt.concatenate, 'on'), alltrials = []; end;
-            fprintf('\n');
-            ersp     = erpim;
-            allfreqs = alltrials;
-            
-        else % ERSP/ITC
-            
-            % reserve arrays
-            % --------------
-            events   = {};
-            %ersp     = cell( nc, ng );
-            %erspinds = cell( nc, ng );
-            
-            % reading options
-            % ---------------
-            fprintf([ 'Reading ' dtype ' data...\n' ]);
-            opts = { 'measure', 'timef' 'freqlimits', opt.freqrange }; % 'timelimits', opt.timerange, (time is selected later to allow for baseline removal)
-            
-            % read the data and select channels
-            % ---------------------------------
-            if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
-            if isempty(subjectList), subjectList = STUDY.design(STUDY.currentdesign).cases.value; end;
-            count = 1;
-            for iSubj = length(subjectList):-1:1
-                datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
-                fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} '.dattimef' ]);
-                
-                if ~isempty(opt.channels)
-                    [dataSubject{ iSubj } params xvals yvals events{ iSubj } ] = std_readfile( fileName,  'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels(ind));
-                else
-                    % find components for a given cluster and subject
-                    setInds = [];
-                    for iDat = 1:length(datInds), setInds = [setInds find(STUDY.cluster(finalinds(ind)).sets(1,:) == datInds(iDat))' ]; end;
-                    if ~isempty(opt.component), setInds = intersect(setInds, opt.component); end;
-                    for iComp = 1:length(setInds)
-                        comps = STUDY.cluster(finalinds(ind)).comps( setInds(iComp) );
-                        [dataSubject{ count } params xvals yvals events{ count } ] = std_readfile( fileName,  'designvar', bigstruct.design.variable, opts{:}, 'components', comps);
-                        count = count+1;
-                    end;
-                end;
-            end;
-            
-            % Issues
-            
-            % when reading the data, if we select a specific frequency range,
-            % this is going to change the baseline which is computed from
-            % the available visible baseline. 
-            
-            
-            % concatenate data - compute average if not dealing with (processing) single trials
-            % ---------------------------------------------------------------------------------
-            if strcmpi(opt.singletrials, 'off')
-                for iSubj = length(dataSubject(:)):-1:1
-                    for iCell = 1:length(dataSubject{1}(:))
-                        if isempty(dataSubject{ iSubj }{ iCell })
-                            error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
-                        end;
-                        tmpdat = callnewtimef(dataSubject{ iSubj }{ iCell }, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, params);
-                        if ~isreal(tmpdat(1,1)), tmpdat = abs(tmpdat); end;
-                        alldata{  iCell}(:,:,iSubj) = tmpdat;
-                        
-                        if ~isempty(events{iSubj}{iCell})
-                             allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
-                        else allevents{iCell} = [];
-                        end;
-                    end;
-                end;
+            if ~isempty(opt.channels)
+                fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} '.dat' fastif(strcmpi(dtype, 'erpim'), 'erpim', 'timef') ]);
+                [dataSubject{ iSubj } params xvals yvals events{ iSubj } ] = std_readfile( fileName,  'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels(ind));
             else
-                % calculate dimensions
-                alldim = zeros(size(dataSubject{1}));
-                for iSubj = length(subjectList):-1:1
-                    for iCell = 1:length(dataSubject{1}(:))
-                        alldim(iCell) = alldim(iCell)+size(dataSubject{ iSubj }{ iCell },3);
-                    end;
+                % find components for a given cluster and subject
+                fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} '.ica' fastif(strcmpi(dtype, 'erpim'), 'erpim', 'timef') ]);
+                setInds = [];
+                for iDat = 1:length(datInds), setInds = [setInds find(STUDY.cluster(finalinds(ind)).sets(1,:) == datInds(iDat))' ]; end;
+                if ~isempty(opt.component), setInds = intersect(setInds, opt.component); end;
+                for iComp = 1:length(setInds)
+                    comps = STUDY.cluster(finalinds(ind)).comps( setInds(iComp) );
+                    [dataSubject{ count } params xvals yvals events{ count } ] = std_readfile( fileName,  'designvar', bigstruct.design.variable, opts{:}, 'components', comps);
+                    count = count+1;
                 end;
-                % initialize arrays
+            end;
+        end;
+        
+        % Issues with ERSP
+        
+        % when reading the data, if we select a specific frequency range,
+        % this is going to change the baseline which is computed from
+        % the available visible baseline.
+        
+        
+        % concatenate data - compute average if not dealing with (processing) single trials
+        % ---------------------------------------------------------------------------------
+        if strcmpi(opt.singletrials, 'off')
+            for iSubj = length(dataSubject(:)):-1:1
                 for iCell = 1:length(dataSubject{1}(:))
-                    alldata{  iCell} = zeros(size(dataSubject{ 1 }{ 1 },1), size(dataSubject{ 1 }{ 1 },2), alldim(iCell));
-                    allevents{iCell} = zeros(size(events{      1 }{ 1 },1), alldim(iCell));
-                end;
-                % populate arrays
-                allcounts = zeros(size(dataSubject{1}));
-                for iSubj = length(subjectList):-1:1
-                    for iCell = 1:length(dataSubject{1}(:))
-                        cols = size(dataSubject{ iSubj }{ iCell },3);
-                        alldata{  iCell}(:,:,allcounts(iCell)+1:allcounts(iCell)+cols) = dataSubject{ iSubj }{ iCell };
-                        if ~isempty(events{iSubj}{iCell})
-                            allevents{iCell}(:,allcounts(iCell)+1:allcounts(iCell)+cols) = events{ iSubj }{ iCell };
-                        else allevents{iCell} = [];
-                        end;
-                        allcounts(iCell) = allcounts(iCell)+cols;
+                    if isempty(dataSubject{ iSubj }{ iCell })
+                        error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
+                    end;
+                    tmpdat = callnewtimef(dataSubject{ iSubj }{ iCell }, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, params);
+                    if ~isreal(tmpdat(1,1)), tmpdat = abs(tmpdat); end;
+                    alldata{  iCell}(:,:,iSubj) = tmpdat;
+                    
+                    if ~isempty(events{iSubj}{iCell})
+                        allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
+                    else allevents{iCell} = [];
                     end;
                 end;
             end;
-            alldata   = reshape(alldata  , size(dataSubject{1}));
-            allevents = reshape(allevents, size(events{1}));
-            
-            newstruct(ind).([ dtype 'data' ])   = alldata;
-            newstruct(ind).([ dtype 'vars' ])   = allevents;
-            newstruct(ind).([ dtype 'times' ])  = xvals;
-            newstruct(ind).([ dtype 'freqs' ])  = yvals;
-            newstruct(ind).([ dtype 'params' ]) = params;
-            STUDY.cache = eeg_cache(STUDY.cache, hashcode, newstruct(ind));
-
-         end;
+        else
+            % calculate dimensions
+            alldim = zeros(size(dataSubject{1}));
+            for iSubj = length(subjectList):-1:1
+                for iCell = 1:length(dataSubject{1}(:))
+                    alldim(iCell) = alldim(iCell)+size(dataSubject{ iSubj }{ iCell },3);
+                end;
+            end;
+            % initialize arrays
+            for iCell = 1:length(dataSubject{1}(:))
+                alldata{  iCell} = zeros(size(dataSubject{ 1 }{ 1 },1), size(dataSubject{ 1 }{ 1 },2), alldim(iCell));
+                allevents{iCell} = zeros(size(events{      1 }{ 1 },1), alldim(iCell));
+            end;
+            % populate arrays
+            allcounts = zeros(size(dataSubject{1}));
+            for iSubj = length(subjectList):-1:1
+                for iCell = 1:length(dataSubject{1}(:))
+                    cols = size(dataSubject{ iSubj }{ iCell },3);
+                    alldata{  iCell}(:,:,allcounts(iCell)+1:allcounts(iCell)+cols) = dataSubject{ iSubj }{ iCell };
+                    if ~isempty(events{iSubj}{iCell})
+                        allevents{iCell}(:,allcounts(iCell)+1:allcounts(iCell)+cols) = events{ iSubj }{ iCell };
+                    else allevents{iCell} = [];
+                    end;
+                    allcounts(iCell) = allcounts(iCell)+cols;
+                end;
+            end;
+        end;
+        alldata   = reshape(alldata  , size(dataSubject{1}));
+        allevents = reshape(allevents, size(events{1}));
+        
+        newstruct(ind).([ dtype 'data' ])   = alldata;
+        newstruct(ind).([ dtype 'vars' ])   = allevents;
+        newstruct(ind).([ dtype 'times' ])  = xvals;
+        newstruct(ind).([ dtype 'freqs' ])  = yvals;
+        newstruct(ind).([ dtype 'params' ]) = params;
+        STUDY.cache = eeg_cache(STUDY.cache, hashcode, newstruct(ind));
+        
     end;
 end;
 
