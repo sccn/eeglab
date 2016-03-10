@@ -83,9 +83,10 @@ end
 
 %% Loading datase
 %  --------------
-EEG = fullfile(STUDY.datasetinfo(index).filepath,STUDY.datasetinfo(index).filename);
+path_tmp = rel2fullpath(STUDY.filepath,STUDY.datasetinfo(index).filepath); 
+EEG = fullfile(path_tmp,STUDY.datasetinfo(index).filename);
 ALLEEG = pop_loadset(EEG);
-name = fullfile(STUDY.datasetinfo(index).filepath, STUDY.datasetinfo(index).subject);
+name = fullfile(path_tmp, STUDY.datasetinfo(index).subject);
 
 %% Channels: update EEG.set file
 %  -----------------------------
@@ -207,3 +208,28 @@ end
 %%
 EEG = ALLEEG; clear ALLEEG;
 pop_saveset(EEG, 'filename', EEG.filename, 'filepath',EEG.filepath,'savemode' ,'twofiles');
+end
+
+% -------------------------------------------------------------------------
+% -------------------------------------------------------------------------
+function file_fullpath = rel2fullpath(studypath,filepath)
+% Return full path if 'filepath' is a relative path. The output format will
+% fit the one of 'filepath'. That means that if 'filepath' is a cell array,
+% then the output will a cell array too, and the same if is a string.
+
+nit = 1; if iscell(filepath), nit = length(filepath);end
+
+for i = 1:nit
+    if iscell(filepath),pathtmp = filepath{i}; else pathtmp = filepath; end
+    if strfind(pathtmp(end),filesep), pathtmp = pathtmp(1:end-1); end % Getting rid of filesep at the end
+    if strfind(pathtmp,['.' filesep])
+        if iscell(filepath),
+            file_fullpath{i} = fullfile(studypath,pathtmp(3:end));
+        else
+            file_fullpath = fullfile(studypath,pathtmp(3:end));
+        end
+    else
+        file_fullpath = pathtmp;
+    end
+end
+end
