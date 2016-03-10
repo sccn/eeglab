@@ -147,8 +147,6 @@ for s = 1:nb_subjects
     order{s} = find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject}));
 end
 
-
-
 % Cleaning old files from the current design (Cleaning ALL)
 % -------------------------------------------------------------------------
 % NOTE: Clean up the .lock files to (to be implemented)
@@ -166,18 +164,16 @@ if strcmp(opt.erase,'on')
         end
     end
     
-   
-    
     % Cleaning level 2 folders
     if isfield(STUDY.design(design_index),'limo') && isfield(STUDY.design(design_index).limo,'groupmodel')
         for nlimos = 1:length(STUDY.design(design_index).limo)
             for ngroupmodel = 1:size(STUDY.design(design_index).limo(nlimos).groupmodel,2)
-                    path2file = fileparts(STUDY.design(design_index).limo(nlimos).groupmodel(ngroupmodel).filename);
-                    try
-                        rmdir(path2file,'s');
-                    catch
-                        fprintf(2,['Fail to remove. Folder ' path2file ' does not exist or has been removed\n']);
-                    end
+                path2file = fileparts(STUDY.design(design_index).limo(nlimos).groupmodel(ngroupmodel).filename);
+                try
+                    rmdir(path2file,'s');
+                catch
+                    fprintf(2,['Fail to remove. Folder ' path2file ' does not exist or has been removed\n']);
+                end
             end
             
         end
@@ -216,12 +212,7 @@ for nsubj = 1 : length(unique_subjects)
     inds     = find(strcmp(unique_subjects{nsubj},{STUDY.datasetinfo.subject}));
     
     % Checking for relative path
-    pathtmp = STUDY.datasetinfo(inds(1)).filepath;
-    if strfind(pathtmp,'./')
-        study_fullpath = fullfile(STUDY.filepath,pathtmp(3:end));
-    else
-        study_fullpath = pathtmp;
-    end
+    study_fullpath = rel2fullpath(STUDY.filepath,STUDY.datasetinfo(inds(1)).filepath);
     %---
     subjpath = fullfile(study_fullpath, [unique_subjects{nsubj} '.' lower(Analysis)]);  % Check issue when relative path (remove comment)
     if exist(subjpath,'file') ~= 2
@@ -364,8 +355,9 @@ for s = 1:nb_subjects
             end
             categ = sum(repmat([1:size(tmpX,2)],nb_row,1).*tmpX,2);
             clear x X tmpX; model.cat_files{s} = categ;
-        end      
-        save(fullfile(ALLEEG(index(1)).filepath, 'categorical_variable.txt'),'categ','-ascii')
+        end 
+        filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
+        save(fullfile(filepath_tmp, 'categorical_variable.txt'),'categ','-ascii');
     end
     
     % model.cont_files: a cell array of continuous variable files
@@ -576,6 +568,7 @@ for i = 1:size(ncomb,1)
     mkdir(LIMO_files.LIMO,tmpname);
     folderpath       = fullfile(LIMO_files.LIMO,tmpname);
     filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                                        ,'type'          ,model.defaults.type ...
                                                                         ,'tfce'          ,tfceval...
                                                                         ,'analysis_type' ,'fullchan'...
                                                                         ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
@@ -594,6 +587,7 @@ end
 
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
+cd(STUDY.filepath);
 end
 % -------------------------------------------------------------------------
 % -------------------------------------------------------------------------
