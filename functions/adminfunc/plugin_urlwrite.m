@@ -77,7 +77,10 @@ if isempty(urlConnection)
     else error(errorid,errormsg);
     end
 end
-urlConnection.setReadTimeout(5000); % timeout in 5 seconds
+
+pluginSize = 2*plugin_urlsize(urlChar)/1000000;
+timeOut = max(round(pluginSize*1000), 5000);
+urlConnection.setReadTimeout(timeOut); % timeout in 5 seconds
 
 % POST method.  Write param/values to server.
 if (nargin > 2) && strcmpi(method,'post')

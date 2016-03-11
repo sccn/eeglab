@@ -235,16 +235,22 @@ for iRow = 1:length(plugin)
                 res = questdlg2([ 'Extension ' plugin(iRow).foldername ' has been reactivated but' 10 'a new version is available. Do you want to install it?' ], 'Warning', 'No', 'Yes', 'Yes');
                 if strcmpi(res, 'yes')
                     plugin_deactivate(plugin(iRow).foldername);
-                    plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
-                    plugin_remove(plugin(iRow).foldername);
+                    if plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version) == -1
+                        plugin_reactivate(plugin(iRow).foldername);
+                    else
+                        plugin_remove(plugin(iRow).foldername);
+                    end;
                 end;
             end;
         else
             if plugin(iRow).installed
                 fprintf('Updating extension %s\n', plugin(iRow).name);
                 plugin_deactivate(plugin(iRow).foldername);
-                plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
-                plugin_remove(plugin(iRow).foldername);
+                if plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version) == -1
+                    plugin_reactivate(plugin(iRow).foldername);
+                else
+                    plugin_remove(plugin(iRow).foldername);
+                end;
             else
                 fprintf('Installing extension %s\n', plugin(iRow).name);
                 plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
