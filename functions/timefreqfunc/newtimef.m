@@ -1767,7 +1767,7 @@ switch lower(g.plotitc)
         %%%%%%%%%%%% Image the ITC %%%%%%%%%%%%%%%%%%
         %
         h(6) = axes('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
-        set(h(1), 'tag', 'itc');
+        if ishandle(h(1));set(h(1), 'tag', 'itc');end;
 
         if abs(R(1,1)-1) < 0.0001, g.plotphaseonly = 'on'; end;
         if strcmpi(g.plotphaseonly, 'on')
