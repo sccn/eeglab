@@ -9,20 +9,26 @@
 %  ALLEEG       - vector of loaded EEG datasets
 %
 % Optional inputs:
-%  'measure' - ['daterp'|'icaerp'|'datspec'|'icaspec'|'datersp'|'icaersp']
-%              measure to compute. Currently, only 'daterp' and
-%             'datspec' are supported. Default is 'daterp'.
-%  'method'  - ['OLS'|'WTS'] Ordinary Least Square (OLS) or Weighted Least
-%              Square (WTS). WTS should be used as it is more robust. It is
-%              slower though.
-%  'design'  - [integer] design index to process. Default is the current
-%              design stored in STUDY.currentdesign.
-%  'erase'   - ['on'|'off'] erase previous files. Default is 'on'.
-%  'neighboropt' - [cell] cell array of options for the function computing
-%              the channel neighbox matrix std_prepare_chanlocs(). The file
-%              is saved automatically if channel location are present.
-%              This option allows to overwrite the defaults when computing
-%              the channel neighbox matrix.
+%  'measure'      - ['daterp'|'icaerp'|'datspec'|'icaspec'|'datersp'|'icaersp']
+%                   measure to compute. Currently, only 'daterp' and
+%                   'datspec' are supported. Default is 'daterp'.
+%  'method'       - ['OLS'|'WTS'] Ordinary Least Square (OLS) or Weighted Least
+%                   Square (WTS). WTS should be used as it is more robust. It is
+%                   slower though.
+%  'design'       - [integer] design index to process. Default is the current
+%                   design stored in STUDY.currentdesign.
+%  'erase'        - ['on'|'off'] erase previous files. Default is 'on'.
+%  'neighboropt'  - [cell] cell array of options for the function computing
+%                   the channel neighbox matrix std_prepare_chanlocs(). The file
+%                   is saved automatically if channel location are present.
+%                   This option allows to overwrite the defaults when computing
+%                   the channel neighbox matrix.
+%   'chanloc'     - Channel location structure. Must be used with 'neighbormat', 
+%                   or it will be ignored. If this option is used, it will
+%                   ignore 'neighboropt' if used.
+%   'neighbormat' - Neighborhood matrix of electrodes. Must be used with 'chanloc', 
+%                   or it will be ignored. If this option is used, it will
+%                   ignore 'neighboropt' if used.
 %      
 % Outputs:
 %  STUDY     - modified STUDY structure (the STUDY.design now contains a list
@@ -73,16 +79,27 @@ if isstr(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}
 else
     opt = finputcheck( varargin, ...
         { 'measure'        'string'  { 'daterp' 'datspec' 'icaerp' 'icaspec'} 'daterp'; ...
-          'method'         'string'  { 'OLS' 'WLS'        } 'OLS';
+          'method'         'string'  { 'OLS' 'WLS' } 'OLS';
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
           'splitreg'       'string'  { 'on','off' }   'off';
-          'neighboropt'    'cell'    {}               {} }, ...
+          'neighboropt'    'cell'    {}               {} ;
+          'chanloc'        'struct'  {}               struct('no', {}); % default empty structure
+          'neighbormat'    'real'    []               [] },...
           'std_limo');
     if isstr(opt), error(opt); end;
 end;
 Analysis     = opt.measure;
 design_index = opt.design;
+
+% Make sure paths are ok for LIMO (Consider to move this to eeglab.m in a future)
+% -------------------------------------------------------------------------
+local_path = which('limo_eeg');
+root = fileparts(local_path);
+addpath([root filesep 'limo_cluster_functions']);
+addpath([root filesep 'external' filesep 'psom']);
+addpath([root filesep 'external']);
+addpath([root filesep 'help']);
 
 % Detecting type of analysis
 % -------------------------------------------------------------------------
@@ -106,18 +123,31 @@ end
     
 % computing channel neighbox matrix
 % ---------------------------------
-if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
-    if  ~isfield(STUDY.etc,'statistic')
-        STUDY = pop_statparams(STUDY, 'default');
-    end
-    [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-    limoChanlocs = fullfile(STUDY.filepath, 'limo_chanlocs_pval_correct.mat');
+flag_ok = 1;
+if isempty(opt.chanloc) && isempty(opt.neighbormat)
+    if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
+        if  ~isfield(STUDY.etc,'statistic')
+            STUDY = pop_statparams(STUDY, 'default');
+        end
+        [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
+        chanlocname = 'limo_chanlocs_pval_correct.mat';
+    else
+        disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
+        limoChanlocs = [];
+        flag_ok = 0;
+    end;
+else
+    limostruct.expected_chanlocs   = opt.chanloc;
+    limostruct.channeighbstructmat = opt.neighbormat;
+    chanlocname = 'limo_chanlocs.mat';
+end
+
+if flag_ok
+    limoChanlocs = fullfile(STUDY.filepath, chanlocname);
     save('-mat', limoChanlocs, '-struct', 'limostruct');
     fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoChanlocs);
-else
-    disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
-    limoChanlocs = [];
-end;
+end
+clear flag_ok tmp1 tmp2
 
 % 1st level analysis
 % -------------------------------------------------------------------------
@@ -257,6 +287,7 @@ for s = 1:nb_subjects
         file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
         model.set_files{s} = fullfile(file_fullpath,ALLEEG(index).filename);
     else
+        filename = ['merged_datasets_design' num2str(design_index) '.set'];
         index = [STUDY.datasetinfo(order{s}).index];
         tmp   = {STUDY.datasetinfo(order{s}).subject};
         if length(unique(tmp)) ~= 1
@@ -273,58 +304,60 @@ for s = 1:nb_subjects
         end
         
         file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
-        model.set_files{s} = fullfile(file_fullpath , ['merged_datasets_design' num2str(design_index) '.set']);
+        model.set_files{s} = fullfile(file_fullpath , filename);
         
-        OUTEEG = pop_mergeset(ALLEEG,index,1);
-        OUTEEG.filename = ['merged_datasets_design' num2str(design_index) '.set'];
-        OUTEEG.datfile = [];
-        
-        % update EEG.etc
-        OUTEEG.etc.merged{1} = ALLEEG(index(1)).filename;
-        
-        % Def fields
-        OUTEEG.etc.datafiles.daterp   = [];
-        OUTEEG.etc.datafiles.datspec  = [];
-        OUTEEG.etc.datafiles.dattimef = [];
-        OUTEEG.etc.datafiles.datitc   = [];
-        OUTEEG.etc.datafiles.icaerp   = [];
-        OUTEEG.etc.datafiles.icaspec  = [];
-        OUTEEG.etc.datafiles.icatimef = [];
-        OUTEEG.etc.datafiles.icaitc   = [];
-        
-        % Filling fields
-        if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
-            OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
+        if exist(file_fullpath) ~= 2
+            OUTEEG = pop_mergeset(ALLEEG,index,1);
+            OUTEEG.filename = filename;
+            OUTEEG.datfile = [];
+            
+            % update EEG.etc
+            OUTEEG.etc.merged{1} = ALLEEG(index(1)).filename;
+            
+            % Def fields
+            OUTEEG.etc.datafiles.daterp   = [];
+            OUTEEG.etc.datafiles.datspec  = [];
+            OUTEEG.etc.datafiles.dattimef = [];
+            OUTEEG.etc.datafiles.datitc   = [];
+            OUTEEG.etc.datafiles.icaerp   = [];
+            OUTEEG.etc.datafiles.icaspec  = [];
+            OUTEEG.etc.datafiles.icatimef = [];
+            OUTEEG.etc.datafiles.icaitc   = [];
+            
+            % Filling fields
+            if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
+                OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
+            end
+            if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
+                OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
+            end
+            if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
+                OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
+            end
+            if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
+                OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
+            end
+            if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
+                OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
+            end
+            if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
+                OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
+            end
+            if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
+                OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
+            end
+            if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
+                OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
+            end
+            
+            filepath_tmp = rel2fullpath(STUDY.filepath,OUTEEG.filepath);
+            % Save info
+            pop_saveset(OUTEEG, 'filename', OUTEEG.filename, 'filepath',filepath_tmp,'savemode' ,'twofiles');
+            clear OUTEEG filepath_tmp
         end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
-            OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
-            OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
-            OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
-            OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
-            OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
-            OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
-            OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
-        end
-        
-        filepath_tmp = rel2fullpath(STUDY.filepath,OUTEEG.filepath);
-        % Save info
-        pop_saveset(OUTEEG, 'filename', OUTEEG.filename, 'filepath',filepath_tmp,'savemode' ,'twofiles');
-        clear OUTEEG filepath_tmp
     end
     
-    [catvar_matrix,tmp] = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cat'); clear tmp; %#ok<ASGLU>
+    catvar_matrix = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cat');
 
     if ~isempty(catvar_matrix)
         if isvector(catvar_matrix) % only one factor of n conditions
@@ -347,14 +380,14 @@ for s = 1:nb_subjects
                 X = [X x];
             end
             
-            tmpX = limo_make_interactions(X, nb_col);
+            tmpX = limo_make_interactions(X, nb_col); dim_interactions(s) = size(tmpX,2);
             tmpX = tmpX(:,sum(nb_col)+1:end);
             getnan = find(isnan(catvar_matrix(:,1)));
             if ~isempty(getnan)
                 tmpX(getnan,:) = NaN;
             end
             categ = sum(repmat([1:size(tmpX,2)],nb_row,1).*tmpX,2);
-            clear x X tmpX; model.cat_files{s} = categ;
+            clear x X tmpX nb_col; model.cat_files{s} = categ;
         end 
         filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
         save(fullfile(filepath_tmp, 'categorical_variable.txt'),'categ','-ascii');
@@ -406,6 +439,10 @@ for s = 1:nb_subjects
             save([ALLEEG(index(1)).filepath filesep 'continuous_variable.txt'],'categ','-ascii')
         end
     end
+end
+
+if length(unique(dim_interactions)) ~= 1
+   error('Number of interactions are not the same. Check design');
 end
 
 model.set_files = model.set_files';
@@ -558,25 +595,25 @@ for i = 1: nparams
 testname{i,1}   = [testype{i} '_parameter' num2str(i)];
 end
 
-% 2- Computing Paired ttest for each combination of parameters
-ncomb        = combnk(1:nparams,2);
-limofiles{1} = LIMO_files.Beta;  
-limofiles{2} = LIMO_files.Beta; 
-
-for i = 1:size(ncomb,1)
-    tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
-    mkdir(LIMO_files.LIMO,tmpname);
-    folderpath       = fullfile(LIMO_files.LIMO,tmpname);
-    filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-                                                                        ,'type'          ,model.defaults.type ...
-                                                                        ,'tfce'          ,tfceval...
-                                                                        ,'analysis_type' ,'fullchan'...
-                                                                        ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
-                                                                        ,'limofiles'     ,limofiles...
-                                                                        ,'folderpath'    ,folderpath);      
-    testype{end+1}      = 'p_ttest';
-    testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
-end
+% % 2- Computing Paired ttest for each combination of parameters
+% ncomb        = combnk(1:nparams,2);
+% limofiles{1} = LIMO_files.Beta;  
+% limofiles{2} = LIMO_files.Beta; 
+% 
+% for i = 1:size(ncomb,1)
+%     tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
+%     mkdir(LIMO_files.LIMO,tmpname);
+%     folderpath       = fullfile(LIMO_files.LIMO,tmpname);
+%     filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+%                                                                         ,'type'          ,model.defaults.type ...
+%                                                                         ,'tfce'          ,tfceval...
+%                                                                         ,'analysis_type' ,'fullchan'...
+%                                                                         ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
+%                                                                         ,'limofiles'     ,limofiles...
+%                                                                         ,'folderpath'    ,folderpath);      
+%     testype{end+1}      = 'p_ttest';
+%     testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
+% end
 % Assigning Level 2 info to STUDY
 % STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
 
