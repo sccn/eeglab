@@ -27,10 +27,10 @@ classdef pop_limoresults < handle
             datorica_list = {'dat','ica'};
             obj.datorica_indx = find(strcmp(analysis,datorica_list));
            
-            obj.gui_h        = guibuilder(STUDY,analysis);
-            obj.string_mplot = get(obj.gui_h.popupmenu_measure2plot,'String'); 
-            obj.gui_h        = guihandles(obj.gui_h.fig);
-            obj.study        = STUDY;
+            [obj.gui_h,STUDY] = guibuilder(STUDY,analysis);
+            obj.string_mplot  = get(obj.gui_h.popupmenu_measure2plot,'String'); 
+            obj.gui_h         = guihandles(obj.gui_h.fig);
+            obj.study         = STUDY;
              
             level_tmp       = get(obj.gui_h.popupmenu_level         ,'Value');
             m2plot_tmp      = get(obj.gui_h.popupmenu_measure2plot  ,'Value');
@@ -224,7 +224,7 @@ classdef pop_limoresults < handle
             % Single subject level
             if val_level ~= 1
    
-                [var2plot,filespath] = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
+                [var2plot,filespath,tmp,obj.study] = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx,1);
                 
                 if strcmp(get(obj.gui_h.popupmenu_measure2plot,'String'),{' '})
                     set(obj.gui_h.popupmenu_measure2plot  ,'String', obj.string_mplot);
@@ -590,24 +590,28 @@ classdef pop_limoresults < handle
         end
         % =================================================================
         function obj = callback_pushbutton_designadd(obj,~,~)
+            clear -global LIMO;
+            
             val_level  = get( obj.gui_h.popupmenu_level        ,'Value');
             val_mplot  = get(obj.gui_h.popupmenu_measure2plot  ,'Value');
             stringtmp  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
-            
+            pwdtmp = pwd; 
             limo_contrast_manager(fullfile(obj.limofiles_path,'LIMO.mat'));
+            cd(pwdtmp);
             htmp = findall(0,'Type','Figure','Tag','figure_limo_contrast_manager');
             if ~isempty(htmp)
                 waitfor(htmp); clear htmp;
             end
             % Get new generated file and add it to the list as current
             % ---------------------------------------------------------
-            currentfiles = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
-            newfile = setdiff(currentfiles,stringtmp);
+            [currentfiles,tmp,tmp,STUDY] = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx,1);
+            obj.study = STUDY;
+            newfile = setdiff(currentfiles.guiname,stringtmp);
             if ~isempty(newfile)
-                stringtmp(end+1) = newfile;
-                set(obj.gui_h.popupmenu_modelvar2plot,'String',currentfiles);
-                set(obj.gui_h.popupmenu_modelvar2plot,'Value',length(currentfiles)-1);
-                obj.limofiles_filename = newfile{1};
+                %stringtmp(end+1) = newfile;
+                set(obj.gui_h.popupmenu_modelvar2plot,'String',currentfiles.guiname);
+                set(obj.gui_h.popupmenu_modelvar2plot,'Value',length(currentfiles.guiname));
+                %obj.limofiles_filename = newfile{1};
             else
                 set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
             end
@@ -616,7 +620,7 @@ classdef pop_limoresults < handle
 end
 % =================================================================
 %% =================================================================
-function handles = guibuilder(STUDY,analysis)
+function [handles,STUDY] = guibuilder(STUDY,analysis)
 
 % Create list "Level of Analysis" (Using First Subject)
 %--------------------------------------------------------------------------
@@ -647,7 +651,7 @@ if ~logical(sum(measure_flag))
 else
     tmp = find(measure_flag);
     measure2plot_indx = tmp(1); % With this we are forcing to pick the first measure available
-    [var2plot] = getmeasures2plot(STUDY,1,measure2plot_indx,datorica);
+    [var2plot,tmp,tmp,STUDY] = getmeasures2plot(STUDY,1,measure2plot_indx,datorica,1);
     if ~iscell(var2plot)
         var2plot_list = var2plot.guiname;
     else
@@ -845,7 +849,7 @@ handles.pushbutton_designadd = uicontrol('parent',handles.panel_1,...
 end
 
 %% =================================================================
-function [var2plot,filespath,limoindx] = getmeasures2plot(STUDY,subjN,measureindx,datoricaindx)
+function [var2plot,filespath,limoindx,STUDY] = getmeasures2plot(STUDY,subjN,measureindx,datoricaindx,checknewfile_flag)
 
 % measureindx  is the index to {'erp','spec'}
 % datoricaindx is the index to {'dat', 'ica'}
@@ -855,6 +859,7 @@ filespath = [];
 var2plot.guiname{1}  = 'No Variables Computed';
 measure_list         = {'erp','spec'};
 datorica_list        = {'dat', 'ica'};
+if ~exist('checknewfile_flag','var'), checknewfile_flag = 0; end;
 
 requested_datatype = [datorica_list{datoricaindx} measure_list{measureindx}];
 measures_computed  = {STUDY.design(STUDY.currentdesign).limo.datatype};
@@ -872,8 +877,36 @@ if ismember(requested_datatype,measures_computed)
     limoindx  = find(strcmp(requested_datatype,measures_computed));
     % Generating list
     %----------------
-    var2plot.guiname  = (STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).guiname);
     filespath         = STUDY.design(STUDY.currentdesign).limo(limoindx).basefolder_level1{subjN};
+    
+    if checknewfile_flag
+        tmp = dir(filespath);
+        if ~isempty({tmp.name})
+            var2plot_list        = {tmp.name}';
+            
+            % Cleaning out the list
+            %----------------------
+            list2cleanout = {'Betas.mat','LIMO.mat','Yr.mat','Yhat.mat','Res.mat','.','..'};
+            for i = 1:length(list2cleanout)
+                ind2delete{i} = find(strcmp(var2plot_list,list2cleanout{i}));
+            end
+            nonemptyvals              = find(cellfun(@(x) ~isempty(x), ind2delete));
+            ind2delete                = [ind2delete{nonemptyvals}];
+            var2plot_list(ind2delete) = [];
+            
+            %Update STUDY
+           
+            [newfiles, newfilesindx] = setdiff(cellfun(@(x) fullfile(filespath,x),var2plot_list,'UniformOutput', false),STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).filename);
+            if ~isempty(newfiles)
+                STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).guiname(newfilesindx) = cellfun(@(x) x(1:end-4),var2plot_list(newfilesindx),'UniformOutput', false);
+                STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).filename(newfilesindx) = cellfun(@(x) fullfile(filespath,x),var2plot_list(newfilesindx),'UniformOutput', false);
+                STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
+                display('pop_limoresults: New contrast files added to STUDY ');
+            end
+        end
+    end
+    
+    var2plot.guiname  = (STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).guiname);
     var2plot.pathname = (STUDY.design(STUDY.currentdesign).limo(limoindx).model(subjN).filename);
 end
 end
