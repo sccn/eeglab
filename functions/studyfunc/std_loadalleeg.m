@@ -71,7 +71,7 @@ function ALLEEG = std_loadalleeg(varargin)
             paths    = cell(size(datasets));
         end;
     end
-    
+   
     set = 1;
     ALLEEG = [];
     
@@ -79,6 +79,7 @@ function ALLEEG = std_loadalleeg(varargin)
     
     % read datasets
     % -------------
+    comp = computer;
     warnfold = 'off';
     if oldgenpath(2) == ':' & ~strcmpi(comp(1:2), 'PC')
         oldgenpath = [ filesep oldgenpath(4:end) ];
@@ -87,7 +88,6 @@ function ALLEEG = std_loadalleeg(varargin)
     
     for dset = 1:length(paths)
         if ~isempty(paths{dset})
-            comp = computer;
             if paths{dset}(2) == ':' & ~strcmpi(comp(1:2), 'PC') 
                 paths{dset} = [ filesep paths{dset}(4:end) ];
                 paths{dset}(find(paths{dset} == '\')) = filesep;
