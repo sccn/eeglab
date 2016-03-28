@@ -1,6 +1,8 @@
-function m = std_serialize(v)
-% Convert a MATLAB data structure into a compact byte vector.
-% Bytes = hlp_serialize(Data)
+% Convert a MATLAB data structure into a compact byte vector. This function
+% is identical to hlp_serialise (as of 2015). It bears a different name 
+% so as to avoid conflict.
+%
+% Bytes = std_serialize(Data)
 %
 % The original data structure can be recovered from the byte vector via hlp_deserialize.
 %
@@ -33,7 +35,7 @@ function m = std_serialize(v)
 %   hlp_deserialize
 % 
 % Examples:
-%   bytes = hlp_serialize(mydata);
+%   bytes = std_serialize(mydata);
 %   ... e.g. transfer the 'bytes' array over the network ...
 %   mydata = hlp_deserialize(bytes);
 %
@@ -42,6 +44,8 @@ function m = std_serialize(v)
 %
 %                                adapted from serialize.m
 %                                (C) 2010 Tim Hutt
+
+function m = std_serialize(v)
 
     % dispatch according to type
     if isnumeric(v) 
@@ -59,14 +63,14 @@ function m = std_serialize(v)
     elseif isobject(v)
         m = serialize_object(v);
     elseif isjava(v)
-        warn_once('hlp_serialize:cannot_serialize_java','Cannot properly serialize Java class %s; using a placeholder instead.',class(v));
-        m = serialize_string(['<<hlp_serialize: ' class(v) ' unsupported>>']);
+        warn_once('std_serialize:cannot_serialize_java','Cannot properly serialize Java class %s; using a placeholder instead.',class(v));
+        m = serialize_string(['<<std_serialize: ' class(v) ' unsupported>>']);
     else
         try
             m = serialize_object(v);
         catch
-            warn_once('hlp_serialize:unknown_type','Cannot properly serialize object of unknown type "%s"; using a placeholder instead.',class(v));
-            m = serialize_string(['<<hlp_serialize: ' class(v) ' unsupported>>']);
+            warn_once('std_serialize:unknown_type','Cannot properly serialize object of unknown type "%s"; using a placeholder instead.',class(v));
+            m = serialize_string(['<<std_serialize: ' class(v) ' unsupported>>']);
         end
     end
 end
@@ -149,7 +153,7 @@ end
 
 % Cell array of heterogenous contents
 function m = serialize_cell_heterogenous(v)
-    contents = cellfun(@hlp_serialize,v,'UniformOutput',false);
+    contents = cellfun(@std_serialize,v,'UniformOutput',false);
     m = [uint8(33); ndims(v); typecast(uint32(size(v)),'uint8').'; vertcat(contents{:})];
 end
 
@@ -214,7 +218,7 @@ function m = serialize_cell(v)
                 m = [uint8(37); class2tag(class(v{1})); ndims(v); typecast(uint32(size(v)),'uint8').'];
             elseif length(unique(cellfun(@class,v(:),'UniformOutput',false))) == 1
                 % of uniform class with prototype
-                m = [uint8(38); hlp_serialize(class(v{1})); ndims(v); typecast(uint32(size(v)),'uint8').'];
+                m = [uint8(38); std_serialize(class(v{1})); ndims(v); typecast(uint32(size(v)),'uint8').'];
             else
                 % of arbitrary classes
                 m = serialize_cell_heterogenous(v);
@@ -233,7 +237,7 @@ function m = serialize_object(v)
         conts = saveobj(v);
         if isstruct(conts) || iscell(conts) || isnumeric(conts) || ischar(conts) || islogical(conts) || isa(conts,'function_handle')
             % contents is something that we can readily serialize
-            conts = hlp_serialize(conts);
+            conts = std_serialize(conts);
         else
             % contents is still an object: turn into a struct now
             conts = serialize_struct(struct(conts));
@@ -289,7 +293,7 @@ function m = serialize_handle(v)
                     % these variables around (referenced by the function) just in case you refer to them.
                     % To avoid this, you can create the anonymous function instead in a sub-function 
                     % to which you only pass the variables that you actually need.
-                    warn_once('hlp_serialize:large_handle','The function handle with code %s references variables of more than 256k bytes; this is likely very slow.',rep.function); 
+                    warn_once('std_serialize:large_handle','The function handle with code %s references variables of more than 256k bytes; this is likely very slow.',rep.function); 
                 end
             else
                 % anonymous function: Tag, Code, and reduced workspace
@@ -303,8 +307,8 @@ function m = serialize_handle(v)
             % scoped function: Tag and Parentage
             m = [uint8(153); serialize_cell(rep.parentage)];
         otherwise
-            warn_once('hlp_serialize:unknown_handle_type','A function handle with unsupported type "%s" was encountered; using a placeholder instead.',rep.type); 
-            m = serialize_string(['<<hlp_serialize: function handle of type ' rep.type ' unsupported>>']);
+            warn_once('std_serialize:unknown_handle_type','A function handle with unsupported type "%s" was encountered; using a placeholder instead.',rep.type); 
+            m = serialize_string(['<<std_serialize: function handle of type ' rep.type ' unsupported>>']);
     end
 end
 
