@@ -81,7 +81,7 @@ function ALLEEG = std_loadalleeg(varargin)
     % -------------
     comp = computer;
     warnfold = 'off';
-    if length(oldgenpath) > 0 && oldgenpath(2) == ':' && ~strcmpi(comp(1:2), 'PC')
+    if ~isempty(oldgenpath) && oldgenpath(2) == ':' & ~strcmpi(comp(1:2), 'PC')
         oldgenpath = [ filesep oldgenpath(4:end) ];
         oldgenpath(find(oldgenpath == '\')) = filesep;
     end;
