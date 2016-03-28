@@ -47,9 +47,6 @@
 %                  For example, ICA component clusters containing
 %                  artifacts. This option is ignored when precomputing
 %                  measures for ICA clusters.
-%  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
-%                  space (dataset space on disk times 10) but allow for refined
-%                  single-trial statistics.
 %  'customfunc'  - [function_handle] execute a specific function on each
 %                  EEGLAB dataset of the selected STUDY design. The fist 
 %                  argument to the function is an EEGLAB dataset. The
@@ -60,6 +57,13 @@
 %  'customclusters' - [integer array] load only specific clusters. This is
 %                    used with SIFT. chanorcomp 3rd input must be 'components'.
 % 
+% Obsolete input:
+%  'savetrials'  - ['on'] save single-trials ERSP. Requires a lot of disk
+%                  space (dataset space on disk times 10) but allow for refined
+%                  single-trial statistics. This option is obsolete. As of
+%                  EEGLAB 14, measures can only be saved in single trial
+%                  mode.
+%
 % Outputs:
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified  
 %                  by adding preprocessing data as pointers to Matlab files that 
@@ -136,7 +140,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'scalp'       'string'  { 'on','off' }     'off';
                                 'allcomps'    'string'  { 'on','off' }     'off';
                                 'itc'         'string'  { 'on','off' }     'off';
-                                'savetrials'  'string'  { 'on','off' }     'off';
+                                'savetrials'  'string'  { 'on','off' }     'on'; % change for EEGLAB 14
                                 'rmicacomps'  'string'  { 'on','off','processica' }     'off';
                                 'cell'        'integer' []                 [];
                                 'design'      'integer' []                 STUDY.currentdesign;
