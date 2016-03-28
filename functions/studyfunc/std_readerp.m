@@ -187,6 +187,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
         % concatenate data - compute average if not dealing with (processing) single trials
         % ---------------------------------------------------------------------------------
         if strcmpi(opt.singletrials, 'off')
+            alldata = {};
             for iSubj = length(dataSubject(:)):-1:1
                 for iCell = 1:length(dataSubject{1}(:))
 %                     if isempty(dataSubject{ iSubj }{ iCell })
