@@ -441,7 +441,7 @@ for s = 1:nb_subjects
     end
 end
 
-if length(unique(dim_interactions)) ~= 1
+if exist('dim_interactions','var') == 1 && length(unique(dim_interactions)) ~= 1
    error('Number of interactions are not the same. Check design');
 end
 
