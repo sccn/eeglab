@@ -1,8 +1,8 @@
-% spectopo() - Plot the mean log spectrum of a set of data epochs at all channels 
-%              as a bundle of traces. At specified frequencies, plot the relative 
-%              topographic distribution of power. If available, uses pwelch() from 
-%              the Matlab signal processing toolbox, else the EEGLAB spec() function.
-%              Plots the mean spectrum for all of the supplied data, not just
+% spectopo() - Plot the power spectral density (PSD) of winsize length segments of data 
+%              epochs at all channels as a bundle of traces. At specified frequencies,
+%              plot the relative topographic distribution of PSD. If available, uses
+%              pwelch() from the Matlab signal processing toolbox, else the EEGLAB spec()
+%              function. Plots the mean spectrum for all of the supplied data, not just
 %              the pre-stimulus baseline.
 % Usage:
 %              >> spectopo(data, frames, srate);
@@ -18,8 +18,8 @@
 % Optional 'keyword',[argument] input pairs:
 %   'freq'     = [float vector (Hz)] vector of frequencies at which to plot power 
 %                scalp maps, or else a single frequency at which to plot component 
-%                contributions at a single channel (see also 'plotchan').
-%   'chanlocs' = [electrode locations filename or EEG.chanlocs structure]. 
+%                contributions at a single channel (see also 'plotchan')
+%   'chanlocs' = [electrode locations filename or EEG.chanlocs structure]
 %                    For format, see >> topoplot example
 %   'limits'   = [xmin xmax ymin ymax cmin cmax] axis limits. Sets x, y, and color 
 %                axis limits. May omit final values or use NaNs.
@@ -27,12 +27,12 @@
 %                Default color limits are symmetric around 0 and are different 
 %                for each scalp map {default|all NaN's: from the data limits}
 %   'title'    = [quoted string] plot title {default: none}
-%   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
-%   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
-%   'winsize'  = [integer] window size in data points {default: from data}
+%   'freqfac'  = [integer] ntimes to oversample (to adjust frequency resolution) {default: 1}
+%   'nfft'     = [integer] Data points to zero-pad data windows to (overwrites 'freqfac')
+%   'winsize'  = [integer] window size in data points {default: Sampling Rate}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
 %   'percent'  = [float 0 to 100] percent of the data to sample for computing the 
-%                spectra. Values < 100 speed up the computation. {default: 100}.
+%                spectra. Values < 100 speed up the computation. {default: 100}
 %   'freqrange' = [min max] frequency range to plot. Changes x-axis limits {default: 
 %                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
 %                power distribution maps are plotted, the highest mapped frequency 
@@ -98,6 +98,14 @@
 % Notes: The original input format is still functional for backward compatibility.
 %        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
 %
+% Non-backward compatible change (Nov 15 2015):
+%   Default winsize was set to the sampling rate (giving a default window
+%   length of 1 sec). Also, the y-axis label in the plot was corrected
+%   to read, "Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)' 
+%   Finally, when winsize is not a power of 2, it is no longer promoted to 
+%   the next higher power of 2. Thanks to Andreas Widmann for his comments.
+%  
+%
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
 %          SCCN/INC/UCSD, La Jolla, 3/01 
 %
@@ -136,7 +144,7 @@ function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,s
 
 icadefs;
 LOPLOTHZ = 1;  % low  Hz to plot
-FREQFAC  = 2;  % approximate frequencies/Hz (default)
+FREQFAC  = 1;  % approximate frequencies/Hz (default)
 allcolors = { [0 0.7500 0.7500] 
               [1 0 0] 
               [0 0.5000 0] 
@@ -542,7 +550,7 @@ if strcmpi(g.plot, 'on')
     xl=xlabel('Frequency (Hz)');
     set(xl,'fontsize',AXES_FONTSIZE_L);
     % yl=ylabel('Rel. Power (dB)');
-    yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
+    yl=ylabel('Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)');%yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
     set(yl,'fontsize',AXES_FONTSIZE_L);
     set(gca,'fontsize',AXES_FONTSIZE_L)
     box off;
@@ -859,21 +867,22 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	end;
 	%fftlength = 2^round(log(srate)/log(2))*g.freqfac;
 	if isempty(g.winsize)
-        winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
-        winlength = min(winlength, 512);
-        winlength = max(winlength, 256);
+%         winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
+%         winlength = min(winlength, 512);
+%         winlength = max(winlength, 256);
+        winlength = srate;
         winlength = min(winlength, frames);
     else
         winlength = g.winsize;
     end;
     if isempty(g.nfft)
-        fftlength = 2^(nextpow2(winlength))*g.freqfac;
+        %fftlength = 2^(nextpow2(winlength))*g.freqfac;
+        fftlength = winlength*g.freqfac;
 	else
         fftlength = g.nfft;
     end;
-%     usepwelch = 1; 
-    usepwelch = license('checkout','Signal_Toolbox'); % 5/22/2014 Ramon 
-%     if ~license('checkout','Signal_Toolbox'), 
+    
+    usepwelch = license('checkout','Signal_Toolbox');
     if ~usepwelch, 
         fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
         fprintf('function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');

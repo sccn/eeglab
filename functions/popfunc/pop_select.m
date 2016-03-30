@@ -603,9 +603,12 @@ else
 end;
 
 if ~isempty(EEG.icawinv)
-    EEG.icawinv = EEG.icawinv(icachans,:);
-    EEG.icaweights = pinv(EEG.icawinv);
-    EEG.icasphere  = eye(size(EEG.icaweights,2));
+    flag_rmchan = (length(icachans) ~= size(EEG.icawinv,1));
+    if  isempty(EEG.icaweights) || flag_rmchan
+        EEG.icawinv    = EEG.icawinv(icachans,:);
+        EEG.icaweights = pinv(EEG.icawinv);
+        EEG.icasphere  = eye(size(EEG.icaweights,2));
+    end
 end;
 if ~isempty(EEG.specicaact)
     if length(g.point) == EEG.pnts

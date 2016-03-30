@@ -78,8 +78,16 @@ end
 outlier_clust = std_findoutlierclust(STUDY,cls); %find the outlier cluster for this cluster
 if outlier_clust ~= 0
     ti = strfind(STUDY.cluster(outlier_clust).name, ' ');
-    clus_id = STUDY.cluster(outlier_clust).name(ti(end) + 1:end);
-    STUDY.cluster(outlier_clust).name = sprintf('Outliers %s %s', new_name, clus_id);     
+    clus_id = STUDY.cluster(outlier_clust).name(ti(end) + 1:end);    
+    % If the outlier has parent clusters, update the parent clusters with the 
+    % new cluster name of child cluster.
+    for k = 1:length(STUDY.cluster(outlier_clust).parent)
+        parent_cls = STUDY.cluster(outlier_clust).parent{k};
+        parent_id = find(strcmp({STUDY.cluster.name},parent_cls));
+        STUDY.cluster(parent_id).child{find(strcmp(STUDY.cluster(parent_id).child,STUDY.cluster(outlier_clust).name))} = sprintf('Outliers %s %s', new_name, clus_id);
+    end
+    
+    STUDY.cluster(outlier_clust).name = sprintf('Outliers %s %s', new_name, clus_id);
 end
 
 % Rename cluster

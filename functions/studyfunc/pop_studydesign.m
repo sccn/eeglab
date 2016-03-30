@@ -312,7 +312,7 @@ elseif isstr(STUDY)
             
         case 'selectfolder',
             res = uigetdir;
-            if ~isempty(findstr(filepath, res)) && findstr(filepath, res) == 1
+            if ~isempty(findstr(filepath, res)) && findstr(filepath, res) == 1 && ~isequal(filepath, res)
                 res = res(length(filepath)+2:end);
             end;
             if res(1) == 0, return; end;

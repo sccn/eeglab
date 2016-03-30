@@ -1765,7 +1765,7 @@ switch lower(g.plotitc)
         %%%%%%%%%%%% Image the ITC %%%%%%%%%%%%%%%%%%
         %
         h(6) = axes('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
-        set(h(1), 'tag', 'itc');
+        if ishandle(h(1));set(h(1), 'tag', 'itc');end;
 
         if abs(R(1,1)-1) < 0.0001, g.plotphaseonly = 'on'; end;
         if strcmpi(g.plotphaseonly, 'on')
@@ -1910,7 +1910,7 @@ switch lower(g.plotitc)
                 g.itcavglim = [ min(E)-max(E)/3 max(E)+max(E)/3];
             end;
         end;
-        if max(g.itcavglim) == 0        % toby 10.02.2006
+        if max(g.itcavglim) == 0 || any(isnan(g.itcavglim))
             g.itcavglim = [-1 1];
         end
         

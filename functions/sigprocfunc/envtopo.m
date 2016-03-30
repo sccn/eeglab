@@ -170,7 +170,6 @@ VERTWEIGHT = 2.0;  % lineweight of specified vertical lines
 LIMCONTRIBWEIGHT = 1.2; % lineweight of limonctrib vertical lines
 MAX_FRAMES = 10000; % maximum frames to plot
 MAXENVPLOTCHANS = 10;  
-myfig =gcf;         % remember the current figure (for Matlab 7.0.0 bug)
 xmin = 0; xmax = 0;
     
 if nargin < 2
@@ -190,6 +189,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'voffsets'      'real'     []                       [] ;
 				  'vert'          'real'     []                       [] ;
 				  'fillcomp'      'integer'  []                       0 ; 
+				  'figure'        'integer'  []                       [] ;                   
 				  'colorfile'     'string'   []                       '' ; 
 				  'colors'        'string'   []                       '' ;
 				  'compnums'      'integer'  []                       []; 
@@ -259,6 +259,7 @@ else % dprecated - old style input args
     g.envmode = 'avg';
     g.dispmaps = 'on';
 end;
+if ~isempty(g.figure), figure(g.figure); end;        % remember the current figure (for Matlab 7.0.0 bug)
 
 if ~isempty(g.pvaf) 
 	g.sortvar = g.pvaf; % leave deprecated g.pvaf behind. 
@@ -278,7 +279,7 @@ end
 if ndims(data) == 3
     data = mean(data,3); % average the data if 3-D
 end;
-[chans,frames] = size(data);
+[chans,frames] = size(data); 
 
 if frames > MAX_FRAMES
    error('number of data frames to plot too large!');
@@ -292,6 +293,19 @@ if isstr(g.chanlocs)
         chans);
         return
     end
+end
+% Checking dimension of chanlocs
+if length(g.chanlocs) > size(data,1)
+    fprintf(2,['\n envtopo warning: Dimensions of data to plot and channel location are not consistent\n' ...
+        '                 As a result, the plots generated can be WRONG\n'...
+        '                 If you are providing the path to your channel location file. Make sure\n'...
+        '                 to load the file first, and to provide as an input only the channels that\n'...
+        '                 correspond to the data to be plotted, otherwise just provide a valid chanlocs\n ']);
+elseif length(g.chanlocs) > size(data,1)
+        fprintf(2,['\n envtopo error: Dimensions of data to plot and channel location are not consistent\n' ...
+        '                 Check the dimension of the channel location provided\n'...
+        '                 Aborting plot ...\n']);
+    exit;
 end
 
 if ~isempty(g.colors)
@@ -442,7 +456,7 @@ end
 if isempty(g.voffsets) | ( size(g.voffsets) == [1,1] & g.voffsets(1) == 0 )
     g.voffsets = zeros(1,MAXTOPOS); 
 end
-if isempty(g.plotchans) | g.plotchans(1)==0 
+if isempty(g.plotchans) | g.plotchans(1)==0
     g.plotchans = 1:chans;
 end
 if max(g.plotchans) > chans | min(g.plotchans) < 1
@@ -1113,7 +1127,6 @@ if strcmpi(g.dispmaps, 'on')
         cla
         
         if ~isempty(g.chanlocs)  % plot the component scalp maps
-            figure(myfig);
             if ~isempty(varargin)
                 topoplot(maxproj(g.plotchans,t),g.chanlocs(g.plotchans), varargin{:});
             else  % if no varargin specified

@@ -55,6 +55,8 @@
 %    in your Matlab path. According to its authors, default parameters
 %    are not optimal: Try args 'approach', 'sym' to estimate components 
 %    in parallel.
+% 4) By default the function resaves the datasets when multiple datasets
+%    are processed.
 %
 % Outputs:
 %   OUT_EEG = The input EEGLAB dataset with new fields icaweights, icasphere 
@@ -226,6 +228,7 @@ end;
                             'dataset'        'integer' []        [1:length(ALLEEG)];
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on','off' }   'off';
+                            'resave'         'string'  { 'on','off' }   'on'; % hidden option (only valid when multiple datasets and concat mode)
                             'concatcond'     'string'  { 'on','off' }   'off';
                             'chanind'        { 'cell','integer' } { [] [] }        [];}, ...
                             'pop_runica', 'ignore');
@@ -237,6 +240,8 @@ if ~isempty(addoptions), g.options = { g.options{:} addoptions{:}}; end;
 if length(g.dataset) == 1
     EEG = ALLEEG(g.dataset);
     EEG = eeg_checkset(EEG, 'loaddata');
+    % continue after test
+    
 elseif length(ALLEEG) > 1 & ~strcmpi(g.concatenate, 'on') & ~strcmpi(g.concatcond, 'on')
     [ ALLEEG com ] = eeg_eval( 'pop_runica', ALLEEG, 'warning', 'off', 'params', ...
            { 'icatype' g.icatype 'options' g.options 'chanind' g.chanind } );
@@ -271,7 +276,7 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
     fprintf('**************************\nNOW RUNNING ALL DECOMPOSITIONS\n****************************\n');
     for index = 1:length(dats)
         ALLEEG(dats{index}) = pop_runica(ALLEEG(dats{index}), 'icatype', g.icatype, ...
-            'options', g.options, 'chanind', g.chanind, 'concatenate', 'on');
+            'options', g.options, 'chanind', g.chanind, 'concatenate', 'on', 'resave', 'off');
         for idat = 1:length(dats{index})
             ALLEEG(dats{index}(idat)).saved = 'no';
             pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
@@ -306,8 +311,22 @@ else
     EEG.trials = 1;
     EEG.pnts   = size(EEG.data,2);
     EEG.saved  = 'no';
+    
+    EEG = pop_runica(EEG, 'icatype', g.icatype, 'options', g.options, 'chanind', g.chanind);
+    
+    for idat = 1:length(ALLEEG)
+        ALLEEG(idat).saved = 'no';
+        ALLEEG(idat).icaweights = EEG.icaweights;
+        ALLEEG(idat).icasphere  = EEG.icasphere;
+        if strcmpi(g.resave, 'on')
+            pop_saveset(ALLEEG(idat), 'savemode', 'resave');
+            ALLEEG(idat).saved = 'yes';
+        end;
+    end;
+    return;
 end;    
 
+% below processing at most one dataset
 % Store and then remove current EEG ICA weights and sphere
 % ---------------------------------------------------
 fprintf('\n');
@@ -490,20 +509,10 @@ if isempty(EEG.icawinv)
     EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
 end;
 
-% copy back data to datasets if necessary
-% ---------------------------------------
-if length(g.dataset) > 1
-    for i = g.dataset
-        ALLEEG(i).icaweights = EEG.icaweights;
-        ALLEEG(i).icasphere  = EEG.icasphere;
-        ALLEEG(i).icawinv    = EEG.icawinv;
-        ALLEEG(i).icachansind = g.chanind;
-    end;            
-    ALLEEG = eeg_checkset(ALLEEG);
-else
-    EEG = eeg_checkset(EEG);
-    ALLEEG = eeg_store(ALLEEG, EEG, g.dataset);
-end;
+% copy back data to ALLEEG if necessary
+% -------------------------------------
+EEG = eeg_checkset(EEG);
+ALLEEG = eeg_store(ALLEEG, EEG, g.dataset);
 
 if nargin < 2 || selectamica
     com = sprintf('%s = pop_runica(%s, %s);', inputname(1), inputname(1),  vararg2str(g.options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );

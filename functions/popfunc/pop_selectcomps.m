@@ -89,7 +89,7 @@ end;
 % -----------------
 column =ceil(sqrt( length(compnum) ))+1;
 rows = ceil(length(compnum)/column);
-if ~exist('fig')
+if ~exist('fig','var')
 	figure('name', [ 'Reject components by map - pop_selectcomps() (dataset: ' EEG.setname ')'], 'tag', currentfigtag, ...
 		   'numbertitle', 'off', 'color', BACKCOLOR);
 	set(gcf,'MenuBar', 'none');
@@ -120,7 +120,7 @@ else
 end;
 count = 1;
 for ri = compnum
-	if exist('fig')
+	if exist('fig','var')
 		button = findobj('parent', fig, 'tag', ['comp' num2str(ri)]);
 		if isempty(button) 
 			error( 'pop_selectcomps(): figure does not contain the component button');
@@ -167,7 +167,7 @@ end;
 
 % draw the bottom button
 % ----------------------
-if ~exist('fig')
+if ~exist('fig','var')
     if ~strcmp(get(gcf, 'tag'), currentfigtag);
         figure(findobj('tag', currentfigtag));
     end

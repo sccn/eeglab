@@ -228,7 +228,7 @@ if popup
                         ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', ''' caption '''' ];
         else
             options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
-                       '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', [''IC '', num2str(num)]' ];
+                       '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', [''IC ' num2str(num) ''']' ];
       end;
     end;
     
@@ -295,8 +295,7 @@ if typeproc == 1
 	tmpsig = EEG.data(num,pointrange,:);
 else
 	if ~isempty( EEG.icasphere )
-        eeglab_options; % changed from eeglaboptions 3/30/02 -sm
- 	    if option_computeica  
+        if ~isempty(EEG.icaact)
     		tmpsig = EEG.icaact(num,pointrange,:);
  	    else
             tmpsig = (EEG.icaweights(num,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));

@@ -922,7 +922,8 @@ else
              end;
              EEG = eeg_checkset(EEG); % for channel orientation
          else
-             disp('Wrong channel structure size, changes ignored');
+             disp('Channel structure size not consistent with the data so changes will be ignored');
+             disp('Use the function pop_select(EEG, ''nochannel'', [x]); if you wish the remove data channels');
          end;
          chansout = EEG;
     else chansout = chans;

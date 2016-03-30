@@ -50,7 +50,7 @@
 
 function [EEG, com, b] = pop_firpm(EEG, varargin)
 
-    if exist('firpm', 'file') ~= 2
+    if ~(exist('firpm', 'file') == 2 || exist('firpm', 'file') == 6)
        error('Requires the signal processing toolbox.');
     end
 

@@ -142,10 +142,10 @@ end;
 if ~isempty(opt.colors), col = opt.colors; end;
 
 nonemptycell = find(~cellfun(@isempty, data));
-maxdim = max(length(data(:)), size(data{nonemptycell(1)}, ndims(data{nonemptycell(1)})));
+
 if strcmpi(opt.plotsubjects, 'off')
     
-    % both group and conditions together
+    % both group and conditions s
     if strcmpi(opt.plotconditions, 'together') && strcmpi(opt.plotgroups, 'together')
         dim1 = max(size(data));
         dim2 = min(size(data));
@@ -158,15 +158,25 @@ if strcmpi(opt.plotsubjects, 'off')
         end;
         if size(coldata,1) ~= size(data,1), coldata = coldata'; end;
     else
-        coldata = manycol';
+        coldata = manycol;
     end;
-       
-    %coldata = col(mod([0:maxdim-1], length(col))+1);
-    %coldata = col(mod([0:maxdim-1], length(col))+1);
-    %coldata = reshape(coldata(1:length(data(:))), size(data));
+    coldata = reshape(coldata(1:length(data(:))), size(data));
 else
     coldata = cell(size(data));
 end;
+
+% Fill empty cells with NaNs (This allow to plot all conditions on the same panel even when there is some missing data)
+% --------------------------
+if strcmpi(opt.plotconditions, 'together') || strcmpi(opt.plotgroups , 'together')
+    emptyindx = find(cellfun(@isempty,data));
+    if ~isempty(emptyindx)
+        for icell = 1:length(emptyindx)
+            if max(size(data{emptyindx(icell)})) == 0
+                data{emptyindx(icell)} = nan;
+            end
+        end
+    end
+end
 
 % remove empty entries
 % --------------------
@@ -239,7 +249,7 @@ end;
 % labels
 % ------
 if strcmpi(opt.unitx, 'ms'), xlab = 'Time (ms)';      ylab = 'Potential (\muV)';
-else                         xlab = 'Frequency (Hz)'; ylab = 'Power (10*log_{10}(\muV^{2}))'; 
+else                         xlab = 'Frequency (Hz)'; ylab = 'Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)'; % ylab = 'Power (10*log_{10}(\muV^{2}))'; 
 end;
 if ~isnan(opt.threshold), statopt = {  'xlabel' xlab };
 else                      statopt = { 'logpval' 'on' 'xlabel' xlab 'ylabel' '-log10(p)' 'ylim' [0 maxplot] };
@@ -290,26 +300,38 @@ for c = 1:ncplot
                     end;
                 end;
             elseif ncplot ~= nc % plot conditions together
-                for ind = 2:size(data,1), if any(size(data{ind,1}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
+                for ind = 2:size(data,1), if numel(size(data{ind,1})) ~= numel(size(data{1})) || any(size(data{ind,1}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
                 for cc = 1:nc
-                    tmptmpdata = real(data{cc,g});
+                    [trash,order] = sort(cellfun(@length,data(:,g)),'descend'); clear trash;
+                    tmptmpdata = real(data{order(cc),g});
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata)); % average across last dim
                     end;
                     if cc == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata)   nc]); end;
                     if cc == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata) 1 nc]); end;
-                    tmpdata(:,:,:,cc) = tmptmpdata;
+                    
+                    if ~any(isnan(tmptmpdata))
+                        tmpdata(:,:,:,order(cc)) = tmptmpdata;
+                    else
+                        tmpdata(:,:,:,order(cc)) = nan;
+                    end
                 end;
             elseif ngplot ~= ng % plot groups together
                 for ind = 2:size(data,2), if numel(size(data{1,ind})) ~= numel(size(data{1}))  || any((size(data{1,ind}) ~= size(data{1}))), dimreduced_sizediffers = 1; end; end;
                 for gg = 1:ng
-                    tmptmpdata = real(data{c,gg});
+                    [trash,order] = sort(cellfun(@length,data(c,:)),'descend'); clear trash;
+                    tmptmpdata = real(data{c,order(gg)});
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
                     if gg == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata)   ng]); end;
                     if gg == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata) 1 ng]); end;
-                    tmpdata(:,:,:,gg) = tmptmpdata;
+                    
+                    if ~any(isnan(tmptmpdata))
+                        tmpdata(:,:,:,order(gg)) = tmptmpdata;
+                    else
+                        tmpdata(:,:,:,order(gg)) = nan;
+                    end
                 end;
             else
                 tmpdata = real(data{c,g});
@@ -374,10 +396,18 @@ for c = 1:ncplot
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
             elseif iscell(tmpdata)
-                plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
+                if ~all(isnan(tmpdata{1}))
+                    plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
+                else
+                    plotcurve( allx, nan(size(tmpdata{1},2),length(allx)), 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
+                end
             else
                 if isempty(findstr(opt.plotstderr, 'nocurve'))
-                    plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'traceinfo', 'on', 'title', opt.titles{c,g});
+                    if all(isnan(tmpdata))
+                        plotcurve( allx, nan(size(tmpdata,2),length(allx)), 'colors', tmpcol, plotopt{2:end}, 'traceinfo', 'on', 'title', opt.titles{c,g});
+                    else
+                        plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'traceinfo', 'on', 'title', opt.titles{c,g});
+                    end
                 end;
                 if ~strcmpi(opt.plotstderr, 'off') 
                     if ~dimreduced_sizediffers

@@ -104,7 +104,11 @@ end;
 if isfield(STUDY.design, 'cell')
     for inddes = 1:length(STUDY.design)
         for indcell = 1:length(STUDY.design(inddes).cell)
-            pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
+            if isempty(STUDY.design(inddes).filepath)
+                pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
+            else
+                pathname = STUDY.design(inddes).filepath;
+            end
             filebase = STUDY.design(inddes).cell(indcell).filebase;
             tmpinds1 = find(filebase == '/');
             tmpinds2 = find(filebase == '\');
@@ -115,7 +119,7 @@ if isfield(STUDY.design, 'cell')
             else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
             end;
         end;
-    end;
+    end
 end
 
 % check for corrupted ERSP ICA data files

@@ -35,5 +35,5 @@ if ~option_storedisk
                    'contain the EEG data.', ' ');
     
     res = questdlg2(vartext, 'Study warning', 'Cancel', 'Ok', 'Ok');
-    if strcmpi(res, 'Cancel'), break; return; end;
+    if strcmpi(res, 'Cancel'),return; end;
 end;

@@ -44,10 +44,8 @@
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 % 'logfile'   = [filename] save all message in a log file in addition to showing them
 %               on screen (default -> none)
-% 'interput'  = ['on'|'off'] draw interupt figure. Default is off.
-% 'rndreset'  = ['on'|'off'] reset the random seed. Default is off (although it
-%               used to be on prior to 2015. This means that ICA will always return.
-%               the same decomposition unless this option is set to 'on'.
+% 'interupt'  = ['on'|'off'] interrupt drawing of figure. Default is off.
+% 'reset_randomseed' - ['on'|'off'] reset random seed for each call. Default is on.
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance
 %                    unless starting weight matrix passed ('weights' above)]
@@ -508,14 +506,14 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
              fprintf('runica(): verbose flag value must be on or off')
              return
          end
-      elseif strcmp(Keyword,'rndreset')
+      elseif strcmp(Keyword,'reset_randomseed')
          if ischar(Value)
-           if strcmp(Value,'yes')
+           if strcmp(Value,'yes') || strcmp(Value,'on')
              reset_randomseed = true;
-           elseif strcmp(Value,'no')
+           elseif strcmp(Value,'no') || strcmp(Value,'off')
              reset_randomseed = false;
            else
-             fprintf('runica(): not using the reset_randomseed flag, it should be ''yes'',''no'',0, or 1');
+             fprintf('runica(): not using the reset_randomseed flag, it should be ''yes'',''on'',''no'', ''off'',0, or 1');
            end
          else
            reset_randomseed = Value;
@@ -828,6 +826,7 @@ step=0;
 laststep=0;
 blockno = 1;  % running block counter for kurtosis interrupts
 
+<<<<<<< HEAD
 warning('off', 'MATLAB:RandStream:ActivatingLegacyGenerators')
 if reset_randomseed
     rand('state',sum(100*clock));  % set the random number generator state to
@@ -837,6 +836,13 @@ end                                % a position dependent on the system clock
 warning('on', 'MATLAB:RandStream:ActivatingLegacyGenerators')
 
 % interupt figure
+=======
+if reset_randomseed
+    rand('state',sum(100*clock));  % set the random number generator state to
+end                                % a position dependent on the system clock
+
+% interrupt figure
+>>>>>>> develop
 % --------------- 
 if strcmpi(interupt, 'on')
     fig = figure('visible', 'off');

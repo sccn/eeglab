@@ -37,8 +37,7 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
     EEG = [];
     com = '';
     if nargin < 3, latpoint0 = 0; end;
-    if nargin < 4, lookupchanfile = 0; end;
-    if nargin < 5, dataField = 'Session'; end;
+    if nargin < 4, dataField = 'Session'; end;
     if nargin < 1 
         % ask user
         [filename, filepath] = uigetfile('*.mat', 'Choose a Matlab file from Netstation -- pop_importegimat()'); 
@@ -143,6 +142,6 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
         end;
         EEG = readegilocs(EEG);
 
-        com = sprintf('EEG = pop_importegimat(''%s'', %3.2f, %3.2f, %d);', filename, srate, latpoint0, lookupchanfile);
+        com = sprintf('EEG = pop_importegimat(''%s'', %3.2f, %3.2f, %d);', filename, srate, latpoint0, dataField);
     end;
     

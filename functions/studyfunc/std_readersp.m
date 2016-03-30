@@ -284,7 +284,7 @@ for ind = 1:length(finalinds)
     end;
 end;
 
-% output unit
+% output units
 % -----------
 tmpparams = newstruct(1).([ dtype 'params' ]);
 if ~isfield(tmpparams, 'baseline'), tmpparams.baseline = 0;     end;

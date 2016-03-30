@@ -653,9 +653,15 @@ else
                     % update Study history
                     a = ['STUDY = std_renameclust(STUDY, ALLEEG, ' num2str(cls(clus_num)) ', ' STUDY.cluster(cls(clus_num)).name  ');'];
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
-
+                    % Renaming cluster in list
                     new_name = [ STUDY.cluster(cls(clus_num)).name ' (' num2str(length(STUDY.cluster(cls(clus_num)).comps))  ' ICs)'];
                     clus_name_list{clus_num+1} = renameclust( clus_name_list{clus_num+1}, new_name);
+                    % Renaming Outlier cluster if exist
+                    outlier_clust = std_findoutlierclust(STUDY,cls(clus_num));
+                    if outlier_clust ~= 0
+                        new_outliername = [ STUDY.cluster(cls(outlier_clust)).name ' (' num2str(length(STUDY.cluster(cls(outlier_clust)).comps))  ' ICs)'];
+                        clus_name_list{outlier_clust+1} = renameclust( clus_name_list{outlier_clust+1}, new_outliername);
+                    end
                     set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                     set(findobj('parent', hdl, 'tag', 'clus_rename'), 'String', '');
                     userdat{1}{2} = STUDY;
