@@ -164,7 +164,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
         if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
         if isempty(subjectList), subjectList = bigstruct.design.cases.value; end;
         count = 1;
-        for iSubj = length(subjectList):-1:1
+        for iSubj = 1:length(subjectList)
             datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
             fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]); 
             
@@ -188,7 +188,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
         % ---------------------------------------------------------------------------------
         if strcmpi(opt.singletrials, 'off')
             alldata = {};
-            for iSubj = length(dataSubject(:)):-1:1
+            for iSubj = 1:length(dataSubject(:))
                 for iCell = 1:length(dataSubject{1}(:))
 %                     if isempty(dataSubject{ iSubj }{ iCell })
 %                         error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
@@ -211,7 +211,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
         else
             % calculate dimensions
             alldim = zeros(size(dataSubject{1}));
-            for iSubj = length(subjectList):-1:1
+            for iSubj = 1:length(subjectList)
                 for iCell = 1:length(dataSubject{1}(:))
                     alldim(iCell) = alldim(iCell)+size(dataSubject{ iSubj }{ iCell },2);
                 end;
@@ -223,7 +223,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
             end;
             % populate arrays
             allcounts = zeros(size(dataSubject{1}));
-            for iSubj = length(subjectList):-1:1
+            for iSubj = 1:length(subjectList)
                 for iCell = 1:length(dataSubject{1}(:))
                     cols = size(dataSubject{ iSubj }{ iCell },2);
                     alldata{  iCell}(:,allcounts(iCell)+1:allcounts(iCell)+cols) = dataSubject{ iSubj }{ iCell };
