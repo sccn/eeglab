@@ -52,6 +52,7 @@
 %   'rmdc'     = ['on'|'off'] 'on' -> remove DC {default: 'off'}  
 %   'plotmean' = ['on'|'off'] 'on' -> plot the mean channel spectrum {default: 'off'}  
 %   'plotchans' = [integer array] plot only specific channels {default: all}
+%   'verbose'  = ['on'|'off'] 'on' shows information on command line {default: 'on'}  
 %
 % Optionally plot component contributions:
 %   'weights'  = ICA unmixing matrix. Here, 'freq' (above) must be a single frequency.
@@ -164,38 +165,37 @@ if nargin<3
 end
 if nargin <= 3 | isstr(varargin{1})
 	% 'key' 'val' sequence
-	fieldlist = { 'freq'          'real'     []                            [] ;
-                  'specdata'      'real'     []                            [] ;
-                  'freqdata'      'real'     []                            [] ;
-				  'chanlocs'      ''         []                            [] ;
-				  'freqrange'     'real'     [0 srate/2]                   [] ;
-				  'memory'        'string'   {'low','high'}                'high' ;
-				  'plot'          'string'   {'on','off'}                  'on' ;
-				  'plotmean'      'string'   {'on','off'}                  'off' ;
-				  'title'         'string'   []                            '';
-				  'limits'        'real'     []                            [nan nan nan nan nan nan];
-				  'freqfac'       'integer'  []                            FREQFAC;
-				  'percent'       'real'     [0 100]                       100 ;
-				  'reref'         'string'   { 'averef','off','no' }       'off' ;
-				  'boundaries'    'integer'  []                            [] ;
-				  'nfft'          'integer'  [1 Inf]                       [] ;
-				  'winsize'       'integer'  [1 Inf]                       [] ;
-				  'overlap'       'integer'  [1 Inf]                       0 ;
-				  'icamode'       'string'   { 'normal','sub' }            'normal' ;
-				  'weights'       'real'     []                            [] ;
-				  'mapnorm'       'real'     []                            [] ;
-				  'plotchan'      'integer'  [1:size(data,1)]              [] ;
-				  'plotchans'     'integer'  [1:size(data,1)]              [] ;
-				  'nicamaps'      'integer'  []                            4 ;
-				  'icawinv'       'real'     []                            [] ;
-				  'icacomps'      'integer'  []                            [] ;
-				  'icachansind'   'integer'  []                            [1:size(data,1)] ; % deprecated
-				  'icamaps'       'integer'  []                            [] ;
-                  'rmdc'          'string'   {'on','off'}                  'off' ;
-				  'mapchans'      'integer'  [1:size(data,1)]              [] ; 
-                  'wintype'       'string'   {'hamming','blackmanharris'}  'hamming' ; 
-                  'blckhn'        'real'     []                            2 ;
-                  'mapframes'     'integer'  [1:size(data,2)]              []};
+	fieldlist = { 'freq'          'real'     []                        [] ;
+                  'specdata'      'real'     []                        [] ;
+                  'freqdata'      'real'     []                        [] ;
+				  'chanlocs'      ''         []                        [] ;
+				  'freqrange'     'real'     [0 srate/2]               [] ;
+				  'memory'        'string'   {'low','high'}           'high' ;
+				  'plot'          'string'   {'on','off'}             'on' ;
+				  'plotmean'      'string'   {'on','off'}             'off' ;
+				  'title'         'string'   []                       '';
+				  'limits'        'real'     []                       [nan nan nan nan nan nan];
+				  'freqfac'       'integer'  []                        FREQFAC;
+				  'percent'       'real'     [0 100]                  100 ;
+				  'reref'         'string'   { 'averef','off','no' }  'off' ;
+				  'boundaries'    'integer'  []                       [] ;
+				  'nfft'          'integer'  [1 Inf]                  [] ;
+				  'winsize'       'integer'  [1 Inf]                  [] ;
+				  'overlap'       'integer'  [1 Inf]                  0 ;
+				  'icamode'       'string'   { 'normal','sub' }        'normal' ;
+				  'weights'       'real'     []                       [] ;
+				  'mapnorm'       'real'     []                       [] ;
+				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
+				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
+				  'nicamaps'      'integer'  []                       4 ;
+				  'icawinv'       'real'     []                       [] ;
+				  'icacomps'      'integer'  []                       [] ;
+				  'icachansind'   'integer'  []                       [1:size(data,1)] ; % deprecated
+				  'icamaps'       'integer'  []                       [] ;
+                  'rmdc'          'string'   {'on','off'}             'off';
+                  'verbose'       'string'   {'on','off'}             'on';
+				  'mapchans'      'integer'  [1:size(data,1)]         [] 
+                  'mapframes'     'integer'  [1:size(data,2)]         []};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
@@ -330,10 +330,10 @@ else
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
         % compute data spectra
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
-        fprintf('Computing spectra')
+        myfprintf(g.verbose, 'Computing spectra')
         [eegspecdB freqs specstd] = spectcomp( data, frames, srate, epoch_subset, g);
         if ~isempty(g.mapnorm) % normalize by component map RMS power (if data contain 1 component
-            disp('Scaling spectrum by component RMS of scalp map power');
+            myfprintf(g.verbose, 'Scaling spectrum by component RMS of scalp map power\n');
             eegspecdB       = sqrt(mean(g.mapnorm.^4)) * eegspecdB;
             % the idea is to take the RMS of the component activity (compact) projected at each channel
             % spec = sqrt( power(g.mapnorm(1)*compact).^2 + power(g.mapnorm(2)*compact).^2 + ...)
@@ -348,7 +348,7 @@ else
         else zchans = [];
         end;
         if length(tmpc) ~= size(eegspecdB,1)
-            fprintf('\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
+            myfprintf(g.verbose, '\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
                        zchans);
             eegspecdB = eegspecdB(tmpc,:);
             if ~isempty(specstd),  specstd = specstd(tmpc,:); end
@@ -358,18 +358,18 @@ else
         end;
         eegspecdB = 10*log10(eegspecdB);
         specstd   = 10*log10(specstd);
-        fprintf('\n');
+        myfprintf(g.verbose, '\n');
     else
         % compute data spectrum
         if isempty(g.plotchan) | g.plotchan == 0
-            fprintf('Computing spectra')
+            myfprintf(g.verbose, 'Computing spectra')
             [eegspecdB freqs specstd] = spectcomp( data, frames, srate, epoch_subset, g);	
-            fprintf('\n'); % log below
+            myfprintf(g.verbose, '\n'); % log below
         else
-            fprintf('Computing spectra at specified channel')
+            myfprintf(g.verbose, 'Computing spectra at specified channel')
             g.reref = 'off';
             [eegspecdB freqs specstd] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
-            fprintf('\n'); % log below
+            myfprintf(g.verbose, '\n'); % log below
         end;
         g.reref = 'off';
 
@@ -379,10 +379,10 @@ else
         if isempty(g.plotchan) % find channel of minimum power
             [tmp indexfreq] = min(abs(g.freq-freqs));
             [tmp g.plotchan] = min(eegspecdB(:,indexfreq));
-            fprintf('Channel %d has maximum power at %g\n', g.plotchan, g.freq);
+            myfprintf(g.verbose, 'Channel %d has maximum power at %g\n', g.plotchan, g.freq);
             eegspecdBtoplot = eegspecdB(g.plotchan, :);		
         elseif g.plotchan == 0
-            fprintf('Computing RMS power at all channels\n');
+            myfprintf(g.verbose, 'Computing RMS power at all channels\n');
             eegspecdBtoplot = sqrt(mean(eegspecdB.^2,1)); % RMS before log as for components
         else 
             eegspecdBtoplot = eegspecdB;
@@ -390,7 +390,7 @@ else
         tmpc = find(eegspecdB(:,1)); 			% > 0 power chans
         zchans = int2str(find(eegspecdB(:,1) == 0)); 	% 0-power chans
         if length(tmpc) ~= size(eegspecdB,1)
-            fprintf('\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
+            myfprintf(g.verbose, '\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
                        zchans);
             eegspecdB = eegspecdB(tmpc,:);
             if ~isempty(specstd),  specstd = specstd(tmpc,:); end
@@ -407,23 +407,23 @@ else
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
         newweights = g.weights;
         if strcmp(g.memory, 'high') & strcmp(g.icamode, 'normal')
-            fprintf('Computing component spectra: ')
+            myfprintf(g.verbose, 'Computing component spectra: ')
             [compeegspecdB freqs] = spectcomp( newweights*data(:,:), frames, srate, epoch_subset, g);
         else % in case out of memory error, multiply conmponent sequencially
             if strcmp(g.icamode, 'sub') & ~isempty(g.plotchan) & g.plotchan == 0
                 % scan all electrodes
-                fprintf('Computing component spectra at each channel: ')
+                myfprintf(g.verbose, 'Computing component spectra at each channel: ')
                 for index = 1:size(data,1)
                     g.plotchan = index;
                     [compeegspecdB(:,:,index) freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
                 end;
                 g.plotchan = 0;
             else
-                fprintf('Computing component spectra: ')
+                myfprintf(g.verbose, 'Computing component spectra: ')
                 [compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
             end;
         end;
-        fprintf('\n');
+        myfprintf(g.verbose, '\n');
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % rescale spectra with respect to projection (rms = root mean square)
@@ -608,7 +608,7 @@ if ~isempty(g.weights)
         if strcmp(g.icamode, 'normal')
             % note: maxdatadb = eegspecdBtoplot (RMS power of data)
             resvar(index)  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-            fprintf('Component %d percent relative variance:%6.2f\n', g.icacomps(index), resvar(index));
+            myfprintf(g.verbose, 'Component %d percent relative variance:%6.2f\n', g.icacomps(index), resvar(index));
         else
             if g.plotchan == 0
                 resvartmp = [];
@@ -617,11 +617,11 @@ if ~isempty(g.weights)
                 end;
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
-                fprintf('Component %d percent variance accounted for:%6.2f ± %3.2f\n', ...
+                myfprintf(g.verbose, 'Component %d percent variance accounted for:%6.2f ± %3.2f\n', ...
                         g.icacomps(index), resvar(index), stdvar(index));
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-                fprintf('Component %d percent variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
+                myfprintf(g.verbose, 'Component %d percent variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
             end;
         end;
     end;
@@ -720,7 +720,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% plot selected channel head using topoplot()
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	fprintf('Plotting scalp distributions: ')
+	myfprintf(g.verbose, 'Plotting scalp distributions: ')
 	for f=1:length(g.freq)
 		axes(headax(realpos(f)));
         
@@ -769,9 +769,9 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		set(tl,'fontsize',AXES_FONTSIZE_L);
 		axis square;
 		drawnow
-		fprintf('.');
+		myfprintf(g.verbose, '.');
 	end;
-	fprintf('\n');
+	myfprintf(g.verbose, '\n');
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% plot independent components
@@ -904,10 +904,10 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     end;
     
     if ~usepwelch, 
-        fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
-        fprintf('function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
+        myfprintf(g.verbose, '\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
+        myfprintf(g.verbose, 'function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
     end;
-    fprintf(' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
+    myfprintf(g.verbose,' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
         
 	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
@@ -962,7 +962,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 				end
 			end;
 		end
-		fprintf('.')
+		myfprintf(g.verbose,'.');
 	end
     
     n = length(epoch_subset);
@@ -972,3 +972,9 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     else specstd   = [];
     end;
 	return;
+    
+    function myfprintf(verbose, varargin)
+        if strcmpi(verbose, 'on')
+            fprintf(varargin{:});
+        end;
+        
