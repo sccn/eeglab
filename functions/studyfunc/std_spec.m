@@ -62,6 +62,12 @@
 %                  'pmtm' and 'pbug' which use multitaper and the Burg 
 %                  method to compute spectrum respectively. NOTE THAT SOME
 %                  OF THESE OPTIONS REQUIRE THE SIGNAL PROCESSING TOOLBOX.
+%   'speccompat'  - ['v13'|'v14'] enforces backward compatibility with
+%                  version 13 of EEGLAB. Default is 'v14'. For the 'specmode'
+%                  option 'fft', EEGLAB 14 and later version detrend the data
+%                  and apply hamming taper to it. EEGLAB 13 and earlier 
+%                  remove the baseline from the data and apply a hamming  
+%                  taper but only for continuous data.
 %   'epochlim'   - [min max] for FFT on continuous data, extract data
 %                  epochs with specific epoch limits in seconds (see also
 %                  'epochrecur' below). Default is [0 1].
@@ -157,6 +163,7 @@ end;
                                       'continuous' 'string'  { 'on','off' } 'off';
                                       'logtrials'  'string'  { 'on','off' 'notset' } 'notset';
                                       'savefile'   'string'  { 'on','off' } 'on';
+                                      'speccompat'   'string'  { 'v13','v14' } 'v14';
                                       'epochlim'   'real'    []         [0 1];
                                       'trialindices' { 'integer','cell' } []         [];
                                       'epochrecur' 'real'    []         0.5;
@@ -286,10 +293,13 @@ if strcmpi(g.logtrials, 'notset'), if strcmpi(g.specmode, 'fft') g.logtrials = '
 if strcmpi(g.logtrials, 'on'), datatype = 'SPECTRUMLOG'; else datatype = 'SPECTRUMABS'; end;
 if strcmpi(g.specmode, 'psd')
     if strcmpi(g.savetrials, 'on') || strcmpi(g.logtrials, 'on')
+        fprintf('Computing spectopo accross trials: ');
         for iTrial = 1:size(X,3)
-            [XX(:,:,iTrial), f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+            [XX(:,:,iTrial), f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, 'verbose', 'off', spec_opt{:});
             if iTrial == 1, XX(:,:,size(X,3)) = 0; end;
+            if mod(iTrial,10) == 0, fprintf('%d ', iTrial); end;
         end;
+        fprintf('\n');
         if strcmpi(g.logtrials, 'off')
              X = 10.^(XX/10);
         else X = XX;
@@ -298,14 +308,14 @@ if strcmpi(g.specmode, 'psd')
             X = mean(X,3);
         end;
     else
-        [X, f] = spectopo(X, size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+        [X, f] = spectopo(X, size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, 'verbose', 'off', spec_opt{:});
         X = 10.^(X/10);
     end;
 elseif strcmpi(g.specmode, 'pmtm')
     if strcmpi(g.logtrials, 'on')
         error('Log trials option cannot be used in conjunction with the PMTM option');
     end;
-    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: multitaper does not take into account boundaries in continuous data'); end;
+    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: multitaper does not take into account boundaries in continuous data (use ''psd'' method instead)'); end;
     fprintf('Computing spectrum using multitaper method:');
     for cind = 1:size(X,1)
         fprintf('.');
@@ -325,7 +335,7 @@ elseif strcmpi(g.specmode, 'pburg')
         error('Log trials option cannot be used in conjunction with the PBURB option');
     end;
     fprintf('Computing spectrum using Burg method:');
-    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: pburg does not take into account boundaries in continuous data'); end;
+    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: pburg does not take into account boundaries in continuous data (use ''psd'' method instead)'); end;
     for cind = 1:size(X,1)
         fprintf('.');
         for tind = 1:size(X,3)
@@ -340,10 +350,24 @@ elseif strcmpi(g.specmode, 'pburg')
     X = X2;
     if strcmpi(g.savetrials, 'off'), X = mean(X,3); end;
 else % fft mode
-    if oritrials == 1 || strcmpi(g.continuous, 'on')
-        X = bsxfun(@times, X, hamming(size(X,2))');
+    %
+    if strcmpi(opt.speccompat, 'v14')
+        if size(X,3) > 1
+            for iTrial = 1:size(X,3)
+                X(:,:,iTrial) = detrend(X(:,:,iTrial)')';
+            end;
+        else
+            X = detrend(X')';
+        end;
+        X = bsxfun(@times, X, hamming(size(X,2))'); % apply hamming window even for data trials (not the case in EEGLAB 13)
+        disp('Warning: std_spec function has changed (see help), for backward compatbility use the ''v13'' option');
+    else
+        if oritrials == 1 || strcmpi(g.continuous, 'on')
+            X = bsxfun(@times, X, hamming(size(X,2))');
+        end;
     end;
-    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data'); end;
+    %end;
+    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end;
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
     f     = f(2:end); % remove DC (match the output of PSD)
