@@ -336,6 +336,9 @@ else
     erspdata = newstruct(1).([ dtype 'data' ]);
 end;
 
+% get events
+events = newstruct(1).([ dtype 'vars' ]); % only works for interpolated data
+
 % compute ERSP baseline
 % ---------------------
 function meanpowbase = computeerspbaseline(erspbase, singletrials)
