@@ -332,7 +332,7 @@ else
             if all(cellfun(@(x)size(x,2), erpdata2(:)) == length(subjects))  % NOT single trial data
                 keepInd = find(~isnan(erpdata2{iDat}(1,:)));
                 erpdata2{iDat} = erpdata2{iDat}(:,keepInd);
-                tmpSubjects = subjects(keepInd)
+                tmpSubjects = subjects(keepInd);
                 comps       = STUDY.cluster(opt.clusters(index)).comps(keepInd);
             else
                 tmpSubjects = subjects;
