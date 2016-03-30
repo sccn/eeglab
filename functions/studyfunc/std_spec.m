@@ -351,7 +351,7 @@ elseif strcmpi(g.specmode, 'pburg')
     if strcmpi(g.savetrials, 'off'), X = mean(X,3); end;
 else % fft mode
     %
-    if strcmpi(opt.speccompat, 'v14')
+    if strcmpi(g.speccompat, 'v14')
         if size(X,3) > 1
             for iTrial = 1:size(X,3)
                 X(:,:,iTrial) = detrend(X(:,:,iTrial)')';
