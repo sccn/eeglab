@@ -826,6 +826,7 @@ step=0;
 laststep=0;
 blockno = 1;  % running block counter for kurtosis interrupts
 
+warning('off', 'MATLAB:RandStream:ActivatingLegacyGenerators')
 if reset_randomseed
     rand('state',sum(100*clock));  % set the random number generator state to
 else
