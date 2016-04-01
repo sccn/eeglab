@@ -199,8 +199,8 @@ for ind = 1:length(finalinds)
         if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
         if isempty(subjectList), subjectList = STUDY.design(STUDY.currentdesign).cases.value; end;
         count = 1;
-        for iSubj = length(subjectList):-1:1
-            datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+        for iSubj = 1:length(subjectList)
+            datInds = find(strncmpi( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
             
             if ~isempty(opt.channels)
                 fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} '.dat' fastif(strcmpi(dtype, 'erpim'), 'erpim', 'timef') ]);
@@ -235,11 +235,10 @@ for ind = 1:length(finalinds)
                         error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
                     end;
                     tmpdat = callnewtimef(dataSubject{ iSubj }{ iCell }, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, params);
-                    if ~isreal(tmpdat(1,1)), tmpdat = abs(tmpdat); end;
                     alldata{  iCell}(:,:,iSubj) = tmpdat;
                     
                     if ~isempty(events{iSubj}{iCell})
-                        allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
+                         allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
                     else allevents{iCell} = [];
                     end;
                 end;
