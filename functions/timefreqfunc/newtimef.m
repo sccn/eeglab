@@ -1169,16 +1169,17 @@ else
     alltfX   = g.precomputed.tfdata;
     timesout = g.precomputed.times;
     freqs    = g.precomputed.freqs;
-    if strcmpi(g.precomputed.recompute, 'ersp')
-        R = [];
-    else
+    R = [];
+    if ~isfield(g.precomputed, 'recompute') || strcmpi(g.precomputed.recompute, 'itc')
         switch g.itctype
             case 'coher',       R = alltfX ./ repmat(sqrt(sum(alltfX .* conj(alltfX),3) * size(alltfX,3)), [1 1 size(alltfX,3)]);
             case 'phasecoher2', R = alltfX ./ repmat(sum(sqrt(alltfX .* conj(alltfX)),3), [1 1 size(alltfX,3)]);
             case 'phasecoher',  R = alltfX ./ sqrt(alltfX .* conj(alltfX));
         end;
         R = mean(R,3);
-        P = []; mbase = []; return;
+        if isfield(g.precomputed, 'recompute') && strcmpi(g.precomputed.recompute, 'itc')
+            P = []; mbase = []; return;
+        end;
     end;
 end;
 
