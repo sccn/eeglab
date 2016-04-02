@@ -29,7 +29,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, ALLEEG, command] = std_checkset(STUDY, ALLEEG, option);
+function [STUDY, ALLEEG, command] = std_checkset(STUDY, ALLEEG, options)
 
 if nargin < 2
     help std_checkset;
@@ -208,6 +208,38 @@ if ~studywasempty
     else
         if isfield(STUDY.design, 'indvar1')
             STUDY  = std_convertdesign(STUDY, ALLEEG);
+        end;
+        
+        % check independent variable
+        setFields   = fieldnames(STUDY.datasetinfo);
+        trialFields = fieldnames(ALLEEG(1).event);
+        rmInd       = [];
+        for indDes = 1:length(STUDY.design)
+            for indVar = 1:length(STUDY.design(indDes).variable)
+                if isempty(strmatch( STUDY.design(indDes).variable(indVar).label, setFields)) && ...
+                    ~isempty(trialFields) && isempty(strmatch( STUDY.design(indDes).variable(indVar).label, trialFields))
+                        % Missing independent variable
+                        
+                        if isempty(rmInd)
+                            textVal1 = sprintf('The variable ''%s'' defined in the STUDY design is not found in ', STUDY.design(indDes).variable(indVar).label);
+                            textVal2 = 'some of the EEG datasets. Some STUDY features will not be functional.';
+                            if nargin > 2 && strcmpi(options, 'popup')
+                                textVal = [ textVal1 10 textVal2 10 10 'Do you want to remove all designs with missing variables?' ];
+                                res = questdlg2(  textVal, 'Issue with studies', 'No', 'Yes', 'Yes');
+                                if strcmpi(res, 'Yes')
+                                    rmInd = [ rmInd indDes ];
+                                end;
+                            else
+                                disp([textVal1 textVal2]);
+                            end;
+                        else
+                            rmInd = [ rmInd indDes ];
+                        end;
+                end;
+            end;
+        end;
+        if ~isempty(rmInd)
+            STUDY.design(rmInd) = [];
         end;
         
         % convert combined independent variable values
