@@ -91,7 +91,10 @@ for k = 1:length(STUDY.datasetinfo)
 end
 
 if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; end;
-[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
+if isempty(varargin)
+     [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG, 'popup');
+else [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
+end;
 
 if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
     if std_uniformfiles(STUDY, ALLEEG) == 0
