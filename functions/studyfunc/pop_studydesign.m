@@ -70,8 +70,6 @@ if nargin < 3 && ~isstr(STUDY)
     cb_listboxfact1 = 'pop_studydesign(''selectfact'', gcf, 0);';
     cb_listboxfact2 = 'pop_studydesign(''selectfact'', gcf, 1);';
     cb_selectsubj   = 'pop_studydesign(''selectsubj'', gcbf);';
-    cb_combinevals1 = 'pop_studydesign(''combinevals'', gcbf, 0);';
-    cb_combinevals2 = 'pop_studydesign(''combinevals'', gcbf, 1);';
     cb_lbval        = 'pop_studydesign(''updategui'', gcbf);';
     cb_selectdesign = 'pop_studydesign(''selectdesign'', gcbf);';
     cb_selectdata   = 'pop_studydesign(''selectdatatrials'', gcbf);';
@@ -204,10 +202,6 @@ elseif isstr(STUDY)
         % case 'updategui', update the study information (whenever the
         %                      user click on a button 
         %
-        % case 'selectfact', select a specific ind. var. (update value listboxes)
-        % case 'combinevals', combine values in value listboxes
-        % case 'selectsubj', select specific subjects
-        %
         % case 'selectdatatrials', new GUI to select specific dataset and trials
         % case 'selectdatatrialssel', % select in the GUI above
         % case 'selectdatatrialsadd', % add new selection in the GUI above
@@ -337,6 +331,8 @@ elseif isstr(STUDY)
                 des(val).variable(end+1).label = tmpVar;
                 des(val).variable(end  ).value = tmpVarList; % empty for cont var
             end;
+            % update var list
+            [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);
             
         case 'editvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
@@ -346,6 +342,9 @@ elseif isstr(STUDY)
                 des(val).variable(val2).label = tmpVar;
                 des(val).variable(val2).value = tmpVarList; % empty for cont var
             end;
+            % update var list
+            [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);
+            
         case 'plotdmat'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             std_plotdmat(usrdat,val);
