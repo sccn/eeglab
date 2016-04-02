@@ -327,6 +327,9 @@ elseif isstr(STUDY)
             end;
             % update var list
             [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);
+            usrdat.factors     = { 'None' usrdat.factors{:} };
+            usrdat.factorvals  = { {}     usrdat.factorvals{:} };
+            usrdat.factsubj    = { {}     usrdat.factsubj{:} };
             
         case 'editvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
@@ -341,6 +344,9 @@ elseif isstr(STUDY)
             end;
             % update var list
             [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);
+            usrdat.factors     = { 'None' usrdat.factors{:} };
+            usrdat.factorvals  = { {}     usrdat.factorvals{:} };
+            usrdat.factsubj    = { {}     usrdat.factsubj{:} };
             
         case 'plotdmat'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
