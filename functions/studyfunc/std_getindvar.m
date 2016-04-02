@@ -169,7 +169,17 @@ if scandesign
         for iVar = 1:length(STUDY.design(desind).variable)
             pos1 = strmatch(STUDY.design(desind).variable(iVar).label, factor, 'exact');
             if ~isempty(pos1), add1 = mysetdiff(STUDY.design(desind).variable(iVar).value, factorvals{pos1}); else add1 = []; end;
-            if ~isempty(add1), factorvals{pos1} = { factorvals{pos1}{:} add1{:} }; end;
+            for addInd = 1:length(add1)
+                duplicate = 0;
+                for iVarVal = 1:length(factorvals{pos1})
+                    if isequal(factorvals{pos1}{iVarVal}, add1{addInd})
+                        duplicate = 1;
+                    end;
+                end;
+                if ~duplicate
+                    factorvals{pos1} = { factorvals{pos1}{:} add1{addInd} }; 
+                end;
+            end;
         end;
     end;
 end;
