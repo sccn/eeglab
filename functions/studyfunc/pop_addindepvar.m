@@ -18,33 +18,19 @@ if isstruct(varlist)
     
     if isempty(values)
         if varlist.numerical(indVar)
-            indCat = 2;
+            indCat = 2; % continous
             indVal = [1:length(varlist.factorvals{indVar})];
         end;
     else
         for iVal = 1:length(values)
-            if isstr(values{1})
-                if iscell(values{iVal})
-                    varlist.factorvals{indVar}{end+1} = values{iVal};
-                    indVal(iVal) = length(varlist.factorvals{indVar});
-                else
-                    indVal(iVal) = strmatch(values{iVal}, varlist.factorvals{indVar});
-                end;
-            else
-                if length(values{iVal}) > 1
-                    varlist.factorvals{indVar}{end+1} = values{iVal};
-                    indVal(iVal) = length(varlist.factorvals{indVar});
-                else
-                    indVal(iVal) = find(values{iVal} == [ varlist.factorvals{indVar}{:} ]);
-                end;
-            end;
+            indVal(iVal) = std_indvarmatch(values{iVal}, varlist.factorvals{indVar});
         end;
     end;
     
     curValues = encodevals(varlist.factorvals{indVar});
     cb_selectfact  = 'pop_addindepvar(''selectfact'', gcbf);';
     cb_vartype     = 'pop_addindepvar(''vartype''   , gcbf);';
-    cb_combinevals = 'pop_studydesign(''combinevals'', gcbf, 0);';
+    cb_combinevals = 'pop_addindepvar(''combinevals'', gcbf);';
     uilist = {     { 'style' 'text'       'string' 'Select independent variable' 'fontweight' 'bold' } ...
         { 'style' 'listbox'    'string' varlist.factors  'value' indVar 'tag' 'lbfact0' 'callback' cb_selectfact } ...
         { 'style' 'popupmenu'  'string' 'This is a categorical var.|This is a continuous var.' 'value' indCat 'tag' 'vartype' 'callback' cb_vartype } ...
@@ -66,7 +52,7 @@ if isstruct(varlist)
     for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;
     streval = [ 'pop_studydesign2(''selectdesign'', gcf);' ];
     [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'title', 'Add variable', 'geom', geometry, 'userdata', varlist);
-    if isempty(tmp), return, end;
+    if isempty(tmp), cat = 0; return, end;
         
     var    = usrdat.factors{ result.lbfact0 };
     values = usrdat.factorvals{ result.lbfact0 }(result.lbval0 );
@@ -92,10 +78,11 @@ elseif isstr(varlist)
             val1  = get(findobj(fig, 'tag', 'lbfact0'), 'value');
             valfact = [1:length(usrdat.factorvals{val1})];
             set(findobj(fig, 'tag', 'lbval0'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact, 'listboxtop', 1);
+            set(findobj(fig, 'tag', 'vartype'), 'ListboxTop', 1);
             if usrdat.numerical(val1), 
-                set(findobj(fig, 'tag', 'vartype'), 'value', 2, 'string', 'Categorical variable|Continuous variable'); 
+                set(findobj(fig, 'tag', 'vartype'), 'value', 2, 'string', 'Categorical variable|Continuous variable', 'ListboxTop', length(usrdat.factorvals{val1})); 
             else
-                set(findobj(fig, 'tag', 'vartype'), 'value', 1, 'string', 'Categorical variable'); 
+                set(findobj(fig, 'tag', 'vartype'), 'value', 1, 'string', 'Categorical variable', 'ListboxTop', length(usrdat.factorvals{val1})); 
             end;
             pop_addindepvar('vartype', fig);
                 
@@ -129,6 +116,9 @@ elseif isstr(varlist)
             end;
             set(findobj(fig, 'tag', 'lbval0'), 'string', encodevals(usrdat.factorvals{val1}));
             set(fig, 'userdata', usrdat);
+            pop_addindepvar('vartype', fig);
+                
+            return;            
     end;
 end;
 
@@ -155,7 +145,7 @@ function [cellout inds ] = mysetdiff(cell1, cell2);
     else [ cellout inds ] = setdiff_bc([ cell1{:} ], [ cell2{:} ]);
          cellout = mattocell(cellout);
     end;
-
+    
 % encode string an numerical values for list boxes
 function cellout = encodevals(cellin)
     if isempty(cellin) 
