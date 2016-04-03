@@ -293,9 +293,15 @@ pointrange = [pointrange1:pointrange2];
 
 % Compute ERSP & ITC
 % ------------------
-all_trials = [];
-for k = 1:length(g.indices)  % for each (specified) component
-    if k>size(X,1), break; end; % happens for components
+allTrialsTmp   = cell(1,length(g.indices));
+allTrialsTime  = cell(1,length(g.indices));
+allTrialsFreqs = cell(1,length(g.indices));
+eeglab_options;
+usesingle = option_single;
+
+% CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
+for k = 1:length(g.indices)  % for each (specified) component/channel
+    %if k>size(X,1), break; end; % happens for components
     if powbaseexist
         tmpparams = parameters;
         tmpparams{end+1} = 'powbase';
@@ -307,25 +313,36 @@ for k = 1:length(g.indices)  % for each (specified) component
     % Run timef() to get ERSP
     % ------------------------
     timefdata  = reshape(X(k,pointrange,:), 1, length(pointrange)*size(X,3));
-    if strcmpi(g.plot, 'on'), figure; end;
+    mytimes = [];
+    mylogfreqs = [];
+    alltfX   = [];
     if ~isempty(timefdata)
-        [logersp,logitc,logbase,times,logfreqs,logeboot,logiboot,alltfX] ...
+        [logersp,logitc,logbase,mytimes,mylogfreqs,logeboot,logiboot,alltfX] ...
               = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, tmpparams{2:end});
         %figure; newtimef( TMP.data(32,:), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles, 'freqs', freqs);
         %figure; newtimef( timefdata, length(pointrange), g.timelimits, EEG.srate, cycles, 'freqs', freqs);
-    else
-        alltfX   = [];
     end;
-    if strcmpi(g.plot, 'on'), return; end;
+    %if strcmpi(g.plot, 'on'), return; end;
+    if usesingle
+        alltfX = single(alltfX);
+    end;
 
-    all_trials = setfield( all_trials, [ prefix int2str(g.indices(k)) ], single( alltfX ));
+    allTrialsTmp{k}   = single( alltfX );
+    allTrialsTime{k}  = mytimes;
+    allTrialsFreqs{k} = mylogfreqs;
 end
-X = logersp;
+all_trials = [];
+for k = 1:length(g.indices)  % for each (specified) component/channel
+    all_trials = setfield( all_trials, [ prefix int2str(g.indices(k)) ], allTrialsTmp{k});
+end;
+X = allTrialsTmp{1};
 
 % Save ERSP into file
 % -------------------
-all_trials.freqs     = logfreqs;
-all_trials.times     = times;
+logfreqs             = allTrialsFreqs{1};
+times                = allTrialsTime{1};
+all_trials.freqs     = allTrialsFreqs{1};
+all_trials.times     = allTrialsTime{1};
 all_trials.parameters = { options{:} parameters{:} };
 all_trials.datatype   = 'TIMEF';
 all_trials.datafiles  = computeFullFileName( { EEG.filepath }, { EEG.filename });
