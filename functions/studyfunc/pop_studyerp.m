@@ -163,10 +163,10 @@ options = { options{:}, 'commands', commands };
 % ------------------------------------
 com1 = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, ALLEEG, %s );', vararg2str(options) );
 [STUDY ALLEEG] = std_editset(STUDY, ALLEEG, options{:});
-if exist([ STUDY.design(STUDY.currentdesign).cell(1).filebase '.daterp' ])
+if exist(fullfile(ALLEEG(1).filepath, [ALLEEG(1).filename(1:end-4) '.daterp' ]))
     textmsg = [ 'WARNING: SOME ERP DATAFILES ALREADY EXIST, OVERWRITE THEM?' 10 ...
-                '(if you have another STUDY using the same datasets, it might overwrite its' 10 ...
-                'precomputed data files. Instead, use a single STUDY and create multiple designs).' ];
+                '(the recomputed files will be identical to the existing ones, unless you modified the EEG' 10 ...
+                'datasets or set a different ERP baseline using menu item STUDY > Precompute channel measures).' ];
     res = questdlg2(textmsg, 'Precomputed datafiles already present on disk', 'No', 'Yes', 'Yes');
     if strcmpi(res, 'No')
         error('User aborded precomputing ERPs');
