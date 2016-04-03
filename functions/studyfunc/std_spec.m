@@ -377,6 +377,10 @@ else % fft mode
     if strcmpi(g.savetrials, 'off'), X = mean(X,3); end;
     if strcmpi(g.logtrials, 'off'),  X = 10*log10(X); end;
 end;
+eeglab_options;
+if option_single
+    X = single(X);
+end;
 
 % Save SPECs in file (all components or channels)
 % -----------------------------------------------
