@@ -273,7 +273,7 @@ warning('off', 'MATLAB:MatFile:OlderFormat');
 if ndims(fileData.(fieldToRead)) == 2
     fieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
     if ~isempty(subTrials), fieldData = fieldData(:, subTrials); end;
-else fieldData = fileData.(fieldToRead)(indBegin1:indEnd1,indBegin2:indEnd2,trials);
+else fieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
     if ~isempty(subTrials), fieldData = fieldData(:, :, subTrials); end;
 end;
 warning('on', 'MATLAB:MatFile:OlderFormat');
