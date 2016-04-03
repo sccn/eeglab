@@ -207,6 +207,10 @@ if ~isempty(X)
         X = mean(X, 3);
     end;
 end;
+eeglab_options;
+if option_single
+    X = single(X);
+end;
 
 % Save ERPs in file (all components or channels)
 % ----------------------------------------------
