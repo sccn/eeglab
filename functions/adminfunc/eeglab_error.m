@@ -33,8 +33,12 @@ function eeglab_error
     ft_error = false;
     if iseeglaberror
         tmp = lasterror; % Add more information to eeglab errors JRI, RMC
-        tmplasterr = sprintf('%s,\n\n  (Error occurred in function %s() at line %d)',...
-          tmplasterr, tmp.stack(1).name, tmp.stack(1).line);
+        if ~isempty(tmp.stack)
+            tmplasterr = sprintf('%s,\n\n  (Error occurred in function %s() at line %d)',...
+              tmplasterr, tmp.stack(1).name, tmp.stack(1).line);
+        else
+            tmplasterr = sprintf('%s,\n', tmplasterr);
+        end;
         errordlg2(tmplasterr, header);
     else
         try
