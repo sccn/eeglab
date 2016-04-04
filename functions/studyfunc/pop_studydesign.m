@@ -139,7 +139,7 @@ if nargin < 3 && ~isstr(STUDY)
     if length(des) < length(STUDY.design)
         for index = length(des)+1:length(STUDY.design)
             fprintf('Deleting STUDY design %d\n', index);
-            com    = 'STUDY.design(index).name = '';'; eval(com);
+            com    = 'STUDY.design(index).name = '''';'; eval(com);
             allcom = [ allcom 10 com ];
         end;
     end;
