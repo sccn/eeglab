@@ -18,26 +18,56 @@ for i = 1 : length(varindx)
     catflag(i) = strcmpi(design.variable(varindx(i)).vartype, 'categorical');
     if ~catflag
          varlength = 1;
-    else varlength = length(design.variable(varindx(i)).value);
+    else
+        varvaluetmp = design.variable(varindx(i)).value;
+        cellindx    = find(cellfun(@iscell,varvaluetmp));
+        c = 1;
+        for ivar = 1:length(varvaluetmp)
+                if ~iscell(varvaluetmp{ivar})
+                    varlist{c} = varvaluetmp{ivar};
+                    c = c+1;
+                else
+                    for ival = 1: length(varvaluetmp)
+                        varlist(c) =  varvaluetmp{ivar}(ival);
+                        c = c+1;
+                    end
+                end
+        end        
+        varlength = length(varlist);
+
     end
     if varlength == 0, varlength = 1; end;
     colLabels{i} = design.variable(varindx(i)).label;
     
     for j = 1 : varlength
         if catflag(i)
-            facval = cell2mat(design.variable(varindx(i)).value(j));
+            
+            %facval = cell2mat(design.variable(varindx(i)).value(j));
+            facval = varlist{j};
             if isnumeric(facval)
-                facval_indx = find(facval == cell2mat(design.variable(varindx(i)).value));
+                if isempty(cellindx)
+                    facval_indx = find(facval == cell2mat(design.variable(varindx(i)).value));
+                else
+                end
             else
-                facval_indx = find(strcmp(facval,design.variable(varindx(i)).value));
+                if isempty(cellindx)
+                    facval_indx = find(strcmp(facval,design.variable(varindx(i)).value));
+                else
+                    for ivar = 1:length(varvaluetmp)
+                        hittmp = find(strcmp(facval,varvaluetmp{ivar}));
+                        if ~isempty(hittmp)
+                            facval_indx = ivar;
+                        end
+                    end
+                end
             end
-        end
-        
-        if catflag(i)
-            if isnumeric( cell2mat(design.variable(varindx(i)).value(j)))
+           
+            %
+            if isnumeric( cell2mat(varlist(j)))
+            %if isnumeric( cell2mat(design.variable(varindx(i)).value(j)))
                 varval = cell2mat(design.variable(varindx(i)).value(j));
             else
-                varval = design.variable(varindx(i)).value(j);
+                varval = varlist(j);
             end
         else
             varval = '';
@@ -87,8 +117,16 @@ if expanding == 1
     
                 % get the label for that column
                 if isstr(design.variable(iCol).value{iUnique})
-                     colLabels{countCol} = [design.variable(iCol).label '-' design.variable(iCol).value{iUnique}];
-                else colLabels{countCol} = [design.variable(iCol).label '-' int2str(design.variable(iCol).value{iUnique})];
+                    colLabels{countCol} = [design.variable(iCol).label '-' design.variable(iCol).value{iUnique}];
+                elseif iscell(design.variable(iCol).value{iUnique})
+                    % Concat all vals
+                    varnametmp = design.variable(iCol).value{iUnique}{1};
+                    for ivar = 2: length(design.variable(iCol).value{iUnique})
+                        varnametmp = [varnametmp '&' design.variable(iCol).value{iUnique}{ivar}];
+                    end
+                    colLabels{countCol} = [design.variable(iCol).label '-' varnametmp];
+                elseif isnumeric(design.variable(iCol).value{iUnique})
+                    colLabels{countCol} = [design.variable(iCol).label '-' int2str(design.variable(iCol).value{iUnique})];
                 end
             end;
         else
