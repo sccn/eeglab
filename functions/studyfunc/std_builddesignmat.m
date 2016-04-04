@@ -71,7 +71,8 @@ if expanding == 1
             prevCol = countCol;
             for iUnique = 1:length(design.variable(iCol).value)
                 countCol    = countCol+1;
-                trialSelect = tmpdmat(:,iCol) == uniqueVals(iUnique);
+                try tmpval = uniqueVals(iUnique); catch, tmpval = NaN; end
+                trialSelect = tmpdmat(:,iCol) == tmpval;
                 otherCols = prevCol+setdiff(1:length(uniqueVals), iUnique);
                 % putting 0 in other columns ensures we process the NaNs 
                 tmpdmatExpanded(trialSelect, countCol ) = 1;
