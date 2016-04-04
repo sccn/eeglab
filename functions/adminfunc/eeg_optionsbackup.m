@@ -8,7 +8,7 @@ option_storedisk     = 0 ;  % If set, keep at most one dataset in memory. This a
 option_savetwofiles  = 1 ;  % If set, save not one but two files for each dataset (header and data). This allows faster data loading in studies.
 option_saveversion6  = 0 ;  % If set, write Matlab files in Matlab v6.5 (max compatibility). If not, write files in Matlab v7.3 (larger than 2Gb).
 % Memory options 
-option_single        = 1 ;  % If set, use single precision under Matlab 7.x. This saves RAM but can lead to rare numerical imprecisions. 
+option_single        = 1 ;  % If set, use single precision number (32-bit instead of 64-bit) in memory and files.
 option_memmapdata    = 0 ;  % If set, use memory mapped array under Matlab 7.x. This may slow down some computation (beta).
 option_eegobject     = 0 ;  % If set, use the EEGLAB EEG object instead of the standard EEG structure (beta). 
 % ICA options 
