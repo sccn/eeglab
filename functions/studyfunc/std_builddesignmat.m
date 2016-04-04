@@ -2,40 +2,47 @@ function [tmpdmat colLabels] = std_builddesignmat(design, trialinfo, expanding)
 
 if nargin < 3, expanding = 0; end;
 ntrials = length(trialinfo);
+varindx = 1:length(design.variable);
 
-tmpdmat = NaN(ntrials,length(design.variable));
-catflag = zeros(1,length(design.variable));
-for i = 1 : length(design.variable)
+% checking if 'group' var (temporal commit to detect group vars, right now only detecting variable 'group')
+groupindx = find(strcmp({design.variable.label},'group'));
+if ~isempty(groupindx)
+    varindx(groupindx) = [];
+end
+
+tmpdmat = NaN(ntrials,length(varindx));
+catflag = zeros(1,length(varindx));
+for i = 1 : length(varindx)
     
     % case for continous variables
-    catflag(i) = strcmpi(design.variable(i).vartype, 'categorical');
+    catflag(i) = strcmpi(design.variable(varindx(i)).vartype, 'categorical');
     if ~catflag
          varlength = 1;
-    else varlength = length(design.variable(i).value);
+    else varlength = length(design.variable(varindx(i)).value);
     end
     if varlength == 0, varlength = 1; end;
-    colLabels{i} = design.variable(i).label;
+    colLabels{i} = design.variable(varindx(i)).label;
     
     for j = 1 : varlength
         if catflag(i)
-            facval = cell2mat(design.variable(i).value(j));
+            facval = cell2mat(design.variable(varindx(i)).value(j));
             if isnumeric(facval)
-                facval_indx = find(facval == cell2mat(design.variable(i).value));
+                facval_indx = find(facval == cell2mat(design.variable(varindx(i)).value));
             else
-                facval_indx = find(strcmp(facval,design.variable(i).value));
+                facval_indx = find(strcmp(facval,design.variable(varindx(i)).value));
             end
         end
         
         if catflag(i)
-            if isnumeric( cell2mat(design.variable(i).value(j)))
-                varval = cell2mat(design.variable(i).value(j));
+            if isnumeric( cell2mat(design.variable(varindx(i)).value(j)))
+                varval = cell2mat(design.variable(varindx(i)).value(j));
             else
-                varval = design.variable(i).value(j);
+                varval = design.variable(varindx(i)).value(j);
             end
         else
             varval = '';
         end
-        [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(i).label, varval);
+        [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(varindx(i)).label, varval);
         
         if ~isempty(trialindsx)
             % case for continous variables
