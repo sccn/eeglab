@@ -164,6 +164,8 @@ for ind = 1:length(finalinds) % scan channels or clusters
         if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
         if isempty(subjectList), subjectList = bigstruct.design.cases.value; end;
         count = 1;
+        tmpw = warning;
+        warning off;
         for iSubj = 1:length(subjectList)
             datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
             fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]); 
@@ -183,6 +185,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
                 end;
             end;
         end;
+        warning(tmpw);
 
         % concatenate data - compute average if not dealing with (processing) single trials
         % ---------------------------------------------------------------------------------
