@@ -59,8 +59,19 @@ if flag.dmatextend
     for i = 1:numel(design.variable)
         if strcmp(design.variable(i).vartype,'categorical')
             for j = 1 : numel(design.variable(i).value)
-                sortlist{c} = design.variable(i).value{j};
-                c = c+1;
+                varvaluetmp = design.variable(i).value{j};
+                if ~iscell(varvaluetmp)
+                    sortlist{c} = varvaluetmp;
+                    c = c+1;
+                else
+                    tmplist = varvaluetmp{1};
+                    for ival = 2: length(varvaluetmp)
+                        tmplist = [tmplist '&' varvaluetmp{ival}];
+                    end
+                    sortlist{c} =  tmplist;
+                        c = c+1;
+                end
+               
             end
         else
             sortlist{c} = design.variable(i).label;
@@ -105,7 +116,8 @@ handles.mainfig = figure('MenuBar'         ,'none',...
                              'NumberTitle' ,'off',...
                              'Units'       ,figunits,...
                              'Color'       ,COLOR,...
-                             'Position'    ,mainfig_pos);
+                             'Position'    ,mainfig_pos,...
+                             'Visible'     ,'off');
 % Data in mainfig
 setappdata(handles.mainfig,'usrdat',usrdat);
 setappdata(handles.mainfig,'numdesign',numdesign);
@@ -202,6 +214,7 @@ set(handles.popup_subject,'String'   ,listsubj,...
                           'callback' ,{@callback_popup_subject,handles});
                       
 callback_popup_subject('', '', handles);
+set(handles.mainfig, 'visible','on')
               
 %--------------------------------------------------------------------------
 % Callbacks
@@ -261,7 +274,21 @@ text2display(1) = {['Design Name: ' design.name]}; %Name of the design
 for i = 1:length(design.variable) % Loop per condition
     allvarstmp = '[';
     for j = 1 : length(design.variable(i).value)
-        allvarstmp = [allvarstmp ' ' num2str(design.variable(i).value{j})];
+%         allvarstmp = [allvarstmp ' ' num2str(design.variable(i).value{j})];
+        % --
+        if isstr(design.variable(i).value{j})
+            allvarstmp = [allvarstmp ' ' design.variable(i).value{j}];
+        elseif iscell(design.variable(i).value{j})
+            % Concat all vals
+            varnametmp = design.variable(i).value{j}{1};
+            for ivar = 2: length(design.variable(i).value{j})
+                varnametmp = [varnametmp '&' design.variable(i).value{j}{ivar}];
+            end
+            allvarstmp = [allvarstmp ' ' varnametmp];
+        elseif isnumeric(design.variable(i).value{j})
+            allvarstmp = [allvarstmp ' ' int2str(design.variable(i).value{j})];
+        end
+        % --
     end
     allvarstmp = [allvarstmp ' ]'];
     
