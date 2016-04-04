@@ -345,6 +345,7 @@ if nargin < 3
     userdata.chans     = chans;
     userdata.nchansori = nchansori;
     userdata.chaninfo  = chaninfo;
+    userdata.urchans   = urchans ;
     userdata.commands  = totaluserdat;
 
     [results userdata returnmode] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', ...
@@ -360,6 +361,7 @@ if nargin < 3
     % transfer events back from global workspace
     chans      = userdata.chans;
     chaninfo   = userdata.chaninfo;
+    urchans    = userdata.urchans; 
     if ~isempty(userdata.commands)
         com = sprintf('%s=pop_chanedit(%s, %s);', inputname(1), inputname(1), vararg2str(userdata.commands));
     end;
@@ -374,6 +376,7 @@ else
         chans       = userdata.chans;
         nchansori   = userdata.nchansori;
         chaninfo    = userdata.chaninfo;
+        urchans     = userdata.urchans;
         currentpos  = str2num(get(findobj(fig, 'tag', 'chaneditnumval'), 'string'));
     end;
     
@@ -809,13 +812,15 @@ else
                             'callback' setmodel } ...
                             { } ...
                             { 'style' 'edit'       'string' userdatatmp{1} 'tag' 'elec' } ...
-                            { 'style' 'pushbutton' 'string' '...' 'callback' commandload } };
+                            { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
+                            { 'Style', 'checkbox', 'value', 1, 'string','Overwrite Original Channels' 'tag' 'plotcurve' } };
 
-                        res = inputgui( { 1 [1 0.3] [1 0.3] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1] );
+                        res = inputgui( { 1 [1 0.3] [1 0.3] 1 }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1 1] );
                         if ~isempty(res)
                             chaninfo.filename = res{2};
                             args{ curfield   } = 'lookup';
                             args{ curfield+1 } = res{2};
+                            flag_replurchan    = res{3};
                             com = args;
                         else
                             return;
@@ -868,7 +873,7 @@ else
                 else
                     chaninfo.nosedir = '+X';
                 end;
-                urchans = chans;
+                if flag_replurchan, urchans = chans; end;
                 for index = 1:length(chans)
                     chans(index).urchan    = index;
                     chans(index).ref       = '';
@@ -884,6 +889,7 @@ if ~isempty(fig)
     userdata.chans    = chans;
     userdata.chaninfo = chaninfo;
     userdata.commands = { userdata.commands{:} args{:} };
+    userdata.urchans  = urchans;
     set(fig, 'userdata', userdata);
 
     set(findobj(fig, 'tag', 'chaneditnumval'), 'string', num2str(currentpos));
@@ -920,6 +926,9 @@ else
                  EEG(index).chanlocs = chans;
                  EEG(index).chaninfo = chaninfo;
              end;
+             % Updating urchanlocs
+             if ~isempty(urchans), EEG.urchanlocs = urchans; end; % Ramon added
+             
              EEG = eeg_checkset(EEG); % for channel orientation
          else
              disp('Channel structure size not consistent with the data so changes will be ignored');
