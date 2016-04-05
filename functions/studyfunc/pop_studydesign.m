@@ -35,6 +35,10 @@ if nargin < 2
     return;
 end;
 
+if ~isstr(STUDY) && isfield(STUDY, 'currentdesign') && STUDY.currentdesign > length(STUDY.design)
+    STUDY.currentdesign = length(STUDY.design);
+end;
+
 if nargin < 3 && ~isstr(STUDY)
     
     %% create GUI
@@ -137,9 +141,9 @@ if nargin < 3 && ~isstr(STUDY)
     des    = usrdat.design;
     allcom = '';
     if length(des) < length(STUDY.design)
-        for index = length(des)+1:length(STUDY.design)
+        for index = length(STUDY.design):-1:length(des)+1
             fprintf('Deleting STUDY design %d\n', index);
-            com    = 'STUDY.design(index).name = '''';'; eval(com);
+            com    = 'STUDY.design(index) = [];'; eval(com);
             allcom = [ allcom 10 com ];
         end;
     end;
