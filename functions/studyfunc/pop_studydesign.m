@@ -353,7 +353,7 @@ elseif isstr(STUDY)
             
         case 'plotdmat'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
-            std_plotdmat(usrdat.design,val,usrdat.datasetinfo);
+            std_plotdmat(usrdat.design(val),usrdat.datasetinfo);
             
         case 'importgvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
