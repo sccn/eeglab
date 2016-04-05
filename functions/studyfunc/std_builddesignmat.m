@@ -1,4 +1,4 @@
-function [tmpdmat colLabels] = std_builddesignmat(design, trialinfo, expanding)
+function [tmpdmat,colLabels,catflag] = std_builddesignmat(design, trialinfo, expanding)
 
 if nargin < 3, expanding = 0; end;
 ntrials = length(trialinfo);
@@ -16,12 +16,13 @@ for i = 1 : length(varindx)
     
     % case for continous variables
     catflag(i) = strcmpi(design.variable(varindx(i)).vartype, 'categorical');
-    if ~catflag
+    if ~catflag(i)
          varlength = 1;
     else
         varvaluetmp = design.variable(varindx(i)).value;
         cellindx    = find(cellfun(@iscell,varvaluetmp));
         c = 1;
+        % Expand cells
         for ivar = 1:length(varvaluetmp)
                 if ~iscell(varvaluetmp{ivar})
                     varlist{c} = varvaluetmp{ivar};
@@ -54,7 +55,7 @@ for i = 1 : length(varindx)
                     facval_indx = find(strcmp(facval,design.variable(varindx(i)).value));
                 else
                     for ivar = 1:length(varvaluetmp)
-                        hittmp = find(strcmp(facval,varvaluetmp{ivar}));
+                        hittmp = find(strcmp(facval,varvaluetmp{ivar}), 1);
                         if ~isempty(hittmp)
                             facval_indx = ivar;
                         end
@@ -63,11 +64,11 @@ for i = 1 : length(varindx)
             end
            
             %
-            if isnumeric( cell2mat(varlist(j)))
+            if isnumeric(varlist{j})
             %if isnumeric( cell2mat(design.variable(varindx(i)).value(j)))
                 varval = cell2mat(design.variable(varindx(i)).value(j));
             else
-                varval = varlist(j);
+                varval = varlist{j};
             end
         else
             varval = '';
@@ -91,8 +92,9 @@ if expanding == 1
     nCols = 0;
     for iCol = 1:size(tmpdmat,2)
         if catflag(iCol)
-             nCols = nCols+length(design.variable(iCol).value);
-        else nCols = nCols+1;
+             nCols = nCols+length(design.variable(varindx(iCol)).value);
+        else
+            nCols = nCols+1;
         end;
     end;
     
@@ -106,7 +108,7 @@ if expanding == 1
             
             % scan unique values
             prevCol = countCol;
-            for iUnique = 1:length(design.variable(iCol).value)
+            for iUnique = 1:length(design.variable(varindx(iCol)).value)
                 countCol    = countCol+1;
                 try tmpval = uniqueVals(iUnique); catch, tmpval = NaN; end
                 trialSelect = tmpdmat(:,iCol) == tmpval;
@@ -116,23 +118,23 @@ if expanding == 1
                 tmpdmatExpanded(trialSelect, otherCols) = 0;
     
                 % get the label for that column
-                if isstr(design.variable(iCol).value{iUnique})
-                    colLabels{countCol} = [design.variable(iCol).label '-' design.variable(iCol).value{iUnique}];
-                elseif iscell(design.variable(iCol).value{iUnique})
+                if isstr(design.variable(varindx(iCol)).value{iUnique})
+                    colLabels{countCol} = [design.variable(varindx(iCol)).label '-' design.variable(varindx(iCol)).value{iUnique}];
+                elseif iscell(design.variable(varindx(iCol)).value{iUnique})
                     % Concat all vals
-                    varnametmp = design.variable(iCol).value{iUnique}{1};
-                    for ivar = 2: length(design.variable(iCol).value{iUnique})
-                        varnametmp = [varnametmp '&' design.variable(iCol).value{iUnique}{ivar}];
+                    varnametmp = design.variable(varindx(iCol)).value{iUnique}{1};
+                    for ivar = 2: length(design.variable(varindx(iCol)).value{iUnique})
+                        varnametmp = [varnametmp '&' design.variable(varindx(iCol)).value{iUnique}{ivar}];
                     end
-                    colLabels{countCol} = [design.variable(iCol).label '-' varnametmp];
-                elseif isnumeric(design.variable(iCol).value{iUnique})
-                    colLabels{countCol} = [design.variable(iCol).label '-' int2str(design.variable(iCol).value{iUnique})];
+                    colLabels{countCol} = [design.variable(varindx(iCol)).label '-' varnametmp];
+                elseif isnumeric(design.variable(varindx(iCol)).value{iUnique})
+                    colLabels{countCol} = [design.variable(varindx(iCol)).label '-' int2str(design.variable(varindx(iCol)).value{iUnique})];
                 end
             end;
         else
             countCol = countCol+1;
-            colLabels{countCol} = design.variable(iCol).label;
-            tmpdmatExpanded(:,countCol) = (tmpdmat(:,iCol)-min(tmpdmat(:,iCol)))/(max(tmpdmat(:,iCol))-min(tmpdmat(:,iCol)));
+            colLabels{countCol} = design.variable(varindx(iCol)).label;
+            tmpdmatExpanded(:,countCol) = tmpdmat(:,iCol);
         end;
     end;
 
