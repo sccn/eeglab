@@ -2,21 +2,13 @@
 %                  each subject. Designed to be used directly (as a callback 
 %                  function of button plot) from pop_studydesign
 % Usage:
-%   >>  
+%   >>  std_plotdmat(STUDY.design(1),STUDY.datasetinfo)
 %
 % Inputs:
-%      usrdat      - Structure who contain the name of the trial's properties
-%      factors     - Cell array with the name of the trial's properties {1x15 cell}
-%      factorvals  -Cell array with the values of the properties in 'factors' for each trial
-%      factsubj 
-%      subjects    -Cell array with the name of the subjects
-%      datasetinfo -datasetinfo
-%      design      -Structure withe the fields {name,filepath,variable,
+%      datasetinfo - datasetinfo
+%      design      - Structure withe the fields {name,filepath,variable,
 %                   cases, include, deletepreviousfiles} for each variable
-%                   in the design
-%      filepath    -Study filepath
-%      numerical  
-%      numdesign   -Design selected
+%                   in the design. i.e. STUDY.design(1)
 %    
 % Outputs:
 %
@@ -41,11 +33,18 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function std_plotmat(usrdat,numdesign)
+function std_plotmat(design,datasetinfo)
 
 % Set var stuff
-design = usrdat.design(numdesign);
 listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
+
+varindx = 1:length(design.variable);
+
+% checking if 'group' var (temporal commit to detect group vars, right now only detecting variable 'group')
+groupindx = find(strcmp({design.variable.label},'group'));
+if ~isempty(groupindx)
+    varindx(groupindx) = [];
+end
 
 flag.dmatextend = true; 
 flag.textdisp   = 1;
@@ -56,10 +55,10 @@ handles.figmode = 0; % Change to 1 if info in GUI. 0 -> info in commandline
 if flag.dmatextend
     sortlist{1} = ' '; 
     c = 2;
-    for i = 1:numel(design.variable)
-        if strcmp(design.variable(i).vartype,'categorical')
-            for j = 1 : numel(design.variable(i).value)
-                varvaluetmp = design.variable(i).value{j};
+    for i = 1:numel(design.variable(varindx))
+        if strcmp(design.variable(varindx(i)).vartype,'categorical')
+            for j = 1 : numel(design.variable(varindx(i)).value)
+                varvaluetmp = design.variable(varindx(i)).value{j};
                 if ~iscell(varvaluetmp)
                     sortlist{c} = varvaluetmp;
                     c = c+1;
@@ -112,16 +111,17 @@ figunits = 'Normalized';
 % Main fig
 %--------------------------------------------------------------------------
 handles.mainfig = figure('MenuBar'         ,'none',...
-                             'Name'        ,'Design Matrix',...
+                             'Name'        ,['Design Matrix:  ' design.name],...
                              'NumberTitle' ,'off',...
                              'Units'       ,figunits,...
                              'Color'       ,COLOR,...
                              'Position'    ,mainfig_pos,...
                              'Visible'     ,'off');
 % Data in mainfig
-setappdata(handles.mainfig,'usrdat',usrdat);
-setappdata(handles.mainfig,'numdesign',numdesign);
+setappdata(handles.mainfig,'design',design);
 setappdata(handles.mainfig,'flag',flag);
+setappdata(handles.mainfig,'datasetinfo',datasetinfo);
+
 
 % Text
 %--------------------------------------------------------------------------
@@ -214,7 +214,9 @@ set(handles.popup_subject,'String'   ,listsubj,...
                           'callback' ,{@callback_popup_subject,handles});
                       
 callback_popup_subject('', '', handles);
-set(handles.mainfig, 'visible','on')
+
+set(handles.mainfig, 'visible','on');
+axes(handles.axes1);
               
 %--------------------------------------------------------------------------
 % Callbacks
@@ -222,18 +224,19 @@ set(handles.mainfig, 'visible','on')
 function callback_popup_subject(src,eventdata,handles)
 
 AXES_FONTSIZE = 11;
-numdesign = getappdata(handles.mainfig,'numdesign');
-usrdat    = getappdata(handles.mainfig,'usrdat');
+design      = getappdata(handles.mainfig,'design');
+flag        = getappdata(handles.mainfig,'flag');
+datasetinfo = getappdata(handles.mainfig,'datasetinfo');
 set(handles.edit_dispclick, 'String', ' ', ...
-                             'ForegroundColor'  , [0 0 0]);
-design = usrdat.design(numdesign);
+                             'ForegroundColor'  , [0 0 0]);       
+
 listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
 if isfield(handles,'popup_subject')
     indtmp = get(handles.popup_subject, 'Value');
 else
     indtmp = 1;
 end
-flag = getappdata(handles.mainfig,'flag');
+
 inner_subj_flag = 1;
 if flag.subj ~= indtmp
     flag.textdisp = 1;
@@ -243,18 +246,18 @@ end
 subj = listsubj{indtmp};
 
 %  Retreiving all trials and values for this subject
-dsetinfo_subjindx = sort(find(strcmp({usrdat.datasetinfo.subject},subj)));  % in usrdat.datasetinfo
-trialinfo  = std_combtrialinfo(usrdat.datasetinfo, dsetinfo_subjindx);      % Combining trialinfo
+dsetinfo_subjindx = sort(find(strcmp({datasetinfo.subject},subj)));  % in datasetinfo
+trialinfo  = std_combtrialinfo(datasetinfo, dsetinfo_subjindx);      % Combining trialinfo
 
 ntrials = 0;
 for i = 1 : length(dsetinfo_subjindx)
     startendindx(i,1) = ntrials + 1;
-    ntrials = ntrials + length(usrdat.datasetinfo(dsetinfo_subjindx(i)).trialinfo);
+    ntrials = ntrials + length(datasetinfo(dsetinfo_subjindx(i)).trialinfo);
     startendindx(i,2) = ntrials;
 end
 
 % call function to build design matrix
-[tmpdmat allLabels] = std_builddesignmat(design, trialinfo, flag.dmatextend);
+[tmpdmat allLabels,catflag] = std_builddesignmat(design, trialinfo, flag.dmatextend);
 
 % Removing NANs (Thanks Cyril!!!)
 check = find(sum(isnan(tmpdmat),2));
@@ -310,23 +313,42 @@ elseif  flag.textdisp
     display('----------------------------------------')
     handles.notdisp = 0;
 end
-axes(handles.axes1)
-handles.figure = imagesc(normc(tmpdmat(dmatsortindex,:))); colormap(flipud(colormap('gray'))); % Normalizing before show (by cols)
+
+% Normalizing tmpdmat for plot
+for iCol = 1:size(tmpdmat,2)
+    dmat_den = (max(tmpdmat(:,iCol))-min(tmpdmat(:,iCol)));
+    if dmat_den ~= 0
+    normtmpdmat(:,iCol) = (tmpdmat(:,iCol)-min(tmpdmat(:,iCol)))/dmat_den;
+    else
+         normtmpdmat(:,iCol) = deal(max(tmpdmat(:,iCol)));
+    end
+end
+
+% Plot matrix
+set(handles.mainfig,'CurrentAxes',handles.axes1);
+handles.figure = imagesc(normtmpdmat(dmatsortindex,:));    
+
+colormap(flipud(colormap('gray'))); 
+
 xlabel('Regressors',...
        'FontWeight', 'normal',...
        'FontSize', AXES_FONTSIZE);
 ylabel('Trials',...
        'FontWeight', 'Normal',...
        'FontSize', AXES_FONTSIZE);
+   
 set(handles.axes1,'XTick',1:size(tmpdmat,2))
-set(handles.axes2','XTick', get(handles.axes1, 'XTick'),...
+set(handles.axes2','XTick'     ,get(handles.axes1, 'XTick'),...
                    'XTickLabel', allLabels,...
-                   'XLim', get(handles.axes1, 'XLim'),...
-                   'FontSize', AXES_FONTSIZE);
-set(handles.figure, 'ButtonDownFcn', {@callback_dmatclick,handles,tmpdmat(dmatsortindex,:),design})
-setappdata(handles.mainfig,'flag',flag)
+                   'XLim'      , get(handles.axes1, 'XLim'),...
+                   'FontSize'  , AXES_FONTSIZE);
+
+
+set(handles.figure, 'ButtonDownFcn', {@callback_dmatclick,handles,tmpdmat(dmatsortindex,:),design});
+setappdata(handles.mainfig,'flag',flag);
 drawnow;
 
+%--------------------------------------------------------------------------
 function callback_dmatclick(src,eventdata,handles,tmpdmat,design)
 
 axesHandle  = get(src,'Parent');
