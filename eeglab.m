@@ -1425,8 +1425,10 @@ index = 1;
 indexmenu = 1;
 MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 
-warning('off','MATLAB:lang:cannotClearExecutingFunction');
+tmp = warning;
+warning off;
 clear functions;
+warning(tmp);
 eeglab_options;
 if isempty(ALLEEG) && ~isempty(EEG) && ~isempty(EEG.data)
     ALLEEG = EEG;
