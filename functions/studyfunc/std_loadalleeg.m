@@ -98,6 +98,9 @@ function ALLEEG = std_loadalleeg(varargin)
         [sub3 sub2] = fileparts(sub2);
         
         % priority is given to relative path of the STUDY if STUDY has moved
+        if ~isempty(oldgenpath) && oldgenpath(end) == filesep
+             oldgenpath(end) = [];
+        end
         if ~isequal(genpath, oldgenpath) && ~isempty(oldgenpath)
             disp('Warning: STUDY moved since last saved, trying to load data files using relative path');
             if  ~isempty(strfind(char(paths{dset}), oldgenpath))
