@@ -83,6 +83,7 @@ else
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
           'splitreg'       'string'  { 'on','off' }   'off';
+          'freqlim'        'real'    []               [] ;
           'neighboropt'    'cell'    {}               {} ;
           'chanloc'        'struct'  {}               struct('no', {}); % default empty structure
           'neighbormat'    'real'    []               [] },...
@@ -467,8 +468,13 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     model.defaults.analysis= 'Frequency';
     model.defaults.start   = -10;
     model.defaults.end     = ALLEEG(index(1)).xmax*1000;
-    model.defaults.lowf    = [];
-    model.defaults.highf   = [];
+    if length(opt.freqlim) == 2
+        model.defaults.lowf    = opt.freqlim(1);
+        model.defaults.highf   = opt.freqlim(end);
+    else
+        model.defaults.lowf    = [];
+        model.defaults.highf   = [];
+    end;
     
 elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
