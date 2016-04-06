@@ -300,7 +300,7 @@ eeglab_options;
 usesingle = option_single;
 
 % CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
-for k = 1:length(g.indices)  % for each (specified) component/channel
+parfor k = 1:length(g.indices)  % for each (specified) component/channel
     %if k>size(X,1), break; end; % happens for components
     if powbaseexist
         tmpparams = parameters;
