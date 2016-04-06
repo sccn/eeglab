@@ -29,6 +29,8 @@
 %   'neighbormat' - Neighborhood matrix of electrodes. Must be used with 'chanloc', 
 %                   or it will be ignored. If this option is used, it will
 %                   ignore 'neighboropt' if used.
+%   'freqlim'     - Frequency trimming
+%   'timelim'     - Time trimming
 %      
 % Outputs:
 %  STUDY     - modified STUDY structure (the STUDY.design now contains a list
@@ -84,6 +86,7 @@ else
           'erase'          'string'  { 'on','off' }   'off';
           'splitreg'       'string'  { 'on','off' }   'off';
           'freqlim'        'real'    []               [] ;
+          'timelim'        'real'    []               [] ;
           'neighboropt'    'cell'    {}               {} ;
           'chanloc'        'struct'  {}               struct('no', {}); % default empty structure
           'neighbormat'    'real'    []               [] },...
@@ -458,8 +461,22 @@ end
 % -----------------------------------------------------------------
 if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     model.defaults.analysis= 'Time';
-    model.defaults.start = ALLEEG(index(1)).xmin*1000; %-10; 
+    model.defaults.start = ALLEEG(index(1)).xmin*1000;
     model.defaults.end   = ALLEEG(index(1)).xmax*1000;
+    if length(opt.timelim) == 2 && opt.timelim(1) < opt.timelim(end)
+        % start value
+        if opt.timelim(1) > model.defaults.start && opt.timelim(1) < model.defaults.end
+            model.defaults.start = opt.timelim(1);
+        else
+            display('std_limo: Invalid time lower limit, using default value instead');
+        end
+        % end value
+        if opt.timelim(end) < model.defaults.end && opt.timelim(end) > model.defaults.start
+            model.defaults.end = opt.timelim(end);
+        else
+            display('std_limo: Invalid time upper limit, using default value instead');
+        end
+    end
     model.defaults.lowf  = [];
     model.defaults.highf = [];
     
@@ -468,7 +485,7 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     model.defaults.analysis= 'Frequency';
     model.defaults.start   = -10;
     model.defaults.end     = ALLEEG(index(1)).xmax*1000;
-    if length(opt.freqlim) == 2
+    if length(opt.freqlim) == 2 && opt.freqlim(1) < opt.freqlim(end)
         model.defaults.lowf    = opt.freqlim(1);
         model.defaults.highf   = opt.freqlim(end);
     else
