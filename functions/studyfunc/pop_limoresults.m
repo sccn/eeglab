@@ -856,6 +856,7 @@ function [var2plot,filespath,limoindx,STUDY] = getmeasures2plot(STUDY,subjN,meas
 
 % Init
 filespath = [];
+limoindx = [];
 var2plot.guiname{1}  = 'No Variables Computed';
 measure_list         = {'erp','spec'};
 datorica_list        = {'dat', 'ica'};
