@@ -8,6 +8,8 @@
 %   "Electrode|Component" - [edit box] electrode or component number(s) to 
 %                 take into consideration for rejection. Sets the 'elecrange'
 %                 parameter in the command line call (see below).
+% "Method to compute spectrum" -[popupmenu] with values {'fft','multitaper'}
+%                 Select method to compute spectrum.
 %   "Lower limits(s)" - [edit box] lower threshold limits(s) (in dB). 
 %                 Sets the command line parameter 'threshold'. If more than
 %                 one, apply to each electrode|component individually. If
@@ -19,10 +21,10 @@
 %                 Sets the command line parameter 'freqlimits'.
 %   "High frequency(s)" - [edit box] high-frequency limit(s) in Hz. 
 %                 Sets the command line parameter 'freqlimits'.
-%   "Display previous rejection marks?" - [edit box] either YES or NO. 
-%                  Sets the command line input option 'eegplotplotallrej'.
-%   "Reject marked trials?" - [edit box] either YES or NO. Sets the
-%                 command line input option 'eegplotreject'.
+%   "Display previous rejection marks: " - [Checkbox]. Sets the command line
+%                   input option 'eegplotplotallrej'.
+%   "Reject marked trials: " - [Checkbox]  Sets the command line
+%                  input option 'eegplotreject'.
 %
 % Command line inputs:
 %   INEEG      - input dataset
