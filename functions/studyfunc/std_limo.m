@@ -587,7 +587,9 @@ for i =1:size(LIMO_files.mat,1)
     end
 end
 
-cd(STUDY.filepath);
+if ~isempty(STUDY.filepath)
+    cd(STUDY.filepath);
+end;
 
 % Computing Stats (Just ttest and paired ttest ... by now)
 % -------------------------------------------------------------------------
