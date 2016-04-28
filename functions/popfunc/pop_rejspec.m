@@ -5,26 +5,29 @@
 %   >> [OUTEEG, Indices] = pop_rejspec( INEEG, typerej, 'key', val, ...);
 %
 % Pop-up window options:
-%   "Electrode|Component" - [edit box] electrode or component number(s) to 
+% "Electrode|Component" - [edit box] electrode or component indices to 
 %                 take into consideration for rejection. Sets the 'elecrange'
 %                 parameter in the command line call (see below).
-% "Method to compute spectrum" -[popupmenu] with values {'fft','multitaper'}
+% "Spectrum computation method" -[popupmenu] with values {'fft','multitaper'}
 %                 Select method to compute spectrum.
-%   "Lower limits(s)" - [edit box] lower threshold limits(s) (in dB). 
-%                 Sets the command line parameter 'threshold'. If more than
-%                 one, apply to each electrode|component individually. If
-%                 fewer than number of electrodes|components, apply the
-%                 last values to all remaining electrodes|components.
-%   "Upper limits(s)" - [edit box] upper threshold limit(s) in dB. 
-%                 Sets the command line parameter 'threshold'.
-%   "Low frequency(s)" - [edit box] low-frequency limit(s) in Hz. 
-%                 Sets the command line parameter 'freqlimits'.
-%   "High frequency(s)" - [edit box] high-frequency limit(s) in Hz. 
-%                 Sets the command line parameter 'freqlimits'.
-%   "Display previous rejection marks: " - [Checkbox]. Sets the command line
-%                   input option 'eegplotplotallrej'.
-%   "Reject marked trials: " - [Checkbox]  Sets the command line
-%                  input option 'eegplotreject'.
+% "Minimum power rejection threshold(s) (dB)" - [edit box] minimum rejection
+%                 threshold(s) in (in dB). Sets the command line parameter 
+%                 'threshold'. If more than one, apply to each electrode|
+%                 component individually. If fewer than number of 
+%                 electrodes|components, apply the last value to all remaining
+%                 electrodes|components.
+% "Maximun power  rejection threshold(s) (dB)" - Maximum rejection threshold(s) 
+%                 Sets the command  line parameter 'threshold'.
+% "Low frequency  limit(s)" - [edit box] Low-frequency limit(s) in Hz of 
+%                 range to perform  rejection. Sets the command line parameter
+%                 'freqlimits'.
+% "High frequency limit(s)" - [edit box] High-frequency limit(s) in Hz of 
+%                 range to perform  rejection. Sets the command line parameter
+%                 'freqlimits'.
+% "Display previous rejection marks: " - [Checkbox]. Sets the command line
+%                 input option 'eegplotplotallrej'.
+% "Reject marked trials: " - [Checkbox]  Sets the command line
+%                 input option 'eegplotreject'.
 %
 % Command line inputs:
 %   INEEG      - input dataset
@@ -106,15 +109,15 @@ if nargin < 3
     
     % which set to save
     % -----------------
-    promptstr = { fastif(icacomp==0, 'Component number(s) (Ex: 2 4 5):', ...
-                                     'Electrode number(s) (Ex: 2 4 5):'), ...
-                  'Method to compute spectrum:',...
-                  'Lower limit(s) (dB):', ...
-                  'Upper limit(s) (dB):', ...
-                  'Low frequency(s) (Hz):', ...
-                  'High frequency(s) (Hz):', ...
-                  'Display previous rejection marks:', ...
-                  'Reject marked trial(s):' };
+    promptstr = { fastif(icacomp==0, 'Component indices (Ex: 2 4 6:8 10)', ...
+                                     'Electrode indices (Ex: 2 4 6:8 10)'), ...
+                  'Spectrum computation method',...
+                  'Minimum power rejection threshold(s) (dB)',... %'Low power rejection threshold (s) (dB)', ...
+                  'Maximum power rejection threshold(s) (dB)',... %'High power rejection threshold (s) (dB)', ...
+                  'Low frequency limit(s) (Hz)', ...
+                  'High frequency limit(s) (Hz)', ...
+                  'Display previous rejection marks', ...
+                  'Reject marked trial(s)' };
     
     inistr = { ['1:' int2str(EEG.nbchan)], ...
                '',...
@@ -127,8 +130,8 @@ if nargin < 3
     
     methodlist = {'FFT', 'Multitaper'};
     g  = [1 0.1 0.75];
-    g2 = [1 0.22 0.9];
-    g3 = [1 0.22 0.4];
+    g2 = [1 0.26 0.9];
+    g3 = [1 0.22 0.85];
     geometry = {g g2 g g g g 1 g3 g3};
     uilist = {...
               { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      ,'string' ,inistr{1}  'tag' 'cpnum'}...
