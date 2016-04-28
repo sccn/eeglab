@@ -1,35 +1,34 @@
-% eegthresh() - classical trial rejection rejection using a threshold on 
-%             the raw signal
+% eegthresh() -  reject trials with out-of-bounds channel values within a
+%                specified epoch time range.
 %
 % Usage:
 %   >> [Iin, Iout, newsignal, elec] = eegthresh( signal, frames, ...
-%              elecs, negthresh, posthresh, timerange, starttime, entime)
+%                elecs, negthresh, posthresh, timerange, starttime,endtime);
 %
-% Inputs:
-%   signal     - signal 2D, channels x (frames*sweeps) or 3D channels x 
-%              frames x sweeps
+% Required inputs:
+%   signal     - 2-D data matrix [channels, frames*sweeps],  
+%                or 3-D data matrix [channels, frames, sweeps]
 %   frames     - number of points per epoch
-%   elecs      - [e1 e2 ...] electrodes (number) to take into 
-%              consideration for rejection
-%   negthresh  - negative threshold limit in mV (can be an array if 
-%              several electrodes; if less numbe  of values than number 
-%              of electrodes the last value is used for the remaining 
-%              electrodes)
-%   posthresh  - positive threshold limit in mV (same syntax as 
-%              negthresh)
-%   timerange  - [mintime maxtime] timerange limit in second 
-%   starttime  - starting time limit in second (same syntax  as 
-%              negthresh)
-%   endtime    - ending time limit in second (same syntax  as negthresh)
+%   elecs      - [int vector] electrode indices to reject on
+%   negthresh  - minimum rejection threshold(s) in uV. This can be an array 
+%                of values for individual electrodes. If fewer values than  
+%                electrodes, the last value is used for the remaining 
+%                electrodes.
+%   posthresh  - maximum rejection threshold(s) in uV (same syntax as for
+%                negthresh)
+%   timerange  - [mintime maxtime] time range limits of the signal
+%   starttime  - Starting limit (in seconds or Hz) of range to perform 
+%                rejection (same syntax  as negthresh)
+%   endtime    - Ending limit (in seconds or Hz) of range to perform 
+%                rejection (same syntax  as negthresh)
 %
 % Outputs:
-%   Iin        - Indexes of sweeps not rejected
-%   Iout       - Indexes of sweeps rejected
-%   newsignal  - signal after 
-%              sweeps rejection (same number of dimension as signal)
-%   elec       - electrode that served for the rejection (array of 0 and
-%              1, same number of column as Iout, rows=number of 
-%              electrodes)
+%   Iin        - Indexes of epochs accepted
+%   Iout       - Indexes of epochs rejected
+%   newsignal  - input data after epoch rejection
+%   elec       - electrode that triggered the rejections (array of 0s 
+%                and 1s with the same number of columns as Iout
+%                and number of rows = number of electrodes).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -60,7 +59,7 @@ end;
 
 if starttime < timerange(1)
 	disp('eegthresh: starting point out of range, adjusted');
-    startime = timerange(1);
+    starttime = timerange(1);
 end;	
 if endtime > timerange(2)
 	disp('eegthresh: ending point out of range, adjusted');
