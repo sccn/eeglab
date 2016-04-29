@@ -9,41 +9,43 @@
 %                   locthresh, globthresh, superpose, reject, vistype);
 %
 % Graphical interface:
-%   "Electrode" - [edit box] electrodes or components (number) to take into
-%                 consideration for rejection. Same as the 'elec_comp'
+%   "Electrode|Component" - [edit box] electrodes or components indices to take 
+%                 into consideration for rejection. Same as the 'elec_comp'
 %                 parameter from the command line.
-%   "Single-channel limit" - [edit box] pkurtosis limit in terms of
-%                 standard-dev. Same as 'locthresh' command line
+%   "Single-channel limit|Single-component limit" - [edit box] kurtosis limit
+%                  in terms of standard-dev. Same as 'locthresh' command line
 %                 parameter.
-%   "All-channel limit" - [edit box] kurtosis limit in terms of
-%                 standard-dev (all channel regrouped). Same as 
+%   "All-channel limit|All-component limit" - [edit box] kurtosis limit
+%                  in terms of standard-dev (all channel regrouped). Same as 
 %                 'globthresh' command line parameter.
-%   "Display with previous rejection" - [edit box] can be either YES or
-%                 NO. This edit box corresponds to the command line input
-%                 option 'superpose'.
-%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
-%                 box corresponds to the command line input option 'reject'.
-%   "visualization type" - [edit box] can be either REJECTRIALS or EEGPLOT.
-%                 This edit box corresponds to the command line input
-%                 option 'vistype'.
+%   "visualization type" - [popup menu] can be either 'REJECTRIALS'|'EEGPLOT'.
+%                 This correspond to the command line input option 'vistype'.
+%   "Display with previous rejection" - [checkbox] This checkbox corresponds
+%                 to the command line input option 'superpose'.          
+%   "Reject marked trial(s)" - [checkbox] This checkbox corresponds
+%                 to the command line input option 'reject'.
 % 
 % Inputs:
-%   INEEG      - input dataset
-%   typerej    - type of rejection (0 = independent components; 1 = eeg
+%   INEEG      - Input dataset
+%   typerej    - Type of rejection (0 = independent components; 1 = eeg
 %              data). Default is 1. For independent components, before
 %              thresholding, the activity is normalized for each 
 %              component.
 %   elec_comp  - [e1 e2 ...] electrodes (number) to take into 
-%              consideration for rejection
-%   locthresh  - activity kurtosis limit in terms of standard-dev.
-%   globthresh - global limit (for all channel). Same unit as above.
-%   superpose  - 0=do not superpose pre-labelling with previous
-%              pre-labelling (stored in the dataset). 1=consider both
-%              pre-labelling (using different colors). Default is 0.
-%   reject     - 0=do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 1.
-%   vistype    - visualization type. 0 calls rejstatepoch() and 1 calls eegplot()
-%              default is 0.  
+%              consideration for rejection.
+%   locthresh  - Activity kurtosis limit in terms of standard-dev.
+%   globthresh - Global limit (for all channel). Same unit as above.
+%   vistype    - Visualization type. [0] calls rejstatepoch() and [1] calls
+%               eegplot() default is [0].When added to the command line
+%               call it will display the visualization
+%               (Note for developers: When called from command line 
+%               it will make 'calldisp = 1')
+%   superpose  - [0] do not superpose pre-labelling with previous
+%              pre-labelling (stored in the dataset). [1] consider 
+%              both pre-labelling (using different colors). Default is [0].
+%   reject     - [0] do not reject labelled trials (but still  
+%              store the labels. [1] reject labelled trials. 
+%              Default is [1].
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated kurtosis array
@@ -102,44 +104,58 @@ if icacomp == 0
 end;	
 
 if nargin < 3
-
-	% which set to save
-	% -----------------
-	promptstr   = { [ fastif(icacomp, 'Electrode', 'Component') ' (number(s); Ex: 2 4 5):' ], ...
-					[ fastif(icacomp, 'Single-channel', 'Single-component') ' limit(s) (std. dev(s).: Ex: 2 2 2.5):'], ...
-					[ fastif(icacomp, 'All-channel', 'All-component') ' limit (std. dev(s).: Ex: 2.1 2 2):'], ...
-               		'Display with previously marked rejections? (YES or NO)', ...
-         			'Reject marked trial(s)? (YES or NO)', ...
-         			'Visualization mode (REJECTTRIALS or EEGPLOT)' };
-	inistr      = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], ['1:' int2str(size(EEG.icaweights,1))])...
-					fastif(icacomp, '3', '5'),  ...
-					fastif(icacomp, '3', '5'), ...
-               		'YES', ...
-            		'NO', ...
-            		'REJECTTRIALS' };
-
-	result       = inputdlg2( promptstr, fastif(~icacomp, 'Trial rejection using comp. kurtosis -- pop_rejkurt()', 'Trial rejection using data kurtosis -- pop_rejkurt()'), 1,  inistr, 'pop_rejkurt');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
-	elecrange    = result{1};
-	locthresh    = result{2};
-	globthresh   = result{3};
-	switch lower(result{4}), case 'yes', superpose=1; otherwise, superpose=0; end;
-	switch lower(result{5}), case 'yes', reject=1; otherwise, reject=0; end;
-	switch lower(result{6}), case 'rejecttrials', vistype=0; otherwise, vistype=1; end;
+    
+    % which set to save
+    % -----------------
+    promptstr   = { [ fastif(icacomp, 'Electrode', 'Component') ' (number(s); Ex: 2 6:8 10):' ], ...
+                    [ fastif(icacomp, 'Single-channel', 'Single-component') ' limit(s) (std. dev(s): Ex: 2 2 2 2.5):'], ...
+                    [ fastif(icacomp, 'All-channel', 'All-component') ' limit(s) (std. dev(s): Ex: 2.1 2 2 2):'], ...
+                    'Visualization mode',...
+                    'Display with previously marked rejections', ...
+                    'Reject marked trial(s)', ...
+                     };
+    inistr = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], ['1:' int2str(size(EEG.icaweights,1))])...
+               fastif(icacomp, '3', '5'),  ...
+               fastif(icacomp, '3', '5'), ...
+               ''...
+               '1', ...
+               '0',};
+    vismodelist= {'REJECTTRIALS','EEGPLOT'};
+    g1  = [1 0.1 0.75];
+    g2 = [1 0.26 0.9];
+    g3 = [1 0.22 0.85];
+    geometry = {g1 g1 g1 g2 [1] g3 g3};
+    
+    uilist = {...
+        { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      , 'string' ,inistr{1} 'tag' 'cpnum'}...
+        { 'Style', 'text', 'string', promptstr{2}} {} { 'Style','edit'      , 'string' ,inistr{2} 'tag' 'singlelimit'}...
+        { 'Style', 'text', 'string', promptstr{3}} {} { 'Style','edit'      , 'string' ,inistr{3} 'tag' 'alllimit'}...
+        { 'Style', 'text', 'string', promptstr{4}} {} { 'Style','popupmenu' , 'string' , vismodelist 'tag' 'specmethod' }...
+        {}...
+        { 'Style', 'text', 'string', promptstr{5}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value'  str2double(inistr{5})  'tag' 'rejmarks' }...
+        { 'Style', 'text', 'string', promptstr{6}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value'  str2double(inistr{6})  'tag' 'rejtrials'} ...
+        };
+    figname = fastif(~icacomp, 'Trial rejection using comp. kurtosis -- pop_rejkurt()', 'Trial rejection using data kurtosis -- pop_rejkurt()');
+    result = inputgui( geometry,uilist,'pophelp(''pop_rejkurt'');', figname);
+   
+    size_result  = size( result );
+    if size_result(1) == 0 return; end;
+    elecrange    = result{1};
+    locthresh    = result{2};
+    globthresh   = result{3};
+    switch result{4}, case 1, vistype=0; otherwise, vistype=1; end;
+    superpose    = result{5};
+    reject       = result{6};
 end;
 
-if ~exist('vistype') vistype = 0; end;
-if ~exist('reject') reject = 0; end;
-if ~exist('superpose') superpose = 1; end;
+if ~exist('vistype','var'),   vistype = 0; calldisp = 0; else calldisp = 1; end;
+if ~exist('reject','var'),    reject = 0;    end;
+if ~exist('superpose','var'), superpose = 1; end;
 
 if isstr(elecrange) % convert arguments if they are in text format 
-	calldisp = 1;
-	elecrange = eval( [ '[' elecrange ']' ]  );
-	locthresh = eval( [ '[' locthresh ']' ]  );
+	elecrange = eval(  [ '[' elecrange ']' ]  );
+	locthresh = eval(  [ '[' locthresh ']' ]  );
 	globthresh = eval( [ '[' globthresh ']' ]  );
-else
-	calldisp = 0;
 end;
 
 if isempty(elecrange)
