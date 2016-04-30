@@ -20,10 +20,10 @@
 %                 'globthresh' command line parameter.
 %   "visualization type" - [popup menu] can be either 'REJECTRIALS'|'EEGPLOT'.
 %                 This correspond to the command line input option 'vistype'.
-%   "Display with previous rejection(s)" - [checkbox] This checkbox corresponds
-%                 to the command line input option 'superpose'.          
-%   "Reject marked trial(s)" - [checkbox] This checkbox corresponds
-%                 to the command line input option 'reject'.
+%   "Display with previous rejection(s)" - [checkbox] This checkbox set the
+%                 command line input option 'superpose'.          
+%   "Reject marked trial(s)" - [checkbox] This checkbox set the command
+%                  line input option 'reject'.
 % 
 % Inputs:
 %   INEEG      - Input dataset
@@ -107,7 +107,7 @@ if nargin < 3
     
     % which set to save
     % -----------------
-    promptstr = { [ fastif(icacomp, 'Electrode', 'Component') ' (number(s); Ex: 2 6:8 10):' ], ...
+    promptstr = { [ fastif(icacomp, 'Electrode', 'Component') ' (indices; Ex: 2 6:8 10):' ], ...
                   [ fastif(icacomp, 'Single-channel', 'Single-component') ' limit(s) (std. dev(s): Ex: 2 2 2 2.5):'], ...
                   [ fastif(icacomp, 'All-channel', 'All-component') ' limit(s) (std. dev(s): Ex: 2.1 2 2 2):'], ...
                   'Visualization mode',...
