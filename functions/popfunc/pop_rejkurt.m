@@ -20,7 +20,7 @@
 %                 'globthresh' command line parameter.
 %   "visualization type" - [popup menu] can be either 'REJECTRIALS'|'EEGPLOT'.
 %                 This correspond to the command line input option 'vistype'.
-%   "Display with previous rejection" - [checkbox] This checkbox corresponds
+%   "Display with previous rejection(s)" - [checkbox] This checkbox corresponds
 %                 to the command line input option 'superpose'.          
 %   "Reject marked trial(s)" - [checkbox] This checkbox corresponds
 %                 to the command line input option 'reject'.
@@ -35,17 +35,17 @@
 %              consideration for rejection.
 %   locthresh  - Activity kurtosis limit in terms of standard-dev.
 %   globthresh - Global limit (for all channel). Same unit as above.
-%   vistype    - Visualization type. [0] calls rejstatepoch() and [1] calls
-%               eegplot() default is [0].When added to the command line
-%               call it will display the visualization
-%               (Note for developers: When called from command line 
-%               it will make 'calldisp = 1')
 %   superpose  - [0] do not superpose pre-labelling with previous
 %              pre-labelling (stored in the dataset). [1] consider 
 %              both pre-labelling (using different colors). Default is [0].
 %   reject     - [0] do not reject labelled trials (but still  
 %              store the labels. [1] reject labelled trials. 
 %              Default is [1].
+%   vistype    - Visualization type. [0] calls rejstatepoch() and [1] calls
+%              eegplot() default is [0].When added to the command line
+%              call it will display the visualization
+%              (Note for developers: When called from command line 
+%              it will make 'calldisp = 1')
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated kurtosis array
@@ -107,13 +107,12 @@ if nargin < 3
     
     % which set to save
     % -----------------
-    promptstr   = { [ fastif(icacomp, 'Electrode', 'Component') ' (number(s); Ex: 2 6:8 10):' ], ...
-                    [ fastif(icacomp, 'Single-channel', 'Single-component') ' limit(s) (std. dev(s): Ex: 2 2 2 2.5):'], ...
-                    [ fastif(icacomp, 'All-channel', 'All-component') ' limit(s) (std. dev(s): Ex: 2.1 2 2 2):'], ...
-                    'Visualization mode',...
-                    'Display with previously marked rejections', ...
-                    'Reject marked trial(s)', ...
-                     };
+    promptstr = { [ fastif(icacomp, 'Electrode', 'Component') ' (number(s); Ex: 2 6:8 10):' ], ...
+                  [ fastif(icacomp, 'Single-channel', 'Single-component') ' limit(s) (std. dev(s): Ex: 2 2 2 2.5):'], ...
+                  [ fastif(icacomp, 'All-channel', 'All-component') ' limit(s) (std. dev(s): Ex: 2.1 2 2 2):'], ...
+                  'Visualization mode',...
+                  'Display previous rejection marks', ...
+                  'Reject marked trial(s)'};
     inistr = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], ['1:' int2str(size(EEG.icaweights,1))])...
                fastif(icacomp, '3', '5'),  ...
                fastif(icacomp, '3', '5'), ...
