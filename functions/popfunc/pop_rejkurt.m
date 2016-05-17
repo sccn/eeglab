@@ -81,7 +81,7 @@
 
 function [EEG, locthresh, globthresh, nrej, com] = pop_rejkurt( EEG, icacomp, elecrange, ...
                        		locthresh, globthresh, superpose, reject, vistype, topcommand);
-com = '';
+locthresh = []; globthresh = []; nrej = []; com = '';
 if nargin < 1
    help pop_rejkurt;
    return;
