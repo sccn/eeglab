@@ -80,8 +80,8 @@
 % 03-08-02 add eeglab options -ad
 
 function [EEG, locthresh, globthresh, nrej, com] = pop_rejkurt( EEG, icacomp, elecrange, ...
-                       		locthresh, globthresh, superpose, reject, vistype, topcommand);
-locthresh = []; globthresh = []; nrej = []; com = '';
+                       		locthresh, globthresh, superpose, reject, vistype, topcommand); 
+nrej = []; com = '';
 if nargin < 1
    help pop_rejkurt;
    return;
@@ -138,7 +138,7 @@ if nargin < 3
     result = inputgui( geometry,uilist,'pophelp(''pop_rejkurt'');', figname);
    
     size_result  = size( result );
-    if size_result(1) == 0 return; end;
+    if size_result(1) == 0, locthresh = []; globthresh = []; return; end;
     elecrange    = result{1};
     locthresh    = result{2};
     globthresh   = result{3};
