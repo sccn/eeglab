@@ -49,6 +49,8 @@
 %   outstruct  - returns outputs as a structure (only tagged ui controls
 %                are considered). The field name of the structure is
 %                the tag of the ui and contain the ui value or string.
+%   instruct   - resturn inputs provided in the same format as 'outstruct'
+%                This allow to compare in/outputs more easy.
 %
 % Note: the function also adds three buttons at the bottom of each 
 %       interactive windows: 'CANCEL', 'HELP' (if callback command
@@ -83,7 +85,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [result, userdat, strhalt, resstruct] = inputgui( varargin);
+function [result, userdat, strhalt, resstruct, instruct] = inputgui( varargin);
 
 if nargin < 2
    help inputgui;
@@ -193,7 +195,8 @@ if isempty(g.getresult)
     % evaluate command before waiting?
     % --------------------------------
     if ~isempty(g.eval), eval(g.eval); end;
-
+    instruct = outstruct(allobj); % Getting default values in the GUI. 
+    
     % create figure and wait for return
     % ---------------------------------
     if isstr(g.mode) & (strcmpi(g.mode, 'plot') | strcmpi(g.mode, 'return') )
@@ -209,50 +212,17 @@ else
     allobj = allobj(end:-1:1);
 end;
 
-result = {};
-userdat = [];
-strhalt = '';
+result    = {};
+userdat   = [];
+strhalt   = '';
 resstruct = [];
 
-% Check if figure still exist (RMC) % try, findobj(fig);catch, return; end;
- if ~(ishandle(fig))
-     return;
- end
+if ~(ishandle(fig)), return; end % Check if figure still exist
  
-strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
-
 % output parameters
 % -----------------
-counter = 1;
-resstruct = [];
-for index=1:length(allobj)
-    if isnumeric(allobj), currentobj = allobj(index);
-    else                  currentobj = allobj{index};
-    end;
-    if isnumeric(currentobj) | ~isprop(currentobj,'GetPropertySpecification') % To allow new object handles
-        try,
-          objstyle = get(currentobj, 'style');
-          switch lower( objstyle )
-          case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' 'radio' }
-             result{counter} = get( currentobj, 'value');
-             if ~isempty(get(currentobj, 'tag')), resstruct = setfield(resstruct, get(currentobj, 'tag'), result{counter}); end;
-             counter = counter+1;
-          case 'edit' 
-             result{counter} = get( currentobj, 'string');
-             if ~isempty(get(currentobj, 'tag')), resstruct = setfield(resstruct, get(currentobj, 'tag'), result{counter}); end;
-             counter = counter+1;
-          end;
-        catch, end;
-    else
-        ps              = currentobj.GetPropertySpecification;
-        result{counter} = arg_tovals(ps,false);
-        count = 1;
-        while isfield(resstruct, ['propgrid' int2str(count)])
-            count = count + 1;
-        end;    
-        resstruct = setfield(resstruct, ['propgrid' int2str(count)], arg_tovals(ps,false));
-    end;
-end;   
+strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
+[resstruct,result] = outstruct(allobj); % Output parameters  
 userdat = get(fig, 'userdata');
 % if nargout >= 4
 % 	resstruct = myguihandles(fig, g);
@@ -276,3 +246,37 @@ drawnow; % for windows
 %                 end;
 % 			catch, end; 
 % 		end;
+
+function [resstructout, resultout] = outstruct(allobj)
+counter   = 1;
+resultout    = {};
+resstructout = [];
+
+for index=1:length(allobj)
+    if isnumeric(allobj), currentobj = allobj(index);
+    else                  currentobj = allobj{index};
+    end;
+    if isnumeric(currentobj) | ~isprop(currentobj,'GetPropertySpecification') % To allow new object handles
+        try,
+            objstyle = get(currentobj, 'style');
+            switch lower( objstyle )
+                case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' 'radio' }
+                    resultout{counter} = get( currentobj, 'value');
+                    if ~isempty(get(currentobj, 'tag')), resstructout = setfield(resstructout, get(currentobj, 'tag'), resultout{counter}); end;
+                    counter = counter+1;
+                case 'edit'
+                    resultout{counter} = get( currentobj, 'string');
+                    if ~isempty(get(currentobj, 'tag')), resstructout = setfield(resstructout, get(currentobj, 'tag'), resultout{counter}); end;
+                    counter = counter+1;
+            end;
+        catch, end;
+    else
+        ps              = currentobj.GetPropertySpecification;
+        resultout{counter} = arg_tovals(ps,false);
+        count = 1;
+        while isfield(resstructout, ['propgrid' int2str(count)])
+            count = count + 1;
+        end;
+        resstructout = setfield(resstructout, ['propgrid' int2str(count)], arg_tovals(ps,false));
+    end;
+end;
