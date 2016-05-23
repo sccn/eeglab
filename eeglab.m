@@ -378,7 +378,7 @@ if nargin == 1
         eeglab;
         return;
     else
-        fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Rebuilding (rebuild) instead\n']);
+        fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
         eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 	end;
 else 
