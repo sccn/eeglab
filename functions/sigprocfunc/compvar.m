@@ -39,7 +39,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ compproj, varegg ] = compvar( data, act, winv, compnums);
+function [ compproj, varegg ] = compvar( data, act, winv, compnums)
 
 if nargin < 4
    help compvar;
@@ -57,13 +57,13 @@ squaredata  = sum(sum(data.^2));             % compute the grand sum-squared dat
 if iscell(act)
     sphere = act{1};
     weight = act{2};
-    act = (weight(compnums,:)*sphere)*data;
+    act = (weight*sphere)*data;
 end;
 
-compproj   = winv(:,compnums)*act(compnums,:)-data;      % difference between data and back-projection
-squarecomp = sum(sum(compproj.^2));          % the summed-square difference
-varegg     = 100*(1- squarecomp/squaredata); % compute pvaf of components in data
-compproj   = compproj+data;                  % restore back-projected data
+compproj   = winv(:,compnums)*act(compnums,:)-data; % difference between data and back-projection
+squarecomp = sum(sum(compproj.^2));                 % the summed-square difference
+varegg     = 100*(1- squarecomp/squaredata);        % compute pvaf of components in data
+compproj   = compproj+data;                         % restore back-projected data
 
 return;
 
