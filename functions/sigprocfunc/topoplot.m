@@ -1060,7 +1060,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  warning('Topoplot and pvalues. When plotting pvalues make sure to use the option ''conv'' to minimize extrapolation effects');
+  disp('Warning: When plotting pvalues in totoplot, use option ''conv'' to minimize extrapolation effects');
   if strcmpi(STYLE,'grid')                     % plot grid only
 
     %
