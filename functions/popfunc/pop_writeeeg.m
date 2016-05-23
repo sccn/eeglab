@@ -40,7 +40,7 @@ global PLUGINLIST
      fprintf(2,'pop_writeeeg error: This function requires you to install <a href="http://biosig.sourceforge.net/index.html">BIOSIG Toolbox</a> plug-in. \n');
      return;
  elseif isempty(PLUGINLIST)
-     fprintf(2,'pop_writeeeg warning: Check for <a href="http://biosig.sourceforge.net/index.html">BIOSIG Toolbox</a> could not be performed.\n');
+     warning('pop_writeeeg check for <a href="http://biosig.sourceforge.net/index.html">BIOSIG Toolbox</a> could not be performed.\n');
  end
 
 if nargin < 2
