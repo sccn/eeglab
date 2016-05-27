@@ -65,7 +65,6 @@
 %                   dataset. Can also be a cell array of channel names.
 %   'nochannel'   - vector of channel indices to exclude from the new
 %                   dataset. Can also be a cell array of channel names.
-%   'newname'     - name for the new dataset (OUTEEG)
 %
 % Outputs:
 %   OUTEEG        - new EEG dataset structure
