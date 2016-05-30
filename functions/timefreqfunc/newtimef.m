@@ -1708,7 +1708,11 @@ switch lower(g.plotersp)
             % plotting limits
             if isempty(g.speclim)
                % g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
-               g.speclim = [min(mbase)-max(abs(mbase))/3 max(mbase)+max(abs(mbase))/3]; % RMC: Just for plotting
+               if all(~isnan(mbase))
+                   g.speclim = [min(mbase)-max(abs(mbase))/3 max(mbase)+max(abs(mbase))/3]; % RMC: Just for plotting
+               else
+                   g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
+               end
             end;
 
             % plot curves
