@@ -43,9 +43,12 @@
 %              Default is [1].
 %   vistype    - Visualization type. [0] calls rejstatepoch() and [1] calls
 %              eegplot() default is [0].When added to the command line
-%              call it will display the visualization
+%              call it will not display the plots if the option 'plotflag'
+%              is not set.
+%   topcommand - [] Deprecated argument , keep to ensure backward compatibility
+%   plotflag   - [1,0] [1]Turns plots 'on' from command line, [0] off.
 %              (Note for developers: When called from command line 
-%              it will make 'calldisp = 1')
+%              it will make 'calldisp = plotflag') {Default: 0}
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated kurtosis array
@@ -80,7 +83,7 @@
 % 03-08-02 add eeglab options -ad
 
 function [EEG, locthresh, globthresh, nrej, com] = pop_rejkurt( EEG, icacomp, elecrange, ...
-                       		locthresh, globthresh, superpose, reject, vistype, topcommand); 
+                       		locthresh, globthresh, superpose, reject, vistype, topcommand, plotflag); 
 nrej = []; com = '';
 if nargin < 1
    help pop_rejkurt;
@@ -147,15 +150,24 @@ if nargin < 3
     reject       = result{6};
 end;
 
-if ~exist('vistype','var'),   vistype = 0; calldisp = 0; else calldisp = 1; end;
-if ~exist('reject','var'),    reject = 0;    end;
+if ~exist('vistype','var'),   vistype   = 0;   end;
+if ~exist('reject','var'),    reject    = 0;    end;
 if ~exist('superpose','var'), superpose = 1; end;
 
 if isstr(elecrange) % convert arguments if they are in text format 
-	elecrange = eval(  [ '[' elecrange ']' ]  );
-	locthresh = eval(  [ '[' locthresh ']' ]  );
+    calldisp   = 1;
+	elecrange  = eval( [ '[' elecrange ']'  ]  );
+	locthresh  = eval( [ '[' locthresh ']'  ]  );
 	globthresh = eval( [ '[' globthresh ']' ]  );
+else
+    calldisp = 0;
 end;
+
+if exist('plotflag','var') && ismember(plotflag,[1,0])
+    calldisp = plotflag;
+else
+    plotflag = 0;
+end
 
 if isempty(elecrange)
 	error('No electrode selectionned');
@@ -249,7 +261,7 @@ end;
 nrej = sum(rej);
 
 com = [ com sprintf('%s = pop_rejkurt(%s,%s);', inputname(1), ...
-		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject})) ];
+		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject,vistype, [], plotflag})) ];
 if nargin < 3 & nargout == 2
 	locthresh = com;
 end;
