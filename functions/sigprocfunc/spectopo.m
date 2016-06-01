@@ -37,6 +37,11 @@
 %                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
 %                power distribution maps are plotted, the highest mapped frequency 
 %                determines the max freq}.
+%   'wintype'  = ['hamming','blackmanharris'] Window type used on the power spectral 
+%                density estimation. The Blackman-Harris windows offers better attenuation
+%                than Hamming windows, but lower spectral resolution. {default: 'hamming'}
+%   'blckhn'   = [integer] Parameter to scale the windows length when Blackman-Harris 
+%                windows is used in 'wintype' {default: 2}
 %   'reref'    = ['averef'|'off'] convert data to average reference {default: 'off'}
 %   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
 %                component, this parameter should contain its scalp map. In this case
@@ -159,36 +164,38 @@ if nargin<3
 end
 if nargin <= 3 | isstr(varargin{1})
 	% 'key' 'val' sequence
-	fieldlist = { 'freq'          'real'     []                        [] ;
-                  'specdata'      'real'     []                        [] ;
-                  'freqdata'      'real'     []                        [] ;
-				  'chanlocs'      ''         []                        [] ;
-				  'freqrange'     'real'     [0 srate/2]               [] ;
-				  'memory'        'string'   {'low','high'}           'high' ;
-				  'plot'          'string'   {'on','off'}             'on' ;
-				  'plotmean'      'string'   {'on','off'}             'off' ;
-				  'title'         'string'   []                       '';
-				  'limits'        'real'     []                       [nan nan nan nan nan nan];
-				  'freqfac'       'integer'  []                        FREQFAC;
-				  'percent'       'real'     [0 100]                  100 ;
-				  'reref'         'string'   { 'averef','off','no' }  'off' ;
-				  'boundaries'    'integer'  []                       [] ;
-				  'nfft'          'integer'  [1 Inf]                  [] ;
-				  'winsize'       'integer'  [1 Inf]                  [] ;
-				  'overlap'       'integer'  [1 Inf]                  0 ;
-				  'icamode'       'string'   { 'normal','sub' }        'normal' ;
-				  'weights'       'real'     []                       [] ;
-				  'mapnorm'       'real'     []                       [] ;
-				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
-				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
-				  'nicamaps'      'integer'  []                       4 ;
-				  'icawinv'       'real'     []                       [] ;
-				  'icacomps'      'integer'  []                       [] ;
-				  'icachansind'   'integer'  []                       [1:size(data,1)] ; % deprecated
-				  'icamaps'       'integer'  []                       [] ;
-                  'rmdc'           'string'   {'on','off'}          'off';
-				  'mapchans'      'integer'  [1:size(data,1)]         [] 
-                  'mapframes'     'integer'  [1:size(data,2)]         []};
+	fieldlist = { 'freq'          'real'     []                            [] ;
+                  'specdata'      'real'     []                            [] ;
+                  'freqdata'      'real'     []                            [] ;
+				  'chanlocs'      ''         []                            [] ;
+				  'freqrange'     'real'     [0 srate/2]                   [] ;
+				  'memory'        'string'   {'low','high'}                'high' ;
+				  'plot'          'string'   {'on','off'}                  'on' ;
+				  'plotmean'      'string'   {'on','off'}                  'off' ;
+				  'title'         'string'   []                            '';
+				  'limits'        'real'     []                            [nan nan nan nan nan nan];
+				  'freqfac'       'integer'  []                            FREQFAC;
+				  'percent'       'real'     [0 100]                       100 ;
+				  'reref'         'string'   { 'averef','off','no' }       'off' ;
+				  'boundaries'    'integer'  []                            [] ;
+				  'nfft'          'integer'  [1 Inf]                       [] ;
+				  'winsize'       'integer'  [1 Inf]                       [] ;
+				  'overlap'       'integer'  [1 Inf]                       0 ;
+				  'icamode'       'string'   { 'normal','sub' }            'normal' ;
+				  'weights'       'real'     []                            [] ;
+				  'mapnorm'       'real'     []                            [] ;
+				  'plotchan'      'integer'  [1:size(data,1)]              [] ;
+				  'plotchans'     'integer'  [1:size(data,1)]              [] ;
+				  'nicamaps'      'integer'  []                            4 ;
+				  'icawinv'       'real'     []                            [] ;
+				  'icacomps'      'integer'  []                            [] ;
+				  'icachansind'   'integer'  []                            [1:size(data,1)] ; % deprecated
+				  'icamaps'       'integer'  []                            [] ;
+                  'rmdc'          'string'   {'on','off'}                  'off' ;
+				  'mapchans'      'integer'  [1:size(data,1)]              [] ; 
+                  'wintype'       'string'   {'hamming','blackmanharris'}  'hamming' ; 
+                  'blckhn'        'real'     []                            2 ;
+                  'mapframes'     'integer'  [1:size(data,2)]              []};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
@@ -860,6 +867,8 @@ function [index, usedplots] = closestplot(xpos, xcentercoords, usedplots);
 % function computing spectrum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
+    usepwelch = license('checkout','Signal_Toolbox');
+    
 	if exist('newweights') == 1
 		nchans = size(newweights,1);
 	else 
@@ -870,19 +879,30 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 %         winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
 %         winlength = min(winlength, 512);
 %         winlength = max(winlength, 256);
-        winlength = srate;
-        winlength = min(winlength, frames);
+        winlength = min(srate, frames);
     else
         winlength = g.winsize;
     end;
-    if isempty(g.nfft)
+    
+     if strcmp(g.wintype,'blackmanharris')
+         if usepwelch
+             winlength = blackmanharris(round(winlength/g.blckhn));
+         else
+             g.wintype = 'hamming';
+             fprintf('\nSignal processing toolbox (SPT) absent: unable to use Blackman-Harris window\n');
+             fprintf('                                        using pwelch function from Octave\n');
+         end
+     end
+        
+    if isempty(g.nfft) && strcmp(g.wintype,'hamming')
         %fftlength = 2^(nextpow2(winlength))*g.freqfac;
         fftlength = winlength*g.freqfac;
-	else
+    elseif ~isempty(g.nfft) && strcmp(g.wintype,'hamming')
         fftlength = g.nfft;
+    elseif strcmp(g.wintype,'blackmanharris')
+        fftlength = 2^(nextpow2(length(winlength)))*g.freqfac;
     end;
     
-    usepwelch = license('checkout','Signal_Toolbox');
     if ~usepwelch, 
         fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
         fprintf('function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
