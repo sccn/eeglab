@@ -90,6 +90,7 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'singletrials'     'string'   { 'on','off' }  'off';
                               'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
                               'channels'         'cell'     []    {};
+                              'cache'            'struct'   []    struct([]);
                               'function'         { 'function_handle' 'integer' } []  [];
                               'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef'} 'erp';                                                 
                               'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
@@ -125,7 +126,12 @@ end;
 
 % get fields to read
 % ------------------
-fileData = matfile([ fileBaseName fileExt ]);
+v6Flag = testv6([ fileBaseName fileExt ]);
+if v6Flag
+    fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
+else
+    fileData = matfile([ fileBaseName fileExt ]);
+end;
 
 % get channel or component indices
 % --------------------------------
@@ -137,6 +143,13 @@ elseif ~isempty(opt.channels)
 elseif ~isempty(opt.components)
      opt.dataindices = opt.components;
 else opt.dataindices = abs(opt.dataindices);
+end;
+
+if v6Flag
+    for iChan = 1:length(opt.dataindices)
+        chanList{iChan} = [ dataType int2str(opt.dataindices(iChan)) ];
+    end;
+    fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs');
 end;
 
 % scan datasets
@@ -239,7 +252,7 @@ function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, opti
 function [ fieldData events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
 
 if length(chan) > 1
-    error('This function can only read one channel at a time');
+%    error('This function can only read one channel at a time');
 end;
 
 % get trial indices
@@ -260,26 +273,54 @@ if ~isempty(trialselect)
     end;
 end;
 
-fieldToRead = [ dataType int2str(chan) ];
+for index = 1:length(chan)
+    fieldToRead = [ dataType int2str(chan(index)) ];
 
-% find trials
-if isempty(trials), 
-    return;
-    % trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); % not sure what this does
+    % find trials
+    if isempty(trials), 
+        return;
+        % trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); % not sure what this does
+    end;
+
+    % load data
+    warning('off', 'MATLAB:MatFile:OlderFormat');
+    if ndims(fileData.(fieldToRead)) == 2
+        tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
+        if ~isempty(subTrials), fieldData = fieldData(:, subTrials); end;
+    else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
+        if ~isempty(subTrials), fieldData = fieldData(:, :, subTrials); end;
+    end;
+    warning('on', 'MATLAB:MatFile:OlderFormat');
+
+    % average single trials if necessary
+    if ~isempty(func)
+        tmpFieldData = func(tmpFieldData);
+    end;
+    
+    % store data
+    if index == 1 && length(chan) == 1
+        fieldData = tmpFieldData;
+    else
+        if index == 1
+            fieldData = zeros([ size(tmpFieldData) length(chan) ]);
+        end;
+        if ndims(tmpFieldData) == 2
+            fieldData(:,:,index) = tmpFieldData;
+        else
+            fieldData(:,:,:,index) = tmpFieldData;
+        end;
+    end;
 end;
 
-% load data
-warning('off', 'MATLAB:MatFile:OlderFormat');
-if ndims(fileData.(fieldToRead)) == 2
-    fieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
-    if ~isempty(subTrials), fieldData = fieldData(:, subTrials); end;
-else fieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
-    if ~isempty(subTrials), fieldData = fieldData(:, :, subTrials); end;
-end;
-warning('on', 'MATLAB:MatFile:OlderFormat');
+% see if a file is v6 of v7.3
+function v6 = testv6(x)
 
-% average single trials if necessary
-if ~isempty(func)
-    fieldData = func(fieldData);
-end;
+fid=fopen(x);
+txt=char(fread(fid,[1,140],'*char'));
+tmp = fclose(fid);
+txt=[txt,0];
+txt=txt(1:find(txt==0,1,'first')-1);
+if ~isempty(strfind(txt, 'MATLAB 5.0')), v6 = true; else v6 = false; end;
+
+
 
