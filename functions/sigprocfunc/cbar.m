@@ -145,7 +145,7 @@ end
 % Draw colorbar using image()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if exist('DEFAULT_COLORMAP', 'var')
-    map = colormap(eval( [ DEFAULT_COLORMAP '(' int2str(size(colormap,1)) ')' ]));
+    map = colormap(eval( [ DEFAULT_COLORMAP '(' int2str(max(size(colormap,1), max(colors))) ')' ]));
 else
     map = colormap;
 end
