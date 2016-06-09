@@ -407,7 +407,7 @@ catch,
 end;
 
 numobjects = cellfun(@ishandle, allhandlers); % (isnumeric by ishanlde was changed here)
-allhandlersnum = [ allhandlers{numobjects} ];
+allhandlersnum = [ allhandlers{numobjects} ]'; % allhandlersnum rotated for Octave compatibility
 hh = findobj(allhandlersnum, 'parent', g.fig, 'style', 'text');
 %set(hh, 'BackgroundColor', get(g.fig, 'color'), 'horizontalalignment', 'left');
 set(hh, 'Backgroundcolor', GUIBACKCOLOR);

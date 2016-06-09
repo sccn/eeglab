@@ -144,49 +144,52 @@ if nargout > 0
     %[ALLEEG, EEG, CURRENTSET, ALLCOM]
 end;
 
-% check Matlab version
-% --------------------
-vers = version;
-tmpv = which('version');
-if ~isempty(findstr(lower(tmpv), 'biosig'))
-    [tmpp tmp] = fileparts(tmpv);
-    rmpath(tmpp);
-end;
-% remove freemat folder if it exist
-tmpPath = fileparts(fileparts(which('sread')));
-newPath = fullfile(tmpPath, 'maybe-missing', 'freemat3.5');
-if exist(newPath) == 7
-    warning('off', 'MATLAB:rmpath:DirNotFound');
-    rmpath(newPath)
-    warning('on', 'MATLAB:rmpath:DirNotFound');
-end;
-if str2num(vers(1)) < 7 && str2num(vers(1)) >= 5
-    tmpWarning = warning('backtrace');
-    warning backtrace off;
-    warning('You are using a Matlab version older than 7.0');
-    warning('This Matlab version is too old to run the current EEGLAB');
-    warning('Download EEGLAB 4.3b at http://sccn.ucsd.edu/eeglab/eeglab4.5b.teaching.zip');
-    warning('This version of EEGLAB is compatible with all Matlab version down to Matlab 5.3');
-    warning(tmpWarning);
-    return;
-end;
+% distinguish between Octave and Matlab
+oct_ver_num=0;
+try oct_ver=OCTAVE_VERSION;
+  pind=strfind(oct_ver,'.');  
+  oct_ver_num=str2num(oct_ver(1:pind(1)-1));
+  disp('Using Octave version 4 or greater... enabling GUI.. ')
 
-% check Matlab version
-% --------------------
-vers = version;
-indp = find(vers == '.');
-if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end;
-indp = find(vers == '.');
-vers = str2num(vers(1:indp(2)-1));
-if vers < 7.06
-    tmpWarning = warning('backtrace');
-    warning backtrace off;
-    warning('You are using a Matlab version older than 7.6 (2008a)');
-    warning('Some of the EEGLAB functions might not be functional');
-    warning('Download EEGLAB 4.3b at http://sccn.ucsd.edu/eeglab/eeglab4.5b.teaching.zip');
-    warning('This version of EEGLAB is compatible with all Matlab version down to Matlab 5.3');
-    warning(tmpWarning);
-end; 
+catch
+
+  % check Matlab version
+  % --------------------
+  vers = version;
+  tmpv = which('version');
+  if ~isempty(findstr(lower(tmpv), 'biosig'))
+      [tmpp tmp] = fileparts(tmpv);
+      rmpath(tmpp);
+  end;
+  if str2num(vers(1)) < 7 && str2num(vers(1)) >= 5
+      tmpWarning = warning('backtrace');
+      warning backtrace off;
+      warning('You are using a Matlab version older than 7.0');
+      warning('This Matlab version is too old to run the current EEGLAB');
+      warning('Download EEGLAB 4.3b at http://sccn.ucsd.edu/eeglab/eeglab4.5b.teaching.zip');
+      warning('This version of EEGLAB is compatible with all Matlab version down to Matlab 5.3');
+      warning(tmpWarning);
+      return;
+  end;
+  
+  % check Matlab version
+  % --------------------
+  vers = version;
+  indp = find(vers == '.');
+  if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end;
+  indp = find(vers == '.');
+  vers = str2num(vers(1:indp(2)-1));
+  if vers < 7.06
+      tmpWarning = warning('backtrace');
+      warning backtrace off;
+      warning('You are using a Matlab version older than 7.6 (2008a)');
+      warning('Some of the EEGLAB functions might not be functional');
+      warning('Download EEGLAB 4.3b at http://sccn.ucsd.edu/eeglab/eeglab4.5b.teaching.zip');
+      warning('This version of EEGLAB is compatible with all Matlab version down to Matlab 5.3');
+      warning(tmpWarning);
+  end; 
+
+end
 
 % check for duplicate versions of EEGLAB
 % --------------------------------------
@@ -479,7 +482,7 @@ catchstrs.update_study           = e_plot_study;
 
 % create eeglab figure
 % --------------------
-javaobj = eeg_mainfig(onearg);
+javaobj = eeg_mainfig(onearg,oct_ver_num);
 
 % detecting icalab
 % ----------------
@@ -657,7 +660,7 @@ cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clusted
 
 % menu definition
 % --------------- 
-if ismatlab
+if ismatlab || oct_ver_num >=4;
     % defaults
     % --------
     % startup:on
@@ -1051,7 +1054,8 @@ end; % iseeglabdeployed2
 % Path exception for BIOSIG (sending BIOSIG down into the path)
 biosigpathlast; % fix str2double issue
 
-if ~ismatlab, return; end;
+if ~ismatlab || oct_ver_num < 4, return; end;
+
 % add other import ...
 % --------------------
 cb_others = [ 'pophelp(''troubleshooting_data_formats'');' ];
@@ -1189,7 +1193,7 @@ end;
 % draw the main figure
 % --------------------
 
-function tb = eeg_mainfig(onearg);
+function tb = eeg_mainfig(onearg,oct_ver_num);
 
 icadefs;
 COLOR = BACKEEGLABCOLOR;
@@ -1301,7 +1305,7 @@ try,
     set(W_MAIN, 'NextPlot','new');
 catch, end;
 
-if ismatlab
+if ismatlab || oct_ver_num >= 4
     BackgroundColor = get(gcf, 'color'); %[0.701960784313725 0.701960784313725 0.701960784313725];
     H_MAIN(1) = uicontrol('Parent',W_MAIN, ...
         'Units','points', ...
