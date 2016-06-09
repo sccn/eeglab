@@ -145,10 +145,13 @@ if nargout > 0
 end;
 
 % distinguish between Octave and Matlab
-oct_ver_num=NaN;
-try oct_ver=OCTAVE_VERSION;
-  pind=strfind(oct_ver,'.');  
-  oct_ver_num=str2num(oct_ver(1:pind(1)-1));
+oct_ver_num=0;
+try 
+    oct_ver=OCTAVE_VERSION;
+    pind=strfind(oct_ver,'.');  
+    oct_ver_num=str2num(oct_ver(1:pind(1)-1));
+    disp('Using Octave version 4 or greater... enabling GUI.. ')
+
 catch
 
   % check Matlab version
@@ -658,7 +661,7 @@ cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clusted
 
 % menu definition
 % --------------- 
-if ismatlab || oct_ver_num >= 4;
+if ismatlab || oct_ver_num >=4;
     % defaults
     % --------
     % startup:on
