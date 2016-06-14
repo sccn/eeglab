@@ -145,7 +145,7 @@ if nargout > 0
 end;
 
 % distinguish between Octave and Matlab
-oct_ver_num=0;
+oct_ver_num=NaN;
 try oct_ver=OCTAVE_VERSION;
   pind=strfind(oct_ver,'.');  
   oct_ver_num=str2num(oct_ver(1:pind(1)-1));
@@ -379,7 +379,7 @@ if nargin == 1
         if nargout < 1, clear ALLEEG; end; % do not return output var
         return;
 	elseif strcmp(onearg, 'redraw')
-        if ~ismatlab,return; end;
+        if ~ismatlab || oct_ver_num < 4,return; end;
 		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
 			updatemenu;
@@ -389,7 +389,7 @@ if nargin == 1
 			eegh('eeglab(''redraw'');');
 		end;
 	elseif strcmp(onearg, 'rebuild')
-        if ~ismatlab,return; end;
+        if ~ismatlab || oct_ver_num < 4,return; end;
 		W_MAIN = findobj('tag', 'EEGLAB');
         close(W_MAIN);
         eeglab;
@@ -493,7 +493,7 @@ end;
 if ~iseeglabdeployed2
     % check for older version of Fieldtrip and presence of topoplot
     % -------------------------------------------------------------
-    if ismatlab
+    if ismatlab || oct_ver_num >= 4
         ptopoplot  = fileparts(mywhich('cbar'));
         ptopoplot2 = fileparts(mywhich('topoplot'));
         if ~strcmpi(ptopoplot, ptopoplot2),
@@ -660,7 +660,7 @@ cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clusted
 
 % menu definition
 % --------------- 
-if ismatlab || oct_ver_num >=4;
+if ismatlab || oct_ver_num >= 4;
     % defaults
     % --------
     % startup:on
