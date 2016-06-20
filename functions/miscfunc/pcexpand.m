@@ -58,5 +58,5 @@ end
 if size(Datameans,1) == 1,
     Datameans = Datameans';   % make a column vector
 end
-expanded_data = EigenVectors(:,1:ncomps)*PCAproj; + Datameans*ones(1,frames);
+expanded_data = EigenVectors(:,1:ncomps)*PCAproj + Datameans*ones(1,frames);
 
