@@ -73,7 +73,7 @@ M=[]; SD=[]; sk=[]; k=[]; med=[]; zlow=[]; zhi=[]; tM=[]; tSD=[]; tndx=[]; ksh=[
 istats=1;	
 hs = help('stats');
 toolbx = ver;
-if isempty(hs) || all(~any(strcmpi({toolbx.Name},'statistics toolbox')), ~any(strcmpi({toolbx.Name},'statistics and machine learning toolbox')))
+if isempty(hs) || all([~any(strcmpi({toolbx.Name},'statistics toolbox')), ~any(strcmpi({toolbx.Name},'statistics and machine learning toolbox'))])
     disp('signalstat() note: the boxplot (not shown) requires the MATLAB Statistics Toolbox or Statistics and Machine Learning Toolbox');
     istats=0;
 end
