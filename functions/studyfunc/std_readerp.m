@@ -103,14 +103,107 @@ end;
 % -----------------------
 testSubjectFile = fullfile(ALLEEG(1).filepath, [ ALLEEG(1).subject fileExt ]);
 
-newstruct = [];
-for ind = 1:length(finalinds) % scan channels or clusters
+% list of subjects
+% ----------------
+allSubjects = { STUDY.datasetinfo.subject };
+uniqueSubjects = unique(allSubjects);
+STUDY.subject = uniqueSubjects;
+if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
+if isempty(subjectList)
+    if isnan(opt.design), subjectList = STUDY.subject;
+    else subjectList = STUDY.design(opt.design).cases.value; 
+    end;
+end;
 
-    % list of subjects
-    % ----------------
-    allSubjects = { STUDY.datasetinfo.subject };
-    uniqueSubjects = unique(allSubjects);
-    STUDY.subject = uniqueSubjects;
+% options
+% -------
+if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
+else                      opts = { 'freqlimits', opt.freqrange };
+end;
+opts = { opts{:} 'singletrials' opt.singletrials };
+
+for iSubj = 1:length(subjectList)
+    
+    % check cache
+    bigstruct = [];
+    if ~isempty(opt.channels), bigstruct.channel = opt.channels;
+    else                       bigstruct.cluster = opt.clusters; % there can only be one cluster
+    end;
+    bigstruct.datatype     = opt.datatype;
+    bigstruct.singletrials = opt.singletrials;
+    bigstruct.subject      = subjectList{iSubj};
+    bigstruct.component    = opt.component;
+    bigstruct.options      = opts;
+    if isnan(opt.design)
+         bigstruct.design.variable = struct([]);
+    else bigstruct.design.variable = STUDY.design(opt.design).variable;
+    end;
+
+    % read all channels/components at once
+    hashcode = gethashcode(std_serialize(bigstruct));
+    [STUDY.cache tmpstruct] = eeg_cache(STUDY.cache, hashcode);
+
+    if ~isempty(tmpstruct)
+        dataTmp{iSubj}   = tmpstruct{1};
+        xvals            = tmpstruct{2};
+        eventsTmp{iSubj} = tmpstruct{3};
+    else
+        datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+        fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
+        [dataTmp{iSubj} params xvals tmp eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels(finalinds));
+        if strcmpi(opt.singletrials, 'off')
+            dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
+        end;
+        STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals eventsTmp{iSubj} });
+    end;
+end;
+
+% store data for all subjects
+datavals = cell(size(dataTmp{1}));
+if strcmpi(opt.singletrials, 'off')
+    for iItem=1:length(dataTmp{1}(:)) datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) length(subjectList)], 'single'); end;
+    for iItem=1:length(dataTmp{1}(:)) datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) length(subjectList)], 'single'); end;
+    for iSubj = 1:length(subjectList)
+        for iItem=1:length(dataTmp{iSubj}) 
+            datavals{iItem}(:,:,iSubj) = dataTmp{iSubj}{iItem}; 
+        end;
+    end;
+else
+    for iItem=1:length(dataTmp{1}(:)) datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},3) sum(cellfun(@(x)size(x{iItem},2), dataTmp)) ], 'single'); end;
+    count = 1;
+    for iSubj = 1:length(subjectList)
+        for iItem=1:length(dataTmp{iSubj}) 
+            datavals{iItem}(:,:,count:count+size(dataTmp{iSubj}{iItem},2)-1) = permute(dataTmp{iSubj}{iItem}, [1 3 2]); 
+            count = count+size(dataTmp{iSubj}{iItem},2);
+        end;
+    end;
+end;
+
+% fix component polarity if necessary
+% -----------------------------------
+componentPol = [];
+if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && strcmpi(opt.componentpol, 'on')
+    disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
+    STUDY = std_readtopoclust(STUDY, ALLEEG, finalinds(ind));
+    componentPol = STUDY.cluster(finalinds(ind)).topopol;
+    if isempty(componentPol)
+        disp('Cluster topographies absent - cannot adjust single component ERP polarities');
+    end;
+end;
+
+return
+
+%         
+%     for ind2 = 1:length(finalinds)
+%         bigstruct2.channel = opt.channels{ind2};
+%         hashcode2 = gethashcode(std_serialize(bigstruct2));
+%         tmpChanData  = cellfun(@(x)mean(x(:,:,2),2), dataTmp, 'uniformoutput', false);
+%         tmpCache = eeg_cache(tmpCache, hashcode2, { tmpChanData eventsTmp });
+%     end;
+% end;
+
+
+for ind = 1:length(finalinds) % scan channels or clusters
 
     % check if data is already here using hashcode
     % --------------------------------------------
@@ -126,7 +219,6 @@ for ind = 1:length(finalinds) % scan channels or clusters
     bigstruct.subject      = opt.subject;
     bigstruct.component    = opt.component;
     if isnan(opt.design)
-         bigstruct.design.cases.value = STUDY.subject;
          bigstruct.design.variable    = struct([]);
     else bigstruct.design  = STUDY.design(opt.design);
     end;
@@ -138,14 +230,16 @@ for ind = 1:length(finalinds) % scan channels or clusters
         else                   newstruct(ind) = tmpstruct;
         end;
     else
+
+        % read and cache all data
+        % -----------------------
+%         if ind  == 1 && length(finalinds) > 5 && ~isempty(opt.channels) && ~isnan(opt.design) && strcmpi(opt.singletrials, 'off')
+% 
+%         end;
         
         % reading options
         % ---------------
         fprintf([ 'Reading ' dtype ' data...\n' ]);
-        if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
-        else                      opts = { 'freqlimits', opt.freqrange };
-        end;
-        opts = { opts{:} 'singletrials' opt.singletrials };
         
         % get component polarity if necessary
         % -----------------------------------
@@ -161,8 +255,6 @@ for ind = 1:length(finalinds) % scan channels or clusters
         
         % read the data and select channels
         % ---------------------------------
-        if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
-        if isempty(subjectList), subjectList = bigstruct.design.cases.value; end;
         count = 1;
         tmpw = warning;
         warning off;
@@ -201,7 +293,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
                     else
                         meanData = mean(dataSubject{ iSubj }{ iCell },2);
                         if exist('alldata', 'var') && (iCell > length(alldata) || size(alldata{  iCell},1) ~= length(meanData))
-                            alldata{  iCell} = zeros(length(meanData), length(dataSubject(:)))*NaN;
+                            alldata{  iCell} = zeros(length(meanData), length(dataSubject(:)))*NaN; % this is causing problems
                         end;
                         alldata{  iCell}(:,iSubj) = meanData;
                     end;
