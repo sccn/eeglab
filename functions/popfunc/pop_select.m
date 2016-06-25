@@ -65,7 +65,6 @@
 %                   dataset. Can also be a cell array of channel names.
 %   'nochannel'   - vector of channel indices to exclude from the new
 %                   dataset. Can also be a cell array of channel names.
-%   'newname'     - name for the new dataset (OUTEEG)
 %
 % Outputs:
 %   OUTEEG        - new EEG dataset structure
@@ -603,9 +602,12 @@ else
 end;
 
 if ~isempty(EEG.icawinv)
-    EEG.icawinv = EEG.icawinv(icachans,:);
-    EEG.icaweights = pinv(EEG.icawinv);
-    EEG.icasphere  = eye(size(EEG.icaweights,2));
+    flag_rmchan = (length(icachans) ~= size(EEG.icawinv,1));
+    if  isempty(EEG.icaweights) || flag_rmchan
+        EEG.icawinv    = EEG.icawinv(icachans,:);
+        EEG.icaweights = pinv(EEG.icawinv);
+        EEG.icasphere  = eye(size(EEG.icaweights,2));
+    end
 end;
 if ~isempty(EEG.specicaact)
     if length(g.point) == EEG.pnts

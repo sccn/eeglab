@@ -656,7 +656,7 @@ end;
 tmpsaveall = (~isnan(g.alpha) & isnan(g.rboot) & strcmp(g.memory, 'high')) ...
                  | (strcmp(g.subitc, 'on') & strcmp(g.memory, 'high'));
 trials = length(X)/g.frame;
-if ~strcmp(lower(g.compute), 'c')
+if ~strcmp(g.compute, 'c')
    Tfx = tfinit(X, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, ...
 									g.srate, g.maxfreq, g.subitc, g.type, g.cyclesfact, tmpsaveall);
    Tfy = tfinit(Y, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, ...
@@ -745,7 +745,7 @@ fprintf('\nProcessing trial (of %d): ',trials);
 % Y = Y(:)';
 % tfy = tfx;
 
-if strcmp(lower(g.compute), 'c')
+if strcmp(g.compute, 'c')
    % C PART
    filename = [ 'tmpcrossf' num2str(round(rand(1)*1000)) ];
    f = fopen([ filename '.in'], 'w');

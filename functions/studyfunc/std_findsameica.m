@@ -1,16 +1,21 @@
 % std_findsameica() - find groups of datasets with identical ICA decomposiotions
+%                     (search identical weight*sphere matrices)
 %
 % Usage: 
 %        >> clusters = std_findsameica(ALLEEG);
 %        >> clusters = std_findsameica(ALLEEG,icathreshold);
 % Inputs:
-%   ALLEEG           - a vector of loaded EEG dataset structures of all sets in the STUDY set.
+%   ALLEEG           - a vector of loaded EEG dataset structures of all sets 
+%                      in the STUDY set.
 %   icathreshold     - Threshold to compare icaweights
 %
 % Outputs:
 %   cluster - cell array of groups of datasets
 %
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, July 2009-
+% 2016 change: as of May 2016, the function now compares the product of the
+%              weight and the sphere matrices instead of just the weight
+%              matrices.
 
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
 %
@@ -44,9 +49,11 @@ for index = 2:length(ALLEEG)
     
     found = 0;
     for c = 1:length(cluster)
-        if all(size(ALLEEG(cluster{c}(1)).icaweights) == size(ALLEEG(index).icaweights))
+        w1 = ALLEEG(cluster{c}(1)).icaweights*ALLEEG(cluster{c}(1)).icasphere;
+        w2 = ALLEEG(index).icaweights*ALLEEG(index).icasphere;
+        if all(size(w1) == size(w2))
             %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
-            if sum(sum(abs(ALLEEG(cluster{c}(1)).icaweights-ALLEEG(index).icaweights))) < icathreshold
+            if sum(sum(abs(w1-w2))) < icathreshold
                 cluster{c}(end+1) = index;
                 found = 1;
                 break;

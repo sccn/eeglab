@@ -55,7 +55,10 @@ if ~(exist('fig') ==1) | isempty(fig) | fig == 0
 end
 
 if ~strcmpi(get(fig, 'type'), 'axes')
-    hndl= findobj('parent',fig,'type','axes');
+    %hndl= findobj('parent',fig,'type','axes');
+    %--
+    childs = get(fig,'Children');
+    hndl   = childs(find(strcmpi(get(childs,'Type'),'axes')));
 else
     hndl=fig;
 end;
@@ -67,7 +70,9 @@ else
    comstr = double(['copyaxis(''' char(command_dbl) ''')']); 
 end;
 for a=1:length(hndl)                    % make all axes visible
-    allobjs = findobj('parent',hndl(a));
+    %allobjs = findobj('parent',hndl(a));
+    %--
+    allobjs = get(hndl(a),'Children');
     for index = 1:length(allobjs)
         if isempty(get(allobjs(index), 'ButtonDownFcn'))
             set(allobjs(index), 'ButtonDownFcn', char(comstr));

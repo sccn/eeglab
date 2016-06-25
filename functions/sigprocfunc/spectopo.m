@@ -1,8 +1,8 @@
-% spectopo() - Plot the mean log spectrum of a set of data epochs at all channels 
-%              as a bundle of traces. At specified frequencies, plot the relative 
-%              topographic distribution of power. If available, uses pwelch() from 
-%              the Matlab signal processing toolbox, else the EEGLAB spec() function.
-%              Plots the mean spectrum for all of the supplied data, not just
+% spectopo() - Plot the power spectral density (PSD) of winsize length segments of data 
+%              epochs at all channels as a bundle of traces. At specified frequencies,
+%              plot the relative topographic distribution of PSD. If available, uses
+%              pwelch() from the Matlab signal processing toolbox, else the EEGLAB spec()
+%              function. Plots the mean spectrum for all of the supplied data, not just
 %              the pre-stimulus baseline.
 % Usage:
 %              >> spectopo(data, frames, srate);
@@ -18,8 +18,8 @@
 % Optional 'keyword',[argument] input pairs:
 %   'freq'     = [float vector (Hz)] vector of frequencies at which to plot power 
 %                scalp maps, or else a single frequency at which to plot component 
-%                contributions at a single channel (see also 'plotchan').
-%   'chanlocs' = [electrode locations filename or EEG.chanlocs structure]. 
+%                contributions at a single channel (see also 'plotchan')
+%   'chanlocs' = [electrode locations filename or EEG.chanlocs structure]
 %                    For format, see >> topoplot example
 %   'limits'   = [xmin xmax ymin ymax cmin cmax] axis limits. Sets x, y, and color 
 %                axis limits. May omit final values or use NaNs.
@@ -27,16 +27,21 @@
 %                Default color limits are symmetric around 0 and are different 
 %                for each scalp map {default|all NaN's: from the data limits}
 %   'title'    = [quoted string] plot title {default: none}
-%   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
-%   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
-%   'winsize'  = [integer] window size in data points {default: from data}
+%   'freqfac'  = [integer] ntimes to oversample (to adjust frequency resolution) {default: 1}
+%   'nfft'     = [integer] Data points to zero-pad data windows to (overwrites 'freqfac')
+%   'winsize'  = [integer] window size in data points {default: Sampling Rate}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
 %   'percent'  = [float 0 to 100] percent of the data to sample for computing the 
-%                spectra. Values < 100 speed up the computation. {default: 100}.
+%                spectra. Values < 100 speed up the computation. {default: 100}
 %   'freqrange' = [min max] frequency range to plot. Changes x-axis limits {default: 
 %                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
 %                power distribution maps are plotted, the highest mapped frequency 
 %                determines the max freq}.
+%   'wintype'  = ['hamming','blackmanharris'] Window type used on the power spectral 
+%                density estimation. The Blackman-Harris windows offers better attenuation
+%                than Hamming windows, but lower spectral resolution. {default: 'hamming'}
+%   'blckhn'   = [integer] Parameter to scale the windows length when Blackman-Harris 
+%                windows is used in 'wintype' {default: 2}
 %   'reref'    = ['averef'|'off'] convert data to average reference {default: 'off'}
 %   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
 %                component, this parameter should contain its scalp map. In this case
@@ -98,6 +103,14 @@
 % Notes: The original input format is still functional for backward compatibility.
 %        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
 %
+% Non-backward compatible change (Nov 15 2015):
+%   Default winsize was set to the sampling rate (giving a default window
+%   length of 1 sec). Also, the y-axis label in the plot was corrected
+%   to read, "Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)' 
+%   Finally, when winsize is not a power of 2, it is no longer promoted to 
+%   the next higher power of 2. Thanks to Andreas Widmann for his comments.
+%  
+%
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
 %          SCCN/INC/UCSD, La Jolla, 3/01 
 %
@@ -136,7 +149,7 @@ function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,s
 
 icadefs;
 LOPLOTHZ = 1;  % low  Hz to plot
-FREQFAC  = 2;  % approximate frequencies/Hz (default)
+FREQFAC  = 1;  % approximate frequencies/Hz (default)
 allcolors = { [0 0.7500 0.7500] 
               [1 0 0] 
               [0 0.5000 0] 
@@ -151,36 +164,38 @@ if nargin<3
 end
 if nargin <= 3 | isstr(varargin{1})
 	% 'key' 'val' sequence
-	fieldlist = { 'freq'          'real'     []                        [] ;
-                  'specdata'      'real'     []                        [] ;
-                  'freqdata'      'real'     []                        [] ;
-				  'chanlocs'      ''         []                        [] ;
-				  'freqrange'     'real'     [0 srate/2]               [] ;
-				  'memory'        'string'   {'low','high'}           'high' ;
-				  'plot'          'string'   {'on','off'}             'on' ;
-				  'plotmean'      'string'   {'on','off'}             'off' ;
-				  'title'         'string'   []                       '';
-				  'limits'        'real'     []                       [nan nan nan nan nan nan];
-				  'freqfac'       'integer'  []                        FREQFAC;
-				  'percent'       'real'     [0 100]                  100 ;
-				  'reref'         'string'   { 'averef','off','no' }  'off' ;
-				  'boundaries'    'integer'  []                       [] ;
-				  'nfft'          'integer'  [1 Inf]                  [] ;
-				  'winsize'       'integer'  [1 Inf]                  [] ;
-				  'overlap'       'integer'  [1 Inf]                  0 ;
-				  'icamode'       'string'   { 'normal','sub' }        'normal' ;
-				  'weights'       'real'     []                       [] ;
-				  'mapnorm'       'real'     []                       [] ;
-				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
-				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
-				  'nicamaps'      'integer'  []                       4 ;
-				  'icawinv'       'real'     []                       [] ;
-				  'icacomps'      'integer'  []                       [] ;
-				  'icachansind'   'integer'  []                       [1:size(data,1)] ; % deprecated
-				  'icamaps'       'integer'  []                       [] ;
-                  'rmdc'           'string'   {'on','off'}          'off';
-				  'mapchans'      'integer'  [1:size(data,1)]         [] 
-                  'mapframes'     'integer'  [1:size(data,2)]         []};
+	fieldlist = { 'freq'          'real'     []                            [] ;
+                  'specdata'      'real'     []                            [] ;
+                  'freqdata'      'real'     []                            [] ;
+				  'chanlocs'      ''         []                            [] ;
+				  'freqrange'     'real'     [0 srate/2]                   [] ;
+				  'memory'        'string'   {'low','high'}                'high' ;
+				  'plot'          'string'   {'on','off'}                  'on' ;
+				  'plotmean'      'string'   {'on','off'}                  'off' ;
+				  'title'         'string'   []                            '';
+				  'limits'        'real'     []                            [nan nan nan nan nan nan];
+				  'freqfac'       'integer'  []                            FREQFAC;
+				  'percent'       'real'     [0 100]                       100 ;
+				  'reref'         'string'   { 'averef','off','no' }       'off' ;
+				  'boundaries'    'integer'  []                            [] ;
+				  'nfft'          'integer'  [1 Inf]                       [] ;
+				  'winsize'       'integer'  [1 Inf]                       [] ;
+				  'overlap'       'integer'  [1 Inf]                       0 ;
+				  'icamode'       'string'   { 'normal','sub' }            'normal' ;
+				  'weights'       'real'     []                            [] ;
+				  'mapnorm'       'real'     []                            [] ;
+				  'plotchan'      'integer'  [1:size(data,1)]              [] ;
+				  'plotchans'     'integer'  [1:size(data,1)]              [] ;
+				  'nicamaps'      'integer'  []                            4 ;
+				  'icawinv'       'real'     []                            [] ;
+				  'icacomps'      'integer'  []                            [] ;
+				  'icachansind'   'integer'  []                            [1:size(data,1)] ; % deprecated
+				  'icamaps'       'integer'  []                            [] ;
+                  'rmdc'          'string'   {'on','off'}                  'off' ;
+				  'mapchans'      'integer'  [1:size(data,1)]              [] ; 
+                  'wintype'       'string'   {'hamming','blackmanharris'}  'hamming' ; 
+                  'blckhn'        'real'     []                            2 ;
+                  'mapframes'     'integer'  [1:size(data,2)]              []};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
@@ -542,7 +557,7 @@ if strcmpi(g.plot, 'on')
     xl=xlabel('Frequency (Hz)');
     set(xl,'fontsize',AXES_FONTSIZE_L);
     % yl=ylabel('Rel. Power (dB)');
-    yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
+    yl=ylabel('Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)');%yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
     set(yl,'fontsize',AXES_FONTSIZE_L);
     set(gca,'fontsize',AXES_FONTSIZE_L)
     box off;
@@ -852,6 +867,8 @@ function [index, usedplots] = closestplot(xpos, xcentercoords, usedplots);
 % function computing spectrum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
+    usepwelch = license('checkout','Signal_Toolbox');
+    
 	if exist('newweights') == 1
 		nchans = size(newweights,1);
 	else 
@@ -859,21 +876,33 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	end;
 	%fftlength = 2^round(log(srate)/log(2))*g.freqfac;
 	if isempty(g.winsize)
-        winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
-        winlength = min(winlength, 512);
-        winlength = max(winlength, 256);
-        winlength = min(winlength, frames);
+%         winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
+%         winlength = min(winlength, 512);
+%         winlength = max(winlength, 256);
+        winlength = min(srate, frames);
     else
         winlength = g.winsize;
     end;
-    if isempty(g.nfft)
-        fftlength = 2^(nextpow2(winlength))*g.freqfac;
-	else
+    
+     if strcmp(g.wintype,'blackmanharris')
+         if usepwelch
+             winlength = blackmanharris(round(winlength/g.blckhn));
+         else
+             g.wintype = 'hamming';
+             fprintf('\nSignal processing toolbox (SPT) absent: unable to use Blackman-Harris window\n');
+             fprintf('                                        using pwelch function from Octave\n');
+         end
+     end
+        
+    if isempty(g.nfft) && strcmp(g.wintype,'hamming')
+        %fftlength = 2^(nextpow2(winlength))*g.freqfac;
+        fftlength = winlength*g.freqfac;
+    elseif ~isempty(g.nfft) && strcmp(g.wintype,'hamming')
         fftlength = g.nfft;
+    elseif strcmp(g.wintype,'blackmanharris')
+        fftlength = 2^(nextpow2(length(winlength)))*g.freqfac;
     end;
-%     usepwelch = 1; 
-    usepwelch = license('checkout','Signal_Toolbox'); % 5/22/2014 Ramon 
-%     if ~license('checkout','Signal_Toolbox'), 
+    
     if ~usepwelch, 
         fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
         fprintf('function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');

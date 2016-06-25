@@ -144,7 +144,7 @@ for index = 1:length(formula)
 	arrayname = [ 'accres{' int2str(index) '}' ];
 	if ndims(tmpvar1) == 2 % 2 dimensions
 		formula1 = [ formula1 arrayname '(:,index) = ' formula{index} ';'];
-		formala2 = [ formula2 arrayname '(:,index) = ' arrayname '(:,index) - ' formula{index}  ';'];	
+		formula2 = [ formula2 arrayname '(:,index) = ' arrayname '(:,index) - ' formula{index}  ';'];	
 	else % 3 dimensions
 		formula1 = [ formula1 arrayname '(:,:,index) = ' formula{index}  ';'];
 		formula2 = [ formula2 arrayname '(:,:,index) = ' arrayname '(:,:,index) - ' formula{index}  ';'];	

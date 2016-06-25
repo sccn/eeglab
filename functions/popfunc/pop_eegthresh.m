@@ -7,21 +7,21 @@
 %                upthresh, starttime, endtime, superpose, reject);
 %
 % Graphic interface:
-%   "Electrode|Component number(s)" - [edit box] number(s) of the electrode(s) or 
+%   "Electrode|Component indices(s)" - [edit box] indices of the electrode(s) or 
 %                 component(s) to take into consideration. Same as the 'elec_comp'
 %                 parameter from the command line.
-%   "Lower limit(s)" - [edit box] lower threshold limit(s) (in uV|std. dev.). 
-%                 Sets command line parameter 'lowthresh'.
-%   "Upper limit(s)" - [edit box] upper threshold limit(s) (in uV|std. dev.). 
-%                 Sets command line parameter 'upthresh'.
-%   "Start time(s)" - [edit box] starting time limit(s) (in seconds). 
+%   "Minimum rejection threshold(s)" - [edit box] lower threshold limit(s) 
+%                 (in uV|std. dev.). Sets command line parameter 'lowthresh'.
+%   "Maximum rejection threshold(s)" - [edit box] upper threshold limit(s) 
+%                  (in uV|std. dev.). Sets command line parameter 'upthresh'.
+%   "Start time limit(s)" - [edit box] starting time limit(s) (in seconds). 
 %                 Sets command line parameter 'starttime'.
-%   "End time(s)" - [edit box] ending time limit(s) (in seconds). 
+%   "End time limit(s)" - [edit box] ending time limit(s) (in seconds). 
 %                 Sets command line parameter 'endtime'.
-%   "Display with previously marked rejections?" - [edit box] either YES or
-%                 NO. This edit box sets command line option 'superpose'.
-%   "Reject marked trials?" - [edit box] either YES or NO. This edit box 
-%                 sets command line option 'reject'.
+%   "Display previous rejection marks: " - [Checkbox]. Sets the command line
+%                 input option 'eegplotplotallrej'.
+%   "Reject marked trials: " - [Checkbox]  Sets the command line
+%                 input option 'eegplotreject'.
 %
 % Inputs:
 %   INEEG      - input EEG dataset
@@ -95,42 +95,56 @@ if exist('reject') ~= 1
 end;
 
 if nargin < 3
-
-	% which set to save
-	% -----------------
-	promptstr   = { fastif(icacomp==0, 'Component (number(s), Ex: 2 4 5):', 'Electrode (number(s), Ex: 2 4 5):'), ...
-					fastif(icacomp==0, 'Lower limit(s) (std. dev,  Ex: -3 -2.5 -2):', 'Lower limit(s) (uV, Ex:-20 -10 -15):'), ...
-					fastif(icacomp==0, 'Upper limit(s) (std. dev, Ex: 2 2 2.5):', 'Upper limit(s) (uV, Ex: 20 10 15):'), ...
-					'Start time(s) (seconds, Ex -0.1 0.3):', ...
-					'End time(s) (seconds, Ex 0.2):', ...
-                    'Display with previously marked rejections? (YES or NO)', ...
-         		    'Reject marked trial(s)? (YES or NO)' };
-	inistr      = { fastif(icacomp==1, ['1:' int2str(EEG.nbchan)], '1:5'), ...
-					fastif(icacomp==1, '-10', '-20'),  ...
-					fastif(icacomp==1, '10', '20'), ...
-					num2str(EEG.xmin), ...
-					num2str(EEG.xmax), ...
-                    'NO', ...
-            	    'NO' };
-
-	result       = inputdlg2( promptstr, fastif(icacomp == 0, 'Rejection abnormal comp. values -- pop_eegthresh()', ...
-											   'Rejection abnormal elec. values -- pop_eegthresh()'), 1,  inistr, 'pop_eegthresh');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
-	elecrange    = result{1};
-	negthresh    = result{2};
-	posthresh    = result{3};
-	starttime    = result{4};
-	endtime      = result{5};
-	switch lower(result{6}), case 'yes', superpose=1; otherwise, superpose=0; end;
-	switch lower(result{7}), case 'yes', reject=1; otherwise, reject=0; end;
+    
+    % which set to save
+    % -----------------
+    promptstr = { fastif(icacomp,'Electrode (indices(s), Ex: 2 4 5):'   , 'Component (indices, Ex: 2 6:8 10):'), ...
+                  fastif(icacomp,'Minimum rejection threshold(s) (uV, Ex:-20 -10 -15):', 'Minimum rejection threshold(s) (std. dev,  Ex: -3 -2.5 -2):'), ...
+                  fastif(icacomp,'Maximum rejection threshold(s) (uV, Ex: 20 10 15):'  , 'Maximum rejection threshold(s) (std. dev, Ex: 2 2 2.5):'), ...
+                  'Start time limit(s) (seconds, Ex -0.1 0.3):', ...
+                  'End time limit(s) (seconds, Ex 0.2):', ...
+                  'Display previous rejection marks', ...
+                  'Reject marked trial(s)' };
+    inistr = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], '1:5'), ...
+               fastif(icacomp, '-10', '-20'),  ...
+               fastif(icacomp, '10', '20'), ...
+               num2str(EEG.xmin), ...
+               num2str(EEG.xmax), ...
+               '0', ...
+               '0' };
+    
+    g1 = [1 0.1 0.75];
+    g2 = [1 0.22 0.85];
+    geometry = {g1 g1 g1 g1 g1 1 g2 g2};
+    uilist = {...
+              { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      ,'string' ,inistr{1}  'tag' 'cpnum'}...
+              { 'Style', 'text', 'string', promptstr{2}} {} { 'Style','edit'      ,'string' ,inistr{2} 'tag' 'lowlim' }...
+              { 'Style', 'text', 'string', promptstr{3}} {} { 'Style','edit'      ,'string' ,inistr{3}  'tag' 'highlim'}...
+              { 'Style', 'text', 'string', promptstr{4}} {} { 'Style','edit'      ,'string' ,inistr{4}  'tag' 'starttime'}...
+              { 'Style', 'text', 'string', promptstr{5}} {} { 'Style','edit'      ,'string' ,inistr{5}  'tag' 'endtime'}...
+              {}...
+              { 'Style', 'text', 'string', promptstr{6}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value' str2double(inistr{6}) 'tag','rejmarks' }...
+              { 'Style', 'text', 'string', promptstr{7}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value' str2double(inistr{7}) 'tag' 'rejtrials'} ...
+               };
+    figname = fastif(icacomp == 0, 'Rejection abnormal comp. values -- pop_eegthresh()','Rejection abnormal elec. values -- pop_eegthresh()');
+    result = inputgui( geometry,uilist,'pophelp(''pop_eegthresh'');', figname);
+    
+    size_result  = size( result );
+    if size_result(1) == 0 return; end;
+    elecrange    = result{1};
+    negthresh    = result{2};
+    posthresh    = result{3};
+    starttime    = result{4};
+    endtime      = result{5};
+    superpose    = result{6};
+    reject       = result{7};
 end;
 
-if isstr(elecrange) % convert arguments if they are in text format 
-	calldisp = 1;
-	elecrange = eval( [ '[' elecrange ']' ]  );
-	negthresh = eval( [ '[' negthresh ']' ]  );
-	posthresh = eval( [ '[' posthresh ']' ]  );
+if isstr(elecrange) % convert arguments if they are in text format
+    calldisp = 1;
+    elecrange = eval( [ '[' elecrange ']' ]  );
+    negthresh = eval( [ '[' negthresh ']' ]  );
+    posthresh = eval( [ '[' posthresh ']' ]  );
     if isstr(starttime)
         starttime = eval( [ '[' starttime ']' ]  );
     end;
@@ -138,7 +152,7 @@ if isstr(elecrange) % convert arguments if they are in text format
         endtime   = eval( [ '[' endtime ']' ]  );
     end;
 else
-	calldisp = 0;
+    calldisp = 0;
 end;
 
 if any(starttime < EEG.xmin) 

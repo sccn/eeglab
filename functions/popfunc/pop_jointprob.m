@@ -10,24 +10,24 @@
 %                   locthresh, globthresh, superpose, reject, vistype);
 %
 % Graphic interface:
-%   "Electrode" - [edit box] electrode|component number(s) to take into
-%                 consideration for rejection. Sets the 'elec_comp'
+%   "Electrode|Component" - [edit box] electrodes or components indices to take 
+%                 into consideration for rejection. Same as the 'elec_comp'
 %                 parameter in the command line call (see below).
-%   "Single-channel limit(s)" - [edit box] activity probability limit(s) (in 
-%                 std. dev.) Sets the 'locthresh' command line parameter.
-%                 If more than one, defined individual electrode|channel
-%                 limits. If fewer values than the number of electrodes | 
-%                 components specified above, the last input value is used 
-%                 for all remaining electrodes|components.
-%   "All-channel limit(s)" - [edit box] activity probability limit(s) (in std.
-%                 dev.) for all channels (grouped). Sets the 'globthresh' 
-%                 command line parameter.
-%   "Display with previously marked rejections?" - [edit box] either YES or
-%                 NO. Sets the command line option 'superpose'.
-%   "Reject marked trial(s)?" - [edit box] either YES or NO. Sets the
-%                 command line option 'reject'.
-%   "visualization mode" - [edit box] either REJECTRIALS or EEGPLOT.
-%                 Sets the command line option 'vistype'.
+%   "Single-channel limit|Single-component limit" - [edit box] activity 
+%                 probability limit(s) (in  std. dev.) Sets the 'locthresh'
+%                  command line parameter. If more than one, defined individual 
+%                 electrode|channel limits. If fewer values than the number 
+%                 of electrodes|components specified above, the last input  
+%                 value is used for all remaining electrodes|components.
+%   "All-channel limit|All-component limit" - [edit box] activity probability 
+%                 limit(s) (in std. dev.) for all channels (grouped). 
+%                 Sets the 'globthresh' command line parameter.
+%   "visualization type" - [popup menu] can be either 'REJECTRIALS'|'EEGPLOT'.
+%                 This correspond to the command line input option 'vistype'
+%   "Display with previous rejection(s)" - [checkbox] This checkbox set the
+%                 command line input option 'superpose'.          
+%   "Reject marked trial(s)" - [checkbox] This checkbox set the command
+%                  line input option 'reject'.
 % Inputs:
 %   INEEG      - input dataset
 %   typerej    - [1|0] data to reject on (0 = component activations; 
@@ -42,8 +42,14 @@
 %              previous marks using different colors. {Default: 0}.
 %   reject     - 0 = do not reject marked trials (but store the marks: 
 %              1 = reject marked trials {Default: 1}.
-%   vistype    - visualization mode: 0 = rejstatepoch(); 1 = eegplot()
-%              {Default: 0}.  
+%   vistype    - Visualization type. [0] calls rejstatepoch() and [1] calls
+%              eegplot() default is [0].When added to the command line
+%              call it will not display the plots if the option 'plotflag'
+%              is not set.
+% topcommand   - [] Deprecated argument , keep to ensure backward compatibility
+% plotflag     - [1,0] [1]Turns plots 'on' from command line, [0] off.
+%              (Note for developers: When called from command line 
+%              it will make 'calldisp = plotflag') {Default: 0}
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated joint probability array
@@ -78,8 +84,8 @@
 % 03-08-02 add eeglab options -ad
 
 function [EEG, locthresh, globthresh, nrej, com] = pop_jointprob( EEG, icacomp, elecrange, ...
-                       		locthresh, globthresh, superpose, reject, vistype, topcommand);
-com = '';
+                       		locthresh, globthresh, superpose, reject, vistype, topcommand,plotflag);
+nrej = []; com = '';
 if nargin < 1
    help pop_jointprob;
    return;
@@ -103,45 +109,70 @@ if exist('reject') ~= 1
 end;
 
 if nargin < 3
-
-	% which set to save
-	% -----------------
-	promptstr   = { [ fastif(icacomp, 'Electrode', 'Component') ' (number(s); Ex: 2 4 5):' ], ...
-					[ fastif(icacomp, 'Single-channel', 'Single-component') ' limit(s) (std. dev(s).: Ex: 2 2 2.5):'], ...
-					[ fastif(icacomp, 'All-channel', 'All-component') ' limit(s) (std. dev(s).: Ex: 2 2.1 2):'], ...
-               		'Display previously marked rejections? (YES or NO)', ...
-         			'Reject marked trial(s)? (YES or NO)', ...
-         			'Visualization mode (REJECTRIALS|EEGPLOT)' };
-	inistr      = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], ['1:' int2str(size(EEG.icaweights,1))])...
-					fastif(icacomp, '3', '5'),  ...
-					fastif(icacomp, '3', '5'), ...
-               		'YES', ...
-            		'NO', ...
-            		'REJECTTRIALS' };
-
-	result       = inputdlg2( promptstr, fastif( ~icacomp, 'Reject. improbable comp. -- pop_jointprob()', 'Reject improbable data -- pop_jointprob()'), 1,  inistr, 'pop_jointprob');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
-	elecrange    = result{1};
-	locthresh    = result{2};
-	globthresh   = result{3};
-	switch lower(result{4}), case 'yes', superpose=1; otherwise, superpose=0; end;
-	switch lower(result{5}), case 'yes', reject=1; otherwise, reject=0; end;
-	switch lower(result{6}), case 'rejecttrials', vistype=0; otherwise, vistype=1; end;
+    
+    % which set to save
+    % -----------------
+    promptstr   = { [ fastif(icacomp, 'Electrode', 'Component') ' (indices; Ex: 2 6:8 10):' ], ...
+                    [ fastif(icacomp, 'Single-channel', 'Single-component') ' limit(s) (std. dev(s).: Ex: 2 2 2.5):'], ...
+                    [ fastif(icacomp, 'All-channel', 'All-component') ' limit(s) (std. dev(s).: Ex: 2 2.1 2):'], ...
+                    'Visualization type',...
+                    'Display previous rejection marks', ...
+                    'Reject marked trial(s)'};
+    
+    inistr = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], ['1:' int2str(size(EEG.icaweights,1))])...
+               fastif(icacomp, '3', '5'),  ...
+               fastif(icacomp, '3', '5'), ...
+               '',...
+               '1', ...
+               '0'};
+    
+    vismodelist= {'REJECTTRIALS','EEGPLOT'};
+    g1  = [1 0.1 0.75];
+    g2 = [1 0.26 0.9];
+    g3 = [1 0.22 0.85];
+    geometry = {g1 g1 g1 g2 [1] g3 g3};
+    
+    uilist = {...
+              { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      , 'string' ,inistr{1} 'tag' 'cpnum'}...
+              { 'Style', 'text', 'string', promptstr{2}} {} { 'Style','edit'      , 'string' ,inistr{2} 'tag' 'singlelimit'}...
+              { 'Style', 'text', 'string', promptstr{3}} {} { 'Style','edit'      , 'string' ,inistr{3} 'tag' 'alllimit'}...
+              { 'Style', 'text', 'string', promptstr{4}} {} { 'Style','popupmenu' , 'string' , vismodelist 'tag' 'specmethod' }...
+              {}...
+              { 'Style', 'text', 'string', promptstr{5}} {} { 'Style','checkbox'  ,'string'  , ' ' 'value' str2double(inistr{5}) 'tag','rejmarks' }...
+              { 'Style', 'text', 'string', promptstr{6}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value'  str2double(inistr{6})  'tag' 'rejtrials'} ...
+              };
+    figname = fastif( ~icacomp, 'Reject. improbable comp. -- pop_jointprob()', 'Reject improbable data -- pop_jointprob()');
+    result = inputgui( geometry,uilist,'pophelp(''pop_jointprob'');', figname);
+    
+    size_result  = size( result );
+    if size_result(1) == 0, locthresh = []; globthresh = []; return; end;
+    elecrange    = result{1};
+    locthresh    = result{2};
+    globthresh   = result{3};
+    switch result{4}, case 1, vistype=0; otherwise, vistype=1; end;
+    superpose    = result{5};
+    reject       = result{6};
+    
 end;
 
-if ~exist('vistype') vistype = 0; end;
-if ~exist('reject') reject = 0; end;
-if ~exist('superpose') superpose = 1; end;
+if ~exist('vistype'  ,'var'), vistype   = 0; end;
+if ~exist('reject'   ,'var'), reject    = 0; end;
+if ~exist('superpose','var'), superpose = 1; end;
 
 if isstr(elecrange) % convert arguments if they are in text format 
-	calldisp = 1;
-	elecrange = eval( [ '[' elecrange ']' ]  );
-	locthresh = eval( [ '[' locthresh ']' ]  );
+    calldisp = 1;
+	elecrange  = eval( [ '[' elecrange ']'  ]  );
+	locthresh  = eval( [ '[' locthresh ']'  ]  );
 	globthresh = eval( [ '[' globthresh ']' ]  );
 else
-	calldisp = 0;
+    calldisp = 0;
 end;
+
+if exist('plotflag','var') && ismember(plotflag,[1,0])
+    calldisp = plotflag;
+else
+    plotflag = 0;
+end
 
 if isempty(elecrange)
 	error('No electrode selectionned');
@@ -234,7 +265,7 @@ end;
 nrej = sum(rej);
 
 com = [ com sprintf('%s = pop_jointprob(%s,%s);', inputname(1), ...
-		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject})) ]; 
+		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject, vistype, [],plotflag})) ]; 
 if nargin < 3 & nargout == 2
 	locthresh = com;
 end;

@@ -6,7 +6,7 @@
 %                winsize, maxslope, minR, superpose, reject,calldisp);
 %
 % Pop-up window interface:
-%   "Electrode|Component number(s)" - [edit box] electrode or component number(s) 
+%   "Electrode|Component indices(s)" - [edit box] electrode or component indices 
 %                 to take into consideration during rejection. Sets the 'elec_comp'
 %                 parameter in the command line call (see below).
 %   "Slope window width" - [edit box] integer number of consecutive data
@@ -21,10 +21,10 @@
 %                 This represents how "line-like" the rejected data should be; 0
 %                 accepts everything that meets the slope requirement, 0.9 is visibly
 %                 flat.
-%   "Display previous rejection marks?" - [edit box] either YES or NO. 
-%                 Sets the command line input option 'superpose'.
-%   "Reject marked trials?" - [edit box] either YES or NO. 
-%                 Sets the command line input option 'reject'.
+%   "Display with previous rejection(s)" - [checkbox] This checkbox set the
+%                 command line input option 'superpose'.          
+%   "Reject marked trial(s)" - [checkbox] This checkbox set the command
+%                  line input option 'reject'.
 % Command line inputs:
 %   INEEG      - input EEG dataset
 %   typerej    - [1|0] data to reject on: 0 = component activations; 
@@ -99,42 +99,53 @@ if exist('reject') ~= 1
     reject = 1;
 end;
 if nargin < 3
-
-	% which set to save
-	% -----------------
-	promptstr   = { fastif(icacomp==0, 'Component number(s), Ex: 2 4 5):', ...
-                                           'Electrode number(s), Ex: 2 4 5):'), ...
-	                'Slope window width (in points)', ... 
-			     fastif(icacomp==0, ...
-                                'Maximum slope to allow (uV/epoch)', ...
-                                'Maximum slope to allow (std. dev./epoch)'), ...
-				'R-square limit to allow (0 to 1, Ex: 0.8):', ...
-               		'Display previous rejection marks? (YES or NO)', ...
-         			'Reject marked trial(s)? (YES or NO)' };
-	inistr      = { ['1:' int2str(EEG.nbchan)], ...
-					int2str(EEG.pnts),  ...
-					'0.5', ...
-					'0.3', ...
-               		'NO', ...
-            		'NO' };
-
-	result       = inputdlg2( promptstr, fastif(~icacomp, 'Trend rejection in component(s) -- pop_rejtrend()', ...
-											   'Data trend rejection -- pop_rejtrend()'), 1,  inistr, 'pop_rejtrend');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
-	elecrange    = result{1};
-	winsize      = result{2};
-	minslope     = result{3};
-	minstd       = result{4};
+    
+    % which set to save
+    % -----------------
+    promptstr = { [fastif(icacomp, 'Electrode', 'Component') ' (indices; Ex: 2 6:8 10):' ], ...
+                  'Slope window width (in points)', ...
+                  [fastif(icacomp,'Maximum slope to allow (std. dev./epoch)','Maximum slope to allow (uV/epoch)')], ...
+                  'R-square limit to allow ([0:1], Ex: 0.8)', ...
+                  'Display previous rejection marks', ...
+                  'Reject marked trial(s)' };
+    
+    inistr = { ['1:' int2str(EEG.nbchan)], ...
+               int2str(EEG.pnts),  ...
+               '0.5', ...
+               '0.3', ...
+               '0',   ...
+               '0' };
+    g1 = [1 0.1 0.75];
+    g2 = [1 0.22 0.85];
+    geometry = {g1 g1 g1 g1 1 g2 g2};
+    
+    uilist = {...
+              { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      ,'string' ,inistr{1}  'tag' 'cpnum'}...
+              { 'Style', 'text', 'string', promptstr{2}} {} { 'Style','edit'      ,'string' ,inistr{2}  'tag' 'win' }...
+              { 'Style', 'text', 'string', promptstr{3}} {} { 'Style','edit'      ,'string' ,inistr{3}  'tag' 'maxslope'}...
+              { 'Style', 'text', 'string', promptstr{4}} {} { 'Style','edit'      ,'string' ,inistr{4}  'tag' 'rlim'}...
+              {}...
+              { 'Style', 'text', 'string', promptstr{5}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value' str2double(inistr{6}) 'tag','rejmarks' }...
+              { 'Style', 'text', 'string', promptstr{6}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value' str2double(inistr{6}) 'tag' 'rejtrials'} ...
+              };
+    
+    figname = fastif(~icacomp, 'Trend rejection in component(s) -- pop_rejtrend()','Data trend rejection -- pop_rejtrend()');
+    result = inputgui( geometry,uilist,'pophelp(''pop_rejtrend'');', figname);
+    size_result  = size( result );
+    if size_result(1) == 0 return; end;
+    elecrange    = result{1};
+    winsize      = result{2};
+    minslope     = result{3};
+    minstd       = result{4};
+    superpose    = result{5};
+    reject       = result{6};
     calldisp     = 1;
-	switch lower(result{5}), case 'yes', superpose=1; otherwise, superpose=0; end;
-	switch lower(result{6}), case 'yes', reject=1; otherwise, reject=0; end;
 end;
-if nargin < 7
-    superpose = 0;
-    reject = 0;
-    calldisp = 1;
-end;
+
+if ~exist('superpose','var'), superpose = 0; end;
+if ~exist('reject','var'),    reject    = 0; end;
+if ~exist('calldisp','var'),  calldisp  = 1; end;
+
 if nargin < 9
     calldisp = 1;
 end

@@ -206,7 +206,17 @@ if nargin < 3
 		if eval(result{4}) ~= 100, options = [ options ', ''percent'', '  result{4} ]; end;
 		if ~isempty(result{5})   , options = [ options ', ''icacomps'', [' result{5} ']' ]; end;
 		if ~isempty(result{6})   , options = [ options ', ''nicamaps'', ' result{6} ]; end;
-		if ~isempty(result{7})   , options = [ options ', ''icamaps'', [' result{7} ']' ]; end;
+        if ~isempty(result{7}) && ~isempty(result{5})
+            try list2 = eval(result{7}); catch,list2 = str2double(result{7}); end
+            try list1 = eval(result{5}); catch,list1 = str2double(result{5}); end
+            [memberflag, pos] = ismember(list2,list1);
+            if sum(memberflag)
+                options = [ options ', ''icamaps'', [' num2str(pos(memberflag)) ']' ];
+            else
+                fprintf(2,'pop_spectopo error: IC(s) selected do not match the ones on the list\n');
+                return;
+            end
+        end;
 		if ~result{8}, options = [ options ', ''icamode'', ''sub''' ]; end;
 		if ~isempty(result{9}),    options = [ options ', ''freqrange'',[' result{9} ']' ]; end;
 		if ~isempty(result{10}), options      =  [ options ',' result{10} ]; end;

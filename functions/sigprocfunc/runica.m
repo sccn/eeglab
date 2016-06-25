@@ -44,7 +44,7 @@
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 % 'logfile'   = [filename] save all message in a log file in addition to showing them
 %               on screen (default -> none)
-% 'interput'  = ['on'|'off'] draw interupt figure. Default is off.
+% 'interupt'  = ['on'|'off'] interrupt drawing of figure. Default is off.
 % 'reset_randomseed' - ['on'|'off'] reset random seed for each call. Default is on.
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance
@@ -830,7 +830,7 @@ if reset_randomseed
     rand('state',sum(100*clock));  % set the random number generator state to
 end                                % a position dependent on the system clock
 
-% interupt figure
+% interrupt figure
 % --------------- 
 if strcmpi(interupt, 'on')
     fig = figure('visible', 'off');

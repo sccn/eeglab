@@ -57,7 +57,7 @@ elseif nargin==2,
     p=min(DEFAULT_LAGS,ceil(N/3)); % number of correlation matrices to be diagonalized
 end;
 
-X(:,:)=X(:,:)-(mean(X(:,:)')'*ones(1,N*ntrials));        % Remove data means 
+X(:,:)=X(:,:)-(mean(X(:,:),2)*ones(1,N*ntrials));        % Remove data means 
 
 for t = 1:ntrials 
     if t == 1
