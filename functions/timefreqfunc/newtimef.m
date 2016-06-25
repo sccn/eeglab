@@ -42,11 +42,11 @@
 %                     To compare two conditions (data1 versus data2), in place of 
 %                     a single data matrix enter a cell array {data1 data2}
 %       frames      = Frames per trial. Ignored if data are 2-D or 3-D.  {750}
-%       epochlim    = [mintime maxtime] (ms).  Note that these are the time limits 
+%       tlimits     = [mintime maxtime] (ms).  Note that these are the time limits 
 %                     of the data epochs themselves, NOT A SUB-WINDOW TO EXTRACT 
 %                     FROM THE EPOCHS as is the case for pop_newtimef(). {[-1000 2000]}
-%       srate       = data sampling rate (Hz)  {default: read from icadefs.m or 250}
-%       'cycles'    = [real] indicates the number of cycles for the time-frequency 
+%       Fs          = data sampling rate (Hz)  {default: read from icadefs.m or 250}
+%       varwin      = [real] indicates the number of cycles for the time-frequency 
 %                        decomposition {default: 0}
 %                     If 0, use FFTs and Hanning window tapering.  
 %                     If [real positive scalar], the number of cycles in each Morlet 
@@ -1708,7 +1708,11 @@ switch lower(g.plotersp)
             % plotting limits
             if isempty(g.speclim)
                % g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
-               g.speclim = [min(mbase)-max(abs(mbase))/3 max(mbase)+max(abs(mbase))/3]; % RMC: Just for plotting
+               if all(~isnan(mbase))
+                   g.speclim = [min(mbase)-max(abs(mbase))/3 max(mbase)+max(abs(mbase))/3]; % RMC: Just for plotting
+               else
+                   g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
+               end
             end;
 
             % plot curves
@@ -1767,7 +1771,7 @@ switch lower(g.plotitc)
         %%%%%%%%%%%% Image the ITC %%%%%%%%%%%%%%%%%%
         %
         h(6) = axes('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
-        set(h(1), 'tag', 'itc');
+        if ishandle(h(1));set(h(1), 'tag', 'itc');end;
 
         if abs(R(1,1)-1) < 0.0001, g.plotphaseonly = 'on'; end;
         if strcmpi(g.plotphaseonly, 'on')

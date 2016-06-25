@@ -5,24 +5,29 @@
 %   >> [OUTEEG, Indices] = pop_rejspec( INEEG, typerej, 'key', val, ...);
 %
 % Pop-up window options:
-%   "Electrode|Component" - [edit box] electrode or component number(s) to 
+% "Electrode|Component" - [edit box] electrode or component indices to 
 %                 take into consideration for rejection. Sets the 'elecrange'
 %                 parameter in the command line call (see below).
-%   "Lower limits(s)" - [edit box] lower threshold limits(s) (in dB). 
-%                 Sets the command line parameter 'threshold'. If more than
-%                 one, apply to each electrode|component individually. If
-%                 fewer than number of electrodes|components, apply the
-%                 last values to all remaining electrodes|components.
-%   "Upper limits(s)" - [edit box] upper threshold limit(s) in dB. 
-%                 Sets the command line parameter 'threshold'.
-%   "Low frequency(s)" - [edit box] low-frequency limit(s) in Hz. 
-%                 Sets the command line parameter 'freqlimits'.
-%   "High frequency(s)" - [edit box] high-frequency limit(s) in Hz. 
-%                 Sets the command line parameter 'freqlimits'.
-%   "Display previous rejection marks?" - [edit box] either YES or NO. 
-%                  Sets the command line input option 'eegplotplotallrej'.
-%   "Reject marked trials?" - [edit box] either YES or NO. Sets the
-%                 command line input option 'eegplotreject'.
+% "Spectrum computation method" -[popupmenu] with values {'fft','multitaper'}
+%                 Select method to compute spectrum.
+% "Minimum power rejection threshold(s) (dB)" - [edit box] minimum rejection
+%                 threshold(s) in (in dB). Sets the command line parameter 
+%                 'threshold'. If more than one, apply to each electrode|
+%                 component individually. If fewer than number of 
+%                 electrodes|components, apply the last value to all remaining
+%                 electrodes|components.
+% "Maximun power  rejection threshold(s) (dB)" - Maximum rejection threshold(s) 
+%                 Sets the command  line parameter 'threshold'.
+% "Low frequency  limit(s)" - [edit box] Low-frequency limit(s) in Hz of 
+%                 range to perform  rejection. Sets the command line parameter
+%                 'freqlimits'.
+% "High frequency limit(s)" - [edit box] High-frequency limit(s) in Hz of 
+%                 range to perform  rejection. Sets the command line parameter
+%                 'freqlimits'.
+% "Display previous rejection marks: " - [Checkbox]. Sets the command line
+%                 input option 'eegplotplotallrej'.
+% "Reject marked trials: " - [Checkbox]  Sets the command line
+%                 input option 'eegplotreject'.
 %
 % Command line inputs:
 %   INEEG      - input dataset
@@ -101,40 +106,61 @@ if icacomp == 0
 end;	
 
 if nargin < 3
-
-	% which set to save
-	% -----------------
-	promptstr   = { fastif(icacomp==0, 'Component number(s) (Ex: 2 4 5):', ...
-                                           'Electrode number(s) (Ex: 2 4 5):'), ...
-					'Lower limit(s) (dB):', ...
-					'Upper limit(s) (dB):', ...
-					'Low frequency(s) (Hz):', ...
-					'High frequency(s) (Hz):', ...
-               		'Display previous rejection marks? (YES or NO)', ...
-         			'Reject marked trial(s)? (YES or NO)' };
-	inistr      = { ['1:' int2str(EEG.nbchan)], ...
-					'-30', ...
-					'30', ...
-					'15', ...
-					'30', ...
-               		'NO', ...
-            		'NO' };
-
-	result       = inputdlg2( promptstr, fastif(~icacomp, 'Reject by component spectra -- pop_rejspec()', ...
-											   'Reject by data spectra -- pop_rejspec()'), 1,  inistr, 'pop_rejspec');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
+    
+    % which set to save
+    % -----------------
+    promptstr = { fastif(icacomp==0, 'Component indices (Ex: 2 4 6:8 10)', ...
+                                     'Electrode indices (Ex: 2 4 6:8 10)'), ...
+                  'Spectrum computation method',...
+                  'Minimum power rejection threshold(s) (dB)',... %'Low power rejection threshold (s) (dB)', ...
+                  'Maximum power rejection threshold(s) (dB)',... %'High power rejection threshold (s) (dB)', ...
+                  'Low frequency limit(s) (Hz)', ...
+                  'High frequency limit(s) (Hz)', ...
+                  'Display previous rejection marks', ...
+                  'Reject marked trial(s)' };
+    
+    inistr = { ['1:' int2str(EEG.nbchan)], ...
+               '',...
+               '-30', ...
+               '30', ...
+               '15', ...
+               '30', ...
+               '0', ...
+               '0' };
+    
+    methodlist = {'FFT', 'Multitaper'};
+    g  = [1 0.1 0.75];
+    g2 = [1 0.26 0.9];
+    g3 = [1 0.22 0.85];
+    geometry = {g g2 g g g g 1 g3 g3};
+    uilist = {...
+              { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      ,'string' ,inistr{1}  'tag' 'cpnum'}...
+              { 'Style', 'text', 'string', promptstr{2}} {} { 'Style','popupmenu' ,'string' ,methodlist 'tag' 'specmethod' }...
+              { 'Style', 'text', 'string', promptstr{3}} {} { 'Style','edit'      ,'string' ,inistr{3}  'tag' 'lowlim'}...
+              { 'Style', 'text', 'string', promptstr{4}} {} { 'Style','edit'      ,'string' ,inistr{4}  'tag' 'higlim'}...
+              { 'Style', 'text', 'string', promptstr{5}} {} { 'Style','edit'      ,'string' ,inistr{5}  'tag' 'lowfreq'}...
+              { 'Style', 'text', 'string', promptstr{6}} {} { 'Style','edit'      ,'string' ,inistr{6}  'tag' 'higfreq'}...
+              {}...
+              { 'Style', 'text', 'string', promptstr{7}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value' str2double(inistr{7}) 'tag','rejmarks' }...
+              { 'Style', 'text', 'string', promptstr{8}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value' str2double(inistr{8}) 'tag' 'rejtrials'} ...
+               };
+    
+    result = inputgui( geometry,uilist,'pophelp(''pop_rejspec'');', 'Reject by data spectra -- pop_rejspec()');
+ 
+    size_result  = size( result );
+    if size_result(1) == 0 return; end;
     options = {};
     options = { options{:} 'elecrange' eval( [ '[' result{1} ']' ]  ) };
-    thresholdsLow  = eval( [ '[' result{2} ']' ]  );
-    thresholdsHigh = eval( [ '[' result{3} ']' ]  );
+    options = { options{:} 'method'   lower(methodlist{result{2}})};
+    thresholdsLow  = eval( [ '[' result{3} ']' ]  );
+    thresholdsHigh = eval( [ '[' result{4} ']' ]  );
     options = { options{:} 'threshold' [thresholdsLow(:) thresholdsHigh(:) ] };
-    freqLimitsLow   = eval( [ '[' result{4} ']' ]  );
-    freqLimitsHigh  = eval( [ '[' result{5} ']' ]  );
+    freqLimitsLow   = eval( [ '[' result{5} ']' ]  );
+    freqLimitsHigh  = eval( [ '[' result{6} ']' ]  );
     options = { options{:} 'freqlimits' [freqLimitsLow(:) freqLimitsHigh(:) ] };
     
-	switch lower(result{6}), case 'yes', superpose=1; otherwise, superpose=0; end;
-	switch lower(result{7}), case 'yes', reject=1; otherwise, reject=0; end;
+    if result{7}, superpose=1; else superpose=0; end;
+    if result{8}, reject=1;    else reject=0; end;
     options = { options{:} 'eegplotplotallrej' superpose };
     options = { options{:} 'eegplotreject'     reject };
 else
@@ -233,7 +259,7 @@ else,            EEG.specicaact = allspec;
 end;
     
 com = [com sprintf('%s = pop_rejspec( %s, %s);', inputname(1), ...
-   inputname(1), vararg2str({icacomp, 'elecrange', opt.elecrange, 'threshold', opt.threshold, 'freqlimits', opt.freqlimits, ...
+   inputname(1), vararg2str({icacomp, 'elecrange', opt.elecrange,'method', opt.method, 'threshold', opt.threshold, 'freqlimits', opt.freqlimits, ...
      'eegplotcom', opt.eegplotcom, 'eegplotplotallrej' opt.eegplotplotallrej 'eegplotreject' opt.eegplotreject })) ]; 
 
 return;

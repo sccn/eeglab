@@ -155,6 +155,8 @@ if ~isempty(varargin) && isstruct(varargin{1})
     defdes = varargin{1};
     varargin(1) = [];
 end;
+if isempty(defdes.variable(1).pairing), defdes.variable(1).pairing = 'on'; end;
+if isempty(defdes.variable(2).pairing), defdes.variable(2).pairing = 'on'; end;
 if isempty(defdes.filepath), defdes.filepath = ''; end;
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;

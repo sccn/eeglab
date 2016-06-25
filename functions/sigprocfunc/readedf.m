@@ -69,7 +69,7 @@ header.physmax = str2num(setstr(fread(fp,[8,header.channels],'char')'));
 header.digimin = str2num(setstr(fread(fp,[8,header.channels],'char')'));
 header.digimax = str2num(setstr(fread(fp,[8,header.channels],'char')'));
 header.prefilt = setstr(fread(fp,[80,header.channels],'char')');
-header.samplerate = str2num(setstr(fread(fp,[8,header.channels],'char')'));
+header.samplerate = str2num(setstr(fread(fp,[8,header.channels],'char')'))./header.duration;
 
 fseek(fp,header.length,-1);
 data = fread(fp,'int16');

@@ -65,7 +65,8 @@
 %                       square containing the (radius intrad) interpolation disk; 'off' -> Interpolate
 %                       values from electrodes shown in the interpolation disk only {default: 'on'}.
 %   'conv'            - ['on'|'off'] Show map interpolation only out to the convext hull of
-%                       the electrode locations to minimize extrapolation.  {default: 'off'}
+%                       the electrode locations to minimize extrapolation. Use this option ['on'] when 
+%                       plotting pvalues  {default: 'off'}
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
@@ -135,6 +136,7 @@
 % Notes: - To change the plot map masking ring to a new figure background color,
 %            >> set(findobj(gca,'type','patch'),'facecolor',get(gcf,'color'))
 %        - Topoplots may be rotated. From the commandline >> view([deg 90]) {default: [0 90])
+%        - When plotting pvalues make sure to use the option 'conv' to minimize extrapolation effects 
 %
 % Authors: Andy Spydell, Colin Humphries, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001 -
@@ -1058,6 +1060,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
+  disp('Warning: When plotting pvalues in totoplot, use option ''conv'' to minimize extrapolation effects');
   if strcmpi(STYLE,'grid')                     % plot grid only
 
     %

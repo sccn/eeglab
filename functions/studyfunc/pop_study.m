@@ -78,7 +78,7 @@ end
 % type of call (gui, script or internal)
 % --------------------------------------
 mode = 'internal_command';
-if ~isstr(STUDY) %intial settings
+if ~isstr(STUDY) %initial settings
     mode = 'script';
     if nargin > 2
         for index = 1:length(varargin)
@@ -267,7 +267,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
                   'title'   , 'Create a new STUDY set -- pop_study()', ...
                   'userdata', fig_arg, ...
                   'eval'    , 'pop_study(''delclust'', gcf); pop_study(''redraw'', gcf);' };
-	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
+	[result, userdat2, strhalt, outstruct, instruct] = inputgui( 'mode', 'noclose', optiongui{:});
     if isempty(result), return; end;
     if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end;
     
@@ -298,9 +298,26 @@ elseif strcmpi(mode, 'gui') % GUI mode
          end;
     else options = { options{:} 'updatedat' 'off' };
     end;
+    
     if outstruct(1).delclust == 1
         options = { options{:} 'rmclust' 'on' };
+    else
+        options = { options{:} 'rmclust' 'off' };
     end;
+    
+    % ---
+    if ~isequaln(outstruct, instruct) && (outstruct(1).delclust ~= 1)
+        strfields = fieldnames(outstruct);
+        for i = 1:length(strfields)
+            strdiff(i) = strcmp(outstruct.(strfields{i}),instruct.(strfields{i}));
+        end
+        % If the information of the STUDY differ, then remove information from clusters
+        % Ignoring ('STUDY set name','STUDY set task','STUDY set notes')
+        if any(~strdiff(3:end-2)) 
+            options{find(strcmp(options,'rmclust'))+1} = 'on';
+        end
+    end
+    % ---
     
     % check channel labels
     % --------------------
