@@ -10,9 +10,9 @@ if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end;
 try
     disp( [ 'Retreiving URL with ' type ' extensions...' ] );
     if strcmpi(type, 'import')
-        [tmp status] = plugin_urlread('https://sccn.ucsd.edu/wiki/Plugin_list_import');
+        [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_import');
     else
-        [tmp status] = plugin_urlread('https://sccn.ucsd.edu/wiki/Plugin_list_process');
+        [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_process');
     end;
 catch,
     error('Cannot connect to the Internet to retrieve extension list');
@@ -21,7 +21,7 @@ end;
 % retreiving download statistics
 try
     disp( [ 'Retreiving download statistics...' ] );
-    [stats status] = plugin_urlread('https://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall.php');
+    [stats status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall.php');
     stats = textscan(stats, '%s%d%s%s');
 catch,
     stats = {};

@@ -1073,7 +1073,7 @@ try
     if isempty(eeglabVersionNumber)
         eeglabVersionNumber = 'dev';
     end;
-    eeglabUpdater = up.updater(eeglabVersionNumber, 'https://sccn.ucsd.edu/eeglab/updater/latest_version.php', 'EEGLAB', currentReleaseDateString);
+    eeglabUpdater = up.updater(eeglabVersionNumber, 'http://sccn.ucsd.edu/eeglab/updater/latest_version.php', 'EEGLAB', currentReleaseDateString);
         
     % create a new GUI item (e.g. under Help)
     %newerVersionMenu = uimenu(help_m, 'Label', 'Upgrade to the Latest Version', 'visible', 'off', 'userdata', 'startup:on;study:on');
