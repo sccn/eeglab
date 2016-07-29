@@ -85,14 +85,6 @@ if isstr(opt), error(opt); end;
 
 dtype = opt.datatype;
 
-% find channel indices
-% --------------------
-if ~isempty(opt.channels)
-     allChangrp = lower({ STUDY.changrp.name });
-     finalinds = std_chaninds(STUDY, opt.channels);
-else finalinds = opt.clusters;
-end;
-
 % get the file extension
 % ----------------------
 if ~isempty(opt.channels), fileExt = [ '.dat' opt.datatype ];
@@ -139,6 +131,17 @@ for iSubj = 1:length(subjectList)
     else bigstruct.design.variable = STUDY.design(opt.design).variable;
     end;
 
+    % find component indices
+    % ----------------------
+    if ~isempty(opt.clusters)
+        datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
+        compList    = [];
+        for iDat = datasetInds(:)'
+            indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject
+            compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
+        end;
+    end;
+    
     % read all channels/components at once
     hashcode = gethashcode(std_serialize(bigstruct));
     [STUDY.cache tmpstruct] = eeg_cache(STUDY.cache, hashcode);
@@ -150,7 +153,10 @@ for iSubj = 1:length(subjectList)
     else
         datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
         fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
-        [dataTmp{iSubj} params xvals tmp eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels(finalinds));
+        if ~isempty(opt.channels)
+             [dataTmp{iSubj} params xvals tmp eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels);
+        else [dataTmp{iSubj} params xvals tmp eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'components', compList);
+        end;
         if strcmpi(opt.singletrials, 'off')
             dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
         end;
