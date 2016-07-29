@@ -127,8 +127,10 @@ end;
 % get fields to read
 % ------------------
 v6Flag = testv6([ fileBaseName fileExt ]);
-if v6Flag
-    fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
+if ~v6Flag
+    if ~isempty(opt.channels)
+        fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
+    end;
 else
     fileData = matfile([ fileBaseName fileExt ]);
 end;
@@ -149,7 +151,9 @@ if v6Flag
     for iChan = 1:length(opt.dataindices)
         chanList{iChan} = [ dataType int2str(opt.dataindices(iChan)) ];
     end;
+    warning('off', 'MATLAB:load:variableNotFound');
     fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs');
+    warning('on', 'MATLAB:load:variableNotFound');
 end;
 
 % scan datasets
