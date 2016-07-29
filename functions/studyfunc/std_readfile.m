@@ -152,7 +152,9 @@ if v6Flag
         chanList{iChan} = [ dataType int2str(opt.dataindices(iChan)) ];
     end;
     warning('off', 'MATLAB:load:variableNotFound');
-    fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs');
+    if length(opt.dataindices) > 0
+        fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs');
+    end;
     warning('on', 'MATLAB:load:variableNotFound');
 end;
 
