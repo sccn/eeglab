@@ -157,32 +157,26 @@ for iSubj = 1:length(subjectList)
              [dataTmp{iSubj} params xvals tmp eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels);
         else [dataTmp{iSubj} params xvals tmp eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'components', compList);
         end;
-        if strcmpi(opt.singletrials, 'off')
+        if strcmpi(opt.singletrials, 'off') && ~isempty(dataTmp{iSubj}{1})
             dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
         end;
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals eventsTmp{iSubj} });
     end;
 end;
 
+% if single trials put channels in 2nd dim and trials in last dim
+if strcmpi(opt.singletrials, 'on') && length(opt.channels) > 1
+    for iCase = 1:length(dataTmp)
+        for iItem = 1:length(dataTmp{1}(:))
+            dataTmp{iCase}{iItem} = permute(dataTmp{iCase}{iItem}, [1 3 2]);
+        end;
+    end;
+end;
+
 % store data for all subjects
-datavals = cell(size(dataTmp{1}));
-if strcmpi(opt.singletrials, 'off')
-    for iItem=1:length(dataTmp{1}(:)) datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) length(subjectList)], 'single'); end;
-    for iItem=1:length(dataTmp{1}(:)) datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) length(subjectList)], 'single'); end;
-    for iSubj = 1:length(subjectList)
-        for iItem=1:length(dataTmp{iSubj}) 
-            datavals{iItem}(:,:,iSubj) = dataTmp{iSubj}{iItem}; 
-        end;
-    end;
-else
-    for iItem=1:length(dataTmp{1}(:)) datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},3) sum(cellfun(@(x)size(x{iItem},2), dataTmp)) ], 'single'); end;
-    count = 1;
-    for iSubj = 1:length(subjectList)
-        for iItem=1:length(dataTmp{iSubj}) 
-            datavals{iItem}(:,:,count:count+size(dataTmp{iSubj}{iItem},2)-1) = permute(dataTmp{iSubj}{iItem}, [1 3 2]); 
-            count = count+size(dataTmp{iSubj}{iItem},2);
-        end;
-    end;
+if length(opt.channels) > 1
+    datavals = reorganizedata(dataTmp, 3);
+else datavals = reorganizedata(dataTmp, 2);
 end;
 
 % fix component polarity if necessary
@@ -190,10 +184,13 @@ end;
 componentPol = [];
 if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && strcmpi(opt.componentpol, 'on')
     disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
-    STUDY = std_readtopoclust(STUDY, ALLEEG, finalinds(ind));
-    componentPol = STUDY.cluster(finalinds(ind)).topopol;
+    STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
+    componentPol = STUDY.cluster(opt.clusters).topopol;
     if isempty(componentPol)
         disp('Cluster topographies absent - cannot adjust single component ERP polarities');
+    end;
+    for iItem = 1:length(datavals)
+        datavals{iItem} = bsxfun(@times, datavals{iItem}, componentPol);
     end;
 end;
 
@@ -439,6 +436,33 @@ function spectrum = removemeanspectrum(spectrum, meanpowbase)
                 else tmpmeanpowbase = meanpowbase;
                 end;
                 spectrum{c,g} = spectrum{c,g} - tmpmeanpowbase;
+            end;
+        end;
+    end;
+
+% reorganize data
+% ---------------
+function datavals = reorganizedata(dataTmp, dim)
+    datavals = cell(size(dataTmp{1}));
+    for iItem=1:length(dataTmp{1}(:)')
+        numItems = sum(cellfun(@(x)size(x{iItem},dim), dataTmp));
+        switch dim
+            case 2, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) numItems], 'single'); 
+            case 3, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) numItems], 'single'); 
+            case 4, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) size(dataTmp{1}{iItem},3) numItems], 'single'); 
+        end;
+    end;
+    for iItem=1:length(dataTmp{1}(:)')
+        count = 1;
+        for iCase = 1:length(dataTmp)
+            if ~isempty(dataTmp{iCase}{iItem})
+                numItems = size(dataTmp{iCase}{iItem},dim);
+                switch dim
+                    case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
+                    case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
+                    case 4, datavals{iItem}(:,:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
+                end;
+                count = count+numItems;
             end;
         end;
     end;
