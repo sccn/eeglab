@@ -1,7 +1,7 @@
 % fastregress - perform fast regression and return p-value
 %
 % Usage:
-% [ypred, alpha, rsq, B] = myregress(x, y, plotflag);
+% [ypred, alpha, rsq, B] = fastregress(x, y, plotflag);
 %
 % Inputs
 %  y - y values
