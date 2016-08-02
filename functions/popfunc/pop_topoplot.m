@@ -248,7 +248,7 @@ for index = 1:size(arg2(:),1)
 			set(curfig,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end;
         end;    
-		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
+		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1,'Parent',curfig);
         set(curax, 'visible', 'off')
     end;
 
