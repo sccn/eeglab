@@ -505,7 +505,9 @@ try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 % wait until button press and return values
 % -----------------------------------------
 waitfor( findobj('parent', fid, 'tag', 'ok'), 'userdata');
-try, findobj(fid); % figure still exist ?
+try
+    tmpobj = findobj(fid); % figure still exist ?
+    if isempty(tmpobj), error(' '); end % After MATLAB 2014b
 catch, transformmat = []; chanlocs1 = []; return; end;
 dat = get(fid, 'userdata');
 transformmat = dat.transform;
