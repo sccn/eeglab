@@ -1003,6 +1003,7 @@ if iscell(data)
             case 'complex',  Rdiff = R1-R2;
         end;
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+            g.erspmax = []; g.itcmax  = []; % auto scale inserted for diff
             plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, meanmbase, [], [], g);
         end;
     else
