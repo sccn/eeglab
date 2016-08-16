@@ -92,7 +92,6 @@
 % TO INVESTIGAGE
 % TO INVESTIGAGE
 % TO INVESTIGAGE
-% TO INVESTIGAGE
 
 function [STUDY, erspdata, alltimes, allfreqs, erspbase, events, unitPower] = std_readersp(STUDY, ALLEEG, varargin)
 
