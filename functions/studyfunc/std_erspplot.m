@@ -227,8 +227,18 @@ end;
 % ---------------------
 if ~isempty(opt.channels)
 
-    [STUDY allersp alltimes allfreqs tmp events unitPower] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
-        'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
+    [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', params.timerange, ...
+        'freqrange', params.freqrange, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', opt.datatype);
+    % 'concatenate', params.concatenate NOT TAKEN INTO ACCOUNT
+    unitPower = newtimefpowerunit(paramsersp);
+    %removeerspbaseline(allersp, alltimes, 0);
+    
+    %[STUDY allersp alltimes allfreqs tmp events unitPower] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
+    %    'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
+    %tic
+    %[STUDY allersp alltimes allfreqs tmp events unitPower] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
+    %   'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
+    %toc
     
     % select specific time and freq
     % -----------------------------
@@ -400,3 +410,39 @@ if isfield(v, 'fieldtrip')
     end;
     s = { s{:} s3{:} };
 end;
+        
+% remove ERSP baseline
+% ---------------------
+function ersp = removeerspbaseline(ersp, timevals, baseline)
+
+    if length(baseline(1)) == 1, baseline = [ timevals(1) baseline ]; end;
+    if size(baseline,2) == 2
+        baseln = [];
+        for index = 1:size(baseline,1)
+            tmptime   = find(timevals >= baseline(index,1) & timevals <= baseline(index,2));
+            baseln = union_bc(baseln, tmptime);
+        end;
+        if length(baseln)==0
+            disp( [ 'Probable error: There are no sample points found in the default baseline.' ] );
+        end
+    end;
+
+    try
+        len = length(ersp(:));
+        for index = 1:len
+            if ~isempty(ersp{index})
+                if index == 1, meanpowbase = abs(mean(ersp{index}(:,baseln,:),2));
+                else           meanpowbase = meanpowbase + abs(mean(ersp{index}(:,baseln,:),2));
+                end;
+            end;
+        end;
+    catch,
+        error([ 'Problem while subtracting common ERSP baseline.' 10 ...
+                'Common baseline subtraction is performed based on' 10 ...
+                'pairing settings in your design. Most likelly, one' 10 ...
+                'independent variable should not have its data paired.' ]);
+    end;
+
+    for g = 1:length(ersp(:))
+        ersp{g} = bsxfun(@minus, ersp{g}, meanpowbase);
+    end;
