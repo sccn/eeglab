@@ -300,6 +300,7 @@ eeglab_options;
 usesingle = option_single;
 
 % CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
+disp('Computing time/frequency decomposition...');
 parfor k = 1:length(g.indices)  % for each (specified) component/channel
     %if k>size(X,1), break; end; % happens for components
     if powbaseexist
@@ -308,6 +309,10 @@ parfor k = 1:length(g.indices)  % for each (specified) component/channel
         tmpparams{end+1} = g.powbase(k,:);
     else
         tmpparams = parameters;
+    end;
+    if length(g.indices) > 1
+        tmpparams{end+1} = 'verbose';
+        tmpparams{end+1} = 'off';
     end;
     
     % Run timef() to get ERSP
