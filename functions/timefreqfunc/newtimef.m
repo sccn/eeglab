@@ -1197,9 +1197,9 @@ end;
 % remove baseline
 % ----------------
 if strcmpi(g.scale, 'log') && ~isnan(g.powbase), g.powbase = 10.^(g.powbase/10); end; 
-[P, baseln, mbase] = newtimefbaseln(P, timesout, g.baseline, 'basenorm', g.basenorm, ...
+[P, baseln, mbase] = newtimefbaseln(P, timesout, 'baseline', g.baseline, 'basenorm', g.basenorm, ...
                                    'verbose', g.verbose, 'trialbase', g.trialbase, ...
-                                   'powbase', g.powbase,'commonbase', g.commonbase);
+                                   'powbase', g.powbase,'singletrials','on');
 
 % ----------------
 % phase amp option
