@@ -36,7 +36,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [P, baseln, mbase] = newtimefbaseln(P, timesout, baseline, varargin)
+function [P, baseln, mbase] = newtimefbaseln(P, timesout, varargin)
 
 if nargin < 3
     help newtimefbaseln;
@@ -45,14 +45,14 @@ end;
 
 [ g timefreqopts ] = finputcheck(varargin, ...
     {'powbase'       'real'      []          NaN; 
+     'baseline'      'real'      []          0; 
      'basenorm'      'string'    {'on','off'} 'off'; 
      'commonbase'    'string'    {'on','off'} 'on'; 
      'scale'         'string'    { 'log','abs'} 'log'; 
      'trialbase'     'string'    {'on','off','full'} 'off'; 
      'verbose'       'string'    {'on','off'} 'on'; 
-    }, 'newtimefbaseln');
+    }, 'newtimefbaseln', 'ignore');
 if isstr(g) error(g); return; end;
-g.baseline = baseline;
 
 % ---------------
 % baseline length
