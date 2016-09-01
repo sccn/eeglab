@@ -1,15 +1,17 @@
 % newtimefbaseln() - Remove baseline power values for newtimef. This
 %                    function assumes absolute power NOT log transformed power.
+%                    This function only removes baseline. Data has to be
+%                    averaged subsequently if necessary.
 %
-% Usage:    
-%   >>  [P,basesamples,basevals] = newtimefbaseln(P, tvals, baseline, 'key', val); 
+% Usage:
+%   >>  [P,basesamples,basevals] = newtimefbaseln(P, tvals, baseline, 'key', val);
 %
 % Inputs:
 %   P        - [3-D or 4-D array] Power array [freqs x times x trials] or
 %              [channels x freqs x times x trials
 %   tvals    - [array] time values
 %   baseline - [] same format as for newtimef
-% 
+%
 % Optional inputs: 'powbase', 'basenorm', 'commonbase', 'verbose'
 %                  and 'trialbase'. Same definition as for newtimef.
 %
@@ -36,7 +38,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [P, baseln, mbase] = newtimefbaseln(P, timesout, varargin)
+function [PP, baseln, mbase] = newtimefbaseln(PPori, timesout, varargin)
 
 if nargin < 3
     help newtimefbaseln;
@@ -44,15 +46,17 @@ if nargin < 3
 end;
 
 [ g timefreqopts ] = finputcheck(varargin, ...
-    {'powbase'       'real'      []          NaN; 
-     'baseline'      'real'      []          0; 
-     'basenorm'      'string'    {'on','off'} 'off'; 
-     'commonbase'    'string'    {'on','off'} 'on'; 
-     'scale'         'string'    { 'log','abs'} 'log'; 
-     'trialbase'     'string'    {'on','off','full'} 'off'; 
-     'verbose'       'string'    {'on','off'} 'on'; 
+    {'powbase'       'real'      []          NaN;
+    'basenorm'      'string'    {'on','off'} 'off';
+    'baseline'      'real'      []          0;
+    'commonbase'    'string'    {'on','off'} 'off';
+    'scale'         'string'    { 'log','abs'} 'log';
+    'singletrials'  'string'    {'on','off'} 'on';
+    'trialbase'     'string'    {'on','off','full'} 'off';
+    'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimefbaseln', 'ignore');
 if isstr(g) error(g); return; end;
+PP = PPori; if ~iscell(PP), PP = { PP }; end;
 
 % ---------------
 % baseline length
@@ -65,9 +69,9 @@ if size(g.baseline,2) == 2
     end;
     if length(baseln)==0
         error( [ 'There are no sample points found in the default baseline.' 10 ...
-                 'This may happen even though data time limits overlap with' 10 ...
-                 'the baseline period (because of the time-freq. window width).' 10 ... 
-                 'Either disable the baseline, change the baseline limits.' ] );
+            'This may happen even though data time limits overlap with' 10 ...
+            'the baseline period (because of the time-freq. window width).' 10 ...
+            'Either disable the baseline, change the baseline limits.' ] );
     end
 else
     if ~isempty(find(timesout < g.baseline))
@@ -76,72 +80,106 @@ else
     end
 end;
 
-% -----------------------------------------
-% remove baseline on a trial by trial basis
-% -----------------------------------------
-if strcmpi(g.trialbase, 'on'), tmpbase = baseln;
-else                           tmpbase = 1:size(P,2); % full baseline
-end;
-if ndims(P) == 4
-    if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
-        mbase = mean(P(:,:,tmpbase,:),3);
-        if strcmpi(g.basenorm, 'on')
-             mstd = std(P(:,:,tmpbase,:),[],3);
-             P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
-        else P = bsxfun(@rdivide, P, mbase);
+allMbase = cell(size(PP));
+allPmean = cell(size(PP));
+for ind = 1:length(PP(:))
+    
+    P = PP{ind};
+    
+    % -----------------------------------------
+    % remove baseline on a trial by trial basis
+    % -----------------------------------------
+    if strcmpi(g.singletrials, 'on')
+        if strcmpi(g.trialbase, 'on'), tmpbase = baseln;
+        else                           tmpbase = 1:size(P,2); % full baseline
         end;
-    end;
-else
-    if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
-        mbase = mean(P(:,tmpbase,:),2);
-        if strcmpi(g.basenorm, 'on')
-            mstd = std(P(:,tmpbase,:),[],2);
-            P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
+        if ndims(P) == 4
+            if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
+                mbase = mean(P(:,:,tmpbase,:),3);
+                if strcmpi(g.basenorm, 'on')
+                    mstd = std(P(:,:,tmpbase,:),[],3);
+                    P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
+                else P = bsxfun(@rdivide, P, mbase);
+                end;
+            end;
         else
-            P = P./repmat(mbase,[1 size(P,2) 1]); 
-            %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
+            if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
+                mbase = mean(P(:,tmpbase,:),2);
+                if strcmpi(g.basenorm, 'on')
+                    mstd = std(P(:,tmpbase,:),[],2);
+                    P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
+                else
+                    P = P./repmat(mbase,[1 size(P,2) 1]);
+                    %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
+                end;
+            end;
         end;
     end;
+    
+    % -----------------------
+    % compute baseline values
+    % -----------------------
+    if isnan(g.powbase(1))
+        verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
+        if strcmpi(g.singletrials, 'on')
+            if ndims(P) == 4, Pmean  = mean(P, 4); % average power over trials (channels x freq x time x trials)
+            else              Pmean  = mean(P, 3); % average power over trials (freq x time x trials)
+            end;
+        else
+            Pmean = P;
+        end;
+        if ndims(P) == 4, mbase = mean(Pmean(:,:,baseln),3);
+                          mstd  = std(Pmean(:,:,baseln),[],3);
+        else              mbase = mean(Pmean(:,baseln),2);
+                          mstd  = std(Pmean(:,baseln),[],2);
+        end;
+    else
+        verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
+        mbase    = g.powbase;
+        if size(mbase,1) == 1 % if input was a row vector, flip to be a column
+            mbase = mbase';
+        end;
+    end
+    
+    PP{ind}       = P;
+    baselength    = length(baseln);
+    allMbase{ind} = mbase;
+    allMstd{ind}  = mstd;
 end;
 
-% -----------------------
-% compute baseline values
-% -----------------------
-if isnan(g.powbase(1))
-
-    verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-    if ndims(P) == 4
-        if ndims(P) > 3, Pori  = mean(P, 4); else Pori = P; end; 
-        mbase = mean(Pori(:,:,baseln),3);
-    else
-        if ndims(P) > 2, Pori  = mean(P, 3); else Pori = P; end; 
-        mbase = mean(Pori(:,baseln),2);
+% compute average baseline
+if strcmpi(g.commonbase, 'on')
+    meanBaseln = allMbase{1}/length(PP(:));
+    meanStd    = allMstd{1}/length(PP(:));
+    for ind = 2:length(PP(:))
+        meanBaseln = meanBaseln + allMbase{ind}/length(PP(:));
+        meanStd    = meanBaseln + allMstd{ ind}/length(PP(:));
     end;
-else
-    verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
-    mbase    = g.powbase; 
-    if size(mbase,1) == 1 % if input was a row vector, flip to be a column
-        mbase = mbase';
+    for ind = 1:length(PP(:))
+        allMbase{ind} = meanBaseln;
+        allMstd{ind}  = meanBaseln;
     end;
-end
-baselength = length(baseln);
+end;
 
 % -------------------------
 % remove baseline (average)
 % -------------------------
 % original ERSP baseline removal
-if ~strcmpi(g.trialbase, 'on')
-    if ~isnan( g.baseline(1) ) && any(~isnan( mbase(1) )) && strcmpi(g.basenorm, 'off')
-        P = bsxfun(@rdivide, P, mbase); % use single trials
-    % ERSP baseline normalized
-    elseif ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.basenorm, 'on')
-
-        if ndims(Pori) == 3, 
-             mstd = std(Pori(:,:,baseln),[],3);
-        else mstd = std(Pori(:,baseln),[],2);
+if ~strcmpi(g.trialbase, 'on') % full or off
+    
+    for ind = 1:length(PP(:))
+        if ~isnan( g.baseline(1) ) && any(~isnan( allMbase{ind}(1) )) && strcmpi(g.basenorm, 'off')
+            PP{ind} = bsxfun(@rdivide, PP{ind}, allMbase{ind}); % use single trials
+            % ERSP baseline normalized
+        elseif ~isnan( g.baseline(1) ) && ~isnan( allMbase{ind}(1) ) && strcmpi(g.basenorm, 'on')
+            PP{ind} = bsxfun(@rdivide, bsxfun(@minus, PP{ind}, allMbase{ind}), allMstd{ind});
         end;
-        P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
     end;
+end;
+mbase = allMbase;
+if ~iscell(PPori)
+    PP = PP{1}; 
+    mbase = allMbase{1};
 end;
 
 % print

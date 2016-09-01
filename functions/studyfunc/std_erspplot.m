@@ -228,10 +228,14 @@ end;
 if ~isempty(opt.channels)
 
     [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', params.timerange, ...
-        'freqrange', params.freqrange, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', opt.datatype);
+        'freqrange', params.freqrange, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', opt.datatype, 'subbaseline', params.subbaseline);
     % 'concatenate', params.concatenate NOT TAKEN INTO ACCOUNT
     unitPower = newtimefpowerunit(paramsersp);
-    %removeerspbaseline(allersp, alltimes, 0);
+    if strcmpi(opt.datatype, 'ersp')
+        paramsersp.singletrials = params.singletrials;
+        paramsersp.commonbase   = params.subbaseline;
+        [allersp,basesamples,basevals] = newtimefbaseln(allersp, alltimes, paramsersp);
+    end;
     
     %[STUDY allersp alltimes allfreqs tmp events unitPower] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
     %    'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
@@ -271,6 +275,13 @@ if ~isempty(opt.channels)
             disp('No statistics possible for single subject STUDY');
         end; % single subject STUDY                                
     end
+
+    % average single trials
+    % ---------------------
+    if strcmpi(params.singletrials, 'on')
+        if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end;
+        if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end;
+    end;
     
     % plot specific channel(s)
     % ------------------------

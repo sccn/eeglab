@@ -72,10 +72,11 @@ STUDY = pop_specparams(STUDY, 'default');
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
-    'timerange'     'real'    []             STUDY.etc.erpparams.timerange;
-    'freqrange'     'real'    []             STUDY.etc.specparams.freqrange;
+    'timerange'     'real'    []             [];
+    'freqrange'     'real'    []             [];
     'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' } 'erp';
     'rmsubjmean'    'string'  { 'on','off' } 'off';
+    'subbaseline'   'string'  { 'on','off' } STUDY.etc.erspparams.subbaseline; % subtract common baseline (ERSP only)
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
@@ -88,7 +89,14 @@ dtype = opt.datatype;
 % get the file extension
 % ----------------------
 tmpDataType = opt.datatype;
-if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc'), tmpDataType = 'timef'; end;
+if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc'), 
+    tmpDataType = 'timef'; 
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end;
+    if isempty(opt.freqrange), opt.timerange = STUDY.etc.specparams.freqrange; end;
+else
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end;
+    if isempty(opt.freqrange), opt.timerange = STUDY.etc.erspparams.freqrange; end;
+end;
 if ~isempty(opt.channels), fileExt = [ '.dat' tmpDataType ];
 else                       fileExt = [ '.ica' tmpDataType ];
 end;
@@ -127,6 +135,7 @@ for iSubj = 1:length(subjectList)
     bigstruct.singletrials = opt.singletrials;
     bigstruct.subject      = subjectList{iSubj};
     bigstruct.component    = opt.component;
+    bigstruct.subbaseline  = opt.subbaseline;
     bigstruct.options      = opts;
     if isnan(opt.design)
          bigstruct.design.variable = struct([]);
@@ -166,7 +175,7 @@ for iSubj = 1:length(subjectList)
             if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') 
                 dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
             else
-                dataTmp{iSubj} = cellfun(@(x)callnewtimef(x, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, params), dataTmp{iSubj}, 'uniformoutput', false);
+                dataTmp{iSubj} = cellfun(@(x)callnewtimef(x, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, opt.subbaseline, params), dataTmp{iSubj}, 'uniformoutput', false);
             end;
             if ~isempty(eventsTmp{iSubj}{1})
                 eventsTmp{iSubj} = cellfun(@(x)squeeze(mean(x)), eventsTmp{iSubj}, 'uniformoutput', false);
@@ -281,17 +290,23 @@ function datavals = reorganizedata(dataTmp, dim)
     
 % call newtimef (duplicate function in std_erspplot)
 % --------------
-function [dataout tmpParams] = callnewtimef(dataSubject, xvals, yvals, pnts, tlimits, datatype, params);
+function [dataout tmpParams] = callnewtimef(dataSubject, xvals, yvals, pnts, tlimits, datatype, subbaseline, params);
 
     precomputed.times = xvals;
     precomputed.freqs = yvals;
     precomputed.recompute = datatype;
+    
+    % remove baseline parameters unless trialbase is being used
+    if strcmpi(subbaseline, 'on') && ( ~isfield(params, 'trialabase') || strcmpi(params.trialbase, 'off') )
+        params.baseline = NaN;
+    end;
     
     cycles = params.cycles;
     params = rmfield(params, 'cycles');
     tmpParams = fieldnames(params)';
     tmpParams(2,:) = struct2cell(params)';
     srate = 1;
+    
     
     if ndims(dataSubject) > 3, precomputed.tfdata = permute(dataSubject, [4 1 2 3]); % switch last 3 dim times x freqs x chan x trials
     else                       precomputed.tfdata = dataSubject;
