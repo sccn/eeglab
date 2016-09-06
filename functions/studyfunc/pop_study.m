@@ -306,7 +306,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     end;
     
     % ---
-    if ~isequaln(outstruct, instruct) && (outstruct(1).delclust ~= 1)
+    if ~isequal(outstruct, instruct) && (outstruct(1).delclust ~= 1) % notice that isequal is sensitive to fields order. isequaln isn't backward compatible 
         strfields = fieldnames(outstruct);
         for i = 1:length(strfields)
             strdiff(i) = strcmp(outstruct.(strfields{i}),instruct.(strfields{i}));
