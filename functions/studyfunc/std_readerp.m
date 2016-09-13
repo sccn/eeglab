@@ -68,6 +68,7 @@ end
 
 STUDY = pop_erpparams(STUDY, 'default');
 STUDY = pop_specparams(STUDY, 'default');
+STUDY = pop_erspparams(STUDY, 'default');
 [opt moreopts] = finputcheck( varargin, { ...
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
@@ -170,16 +171,16 @@ for iSubj = 1:length(subjectList)
              [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels);
         else [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'components', compList);
         end;
-        if strcmpi(opt.singletrials, 'off') && ~isempty(dataTmp{iSubj}{1})
-%            tmpdat = callnewtimef(dataSubject{ iSubj }{ iCell }, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, params);
-            if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') 
+
+        if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') % ERP or spectrum
+            if strcmpi(opt.singletrials, 'off')
                 dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
-            else
-                dataTmp{iSubj} = cellfun(@(x)callnewtimef(x, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, opt.subbaseline, params), dataTmp{iSubj}, 'uniformoutput', false);
             end;
-            if ~isempty(eventsTmp{iSubj}{1})
-                eventsTmp{iSubj} = cellfun(@(x)squeeze(mean(x)), eventsTmp{iSubj}, 'uniformoutput', false);
-            end;
+        else
+            dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
+        end;
+        if ~isempty(eventsTmp{iSubj}{1}) && strcmpi(opt.singletrials, 'off')
+            eventsTmp{iSubj} = cellfun(@(x)squeeze(mean(x)), eventsTmp{iSubj}, 'uniformoutput', false);
         end;
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params });
     end;
@@ -290,33 +291,21 @@ function datavals = reorganizedata(dataTmp, dim)
     
 % call newtimef (duplicate function in std_erspplot)
 % --------------
-function [dataout tmpParams] = callnewtimef(dataSubject, xvals, yvals, pnts, tlimits, datatype, subbaseline, params);
+function dataout = processtf(dataSubject, xvals, datatype, singletrials, g)
 
-    precomputed.times = xvals;
-    precomputed.freqs = yvals;
-    precomputed.recompute = datatype;
-    
-    % remove baseline parameters unless trialbase is being used
-    if strcmpi(subbaseline, 'on') && ( ~isfield(params, 'trialabase') || strcmpi(params.trialbase, 'off') )
-        params.baseline = NaN;
-    end;
-    
-    cycles = params.cycles;
-    params = rmfield(params, 'cycles');
-    tmpParams = fieldnames(params)';
-    tmpParams(2,:) = struct2cell(params)';
-    srate = 1;
-    
-    
-    if ndims(dataSubject) > 3, precomputed.tfdata = permute(dataSubject, [4 1 2 3]); % switch last 3 dim times x freqs x chan x trials
-    else                       precomputed.tfdata = dataSubject;
-    end;
+    % compute ITC or ERSP
     if strcmpi(datatype, 'ersp')
-        dataout = newtimef([],pnts,tlimits, srate, cycles, 'precomputed', precomputed, 'verbose', 'off', tmpParams{:});
+        P = dataSubject .* conj(dataSubject);
+        dataout = newtimeftrialbaseln(P, xvals, g);
+        if strcmpi(singletrials, 'off')
+            if ndims(dataout) == 4,     dataout = mean(dataout, 4);
+            elseif ndims(dataout) == 3, dataout = mean(dataout, 3);
+            end;
+        end;
     else
-        [tmp dataout] = newtimef([],pnts,tlimits, srate, cycles, 'precomputed', precomputed, 'verbose', 'off', tmpParams{:});
-    end;
-    if ndims(dataout) == 3
-        dataout = permute(dataout, [2 3 1]); % put channels back at the end
+        if strcmpi(singletrials, 'off')
+            if ~isfield(params, 'itctype'), params.itctype = 'phasecoher'; end;
+            dataout = newtimefitc(dataSubject, g.itctype);
+        end;
     end;
     
