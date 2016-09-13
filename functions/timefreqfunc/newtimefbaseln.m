@@ -1,7 +1,8 @@
 % newtimefbaseln() - Remove baseline power values for newtimef. This
 %                    function assumes absolute power NOT log transformed power.
 %                    This function only removes baseline. Data has to be
-%                    averaged subsequently if necessary.
+%                    averaged subsequently if necessary. This function
+%                    works both for single trial data and for average data.
 %
 % Usage:
 %   >>  [P,basesamples,basevals] = newtimefbaseln(P, tvals, baseline, 'key', val);
@@ -52,7 +53,7 @@ end;
     'commonbase'    'string'    {'on','off'} 'off';
     'scale'         'string'    { 'log','abs'} 'log';
     'singletrials'  'string'    {'on','off'} 'on';
-    'trialbase'     'string'    {'on','off','full'} 'off';
+    'trialbase'     'string'    {'on','off','full'} 'off'; % 'on' skip the baseline
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimefbaseln', 'ignore');
 if isstr(g) error(g); return; end;
@@ -86,36 +87,6 @@ for ind = 1:length(PP(:))
     
     P = PP{ind};
     
-    % -----------------------------------------
-    % remove baseline on a trial by trial basis
-    % -----------------------------------------
-    if strcmpi(g.singletrials, 'on')
-        if strcmpi(g.trialbase, 'on'), tmpbase = baseln;
-        else                           tmpbase = 1:size(P,2); % full baseline
-        end;
-        if ndims(P) == 4
-            if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
-                mbase = mean(P(:,:,tmpbase,:),3);
-                if strcmpi(g.basenorm, 'on')
-                    mstd = std(P(:,:,tmpbase,:),[],3);
-                    P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
-                else P = bsxfun(@rdivide, P, mbase);
-                end;
-            end;
-        else
-            if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
-                mbase = mean(P(:,tmpbase,:),2);
-                if strcmpi(g.basenorm, 'on')
-                    mstd = std(P(:,tmpbase,:),[],2);
-                    P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
-                else
-                    P = P./repmat(mbase,[1 size(P,2) 1]);
-                    %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
-                end;
-            end;
-        end;
-    end;
-    
     % -----------------------
     % compute baseline values
     % -----------------------
@@ -147,7 +118,9 @@ for ind = 1:length(PP(:))
     allMstd{ind}  = mstd;
 end;
 
+% ------------------------
 % compute average baseline
+% ------------------------
 if strcmpi(g.commonbase, 'on')
     meanBaseln = allMbase{1}/length(PP(:));
     meanStd    = allMstd{1}/length(PP(:));
@@ -166,7 +139,6 @@ end;
 % -------------------------
 % original ERSP baseline removal
 if ~strcmpi(g.trialbase, 'on') % full or off
-    
     for ind = 1:length(PP(:))
         if ~isnan( g.baseline(1) ) && any(~isnan( allMbase{ind}(1) )) && strcmpi(g.basenorm, 'off')
             PP{ind} = bsxfun(@rdivide, PP{ind}, allMbase{ind}); % use single trials
