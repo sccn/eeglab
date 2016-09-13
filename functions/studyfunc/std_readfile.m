@@ -292,9 +292,9 @@ for index = 1:length(chan)
     warning('off', 'MATLAB:MatFile:OlderFormat');
     if ndims(fileData.(fieldToRead)) == 2
         tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
-        if ~isempty(subTrials), fieldData = fieldData(:, subTrials); end;
+        if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end;
     else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
-        if ~isempty(subTrials), fieldData = fieldData(:, :, subTrials); end;
+        if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, :, subTrials); end;
     end;
     warning('on', 'MATLAB:MatFile:OlderFormat');
 
