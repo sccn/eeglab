@@ -527,6 +527,7 @@ if ~isempty(g.timestretch) && length(g.timestretch{1}) > 0
         tmpall(:,:,t) =  TStmpall;
     end
 end
+
 %time-warp ends
 zerovals = tmpall == 0;
 if any(reshape(zerovals, 1, prod(size(zerovals))))
@@ -538,7 +539,7 @@ end;
 % compute and subtract ITC
 % ------------------------
 if nargout > 3 || strcmpi(g.subitc, 'on')
-    itcvals = tfitc(tmpall, g.itctype);
+    itcvals = newtimefitc(tmpall, g.itctype);
 end;
 if strcmpi(g.subitc, 'on')
     %a = gcf; figure; imagesc(abs(itcvals)); cbar; figure(a);
@@ -573,39 +574,6 @@ end;
 timesout = g.timesout;
 
 %figure; imagesc(abs(sum(itcvals,3))); cbar;
-return;
-
-% function for itc
-% ----------------
-function [itcvals] = tfitc(tfdecomp, itctype);
-% first dimension are trials
-nd = max(3,ndims(tfdecomp));
-switch itctype
-    case 'coher',
-        try,
-            itcvals = sum(tfdecomp,nd) ./ sqrt(sum(tfdecomp .* conj(tfdecomp),nd) * size(tfdecomp,nd));
-        catch, % scan rows if out of memory
-            for index =1:size(tfdecomp,1)
-                itcvals(index,:,:) = sum(tfdecomp(index,:,:,:),nd) ./ sqrt(sum(tfdecomp(index,:,:,:) .* conj(tfdecomp(index,:,:,:)),nd) * size(tfdecomp,nd));
-            end;
-        end;
-    case 'phasecoher2',
-        try,
-            itcvals = sum(tfdecomp,nd) ./ sum(sqrt(tfdecomp .* conj(tfdecomp)),nd);
-        catch, % scan rows if out of memory
-            for index =1:size(tfdecomp,1)
-                itcvals(index,:,:) = sum(tfdecomp(index,:,:,:),nd) ./ sum(sqrt(tfdecomp(index,:,:,:) .* conj(tfdecomp(index,:,:,:))),nd);
-            end;
-        end;
-    case 'phasecoher',
-        try,
-            itcvals = sum(tfdecomp ./ sqrt(tfdecomp .* conj(tfdecomp)) ,nd) / size(tfdecomp,nd);
-        catch, % scan rows if out of memory
-            for index =1:size(tfdecomp,1)
-                itcvals(index,:,:) = sum(tfdecomp(index,:,:,:) ./ sqrt(tfdecomp(index,:,:,:) .* conj(tfdecomp(index,:,:,:))) ,nd) / size(tfdecomp,nd);
-            end;
-        end;
-end % ~any(isnan())
 return;
 
 function w = hanning(n)
