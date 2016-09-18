@@ -289,7 +289,7 @@ for ind = 1:length(finalinds)
                                  erspbase{c, g}                             = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erspbase', opts{:});
                                  [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'ersp'    , opts{:});
                             else [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'itc'     , opts{:});
-                                 ersp{c, g} = abs(ersp{c, g});
+                                 ersp{c, g} = ersp{c, g};
                             end;
                             fprintf('.');
                             %ersp{c, g}      = permute(ersp{c, g}           , [3 2 1]);
@@ -505,12 +505,12 @@ function meanpowbase = computeerspbaseline(erspbase, singletrials)
         for index = 1:len
             if ~isempty(erspbase{index})
                 if strcmpi(singletrials, 'on')
-                    if count == 0, meanpowbase = abs(mean(erspbase{index},3));
-                    else           meanpowbase = meanpowbase + abs(mean(erspbase{index},3));
+                    if count == 0, meanpowbase = mean(erspbase{index},3);
+                    else           meanpowbase = meanpowbase + mean(erspbase{index},3);
                     end;
                 else
-                    if count == 0, meanpowbase = abs(erspbase{index});
-                    else           meanpowbase = meanpowbase + abs(erspbase{index});
+                    if count == 0, meanpowbase = erspbase{index};
+                    else           meanpowbase = meanpowbase + erspbase{index};
                     end;
                 end;
                 count = count+1;
@@ -538,7 +538,7 @@ function ersp = removeerspbaseline(ersp, erspbase, meanpowbase)
                 tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) 1]);
                 if convert2log
                      ersp{c,g} = ersp{c,g} - repmat(10*log10(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + 10*log10(tmpmeanpowbase);
-                else ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
+                else ersp{c,g} = ersp{c,g} - repmat(erspbasetmp, [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
                 end;
             end;
         end;
