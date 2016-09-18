@@ -99,11 +99,8 @@ for ind = 1:length(PP(:))
         else
             Pmean = P;
         end;
-        if ndims(P) == 4, mbase = mean(Pmean(:,:,baseln),3);
-                          mstd  = std(Pmean(:,:,baseln),[],3);
-        else              mbase = mean(Pmean(:,baseln),2);
-                          mstd  = std(Pmean(:,baseln),[],2);
-        end;
+        mbase = mean(Pmean(:,baseln,:,:),2);
+        mstd  = std(Pmean(:,baseln,:,:),[],2);
     else
         verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
         mbase    = g.powbase;
