@@ -227,7 +227,7 @@ end;
 % ---------------------
 if ~isempty(opt.channels)
 
-    [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', params.timerange, ...
+    [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', params.timerange, ...
         'freqrange', params.freqrange, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', opt.datatype, 'subbaseline', params.subbaseline);
     % 'concatenate', params.concatenate NOT TAKEN INTO ACCOUNT
     unitPower = newtimefpowerunit(paramsersp);
