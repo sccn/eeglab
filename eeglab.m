@@ -138,7 +138,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function varargout = eeglab( onearg )
-
+warning off;
 if nargout > 0
     varargout = { [] [] 0 {} [] };
     %[ALLEEG, EEG, CURRENTSET, ALLCOM]
@@ -149,8 +149,6 @@ oct_ver_num=NaN;
 try oct_ver=OCTAVE_VERSION;
   pind=strfind(oct_ver,'.');  
   oct_ver_num=str2num(oct_ver(1:pind(1)-1));
-  disp('Using Octave version 4 or greater... enabling GUI.. ')
-
 catch
 
   % check Matlab version
@@ -249,7 +247,7 @@ end;
 fileformat = 'maclinux';
 comp = computer;
 try
-    if strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC') | strcmpi(comp(1:3), 'SOL')
+    if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC') || strcmpi(comp(1:3), 'SOL')
         fileformat = 'maclinux';
     elseif strcmpi(comp(1:5), 'pcwin')
         fileformat = 'pcwin';
@@ -361,7 +359,7 @@ evalin('base'  , comtmp, '');
 evalin('caller', comtmp, '');
     
 evalin('base', 'eeg_global;');
-if nargin < 1 | exist('EEG') ~= 1
+if nargin < 1 || exist('EEG') ~= 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM STUDY;
     CURRENTSTUDY = 0;
 	eeg_global;
@@ -379,7 +377,7 @@ if nargin == 1
         if nargout < 1, clear ALLEEG; end; % do not return output var
         return;
 	elseif strcmp(onearg, 'redraw')
-        if ~ismatlab || oct_ver_num < 4,return; end;
+        if ~ismatlab && oct_ver_num < 4,return; end;
 		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
 			updatemenu;
@@ -389,7 +387,7 @@ if nargin == 1
 			eegh('eeglab(''redraw'');');
 		end;
 	elseif strcmp(onearg, 'rebuild')
-        if ~ismatlab || oct_ver_num < 4,return; end;
+        if ~ismatlab && oct_ver_num < 4,return; end;
 		W_MAIN = findobj('tag', 'EEGLAB');
         close(W_MAIN);
         eeglab;
@@ -438,12 +436,12 @@ backup =     [ 'if CURRENTSET ~= 0,' ...
 
 storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
 storenewcall = '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''study'', ~isempty(STUDY)+0); eegh(LASTCOM);';
-storeallcall = [ 'if ~isempty(ALLEEG) & ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG);' ...
+storeallcall = [ 'if ~isempty(ALLEEG) && ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG);' ...
                  'EEG = eeg_retrieve(ALLEEG, CURRENTSET); eegh(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_retrieve(ALLEEG, CURRENTSET);''); end;' ];
 
 testeegtmp   =  'if exist(''EEGTMP'') == 1, EEG = EEGTMP; clear EEGTMP; end;'; % for backward compatibility
-ifeeg        =  'if ~isempty(LASTCOM) & ~isempty(EEG),';
-ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),';
+ifeeg        =  'if ~isempty(LASTCOM) && ~isempty(EEG),';
+ifeegnh      =  'if ~isempty(LASTCOM) && ~isempty(EEG) && ~isempty(findstr(''='',LASTCOM)),';
 
 % nh = no dataset history
 % -----------------------
@@ -922,7 +920,7 @@ else
         funcname = '';
         pluginVersion = '';
         if exist([p 'deactivatedplugins' filesep dircontent{index}]) == 7
-            if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
+            if ~strcmpi(dircontent{index}, '.') && ~strcmpi(dircontent{index}, '..')
                 tmpdir = dir([ p 'deactivatedplugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
                 [ pluginName pluginVersion ] = parsepluginname(dircontent{index});
                 if ~isempty(tmpdir)
@@ -962,7 +960,7 @@ else
         funcname = '';
         pluginVersion = [];
         if exist([p 'plugins' filesep dircontent{index}]) == 7
-            if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
+            if ~strcmpi(dircontent{index}, '.') && ~strcmpi(dircontent{index}, '..')
                 newpath = [ 'plugins' filesep dircontent{index} ];
                 tmpdir = dir([ p 'plugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
                 
@@ -1054,7 +1052,7 @@ end; % iseeglabdeployed2
 % Path exception for BIOSIG (sending BIOSIG down into the path)
 biosigpathlast; % fix str2double issue
 
-if ~ismatlab || oct_ver_num < 4, return; end;
+if ~ismatlab && oct_ver_num < 4, return; end;
 
 % add other import ...
 % --------------------
@@ -1179,6 +1177,7 @@ catch
         fprintf('Updater could not be initialized.\n');
     end;
 end;
+end
 
 % REMOVED MENUS
 	%uimenu( tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
@@ -1187,7 +1186,7 @@ end;
      function command_on_update_menu_click(callerHandle, tmp, eeglabUpdater, installDirectory, goOneFolderLevelIn, backGroundColor)
          postInstallCallbackString = 'clear all function functions; eeglab';
          eeglabUpdater.launchGui(installDirectory, goOneFolderLevelIn, backGroundColor, postInstallCallbackString);
-    
+     end
 %     
 % --------------------
 % draw the main figure
@@ -1370,7 +1369,7 @@ if ismatlab || oct_ver_num >= 4
     set(W_MAIN, 'visible', 'on');
 end;
 
-return;
+end
 
 % eeglab(''redraw'')() - Update EEGLAB menus based on values of global variables.
 %
@@ -1439,7 +1438,7 @@ MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 
 tmp = warning;
 warning off;
-clear functions;
+%clear functions;
 warning(tmp);
 eeglab_options;
 if isempty(ALLEEG) && ~isempty(EEG) && ~isempty(EEG.data)
@@ -1469,7 +1468,7 @@ while( index <= MAX_SET)
 		if ~isempty( ALLEEG(index).data)
             
             cb_retrieve = [ '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''retrieve'', ' int2str(index) ', ''study'', ~isempty(STUDY)+0);' ...
-                            'if CURRENTSTUDY & ~isempty(LASTCOM), CURRENTSTUDY = 0; LASTCOM = [ ''CURRENTSTUDY = 0;'' LASTCOM ]; end; eegh(LASTCOM);' ...
+                            'if CURRENTSTUDY && ~isempty(LASTCOM), CURRENTSTUDY = 0; LASTCOM = [ ''CURRENTSTUDY = 0;'' LASTCOM ]; end; eegh(LASTCOM);' ...
                             'eeglab(''redraw'');' ];
             
        		menutitle   = sprintf('Dataset %d:%s', index, ALLEEG(index).setname);
@@ -1504,7 +1503,7 @@ end;
 % STUDY consistency
 % -----------------
 exist_study = 0;
-if exist('STUDY') & exist('CURRENTSTUDY')
+if exist('STUDY') && exist('CURRENTSTUDY')
 
     % if study present, check study consistency with loaded datasets
     % --------------------------------------------------------------
@@ -1556,7 +1555,7 @@ end;
 EEGUSERDAT{2} = EEGMENU;
 set(W_MAIN, 'userdata', EEGUSERDAT);
 
-if (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET(1) | CURRENTSET(1) == 0 | isempty(ALLEEG(CURRENTSET(1)).data))
+if (isempty(CURRENTSET) || length(ALLEEG) < CURRENTSET(1) || CURRENTSET(1) == 0 || isempty(ALLEEG(CURRENTSET(1)).data))
 	CURRENTSET = 0;
 	for index = 1:length(ALLEEG)
 		if ~isempty(ALLEEG(index).data)
@@ -1565,22 +1564,22 @@ if (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET(1) | CURRENTSET(1) == 0 | 
 		end;
 	end;
 	if CURRENTSET ~= 0
-		eegh([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ])
+		eegh([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ]);
 		[EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
 	else 
 		EEG = eeg_emptyset;
 	end;
 end;
 
-if (isempty(EEG) | isempty(EEG(1).data)) & CURRENTSET(1) ~= 0
-	eegh([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ])
+if (isempty(EEG) || isempty(EEG(1).data)) && CURRENTSET(1) ~= 0
+	eegh([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ]);
 	[EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
 end;
 
 % test if dataset has changed
 % ---------------------------
 if length(EEG) == 1
-    if ~isempty(ALLEEG) & CURRENTSET~= 0 & ~isequal(EEG.data, ALLEEG(CURRENTSET).data) & ~isnan(EEG.data(1))
+    if ~isempty(ALLEEG) && CURRENTSET~= 0 && ~isequal(EEG.data, ALLEEG(CURRENTSET).data) && ~isnan(EEG.data(1))
         % the above comparison does not work for ome structures
         %tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
         %                      'Dataset change detected', ...
@@ -1612,7 +1611,7 @@ if ~isfield(g, 'win0') % no display
 end;
 
 study_selected = 0;
-if exist('STUDY') & exist('CURRENTSTUDY')
+if exist('STUDY') && exist('CURRENTSTUDY')
     if CURRENTSTUDY == 1, study_selected = 1; end;
 end;
 
@@ -1630,7 +1629,7 @@ if study_selected
     % dataset type
     % ------------
     datasettype = unique_bc( [ EEG.trials ] );
-    if datasettype(1) == 1 & length(datasettype) == 1, datasettype = 'continuous';
+    if datasettype(1) == 1 && length(datasettype) == 1, datasettype = 'continuous';
     elseif datasettype(1) == 1,                        datasettype = 'epoched and continuous';
     else                                               datasettype = 'epoched';
     end;
@@ -1715,7 +1714,7 @@ if study_selected
     set( g.val11, 'String', studystatus);
     set( g.val12, 'String', num2str(round(sum( [ totsize.bytes] )/1E6*10)/10));        
     
-elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data) 
+elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data) 
 
     hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
     hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
@@ -1736,7 +1735,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         % dataset type
         % ------------
         datasettype = unique_bc( [ EEG.trials ] );
-        if datasettype(1) == 1 & length(datasettype) == 1, datasettype = 'continuous';
+        if datasettype(1) == 1 && length(datasettype) == 1, datasettype = 'continuous';
         elseif datasettype(1) == 1,                        datasettype = 'epoched and continuous';
         else                                               datasettype = 'epoched';
         end;
@@ -1844,7 +1843,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         set( g.val4, 'String', int2str(EEG.trials));
         set( g.val5, 'String', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event))));
         set( g.val6, 'String', int2str( round(EEG.srate)) );
-        if round(EEG.xmin) == EEG.xmin & round(EEG.xmax) == EEG.xmax
+        if round(EEG.xmin) == EEG.xmin && round(EEG.xmax) == EEG.xmax
             set( g.val7, 'String', sprintf('%d\n', EEG.xmin));
             set( g.val8, 'String', sprintf('%d\n', EEG.xmax));
         else 
@@ -1869,7 +1868,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         if isempty(EEG.chanlocs)
             set( g.val10, 'String', 'No');
         else
-            if ~isfield(EEG.chanlocs, 'theta') | all(cellfun('isempty', { EEG.chanlocs.theta }))
+            if ~isfield(EEG.chanlocs, 'theta') || all(cellfun('isempty', { EEG.chanlocs.theta }))
                 set( g.val10, 'String', 'No (labels only)');           
             else
                 set( g.val10, 'String', 'Yes');
@@ -1995,7 +1994,7 @@ set(g.win0, 'position', [poswin0(1:2) extwin0(3) extwin0(4)]);
 % -------------------
 handlesname = fieldnames(g);
 for i = 1:length(handlesname)
-    if isprop(eval(['g.' handlesname{i}]),'Style') & ~strcmp(handlesname{i},'win0')
+    if isprop(eval(['g.' handlesname{i}]),'Style') && ~strcmp(handlesname{i},'win0')
         propval = get(eval(['g.' handlesname{i}]), 'Style');
         if strcmp(propval,'text')
             set(eval(['g.' handlesname{i}]),'FontSize',TEXT_FONTSIZE);
@@ -2003,7 +2002,7 @@ for i = 1:length(handlesname)
     end
 end
 
-return;
+end
 
 function num = popask( text )
 	 ButtonName=questdlg2( text, ...
@@ -2012,6 +2011,7 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
+end
 
 function g = myguihandles(fig)
 	g = [];
@@ -2021,7 +2021,7 @@ function g = myguihandles(fig)
 			g = setfield(g, get(hh(index), 'tag'), hh(index));
 		end;
 	end;
-
+end
     
 function rmpathifpresent(newpath);  
     comp = computer;
@@ -2038,7 +2038,8 @@ function rmpathifpresent(newpath);
     if ~isempty(ind)
         rmpath(newpath);
     end;
-        
+end
+
 % add path only if it is not already in the list
 % ----------------------------------------------
 function addpathifnotinlist(newpath);  
@@ -2059,6 +2060,7 @@ function addpathifnotinlist(newpath);
             addpath(newpath);
         end;
     end;
+end
 
 function addpathifnotexist(newpath, functionname);
     tmpp = mywhich(functionname);
@@ -2066,7 +2068,8 @@ function addpathifnotexist(newpath, functionname);
     if isempty(tmpp)
         addpath(newpath);
     end;
-    
+end
+
 % find a function path and add path if not present
 % ------------------------------------------------
 function myaddpath(eeglabpath, functionname, pathtoadd);
@@ -2087,16 +2090,19 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         %disp([ 'Adding new path ' tmpnewpath ]);
         addpathifnotinlist(tmpnewpath);
     end;
+end
 
 function val = iseeglabdeployed2;
 %val = 1; return;
-if exist('isdeployed')
-     val = isdeployed;
-else val = 0;
-end;
+    if exist('isdeployed')
+        val = isdeployed;
+    else val = 0;
+    end;
+end
 
 function buildhelpmenu;
-    
+end
+
 % parse plugin function name
 % --------------------------
 function [name, vers] = parsepluginname(dirName);
@@ -2113,6 +2119,7 @@ function [name, vers] = parsepluginname(dirName);
         vers = dirName(ind+1:end);
         vers(find(vers == '_')) = '.';
     end;
+end
 
 % required here because path not added yet
 % to the admin folder
@@ -2124,11 +2131,14 @@ if v(1) > '4'
 else
     res = 0;
 end;
-    
+end
+
 function res = mywhich(varargin);
 try
     res = which(varargin{:});
 catch
     fprintf('Warning: permission error accesssing %s\n', varargin{1});
 end;
-    
+end
+   
+

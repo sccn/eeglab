@@ -199,7 +199,7 @@ if isempty(g.getresult)
     
     % create figure and wait for return
     % ---------------------------------
-    if isstr(g.mode) & (strcmpi(g.mode, 'plot') | strcmpi(g.mode, 'return') )
+    if isstr(g.mode) && (strcmpi(g.mode, 'plot') || strcmpi(g.mode, 'return') )
         if strcmpi(g.mode, 'plot')
            return; % only plot and returns
         end;

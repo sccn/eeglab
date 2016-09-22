@@ -160,7 +160,7 @@ end;
 % create new figure
 % -----------------
 if g.fig == 0
-	g.fig = figure('visible','off');
+	g.fig = figure('visible','on');
 end
 
 % converting the geometry formats
@@ -370,7 +370,7 @@ try,
     end;
 catch, end;
 factmulty = factmulty*0.9; % global shinking
-warning on;	
+%warning on;	
 
 % scale and replace the figure in the screen
 % -----------------------------------------
@@ -381,7 +381,7 @@ end;
 pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
 pos(3) = max(pos(3)*factmultx, g.minwidth);
 pos(4) = pos(4)*factmulty;
-set(g.fig, 'position', pos);
+%set(g.fig, 'position', pos);
 
 % vertical alignment to bottom for text (isnumeric by ishanlde was changed here)
 % ---------------------------------------
@@ -487,6 +487,7 @@ function [posx posy width height] = getcoord(geom1, geom2, coord1, sz, borders, 
     posy   = posy*(1-borders(3)-borders(4))+borders(4);
     width  = width*( 1-borders(1)-borders(2));
     height = height*(1-borders(3)-borders(4));
+return;
     
 function [posx posy width height] = getcoordold(geom1, geom2, coord1, sz);
     
@@ -515,7 +516,8 @@ function [posx posy width height] = getcoordold(geom1, geom2, coord1, sz);
     posy   = posy*(1- vert_border)+vert_border/2;
     width  = width*(1-horiz_border);
     height = height*(1-vert_border);
- 
+
+return; 
     %     posx   = coord1(1)/geom1+horiz_border*1/geom1/2;
 %     posy   = 1-(coord1(2)/geom2+vert_border*1/geom2/2)-1/geom2;
 %     
