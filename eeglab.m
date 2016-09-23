@@ -1030,6 +1030,11 @@ else
     end;
     global PLUGINLIST;
     PLUGINLIST = pluginlist;
+    
+    % Path exception for BIOSIG (sending BIOSIG down into the path)
+    fprintf(1,'EEGLAB message: Your MATLAB path is about to be modified. BIOSIG toolbox will be relocated last in the path\n');
+    plugin_movepath('biosig','end');
+    
 end; % iseeglabdeployed2
 
 if ~ismatlab, return; end;
