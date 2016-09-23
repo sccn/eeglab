@@ -381,7 +381,7 @@ end;
 pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
 pos(3) = max(pos(3)*factmultx, g.minwidth);
 pos(4) = pos(4)*factmulty;
-%set(g.fig, 'position', pos);
+set(g.fig, 'position', pos);
 
 % vertical alignment to bottom for text (isnumeric by ishanlde was changed here)
 % ---------------------------------------
