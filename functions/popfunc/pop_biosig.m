@@ -65,6 +65,15 @@ EEG = [];
 command = '';
 
 if ~plugin_askinstall('Biosig', 'sopen'), return; end;
+
+% Checking if SOPEN is on top of the path
+folders = path;
+sep = find(folders == ':');
+sopenpath = fileparts( which('sopen') );
+if ~strcmp(folders(1:sep-1),sopenpath)
+    rmpath(sopenpath);
+    addpath(sopenpath,'-begin');
+end
     
 if nargin < 1
 	% ask user
