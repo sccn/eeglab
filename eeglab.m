@@ -120,7 +120,7 @@
 % <a href="matlab:helpwin eeg_helppop">eeg_helppop</a>        - help on pop_ and eeg_ functions
 % <a href="matlab:helpwin eeg_helpsigproc">eeg_helpsigproc</a>    - help on
 
-% Copyright (C) 2001 Arnaud Delorme and Scott Makeig, Salk Institute, 
+% Copyright (C) 2001 Arnaud Delorme and Scott Makeig, Salk Institute,
 % arno@salk.edu, smakeig@ucsd.edu.
 %
 % This program is free software; you can redistribute it and/or modify
@@ -151,6 +151,14 @@ tmpv = which('version');
 if ~isempty(findstr(lower(tmpv), 'biosig'))
     [tmpp tmp] = fileparts(tmpv);
     rmpath(tmpp);
+end;
+% remove freemat folder if it exist
+tmpPath = fileparts(fileparts(which('sread')));
+newPath = fullfile(tmpPath, 'maybe-missing', 'freemat3.5');
+if exist(newPath) == 7
+    warning('off', 'MATLAB:rmpath:DirNotFound');
+    rmpath(newPath)
+    warning('on', 'MATLAB:rmpath:DirNotFound');
 end;
 if str2num(vers(1)) < 7 && str2num(vers(1)) >= 5
     tmpWarning = warning('backtrace');
@@ -1032,7 +1040,6 @@ else
     PLUGINLIST = pluginlist;
     
     % Path exception for BIOSIG (sending BIOSIG down into the path)
-    fprintf(1,'EEGLAB message: Your MATLAB path is about to be modified. BIOSIG toolbox will be relocated last in the path\n');
     plugin_movepath('biosig','end');
     
 end; % iseeglabdeployed2
