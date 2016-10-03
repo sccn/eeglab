@@ -100,10 +100,10 @@ rmpath(genpath(pluginfolder));
 % Add folder to the path again in the requested position
  if strcmp(pluginpos,'begin')
      addpath(genpath(pluginfolder),'-begin');
-     fprintf(1,['\n','EEGLAB message: ' PLUGINLIST(hitindx).foldername ' has been located at the beggining of the path\n','\n',]);
+     fprintf(1,['EEGLAB warning: to avoid name conflict ' PLUGINLIST(hitindx).foldername ' functions relocated at the end of the path\n']);
  elseif strcmp(pluginpos,'end')
      addpath(genpath(pluginfolder),'-end');
-     fprintf(1,['\n','EEGLAB message: ' PLUGINLIST(hitindx).foldername ' has been located at the end of the path\n','\n',]);
+     fprintf(1,['EEGLAB warning: to avoid name conflict ' PLUGINLIST(hitindx).foldername ' functions relocated at the end of the path\n']);
  end
  
  % Restoring warnings
