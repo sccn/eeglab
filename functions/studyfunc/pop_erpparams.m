@@ -133,10 +133,12 @@ if isempty(varargin)
     if ~isequal(res.ylim       , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
     if ~isequal(res.timerange  , STUDY.etc.erpparams.timerange)  , options = { options{:} 'timerange' res.timerange }; end;
     if ~isequal(res.averagechan, STUDY.etc.erpparams.averagechan), options = { options{:} 'averagechan' res.averagechan }; end;
-    if (all(isnan(res.topotime)) & all(~isnan(STUDY.etc.erpparams.topotime))) | ...
-            (all(~isnan(res.topotime)) & all(isnan(STUDY.etc.erpparams.topotime))) | ...
+    if (all(isnan(res.topotime)) && all(~isnan(STUDY.etc.erpparams.topotime))) || ...
+            (all(~isnan(res.topotime)) & all(isnan(STUDY.etc.erpparams.topotime))) || ...
                 (all(~isnan(res.topotime)) & ~isequal(res.topotime, STUDY.etc.erpparams.topotime))
-        options = { options{:} 'topotime' res.topotime }; 
+            if ~isequal(res.topotime, STUDY.etc.erpparams.topotime)
+                options = { options{:} 'topotime' res.topotime }; 
+            end;
     end;
     if ~isempty(options)
         STUDY = pop_erpparams(STUDY, options{:});
