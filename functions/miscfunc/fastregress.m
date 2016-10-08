@@ -16,7 +16,7 @@
 %
 % Arnaud Delorme, 25 Feb 2003
 
-function [ypred, alpha, rsq, B] = fastregress(x, y, ploting);
+function [ypred, alpha, rsq, B, BINT] = fastregress(x, y, plotflag)
     
     if nargin < 1
         help fastregress; return;
