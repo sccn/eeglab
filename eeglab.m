@@ -1156,7 +1156,7 @@ try
                 stop(eeglabtimers);
                 delete(eeglabtimers);
             end;
-            % This is disabled because it cause Matlab to hang in case
+            % This is disabled because it cause Matlab to freeze in case
             % there is no connection or the connection is available but not
             % usable
             % start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end; clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
