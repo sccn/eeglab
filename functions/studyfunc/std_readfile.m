@@ -127,7 +127,7 @@ end;
 % get fields to read
 % ------------------
 v6Flag = testv6([ fileBaseName fileExt ]);
-if ~v6Flag
+if v6Flag
     if ~isempty(opt.channels)
         fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
     end;
