@@ -269,18 +269,22 @@ function spectrum = removemeanspectrum(spectrum, meanpowbase)
 function datavals = reorganizedata(dataTmp, dim)
     datavals = cell(size(dataTmp{1}));
     for iItem=1:length(dataTmp{1}(:)')
-        numItems = sum(cellfun(@(x)size(x{iItem},dim), dataTmp));
-        switch dim
-            case 2, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) numItems], 'single'); 
-            case 3, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) numItems], 'single'); 
-            case 4, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) size(dataTmp{1}{iItem},3) numItems], 'single'); 
+        numItems    = sum(cellfun(@(x)size(x{iItem},dim)*(size(x{iItem},1) > 1), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
+        ind         = find(~cellfun(@(x)isempty(x{iItem}), dataTmp)); 
+        if ~isempty(ind)
+            ind = ind(1);
+            switch dim
+                case 2, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) numItems], 'single'); 
+                case 3, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) numItems], 'single'); 
+                case 4, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) size(dataTmp{ind}{iItem},3) numItems], 'single'); 
+            end;
         end;
     end;
     for iItem=1:length(dataTmp{1}(:)')
         count = 1;
         for iCase = 1:length(dataTmp)
             if ~isempty(dataTmp{iCase}{iItem})
-                numItems = size(dataTmp{iCase}{iItem},dim);
+                numItems = size(dataTmp{iCase}{iItem},dim) * (size(dataTmp{iCase}{iItem},1) > 1); % the size > 1 allows to detect empty array which have a non-null last dim
                 switch dim
                     case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
