@@ -212,7 +212,10 @@ if ~studywasempty
         
         % check independent variable
         setFields   = fieldnames(STUDY.datasetinfo);
-        trialFields = fieldnames(ALLEEG(1).event);
+        if isempty(ALLEEG(1).event)
+             trialFields = [];
+        else trialFields = fieldnames(ALLEEG(1).event);
+        end;
         rmInd       = [];
         for indDes = 1:length(STUDY.design)
             for indVar = 1:length(STUDY.design(indDes).variable)
