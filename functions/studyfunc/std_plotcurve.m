@@ -160,6 +160,9 @@ if strcmpi(opt.plotsubjects, 'off')
     else
         coldata = manycol;
     end;
+    while length(coldata) < length(data(:))
+        coldata = [ coldata coldata ];
+    end;
     coldata = reshape(coldata(1:length(data(:))), size(data));
 else
     coldata = cell(size(data));
