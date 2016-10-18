@@ -193,7 +193,10 @@ if strcmp(opt.erase,'on')
         tmpfiles = {tmpfiles.name};
         if ~isempty(tmpfiles)
             for j = 1:length(tmpfiles)
+                try
                 rmdir([STUDY.filepath filesep 'LIMO_' filename filesep unique_subjects{i} filesep tmpfiles{j}],'s');
+                catch
+                end
             end
         end
     end
@@ -423,8 +426,8 @@ for s = 1:nb_subjects
                 which_dataset = contvar_info.dataset(cond);                    % dataset nb
                 dataset_nb = find(which_dataset == order{s});                  % position in the concatenated data
                 position = cell2mat(contvar_info.datasetinfo_trialindx(cond)); % position in the set
-                values = contvar_matrix(position+set_positions(dataset_nb));   % covariable values
-                contvar(position+set_positions(dataset_nb)) = values;          % position in the set + position in the concatenated data
+                values = contvar_matrix(position+set_positions(dataset_nb),:); % covariable values
+                contvar(position+set_positions(dataset_nb),:) = values;        % position in the set + position in the concatenated data
             end
         end
 
@@ -438,9 +441,9 @@ for s = 1:nb_subjects
         end
         
         if size(contvar,2) > 1
-            save([ALLEEG(index(1)).filepath filesep 'continuous_variables.txt'],'categ','-ascii')
+            save([ALLEEG(index(1)).filepath filesep 'continuous_variables.txt'],'contvar','-ascii')
         else
-            save([ALLEEG(index(1)).filepath filesep 'continuous_variable.txt'],'categ','-ascii')
+            save([ALLEEG(index(1)).filepath filesep 'continuous_variable.txt'],'contvar','-ascii')
         end
     end
 end
