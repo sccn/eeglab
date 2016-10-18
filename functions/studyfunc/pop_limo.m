@@ -85,7 +85,10 @@ else
 end;
 if strcmp(fastif(res.erase, 'on', 'off'), 'on')
     if exist([STUDY.filepath filesep 'limo_batch_report'],'dir')
-        rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
+        try
+            rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
+        catch
+        end
     end
 end
 [STUDY tmp] = std_limo(STUDY, ALLEEG, options{:});
