@@ -128,6 +128,10 @@ end
 % computing channel neighbox matrix
 % ---------------------------------
 flag_ok = 1;
+if exist('ft_prepare_neighbours','file')~=2
+    error('std_limo: FieldTrip toolbox is needed to prepare group level channel layout - please install it')
+end
+
 if isempty(opt.chanloc) && isempty(opt.neighbormat)
     if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
         if  ~isfield(STUDY.etc,'statistic')
@@ -518,17 +522,19 @@ STUDY.names = names;
 
 % Contrast
 % -------------------------------------------------------------------------
-if cont_var_flag && exist('categ','var')
-    if strcmp(opt.splitreg,'on')
-        limocontrast.mat = [zeros(1,max(categ)) ones(1,max(categ)) 0];
-    else
-        limocontrast.mat = [zeros(1,max(categ))  ones(1,size(contvar,2)) 0];
-    end
-    LIMO_files = limo_batch('both',model,limocontrast,STUDY);
-else
-    limocontrast.mat = [];
-    LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
-end
+% if cont_var_flag && exist('categ','var')
+%     if strcmp(opt.splitreg,'on')
+%         limocontrast.mat = [zeros(1,max(categ)) ones(1,max(categ)) 0]; % this already computed ie this the 1.*Beta ! 
+%     else
+%         limocontrast.mat = [zeros(1,max(categ))  ones(1,size(contvar,2)) 0];  % doesn't make sense to add continuous regressors 
+%     end
+%     LIMO_files = limo_batch('both',model,limocontrast,STUDY);
+% else
+%     limocontrast.mat = [];
+%     LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
+% end
+limocontrast.mat = [];
+LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
 LIMO_files.expected_chanlocs = limoChanlocs;
 
 for i = 1:length(LIMO_files.Beta)
@@ -594,11 +600,10 @@ if ~isempty(STUDY.filepath)
     cd(STUDY.filepath);
 end;
 
-% Computing Stats (Just ttest and paired ttest ... by now)
+% Computing one sample t-test for each parameters
 % -------------------------------------------------------------------------
 % NOTE: 
-% 1- Still need to consider the way to figure it out the types of contrast to perform
-% 2- Group variables need to be defined to split data in groups. ??
+% if a Group lvel variable exist, we need to split data accordingly (TO DO)
 
 % 1 - Computing ttest for each parameter
 nparams = 0;
