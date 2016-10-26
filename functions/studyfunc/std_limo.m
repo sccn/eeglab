@@ -398,7 +398,8 @@ for s = 1:nb_subjects
                 tmpX(getnan,:) = NaN;
             end
             categ = sum(repmat([1:size(tmpX,2)],nb_row,1).*tmpX,2);
-            clear x X tmpX nb_col; model.cat_files{s} = categ;
+            clear x X tmpX nb_col; 
+            model.cat_files{s} = categ;
         end 
         filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
         save(fullfile(filepath_tmp, 'categorical_variable.txt'),'categ','-ascii');
@@ -534,11 +535,12 @@ STUDY.names = names;
 %     LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
 % end
 limocontrast.mat = [];
-LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
+[LIMO_files, procstatus] = limo_batch('model specification',model,limocontrast,STUDY);
 LIMO_files.expected_chanlocs = limoChanlocs;
+procOK = find(procstatus);
 
-for i = 1:length(LIMO_files.Beta)
-    limofolders{i} = fileparts(LIMO_files.mat{i});
+for i = 1:length(procOK)
+    limofolders{i} = fileparts(LIMO_files.mat{procOK(i)});
 end
 
 % Getting indices to save LIMO in STUDY structure (save multiples analysis)
@@ -572,9 +574,9 @@ end
 STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).datatype = Analysis;
 STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc  = LIMO_files.expected_chanlocs;
 
-for i =1:size(LIMO_files.mat,1)
-    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).basefolder_level1{i}  = fileparts(LIMO_files.mat{i});
-    tmp = dir(fileparts(LIMO_files.mat{i}));
+for i =1:length(procOK)
+    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).basefolder_level1{procOK(i)}  = fileparts(LIMO_files.mat{procOK(i)});
+    tmp = dir(fileparts(LIMO_files.mat{procOK(i)}));
     if ~isempty({tmp.name})
         outputfiles = {tmp.name}';
         
@@ -590,70 +592,71 @@ for i =1:size(LIMO_files.mat,1)
         clear ind2delete;
     end
     for nfiles = 1:size(outputfiles,1)
-        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(i).filename{nfiles,1}  = fullfile(fileparts(LIMO_files.mat{i}),outputfiles{nfiles}); 
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(procOK(i)).filename{nfiles,1}  = fullfile(fileparts(LIMO_files.mat{procOK(i)}),outputfiles{nfiles}); 
         [trash,tmp] = fileparts(outputfiles{nfiles});
-        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(i).guiname{nfiles,1} = tmp;
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(procOK(i)).guiname{nfiles,1} = tmp;
     end
 end
 
 if ~isempty(STUDY.filepath)
     cd(STUDY.filepath);
 end;
-
-% Computing one sample t-test for each parameters
-% -------------------------------------------------------------------------
-% NOTE: 
-% if a Group lvel variable exist, we need to split data accordingly (TO DO)
-
-% 1 - Computing ttest for each parameter
-nparams = 0;
-if exist('categ','var'),   nparams = max(categ); end;
-if exist('contvar','var'), nparams = nparams + size(contvar,2); end;    
-
-foldername = [STUDY.filename(1:end-6) '_GLM' num2str(STUDY.currentdesign) '_' model.defaults.type '_' model.defaults.analysis '_'];
-nbootval   = 0;
-tfceval    = 0;
-
-filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-                                                            ,'type'          ,model.defaults.type ...
-                                                            ,'tfce'          ,tfceval...
-                                                            ,'analysis_type' ,'fullchan'...
-                                                            ,'parameters'    ,{[1:nparams]}...
-                                                            ,'limofiles'     ,{LIMO_files.Beta}...;
-                                                            ,'folderprefix'  ,foldername...
-                                                            ,'folderpath'    ,LIMO_files.LIMO);
-testype    = cell([length(filesout),1]);
-testype(:) = {'ttest'};
-for i = 1: nparams
-testname{i,1}   = [testype{i} '_parameter' num2str(i)];
+if ~isempty(find(procstatus==0))
+    % Computing one sample t-test for each parameters
+    % -------------------------------------------------------------------------
+    % NOTE:
+    % if a Group lvel variable exist, we need to split data accordingly (TO DO)
+    
+    % 1 - Computing ttest for each parameter
+    nparams = 0;
+    if exist('categ','var'),   nparams = max(categ); end;
+    if exist('contvar','var'), nparams = nparams + size(contvar,2); end;
+    
+    foldername = [STUDY.filename(1:end-6) '_GLM' num2str(STUDY.currentdesign) '_' model.defaults.type '_' model.defaults.analysis '_'];
+    nbootval   = 0;
+    tfceval    = 0;
+    
+    filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                                ,'type'          ,model.defaults.type ...
+                                                                ,'tfce'          ,tfceval...
+                                                                ,'analysis_type' ,'fullchan'...
+                                                                ,'parameters'    ,{[1:nparams]}...
+                                                                ,'limofiles'     ,{LIMO_files.Beta}...;
+                                                                ,'folderprefix'  ,foldername...
+                                                                ,'folderpath'    ,LIMO_files.LIMO);
+    testype    = cell([length(filesout),1]);
+    testype(:) = {'ttest'};
+    for i = 1: nparams
+        testname{i,1}   = [testype{i} '_parameter' num2str(i)];
+    end
+    
+    % 2- Computing Paired ttest for each combination of parameters
+    ncomb        = combnk(1:nparams,2);
+    limofiles{1} = LIMO_files.Beta;
+    limofiles{2} = LIMO_files.Beta;
+    
+    for i = 1:size(ncomb,1)
+        tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
+        mkdir(LIMO_files.LIMO,tmpname);
+        folderpath       = fullfile(LIMO_files.LIMO,tmpname);
+        filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                                            ,'type'          ,model.defaults.type ...
+                                                                            ,'tfce'          ,tfceval...
+                                                                            ,'analysis_type' ,'fullchan'...
+                                                                            ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
+                                                                            ,'limofiles'     ,limofiles...
+                                                                            ,'folderpath'    ,folderpath);
+        testype{end+1}      = 'p_ttest';
+        testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
+    end
+    % Assigning Level 2 info to STUDY
+    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
+    
+    for i = 1:size(filesout,2)
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).filename = filesout{1,i};
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).guiname  = testname{i,1};
+    end
 end
-
-% % 2- Computing Paired ttest for each combination of parameters
-% ncomb        = combnk(1:nparams,2);
-% limofiles{1} = LIMO_files.Beta;  
-% limofiles{2} = LIMO_files.Beta; 
-% 
-% for i = 1:size(ncomb,1)
-%     tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
-%     mkdir(LIMO_files.LIMO,tmpname);
-%     folderpath       = fullfile(LIMO_files.LIMO,tmpname);
-%     filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-%                                                                         ,'type'          ,model.defaults.type ...
-%                                                                         ,'tfce'          ,tfceval...
-%                                                                         ,'analysis_type' ,'fullchan'...
-%                                                                         ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
-%                                                                         ,'limofiles'     ,limofiles...
-%                                                                         ,'folderpath'    ,folderpath);      
-%     testype{end+1}      = 'p_ttest';
-%     testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
-% end
-% Assigning Level 2 info to STUDY
-% STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
-
- for i = 1:size(filesout,2)
-     STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).filename = filesout{1,i};
-     STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).guiname  = testname{i,1};
- end
 
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
