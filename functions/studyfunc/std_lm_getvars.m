@@ -110,7 +110,11 @@ if isempty(g.factors)
     varindx   = find(strcmp({STUDY.design(g.design).variable.vartype},vartype));
     for i = 1:length(varindx)
         if strcmp(g.vartype,'cat')
-            g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value;
+            if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
+                g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value;
+            else
+                g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value{:};
+            end
         else
             g.factors{i} = STUDY.design(g.design).variable(varindx(i)).label;
         end
@@ -162,27 +166,41 @@ for i = 1 : length(varindx)
         varlength = 1;
         catflag = 0;
     else
-        varlength = length(STUDY.design(g.design).variable(varindx(i)).value);
+        varlength = length( STUDY.design(g.design).variable(varindx(i)).value);
         catflag = 1;
     end
     
     % Loop per Variable values
     for j = 1 : varlength
         if catflag
-            facval = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
-            if isnumeric(facval)
-                facval_indx = find(facval == cell2mat(STUDY.design(g.design).variable(varindx(i)).value));
+            if isnumeric(STUDY.design(g.design).variable(varindx(i)).value{j})
+                facval      = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
+                if length(facval)==1
+                    facval_indx = find(facval == cell2mat(STUDY.design(g.design).variable(varindx(i)).value));
+                else
+                    facval_indx = j;
+                end
             else
-                facval_indx = find(strcmp(facval,STUDY.design(g.design).variable(varindx(i)).value));
+                if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
+                    facval = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
+                    facval_indx = find(strcmp(facval,STUDY.design(g.design).variable(varindx(i)).value));
+                else
+                    facval_indx = j;
+                end
+                
             end
         end
         
         % No loop per dataset since we merged datasetinfo
         if catflag
-            if isnumeric( cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j)))
+            if isnumeric(STUDY.design(g.design).variable(varindx(i)).value{j})
                 varval = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
             else
-                varval = STUDY.design(g.design).variable(varindx(i)).value(j);
+                if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
+                    varval = STUDY.design(g.design).variable(varindx(i)).value(j);
+                else
+                    varval = STUDY.design(g.design).variable(varindx(i)).value{j};
+                end
             end
         else
             varval = '';
