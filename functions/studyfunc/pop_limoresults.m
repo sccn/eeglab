@@ -66,12 +66,36 @@ classdef pop_limoresults < handle
                     if strcmp(STUDY.design(STUDY.currentdesign).variable(i).vartype,'categorical')
                         if isempty(tmpregnames)
                             for j = 1: length(STUDY.design(STUDY.currentdesign).variable(i).value)
-                                tmpregnames{j} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                if  ~iscell(STUDY.design(STUDY.currentdesign).variable(i).value{1})
+                                    tmpregnames{j} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                else
+                                    for jvars = 1:length(STUDY.design(STUDY.currentdesign).variable(i).value{j})
+                                        if jvars == 1
+                                            jointtmp = STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars};
+                                        else
+                                            jointtmp = strcat (jointtmp, '&',  STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars});
+                                        end
+                                    end
+                                    tmpregnames{j} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' jointtmp{:}];
+                                end
                             end
                             [vartype_tmp{1:length(tmpregnames)}] = deal(STUDY.design(STUDY.currentdesign).variable(i).vartype);
                         else
                             for j = 1:length(STUDY.design(STUDY.currentdesign).variable(i).value)
-                                tmpregnames{end+1} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                if  ~iscell(STUDY.design(STUDY.currentdesign).variable(i).value{1})
+                                    tmpregnames{end+1} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                else
+                                    for jvars = 1:length(STUDY.design(STUDY.currentdesign).variable(i).value{j})
+                                        if jvars == 1
+                                            jointtmp = STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars};
+                                        else
+                                            jointtmp = strcat (jointtmp, '&',  STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars});
+                                        end
+                                    end
+                                    tmpregnames{end+1} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' jointtmp];
+                                end
+                                
+                                %
                                 vartype_tmp{end+1} = STUDY.design(STUDY.currentdesign).variable(i).vartype;
                             end
                         end
