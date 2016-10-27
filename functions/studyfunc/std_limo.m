@@ -138,7 +138,7 @@ if isempty(opt.chanloc) && isempty(opt.neighbormat)
             STUDY = pop_statparams(STUDY, 'default');
         end
         [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-        chanlocname = 'limo_chanlocs_pval_correct.mat';
+        chanlocname = 'limo_gp_level_chanlocs.mat';
     else
         disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
         limoChanlocs = [];
