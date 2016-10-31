@@ -601,7 +601,7 @@ end
 if ~isempty(STUDY.filepath)
     cd(STUDY.filepath);
 end;
-if ~isempty(find(procstatus==0))
+if isempty(find(procstatus==0))
     % Computing one sample t-test for each parameters
     % -------------------------------------------------------------------------
     % NOTE:
