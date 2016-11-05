@@ -1,3 +1,43 @@
+% std_builddesignmat() - Build the design matrix for an specific design
+% specified in the structure ''design'' provided as input
+%
+% Usage:
+%
+% [tmpdmat,colLabels,catflag] = std_builddesignmat(design, trialinfo, 1)
+% 
+% Inputs:
+%  design      - Design structure as in the STUDY
+%  trialinfo   - Structure of trial information. Each field should be a
+%                cell array with one element for each trial
+% expanding    - Expand the design matrix
+% Optional inputs:
+%
+% Outputs:
+%   tmpdmat    - Design matrix
+%   colLabels  - Labels for each column of the deisgn matrix
+%   catflag    - Binary vector with dimension equal to the number of columns in the design matrix. 
+%                [0] mean a continuous regressor, [1] means a categotical one.
+%            
+% See also: std_combtrialinfo , std_plodtmat
+%   
+% Authors: Ramon Martinez-Cancino
+%                
+% Copyright (C) 2015  Ramon Martinez-Cancino, UCSD, INC, SCCN
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 function [tmpdmat,colLabels,catflag] = std_builddesignmat(design, trialinfo, expanding)
 
 if nargin < 3, expanding = 0; end;
@@ -10,82 +50,84 @@ if ~isempty(groupindx)
     varindx(groupindx) = [];
 end
 
-tmpdmat = NaN(ntrials,length(varindx));
-catflag = zeros(1,length(varindx));
-for i = 1 : length(varindx)
-    
-    % case for continous variables
-    catflag(i) = strcmpi(design.variable(varindx(i)).vartype, 'categorical');
-    if ~catflag(i)
-         varlength = 1;
-    else
-        varvaluetmp = design.variable(varindx(i)).value;
-        cellindx    = find(cellfun(@iscell,varvaluetmp));
-        c = 1;
-        % Expand cells
-        for ivar = 1:length(varvaluetmp)
-                if ~iscell(varvaluetmp{ivar})
-                    varlist{c} = varvaluetmp{ivar};
-                    c = c+1;
-                else
-                    for ival = 1: length(varvaluetmp)
-                        varlist(c) =  varvaluetmp{ivar}(ival);
-                        c = c+1;
-                    end
-                end
-        end        
-        varlength = length(varlist);
+tmpdmat   = NaN(ntrials,length(varindx));
+catflag   = strcmp({design.variable.vartype}, 'categorical');
+colLabels = {design.variable.label};
 
-    end
-    if varlength == 0, varlength = 1; end;
-    colLabels{i} = design.variable(varindx(i)).label;
-    
-    for j = 1 : varlength
-        if catflag(i)
-            
-            %facval = cell2mat(design.variable(varindx(i)).value(j));
-            facval = varlist{j};
-            if isnumeric(facval)
-                if isempty(cellindx)
-                    facval_indx = find(facval == cell2mat(design.variable(varindx(i)).value));
-                else
-                end
+for i = 1 : length(varindx)
+     % case for cont variables
+    if ~catflag(i)
+         [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(varindx(i)).label, '');
+         if ~isempty(trialindsx)
+             tmpdmat(trialindsx,i) = eventvals;
+         end
+    else % case for cat variables
+        varvaluetmp = design.variable(varindx(i)).value;
+
+        % Expanding cells cells
+        c = 1; varlist = {}; varvallength = []; facval_indx = []; dmatval = 1; jcount = 1;
+        for ivar = 1:length(varvaluetmp)
+
+            % Legth of varvaluetmp(i)
+            if iscellstr(varvaluetmp(ivar))
+                varvallength(ivar) = length(varvaluetmp(ivar)) ;
+            elseif iscell(varvaluetmp(ivar))
+                varvallength(ivar) = length(varvaluetmp{ivar}) ;
             else
-                if isempty(cellindx)
-                    facval_indx = find(strcmp(facval,design.variable(varindx(i)).value));
-                else
-                    for ivar = 1:length(varvaluetmp)
-                        hittmp = find(strcmp(facval,varvaluetmp{ivar}), 1);
-                        if ~isempty(hittmp)
-                            facval_indx = ivar;
-                        end
+                varvallength(ivar) = length(varvaluetmp{ivar}) ;
+            end
+            % Retreiving value and assigning index in design matrix
+            if ~iscell(varvaluetmp{ivar})  && varvallength(ivar) == 1
+                varlist{c} = varvaluetmp{ivar};
+                varindxjoint{ivar} = c;
+                facval_indx(c) = dmatval;
+                c = c+1;
+            else
+                tmpcindx = [];
+                for ival = 1: varvallength(ivar)
+                    if iscellstr(varvaluetmp{ivar}(ival))
+                        varlist{c} =  varvaluetmp{ivar}{ival};
+                    else
+                        varlist{c} =  varvaluetmp{ivar}(ival);
                     end
+                    facval_indx(c) = dmatval;
+                    tmpcindx       = cat(1,tmpcindx,c);
+                    c = c+1;
+                end
+                varindxjoint{ivar} = tmpcindx;
+            end
+            dmatval = dmatval+1;
+            %---
+            for j = 1 :varvallength(ivar)
+                %
+                if iscellstr(varlist(varindxjoint{ivar}))
+                    facval = varlist{varindxjoint{ivar}(j)};
+                elseif iscell(varlist(varindxjoint{ivar}))
+                    tmpval = varlist(varindxjoint{ivar});
+                    if isnumeric(tmpval{j})
+                        facval = tmpval{j};
+                    else
+                        facval = tmpval(j);
+                    end
+                elseif  isnumeric(varlist(varindxjoint{ivar}))
+                    facval = varlist(varindxjoint{ivar}(j));
+                elseif ischar(varlist(varindxjoint{ivar}))
+                    %                     facval = varlist(varindxjoint{ivar}(j));
+                end
+                % Find indices of triasl for facval
+                [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(varindx(i)).label, facval);
+
+                % Populating the design matrix
+                if ~isempty(trialindsx)
+                    tmpdmat(trialindsx,i) = facval_indx(jcount);
+                    jcount = jcount+1;
                 end
             end
-           
-            %
-            if isnumeric(varlist{j})
-            %if isnumeric( cell2mat(design.variable(varindx(i)).value(j)))
-                varval = cell2mat(design.variable(varindx(i)).value(j));
-            else
-                varval = varlist{j};
-            end
-        else
-            varval = '';
-        end
-        [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(varindx(i)).label, varval);
-        
-        if ~isempty(trialindsx)
-            % case for continous variables
-            if ~catflag(i)
-                facval_indx = eventvals;
-            end
-            tmpdmat(trialindsx,i) = facval_indx;
-            
-        end
+            %---
+        end 
     end
 end
-
+% -------------------------------------------------------------------------
 % expand categ var
 if expanding == 1
     % count number of columns
