@@ -631,8 +631,13 @@ if EEG.trials == 1
     end;
     EEG.epoch = [];
 end;
-
-EEG.reject = [];
+if isfield(EEG.reject, 'gcompreject') && isequal(g.channel,1:size(EEG.data,1))
+    tmpgcompreject = EEG.reject.gcompreject;
+    EEG.reject = [];
+    EEG.reject.gcompreject = tmpgcompreject;
+else
+    EEG.reject = [];
+end;
 EEG.stats  = [];
 EEG.reject.rejmanual = [];
 % for stats, can adapt remove the selected trials and electrodes
