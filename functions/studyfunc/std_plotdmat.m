@@ -103,8 +103,8 @@ else
     axes_pos           = [.118  .07   .817  .750];
 end
 
-GUI_FONTSIZE = 10;
-AXES_FONTSIZE = 9;
+GUI_FONTSIZE = 12;
+AXES_FONTSIZE = 12;
 COLOR = [.66 .76 1];
 figunits = 'Normalized';
 
@@ -142,7 +142,7 @@ set(handles.Text2,'String'          ,'Subject Variables Design',...
 end           
 handles.Text3 = uicontrol('Style','Text');
 set(handles.Text3,'String'          ,'Design Matrix',...
-                  'FontSize'        ,GUI_FONTSIZE,...
+                  'FontSize'        ,GUI_FONTSIZE+4,...
                   'FontWeight'      ,'bold',...
                   'Units'           ,figunits,...
                   'BackgroundColor' ,COLOR,...
@@ -315,6 +315,7 @@ elseif  flag.textdisp
 end
 
 % Normalizing tmpdmat for plot
+normtmpdmat = nan(size(tmpdmat));
 for iCol = 1:size(tmpdmat,2)
     dmat_den = (max(tmpdmat(:,iCol))-min(tmpdmat(:,iCol)));
     if dmat_den ~= 0
@@ -332,18 +333,19 @@ colormap(flipud(colormap('gray')));
 
 xlabel('Regressors',...
        'FontWeight', 'normal',...
-       'FontSize', AXES_FONTSIZE);
+       'FontSize', AXES_FONTSIZE+4);
 ylabel('Trials',...
        'FontWeight', 'Normal',...
-       'FontSize', AXES_FONTSIZE);
+       'FontSize', AXES_FONTSIZE+4);
    
 set(handles.axes1,'XTick',1:size(tmpdmat,2))
 set(handles.axes2','XTick'     ,get(handles.axes1, 'XTick'),...
                    'XTickLabel', allLabels,...
                    'XLim'      , get(handles.axes1, 'XLim'),...
-                   'FontSize'  , AXES_FONTSIZE);
+                   'FontSize'  , AXES_FONTSIZE+2);
+               
 
-
+set(handles.axes1,'FontSize', AXES_FONTSIZE+2)
 set(handles.figure, 'ButtonDownFcn', {@callback_dmatclick,handles,tmpdmat(dmatsortindex,:),design});
 setappdata(handles.mainfig,'flag',flag);
 drawnow;
