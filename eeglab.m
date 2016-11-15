@@ -144,12 +144,6 @@ if nargout > 0
     %[ALLEEG, EEG, CURRENTSET, ALLCOM]
 end;
 
-% remove BIOSIG path which are not needed and might cause conflicts
-biosigp{1} = fileparts(which('sopen.m'));
-biosigp{2} = fileparts(which('regress_eog.m'));
-biosigp{3} = fileparts(which('DecimalFactors.txt'));
-removepath(fileparts(fileparts(biosigp{1})), biosigp{:})
-
 % check Matlab version
 % --------------------
 vers = version;
@@ -331,6 +325,12 @@ if ~iseeglabdeployed2
         rmpathifpresent( optimpath );
         warning('on', 'MATLAB:rmpath:DirNotFound');
     end;
+
+    % remove BIOSIG path which are not needed and might cause conflicts
+    biosigp{1} = fileparts(which('sopen.m'));
+    biosigp{2} = fileparts(which('regress_eog.m'));
+    biosigp{3} = fileparts(which('DecimalFactors.txt'));
+    removepath(fileparts(fileparts(biosigp{1})), biosigp{:})
 else
     eeglab_options;
 end;
