@@ -67,7 +67,7 @@ if ~isempty(tmpfile), filename = tmpfile; end;
 % Modified by Joaquin
 % while getfield(dir(filename), 'bytes') < 1000
 i = 1;
-while getfield(dir(filename), 'bytes') < 1500
+while getfield(dir(filename), 'bytes') < 5000
     topo = load( '-mat', filename);
     filename = correctfile(topo.file, ALLEEG(abset).filepath);
     tmpfile  = which(filename);
