@@ -33,7 +33,10 @@
 
 function [command] = pop_writeeeg(EEG, filename, varargin)
 command = '';
- 
+
+% enforce use the str2double of Biosig
+biosigpathfirst
+
 % Check for BIOSIG Toolbox
 global PLUGINLIST
  if ~isempty(PLUGINLIST) && ~any(strcmpi({PLUGINLIST.plugin}','biosig'))
@@ -81,5 +84,5 @@ end;
 warning('on', 'MATLAB:intConvertNonIntVal');
 
 command = sprintf('pop_writeeeg(EEG, ''%s'', %s);', filename, vararg2str(options)); 
+biosigpathlast
 
-return;

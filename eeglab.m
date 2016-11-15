@@ -144,6 +144,12 @@ if nargout > 0
     %[ALLEEG, EEG, CURRENTSET, ALLCOM]
 end;
 
+% remove BIOSIG path which are not needed and might cause conflicts
+biosigp{1} = fileparts(which('sopen.m'));
+biosigp{2} = fileparts(which('regress_eog.m'));
+biosigp{3} = fileparts(which('DecimalFactors.txt'));
+removepath(fileparts(fileparts(biosigp{1})), biosigp{:})
+
 % check Matlab version
 % --------------------
 vers = version;
@@ -1043,6 +1049,7 @@ else
     plugin_movepath('biosig','end');
     
 end; % iseeglabdeployed2
+biosigpathlast; % fix str2double issue
 
 if ~ismatlab, return; end;
 % add other import ...
