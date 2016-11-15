@@ -110,6 +110,7 @@ if isempty(val)
             fwrite(fid, tmpMMO.Data.x(index), 'float');
         end;
         fclose(fid);
+        fprintf('Warning: memory mapped object writing might not be up to date in cache on network drive');
     else
         if length(ss(1).subs) < length(newdim2)
             newdim2(length(ss(1).subs)) = prod(newdim2(length(ss(1).subs):end));
@@ -134,6 +135,7 @@ if isempty(val)
             fwrite(fid, tmpdata, 'float');
         end;
         fclose(fid);
+        fprintf('Warning: memory mapped object writing might not be up to date in cache on network drive');
     end;
     
     % delete file if necessary
@@ -221,6 +223,7 @@ else
         end;
         fwrite(fid, tmpdata3, 'float');
         fclose(fid);
+        fprintf('Warning: memory mapped object writing might not be up to date in cache on network drive');
         
         % delete file if necessary
         if ncopies == 1 && obj.writable
