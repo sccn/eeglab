@@ -347,7 +347,7 @@ classdef pop_limoresults < handle
                 datatype = [datorica_list{obj.datorica_indx} measure_list{get(obj.gui_h.popupmenu_measure2plot,'Value')}];
                 
                 obj.limostruct_indx = find(~cellfun(@isempty,strfind({obj.study.design(obj.study.currentdesign).limo.datatype},datatype)));  
-                if ~isempty(obj.limostruct_indx) && isfield(obj.study.design(obj.study.currentdesign).limo, 'groupmodel') && ~isempty(obj.study(obj.study.currentdesign).design.limo(obj.limostruct_indx).groupmodel)
+                if ~isempty(obj.limostruct_indx) && isfield(obj.study.design(obj.study.currentdesign).limo, 'groupmodel') && ~isempty(obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel)
                     obj.limofiles_level2.guiname  = {obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel.guiname}';
                     obj.limofiles_level2.pathname = {obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel.filename}';
                     obj.limofiles_level2.index = 1;
@@ -392,7 +392,7 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_compmethod    ,'Enable','off');
                     set(obj.gui_h.checkbox_stats	      ,'Enable','off');
                     set(obj.gui_h.edit_pval               ,'Enable','on');
-                    set(obj.gui_h.pushbutton_designadd    ,'Enable','on');% Check this
+                    set(obj.gui_h.pushbutton_designadd    ,'Enable','off');% Check this
                 else
                     % Disabling GUI features
                     %------------------------------------------------------
