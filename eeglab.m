@@ -1045,10 +1045,8 @@ else
     global PLUGINLIST;
     PLUGINLIST = pluginlist;
     
-    % Path exception for BIOSIG (sending BIOSIG down into the path)
-    plugin_movepath('biosig','end');
-    
 end; % iseeglabdeployed2
+% Path exception for BIOSIG (sending BIOSIG down into the path)
 biosigpathlast; % fix str2double issue
 
 if ~ismatlab, return; end;
