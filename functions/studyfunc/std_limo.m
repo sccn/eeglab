@@ -105,6 +105,12 @@ addpath([root filesep 'external' filesep 'psom']);
 addpath([root filesep 'external']);
 addpath([root filesep 'help']);
 
+% Checking fieldtrip paths
+global PLUGINLIST;
+if isempty(find(strncmpi('Fieldtrip',{PLUGINLIST.plugin},9), 1)) || strcmp(PLUGINLIST(find(strncmpi('Fieldtrip',{PLUGINLIST.plugin},9), 1)).status,'deactivated')
+    error('std_limo error: Fieldtrip extension must be installed');
+end
+
 % Detecting type of analysis
 % -------------------------------------------------------------------------
 if strncmp(Analysis,'dat',3)
@@ -128,9 +134,6 @@ end
 % computing channel neighbox matrix
 % ---------------------------------
 flag_ok = 1;
-if exist('ft_prepare_neighbours','file')~=2
-    error('std_limo: FieldTrip toolbox is needed to prepare group level channel layout - please install it')
-end
 
 if isempty(opt.chanloc) && isempty(opt.neighbormat)
     if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
