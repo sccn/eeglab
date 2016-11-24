@@ -831,7 +831,7 @@ if ismatlab
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
     
-    limo_chn = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Channels)' , 'userdata', onstudy);
+    limo_chn = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Channels)' , 'userdata', onstudy,'Tag','limochan');
     uimenu( limo_chn,  'Label', 'Estimate Model Parameters (Channels)'         , 'userdata', onstudy, 'CallBack', cb_limorunchan);
     uimenu( limo_chn,  'Label', 'Linear Model Results (Channels)'              , 'userdata', onstudy, 'CallBack', cb_limoreschan);
     
@@ -841,7 +841,7 @@ if ismatlab
     uimenu( clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
     
-    limo_comp = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Components)' , 'userdata', onstudy);
+    limo_comp = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Components)' , 'userdata', onstudy,'Tag','limocomp');
     uimenu( limo_comp,  'Label', 'Estimate Model Parameters (Components)'         , 'userdata', onstudy, 'CallBack', cb_limoruncomp);
     uimenu( limo_comp,  'Label', 'Linear Model Results (Components)'              , 'userdata', onstudy, 'CallBack', cb_limorescomp);
 
@@ -1050,6 +1050,13 @@ cb_others = [ 'pophelp(''troubleshooting_data_formats'');' ];
 uimenu( import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
 uimenu( import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
 uimenu( import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
+
+% Checking if LIMO is present. If not then disabling it from the STUDY MENU
+if isempty(find(strncmpi('limo',{PLUGINLIST.plugin},4), 1)) || strcmp(PLUGINLIST(find(strncmpi('limo',{PLUGINLIST.plugin},4), 1)).status,'deactivated')
+    stdmenus = get(std_m,'Children');
+    menuindx = find(strncmpi('limo',get(stdmenus,'Tag'),4));
+    set(stdmenus(menuindx),'Enable','off'); 
+end
 
 % changing plugin menu color
 % --------------------------
@@ -1946,10 +1953,15 @@ elseif any(strcmp(menustatus, 'continuous_dataset'))
     
     set(allmenus, 'enable', 'on');  
     eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''continuous:off''))), allstrs);');  
-    set(allmenus(indmatchvar), 'enable', 'off');
-
-    
+    set(allmenus(indmatchvar), 'enable', 'off');  
 end;
+
+% Checking if LIMO is present. If not then disabling it from the STUDY MENU
+if isempty(find(strncmpi('limo',{PLUGINLIST.plugin},4), 1)) || strcmp(PLUGINLIST(find(strncmpi('limo',{PLUGINLIST.plugin},4), 1)).status,'deactivated')
+    menuindx = find(strncmpi('limo',get(allmenus,'Tag'),4));
+    set(allmenus(menuindx),'Enable','off');
+end
+
 if any(strcmp(menustatus, 'chanloc_absent'))
     
     eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''chanloc:on''))), allstrs);');  
