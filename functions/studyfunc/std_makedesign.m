@@ -323,7 +323,7 @@ for n1 = 1:nf1
                     if ~isempty(subjects{s}), txtval = [ '_' rmblk(subjects{s}) txtval ]; end;
                     if isempty(opt.filepath), tmpfilepath = ALLEEG(datsubj(1)).filepath; else tmpfilepath = opt.filepath; end;
                     des.cell(count).filebase = fullfile(tmpfilepath, [ 'design' int2str(designind) txtval ] );
-                    des.cell(count).filebase = checkfilelength(des.cell(count).filebase);
+                    %des.cell(count).filebase = checkfilelength(des.cell(count).filebase);
                 end;
                 count = count+1;
             end;
