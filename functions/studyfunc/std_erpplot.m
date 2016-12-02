@@ -229,11 +229,11 @@ if ~isempty(opt.channels)
     chaninds = 1:length(opt.channels);
 
     if strcmpi(opt.datatype, 'erp')
-        [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
+        [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     else
-        [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
-            'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design);
+        [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
+                'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype], 'rmsubjmean', params.subtractsubjectmean);
     end;
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
         for index = 1:length(erpdata(:))
@@ -309,11 +309,16 @@ else
 
         if length(opt.clusters) > 1, subplot(nr,nc,index); end;
         if strcmpi(opt.datatype, 'erp')
-            [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
-                        'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
+            [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
+                    'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
         else
-            [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
-                        'rmsubjmean', params.subtractsubjectmean, 'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
+            [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
+                    'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype], 'rmsubjmean', params.subtractsubjectmean);
+%             [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
+%                         'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
+%         else
+%             [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
+%                         'rmsubjmean', params.subtractsubjectmean, 'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
         end;
         if isempty(erpdata), return; end;
 

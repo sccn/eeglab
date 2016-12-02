@@ -24,7 +24,7 @@
 %         * Note: Left-click on subplots to view and zoom in separate windows.
 %
 % Usage with single dataset:
-%        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
+%        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot,tfdata] = ...
 %                  newtimef(data, frames, epochlim, srate, cycles,...
 %                       'key1',value1, 'key2',value2, ... );
 %
@@ -134,7 +134,7 @@
 %                     above in single trial instead of the trial average. Default
 %                     if 'off'. 'full' is an option that perform single
 %                     trial normalization (or simple division based on the
-%                     'basenorm' input over the full trial length before
+%                     'basenorm' input over the full trial length) before
 %                     performing standard baseline removal. It has been
 %                     shown to be less sensitive to noisy trials in Grandchamp R, 
 %                     Delorme A. (2011) Single-trial normalization for event-related 
@@ -534,12 +534,13 @@ end
     'newfig'        'string'    {'on','off'} 'on'; ...
     'type'          'string'    {'coher','phasecoher','phasecoher2'}  'phasecoher'; ...
     'itctype'       'string'    {'coher','phasecoher','phasecoher2'}  'phasecoher'; ...
+    'outputformat'  'string'    {'old','new','plot' } 'plot'; ...
     'phsamp'        'string'    {'on','off'} 'off'; ...  % phsamp not completed - Toby 9.28.2006
     'plotphaseonly' 'string'    {'on','off'} 'off'; ...
     'plotphasesign' 'string'    {'on','off'} 'on'; ...
     'plotphase'     'string'    {'on','off'} 'on'; ... % same as above for backward compatibility
     'pcontour'      'string'    {'on','off'} 'off'; ... 
-    'outputformat'  'string'    {'old','new','plot' } 'plot'; ...
+    'precomputed'   'struct'    []           struct([]); ...
     'itcmax'        'real'      []           []; ...
     'erspmax'       'real'      []           []; ...
     'lowmem'        'string'    {'on','off'} 'off'; ...
@@ -557,7 +558,6 @@ end
     'ntimesout'     'real'      []           []; ...
     'scale'         'string'    { 'log','abs'} 'log'; ...
     'timewarp'      'real'      []           []; ...
-    'precomputed'   'struct'    []           struct([]); ...
     'timewarpms'    'real'      []           []; ...
     'timewarpfr'    'real'      []           []; ...
     'timewarpidx'   'real'      []           []; ...
@@ -1193,101 +1193,13 @@ else
     P  = alltfX.*conj(alltfX); % power for wavelets
 end;
 
-% ---------------
-% baseline length
-% ---------------
-if size(g.baseline,2) == 2
-    baseln = [];
-    for index = 1:size(g.baseline,1)
-        tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
-        baseln = union_bc(baseln, tmptime);
-    end;
-    if length(baseln)==0
-        error( [ 'There are no sample points found in the default baseline.' 10 ...
-                 'This may happen even though data time limits overlap with' 10 ...
-                 'the baseline period (because of the time-freq. window width).' 10 ... 
-                 'Either disable the baseline, change the baseline limits.' ] );
-    end
-else
-    if ~isempty(find(timesout < g.baseline))
-         baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
-    else baseln = 1:length(timesout); % use all times as baseline
-    end
-end;
-
-if ~isnan(g.alpha) && length(baseln)==0
-    verboseprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
-    return
-end
-
-% -----------------------------------------
-% remove baseline on a trial by trial basis
-% -----------------------------------------
-if strcmpi(g.trialbase, 'on'), tmpbase = baseln;
-else                           tmpbase = 1:size(P,2); % full baseline
-end;
-if ndims(P) == 4
-    if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
-        mbase = mean(P(:,:,tmpbase,:),3);
-        if strcmpi(g.basenorm, 'on')
-             mstd = std(P(:,:,tmpbase,:),[],3);
-             P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
-        else P = bsxfun(@rdivide, P, mbase);
-        end;
-    end;
-else
-    if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
-        mbase = mean(P(:,tmpbase,:),2);
-        if strcmpi(g.basenorm, 'on')
-            mstd = std(P(:,tmpbase,:),[],2);
-            P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
-        else
-            P = P./repmat(mbase,[1 size(P,2) 1]); 
-            %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
-        end;
-    end;
-end;
-
-% -----------------------
-% compute baseline values
-% -----------------------
-if isnan(g.powbase(1))
-
-    verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-    if ndims(P) == 4
-        if ndims(P) > 3, Pori  = mean(P, 4); else Pori = P; end; 
-        mbase = mean(Pori(:,:,baseln),3);
-    else
-        if ndims(P) > 2, Pori  = mean(P, 3); else Pori = P; end; 
-        mbase = mean(Pori(:,baseln),2);
-    end;
-else
-    verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
-    mbase    = g.powbase; 
-    if strcmpi(g.scale, 'log'), mbase = 10.^(mbase/10); end; 
-    if size(mbase,1) == 1 % if input was a row vector, flip to be a column
-        mbase = mbase';
-    end;
-end
-baselength = length(baseln);
-
-% -------------------------
-% remove baseline (average)
-% -------------------------
-% original ERSP baseline removal
-if ~strcmpi(g.trialbase, 'on')
-    if ~isnan( g.baseline(1) ) && any(~isnan( mbase(1) )) && strcmpi(g.basenorm, 'off')
-        P = bsxfun(@rdivide, P, mbase); % use single trials
-    % ERSP baseline normalized
-    elseif ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.basenorm, 'on')
-
-        if ndims(Pori) == 3, 
-             mstd = std(Pori(:,:,baseln),[],3);
-        else mstd = std(Pori(:,baseln),[],2);
-        end;
-        P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
-    end;
-end;
+% ----------------
+% remove baseline
+% ----------------
+if strcmpi(g.scale, 'log') && ~isnan(g.powbase), g.powbase = 10.^(g.powbase/10); end; 
+P = newtimeftrialbaseln(P, timesout, 'baseline', g.baseline, 'basenorm', g.basenorm, 'trialbase', g.trialbase);
+[P, baseln, mbase] = newtimefbaseln(P, timesout, 'baseline', g.baseline, 'basenorm', g.basenorm, ...
+                                   'verbose', g.verbose, 'powbase', g.powbase,'singletrials','on');
 
 % ----------------
 % phase amp option

@@ -213,7 +213,10 @@ if ~studywasempty
         
         % check independent variable
         setFields   = fieldnames(STUDY.datasetinfo);
-        trialFields = fieldnames(ALLEEG(1).event);
+        if isempty(ALLEEG(1).event)
+             trialFields = [];
+        else trialFields = fieldnames(ALLEEG(1).event);
+        end;
         rmInd       = [];
         for indDes = 1:length(STUDY.design)
             for indVar = 1:length(STUDY.design(indDes).variable)
@@ -247,23 +250,15 @@ if ~studywasempty
         % between dash to cell array of strings
         % -------------------------------------
         for inddes = 1:length(STUDY.design)
-            if length(STUDY.design(inddes).variable) == 0
-                STUDY.design(inddes).variable(1).label = '';
-                STUDY.design(inddes).variable(1).value = [];
-            end;
-            if length(STUDY.design(inddes).variable) == 1
-                STUDY.design(inddes).variable(2).label = '';
-                STUDY.design(inddes).variable(2).value = [];
-            end;
-            if ~isfield(STUDY.design(inddes).variable, 'pairing')
-                STUDY.design(inddes).variable(1).pairing = 'on';
-                STUDY.design(inddes).variable(2).pairing = 'on';
-            end;
+            rmVar = [];
             for indvar = 1:length(STUDY.design(inddes).variable)
                 
                 % add pairing info in case it is missing
+                if isempty(STUDY.design(inddes).variable(indvar).label)
+                    rmVar = [ rmVar indvar ];
+                end;
                 if ~isfield(STUDY.design(inddes).variable, 'pairing') || isempty(STUDY.design(inddes).variable(indvar).pairing)
-                    if strcmpi(STUDY.design(inddes).variable(1).label, 'group')
+                    if strcmpi(STUDY.design(inddes).variable(indvar).label, 'group')
                         STUDY.design(inddes).variable(indvar).pairing = 'off';
                     else
                         STUDY.design(inddes).variable(indvar).pairing = 'on';
@@ -274,35 +269,13 @@ if ~studywasempty
                     STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
                 end;
             end;
-        end;
-        
-        for inddes = 1:length(STUDY.design)
-            if ~isfield(STUDY.design(inddes), 'cell') || isempty(STUDY.design(inddes).cell)
-                fprintf('Warning: Importing newer STUDY format - some information will be lost\n');
-                STUDY = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes));
-            end;
-            for indcell = 1:length(STUDY.design(inddes).cell)
-                for indval = 1:length(STUDY.design(inddes).cell(indcell).value)
-                    STUDY.design(inddes).cell(indcell).value{indval} = convertindvarval(STUDY.design(inddes).cell(indcell).value{indval});
-                end;
-            end;
+            STUDY.design(inddes).variable(rmVar) = [];
             for indinclude = 1:length(STUDY.design(inddes).include)
                 if iscell(STUDY.design(inddes).include{indinclude})
                     for indval = 1:length(STUDY.design(inddes).include{indinclude})
                         STUDY.design(inddes).include{indinclude}{indval} = convertindvarval(STUDY.design(inddes).include{indinclude}{indval});
                     end;
                 end;
-            end;
-            
-            % check for duplicate entries in filebase
-            % ---------------------------------------
-            if length( { STUDY.design(inddes).cell.filebase } ) > length(unique({ STUDY.design(inddes).cell.filebase }))
-                if ~isempty(findstr('design_', STUDY.design(inddes).cell(1).filebase))
-                    error('There is a problem with your STUDY, contact EEGLAB support');
-                else
-                    fprintf('Duplicate entry detected in Design %d, reinitializing design\n', inddes);
-                    [STUDY com] = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
-                end
             end;
         end;
     end;

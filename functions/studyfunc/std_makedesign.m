@@ -318,9 +318,11 @@ else
 end;
 
 % remove empty variables
-for iVar = length(STUDY.design(designind).variable):-1:1
-    if isempty(STUDY.design(designind).variable(iVar).label)
-        STUDY.design(designind).variable(iVar) = [];
+if designind <= length(STUDY.design)
+    for iVar = length(STUDY.design(designind).variable):-1:1
+        if isempty(STUDY.design(designind).variable(iVar).label)
+            STUDY.design(designind).variable(iVar) = [];
+        end;
     end;
 end;
 

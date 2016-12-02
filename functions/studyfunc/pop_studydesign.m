@@ -35,6 +35,10 @@ if nargin < 2
     return;
 end;
 
+if ~isstr(STUDY) && isfield(STUDY, 'currentdesign') && STUDY.currentdesign > length(STUDY.design)
+    STUDY.currentdesign = length(STUDY.design);
+end;
+
 if nargin < 3 && ~isstr(STUDY)
     
     %% create GUI
@@ -137,9 +141,13 @@ if nargin < 3 && ~isstr(STUDY)
     des    = usrdat.design;
     allcom = '';
     if length(des) < length(STUDY.design)
-        for index = length(des)+1:length(STUDY.design)
+        for index = length(STUDY.design):-1:length(des)+1
             fprintf('Deleting STUDY design %d\n', index);
+<<<<<<< HEAD
             com    = 'STUDY.design(index).name = '''';'; eval(com);
+=======
+            com    = 'STUDY.design(index) = [];'; eval(com);
+>>>>>>> 647e29c92e22118dca2eb4308fbfb040f8035151
             allcom = [ allcom 10 com ];
         end;
     end;
@@ -350,7 +358,11 @@ elseif isstr(STUDY)
             
         case 'plotdmat'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
+<<<<<<< HEAD
             std_plotdmat(usrdat,val);
+=======
+            std_plotdmat(usrdat.design(val),usrdat.datasetinfo);
+>>>>>>> 647e29c92e22118dca2eb4308fbfb040f8035151
             
         case 'importgvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');

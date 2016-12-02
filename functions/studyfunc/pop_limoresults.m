@@ -66,12 +66,36 @@ classdef pop_limoresults < handle
                     if strcmp(STUDY.design(STUDY.currentdesign).variable(i).vartype,'categorical')
                         if isempty(tmpregnames)
                             for j = 1: length(STUDY.design(STUDY.currentdesign).variable(i).value)
-                                tmpregnames{j} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                if  ~iscell(STUDY.design(STUDY.currentdesign).variable(i).value{1})
+                                    tmpregnames{j} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                else
+                                    for jvars = 1:length(STUDY.design(STUDY.currentdesign).variable(i).value{j})
+                                        if jvars == 1
+                                            jointtmp = STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars};
+                                        else
+                                            jointtmp = strcat (jointtmp, '&',  STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars});
+                                        end
+                                    end
+                                    tmpregnames{j} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' jointtmp{:}];
+                                end
                             end
                             [vartype_tmp{1:length(tmpregnames)}] = deal(STUDY.design(STUDY.currentdesign).variable(i).vartype);
                         else
                             for j = 1:length(STUDY.design(STUDY.currentdesign).variable(i).value)
-                                tmpregnames{end+1} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                if  ~iscell(STUDY.design(STUDY.currentdesign).variable(i).value{1})
+                                    tmpregnames{end+1} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' STUDY.design(STUDY.currentdesign).variable(i).value{j}];
+                                else
+                                    for jvars = 1:length(STUDY.design(STUDY.currentdesign).variable(i).value{j})
+                                        if jvars == 1
+                                            jointtmp = STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars};
+                                        else
+                                            jointtmp = strcat (jointtmp, '&',  STUDY.design(STUDY.currentdesign).variable(i).value{j}{jvars});
+                                        end
+                                    end
+                                    tmpregnames{end+1} = [STUDY.design(STUDY.currentdesign).variable(i).label '_' jointtmp];
+                                end
+                                
+                                %
                                 vartype_tmp{end+1} = STUDY.design(STUDY.currentdesign).variable(i).vartype;
                             end
                         end
@@ -323,7 +347,7 @@ classdef pop_limoresults < handle
                 datatype = [datorica_list{obj.datorica_indx} measure_list{get(obj.gui_h.popupmenu_measure2plot,'Value')}];
                 
                 obj.limostruct_indx = find(~cellfun(@isempty,strfind({obj.study.design(obj.study.currentdesign).limo.datatype},datatype)));  
-                if ~isempty(obj.limostruct_indx) && isfield(obj.study.design(obj.study.currentdesign).limo, 'groupmodel') && ~isempty(obj.study(obj.study.currentdesign).design.limo(obj.limostruct_indx).groupmodel)
+                if ~isempty(obj.limostruct_indx) && isfield(obj.study.design(obj.study.currentdesign).limo, 'groupmodel') && ~isempty(obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel)
                     obj.limofiles_level2.guiname  = {obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel.guiname}';
                     obj.limofiles_level2.pathname = {obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).groupmodel.filename}';
                     obj.limofiles_level2.index = 1;
@@ -368,7 +392,7 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_compmethod    ,'Enable','off');
                     set(obj.gui_h.checkbox_stats	      ,'Enable','off');
                     set(obj.gui_h.edit_pval               ,'Enable','on');
-                    set(obj.gui_h.pushbutton_designadd    ,'Enable','on');% Check this
+                    set(obj.gui_h.pushbutton_designadd    ,'Enable','off');% Check this
                 else
                     % Disabling GUI features
                     %------------------------------------------------------
@@ -856,6 +880,7 @@ function [var2plot,filespath,limoindx,STUDY] = getmeasures2plot(STUDY,subjN,meas
 
 % Init
 filespath = [];
+limoindx = [];
 var2plot.guiname{1}  = 'No Variables Computed';
 measure_list         = {'erp','spec'};
 datorica_list        = {'dat', 'ica'};

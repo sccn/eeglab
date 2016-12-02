@@ -29,6 +29,8 @@
 %   'neighbormat' - Neighborhood matrix of electrodes. Must be used with 'chanloc', 
 %                   or it will be ignored. If this option is used, it will
 %                   ignore 'neighboropt' if used.
+%   'freqlim'     - Frequency trimming
+%   'timelim'     - Time trimming
 %      
 % Outputs:
 %  STUDY     - modified STUDY structure (the STUDY.design now contains a list
@@ -83,6 +85,8 @@ else
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
           'splitreg'       'string'  { 'on','off' }   'off';
+          'freqlim'        'real'    []               [] ;
+          'timelim'        'real'    []               [] ;
           'neighboropt'    'cell'    {}               {} ;
           'chanloc'        'struct'  {}               struct('no', {}); % default empty structure
           'neighbormat'    'real'    []               [] },...
@@ -100,6 +104,12 @@ addpath([root filesep 'limo_cluster_functions']);
 addpath([root filesep 'external' filesep 'psom']);
 addpath([root filesep 'external']);
 addpath([root filesep 'help']);
+
+% Checking fieldtrip paths
+global PLUGINLIST;
+if isempty(find(strncmpi('Fieldtrip',{PLUGINLIST.plugin},9), 1)) || strcmp(PLUGINLIST(find(strncmpi('Fieldtrip',{PLUGINLIST.plugin},9), 1)).status,'deactivated')
+    error('std_limo error: Fieldtrip extension must be installed');
+end
 
 % Detecting type of analysis
 % -------------------------------------------------------------------------
@@ -124,13 +134,14 @@ end
 % computing channel neighbox matrix
 % ---------------------------------
 flag_ok = 1;
+
 if isempty(opt.chanloc) && isempty(opt.neighbormat)
     if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
         if  ~isfield(STUDY.etc,'statistic')
             STUDY = pop_statparams(STUDY, 'default');
         end
         [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-        chanlocname = 'limo_chanlocs_pval_correct.mat';
+        chanlocname = 'limo_gp_level_chanlocs.mat';
     else
         disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
         limoChanlocs = [];
@@ -189,7 +200,10 @@ if strcmp(opt.erase,'on')
         tmpfiles = {tmpfiles.name};
         if ~isempty(tmpfiles)
             for j = 1:length(tmpfiles)
+                try
                 rmdir([STUDY.filepath filesep 'LIMO_' filename filesep unique_subjects{i} filesep tmpfiles{j}],'s');
+                catch
+                end
             end
         end
     end
@@ -387,7 +401,8 @@ for s = 1:nb_subjects
                 tmpX(getnan,:) = NaN;
             end
             categ = sum(repmat([1:size(tmpX,2)],nb_row,1).*tmpX,2);
-            clear x X tmpX nb_col; model.cat_files{s} = categ;
+            clear x X tmpX nb_col; 
+            model.cat_files{s} = categ;
         end 
         filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
         save(fullfile(filepath_tmp, 'categorical_variable.txt'),'categ','-ascii');
@@ -419,8 +434,8 @@ for s = 1:nb_subjects
                 which_dataset = contvar_info.dataset(cond);                    % dataset nb
                 dataset_nb = find(which_dataset == order{s});                  % position in the concatenated data
                 position = cell2mat(contvar_info.datasetinfo_trialindx(cond)); % position in the set
-                values = contvar_matrix(position+set_positions(dataset_nb));   % covariable values
-                contvar(position+set_positions(dataset_nb)) = values;          % position in the set + position in the concatenated data
+                values = contvar_matrix(position+set_positions(dataset_nb),:); % covariable values
+                contvar(position+set_positions(dataset_nb),:) = values;        % position in the set + position in the concatenated data
             end
         end
 
@@ -434,9 +449,9 @@ for s = 1:nb_subjects
         end
         
         if size(contvar,2) > 1
-            save([ALLEEG(index(1)).filepath filesep 'continuous_variables.txt'],'categ','-ascii')
+            save([ALLEEG(index(1)).filepath filesep 'continuous_variables.txt'],'contvar','-ascii')
         else
-            save([ALLEEG(index(1)).filepath filesep 'continuous_variable.txt'],'categ','-ascii')
+            save([ALLEEG(index(1)).filepath filesep 'continuous_variable.txt'],'contvar','-ascii')
         end
     end
 end
@@ -457,8 +472,22 @@ end
 % -----------------------------------------------------------------
 if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     model.defaults.analysis= 'Time';
-    model.defaults.start = ALLEEG(index(1)).xmin*1000; %-10; 
+    model.defaults.start = ALLEEG(index(1)).xmin*1000;
     model.defaults.end   = ALLEEG(index(1)).xmax*1000;
+    if length(opt.timelim) == 2 && opt.timelim(1) < opt.timelim(end)
+        % start value
+        if opt.timelim(1) > model.defaults.start && opt.timelim(1) < model.defaults.end
+            model.defaults.start = opt.timelim(1);
+        else
+            display('std_limo: Invalid time lower limit, using default value instead');
+        end
+        % end value
+        if opt.timelim(end) < model.defaults.end && opt.timelim(end) > model.defaults.start
+            model.defaults.end = opt.timelim(end);
+        else
+            display('std_limo: Invalid time upper limit, using default value instead');
+        end
+    end
     model.defaults.lowf  = [];
     model.defaults.highf = [];
     
@@ -467,8 +496,13 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     model.defaults.analysis= 'Frequency';
     model.defaults.start   = -10;
     model.defaults.end     = ALLEEG(index(1)).xmax*1000;
-    model.defaults.lowf    = [];
-    model.defaults.highf   = [];
+    if length(opt.freqlim) == 2 && opt.freqlim(1) < opt.freqlim(end)
+        model.defaults.lowf    = opt.freqlim(1);
+        model.defaults.highf   = opt.freqlim(end);
+    else
+        model.defaults.lowf    = [];
+        model.defaults.highf   = [];
+    end;
     
 elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
@@ -492,21 +526,24 @@ STUDY.names = names;
 
 % Contrast
 % -------------------------------------------------------------------------
-if cont_var_flag && exist('categ','var')
-    if strcmp(opt.splitreg,'on')
-        limocontrast.mat = [zeros(1,max(categ)) ones(1,max(categ)) 0];
-    else
-        limocontrast.mat = [zeros(1,max(categ))  ones(1,size(contvar,2)) 0];
-    end
-    LIMO_files = limo_batch('both',model,limocontrast,STUDY);
-else
-    limocontrast.mat = [];
-    LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
-end
+% if cont_var_flag && exist('categ','var')
+%     if strcmp(opt.splitreg,'on')
+%         limocontrast.mat = [zeros(1,max(categ)) ones(1,max(categ)) 0]; % this already computed ie this the 1.*Beta ! 
+%     else
+%         limocontrast.mat = [zeros(1,max(categ))  ones(1,size(contvar,2)) 0];  % doesn't make sense to add continuous regressors 
+%     end
+%     LIMO_files = limo_batch('both',model,limocontrast,STUDY);
+% else
+%     limocontrast.mat = [];
+%     LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
+% end
+limocontrast.mat = [];
+[LIMO_files, procstatus] = limo_batch('model specification',model,limocontrast,STUDY);
 LIMO_files.expected_chanlocs = limoChanlocs;
+procOK = find(procstatus);
 
-for i = 1:length(LIMO_files.Beta)
-    limofolders{i} = fileparts(LIMO_files.mat{i});
+for i = 1:length(procOK)
+    limofolders{i} = fileparts(LIMO_files.mat{procOK(i)});
 end
 
 % Getting indices to save LIMO in STUDY structure (save multiples analysis)
@@ -540,9 +577,9 @@ end
 STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).datatype = Analysis;
 STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc  = LIMO_files.expected_chanlocs;
 
-for i =1:size(LIMO_files.mat,1)
-    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).basefolder_level1{i}  = fileparts(LIMO_files.mat{i});
-    tmp = dir(fileparts(LIMO_files.mat{i}));
+for i =1:length(procOK)
+    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).basefolder_level1{procOK(i)}  = fileparts(LIMO_files.mat{procOK(i)});
+    tmp = dir(fileparts(LIMO_files.mat{procOK(i)}));
     if ~isempty({tmp.name})
         outputfiles = {tmp.name}';
         
@@ -558,69 +595,71 @@ for i =1:size(LIMO_files.mat,1)
         clear ind2delete;
     end
     for nfiles = 1:size(outputfiles,1)
-        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(i).filename{nfiles,1}  = fullfile(fileparts(LIMO_files.mat{i}),outputfiles{nfiles}); 
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(procOK(i)).filename{nfiles,1}  = fullfile(fileparts(LIMO_files.mat{procOK(i)}),outputfiles{nfiles}); 
         [trash,tmp] = fileparts(outputfiles{nfiles});
-        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(i).guiname{nfiles,1} = tmp;
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(procOK(i)).guiname{nfiles,1} = tmp;
     end
 end
 
-cd(STUDY.filepath);
-
-% Computing Stats (Just ttest and paired ttest ... by now)
-% -------------------------------------------------------------------------
-% NOTE: 
-% 1- Still need to consider the way to figure it out the types of contrast to perform
-% 2- Group variables need to be defined to split data in groups. ??
-
-% 1 - Computing ttest for each parameter
-nparams = 0;
-if exist('categ','var'),   nparams = max(categ); end;
-if exist('contvar','var'), nparams = nparams + size(contvar,2); end;    
-
-foldername = [STUDY.filename(1:end-6) '_GLM' num2str(STUDY.currentdesign) '_' model.defaults.type '_' model.defaults.analysis '_'];
-nbootval   = 0;
-tfceval    = 0;
-
-filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-                                                            ,'type'          ,model.defaults.type ...
-                                                            ,'tfce'          ,tfceval...
-                                                            ,'analysis_type' ,'fullchan'...
-                                                            ,'parameters'    ,{[1:nparams]}...
-                                                            ,'limofiles'     ,{LIMO_files.Beta}...;
-                                                            ,'folderprefix'  ,foldername...
-                                                            ,'folderpath'    ,LIMO_files.LIMO);
-testype    = cell([length(filesout),1]);
-testype(:) = {'ttest'};
-for i = 1: nparams
-testname{i,1}   = [testype{i} '_parameter' num2str(i)];
+if ~isempty(STUDY.filepath)
+    cd(STUDY.filepath);
+end;
+if isempty(find(procstatus==0))
+    % Computing one sample t-test for each parameters
+    % -------------------------------------------------------------------------
+    % NOTE:
+    % if a Group lvel variable exist, we need to split data accordingly (TO DO)
+    
+    % 1 - Computing ttest for each parameter
+    nparams = 0;
+    if exist('categ','var'),   nparams = max(categ); end;
+    if exist('contvar','var'), nparams = nparams + size(contvar,2); end;
+    
+    foldername = [STUDY.filename(1:end-6) '_GLM' num2str(STUDY.currentdesign) '_' model.defaults.type '_' model.defaults.analysis '_'];
+    nbootval   = 0;
+    tfceval    = 0;
+    
+    filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                                ,'type'          ,model.defaults.type ...
+                                                                ,'tfce'          ,tfceval...
+                                                                ,'analysis_type' ,'fullchan'...
+                                                                ,'parameters'    ,{[1:nparams]}...
+                                                                ,'limofiles'     ,{LIMO_files.Beta}...;
+                                                                ,'folderprefix'  ,foldername...
+                                                                ,'folderpath'    ,LIMO_files.LIMO);
+    testype    = cell([length(filesout),1]);
+    testype(:) = {'ttest'};
+    for i = 1: nparams
+        testname{i,1}   = [testype{i} '_parameter' num2str(i)];
+    end
+    
+    % 2- Computing Paired ttest for each combination of parameters
+    ncomb        = combnk(1:nparams,2);
+    limofiles{1} = LIMO_files.Beta;
+    limofiles{2} = LIMO_files.Beta;
+    
+    for i = 1:size(ncomb,1)
+        tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
+        mkdir(LIMO_files.LIMO,tmpname);
+        folderpath       = fullfile(LIMO_files.LIMO,tmpname);
+        filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                                            ,'type'          ,model.defaults.type ...
+                                                                            ,'tfce'          ,tfceval...
+                                                                            ,'analysis_type' ,'fullchan'...
+                                                                            ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
+                                                                            ,'limofiles'     ,limofiles...
+                                                                            ,'folderpath'    ,folderpath);
+        testype{end+1}      = 'p_ttest';
+        testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
+    end
+    % Assigning Level 2 info to STUDY
+    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
+    
+    for i = 1:size(filesout,2)
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).filename = filesout{1,i};
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).guiname  = testname{i,1};
+    end
 end
-
-% % 2- Computing Paired ttest for each combination of parameters
-% ncomb        = combnk(1:nparams,2);
-% limofiles{1} = LIMO_files.Beta;  
-% limofiles{2} = LIMO_files.Beta; 
-% 
-% for i = 1:size(ncomb,1)
-%     tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
-%     mkdir(LIMO_files.LIMO,tmpname);
-%     folderpath       = fullfile(LIMO_files.LIMO,tmpname);
-%     filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-%                                                                         ,'type'          ,model.defaults.type ...
-%                                                                         ,'tfce'          ,tfceval...
-%                                                                         ,'analysis_type' ,'fullchan'...
-%                                                                         ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
-%                                                                         ,'limofiles'     ,limofiles...
-%                                                                         ,'folderpath'    ,folderpath);      
-%     testype{end+1}      = 'p_ttest';
-%     testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
-% end
-% Assigning Level 2 info to STUDY
-% STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
-
- for i = 1:size(filesout,2)
-     STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).filename = filesout{1,i};
-     STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).guiname  = testname{i,1};
- end
 
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');

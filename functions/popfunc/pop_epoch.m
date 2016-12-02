@@ -105,7 +105,7 @@ if ~isfield(EEG.event, 'latency'),
      beep; return;
 end;
 if size(EEG.data,3) > 1
-    epochlim = [num2str( round(EEG.xmin*1000,1)) '  '  num2str(round(EEG.xmax*1000,1))];
+    epochlim = [num2str( round(EEG.xmin*1000)) '  '  num2str(round(EEG.xmax*1000))];
 else
     epochlim = '-1 2';
 end

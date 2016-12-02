@@ -108,6 +108,8 @@
 %   'headrad'     - [float] change head radius.
 %   'lookup'      - [string] look-up channel numbers for standard locations in the
 %                   channel location file given as input.
+%  'rplurchanloc' - [1,0] [1] Replace EEG.urchanlocs.If EEG.urchanlocs is empty this
+%                   option will be ignored and will be set to [1]
 %
 % Outputs:
 %   EEG        - new EEGLAB dataset with updated channel location structures 
@@ -197,6 +199,13 @@ if isempty(chans) || all(~ishandle(chans))
         end;
         orichaninfo = [];
     end;
+    
+    % Checking for flag to replace 'urchanloc' field
+    indx_tmp = find(strcmp(varargin,'rplurchanloc'));
+    flag_replurchan = 0;
+     if ~isempty(indx_tmp)
+         flag_replurchan = varargin{indx_tmp+1};
+     end
     
     % insert "no data channels" in channel structure
     % ----------------------------------------------
@@ -317,9 +326,12 @@ if nargin < 3
 
     % add sorting options
     % -------------------
+    cb_rplurchan = [ 'valnumtmp   = get(findobj(gcbf, ''tag'', ''rplurchan''), ''value'');' ...
+                     'pop_chanedit(gcbf, [], ''rplurchanloc'', valnumtmp);' ...
+                     'clear valnumtmp;' ];
     noseparam = strmatch(upper(chaninfo.nosedir), { '+X' '-X' '+Y' '-Y' });
     if isempty(noseparam), error('Wrong value for nose direction'); end;
-    geometry = { geometry{:} [1] [0.9 1.3 0.6 1.1 0.9] [1] [1 1 1 1 1]};
+    geometry = { geometry{:} [1] [0.9 1.3 0.6 1.1 0.9] [1] [1 1 1 1 1] [1]};
     uilist   = { uilist{:},...
         { } ...
         { 'Style', 'pushbutton', 'string', 'Plot 2-D', 'callback', 'pop_chanedit(gcbf, [], ''plot2d'', []);' },...
@@ -329,22 +341,24 @@ if nargin < 3
         'tag' 'nosedir' 'value',noseparam, 'callback' 'pop_chanedit(gcbf,[],''nosedir'',[]);' 'listboxtop' noseparam } ...
         { 'Style', 'pushbutton', 'string', 'Plot 3-D (xyz)',     'callback', 'pop_chanedit(gcbf, [], ''plot3d'', []);' } ...
         {}, ...
-        { 'Style', 'pushbutton', 'string', 'Read locations',     'callback', 'pop_chanedit(gcbf,[],''load'',[]);' }, ...
-        { 'Style', 'pushbutton', 'string', 'Read locs help',     'callback', 'pophelp(''readlocs.m'');' }, ...
-        { 'Style', 'pushbutton', 'string', 'Look up locs',       'callback', 'pop_chanedit(gcbf,[], ''lookupgui'', []);' }, ...
-        { 'Style', 'pushbutton', 'string', 'Save (as .ced)',     'callback', 'pop_chanedit(gcbf,[], ''save'',[]);' } ...
-        { 'Style', 'pushbutton', 'string', 'Save (other types)'  'callback', 'pop_chanedit(gcbf,[], ''saveothers'',[]);' } ...
+        { 'Style', 'pushbutton', 'string', 'Read locations',              'callback', 'pop_chanedit(gcbf,[],''load'',[]);' }, ...
+        { 'Style', 'pushbutton', 'string', 'Read locs help',              'callback', 'pophelp(''readlocs.m'');' }, ...
+        { 'Style', 'pushbutton', 'string', 'Look up locs',                'callback', 'pop_chanedit(gcbf,[], ''lookupgui'', []);' }, ...
+        { 'Style', 'pushbutton', 'string', 'Save (as .ced)',              'callback', 'pop_chanedit(gcbf,[], ''save'',[]);' } ...
+        { 'Style', 'pushbutton', 'string', 'Save (other types)',          'callback', 'pop_chanedit(gcbf,[], ''saveothers'',[]);' } ...
+        { 'Style', 'checkbox'  , 'string', 'Overwrite Original Channels (if exist)', 'callback', cb_rplurchan, 'tag'   , 'rplurchan',  'value', 0  }...
         };
 
     % evaluation of command below is required to center text (if
     % declared a text instead of edit, the uicontrol is not centered)
     comeval = [ 'set(findobj( ''tag'', ''chanediturchan''), ''style'', ''text'', ''backgroundcolor'', [.66 .76 1] );' ...
                 'set(findobj( ''tag'', ''chaneditref''),    ''style'', ''text'', ''backgroundcolor'', [.66 .76 1] );' ...
-                'set(findobj( ''tag'', ''ok''), ''callback'', ''pop_chanedit(gcbf, [], ''''return'''', []);'')' ];
+                'set(findobj( ''tag'', ''ok''), ''callback'', ''valnumtmp   = get(findobj(gcbf, ''''tag'''', ''''rplurchan''''), ''''value''''); pop_chanedit(gcbf, [],''''rplurchanloc'''',valnumtmp, ''''return'''', []);'')' ];
 
     userdata.chans     = chans;
     userdata.nchansori = nchansori;
     userdata.chaninfo  = chaninfo;
+    userdata.urchans   = urchans ;
     userdata.commands  = totaluserdat;
 
     [results userdata returnmode] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', ...
@@ -360,6 +374,7 @@ if nargin < 3
     % transfer events back from global workspace
     chans      = userdata.chans;
     chaninfo   = userdata.chaninfo;
+    urchans    = userdata.urchans; 
     if ~isempty(userdata.commands)
         com = sprintf('%s=pop_chanedit(%s, %s);', inputname(1), inputname(1), vararg2str(userdata.commands));
     end;
@@ -374,6 +389,7 @@ else
         chans       = userdata.chans;
         nchansori   = userdata.nchansori;
         chaninfo    = userdata.chaninfo;
+        urchans     = userdata.urchans;
         currentpos  = str2num(get(findobj(fig, 'tag', 'chaneditnumval'), 'string'));
     end;
     
@@ -383,6 +399,9 @@ else
     % ------------------------
     for curfield = 1:2:length(args)
         switch lower(args{curfield})
+            case 'rplurchanloc'
+                args{curfield} = 'rplurchanloc';
+                args{ curfield+1 } =   0;
             case 'return'
                 [tmpchans] = eeg_checkchanlocs(chans);
                 if nchansori ~= 0 & nchansori ~= length(tmpchans)
@@ -809,13 +828,16 @@ else
                             'callback' setmodel } ...
                             { } ...
                             { 'style' 'edit'       'string' userdatatmp{1} 'tag' 'elec' } ...
-                            { 'style' 'pushbutton' 'string' '...' 'callback' commandload } };
+                            { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
+                            { 'Style', 'checkbox', 'value', 1, 'string','Overwrite Original Channels' } };
 
-                        res = inputgui( { 1 [1 0.3] [1 0.3] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1] );
+                        res = inputgui( { 1 [1 0.3] [1 0.3] 1 }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1 1] );
                         if ~isempty(res)
                             chaninfo.filename = res{2};
                             args{ curfield   } = 'lookup';
                             args{ curfield+1 } = res{2};
+                            args{ curfield+1 } = res{3};
+                            flag_replurchan    = res{3};
                             com = args;
                         else
                             return;
@@ -868,7 +890,7 @@ else
                 else
                     chaninfo.nosedir = '+X';
                 end;
-                urchans = chans;
+                if flag_replurchan, urchans = chans; end;
                 for index = 1:length(chans)
                     chans(index).urchan    = index;
                     chans(index).ref       = '';
@@ -884,6 +906,7 @@ if ~isempty(fig)
     userdata.chans    = chans;
     userdata.chaninfo = chaninfo;
     userdata.commands = { userdata.commands{:} args{:} };
+    userdata.urchans  = urchans;
     set(fig, 'userdata', userdata);
 
     set(findobj(fig, 'tag', 'chaneditnumval'), 'string', num2str(currentpos));
@@ -920,12 +943,14 @@ else
                  EEG(index).chanlocs = chans;
                  EEG(index).chaninfo = chaninfo;
              end;
+             % Updating urchanlocs            
+             if (flag_replurchan && ~isempty(urchans)) || (isempty(EEG.urchanlocs) && ~isempty(urchans)), EEG.urchanlocs = urchans; end;
              EEG = eeg_checkset(EEG); % for channel orientation
          else
              disp('Channel structure size not consistent with the data so changes will be ignored');
              disp('Use the function pop_select(EEG, ''nochannel'', [x]); if you wish the remove data channels');
          end;
-         chansout = EEG;
+         try chansout = EEG; catch, end;
     else chansout = chans;
     end;
 end;

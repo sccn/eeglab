@@ -25,6 +25,13 @@
 %                By default NaNs values will be inserted if no info from
 %                that variable is not found in the original ALLEEG index,
 %                This is to keep the original number of trials from ALLEEG
+% catvar_info  - Information of the trials that contains all the events requested.
+%                If one of the events requested is not contained in the trial,
+%                then this info (second argument) would not be returned for
+%                that especific trial. Notice that might be possible with
+%                categotical variables, that at least one event is not
+%                contained in every trial (for all of them), then this otput
+%                will be returned as empty.
 % See also:
 %
 % Author: Ramon Martinez-Cancino, SCCN, 2015
@@ -103,7 +110,11 @@ if isempty(g.factors)
     varindx   = find(strcmp({STUDY.design(g.design).variable.vartype},vartype));
     for i = 1:length(varindx)
         if strcmp(g.vartype,'cat')
-            g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value;
+            if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
+                g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value;
+            else
+                g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value{:};
+            end
         else
             g.factors{i} = STUDY.design(g.design).variable(varindx(i)).label;
         end
@@ -155,27 +166,41 @@ for i = 1 : length(varindx)
         varlength = 1;
         catflag = 0;
     else
-        varlength = length(STUDY.design(g.design).variable(varindx(i)).value);
+        varlength = length( STUDY.design(g.design).variable(varindx(i)).value);
         catflag = 1;
     end
     
     % Loop per Variable values
     for j = 1 : varlength
         if catflag
-            facval = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
-            if isnumeric(facval)
-                facval_indx = find(facval == cell2mat(STUDY.design(g.design).variable(varindx(i)).value));
+            if isnumeric(STUDY.design(g.design).variable(varindx(i)).value{j})
+                facval      = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
+                if length(facval)==1
+                    facval_indx = find(facval == cell2mat(STUDY.design(g.design).variable(varindx(i)).value));
+                else
+                    facval_indx = j;
+                end
             else
-                facval_indx = find(strcmp(facval,STUDY.design(g.design).variable(varindx(i)).value));
+                if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
+                    facval = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
+                    facval_indx = find(strcmp(facval,STUDY.design(g.design).variable(varindx(i)).value));
+                else
+                    facval_indx = j;
+                end
+                
             end
         end
         
         % No loop per dataset since we merged datasetinfo
         if catflag
-            if isnumeric( cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j)))
+            if isnumeric(STUDY.design(g.design).variable(varindx(i)).value{j})
                 varval = cell2mat(STUDY.design(g.design).variable(varindx(i)).value(j));
             else
-                varval = STUDY.design(g.design).variable(varindx(i)).value(j);
+                if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
+                    varval = STUDY.design(g.design).variable(varindx(i)).value(j);
+                else
+                    varval = STUDY.design(g.design).variable(varindx(i)).value{j};
+                end
             end
         else
             varval = '';
@@ -191,53 +216,59 @@ for i = 1 : length(varindx)
     end
 end
 
-%% Getting trialindex  and names for overlapped conditions
+%% Getting trialindex  and names for overlapped conditions 
+% This means for the trials that contains all the type of events requested.
+% If one of the events requested is not contained in the trial, then this info (second argument) would not be returned
 %  -------------------------------------------------------
 tmpmat = var_matrix;
 tmpindx = find(isnan(tmpmat));
 [I,tmp] = ind2sub(size(tmpmat),tmpindx); clear tmp; %#ok<ASGLU>
 tmpmat(I,:) = [];
-if strcmp(g.vartype,'cat')
-    ind = 1;
-    comb = unique(tmpmat,'rows');
-    for i = 1: size(comb,1)
-        TrialIndx_tmp{i} = find(sum(repmat(comb(i,:),[size(var_matrix,1),1]) == var_matrix,2) == size(var_matrix,2));
-        tmpsets = dsetvect(TrialIndx_tmp{i});
-        uniqtmpset = unique(tmpsets);
-        if length(uniqtmpset) ~= 1
-            tmpvect = dsetvect;
-            tmpvect(setdiff(1:length(dsetvect),TrialIndx_tmp{i})) = 0;
-            
-            for k = 1: length(uniqtmpset)
-                TrialIndx_datasetinfo{ind} = find(uniqtmpset(k) == tmpvect);
-                datasets{ind} = uniqtmpset(k);
-                ind = ind + 1;
+if ~isempty(tmpmat)
+%     If all the rows in 'var_matrix' contains at least one NaN, then this
+%     loop will no be executed
+    if strcmp(g.vartype,'cat')
+        ind = 1;
+        comb = unique(tmpmat,'rows');
+        for i = 1: size(comb,1)
+            TrialIndx_tmp{i} = find(sum(repmat(comb(i,:),[size(var_matrix,1),1]) == var_matrix,2) == size(var_matrix,2));
+            tmpsets = dsetvect(TrialIndx_tmp{i});
+            uniqtmpset = unique(tmpsets);
+            if length(uniqtmpset) ~= 1
+                tmpvect = dsetvect;
+                tmpvect(setdiff(1:length(dsetvect),TrialIndx_tmp{i})) = 0;
+                
+                for k = 1: length(uniqtmpset)
+                    TrialIndx_datasetinfo{ind} = find(uniqtmpset(k) == tmpvect);
+                    datasets{ind} = uniqtmpset(k);
+                    ind = ind + 1;
+                end
+            else
+                TrialIndx_datasetinfo{ind} = TrialIndx_tmp{i};
+                datasets{ind}              = uniqtmpset;
             end
-        else
-            TrialIndx_datasetinfo{ind} = TrialIndx_tmp{i};
-            datasets{ind}              = uniqtmpset;
+            ind = ind + 1;
         end
-        ind = ind + 1;
-    end
-else
-    datasets = g.setindx;
-    TrialIndx_datasetinfo = StartEndIndx;
-    if ~isempty(tmpindx)
-        for i = 1:length(TrialIndx_datasetinfo)
-            for j = 1:length(I)
-                if ismember(I(j),TrialIndx_datasetinfo{i}), TrialIndx_datasetinfo{i}(I(j)) = []; end
+    else
+        datasets = g.setindx;
+        TrialIndx_datasetinfo = StartEndIndx;
+        if ~isempty(tmpindx)
+            for i = 1:length(TrialIndx_datasetinfo)
+                for j = 1:length(I)
+                    if ismember(I(j),TrialIndx_datasetinfo{i}), TrialIndx_datasetinfo{i}(I(j)) = []; end
+                end
             end
         end
     end
+    
+    for i = 1:length(TrialIndx_datasetinfo)
+        TrialIndx_sets{i} =  indstrialscont(TrialIndx_datasetinfo{i});
+    end
+    
+    %% Outputs
+    %  -------
+    catvar_info.datasetinfo_trialindx   = TrialIndx_sets;  % Indices at datasetinfo.trialinfo {1:Ntrials1} {1:Ntrials2}
+    catvar_info.concat_trialindx        = StartEndIndx;    % Indices at [ 1 : Ntrials1 , Ntrials1+1 : Ntrials2]
+    catvar_info.datasetinfo_concatindx  = g.setindx;
+    catvar_info.dataset                 = datasets;
 end
-
-for i = 1:length(TrialIndx_datasetinfo)
-    TrialIndx_sets{i} =  indstrialscont(TrialIndx_datasetinfo{i});
-end
-
-%% Outputs
-%  -------
-catvar_info.datasetinfo_trialindx   = TrialIndx_sets;  % Indices at datasetinfo.trialinfo {1:Ntrials1} {1:Ntrials2}
-catvar_info.concat_trialindx        = StartEndIndx;    % Indices at [ 1 : Ntrials1 , Ntrials1+1 : Ntrials2]
-catvar_info.datasetinfo_concatindx  = g.setindx;
-catvar_info.dataset                 = datasets;

@@ -262,7 +262,7 @@ function plotcurve( times, R, varargin);
   else
       title(g.title, 'interpreter', 'none')
       if ~isempty(g.legend)
-          hh = legend(g.legend(:));
+          hh = legend(g.legend(:), 'location', 'southeast');
           set(hh, 'unit', 'pixels', 'interpreter', 'none')
       end;
       if isempty(g.maskarray)

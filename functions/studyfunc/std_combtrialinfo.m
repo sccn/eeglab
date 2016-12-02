@@ -63,7 +63,16 @@ if ~isfield(datasetinfo, 'trialinfo')
     trialinfo = struct([]);
     nvals = [ 1 cumsum( [trials( [ datasetinfo(inds).index ]) ])+ 1 ];
 else
-    trialinfo = [ datasetinfo(inds).trialinfo ];
+    % check if duration field is present
+    for iDat = inds(:)'
+        if ~isfield(datasetinfo(iDat).trialinfo, 'duration') datasetinfo(iDat).trialinfo(1).duration = []; end;
+    end;
+    try
+        trialinfo = [ datasetinfo(inds(:)').trialinfo ];
+    catch
+        datasetinfo(inds(:)').trialinfo
+        error( [ 'Trial information field differ for subject ' datasetinfo(inds(1)).subject ' (see above)' ]);
+    end;
     nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
 end;
 

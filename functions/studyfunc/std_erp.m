@@ -140,10 +140,10 @@ filename = filenameshort;
 
 % ERP information found in datasets
 % ---------------------------------
-if exist(filename) & strcmpi(g.recompute, 'off')
+if exist(filename) && strcmpi(g.recompute, 'off') && nargout > 0
 
     fprintf('File "%s" found on disk, no need to recompute\n', filenameshort);
-    setinfo.filebase = g.fileout;
+    setinfo.filebase = filename;
     if strcmpi(prefix, 'comp')
         [X tmp t] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
     else
@@ -173,7 +173,7 @@ if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
 if isempty(g.channels)
      X = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
-else X = eeg_getdatact(EEG, 'channel'  , [1:EEG(1).nbchan], 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
+else X = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end;
 
 % Remove baseline mean

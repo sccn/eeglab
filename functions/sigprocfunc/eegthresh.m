@@ -103,6 +103,7 @@ for indexe = 1:size(electrodes(:),1)
 	% remove outliers
 	% ---------------
 	sigtmp = squeeze(signal(indexe,framelowlimit:framehighlimit,:));
+    if size(signal,3) == 1, sigtmp = sigtmp'; end;
 	sigmax = max(sigtmp, [], 1);
 	sigmin = min(sigtmp, [], 1);
 	elec(indexe,:) = ( sigmin < negthresh(indexe) ) | ( sigmax > posthresh(indexe) );

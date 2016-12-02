@@ -104,24 +104,26 @@ if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
 end;
 
 % Update the design path
-for inddes = 1:length(STUDY.design)
-    for indcell = 1:length(STUDY.design(inddes).cell)
-        if isempty(STUDY.design(inddes).filepath)
-            pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
-        else
-            pathname = STUDY.design(inddes).filepath;
-        end
-        filebase = STUDY.design(inddes).cell(indcell).filebase;
-        tmpinds1 = find(filebase == '/');
-        tmpinds2 = find(filebase == '\');
-        if ~isempty(tmpinds1)
-            STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds1(end)+1:end));
-        elseif ~isempty(tmpinds2)
-            STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
-        else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
+if isfield(STUDY.design, 'cell')
+    for inddes = 1:length(STUDY.design)
+        for indcell = 1:length(STUDY.design(inddes).cell)
+            if isempty(STUDY.design(inddes).filepath)
+                pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
+            else
+                pathname = STUDY.design(inddes).filepath;
+            end
+            filebase = STUDY.design(inddes).cell(indcell).filebase;
+            tmpinds1 = find(filebase == '/');
+            tmpinds2 = find(filebase == '\');
+            if ~isempty(tmpinds1)
+                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds1(end)+1:end));
+            elseif ~isempty(tmpinds2)
+                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
+            else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
+            end;
         end;
-    end;
-end;
+    end
+end
 
 % Update the design path
 if isfield(STUDY.design, 'cell')

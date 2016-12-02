@@ -52,7 +52,7 @@ if isstruct(varlist)
     for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;
     streval = [ 'pop_studydesign2(''selectdesign'', gcf);' ];
     [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'title', 'Add variable', 'geom', geometry, 'userdata', varlist);
-    if isempty(tmp), cat = 0; return, end;
+    if isempty(tmp), var = []; cat = 0; return, end;
         
     var    = usrdat.factors{ result.lbfact0 };
     values = usrdat.factorvals{ result.lbfact0 }(result.lbval0 );
