@@ -336,6 +336,7 @@ if ~isempty(opt.channels)
                 for ind = 1:length(allersp(:))
                     if ~isempty(allersp{ind})
                         tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:));
+                        tmpersp{ind} = permute(tmpersp{ind}, [2 1 3]); % somehow time/freq are swapped in ntimes = nfreqs
                     end;
                 end;
                 alltitles = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
@@ -383,7 +384,7 @@ else
             [tmp ti1] = min(abs(alltimes-params.plottf(3)));
             [tmp ti2] = min(abs(alltimes-params.plottf(4)));
             for index = 1:length(allersp(:))
-                allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2);
+                allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2)'; % transposed because otherwise time/freq are inverted
                 allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
             end;
         end
