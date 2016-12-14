@@ -312,9 +312,7 @@ function dataout = processtf(dataSubject, xvals, datatype, singletrials, g)
         P = dataSubject .* conj(dataSubject);
         dataout = newtimeftrialbaseln(P, xvals, g);
         if strcmpi(singletrials, 'off')
-            if ndims(dataout) == 4,     dataout = mean(dataout, 4);
-            elseif ndims(dataout) == 3, dataout = mean(dataout, 3);
-            end;
+            dataout = squeeze(mean(dataout, 3));
         end;
     else
         if strcmpi(singletrials, 'off')
