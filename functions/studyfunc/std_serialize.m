@@ -354,8 +354,8 @@ function b = class2tag(cls)
         %   b = uint8(38);
         % case 'cellbools'
         %   b = uint8(39);
-        % case 'struct'
-        %   b = uint8(128);
+        case 'struct'
+           b = uint8(128);
         % case 'sparse'
         %   b = uint8(130);
         % case 'complex'
