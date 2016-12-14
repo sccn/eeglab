@@ -153,7 +153,8 @@ if v6Flag
     end;
     warning('off', 'MATLAB:load:variableNotFound');
     if length(opt.dataindices) > 0
-        fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters');
+         fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters');
+    else fileData = load('-mat', [ fileBaseName fileExt ], 'trialinfo', 'times', 'freqs', 'parameters');
     end;
     warning('on', 'MATLAB:load:variableNotFound');
 end;
