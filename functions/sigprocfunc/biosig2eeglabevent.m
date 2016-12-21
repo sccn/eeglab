@@ -1,12 +1,14 @@
 % biosig2eeglabevent() - convert biosig events to EEGLAB event structure
 %
 % Usage:
-%   >> eeglabevent = biosig2eeglabevent( biosigevent, interval )
+%   >> eeglabevent = biosig2eeglabevent( biosigevent, interval, mode)
 %
 % Inputs:
 %   biosigevent    - BioSig event structure
 %   interval       - Period to extract events for, in frames.
 %                    Default [] is all.
+%   mode           - [], 0: old behavior: event(i).type contains numeric event type
+%                    1: new behavior: event(i).type may contain textual event annotation
 %
 % Outputs:
 %   eeglabevent    - EEGLAB event structure
@@ -14,6 +16,7 @@
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
 % Copyright (C) 13 2006- Arnaud Delorme, Salk Institute, arno@salk.edu
+% Copyright (C) 2016 Alois Schloegl <alois.schloegl@gmail.com
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -29,14 +32,19 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function event = biosig2eeglabevent(EVENT, interval)
+function event = biosig2eeglabevent(EVENT, interval, mode)
 
 if nargin < 2
     interval = [];
 end;
+if (nargin < 3) || isempty(mode)
+    mode = 0;
+end;
 
 event = [];
 disp('Importing data events...');
+
+EVT=sopen('eventcodes.txt');sclose(EVT);
 
 % If the interval variable is empty, import all events.
 if isempty(interval)
@@ -45,7 +53,16 @@ if isempty(interval)
     end
     if isfield(EVENT, 'TYP')
         for index = 1:length( EVENT.TYP )
-            event(index).type = EVENT.TYP(index);
+            typ = EVENT.TYP(index);
+            if (mode==0)
+                event(index).type = typ;
+            elseif (typ<256)
+                event(index).type = EVENT.CodeDesc{typ};
+            elseif isfield(EVT, 'Event') && isfield(EVT.Event,'CodeIndex') && isfield(EVT.Event,'CodeDesc')
+                event(index).type = EVENT.CodeDesc{EVENT.CodeIndex==typ};
+            else
+                event(index).type = typ;
+            end
         end
     end
     if isfield(EVENT, 'POS')
@@ -75,8 +92,21 @@ elseif isfield(EVENT,'POS')
         pos_tmp = EVENT.POS(index) - interval(1) + 1;
         if pos_tmp > 0 & EVENT.POS(index) <= interval(2)
             event(count).latency = pos_tmp;
-            if isfield(EVENT, 'TYP'), event(count).type = EVENT.TYP(index); end
-            if isfield(EVENT, 'CHN'), event(count).chanindex = EVENT.CHN(index); end
+            if isfield(EVENT, 'TYP')
+                typ = EVENT.TYP(index);
+                if (mode==0)
+                    event(count).type = typ;
+                elseif (typ<256)
+                    event(count).type = EVENT.CodeDesc{typ};
+                elseif isfield(EVT, 'Event') && isfield(EVT.Event,'CodeIndex') && isfield(EVT.Event,'CodeDesc')
+                    event(count).type = EVENT.CodeDesc{EVENT.CodeIndex==typ};
+                else
+                    event(count).type = typ;
+                end
+            end
+            if isfield(EVENT, 'CHN')
+                event(count).chanindex = EVENT.CHN(index);
+            end
             if isfield(EVENT, 'DUR')
                 event(count).duration = min(EVENT.DUR(index), interval(2) - EVENT.POS(index));
             end
