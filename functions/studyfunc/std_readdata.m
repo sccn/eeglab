@@ -168,8 +168,8 @@ for iSubj = 1:length(subjectList)
         datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
         fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
         if ~isempty(opt.channels)
-             [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels);
-        else [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'components', compList);
+             [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
+        else [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
         end;
 
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') % ERP or spectrum
