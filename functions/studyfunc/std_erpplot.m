@@ -125,7 +125,11 @@ statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
-stats.paired = { STUDY.design(STUDY.currentdesign).variable(:).pairing };
+if isempty(STUDY.design(STUDY.currentdesign).variable)
+    stats.paired = { };
+else
+    stats.paired = { STUDY.design(STUDY.currentdesign).variable(:).pairing };
+end;
 
 % potentially missing fields
 % --------------------------
@@ -327,13 +331,14 @@ else
         if ~isempty(opt.comps)
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
+            for iDat = 1:length(erpdata(:)), erpdata{iDat} = erpdata{iDat}(:,opt.comps); end;
         end;
         
         % remove NaNs and generate labels
         % -------------------------------
         erpdata2 = erpdata;
         subjects       = { STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,:)).subject };
-        for iDat = 1:length(erpdata2)
+        for iDat = 1:length(erpdata2(:))
             if all(cellfun(@(x)size(x,2), erpdata2(:)) == length(subjects))  % NOT single trial data
                 keepInd = find(~isnan(erpdata2{iDat}(1,:)));
                 erpdata2{iDat} = erpdata2{iDat}(:,keepInd);
