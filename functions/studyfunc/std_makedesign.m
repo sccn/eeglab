@@ -177,6 +177,7 @@ if isstr(opt), error(opt); end;
 if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end;
 if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end;
 if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end;
+if ~isempty(opt.subjselect) && iscell(opt.subjselect{1}), opt.subjselect = opt.subjselect{1}; end;
 %if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end;
 %if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end;
     
