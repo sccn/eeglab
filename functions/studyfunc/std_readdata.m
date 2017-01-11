@@ -150,7 +150,9 @@ for iSubj = 1:length(subjectList)
         compList    = [];
         for iDat = datasetInds(:)'
             indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject
-            compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
+            if ~isempty(indSet)
+                compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
+            end;
         end;
     end;
     
