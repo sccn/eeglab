@@ -145,7 +145,7 @@ function filename = correctfile(filename, datasetpath)
             else
                 filename = fullfile(datasetpath, [ tmpf ext ]);
                 if ~exist(filename)
-                    error([ 'Cannot load file ''' [ tmpf ext ] '''' ]);
+                    error([ 'Cannot load file ''' [ tmpf ext ] '''' 10 'Go back and recompute the data file.' 10 'Note that plotting ICA component ERPs require' 10 'to precompute ICA topographies (see tutorial)']);
                 end;
             end;
         end;
