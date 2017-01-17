@@ -327,18 +327,22 @@ else % INEEG is an EEG struct
 
         % append
         % ------
+<<<<<<< HEAD
         INEEG1.event(orilen + (1:newlen)) = INEEG2.event;
+=======
+        INEEG1.event(orilen+1+(1:newlen)) = INEEG2.event;
+>>>>>>> Using custom commands instead of the eeg_insertbound function to instead boundary event
         INEEG2event = INEEG2.event;
         if isfield(INEEG1.event,'latency') && isfield(INEEG2.event,'latency')
             % update latency
             tmpevents = INEEG1.event;
-            [tmpevents(orilen + (1:newlen)).latency] = celldeal(num2cell([INEEG2event.latency] + INEEG1pnts*INEEG1trials));
+            [tmpevents(orilen+1 + (1:newlen)).latency] = celldeal(num2cell([INEEG2event.latency] + INEEG1pnts*INEEG1trials));
             INEEG1.event = tmpevents;
         end
         if isfield(INEEG1.event,'epoch') && isfield(INEEG2.event,'epoch')
             % update epoch index
             tmpevents = INEEG1.event;
-            [tmpevents(orilen + (1:newlen)).epoch] = celldeal(num2cell([INEEG2event.epoch]+INEEG1trials));
+            [tmpevents(orilen+1 + (1:newlen)).epoch] = celldeal(num2cell([INEEG2event.epoch]+INEEG1trials));
             INEEG1.event = tmpevents;
         end
 
