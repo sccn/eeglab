@@ -24,8 +24,10 @@
 %                 defined, it can be specified using the text box below.
 % Inputs:
 %   EEG         - input dataset
-%   ref         - reference: []            = convert to average reference
-%                            [int vector]  = new reference electrode number(s)
+%   ref         - reference: []             = convert to average reference
+%                            [int vector]   = new reference electrode number(s)
+%                            'Cz'           = string
+%                            { 'P09' 'P10 } = cell array of strings
 % Optional inputs:
 %   'exclude'   - [integer array] List of channels to exclude. Default: none.
 %   'keepref'   - ['on'|'off'] keep the reference channel. Default: 'off'.
@@ -175,6 +177,8 @@ if nargin < 2
 else
     options = varargin;
 end;
+if isstr(ref), ref = { ref }; end;
+if iscell(ref), ref = eeg_chaninds(EEG, ref); end;
 optionscall = options;
 
 % include channel location file
