@@ -14,7 +14,10 @@
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
+<<<<<<< HEAD
 %   indnew     - Indices of the new events
+=======
+>>>>>>> New code to recompute event latencies
 %
 % Notes:
 %   This function performs the following: 
