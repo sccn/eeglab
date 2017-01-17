@@ -294,6 +294,16 @@ else % INEEG is an EEG struct
         newlen = length(INEEG2.event);
         %allfields = fieldnames(INEEG2.event);
 
+        % add discontinuity event if continuous
+        % -------------------------------------
+        if INEEG1trials  == 1 & INEEG2trials == 1
+            disp('Adding boundary event...');
+            INEEG1.event(end+1).type    = 'boundary'; 
+            INEEG1.event(end  ).latency = INEEG1pnts+0.5; 
+            INEEG1.event(end  ).duration = NaN; 
+%            eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+1, 0); % +1 since 0.5 is subtracted
+        end;
+        
         % ensure similar event structures
         % -------------------------------
         if ~isempty(INEEG2.event)
@@ -315,27 +325,21 @@ else % INEEG is an EEG struct
         end;
 
         % append
-        INEEG1.event(orilen+(1:newlen)) = INEEG2.event;
+        % ------
+        INEEG1.event(orilen+1+(1:newlen)) = INEEG2.event;
         INEEG2event = INEEG2.event;
         if isfield(INEEG1.event,'latency') && isfield(INEEG2.event,'latency')
             % update latency
             tmpevents = INEEG1.event;
-            [tmpevents(orilen + (1:newlen)).latency] = celldeal(num2cell([INEEG2event.latency] + INEEG1pnts*INEEG1trials));
+            [tmpevents(orilen+1 + (1:newlen)).latency] = celldeal(num2cell([INEEG2event.latency] + INEEG1pnts*INEEG1trials));
             INEEG1.event = tmpevents;
         end
         if isfield(INEEG1.event,'epoch') && isfield(INEEG2.event,'epoch')
             % update epoch index
             tmpevents = INEEG1.event;
-            [tmpevents(orilen + (1:newlen)).epoch] = celldeal(num2cell([INEEG2event.epoch]+INEEG1trials));
+            [tmpevents(orilen+1 + (1:newlen)).epoch] = celldeal(num2cell([INEEG2event.epoch]+INEEG1trials));
             INEEG1.event = tmpevents;
         end
-
-        % add discontinuity event if continuous
-        % -------------------------------------
-        if INEEG1trials  == 1 & INEEG2trials == 1
-            disp('Adding boundary event...');
-            INEEG1.event = eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+1, 0); % +1 since 0.5 is subtracted
-        end;
 
     end;
 
