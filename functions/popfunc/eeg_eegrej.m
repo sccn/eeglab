@@ -112,29 +112,39 @@ EEG.xmax   = EEG.xmax+EEG.xmin;
 
 % add boundary events
 % -------------------
-if ~isempty(boundevents) % boundevent latencies will be recomputed in the function below
-    [ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
-    EEG = eeg_checkset(EEG, 'eventconsistency');
-    
-    % double check event latencies
-    % the function that insert boundary events and recompute latency is
-    % delicate so we do it twice using different methods and check
-    % the results. It is longer, but accuracy is paramount.
-    alllats = [ EEG.event.latency ];
-    otherlatencies = [event2.latency];
-    if ~isequal(alllats, otherlatencies)
-        error([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+[ eventtmp ] = eeg_insertboundold(EEG.event, oldEEGpnts, regions);
+[ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
+EEG = eeg_checkset(EEG, 'eventconsistency');
+
+% assess difference between old and new event latencies
+differs = 0;
+for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
+    if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
+        differs = differs+1;
     end;
-    
-    % double check boundary event latencies
-    if ischar(EEG.event(1).type)
-        indBound1 = strmatch('boundary', { EEG.event(:).type });
-        indBound2 = strmatch('boundary', { event2(:).type });
-        duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
-        duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
-        if ~isequal(duration1, duration2)
-            error(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
-        end;
+end;
+if 100*differs/length(EEG.event) > 50
+    fprintf('IF YOU ARE USING A SCRIPT TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING\nTHE ONSET OF THE DATA, EVENTS WERE CORRUPTED UP TO EEGLAB 13.6.5 (SEE BUG 1971)\n', 100*differs/length(EEG.event));
+end;
+
+% double check event latencies
+% the function that insert boundary events and recompute latency is
+% delicate so we do it twice using different methods and check
+% the results. It is longer, but accuracy is paramount.
+alllats = [ EEG.event.latency ];
+otherlatencies = [event2.latency];
+if ~isequal(alllats, otherlatencies)
+    error([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+end;
+
+% double check boundary event latencies
+if ~isempty(EEG.event) && ischar(EEG.event(1).type) && isfield(EEG.event, 'duration') && isfield(event2, 'duration')
+    indBound1 = strmatch('boundary', { EEG.event(:).type });
+    indBound2 = strmatch('boundary', { event2(:).type });
+    duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
+    duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
+    if ~isequal(duration1, duration2)
+        error(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
     end;
 end;
 
@@ -159,6 +169,21 @@ com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2st
 %         newregions(index,:)   = [];
 %     end;
 % end;
+
+function res = issameevent(evt1, evt2)
+
+res = true;
+if isequal(evt1,evt2)
+    return;
+elseif isfield(evt1, 'duration') && isnan(evt1.duration) && isfield(evt2, 'duration') && isnan(evt2.duration)
+    evt1.duration = 1;
+    evt2.duration = 1;
+    if isequal(evt1,evt2)
+        return;
+    end;
+end;
+res = false;
+return;
 
 function newregions = combineregions(regions)
 % 9/1/2014 RMC
