@@ -86,8 +86,8 @@ function [eventin] = eeg_insertbound( eventin, pnts, regions, lengths)
         rmEvent = [ rmEvent tmpnest ];
         if regions(iRegion,1)>1
             eventin(end+1).type   = 'boundary';
-            eventin(end).latency  = regions(iRegion,1)-sum(lengths(1:iRegion-1));
-            eventin(end).duration = lengths(iRegion,1)-1+addlength;
+            eventin(end).latency  = regions(iRegion,1)-sum(lengths(1:iRegion-1))-0.5;
+            eventin(end).duration = lengths(iRegion,1)+addlength;
         end;
     end
 
@@ -117,7 +117,7 @@ function [eventin] = eeg_insertbound( eventin, pnts, regions, lengths)
 function [ indEvents, addlen ] = findnested(event, eventlat, region)
     indEvents = find( eventlat > region(1) & eventlat < region(2));
 
-    if ~isempty(event) && isstr(event(1).type)
+    if ~isempty(event) && isstr(event(1).type) && isfield(event, 'duration')
         boundaryInd = strmatch('boundary', { event(indEvents).type });
         addlen      = sum( [ event(indEvents(boundaryInd)).duration ] );
     else
