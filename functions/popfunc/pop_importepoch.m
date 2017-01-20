@@ -225,7 +225,8 @@ if isstr(filename)
 	if exist(filename) == 2 & evalin('base', ['exist(''' filename ''')']) == 1
 		disp('Pop_importepoch WARNING: FILE AND ARRAY WITH THE SAME NAME, LOADING FILE');
 	end;
-    values = load_file_or_array( filename, g.headerlines );
+    %values = load_file_or_array( filename, g.headerlines );
+    values = loadtxt( filename, 'skipline', g.headerlines, 'delim', 9);
 else
     values = filename;
     filename = inputname(2);
