@@ -93,15 +93,9 @@ if ~isempty(events)
         
     end;
     for iEvent = 1:length(events)
-        events(iEvent).oldlatency = events(iEvent).latency;
         events(iEvent).latency = eventLatencies(iEvent);
     end;
-    
-%     eventtmp = zeros(35,1);
-%     eventtmp(rmEvent) = 1;
-%     tmpeventlat = [ events(:).oldlatency ];
-%     [[1:35]' tmpeventlat(1:35)' eventtmp]
-    
+        
     events(rmEvent) = [];
 end;
 
@@ -109,10 +103,10 @@ end;
 % -----------------------------
 boundevents = regions(:,1)-1;
 for iRegion1=1:size(regions,1)
-    duration(iRegion1)    = regions(iRegion1,2)-regions(iRegion1,1);
+    duration(iRegion1)    = regions(iRegion1,2)-regions(iRegion1,1)+1;
     
     % add nested boundary events
-    if isstr(events(1).type)
+    if ~isempty(events) && isstr(events(1).type) && isfield(events, 'duration')
         selectedEvent = oriEvents(rejectedEvents{iRegion1});
         indBound      = strmatch('boundary', { selectedEvent.type });
         duration(iRegion1) = duration(iRegion1) + sum([selectedEvent(indBound).duration]);
@@ -154,11 +148,10 @@ times = times * size(indata,2) / length(reject);
 % insert boundary events
 % ----------------------
 for iRegion1=1:size(regions,1)
-    if boundevents(iRegion1) > 1 && boundevents(iRegion1)+0.5 < size(indata,2)
+    if boundevents(iRegion1) > 1 && boundevents(iRegion1) < size(indata,2)
         events(end+1).type = 'boundary';
-        events(end).latency  = boundevents(iRegion1)+0.5;
+        events(end).latency  = boundevents(iRegion1);
         events(end).duration = duration(iRegion1);
-        events(end).oldlatency = NaN;
     end;
 end;
 events([ events.latency ] < 1) = [];
