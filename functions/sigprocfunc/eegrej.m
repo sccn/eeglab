@@ -49,7 +49,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [indata, times, newevents, boundevents] = eegrej( indata, regions, times, eventtimes );
+function [indata, times, events, boundevents] = eegrej( indata, regions, times, events )
 
 if nargin < 2
    help eegrej;
@@ -63,56 +63,63 @@ else
 end;
 
 reject = zeros(1,datlen);
-regions = round(regions);
-% Checking for extreme values in regions (correcting round) RMC
-if max(regions(:)) > size(indata, 2)
-    IndxOut = find(regions(:) > size(indata, 2));
-    regions(IndxOut) = size(indata, 2);
-end
 
+% Checking for extreme values in regions (correcting round) RMC
+regions = round(regions);
+regions(regions > size(indata, 2)) = size(indata, 2);
+regions(regions < 1) = 1;
 regions = sortrows(sort(regions,2));        % Sorting regions %regions = sort(regions,1); RMC
-Izero = find(regions == 0);                 % Find regions index == 0 to adjust them
-if ~isempty(Izero), regions(Izero) = 1;end; % Fractional point below 1 adjusted to 1
 for i=1:size(regions,1)
-   try
-      reject(regions(i,1):regions(i,2)) = 1;
-   catch
-      error(['Region ' int2str(i) ' out of bound']);
-   end;
+    reject(regions(i,1):regions(i,2)) = 1;
 end;
 
 % recompute event times
 % ---------------------
-newevents = [];
-if exist('eventtimes') == 1 
-    if ~isempty(eventtimes)
-        try
-            rmevent = find( reject(min(length(reject),max(1,round(eventtimes)))) == 1); % cko: sometimes, events may have latencies < 0.5 or >= length(reject)+0.5 (e.g. after resampling)
-	    catch, error('Latency event out of bound'); end;
-        eventtimes(rmevent) = NaN;
-	    newevents = eventtimes;
-	    for i=1:size(regions,1)
-	        for index=1:length( eventtimes )
-	            if ~isnan(eventtimes(index))
-	                if regions(i,2) < eventtimes(index)
-	                    newevents(index) = newevents(index) - (regions(i,2)-regions(i,1)+1);
-	                end;
-	            end;
-	        end;
-	    end;
+rmEvent = [];
+rejectedEvents = {};
+oriEvents = events;
+if ~isempty(events)
+    eventLatencies = [ events.latency ];
+    oriEventLatencies = eventLatencies;
+    for i=1:size(regions,1)
+        
+        % indices of removed events
+        rejectedEvents{i} = find( oriEventLatencies > regions(i,1) & oriEventLatencies < regions(i,2) );
+        rmEvent = [ rmEvent rejectedEvents{i} ];
+        
+        % remove events within the selected regions
+        eventLatencies( oriEventLatencies > regions(i,1) ) = eventLatencies( oriEventLatencies > regions(i,1) )-(regions(i,2)-regions(i,1)+1);
+        %if i == 24, dsafds; end;
+        
     end;
-end;                    
+    for iEvent = 1:length(events)
+        events(iEvent).latency = eventLatencies(iEvent);
+    end;
+        
+    events(rmEvent) = [];
+end;
 
 % generate boundaries latencies
 % -----------------------------
 boundevents = regions(:,1)-1;
-for i=1:size(regions,1)
-	for index=i+1:size(regions)
-		boundevents(index) = boundevents(index) - (regions(i,2)-regions(i,1)+1);
+for iRegion1=1:size(regions,1)
+    duration(iRegion1)    = regions(iRegion1,2)-regions(iRegion1,1)+1;
+    
+    % add nested boundary events
+    if ~isempty(events) && isstr(events(1).type) && isfield(events, 'duration')
+        selectedEvent = oriEvents(rejectedEvents{iRegion1});
+        indBound      = strmatch('boundary', { selectedEvent.type });
+        duration(iRegion1) = duration(iRegion1) + sum([selectedEvent(indBound).duration]);
+    end;
+    
+	for iRegion2=iRegion1+1:size(regions)
+		boundevents(iRegion2) = boundevents(iRegion2) - (regions(iRegion1,2)-regions(iRegion1,1)+1);
     end;
 end;
 boundevents = boundevents+0.5;
 
+% reject data
+% -----------
 if isstr(indata)
   disp('Using disk to reject data');
   increment = 10000;
@@ -134,9 +141,22 @@ if isstr(indata)
   evalin('base', 'clear numberrow indextmp endtmp fid');  
   evalin('base', 'delete(''tmpeegrej.fdt'')');  
 else
-  timeIndices = find(reject == 1);
-  indata(:,timeIndices) = [];
+  indata(:,reject == 1) = [];
 end;
-times = times * length(find(reject ==0)) / length(reject);
+times = times * size(indata,2) / length(reject);
+
+% insert boundary events
+% ----------------------
+for iRegion1=1:size(regions,1)
+    if boundevents(iRegion1) > 1 && boundevents(iRegion1) < size(indata,2)
+        events(end+1).type = 'boundary';
+        events(end).latency  = boundevents(iRegion1);
+        events(end).duration = duration(iRegion1);
+    end;
+end;
+events([ events.latency ] < 1) = [];
+alllatencies = [ events.latency ];
+[tmp, sortind] = sort(alllatencies);
+events = events(sortind);
 
 return;

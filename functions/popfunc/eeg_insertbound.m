@@ -14,8 +14,7 @@
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
-%   indnew     - array of indices returning new event index for any old 
-%                (input eventin) event index
+%
 % Notes:
 %   This function performs the following: 
 %   1) add boundary events to the 'event' structure; 
@@ -45,21 +44,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
+function [eventin] = eeg_insertbound( eventin, pnts, regions, lengths)
     
     if nargin < 3
         help eeg_insertbound;
         return;
     end;
-    if size(regions,2) ~= 1 & exist('lengths') ~= 1
-        lengths = regions(:,2)-regions(:,1)+1;
-        regions = regions(:,1);
-    end;
-    if exist('lengths') ~= 1
-        lengths = zeros(size(regions));
-    end;
-    
-    if length(regions)
+    regions(regions < 1) = 1;
+    regions(regions > pnts) = pnts;
+
+    if ~isempty(regions)
         fprintf('eeg_insertbound(): %d boundary (break) events added.\n', size(regions, 1));
     else 
         return;
@@ -67,68 +61,52 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
 
     % recompute latencies of boundevents (in new dataset)
     % ---------------------------------------------------
-    [regions tmpsort] = sort(regions);
-    lengths           = lengths(tmpsort);
-    boundevents       = regions(:,1)-0.5;
+    [tmp, tmpsort] = sort(regions(:,1));
+    regions        = regions(tmpsort,:);
+    lengths = regions(:,2)-regions(:,1)+1;
     
-    % sort boundevents by decreasing order (otherwise bug in new event index)
-    % ------------------------------------
-    boundevents = boundevents(end:-1:1);
-    lengths     = lengths    (end:-1:1);
-    eventout    = eventin;
-    indnew      = 1:length(eventin);
-    allnest     = [];
-    countrm     = 0;
-	for tmpindex = 1:length(boundevents) % sorted in decreasing order
-        if boundevents(tmpindex) >= 0.5 & boundevents(tmpindex) <= pnts
-                            
-            % find event succeding boundary to insert event 
-            % at the correct location in the event structure
-            % ----------------------------------------------
-            if ~isempty(eventout) & isfield(eventout, 'latency')
-                alllats   = [ eventout.latency ] - boundevents(tmpindex);
-                tmpind    = find( alllats >= 0 );
-                [tmp tmpind2 ] = min(alllats(tmpind));
-                tmpind2        = tmpind(tmpind2);
-            else
-                tmpind2 = [];
-            end;
-            
-            % insert event at tmpind2
-            % -----------------------
-            if ~isempty(tmpind2)
-                eventout(end+1).type      = 'boundary';
-                tmp = eventout(end);
-                eventout(tmpind2+1:end) = eventout(tmpind2:end-1);
-                eventout(tmpind2) = tmp;
-                indnew(tmpind2:end) = indnew(tmpind2:end)+1;
-            else
-                tmpind2 = length(eventout)+1;
-                eventout(tmpind2).type     = 'boundary';
-            end;
-            eventout(tmpind2).latency  = boundevents(tmpindex);
-            eventout(tmpind2).duration = lengths(tmpindex); % just to create field
-            
-            [ tmpnest addlength ] = findnested(eventout, tmpind2);
-            
-            % recompute latencies and remove events in the rejected region
-            % ------------------------------------------------------------
-            eventout(tmpnest) = [];
-            countrm           = countrm+length(tmpnest);
-            for latind = tmpind2+1:length(eventout)
-                eventout(latind).latency = eventout(latind).latency-lengths(tmpindex);
-            end;
-            
-            % add lengths of previous events (must be done after above)
-            % ---------------------------------------------------------
-            eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
-            if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
-        
-        end; 
-	end;
+    if ~isempty(eventin)
+         eventLatencies = [ eventin.latency ]; 
+    else eventLatencies = [];
+    end;
+    newEventLatencies = eventLatencies;
+    oriLen            = length(eventin);
+    rmEvent           = [];
+	for iRegion = 1:size(regions,1) % sorted in decreasing order
 
-    if countrm > 0
-        fprintf('eeg_insertbound(): event latencies recomputed and %d events removed.\n', countrm);
+        % find event succeding boundary to insert event
+        % at the correct location in the event structure
+        % ----------------------------------------------
+        tmpind    = find( eventLatencies - regions(iRegion,1) > 0 );
+        newEventLatencies(tmpind) = newEventLatencies(tmpind)-lengths(iRegion);
+        
+        % insert event
+        % ------------
+        [tmpnest, addlength ]  = findnested(eventin, eventLatencies, regions(iRegion,:));
+        rmEvent = [ rmEvent tmpnest ];
+        if regions(iRegion,1)>1
+            eventin(end+1).type   = 'boundary';
+            eventin(end).latency  = regions(iRegion,1)-sum(lengths(1:iRegion-1))-0.5;
+            eventin(end).duration = lengths(iRegion,1)+addlength;
+        end;
+    end
+
+    % copy latencies
+    % --------------
+    for iEvent = 1:oriLen
+        eventin(iEvent).latency = newEventLatencies(iEvent);
+    end;
+    eventin(rmEvent) = [];
+    
+    % resort events
+    % -------------
+    eventin([ eventin.latency ] < 1) = [];
+    alllatencies = [ eventin.latency ];
+    [tmp, sortind] = sort(alllatencies);
+    eventin = eventin(sortind);
+    
+    if ~isempty(rmEvent)
+        fprintf('eeg_insertbound(): event latencies recomputed and %d events removed.\n', length(rmEvent));
     end;
 
     
@@ -136,43 +114,13 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
 % retrun indices of nested events and
 % their total length
 % -----------------------------------
-function [ indnested, addlen ] = findnested(event, ind);
-    indnested = [];
-    addlen = 0;
-    tmpind = ind+1;
+function [ indEvents, addlen ] = findnested(event, eventlat, region)
+    indEvents = find( eventlat > region(1) & eventlat < region(2));
 
-    while tmpind <= length(event) & ...
-        event(tmpind).latency < event(ind).latency+event(ind).duration
-        if strcmpi(event(tmpind).type, 'boundary')
-            if ~isempty( event(tmpind).duration )
-                addlen    = addlen + event(tmpind).duration;
-                % otherwise old event duration or merge data discontinuity
-            end;
-        end;
-        indnested = [ indnested tmpind ];
-        tmpind = tmpind+1;
+    if ~isempty(event) && isstr(event(1).type) && isfield(event, 'duration')
+        boundaryInd = strmatch('boundary', { event(indEvents).type });
+        addlen      = sum( [ event(indEvents(boundaryInd)).duration ] );
+    else
+        addlen = 0;
     end;
-    
-% remove urevent and recompute indices
-% THIS FUNCTION IS DEPRECATED
-% ------------------------------------
-function [event, urevent] = removenested(event, urevent, nestind);
-    
-    if length(nestind) > 0
-        fprintf('eeg_insertbound() debug msg: removing %d nested urevents\n', length(nestind));
-        nestind = sort(nestind);
-        urind = [ event.urevent ]; % this must not be done in the loop
-                                             % since the indices are dyanmically updated
-    end;
-    
-    for ind = 1:length(nestind)
-        % find event urindices higher than the urevent to suppress
-        % --------------------------------------------------------
-        tmpind = find( urind > nestind(ind) );
-        for indevent = tmpind
-            event(indevent).urevent = event(indevent).urevent-1;
-        end;    
-    end;
-    
-    urevent(nestind) = [];
     
