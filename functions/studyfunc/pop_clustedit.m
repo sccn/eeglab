@@ -331,7 +331,7 @@ if ~isstr(varargin{1})
 
     % enable buttons
     % --------------
-    filename = STUDY.design(STUDY.currentdesign).cell(1).filebase;
+    filename = fullfile(STUDY.datasetinfo(1).filepath, STUDY.datasetinfo(1).subject);
     if exist([filename '.icaspec']) ,   spec_enable = 'on'; else spec_enable  = 'off'; end;
     if exist([filename '.icaerp'] )  ,   erp_enable = 'on'; else erp_enable   = 'off'; end;
     if exist([filename '.icaerpim'] ), erpim_enable = 'on'; else erpim_enable = 'off'; end;

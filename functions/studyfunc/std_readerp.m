@@ -11,15 +11,17 @@
 %
 % Optional inputs:
 %  'design'    - [integer] read files from a specific STUDY design. Default
-%                is empty (use current design in STUDY.currentdesign).
+%                is empty (use current design in STUDY.currentdesign). Use
+%                NaN to create a design with with all the data.
 %  'channels'  - [cell] list of channels to import {default: none}
 %  'clusters'  - [integer] list of clusters to import {[]|default: all but
 %                the parent cluster (1) and any 'NotClust' clusters}
 %  'singletrials' - ['on'|'off'] load single trials spectral data (if 
 %                available). Default is 'off'.
 %  'subject'   - [string] select a specific subject {default:all}
-%  'component' - [integer] select a specific component in a cluster
-%                 {default:all}
+%  'component' - [integer] select a specific component in a cluster.
+%                This is the index of the component in the cluster not the
+%                component number {default:all}
 %
 % ERP specific optional inputs:
 %  'timerange' - [min max] time range {default: whole measure range}
@@ -57,239 +59,166 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, datavals, xvals, setinds, allinds] = std_readerp(STUDY, ALLEEG, varargin)
+function [STUDY, datavals, xvals, yvals, events, params] = std_readerp(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_readerp;
     return;
 end
-if ~isstruct(ALLEEG) 
-    % old calling format
-    % ------------------
-    EEG = STUDY(ALLEEG);
-    filename   = fullfile(EEG.filepath, EEG.filename(1:end-4));
-    comporchan = varargin{1};
-    options = {'measure', 'erp'};
-    if length(varargin) > 1, options = { options{:} 'timelimits', varargin{2} }; end;
-    if comporchan(1) > 0
-        [datavals tmp xvals] = std_readfile(filename, 'components',comporchan, options{:});
-    else
-       [datavals tmp xvals] = std_readfile(filename, 'channels', comporchan, options{:});
-    end;
-    STUDY    = datavals';
-    datavals = xvals;
-    return;
-end;
 
 STUDY = pop_erpparams(STUDY, 'default');
 STUDY = pop_specparams(STUDY, 'default');
+STUDY = pop_erspparams(STUDY, 'default');
 [opt moreopts] = finputcheck( varargin, { ...
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
-    'timerange'     'real'    []             STUDY.etc.erpparams.timerange;
-    'freqrange'     'real'    []             STUDY.etc.specparams.freqrange;
-    'datatype'      'string'  { 'erp','spec' } 'erp';
+    'timerange'     'real'    []             [];
+    'freqrange'     'real'    []             [];
+    'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' } 'erp';
     'rmsubjmean'    'string'  { 'on','off' } 'off';
+    'subbaseline'   'string'  { 'on','off' } STUDY.etc.erspparams.subbaseline; % subtract common baseline (ERSP only)
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
 if isstr(opt), error(opt); end;
-% nc = max(length(STUDY.design(opt.design).variable(1).value),1);
-% ng = max(length(STUDY.design(opt.design).variable(2).value),1);
 
 dtype = opt.datatype;
 
-% find channel indices
-% --------------------
-if ~isempty(opt.channels)
-     allChangrp = lower({ STUDY.changrp.name });
-     finalinds = std_chaninds(STUDY, opt.channels);
-else finalinds = opt.clusters;
-end;
-
 % get the file extension
 % ----------------------
-if ~isempty(opt.channels), fileExt = '.daterp';
-else                       fileExt = '.icaerp';
+tmpDataType = opt.datatype;
+if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc'), 
+    tmpDataType = 'timef'; 
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end;
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.specparams.freqrange; end;
+else
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end;
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.erspparams.freqrange; end;
+end;
+if ~isempty(opt.channels), fileExt = [ '.dat' tmpDataType ];
+else                       fileExt = [ '.ica' tmpDataType ];
 end;
 
 % first subject data file
 % -----------------------
 testSubjectFile = fullfile(ALLEEG(1).filepath, [ ALLEEG(1).subject fileExt ]);
 
-for ind = 1:length(finalinds) % scan channels or components
+% list of subjects
+% ----------------
+allSubjects = { STUDY.datasetinfo.subject };
+uniqueSubjects = unique(allSubjects);
+STUDY.subject = uniqueSubjects;
+if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
+if isempty(subjectList)
+    if isnan(opt.design), subjectList = STUDY.subject;
+    else subjectList = STUDY.design(opt.design).cases.value; 
+    end;
+end;
 
-    % find indices
-    % ------------
-    if ~isempty(opt.channels)
-        tmpstruct = STUDY.changrp(finalinds(ind));
+% options
+% -------
+if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
+else                      opts = { 'freqlimits', opt.freqrange };
+end;
+opts = { opts{:} 'singletrials' opt.singletrials };
+
+for iSubj = 1:length(subjectList)
+    
+    % check cache
+    bigstruct = [];
+    if ~isempty(opt.channels), bigstruct.channel = opt.channels;
+    else                       bigstruct.cluster = opt.clusters; % there can only be one cluster
+    end;
+    bigstruct.datatype     = opt.datatype;
+    bigstruct.singletrials = opt.singletrials;
+    bigstruct.subject      = subjectList{iSubj};
+    bigstruct.component    = opt.component;
+    bigstruct.subbaseline  = opt.subbaseline;
+    bigstruct.options      = opts;
+    if isnan(opt.design)
+         bigstruct.design.variable = struct([]);
+    else bigstruct.design.variable = STUDY.design(opt.design).variable;
+    end;
+
+    % find component indices
+    % ----------------------
+    if ~isempty(opt.clusters)
+        datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
+        compList    = [];
+        for iDat = datasetInds(:)'
+            indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject
+            compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
+        end;
+    end;
+    
+    % read all channels/components at once
+    hashcode = gethashcode(std_serialize(bigstruct));
+    [STUDY.cache tmpstruct] = eeg_cache(STUDY.cache, hashcode);
+
+    if ~isempty(tmpstruct)
+        dataTmp{iSubj}   = tmpstruct{1};
+        xvals            = tmpstruct{2};
+        yvals            = tmpstruct{3};
+        eventsTmp{iSubj} = tmpstruct{4};
+        params           = tmpstruct{5};
     else
-        tmpstruct = STUDY.cluster(finalinds(ind));
-    end;
-
-    % check if data is already here
-    % -----------------------------
-    dataread = 0;
-    if strcmpi(dtype, 'erp'), eqtf = isequal( STUDY.etc.erpparams.timerange, opt.timerange);
-    else                      eqtf = isequal(STUDY.etc.specparams.freqrange, opt.freqrange) && ...
-                                     isequal( STUDY.etc.specparams.subtractsubjectmean, opt.rmsubjmean);
-    end;
-    if isfield(tmpstruct, [ dtype 'data' ]) && ~isempty(getfield(tmpstruct, [ dtype 'data' ])) && eqtf
-        dataread = 1;
-    end;
-    
-    if ~dataread
-        
-        % reading options
-        % ---------------
-        optGetparams = { 'measure', dtype, 'getparamonly', 'on', 'timelimits', opt.timerange, 'freqlimits', opt.freqrange};
-        if ~isempty(opt.channels), [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'channels', opt.channels(ind));
-        else                       [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'components', finalinds(ind));
-        end;
-        fprintf([ 'Reading ' dtype ' data...' ]);
-        if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
-        else                      opts = { 'freqlimits', opt.freqrange };
-        end;
-        opts = { opts{:} 'singletrials' opt.singletrials };
-        
-        % read the data and select channels
-        % ---------------------------------
-        allSubjects = { STUDY.datasetinfo.subject };
-        uniqueSubjects = unique(allSubjects);
-        STUDY.subject = uniqueSubjects;
-        for iSubj = length(STUDY.subject):-1:1
-            inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
-            fileName = fullfile(STUDY.datasetinfo(inds(1)).filepath, [ STUDY.subject{iSubj} fileExt ]); % FIX THIS - NEED TO FIND FILEPATH FOR SUBJECT
-            
-            dataSubject{iSubj} = std_readfile( fileName,  'designvar', STUDY.design(STUDY.currentdesign).variable, opts{:}, 'channels', opt.channels(ind));
-            % DEAL WITH COMPONENTS HERE
-        end;
-        
-        alldata = cell(size(dataSubject{1}));
-        for iCell = 1:length(dataSubject{1}(:))
-            for iSubj = length(STUDY.subject):-1:1
-                alldata{iCell}(:,iSubj) = mean(dataSubject{iSubj}{iCell},2);
-            end;
-        end;
-        
-        % inverting component polaritites
-        % -------------------------------
-        if isempty(opt.channels) && strcmpi(dtype, 'erp')
-            if strcmpi(opt.singletrials, 'on')
-                disp('Warning: component ERP polarity cannot (yet) be inverted for single trials');
-            else
-                STUDY = std_readtopoclust(STUDY, ALLEEG, finalinds(ind));
-                if isfield(STUDY.cluster, 'topopol') && ~isempty(STUDY.cluster(finalinds(ind)).topopol)
-                    [ tmpstruct tmp1 tmp2 topopolcell] = std_setcomps2cell(STUDY, STUDY.cluster(finalinds(ind)).sets, STUDY.cluster(finalinds(ind)).comps, STUDY.cluster(finalinds(ind)).topopol);
-                    disp('Inverting ERP component polarities based on scalp map polarities');
-                    for index = 1:length(alldata(:))
-                        for comps = 1:size(alldata{index},2)
-                            alldata{index}(:,comps) = alldata{index}(:,comps)*topopolcell{index}(comps);
-                        end;
-                    end;
-                else
-                    disp('Cluster topographies absent - cannot adjust single component ERP polarities');
-                end;
-            end;
+        datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+        fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
+        if ~isempty(opt.channels)
+             [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels);
+        else [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'components', compList);
         end;
 
-        % remove mean of each subject across groups and conditions
-        if strcmpi(dtype, 'spec') && strcmpi(opt.rmsubjmean, 'on') && ~isempty(opt.channels)
-            disp('Removing subject''s average spectrum based on pairing settings');
-            if strcmpi(paired1, 'on') && strcmpi(paired2, 'on') && (nc > 1 || ng > 1)
-                disp('Removing average spectrum for both indep. variables');
-                meanpowbase = computemeanspectrum(alldata(:), opt.singletrials);
-                alldata     = removemeanspectrum(alldata, meanpowbase);
-            elseif strcmpi(paired1, 'on') && ng > 1
-                disp('Removing average spectrum for first indep. variables (second indep. var. is unpaired)');
-                for g = 1:ng        % ng = number of groups
-                    meanpowbase  = computemeanspectrum(alldata(:,g), opt.singletrials);
-                    alldata(:,g) = removemeanspectrum(alldata(:,g), meanpowbase);
-                end;
-            elseif strcmpi(paired2, 'on') && nc > 1
-                disp('Removing average spectrum for second indep. variables (first indep. var. is unpaired)');
-                for c = 1:nc        % ng = number of groups
-                    meanpowbase  = computemeanspectrum(alldata(c,:), opt.singletrials);
-                    alldata(c,:) = removemeanspectrum(alldata(c,:), meanpowbase);
-                end;
-            else
-                disp('Not removing average spectrum baseline (both indep. variables are unpaired');
+        if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') % ERP or spectrum
+            if strcmpi(opt.singletrials, 'off')
+                dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
             end;
+        else
+            dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
         end;
-        
-        if strcmpi(opt.singletrials, 'on')
-             tmpstruct = setfield( tmpstruct, [ dtype 'datatrials' ], alldata);
-             tmpstruct = setfield( tmpstruct, [ 'setindstrials' ], setinfoIndices);             
-             if ~isempty(opt.channels)
-                  tmpstruct = setfield( tmpstruct, [ dtype 'trialinfo' ], opt.subject);
-             else tmpstruct = setfield( tmpstruct, [ dtype 'trialinfo' ], opt.component);
-             end;
-        else tmpstruct = setfield( tmpstruct, [ dtype 'data' ], alldata);
+        if ~isempty(eventsTmp{iSubj}{1}) && strcmpi(opt.singletrials, 'off')
+            eventsTmp{iSubj} = cellfun(@(x)squeeze(mean(x)), eventsTmp{iSubj}, 'uniformoutput', false);
         end;
-        if strcmpi(dtype, 'spec'), tmpstruct.specfreqs = xvals;
-        else                       tmpstruct.erptimes  = xvals;
-        end;
-        
-        % copy results to structure
-        % -------------------------
-        fieldnames = { [ dtype 'data' ]  [ dtype 'freqs' ] [ dtype 'datatrials' ] ...
-                       [ dtype 'times' ] [ dtype 'trialinfo' ] 'allinds' 'setinds' 'setindstrials' };
-        for f = 1:length(fieldnames)
-            if isfield(tmpstruct, fieldnames{f}),
-                tmpdata = getfield(tmpstruct, fieldnames{f});
-                if ~isempty(opt.channels)
-                     STUDY.changrp = setfield(STUDY.changrp, { finalinds(ind) }, fieldnames{f}, tmpdata);
-                else STUDY.cluster = setfield(STUDY.cluster, { finalinds(ind) }, fieldnames{f}, tmpdata);
-                end;
-            end;
+        STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params });
+    end;
+end;
+
+% if single trials put channels in 2nd dim and trials in last dim
+if strcmpi(opt.singletrials, 'on') && length(opt.channels) > 1
+    for iCase = 1:length(dataTmp)
+        for iItem = 1:length(dataTmp{1}(:))
+            dataTmp{iCase}{iItem} = permute(dataTmp{iCase}{iItem}, [1 3 2]);
         end;
     end;
 end;
 
-% if several channels, agregate them
-% ----------------------------------
-allinds   = finalinds;
-if ~isempty(opt.channels)
-    structdat = STUDY.changrp;
-    datavals  = cell(size(alldata));
-    if strcmpi( dtype, 'spec'), xvals = getfield(structdat(allinds(1)), [ dtype 'freqs' ]);
-    else                        xvals = getfield(structdat(allinds(1)), [ dtype 'times' ]);
+% store data for all subjects
+if strcmpi(opt.datatype, 'erp') || strcmpi(opt.datatype, 'spec')
+     if length(opt.channels) > 1, dim = 3; else dim = 2; end;
+else if length(opt.channels) > 1, dim = 4; else dim = 3; end;
+end;
+datavals = reorganizedata(dataTmp, dim);
+events   = reorganizedata(eventsTmp, 1);
+
+% fix component polarity if necessary
+% -----------------------------------
+componentPol = [];
+if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && strcmpi(opt.componentpol, 'on')
+    disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
+    STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
+    componentPol = STUDY.cluster(opt.clusters).topopol;
+    if isempty(componentPol)
+        disp('Cluster topographies absent - cannot adjust single component ERP polarities');
     end;
-   
-    for chan = length(finalinds):-1:1
-        tmpdat = getfield(structdat(finalinds(chan)), [ dtype 'data' ]); % only works for interpolated data
-        for ind =  1:length(tmpdat(:))
-            datavals{ind}(:,:,chan) = tmpdat{ind};
-        end;
-    end;
-    datavals = reshape(datavals, size(tmpdat));
-    
-    for ind =  1:length(datavals(:))
-        datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
-    end;
-    if ~isempty(opt.subject)
-        indSubj = strncmp(opt.subject, STUDY.subject, 100);
-        datavals = datavals(indSubj); 
-    end;
-else
-    if strcmpi(opt.singletrials, 'on')
-         datavals = getfield(STUDY.cluster(allinds(1)), [ dtype 'datatrials' ]);
-    else datavals = getfield(STUDY.cluster(allinds(1)), [ dtype 'data' ]);
-    end;
-    if strcmpi( dtype, 'spec'), xvals = getfield(STUDY.cluster(allinds(1)), [ dtype 'freqs' ]);
-    else                        xvals = getfield(STUDY.cluster(allinds(1)), [ dtype 'times' ]);
-    end;
-    compinds = STUDY.cluster(allinds(1)).allinds;
-    setinds  = STUDY.cluster(allinds(1)).setinds;
-    if ~isempty(opt.component) && length(allinds) == 1 && strcmpi(opt.singletrials,'off')
-        datavals = std_selcomp(STUDY, datavals, allinds, setinds, compinds, opt.component);
+    for iItem = 1:length(datavals)
+        datavals{iItem} = bsxfun(@times, datavals{iItem}, componentPol);
     end;
 end;
 
-% compute mean spectrum 
+% compute mean spectrum
 % ---------------------
 function meanpowbase = computemeanspectrum(spectrum, singletrials)
 
@@ -333,5 +262,50 @@ function spectrum = removemeanspectrum(spectrum, meanpowbase)
         end;
     end;
 
+% reorganize data
+% ---------------
+function datavals = reorganizedata(dataTmp, dim)
+    datavals = cell(size(dataTmp{1}));
+    for iItem=1:length(dataTmp{1}(:)')
+        numItems = sum(cellfun(@(x)size(x{iItem},dim), dataTmp));
+        switch dim
+            case 2, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) numItems], 'single'); 
+            case 3, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) numItems], 'single'); 
+            case 4, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) size(dataTmp{1}{iItem},3) numItems], 'single'); 
+        end;
+    end;
+    for iItem=1:length(dataTmp{1}(:)')
+        count = 1;
+        for iCase = 1:length(dataTmp)
+            if ~isempty(dataTmp{iCase}{iItem})
+                numItems = size(dataTmp{iCase}{iItem},dim);
+                switch dim
+                    case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
+                    case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
+                    case 4, datavals{iItem}(:,:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
+                end;
+                count = count+numItems;
+            end;
+        end;
+    end;
+    
+% call newtimef (duplicate function in std_erspplot)
+% --------------
+function dataout = processtf(dataSubject, xvals, datatype, singletrials, g)
 
-   
+    % compute ITC or ERSP
+    if strcmpi(datatype, 'ersp')
+        P = dataSubject .* conj(dataSubject);
+        dataout = newtimeftrialbaseln(P, xvals, g);
+        if strcmpi(singletrials, 'off')
+            if ndims(dataout) == 4,     dataout = mean(dataout, 4);
+            elseif ndims(dataout) == 3, dataout = mean(dataout, 3);
+            end;
+        end;
+    else
+        if strcmpi(singletrials, 'off')
+            if ~isfield(params, 'itctype'), params.itctype = 'phasecoher'; end;
+            dataout = newtimefitc(dataSubject, g.itctype);
+        end;
+    end;
+    

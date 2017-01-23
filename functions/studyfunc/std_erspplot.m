@@ -227,11 +227,25 @@ end;
 % ---------------------
 if ~isempty(opt.channels)
 
-    [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', params.timerange, ...
-        'freqrange', params.freqrange, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', opt.datatype);
+    [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', params.timerange, ...
+        'freqrange', params.freqrange, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', opt.datatype, 'subbaseline', params.subbaseline);
     % 'concatenate', params.concatenate NOT TAKEN INTO ACCOUNT
     unitPower = newtimefpowerunit(paramsersp);
-    %removeerspbaseline(allersp, alltimes, 0);
+    
+    if strcmpi(opt.datatype, 'ersp') && strcmpi(params.subbaseline, 'off')
+        if  strcmpi(params.singletrials, 'off')
+            % rational for baseline
+            % - no baseline calculation or log transformation at reading time (except single trial baseline if any)
+            % - if not single trial and no common baseline, remove baseline and transform data here in each condition (before stats)
+            % - otherwise, do so after baseline removal
+            paramsersp.singletrials = params.singletrials;
+            paramsersp.commonbase   = params.subbaseline;
+            [allersp,basesamples,basevals] = newtimefbaseln(allersp, alltimes, paramsersp);
+        else
+            opt.subbaseline = 'on';
+            disp('Warning: when using single-trial statistics, a common baseline is forced accross all conditions');
+        end;
+    end;
     
     %[STUDY allersp alltimes allfreqs tmp events unitPower] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
     %    'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
@@ -271,6 +285,27 @@ if ~isempty(opt.channels)
             disp('No statistics possible for single subject STUDY');
         end; % single subject STUDY                                
     end
+
+    % average single trials
+    % ---------------------
+    if strcmpi(opt.datatype, 'ersp')
+        if strcmpi(params.singletrials, 'on')
+            if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end;
+            if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end;
+        end;
+        if  strcmpi(params.subbaseline, 'on')
+            % see above for rational for baseline
+            paramsersp.singletrials = params.singletrials;
+            paramsersp.commonbase   = params.subbaseline;
+            [allersp,basesamples,basevals] = newtimefbaseln(allersp, alltimes, paramsersp);
+        end;
+        % transform to log
+        if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+            tmpsize = size(allersp);
+            allersp = cellfun(@(x)10*log10(x), allersp(:), 'uniformoutput', false);
+            allersp = reshape(allersp, tmpsize);
+        end;
+    end;
     
     % plot specific channel(s)
     % ------------------------

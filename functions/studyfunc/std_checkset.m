@@ -53,6 +53,7 @@ if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
 if ~isfield(STUDY, 'setind'),    STUDY.setind    = {}; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
+if ~isfield(STUDY, 'cache'),     STUDY.cache     = []; modif = 1; end;
 if ~isfield(STUDY, 'etc.warnmemory'), STUDY.etc.warnmemory = 1; modif = 1; end;
 if ~isfield(STUDY, 'preclust'),  STUDY.preclust  = []; modif = 1; end;
 if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
@@ -249,52 +250,32 @@ if ~studywasempty
         % between dash to cell array of strings
         % -------------------------------------
         for inddes = 1:length(STUDY.design)
-            if length(STUDY.design(inddes).variable) == 0
-                STUDY.design(inddes).variable(1).label = '';
-                STUDY.design(inddes).variable(1).value = [];
-            end;
-            if length(STUDY.design(inddes).variable) == 1
-                STUDY.design(inddes).variable(2).label = '';
-                STUDY.design(inddes).variable(2).value = [];
-            end;
-            if ~isfield(STUDY.design(inddes).variable, 'pairing')
-                STUDY.design(inddes).variable(1).pairing = 'on';
-                STUDY.design(inddes).variable(2).pairing = 'on';
-            end;
+            rmVar = [];
             for indvar = 1:length(STUDY.design(inddes).variable)
+                
+                % add pairing info in case it is missing
+                if isempty(STUDY.design(inddes).variable(indvar).label)
+                    rmVar = [ rmVar indvar ];
+                end;
+                if ~isfield(STUDY.design(inddes).variable, 'pairing') || isempty(STUDY.design(inddes).variable(indvar).pairing)
+                    if strcmpi(STUDY.design(inddes).variable(indvar).label, 'group')
+                        STUDY.design(inddes).variable(indvar).pairing = 'off';
+                    else
+                        STUDY.design(inddes).variable(indvar).pairing = 'on';
+                    end;
+                end;
+                
                 for indval = 1:length(STUDY.design(inddes).variable(indvar).value)
                     STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
                 end;
             end;
-        end;
-        
-        for inddes = 1:length(STUDY.design)
-            if ~isfield(STUDY.design(inddes), 'cell') || isempty(STUDY.design(inddes).cell)
-                fprintf('Warning: Importing newer STUDY format - some information might be lost\n');
-                STUDY = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
-            end;
-            for indcell = 1:length(STUDY.design(inddes).cell)
-                for indval = 1:length(STUDY.design(inddes).cell(indcell).value)
-                    STUDY.design(inddes).cell(indcell).value{indval} = convertindvarval(STUDY.design(inddes).cell(indcell).value{indval});
-                end;
-            end;
+            STUDY.design(inddes).variable(rmVar) = [];
             for indinclude = 1:length(STUDY.design(inddes).include)
                 if iscell(STUDY.design(inddes).include{indinclude})
                     for indval = 1:length(STUDY.design(inddes).include{indinclude})
                         STUDY.design(inddes).include{indinclude}{indval} = convertindvarval(STUDY.design(inddes).include{indinclude}{indval});
                     end;
                 end;
-            end;
-            
-            % check for duplicate entries in filebase
-            % ---------------------------------------
-            if length( { STUDY.design(inddes).cell.filebase } ) > length(unique({ STUDY.design(inddes).cell.filebase }))
-                if ~isempty(findstr('design_', STUDY.design(inddes).cell(1).filebase))
-                    error('There is a problem with your STUDY, contact EEGLAB support');
-                else
-                    fprintf('Duplicate entry detected in Design %d, reinitializing design\n', inddes);
-                    [STUDY com] = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
-                end
             end;
         end;
     end;
@@ -303,22 +284,15 @@ if ~studywasempty
         STUDY = std_rebuilddesign(STUDY, ALLEEG);
     end;
     
-    % scan design to fix old paring format
+    % scan design to fix old pairing format
     % ------------------------------------
     for design = 1:length(STUDY.design)
         for var = 1:length(STUDY.design(design).variable)
-            if isstr(STUDY.design(design).variable(1).pairing)
-                if strcmpi(STUDY.design(design).variable(1).pairing, 'paired')
-                    STUDY.design(design).variable(1).pairing = 'on';
-                elseif strcmpi(STUDY.design(design).variable(1).pairing, 'unpaired')
-                    STUDY.design(design).variable(1).pairing = 'off';
-                end;
-            end;
-            if isstr(STUDY.design(design).variable(2).pairing)
-                if strcmpi(STUDY.design(design).variable(2).pairing, 'paired')
-                    STUDY.design(design).variable(2).pairing = 'on';
-                elseif strcmpi(STUDY.design(design).variable(2).pairing, 'unpaired')
-                    STUDY.design(design).variable(2).pairing = 'off';
+            if isstr(STUDY.design(design).variable(var).pairing)
+                if strcmpi(STUDY.design(design).variable(var).pairing, 'paired')
+                    STUDY.design(design).variable(var).pairing = 'on';
+                elseif strcmpi(STUDY.design(design).variable(var).pairing, 'unpaired')
+                    STUDY.design(design).variable(var).pairing = 'off';
                 end;
             end;
         end;

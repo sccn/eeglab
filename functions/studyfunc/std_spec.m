@@ -218,7 +218,7 @@ end
 % -------------------------
 options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
-if ~isempty(g.interp),  options = { options{:} 'interp'  g.interp  }; end;
+if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
 if isempty(g.channels)
      [X boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
 else [X boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);

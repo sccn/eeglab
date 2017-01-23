@@ -40,6 +40,7 @@ if nargin < 2
     return;
 end;
 
+if ~isfield(STUDY.design(1), 'cell') || isempty(STUDY.design(1).cell), return; end;
 STUDY2 = std_makedesign(STUDY, ALLEEG, 1, STUDY.design(1), 'defaultdesign', 'forceoff', 'verbose', 'off');
 allCell1 = {  STUDY.design(1).cell.filebase };
 allCell2 = { STUDY2.design(1).cell.filebase };

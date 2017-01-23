@@ -42,7 +42,7 @@ end;
 if nargin < 3 && ~isstr(STUDY)
     
     %% create GUI
-    [ usrdat.factors usrdat.factorvals usrdat.factsubj] = std_getindvar(STUDY, 'both', 1);
+    [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(STUDY, 'both', 1);
     
     usrdat.factors     = { 'None' usrdat.factors{:} };
     usrdat.factorvals  = { {}     usrdat.factorvals{:} };
@@ -149,26 +149,19 @@ if nargin < 3 && ~isstr(STUDY)
     end;
     for index = 1:length(des)
         tmpdes  = rmfield(des(index), 'deletepreviousfiles');
+        if ~isfield(tmpdes.variable, 'vartype'), tmpdes.variable(1).vartype = []; end; 
         rmfiles = fastif(des(index).deletepreviousfiles, 'limited', 'off');
         if index > length(STUDY.design) || ~isequal(STUDY.design(index), tmpdes) || strcmpi(rmfiles, 'on')
             fprintf('Updating/creating STUDY design %d\n', index);
             
-            % test if file exist and issue warning
-            if length(STUDY.design) >= index && isfield('cell', STUDY.design) && ~isempty(STUDY.design(index).cell) && ...
-                ~isempty(dir([ STUDY.design(index).cell(1).filebase '.*' ])) &&  strcmpi(rmfiles, 'off')
-                if ~isequal(tmpdes.variable(1).label, STUDY.design(index).variable(1).label) || ...
-                     ~isequal(tmpdes.variable(2).label, STUDY.design(index).variable(2).label) || ...
-                      ~isequal(tmpdes.include, STUDY.design(index).include) || ...
-                       ~isequal(tmpdes.variable(1).value, STUDY.design(index).variable(1).value) || ...
-                        ~isequal(tmpdes.cases.value, STUDY.design(index).cases.value) || ...
-                         ~isequal(tmpdes.variable(2).value, STUDY.design(index).variable(2).value)
-                    res = questdlg2(strvcat([ 'Precomputed data files exist for design ' int2str(index) '.' ], ' ', ...
-                                       'Modifying this design without deleting the associated files', ...
-                                       'might mean that they will stay on disk and will be unusable'), ...
-                                       'STUDY design warning', 'Abort', 'Continue', 'Continue');
-                    if strcmpi(res, 'Abort'), return; end;
+            if isfield(tmpdes, 'variable')
+                for iVar = 1:length(tmpdes.variable)
+                    if isempty(tmpdes.variable(iVar).vartype)
+                        tmpdes.variable(iVar).vartype = 'categorical';
+                    end;
                 end;
             end;
+            
             [STUDY com] = std_makedesign(STUDY, ALLEEG, index, tmpdes, 'delfiles', rmfiles);
             allcom = [ allcom 10 com ];
         else
@@ -246,7 +239,7 @@ elseif isstr(STUDY)
             % categorical var
             curVal = {};
             for iVar = 1:length(des(val).variable)
-                if ~isempty(des(val).variable(iVar).value)
+                if ~isempty(des(val).variable(iVar).value) && strcmpi(des(val).variable(iVar).vartype, 'categorical')
                     valStr = '';
                     valStrCell = encodevals(des(val).variable(iVar).value);
                     for iVal = 1:length(valStrCell)
@@ -330,10 +323,11 @@ elseif isstr(STUDY)
             
         case 'newvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
-            [tmpVar tmpVarList] = pop_addindepvar(usrdat);
-            if ~isempty(tmpVar)
+            [tmpVar tmpVarList cat] = pop_addindepvar(usrdat);
+            if ~isempty(tmpVar) && ~strcmp(tmpVar,'None')
                 des(val).variable(end+1).label = tmpVar;
                 des(val).variable(end  ).value = tmpVarList; % empty for cont var
+                if cat, des(val).variable(end).vartype = 'categorical'; else des(val).variable(end).vartype = 'continuous'; end;
             end;
             % update var list
             [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);
@@ -344,10 +338,13 @@ elseif isstr(STUDY)
         case 'editvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
-            [tmpVar tmpVarList] = pop_addindepvar(usrdat, [], des(val).variable(val2).label, des(val).variable(val2).value);
-            if ~isempty(tmpVar)
+            tmpval = des(val).variable(val2).value;
+            if strcmpi(des(val).variable(val2).vartype, 'continuous'), tmpval = []; end;
+            [tmpVar tmpVarList cat] = pop_addindepvar(usrdat, [], des(val).variable(val2).label, tmpval);
+            if ~isempty(tmpVar) && ~strcmp(tmpVar,'None')
                 des(val).variable(val2).label = tmpVar;
                 des(val).variable(val2).value = tmpVarList; % empty for cont var
+                if cat, des(val).variable(val2).vartype = 'categorical'; else des(val).variable(val2).vartype = 'continuous'; end;
             end;
             % update var list
             [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);

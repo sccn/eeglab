@@ -394,11 +394,16 @@ function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute
     if ~recompute, return; end;
     if warnflag, return; end; % warning has already been issued
     
+    oneSubject = STUDY.design(STUDY.currentdesign).cases.value{1};
     if comps
-         dataFilename = [ STUDY.design(STUDY.currentdesign).cell(1).filebase '.ica' datatype ];
-    else dataFilename = [ STUDY.design(STUDY.currentdesign).cell(1).filebase '.dat' datatype ];
+         dataFilename = [ oneSubject '.ica' datatype ];
+    else dataFilename = [ oneSubject '.dat' datatype ];
     end;
-    if exist(dataFilename)
+    allSubjects = { STUDY.datasetinfo.subject };
+    inds = strmatch( oneSubject, allSubjects, 'exact');
+    filepath = STUDY.datasetinfo(inds(1)).filepath;
+    
+    if exist(fullfile(filepath, dataFilename))
         textmsg = [ 'WARNING: SOME DATAFILES ALREADY EXIST, OVERWRITE THEM?' 10 ...
                     '(if you have another STUDY using the same datasets, it might overwrite its' 10 ...
                     'precomputed data files. Instead, use a single STUDY and create multiple designs).' ];

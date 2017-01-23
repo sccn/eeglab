@@ -125,7 +125,11 @@ statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
-stats.paired = { STUDY.design(STUDY.currentdesign).variable(:).pairing };
+if isempty(STUDY.design(STUDY.currentdesign).variable)
+    stats.paired = { };
+else
+    stats.paired = { STUDY.design(STUDY.currentdesign).variable(:).pairing };
+end;
 
 % potentially missing fields
 % --------------------------
@@ -229,11 +233,11 @@ if ~isempty(opt.channels)
     chaninds = 1:length(opt.channels);
 
     if strcmpi(opt.datatype, 'erp')
-        [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
+        [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     else
-        [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
-            'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
+        [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
+                'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype], 'rmsubjmean', params.subtractsubjectmean);
     end;
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
         for index = 1:length(erpdata(:))
@@ -327,9 +331,30 @@ else
         if ~isempty(opt.comps)
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
+            for iDat = 1:length(erpdata(:)), erpdata{iDat} = erpdata{iDat}(:,opt.comps); end;
         end;
-        stats.paired = paired;
-        [pcond pgroup pinter] = std_stat(erpdata, stats);
+        
+        % remove NaNs and generate labels
+        % -------------------------------
+        erpdata2 = erpdata;
+        subjects       = { STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,:)).subject };
+        for iDat = 1:length(erpdata2(:))
+            if all(cellfun(@(x)size(x,2), erpdata2(:)) == length(subjects))  % NOT single trial data
+                keepInd = find(~isnan(erpdata2{iDat}(1,:)));
+                erpdata2{iDat} = erpdata2{iDat}(:,keepInd);
+                tmpSubjects = subjects(keepInd);
+                comps       = STUDY.cluster(opt.clusters(index)).comps(keepInd);
+            else
+                tmpSubjects = subjects;
+                comps       = STUDY.cluster(opt.clusters(index)).comps;
+            end;
+            for iKeep = 1:length(tmpSubjects)
+                sbtitles{iDat}{iKeep} = [ tmpSubjects{iKeep}  '/IC' num2str(comps(iKeep)) ];
+            end;
+        end;
+        sbtitles = reshape(sbtitles, size(erpdata2));
+        
+        [pcond pgroup pinter] = std_stat(erpdata2, stats);
         if strcmpi(opt.noplot, 'on'), return; end;
             
         [alltitles alllegends ] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
@@ -337,40 +362,21 @@ else
                                  'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
         
         if length(opt.clusters) > 1 && index < length(opt.clusters), alllegends = {}; end;
-        std_plotcurve(alltimes, erpdata, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, 'plotstderr', opt.plotstderr, ...
+        std_plotcurve(alltimes, erpdata2, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, 'plotstderr', opt.plotstderr, ...
                                           'titles', alltitles, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'plotsubjects', opt.plotsubjects, plotcurveopt{:});
 %--------------------------------------------------------------------------                                      
-%--------------------------------------------------------------------------                          
         if all([strcmp(opt.plotsubjects,'on') strcmp(opt.detachplots,'on')])
             
-            % Getting IC and subj
-            %--------------------------------------------------------------
-            % WARNING: design.cell used here (this should be replaced)
-            %--------------------------------------------------------------
-            c = 0;
-            for i = 1 : numel(STUDY.cluster(opt.clusters(index)).allinds)
-                if numel(STUDY.cluster(opt.clusters(index)).allinds{i}) ~= 0
-                    c = c+1;
-                    for j = 1 : numel(STUDY.cluster(opt.clusters(index)).allinds{i})
-                        comp         = STUDY.cluster(opt.clusters(index)).allinds{i}(j);
-                        dsgcell_indx = STUDY.cluster(opt.clusters(index)).setinds{i}(j);
-                        subject = STUDY.design(opt.design).cell(dsgcell_indx).case;
-                        sbtitles{c}{j} = ([subject '/' 'IC' num2str(comp)]);
-                    end
-                end
-            end
-            %--------------------------------------------------------------
              [alltitlestmp tmp] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', 'off', 'cond2stat', 'off', ...
                                  'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
                                  'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
                              
             handles = findall(0,'Type','Figure', 'Tag','tmp_curvetag');
-            std_detachplots('','','data',erpdata,'figtitles', {alltitlestmp{:}}','sbtitles',sbtitles,'handles', handles, 'filter',params.filter);
+            std_detachplots('','','data',erpdata2,'figtitles', {alltitlestmp{:}}','sbtitles',sbtitles,'handles', handles, 'filter',params.filter);
             axcopyflag = 0;
 
         end
-%--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
     end;
     tmpgcf = gcf;

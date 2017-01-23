@@ -12,12 +12,11 @@
 %
 % Optional inputs:
 %   'channels'       - [cell or integer] channel labels - for instance 
-%                      { 'cz' 'pz' }
-%                      of channels to load from the data file.
-%   'components'     - [integer] component index in the selected EEG dataset for which 
-%                      to read the ERSP
-%   'timelimits'     - [min max] ERSP time (latency in ms) range of interest
-%   'freqlimits'     - [min max] ERSP frequency range (in Hz) of interest
+%                      { 'cz' 'pz' } of channels to load from the data file.
+%   'components'     - [integer] component index in the selected EEG dataset 
+%                      for which to read the data
+%   'timelimits'     - [min max] ERSP/ERP time (latency in ms) range of interest
+%   'freqlimits'     - [min max] ERSP/Spectrum frequency range (in Hz) of interest
 %   'measure'        - ['erp'|'spec'|'ersp'|'itc'|'timef'|'erspbase'|'erspboot'
 %                      'itcboot'|'erpim'] data measure to read. If a full file name
 %                      is provided, the data measure is selected automatically.
@@ -26,14 +25,15 @@
 %                      of the field in the trialinfo structure to be used to pull out the trials. 
 %                      i.e. if values are string:  {'field1',{val1_fromfield1 val2_fromfield1}, 'field2'...} 
 %                           if values are numeric: {'field1',[val1 val2], 'field2'...}
-%   'designvar'      - Structure of Independent Variables(IV) with fields 'label'
-%                      and 'value'. Each IV should have these two fields so
-%                      the function can use these values to pull out the trials. 
+%   'designvar'      - Structure of independent variables with fields 'label'
+%                      and 'value'. Each independent variable should have these 
+%                      two fields so the function can use these values to pull 
+%                      out the trials. If empty, all the trials are read.
 %   'singletrials'   - { 'on','off' } Extract single trials. Default 'off'
 %   'getparamonly'   - { 'on','off'} Get only parameters. Default 'off'
 %   'concatenate'    - { 'on','off'} In case of ERP images this function
 %                      set 'singletrials' to 'on'. Default 'off'
-%   'dataindices'    - (To be updated)
+%   'dataindices'    - obsolete input
 %
 % Outputs:
 %   data                - the multi-channel or multi-component data. The size of this
@@ -43,7 +43,6 @@
 %   range1              - time points (ERP, ERSP) or frequency points (spectrum)
 %   range2              - frequency points (ERSP, ITCs)
 %   events              - Event readed from the data structure
-%   setinfoTrialIndices - Deprecated
 %
 % Examples:
 %   % the examples below read all data channels for the selected files
@@ -73,7 +72,7 @@
 % dimensions
 % time x freqs x channel_comps x subjects_trials
 
-function [measureData, parameters, measureRange1, measureRange2, events, setinfoTrialIndices] = std_readfile(fileBaseName, varargin);
+function [measureData, parameters, measureRange1, measureRange2, events] = std_readfile(fileBaseName, varargin);
 
 if nargin < 1
     help std_readfile;
@@ -91,6 +90,7 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'singletrials'     'string'   { 'on','off' }  'off';
                               'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
                               'channels'         'cell'     []    {};
+                              'cache'            'struct'   []    struct([]);
                               'function'         { 'function_handle' 'integer' } []  [];
                               'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef'} 'erp';                                                 
                               'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
@@ -126,7 +126,14 @@ end;
 
 % get fields to read
 % ------------------
-fileData = matfile([ fileBaseName fileExt ]);
+v6Flag = testv6([ fileBaseName fileExt ]);
+if v6Flag
+    if ~isempty(opt.channels)
+        fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
+    end;
+else
+    fileData = matfile([ fileBaseName fileExt ]);
+end;
 
 % get channel or component indices
 % --------------------------------
@@ -138,6 +145,18 @@ elseif ~isempty(opt.channels)
 elseif ~isempty(opt.components)
      opt.dataindices = opt.components;
 else opt.dataindices = abs(opt.dataindices);
+end;
+
+if v6Flag
+    for iChan = 1:length(opt.dataindices)
+        chanList{iChan} = [ dataType int2str(opt.dataindices(iChan)) ];
+    end;
+    warning('off', 'MATLAB:load:variableNotFound');
+    if length(opt.dataindices) > 0
+         fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters');
+    else fileData = load('-mat', [ fileBaseName fileExt ], 'trialinfo', 'times', 'freqs', 'parameters');
+    end;
+    warning('on', 'MATLAB:load:variableNotFound');
 end;
 
 % scan datasets
@@ -159,7 +178,6 @@ if any(strncmp('parameters', fileFields, 100))
 end;
 if any(strncmp('times', fileFields, 100)),  measureRange1 = fileData.times; end;
 if any(strncmp('freqs', fileFields, 100)),  measureRange2 = fileData.freqs; end;
-if any(strncmp('events', fileFields, 100)), events        = fileData.events; end;
 
 % if the function is only called to get parameters
 % ------------------------------------------------
@@ -181,52 +199,13 @@ if strcmpi(opt.getparamonly, 'on'),
     return;
 end;
 
-% scan design
-% -----------
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
 if isempty(opt.designvar)
-    measureData = getfiledata(fileData, opt.trialselect, options{:});
+    [ measureData events ] = getfiledata(fileData, NaN, options{:}); % read all data
+    measureData = { measureData };
+    events      = { events };
 else
-    % loop for 1 or more var
-    for iField1 = 1:length(opt.designvar(1).value)
-        trialselect = { opt.designvar(1).label opt.designvar(1).value{iField1} };
-        
-        % test for 2 or more var
-        if length(opt.designvar) > 1
-            
-            for iField2 = 1:length(opt.designvar(2).value)
-                trialselect = { trialselect{:} opt.designvar(2).label opt.designvar(2).value{iField2} };
-             
-                % test for 3 or more var
-                if length(opt.designvar) > 2
-                    for iField3 = 1:length(opt.designvar(3).value)
-                        trialselect = { trialselect{:} opt.designvar(3).label opt.designvar(3).value{iField3} };
-                        
-                        % test for 4
-                        if length(opt.designvar) > 3
-                            for iField4 = 1:length(opt.designvar(4).value)
-                                trialselect = { trialselect{:} opt.designvar(4).label opt.designvar(4).value{iField4} };
-                                measureData{iField1,iField2,iField3,iField4} = getfiledata(fileData, trialselect, options{:});
-                            end;
-                        else
-                            measureData{iField1,iField2,iField3} = getfiledata(fileData, trialselect, options{:});
-                        end;
-                    end;
-                else
-                    measureData{iField1,iField2} = getfiledata(fileData, trialselect, options{:});
-                end;
-            end;
-        else
-            measureData{iField1} = getfiledata(fileData, trialselect, options{:});
-        end;
-    end;
-end;  
-
-% special ERP image
-% -----------------
-if ~isempty(events)
-    len    = length(events{1});
-    events = [ events{:} ];
+    [ measureData events ] = globalgetfiledata(fileData, opt.designvar, options, {});
 end;
 
 % remove duplicates in the list of parameters
@@ -249,41 +228,106 @@ function [measureRange indBegin indEnd] = indicesselect(measureRange, measureLim
         measureRange = measureRange(indBegin:indEnd);
     end;
 
+% recursive function to load data
+% -------------------------------
+function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect);
+
+    if length(designvar) == 0
+        [ measureData eventVals ] = getfiledata(fileData, trialselect, options{:});
+        measureData = { measureData };
+        eventVals   = { eventVals   };
+    else
+        % scan independent variable values
+        if strcmpi('continuous', designvar(1).vartype)
+            if ~isstr(designvar(1).value), designvar(1).value = ''; end;
+            trialselect = { trialselect{:} designvar(1).label designvar(1).value };
+            [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+            measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+            eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
+        else
+            for iField = 1:length(designvar(1).value)
+                trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
+                [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+                measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+                eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
+            end;
+        end;
+    end;
+    
 % load data from structure or file
 % --------------------------------
-function fieldData = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
+function [ fieldData events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
 
 if length(chan) > 1
-    error('This function can only read one channel at a time');
+%    error('This function can only read one channel at a time');
 end;
 
 % get trial indices
+fieldData = [];
+events    = [];
 subTrials = [];
 trials    = [];
 if ~isempty(trialselect)
-    trials = std_gettrialsind(fileData.trialinfo, trialselect{:});
-    if length(unique(diff(trials))) > 1
-        temptrials = [trials(1):trials(end)];
-        subTrials  = trials-trials(1)+1;
-        trials     = temptrials;
+    if isnumeric(trialselect) && isnan(trialselect(1))
+        trials = [1:length(fileData.trialinfo)]; % read all trials if NaN
+    else
+        [trials events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
+        if length(unique(diff(trials))) > 1
+            temptrials = [trials(1):trials(end)];
+            subTrials  = trials-trials(1)+1;
+            trials     = temptrials;
+        end;
     end;
 end;
 
-fieldToRead = [ dataType int2str(chan) ];
+for index = 1:length(chan)
+    fieldToRead = [ dataType int2str(chan(index)) ];
 
-% find trials
-if isempty(trials), trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); end;
+    % find trials
+    if isempty(trials), 
+        return;
+        % trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); % not sure what this does
+    end;
 
-% load data
-if ndims(fileData.(fieldToRead)) == 2
-    fieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
-    if ~isempty(subTrials), fieldData = fieldData(:, subTrials); end;
-else fieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
-    if ~isempty(subTrials), fieldData = fieldData(:, :, subTrials); end;
+    % load data
+    warning('off', 'MATLAB:MatFile:OlderFormat');
+    if ndims(fileData.(fieldToRead)) == 2
+        tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
+        if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end;
+    else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
+        if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, :, subTrials); end;
+    end;
+    warning('on', 'MATLAB:MatFile:OlderFormat');
+
+    % average single trials if necessary
+    if ~isempty(func)
+        tmpFieldData = func(tmpFieldData);
+    end;
+    
+    % store data
+    if index == 1 && length(chan) == 1
+        fieldData = tmpFieldData;
+    else
+        if index == 1
+            fieldData = zeros([ size(tmpFieldData) length(chan) ]);
+        end;
+        if ndims(tmpFieldData) == 2
+            fieldData(:,:,index) = tmpFieldData;
+        else
+            fieldData(:,:,:,index) = tmpFieldData;
+        end;
+    end;
 end;
 
-% average single trials if necessary
-if ~isempty(func)
-    fieldData = func(fieldData);
-end;
+% see if a file is v6 of v7.3
+function v6 = testv6(x)
+
+fid=fopen(x);
+txt=char(fread(fid,[1,140],'*char'));
+tmp = fclose(fid);
+txt=[txt,0];
+txt=txt(1:find(txt==0,1,'first')-1);
+if ~isempty(strfind(txt, 'MATLAB 5.0')), v6 = true; else v6 = false; end;
+
+
 
