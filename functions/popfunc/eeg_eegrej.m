@@ -131,10 +131,12 @@ end;
 % the function that insert boundary events and recompute latency is
 % delicate so we do it twice using different methods and check
 % the results. It is longer, but accuracy is paramount.
-alllats = [ EEG.event.latency ];
-otherlatencies = [event2.latency];
-if ~isequal(alllats, otherlatencies)
-    error([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+if isfield(EEG.event, 'latency')
+    alllats = [ EEG.event.latency ];
+    otherlatencies = [event2.latency];
+    if ~isequal(alllats, otherlatencies)
+        error([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+    end;
 end;
 
 % double check boundary event latencies

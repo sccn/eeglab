@@ -154,9 +154,11 @@ for iRegion1=1:size(regions,1)
         events(end).duration = duration(iRegion1);
     end;
 end;
-events([ events.latency ] < 1) = [];
-alllatencies = [ events.latency ];
-[tmp, sortind] = sort(alllatencies);
-events = events(sortind);
+if ~isempty(events) && isfield(events, 'latency')
+    events([ events.latency ] < 1) = [];
+    alllatencies = [ events.latency ];
+    [tmp, sortind] = sort(alllatencies);
+    events = events(sortind);
+end;
 
 return;
