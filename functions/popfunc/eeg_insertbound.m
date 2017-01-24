@@ -100,10 +100,12 @@ function [eventin] = eeg_insertbound( eventin, pnts, regions, lengths)
     
     % resort events
     % -------------
-    eventin([ eventin.latency ] < 1) = [];
-    alllatencies = [ eventin.latency ];
-    [tmp, sortind] = sort(alllatencies);
-    eventin = eventin(sortind);
+    if ~isempty(eventin) && isfield(eventin, 'latency')
+        eventin([ eventin.latency ] < 1) = [];
+        alllatencies = [ eventin.latency ];
+        [tmp, sortind] = sort(alllatencies);
+        eventin = eventin(sortind);
+    end;
     
     if ~isempty(rmEvent)
         fprintf('eeg_insertbound(): event latencies recomputed and %d events removed.\n', length(rmEvent));
