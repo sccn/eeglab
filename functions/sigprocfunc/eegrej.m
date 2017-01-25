@@ -145,9 +145,22 @@ else
 end;
 times = times * size(indata,2) / length(reject);
 
+% merge boundary events
+% ---------------------
+for iBound = length(boundevents):-1:2
+    if boundevents(iBound) == boundevents(iBound-1)
+        duration(iBound-1) = duration(iBound-1)+duration(iBound);
+        boundevents(iBound) = [];
+        duration(iBound) = [];
+    end;
+end;
+if ~isempty(boundevents) && boundevents(end) > size(indata,2)-1
+    boundevents(end) = [];
+end;
+
 % insert boundary events
 % ----------------------
-for iRegion1=1:size(regions,1)
+for iRegion1=1:length(boundevents)
     if boundevents(iRegion1) > 1 && boundevents(iRegion1) < size(indata,2)
         events(end+1).type = 'boundary';
         events(end).latency  = boundevents(iRegion1);
