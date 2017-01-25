@@ -14,6 +14,7 @@
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
+%   indnew     - Indices of the new events
 %
 % Notes:
 %   This function performs the following: 
@@ -44,12 +45,13 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [eventin] = eeg_insertbound( eventin, pnts, regions, lengths)
+function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     
     if nargin < 3
         help eeg_insertbound;
         return;
     end;
+    regions = round(regions);
     regions(regions < 1) = 1;
     regions(regions > pnts) = pnts;
 
@@ -105,6 +107,7 @@ function [eventin] = eeg_insertbound( eventin, pnts, regions, lengths)
         alllatencies = [ eventin.latency ];
         [tmp, sortind] = sort(alllatencies);
         eventin = eventin(sortind);
+        newind = sortind(oriLen+1:end);
     end;
     
     if ~isempty(rmEvent)
