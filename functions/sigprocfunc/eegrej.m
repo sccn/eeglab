@@ -56,6 +56,10 @@ if nargin < 2
 	return;
 end;
 
+if nargin < 4
+    events = [];
+end;
+
 if isstr(indata)
   datlen = evalin('base', [ 'size(' indata ',2)' ]);
 else
@@ -69,6 +73,12 @@ regions = round(regions);
 regions(regions > size(indata, 2)) = size(indata, 2);
 regions(regions < 1) = 1;
 regions = sortrows(sort(regions,2));        % Sorting regions %regions = sort(regions,1); RMC
+for i=2:size(regions,1)
+    if regions(i-1,2) >= regions(i,1)
+        regions(i,1) = regions(i-1,2)+1;
+    end;
+end;
+
 for i=1:size(regions,1)
     reject(regions(i,1):regions(i,2)) = 1;
 end;
@@ -154,7 +164,7 @@ for iBound = length(boundevents):-1:2
         duration(iBound) = [];
     end;
 end;
-if ~isempty(boundevents) && boundevents(end) > size(indata,2)-1
+if ~isempty(boundevents) && boundevents(end) > size(indata,2)
     boundevents(end) = [];
 end;
 
