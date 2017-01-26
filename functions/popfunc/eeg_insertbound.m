@@ -54,6 +54,11 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     regions = round(regions);
     regions(regions < 1) = 1;
     regions(regions > pnts) = pnts;
+    for i=2:size(regions,1)
+        if regions(i-1,2) >= regions(i,1)
+            regions(i,1) = regions(i-1,2)+1;
+        end;
+    end;
 
     if ~isempty(regions)
         fprintf('eeg_insertbound(): %d boundary (break) events added.\n', size(regions, 1));
