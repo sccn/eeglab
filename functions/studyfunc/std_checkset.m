@@ -233,12 +233,12 @@ if ~studywasempty
             end;
         end;
         
-        for inddes = 1:length(STUDY.design)
-            if ~isfield(STUDY.design(inddes), 'cell') || isempty(STUDY.design(inddes).cell)
-                fprintf('Warning: Importing newer STUDY format - some information might be lost\n');
-                STUDY = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
-            end;
-            for indcell = 1:length(STUDY.design(inddes).cell)
+       if ~isfield(STUDY.design(1), 'cell') || isempty(STUDY.design(1).cell)
+           fprintf('Warning: Importing STUDY from a newer version of EEGLAB - some information will be lost\n');
+           STUDY = std_makedesign(STUDY, ALLEEG, 1, STUDY.design(1), 'defaultdesign', 'forceoff');
+       end;
+       for inddes = 1:length(STUDY.design)
+             for indcell = 1:length(STUDY.design(inddes).cell)
                 for indval = 1:length(STUDY.design(inddes).cell(indcell).value)
                     STUDY.design(inddes).cell(indcell).value{indval} = convertindvarval(STUDY.design(inddes).cell(indcell).value{indval});
                 end;
