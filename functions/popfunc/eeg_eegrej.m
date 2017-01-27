@@ -124,7 +124,9 @@ for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
     end;
 end;
 if 100*differs/length(EEG.event) > 50
-    fprintf('IF YOU ARE USING A SCRIPT TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING\nTHE ONSET OF THE DATA, EVENTS WERE CORRUPTED UP TO EEGLAB 13.6.5 (SEE BUG 1971)\n', 100*differs/length(EEG.event));
+    fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF\n' ...
+            'EEGLAB TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA,\n' ...
+            'EVENTS WERE CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
 end;
 
 % double check event latencies
