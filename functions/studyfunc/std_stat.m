@@ -113,9 +113,11 @@ if ~isnan(opt.eeglab.alpha(1)) && isempty(opt.eeglab.naccu), opt.eeglab.naccu = 
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if strcmpi(opt.eeglab.mcorrect, 'fdr'), opt.eeglab.naccu = opt.eeglab.naccu*20; end;
 if isempty(opt.eeglab.naccu), opt.eeglab.naccu = 2000; end;
-if strcmpi(opt.eeglab.method(1:3), 'par') && ~isreal(data{1})
-    fprintf('*** Cannot use parametric statistics for single-trial ITC significance ***\n');
-    return;
+if ~isreal(data{1})
+    fprintf('*** ITC significance - converting complex values to absolute amplitude ***\n');
+    for ind = 1:length(data(:))
+        data{ind} = abs(data{ind});
+    end;
 end;
 nc = size(data,1);
 ng = size(data,2);
