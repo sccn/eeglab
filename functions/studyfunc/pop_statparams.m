@@ -270,6 +270,12 @@ if isempty(varargin) && ~isempty(STUDY)
     % build command call
     % ------------------
     options = {};
+    if strcmp(res.stateeglab, 'param' ) && exist('fcdf') ~= 2
+        fprintf(['statcond(): EEGLAB parametric testing requires fcdf() \n' ...
+            '                 from the Matlab Statstical Toolbox. Running\n' ...
+            '                 nonparametric permutation tests instead.\n']);
+        res.stateeglab = 'perm';
+    end
     if ~strcmpi( res.groupstats,   paramstruct.groupstats),    options = { options{:} 'groupstats' res.groupstats }; end;
     if ~strcmpi( res.condstats ,   paramstruct.condstats ),    options = { options{:} 'condstats'  res.condstats  }; end;
     if ~strcmpi( res.singletrials, paramstruct.singletrials ), options = { options{:} 'singletrials'  res.singletrials }; end;
