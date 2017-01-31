@@ -127,6 +127,7 @@ for iRegion1=1:size(regions,1)
     end;
 end;
 boundevents = boundevents+0.5;
+boundevents(boundevents < 1) = [];
 
 % reject data
 % -----------
