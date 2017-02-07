@@ -66,7 +66,8 @@
 %                       values from electrodes shown in the interpolation disk only {default: 'on'}.
 %   'conv'            - ['on'|'off'] Show map interpolation only out to the convext hull of
 %                       the electrode locations to minimize extrapolation. Use this option ['on'] when 
-%                       plotting pvalues  {default: 'off'}
+%                       plotting pvalues  {default: 'off'}. When plotting pvalues in totoplot, set 
+%                       'conv' option to 'on' to minimize interpolation effects
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
@@ -1060,7 +1061,6 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  disp('Warning: When plotting pvalues in totoplot, use option ''conv'' to minimize extrapolation effects');
   if strcmpi(STYLE,'grid')                     % plot grid only
 
     %
