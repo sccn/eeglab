@@ -238,7 +238,7 @@ function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, opti
         eventVals   = { eventVals   };
     else
         % scan independent variable values
-        if strcmpi('continuous', designvar(1).vartype)
+        if isfield(designvar(1), 'vartype') && strcmpi('continuous', designvar(1).vartype)
             if ~isstr(designvar(1).value), designvar(1).value = ''; end;
             trialselect = { trialselect{:} designvar(1).label designvar(1).value };
             [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
