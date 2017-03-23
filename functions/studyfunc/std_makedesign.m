@@ -172,7 +172,7 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'delfiles'      'string'    { 'on','off', 'limited' } 'off';
                               'verbose'       'string'    { 'on','off' } 'on';
                               'defaultdesign' 'string'    { 'on','off','forceoff'} fastif(nargin < 3, 'on', 'off') }, ...
-                              'std_makedesign');
+                              'std_makedesign', 'ignore');
 if isstr(opt), error(opt); end;
 if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end;
 if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end;
