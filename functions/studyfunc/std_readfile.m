@@ -176,8 +176,8 @@ if any(strncmp('parameters', fileFields, 100))
     for index = 1:length(parameters), if iscell(parameters{index}), parameters{index} = { parameters{index} }; end; end;
     parameters = struct(parameters{:});
 end;
-if any(strncmp('times', fileFields, 100)),  measureRange1 = fileData.times; end;
-if any(strncmp('freqs', fileFields, 100)),  measureRange2 = fileData.freqs; end;
+if ~isempty(strmatch('times', fileFields, 'exact')),  measureRange1 = fileData.times; end;
+if ~isempty(strmatch('freqs', fileFields, 'exact')),  measureRange2 = fileData.freqs; end;
 
 % if the function is only called to get parameters
 % ------------------------------------------------
