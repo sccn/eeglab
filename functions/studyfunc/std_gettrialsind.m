@@ -115,7 +115,9 @@ for iVar = 1 :  length(varnames)
                 error(sprintf('Type error - excepting numerical values for field %s', varnames{iVar}));
             end;
             for iVal = 1:length(indvarvals) % programmed for speed - AD
-                hits(:,iVar) = hits(:,iVar) | strncmp(indvarvals{iVal}, dattrials, 100)';
+                hits(strmatch(indvarvals{iVal}, dattrials, 'exact'),iVar) = 1;
+                % older version not compatible with old Matlab
+                % hits(:,iVar) = hits(:,iVar) | strncmp(indvarvals{iVal}, dattrials, 100)';
             end;
         else
             if iscell(indvarvals)
