@@ -115,6 +115,9 @@ EEG.xmax   = EEG.xmax+EEG.xmin;
 [ eventtmp ] = eeg_insertboundold(EEG.event, oldEEGpnts, regions);
 [ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
 EEG = eeg_checkset(EEG, 'eventconsistency');
+if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency > EEG.pnts
+    EEG.event(end) = []; % remove last event if necessary
+end;
 
 % assess difference between old and new event latencies
 differs = 0;
@@ -141,14 +144,19 @@ if isfield(EEG.event, 'latency')
     end;
 end;
 
+
+
 % double check boundary event latencies
 if ~isempty(EEG.event) && ischar(EEG.event(1).type) && isfield(EEG.event, 'duration') && isfield(event2, 'duration')
-    indBound1 = strmatch('boundary', { EEG.event(:).type });
-    indBound2 = strmatch('boundary', { event2(:).type });
-    duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
-    duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
-    if ~isequal(duration1, duration2)
-        error(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
+    try
+        indBound1 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { EEG.event(:).type }));
+        indBound2 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { event2(:).type }));
+        duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
+        duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
+        if ~isequal(duration1, duration2)
+            error(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
+        end;
+    catch, disp('Unknown error when checking event latency - please send us your dataset');
     end;
 end;
 
