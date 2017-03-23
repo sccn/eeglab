@@ -126,7 +126,8 @@ if ~isempty(g.icaweights)
         disp('         of the mean reference value (which is now output argument 5)');
     end;
 end;
-
+if isstr(ref), ref = { ref }; end;
+if iscell(ref), ref = eeg_chaninds(g.elocs, ref); end;
 if ~isempty(ref)
     if ref > size(data,1)
         error('reference channel index out of range');
