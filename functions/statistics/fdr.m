@@ -50,7 +50,7 @@ cVN = sum(1./(1:V));
 
 if nargin < 2
     pID = ones(size(pvals));
-    thresholds = exp(linspace(log(0.1),log(0.000001), 100));
+    thresholds = exp(linspace(log(0.1),log(0.000001), 1000));
     for index = 1:length(thresholds)
         [tmp p_masked] = fdr(pvals, thresholds(index));
         pID(p_masked) = thresholds(index);    
