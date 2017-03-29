@@ -268,7 +268,10 @@ for index = 1:2:length(args)
     com = sprintf( '%s ''%s'', %d,', com, args{index}, args{index+1});
 end;
 com = [com(1:end-1) ');'];   
+wtmp = warning;
+warning off;
 clear functions
+warning(wtmp);
 
 % ---------------------------
 function  chopedtext = choptext( tmptext )
