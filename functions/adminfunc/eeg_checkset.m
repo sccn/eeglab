@@ -1250,37 +1250,8 @@ for inddataset = 1:length(ALLEEG)
     if ~isfield(EEG.reject, 'rejglobal')        EEG.reject.rejglobal  = []; res = com; end;
     if ~isfield(EEG.reject, 'rejglobalE')       EEG.reject.rejglobalE = []; res = com; end;
     
-    % check event consistency based on bug 1971
-    % -----------------------------------------
-    if ~isfield(EEG.etc, 'eeglabvers') % this means modified by earlier version of EEGLAB
-        bugstring = {   'EEG = eeg_eegrej( EEG, [1 ' ...
-                        'EEG = eeg_eegrej( EEG, [0 ' ...
-                        'EEG = pop_select( EEG,''notime'',[0 ' ...
-                        'EEG = pop_select( EEG,''nopoint'',[1 ' ...
-                        'EEG = pop_select( EEG,''time'',[' ...
-                        'EEG = pop_select( EEG,''point'',['  };
-        strind = [];
-        for iBug = 1:length(bugstring)
-            strindtmp = strfind(EEG.history, bugstring{iBug});
-            
-            if ~isempty(strindtmp) && (iBug == 5 || iBug == 6)
-                for iStr = length(strindtmp):-1:1
-                    tmpstr = EEG.history(strindtmp(iStr)+length(bugstring{iBug}):end);
-                    firstspace = find(tmpstr == ' ');
-                    tmpstr = tmpstr(1:firstspace(1)); % get first value for rejected data
-                    if str2double(tmpstr) == 0 && iBug == 5, strindtmp(iStr) = []; end; % time starting with 0 (no bug here)
-                    if str2double(tmpstr) == 1 && iBug == 6, strindtmp(iStr) = []; end; % point starting with 1 (no bug here)
-                end;
-            end;
-            strind = [ strind strindtmp(:)' ];
-        end;
-        if any(strind)
-            warndlg2([ 'NOTICE: ACCORDING TO THIS DATASET''S HISTORY, SINCE YOU REJECTED THE BEGINNING' 10 ...
-                       'OF THE DATA IN A PREVIOUS EEGLAB VERSION, EVENTS RECORDS IN THIS DATASET HAVE' 10 ...
-                       'BEEN CORRUPTED. YOU MUST GO BACK TO THE CONTINUOUS DATA AND REPROCESS THIS' 10 ...
-                       'DATASET.  FOR MORE INFORMATION SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971' ]);
-        end;
-    end;
+    % track version of EEGLAB
+    % -----------------------
     tmpvers = eeg_getversion;
     if ~isfield(EEG.etc, 'eeglabvers') || ~isequal(EEG.etc.eeglabvers, tmpvers)
         EEG.etc.eeglabvers = tmpvers;
