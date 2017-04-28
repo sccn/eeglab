@@ -107,36 +107,47 @@ regions = combineregions(regions);
 
 [EEG.data, EEG.xmax, event2, boundevents] = eegrej( EEG.data, regions, EEG.xmax-EEG.xmin, EEG.event);
 oldEEGpnts = EEG.pnts;
+oldEEGevents = EEG.event;
 EEG.pnts   = size(EEG.data,2);
 EEG.xmax   = EEG.xmax+EEG.xmin;
 
 % add boundary events
 % -------------------
-[ eventtmp ] = eeg_insertboundold(EEG.event, oldEEGpnts, regions);
 [ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
 EEG = eeg_checkset(EEG, 'eventconsistency');
 if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency > EEG.pnts
     EEG.event(end) = []; % remove last event if necessary
 end;
 
-% assess difference between old and new event latencies
-differs = 0;
-for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
-    if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
-        differs = differs+1;
-    end;
-end;
-if 100*differs/length(EEG.event) > 50
-    fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF\n' ...
-            'EEGLAB TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA,\n' ...
-            'EVENTS WERE CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
-end;
-
 % double check event latencies
 % the function that insert boundary events and recompute latency is
 % delicate so we do it twice using different methods and check
 % the results. It is longer, but accuracy is paramount.
-if isfield(EEG.event, 'latency')
+if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
+    % assess difference between old and new event latencies
+    [ eventtmp ] = eeg_insertboundold(oldEEGevents, oldEEGpnts, regions);
+    if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && isequal(eventtmp(1).type, 'boundary')
+        eventtmp(1) = [];
+    end;
+    if isfield(eventtmp, 'duration')
+        for iEvent=1:length(eventtmp)
+            if isempty(eventtmp(iEvent).duration)
+                eventtmp(iEvent).duration = 0;
+            end;
+        end;
+    end;
+    differs = 0;
+    for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
+        if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
+            differs = differs+1;
+        end;
+    end;
+    if 100*differs/length(EEG.event) > 50
+        fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF\n' ...
+                'EEGLAB TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA,\n' ...
+                'EVENTS WERE CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
+    end;
+    
     alllats = [ EEG.event.latency ];
     otherlatencies = [event2.latency];
     if ~isequal(alllats, otherlatencies)
@@ -144,10 +155,8 @@ if isfield(EEG.event, 'latency')
     end;
 end;
 
-
-
 % double check boundary event latencies
-if ~isempty(EEG.event) && ischar(EEG.event(1).type) && isfield(EEG.event, 'duration') && isfield(event2, 'duration')
+if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) && isfield(EEG.event, 'duration') && isfield(event2, 'duration')
     try
         indBound1 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { EEG.event(:).type }));
         indBound2 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { event2(:).type }));
