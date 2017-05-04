@@ -178,6 +178,10 @@ if isfield(EEG.event, 'latency')
             
             EEG.event( iEvt ).latency = ( EEG.event( iEvt ).latency - ( EEG.event(iEvt).epoch - 1 ) * oldpnts - 1 ) * p / q + ( EEG.event(iEvt).epoch - 1 ) * EEG.pnts + 1;
             
+            % % Recompute event latencies
+            if isfield(EEG.event, 'duration') && ~isempty(EEG.event(iEvt).duration)
+                EEG.event( iEvt ).duration = EEG.event( iEvt ).duration * p/q;
+            end
         end
         
         EEG.urevent = [];
@@ -201,6 +205,11 @@ if isfield(EEG.event, 'latency')
             else
                 iBnd = sum(EEG.event(iEvt).latency >= bounds);
                 EEG.event(iEvt).latency = (EEG.event(iEvt).latency - bounds(iBnd)) * p / q + indices(iBnd);
+            end
+            
+            % Recompute event duration relative to segment onset
+            if isfield(EEG.event, 'duration') && ~isempty(EEG.event(iEvt).duration)
+                EEG.event( iEvt ).duration = EEG.event( iEvt ).duration * p/q;
             end
 
         end
