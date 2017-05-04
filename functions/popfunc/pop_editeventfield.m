@@ -23,7 +23,8 @@
 %               'FIELDNAME_X' may be 'latency', 'type', 'duration'.
 %  'latency'  - [ 'filename'|vector ] example of field name (see description above).
 %  'type'     - [ 'filename'|vector ] example of field name (see description above).
-%  'duration' - [ 'filename'|vector ] example of field name (see description above).
+%  'duration' - [ 'filename'|vector ] example of field name (see description above). 
+%               Units must be in seconds (s).
 %  'FIELDNAME_X_info' - new comment string for field FIELDNAME_X.
 %  'latency_info'     - description string for the latency field.
 %  'type_info'        - description string for the type field.
@@ -342,7 +343,7 @@ for curfield = tmpfields'
 							  end;
  							  if strcmp(curfield{1}, 'duration')
                                   for indtmp = 1:length(EEG.event)
-                                      EEG.event(indtmp).duration = EEG.event(indtmp).duration/EEG.srate;
+                                      EEG.event(indtmp).duration = EEG.event(indtmp).duration*EEG.srate;
                                   end;
 							  end;
                               if isfield(EEG, 'urevent')
