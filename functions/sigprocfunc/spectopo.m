@@ -194,6 +194,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'icamaps'       'integer'  []                       [] ;
                   'rmdc'          'string'   {'on','off'}             'off';
                   'verbose'       'string'   {'on','off'}             'on';
+                  'wintype'       'string'   {}                       'hamming';
 				  'mapchans'      'integer'  [1:size(data,1)]         [] 
                   'mapframes'     'integer'  [1:size(data,2)]         []};
 	
@@ -884,7 +885,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
         winlength = g.winsize;
     end;
     
-     if strcmp(g.wintype,'blackmanharris')
+    if strcmpi(g.wintype,'blackmanharris')
          if usepwelch
              winlength = blackmanharris(round(winlength/g.blckhn));
          else
@@ -892,7 +893,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
              fprintf('\nSignal processing toolbox (SPT) absent: unable to use Blackman-Harris window\n');
              fprintf('                                        using pwelch function from Octave\n');
          end
-     end
+    end
         
     if isempty(g.nfft) && strcmp(g.wintype,'hamming')
         %fftlength = 2^(nextpow2(winlength))*g.freqfac;
