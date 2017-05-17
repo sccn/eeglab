@@ -1,7 +1,7 @@
 % eeg_insertbound() - insert boundary event in an EEG event structure.
 %
 % Usage:
-%       >> [eventout indnew] = eeg_insertbound( eventin, pnts, ...
+%       >> [eventout newind] = eeg_insertbound( eventin, pnts, ...
 %                                                abslatency, duration);
 % Required Inputs:
 %   eventin    - EEGLAB event structure (EEG.event)
@@ -14,10 +14,7 @@
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
-<<<<<<< HEAD
-%   indnew     - Indices of the new events
-=======
->>>>>>> New code to recompute event latencies
+%   newind     - Indices of the new events
 %
 % Notes:
 %   This function performs the following: 
