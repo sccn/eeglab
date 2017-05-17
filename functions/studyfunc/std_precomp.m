@@ -521,26 +521,4 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     function res = computeFullFileName(filePaths, fileNames);
         for index = 1:length(fileNames)
             res{index} = fullfile(filePaths{index}, fileNames{index});
-<<<<<<< HEAD
         end;
-=======
-        end;
-        
-    % combine trial information
-    % -------------------------
-    function trialinfo = combine_trialinfo(datasetinfo, inds);
-
-        trialinfo = [ datasetinfo(inds).trialinfo ];
-        nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
-        
-        for iDat = 1:length(inds)
-            [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
-            [trialinfo(nvals(iDat):nvals(iDat+1)-1).group    ] = deal( datasetinfo(inds(iDat)).group     );
-            [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
-        end;
-<<<<<<< HEAD
-        
->>>>>>> Remove code snippet for trial information
-=======
-        
->>>>>>> Remove code snippet for trial information
