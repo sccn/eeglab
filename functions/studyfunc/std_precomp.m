@@ -259,7 +259,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 if length(inds)>1 && ~isequal(chanlist{inds})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                 end;
-                std_erp(ALLEEG(inds), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.erpparams{:});
+                std_erp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:}, g.erpparams{:});
             end;
         end;
         if isfield(curstruct, 'erpdata')
