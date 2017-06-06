@@ -165,9 +165,9 @@ if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) 
         duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
         duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
         if ~isequal(duration1, duration2)
-            error(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
+            warning(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
         end;
-    catch, disp('Unknown error when checking event latency - please send us your dataset');
+    catch, warning('Unknown error when checking event latency - please send us your dataset');
     end;
 end;
 
