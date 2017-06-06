@@ -148,11 +148,11 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
                 'EVENTS WERE CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
     end
     
+    alllats = [ EEG.event.latency ];
     if ~isempty(event2)
-        alllats = [ EEG.event.latency ];
         otherlatencies = [event2.latency];
         if ~isequal(alllats, otherlatencies)
-            error([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+            warning([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
         end
     end
 end
@@ -165,9 +165,9 @@ if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) 
         duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
         duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
         if ~isequal(duration1, duration2)
-            error(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
+            warning(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
         end;
-    catch, disp('Unknown error when checking event latency - please send us your dataset');
+    catch, warning('Unknown error when checking event latency - please send us your dataset');
     end;
 end;
 
