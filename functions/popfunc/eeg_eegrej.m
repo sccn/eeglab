@@ -128,32 +128,34 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     [ eventtmp ] = eeg_insertboundold(oldEEGevents, oldEEGpnts, regions);
     if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && isequal(eventtmp(1).type, 'boundary')
         eventtmp(1) = [];
-    end;
+    end
     if isfield(eventtmp, 'duration')
         for iEvent=1:length(eventtmp)
             if isempty(eventtmp(iEvent).duration)
                 eventtmp(iEvent).duration = 0;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     differs = 0;
     for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
         if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
             differs = differs+1;
-        end;
-    end;
+        end
+    end
     if 100*differs/length(EEG.event) > 50
         fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF\n' ...
                 'EEGLAB TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA,\n' ...
                 'EVENTS WERE CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
-    end;
+    end
     
     alllats = [ EEG.event.latency ];
-    otherlatencies = [event2.latency];
-    if ~isequal(alllats, otherlatencies)
-        error([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
-    end;
-end;
+    if ~isempty(event2)
+        otherlatencies = [event2.latency];
+        if ~isequal(alllats, otherlatencies)
+            warning([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+        end
+    end
+end
 
 % double check boundary event latencies
 if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) && isfield(EEG.event, 'duration') && isfield(event2, 'duration')
