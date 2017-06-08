@@ -4,7 +4,7 @@
 %   >>   EEG = std_lm_seteegfields(STUDY,index,'datatype','Channels','format', 'cell')
 %
 % Inputs:
-%      STUDY    - studyset structure containing some or all files in ALLEEG
+%      STUDY    - studyset structure containing some or all files in EEG
 %      index    - index of dataset in STUDY.datasetinfo
 %
 % Optional inputs:
@@ -16,10 +16,10 @@
 %
 % See also:
 %
-% Author: Cyril Pernet, The university of Edinburgh
-%         Arnaud Delorme, SCCN
-%         Ramon Martinez-Cancino, SCCN
-%
+% Authors: Cyril Pernet, The university of Edinburgh
+%          Arnaud Delorme, SCCN
+%          Ramon Martinez-Cancino, SCCN
+
 % Copyright (C) 2015  Ramon Martinez-Cancino,INC, SCCN
 %
 % This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function EEG = std_lm_seteegfields(STUDY,index,varargin)
+function EEG = std_lm_seteegfields(STUDY,EEG,index,varargin)
 
 %% Settings defaults
 %  -----------------
@@ -84,8 +84,6 @@ end
 %% Loading datase
 %  --------------
 path_tmp = rel2fullpath(STUDY.filepath,STUDY.datasetinfo(index).filepath); 
-EEG = fullfile(path_tmp,STUDY.datasetinfo(index).filename);
-ALLEEG = pop_loadset(EEG);
 name = fullfile(path_tmp, STUDY.datasetinfo(index).subject);
 
 %% Channels: update EEG.set file
@@ -94,56 +92,56 @@ if strcmpi(opt.datatype,'channels')
     % DATERP 
     if strcmp(opt.erp,'on')
         data = load('-mat',[name '.daterp']);
-        ALLEEG.etc.timeerp = data.times;
+        EEG.etc.timeerp = data.times;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_daterp.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.daterp = [name '_daterp.mat'];
+            EEG.etc.datafiles.daterp = [name '_daterp.mat'];
             delete([name '.daterp']);
         else
-            ALLEEG.etc.datafiles.daterp = [name '.daterp'];
+            EEG.etc.datafiles.daterp = [name '.daterp'];
         end
     end
     % DATSPEC
     if strcmp(opt.spec,'on')
         data = load('-mat',[name '.datspec']);
-        ALLEEG.etc.freqspec = data.freqs;
+        EEG.etc.freqspec = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_datspec.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.datspec = [name '_datspec.mat'];
+            EEG.etc.datafiles.datspec = [name '_datspec.mat'];
             delete([name '.datspec']);
         else
-            ALLEEG.etc.datafiles.datspec = [name '.datspec'];
+            EEG.etc.datafiles.datspec = [name '.datspec'];
         end
     end
     % DATERSP    
     if strcmp(opt.ersp,'on')
         disp('reading single trials ersp, be patient ..')
         data = load('-mat',[name '.dattimef']);
-        ALLEEG.etc.timeersp = data.times;
-        ALLEEG.etc.freqersp = data.freqs;
+        EEG.etc.timeersp = data.times;
+        EEG.etc.freqersp = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_datersp.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.datersp = [name '_datersp.mat'];
+            EEG.etc.datafiles.datersp = [name '_datersp.mat'];
             delete([name '.dattimef']);
         else
-            ALLEEG.etc.datafiles.datersp = [name '.dattimef'];
+            EEG.etc.datafiles.datersp = [name '.dattimef'];
         end
     end
     % DATITC
     if strcmp(opt.itc,'on')
         data = load('-mat',[name '.datitc']);
-        ALLEEG.etc.timeitc = data.times;
-        ALLEEG.etc.freqitc = data.freqs;
+        EEG.etc.timeitc = data.times;
+        EEG.etc.freqitc = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_datitc.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.datitc = [name '_datitc.mat'];
+            EEG.etc.datafiles.datitc = [name '_datitc.mat'];
             delete([name '.datitc']);
         else
-            ALLEEG.etc.datafiles.datitc = [name '.datitc'];
+            EEG.etc.datafiles.datitc = [name '.datitc'];
         end
     end
 end
@@ -153,61 +151,57 @@ end
 if strcmpi(opt.datatype,'components')
     if strcmp(opt.erp,'on')
         data = load('-mat',[name '.icaerp']);
-        ALLEEG.etc.timeerp = data.times;
+        EEG.etc.timeerp = data.times;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_icaerp.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.daterp = [name '_icaerp.mat'];
+            EEG.etc.datafiles.daterp = [name '_icaerp.mat'];
             delete([name '.icaerp']);
         else
-            ALLEEG.etc.datafiles.icaerp = [name '.icaerp'];
+            EEG.etc.datafiles.icaerp = [name '.icaerp'];
         end
     end
     % ICAERP
     if strcmp(opt.spec,'on')
         data = load('-mat',[name '.icaspec']);
-        ALLEEG.etc.freqspec = data.freqs;
+        EEG.etc.freqspec = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_icaspec.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.datspec = [name '_icaspec.mat'];
+            EEG.etc.datafiles.datspec = [name '_icaspec.mat'];
             delete([name '.icaspec']);
         else
-            ALLEEG.etc.datafiles.icaspec = [name '.icaspec'];
+            EEG.etc.datafiles.icaspec = [name '.icaspec'];
         end
     end
     % ICAERSP    
     if strcmp(opt.ersp,'on')
         data = load('-mat',[name '.icatimef']);
-        ALLEEG.etc.timeersp = data.times;
-        ALLEEG.etc.freqersp = data.freqs;
+        EEG.etc.timeersp = data.times;
+        EEG.etc.freqersp = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_icaersp.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.datersp = [name '_icaersp.mat'];
+            EEG.etc.datafiles.datersp = [name '_icaersp.mat'];
             delete([name '.icatimef']);
         else
-            ALLEEG.etc.datafiles.icaersp = [name '.icatimef'];
+            EEG.etc.datafiles.icaersp = [name '.icatimef'];
         end
     end
     % ICAITC
     if strcmp(opt.itc,'on')
         data = load('-mat',[name '.icaitc']);
-        ALLEEG.etc.timeitc = data.times;
-        ALLEEG.etc.freqitc = data.freqs;
+        EEG.etc.timeitc = data.times;
+        EEG.etc.freqitc = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
             save([name '_icaitc.mat'],'data'); clear data
-            ALLEEG.etc.datafiles.datitc = [name '_icaitc.mat'];
+            EEG.etc.datafiles.datitc = [name '_icaitc.mat'];
             delete([name '.icaitc']);
         else
-            ALLEEG.etc.datafiles.icaitc = [name '.icaitc'];
+            EEG.etc.datafiles.icaitc = [name '.icaitc'];
         end
     end
-end
-%%
-EEG = ALLEEG; clear ALLEEG;
-pop_saveset(EEG, 'filename', EEG.filename, 'filepath',EEG.filepath,'savemode' ,'twofiles');
 end
 
 % -------------------------------------------------------------------------
@@ -235,5 +229,4 @@ for i = 1:nit
             file_fullpath = pathtmp;
         end
     end
-end
 end
