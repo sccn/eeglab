@@ -332,7 +332,7 @@ for s = 1:nb_subjects
     OUTEEG = [];
     
     if all([ALLEEG(index).trials] == 1)
-        OUTEEG.trials = 1;
+         OUTEEG.trials = 1;
     else OUTEEG.trials = sum([ALLEEG(index).trials]);
     end
     
@@ -343,7 +343,6 @@ for s = 1:nb_subjects
     OUTEEG.icaweights = ALLEEG(index(1)).icaweights;
     OUTEEG.icasphere  = ALLEEG(index(1)).icasphere;
     OUTEEG.icasphere  = ALLEEG(index(1)).icasphere;
-    OUTEEG.srate      = ALLEEG(index).trials;
     OUTEEG.chanlocs   = ALLEEG(index(1)).chanlocs;
     OUTEEG.etc        = ALLEEG(index(1)).etc;
     
