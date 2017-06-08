@@ -9,17 +9,19 @@
 %               See >> topoplot example for file format.
 %
 % Optional ordered inputs:
-%  'limits'    = [minms maxms minval maxval] data limits for latency (in ms) and y-values
+%  'limits'      = [minms maxms minval maxval] data limits for latency (in ms) and y-values
 %                 (assumes uV) {default|0 -> use [0 npts-1 data_min data_max]; 
-%                 else [minms maxms] or [minms maxms 0 0] -> use
-%                [minms maxms data_min data_max]
-%  'plottimes' = [vector] latencies (in ms) at which to plot scalp maps 
-%                {default|NaN -> latency of maximum variance}
-% 'title'      = [string] plot title {default|0 -> none}
-% 'plotchans'  = vector of data channel(s) to plot. Note that this does not
-%                affect scalp topographies {default|0 -> all}
-% 'voffsets'   = vector of (plotting-unit) distances vertical lines should extend 
-%                above the data (in special cases) {default -> all = standard}
+%                  else [minms maxms] or [minms maxms 0 0] -> use
+%                  [minms maxms data_min data_max]
+%  'plottimes'   = [vector] latencies (in ms) at which to plot scalp maps 
+%                  {default|NaN -> latency of maximum variance}
+% 'title'        = [string] plot title {default|0 -> none}
+% 'plotchans'    = vector of data channel(s) to plot. Note that this does not
+%                  affect scalp topographies {default|0 -> all}
+% 'voffsets'     = vector of (plotting-unit) distances vertical lines should extend 
+%                  above the data (in special cases) {default -> all = standard}
+% 'plotenvelope' = [0 1] Flag to plot [1] or do not [0] the envelopes of all
+%                  the time series plotted {default |0 -> Do not plot envelopes}
 %
 % Optional keyword, arg pair inputs (must come after the above):
 % 'topokey','val' = optional topoplot() scalp map plotting arguments. See >> help topoplot 
@@ -90,7 +92,8 @@ fieldlist = { 'limits'        'real'     []                       0;
               'plottimes'     'real'     []                       [];
               'title'         'string'   []                       '';
               'plotchans'     'integer'  [1:size(data,1)]         0;
-              'voffsets'      'real'     []                       [] ;};
+              'voffsets'      'real'     []                       [];
+              'plotenvelope'  'real'     [0 1]                    0};
 [g topoargs] = finputcheck(options, fieldlist, 'timtopo', 'ignore');
 
 if ischar(g), error(g); end;
@@ -328,6 +331,13 @@ set(yl,'FontSize',axfont,'FontAngle','normal');
 axis([xmin xmax ymin ymax]);
 hold on
 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%% Compute and plot envelopes %%%%%%%%%%%%%%%%%%%
+%
+if g.plotenvelope
+    envelopes = minmax(data')';
+    plot(x,envelopes,'Tag','envelopes','Linewidth',2,'color',[0 0 0]);
+end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot zero time line %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
