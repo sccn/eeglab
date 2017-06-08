@@ -68,11 +68,13 @@ function [STUDY, LIMO_files] = std_limo(STUDY,ALLEEG,varargin)
 
 LIMO_files = [];
 
+cd(STUDY.filepath);
 if nargin < 2
     help std_limo;
     return;
 end;
 
+warning('off', 'MATLAB:lang:cannotClearExecutingFunction');
 if isstr(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}, 'datspec') || strcmpi(varargin{1}, 'icaerp')|| strcmpi(varargin{1}, 'icaspec'))
     opt.measure  = varargin{1};
     opt.design   = varargin{2};
@@ -298,86 +300,96 @@ else
 end
 % -------------------------------------------------------------------------
 for s = 1:nb_subjects     
-    % model.set_files: a cell array of EEG.set (full path) for the different subjects
-    if nb_sets == 1
-        index = STUDY.datasetinfo(order{s}).index;
-        names{s} = STUDY.datasetinfo(order{s}).subject;
-        
-        % Creating fields for limo
-        % ------------------------
-        ALLEEG(index) = std_lm_seteegfields(STUDY,order{s},'datatype',model.defaults.type,'format', 'cell');
-        file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
-        model.set_files{s} = fullfile(file_fullpath,ALLEEG(index).filename);
+    filename = [ STUDY.datasetinfo(order{s}(1)).subject '_limo_file_tmp' num2str(design_index) '.set'];
+    index = [STUDY.datasetinfo(order{s}).index];
+    tmp   = {STUDY.datasetinfo(order{s}).subject};
+    if length(unique(tmp)) ~= 1
+        error('it seems that sets of different subjects are merged')
     else
-        filename = [ STUDY.datasetinfo(order{s}).subject 'merged_datasets_design' num2str(design_index) '.set'];
-        index = [STUDY.datasetinfo(order{s}).index];
-        tmp   = {STUDY.datasetinfo(order{s}).subject};
-        if length(unique(tmp)) ~= 1
-            error('it seems that sets of different subjects are merged')
-        else
-            names{s} =  cell2mat(unique(tmp));
-        end
-        
-        % Creating fields for limo
-        % ------------------------
-        for sets = 1:length(index)
-            EEGTMP = std_lm_seteegfields(STUDY,index(sets),'datatype',model.defaults.type,'format', 'cell');
-            ALLEEG = eeg_store(ALLEEG, EEGTMP, index(sets));
-        end
-        
-        file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
-        model.set_files{s} = fullfile(file_fullpath , filename);
-        
-        if exist(file_fullpath) ~= 2
-            OUTEEG = pop_mergeset(ALLEEG,index,1);
-            OUTEEG.filename = filename;
-            OUTEEG.datfile = [];
-            
-            % update EEG.etc
-            OUTEEG.etc.merged{1} = ALLEEG(index(1)).filename;
-            
-            % Def fields
-            OUTEEG.etc.datafiles.daterp   = [];
-            OUTEEG.etc.datafiles.datspec  = [];
-            OUTEEG.etc.datafiles.dattimef = [];
-            OUTEEG.etc.datafiles.datitc   = [];
-            OUTEEG.etc.datafiles.icaerp   = [];
-            OUTEEG.etc.datafiles.icaspec  = [];
-            OUTEEG.etc.datafiles.icatimef = [];
-            OUTEEG.etc.datafiles.icaitc   = [];
-            
-            % Filling fields
-            if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
-                OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
-            end
-            if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
-                OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
-            end
-            if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
-                OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
-            end
-            if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
-                OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
-            end
-            if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
-                OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
-            end
-            if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
-                OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
-            end
-            if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
-                OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
-            end
-            if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
-                OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
-            end
-            
-            filepath_tmp = rel2fullpath(STUDY.filepath,OUTEEG.filepath);
-            % Save info
-            pop_saveset(OUTEEG, 'filename', OUTEEG.filename, 'filepath',filepath_tmp,'savemode' ,'twofiles');
-            clear OUTEEG filepath_tmp
-        end
+        names{s} =  cell2mat(unique(tmp));
     end
+    
+    % Creating fields for limo
+    % ------------------------
+    for sets = 1:length(index)
+        EEGTMP = std_lm_seteegfields(STUDY,ALLEEG(index(sets)), index(sets),'datatype',model.defaults.type,'format', 'cell');
+        ALLEEG = eeg_store(ALLEEG, EEGTMP, index(sets));
+    end
+    
+    file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
+    model.set_files{s} = fullfile(file_fullpath , filename);
+    
+    % field which are needed
+    % EEGLIMO.etc
+    % EEGLIMO.times
+    % EEGLIMO.chanlocs
+    % EEGLIMO.srate
+    % EEGLIMO.filepath
+    % EEGLIMO.filename
+    % EEGLIMO.icawinv
+    % EEGLIMO.icaweights
+    
+    OUTEEG = [];
+    
+    if all([ALLEEG(index).trials] == 1)
+        OUTEEG.trials = 1;
+    else OUTEEG.trials = sum([ALLEEG(index).trials]);
+    end
+    
+    filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
+    OUTEEG.filepath   = filepath_tmp;
+    OUTEEG.filename   = filename;
+    OUTEEG.srate      = ALLEEG(index(1)).srate;
+    OUTEEG.icaweights = ALLEEG(index(1)).icaweights;
+    OUTEEG.icasphere  = ALLEEG(index(1)).icasphere;
+    OUTEEG.icasphere  = ALLEEG(index(1)).icasphere;
+    OUTEEG.srate      = ALLEEG(index).trials;
+    OUTEEG.chanlocs   = ALLEEG(index(1)).chanlocs;
+    OUTEEG.etc        = ALLEEG(index(1)).etc;
+    
+    % update EEG.etc
+    OUTEEG.etc.merged{1} = ALLEEG(index(1)).filename;
+    
+    % Def fields
+    OUTEEG.etc.datafiles.daterp   = [];
+    OUTEEG.etc.datafiles.datspec  = [];
+    OUTEEG.etc.datafiles.dattimef = [];
+    OUTEEG.etc.datafiles.datitc   = [];
+    OUTEEG.etc.datafiles.icaerp   = [];
+    OUTEEG.etc.datafiles.icaspec  = [];
+    OUTEEG.etc.datafiles.icatimef = [];
+    OUTEEG.etc.datafiles.icaitc   = [];
+    
+    % Filling fields
+    if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
+        OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
+    end
+    if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
+        OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
+    end
+    if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
+        OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
+    end
+    if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
+        OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
+    end
+    if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
+        OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
+    end
+    if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
+        OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
+    end
+    if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
+        OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
+    end
+    if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
+        OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
+    end
+    
+    % Save info
+    EEG = OUTEEG;
+    save('-mat', fullfile( filepath_tmp, OUTEEG.filename), 'EEG');
+    clear OUTEEG filepath_tmp
     
     catvar_matrix = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cat');
 
