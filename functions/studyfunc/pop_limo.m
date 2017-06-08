@@ -3,10 +3,14 @@
 %
 % Usage:
 %   >> STUDY = pop_limo( STUDY, ALLEEG, 'key', val)
+%   >> STUDY = pop_limo( STUDY, ALLEEG, 'dat', 'key', val)
+%   >> STUDY = pop_limo( STUDY, ALLEEG, 'ica', 'key', val)
 %
 % Inputs:
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
+%   'dat'|'ica'  - show the interface for data channels or for ICA. The
+%                  default is to use data.
 %
 % Optional inputs: same as std_limo()
 %
@@ -38,15 +42,20 @@ function [STUDY,com] = pop_limo(STUDY, ALLEEG, measureflag, varargin)
 if nargin < 2
     help pop_limo;
     return;
-end;
+end
+
 com = '';
-if strcmpi(measureflag,'dat')
-    measureflagindx = 1;
-elseif strcmpi(measureflag,'ica')
-    measureflagindx = 2;
+if nargin > 2
+    if strcmpi(measureflag,'dat')
+        measureflagindx = 1;
+    elseif strcmpi(measureflag,'ica')
+        measureflagindx = 2;
+    else
+        varargin = { measureflag varargin{:} };
+        measureflagindx = 1;
+    end
 else
-    fprintf(2,'pop_limo error: Invalid '' measureflag '' input provided \n');
-    return;
+    measureflagindx = 1;
 end
     
 if nargin < 4
@@ -82,14 +91,7 @@ if nargin < 4
     options = { 'method' methods{res.method} 'measure' fileMeasures{measureflagindx,res.measure} opttmp{:} 'erase' fastif(res.erase, 'on', 'off') 'splitreg' 'off' };
 else
     options = varargin;
-end;
-if strcmp(fastif(res.erase, 'on', 'off'), 'on')
-    if exist([STUDY.filepath filesep 'limo_batch_report'],'dir')
-        try
-            rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
-        catch
-        end
-    end
 end
+
 [STUDY tmp] = std_limo(STUDY, ALLEEG, options{:});
 com = sprintf('pop_limo(STUDY, ALLEEG, %s);', vararg2str(options));
