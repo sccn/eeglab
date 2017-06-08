@@ -64,7 +64,7 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
     if isempty(EEG.chanlocs)
         disp('std_prepare_neighbors: cannot prepare channel neighbour structure because of empty channel structures');
         return;
-    end;
+    end
     
     if ~isempty(STUDY.etc.statistics.fieldtrip.channelneighbor) && isempty(addopts) && ...
         length(STUDY.etc.statistics.fieldtrip.channelneighbor) == length(EEG.chanlocs)
@@ -77,7 +77,7 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
         if ~isempty(opt.channels)
             indChans = eeg_chaninds(EEG, opt.channels);
             EEG.chanlocs = EEG.chanlocs(indChans);
-        end;
+        end
         
         EEG.nbchan   = length(EEG.chanlocs);
         EEG.data     = zeros(EEG.nbchan,100,1);
@@ -94,32 +94,40 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
         addparams = eval( [ '{' STUDY.etc.statistics.fieldtrip.channelneighborparam '}' ]);
         for index = 1:2:length(addparams)
             tmpcfg = setfield(tmpcfg, addparams{index}, addparams{index+1});
-        end;
+        end
         for index = 1:2:length(addopts)
             tmpcfg = setfield(tmpcfg, addopts{index}, addopts{index+1});
-        end;
+        end
         warning off;
-        cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg);
+        if isfield(EEG.chanlocs, 'theta') && ~isempty(EEG.chanlocs(1).theta)
+            cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg);
+            neighbors = cfg.neighbors;
+        else
+            neighbors = [];
+        end
         warning on;
-        neighbors = cfg.neighbors;
         
-    end;
+    end
 
     STUDY.etc.statistics.fieldtrip.channelneighbor = neighbors;
     
     if nargout > 2
         limostruct.expected_chanlocs = EEG.chanlocs;
-        limostruct.channeighbstructmat = zeros(length(EEG.chanlocs));
-        allLabels = { neighbors.label };
-        
-        for iN = 1:length(neighbors)
-            if ~isequal(neighbors(iN).label, limostruct.expected_chanlocs(iN).labels)
-                error('Wrong label');
-            else
-                [tmp posChan] = intersect( allLabels, neighbors(iN).neighblabel);
-                limostruct.channeighbstructmat(iN,posChan) = 1;
-                limostruct.channeighbstructmat(posChan,iN) = 1;
-            end;
-        end;
-    end;
-end;
+
+        if ~isempty(neighbors)
+            allLabels = { neighbors.label };
+            limostruct.channeighbstructmat = zeros(length(EEG.chanlocs));
+            for iN = 1:length(neighbors)
+                if ~isequal(neighbors(iN).label, limostruct.expected_chanlocs(iN).labels)
+                    error('Wrong label');
+                else
+                    [tmp posChan] = intersect( allLabels, neighbors(iN).neighblabel);
+                    limostruct.channeighbstructmat(iN,posChan) = 1;
+                    limostruct.channeighbstructmat(posChan,iN) = 1;
+                end
+            end
+        else
+            limostruct.channeighbstructmat = ones(length(EEG.chanlocs));
+        end
+    end
+end
