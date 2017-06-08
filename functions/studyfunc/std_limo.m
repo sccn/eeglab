@@ -92,7 +92,8 @@ else
           'neighbormat'    'real'    []               [] },...
           'std_limo');
     if isstr(opt), error(opt); end;
-end;
+end
+
 Analysis     = opt.measure;
 design_index = opt.design;
 
@@ -192,6 +193,13 @@ end
 % -------------------------------------------------------------------------
 % NOTE: Clean up the .lock files to (to be implemented)
 if strcmp(opt.erase,'on')
+    if exist([STUDY.filepath filesep 'limo_batch_report'],'dir')
+        try
+            rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
+        catch
+        end
+    end
+    
     [tmp,filename] = fileparts(STUDY.filename);
     
     % Cleaning level 1 folders
@@ -301,7 +309,7 @@ for s = 1:nb_subjects
         file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
         model.set_files{s} = fullfile(file_fullpath,ALLEEG(index).filename);
     else
-        filename = ['merged_datasets_design' num2str(design_index) '.set'];
+        filename = [ STUDY.datasetinfo(order{s}).subject 'merged_datasets_design' num2str(design_index) '.set'];
         index = [STUDY.datasetinfo(order{s}).index];
         tmp   = {STUDY.datasetinfo(order{s}).subject};
         if length(unique(tmp)) ~= 1
@@ -677,11 +685,11 @@ nit = 1; if iscell(filepath), nit = length(filepath);end
 for i = 1:nit
     if iscell(filepath),pathtmp = filepath{i}; else pathtmp = filepath; end
     if strfind(pathtmp(end),filesep), pathtmp = pathtmp(1:end-1); end % Getting rid of filesep at the end
-    if strfind(pathtmp(1:2),['.' filesep])
+    if ~isempty(strfind(pathtmp(1:2),['.' filesep])) || (isunix && pathtmp(1) ~= '/') || (ispc && pathtmp(2) ~= ':')
         if iscell(filepath),
-            file_fullpath{i} = fullfile(studypath,pathtmp(3:end));
+            file_fullpath{i} = fullfile(studypath,pathtmp(1:end));
         else
-            file_fullpath = fullfile(studypath,pathtmp(3:end));
+            file_fullpath = fullfile(studypath,pathtmp(1:end));
         end
     else
         if iscell(filepath),
