@@ -335,11 +335,12 @@ for index = 1:size(arg2(:),1)
                  figure(curfig);  if nbgraph > 1, axes(curax); end;
                  tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, options{:} );
             end;    			
-			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
-			else             texttitle = ['' int2str(arg2(index))];
+			if nbgraph == 1, texttitle = ['IC ' int2str(arg2(index)) ' from ' topotitle];
+			else             texttitle = ['IC ' int2str(arg2(index))];
 			end;
             if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end;
-            figure(curfig);  if nbgraph > 1, axes(curax); end; title(texttitle);
+            figure(curfig);  if nbgraph > 1, axes(curax); end; htmp = title(texttitle);
+            try, icadefs; set(htmp,'FontSize',AXES_FONTSIZE_L); catch, end; clear htmp;
 		end;
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
         countobj = countobj+length(tmpobj);
@@ -366,7 +367,8 @@ if colorbar_switch
     end
     if ~typeplot    % Draw '+' and '-' instead of numbers for colorbar tick labels
         tmp = get(gca, 'ytick');
-        set(gca, 'ytickmode', 'manual', 'yticklabelmode', 'manual', 'ytick', [tmp(1) tmp(end)], 'yticklabel', { '-' '+' });
+        set(gca, 'ytickmode', 'manual', 'yticklabelmode', 'manual', 'ytick', [tmp(1) 0 tmp(end)], 'yticklabel', { '-' '0' '+' });
+        try, icadefs; set(gca,'FontSize',AXES_FONTSIZE_L+2); catch, end;
     end
 end
 
