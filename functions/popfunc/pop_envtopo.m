@@ -103,7 +103,7 @@ if nargin < 3
     if ~isempty(result{5}),   options = [ options '''subcomps'',[' result{5} '],' ]; end;
     if ~isempty(result{6}),   options = [ options '''title'', ''' result{6} ''',' ]; end;
 	options      =  [ options result{7} ];
-	fig = figure;
+	fig = figure('Units', 'normalized','PaperPositionMode','auto','InvertHardcopy','off');
     if ~isnumeric(fig), fig = fig.Number; end;
     optionsplot = [ options ', ''figure'',' int2str(fig) ];
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
@@ -148,11 +148,11 @@ end;
 % ------------------------
 if length( options ) < 2, options = ''; end;
 if length(EEG) == 1
-    varargout{1} = sprintf('figure; pop_envtopo(%s, [%s] %s);', ...
+    varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(%s, [%s] %s);', ...
                                    inputname(1), num2str(timerange), options);
 else
     if exist('subindices')
-        varargout{1} = sprintf('figure; pop_envtopo(%s([%s]), [%s] %s);', ...
+        varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(%s([%s]), [%s] %s);', ...
                                    inputname(1), int2str(subindices), num2str(timerange), options);
     end;
 end;
