@@ -59,7 +59,7 @@ if nargin < 1
 else
     % account for old calling format
     % ------------------------------
-    if ~strcmpi(inputname, 'filename') && ~strcmpi(inputname, 'filepath') && ~strcmpi(inputname, 'eeg')
+    if ~strcmpi(inputname, 'filename') && ~strcmpi(inputname, 'filepath') && ~strcmpi(inputname, 'eeg') && ~strcmpi(inputname, 'loadmode') && ~strcmpi(inputname, 'check')
         options = { 'filename' inputname }; 
         if nargin > 1
             options = { options{:} 'filepath' inputpath }; 
