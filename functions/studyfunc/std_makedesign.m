@@ -124,18 +124,22 @@ function [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, varargin)
 if nargin < 2
     help std_makedesign;
     return;
-end;
+end
 if nargin < 3 
     designind = 1;
-end;
+end
 
 defdes.name = sprintf('STUDY.design %d', designind);
 defdes.cases.label = 'subject';
 defdes.cases.value = {};
 defdes.variable(1).label = 'condition';
 defdes.variable(2).label = 'group';
+defdes.variable(3).label = '';
+defdes.variable(4).label = '';
 defdes.variable(1).value = {};
 defdes.variable(2).value = {};
+defdes.variable(3).value = {};
+defdes.variable(4).value = {};
 defdes.variable(1).vartype = 'categorical';
 defdes.variable(2).vartype = 'categorical';
 defdes.filepath = '';
@@ -144,13 +148,13 @@ orivarargin = varargin;
 if ~isempty(varargin) && isstruct(varargin{1})
     defdes = varargin{1};
     varargin(1) = [];
-end;
-if isempty(defdes.filepath), defdes.filepath = ''; end;
-if length(defdes.variable) == 0, defdes.variable(1).label = 'continuous'; defdes.variable(1).vartype = 'categorical'; end;
-if length(defdes.variable) == 1, defdes.variable(2).label = 'continuous'; defdes.variable(2).vartype = 'categorical'; end;
-if length(defdes.variable) == 2, defdes.variable(3).label = 'continuous'; defdes.variable(3).vartype = 'categorical'; end;
-if length(defdes.variable) == 3, defdes.variable(4).label = 'continuous'; defdes.variable(4).vartype = 'categorical'; end;
-for iVar = 1:4, if isempty(defdes.variable(iVar).vartype), defdes.variable(iVar).vartype = 'continuous'; end; end;
+end
+if isempty(defdes.filepath), defdes.filepath = ''; end
+if length(defdes.variable) == 0, defdes.variable(1).label = 'continuous'; defdes.variable(1).vartype = 'categorical'; defdes.variable(1).value = {}; end
+if length(defdes.variable) == 1, defdes.variable(2).label = 'continuous'; defdes.variable(2).vartype = 'categorical'; defdes.variable(2).value = {}; end
+if length(defdes.variable) == 2, defdes.variable(3).label = 'continuous'; defdes.variable(3).vartype = 'categorical'; defdes.variable(3).value = {}; end
+if length(defdes.variable) == 3, defdes.variable(4).label = 'continuous'; defdes.variable(4).vartype = 'categorical'; defdes.variable(4).value = {}; end
+for iVar = 1:4, if isempty(defdes.variable(iVar).vartype), defdes.variable(iVar).vartype = 'continuous'; end; end
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
                               'variable3'     'string'    []     defdes.variable(3).label;
@@ -172,10 +176,10 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'verbose'       'string'    { 'on','off' } 'on';
                               'defaultdesign' 'string'    { 'on','off','forceoff'} fastif(nargin < 3, 'on', 'off') }, ...
                               'std_makedesign', 'ignore');
-if isstr(opt), error(opt); end;
-if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end;
-if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end;
-if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end;
+if isstr(opt), error(opt); end
+if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end
+if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end
+if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end
 %if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end;
 %if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end;
     
@@ -198,7 +202,7 @@ if ~isempty(opt.subjselect)
     allsubjects = opt.subjselect;
 else
     allsubjects = unique_bc( datsubjects );
-end;
+end
     
 % delete design files
 % ---------------------
@@ -209,8 +213,8 @@ if strcmpi(opt.delfiles, 'on')
         files = dir(files);
         for indf = 1:length(files)
             delete(fullfile(ALLEEG(index).filepath, files(indf).name));
-        end;
-    end;
+        end
+    end
 elseif strcmpi(opt.delfiles, 'limited')
     myfprintf(opt.verbose, 'Deleting all files for STUDY design %d\n', designind);
     for index = 1:length(STUDY.design(designind).cell)
@@ -220,8 +224,8 @@ elseif strcmpi(opt.delfiles, 'limited')
         for indf = 1:length(files)
             %disp(fullfile(filepath, files(indf).name));
             delete(fullfile(filepath, files(indf).name));
-        end;
-    end;
+        end
+    end
     for index = 1:length(STUDY.design(designind).cell)
         filedir = [ STUDY.design(designind).cell(index).filebase '.ica*' ];
         filepath = fileparts(filedir);
@@ -229,9 +233,9 @@ elseif strcmpi(opt.delfiles, 'limited')
         for indf = 1:length(files)
             %disp(fullfile(filepath, files(indf).name));
             delete(fullfile(filepath, files(indf).name));
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % check inputs
 % ------------
@@ -240,23 +244,23 @@ if isfield(STUDY.datasetinfo, 'trialinfo')
      alltrialinfo = { STUDY.datasetinfo.trialinfo };
      dattrialselect = cellfun(@(x)([1:length(x)]), alltrialinfo, 'uniformoutput', false);
 else alltrialinfo = cell(length(STUDY.datasetinfo));
-     for i=1:length(ALLEEG), dattrialselect{i} = [1:ALLEEG(i).trials]; end;
-end;
+     for i=1:length(ALLEEG), dattrialselect{i} = [1:ALLEEG(i).trials]; end
+end
 
 % get values for each independent variable
 % ----------------------------------------
-m1 = strmatch(opt.variable1, indvars, 'exact'); if isempty(m1), opt.variable1 = ''; end;
-m2 = strmatch(opt.variable2, indvars, 'exact'); if isempty(m2), opt.variable2 = ''; end;
-m3 = strmatch(opt.variable3, indvars, 'exact'); if isempty(m3), opt.variable3 = ''; end;
-m4 = strmatch(opt.variable4, indvars, 'exact'); if isempty(m4), opt.variable4 = ''; end;
-if isempty(opt.values1) && ~isempty(opt.variable1), opt.values1 = indvarvals{m1}; end;
-if isempty(opt.values2) && ~isempty(opt.variable2), opt.values2 = indvarvals{m2}; end;
-if isempty(opt.values3) && ~isempty(opt.variable3), opt.values3 = indvarvals{m3}; end;
-if isempty(opt.values4) && ~isempty(opt.variable4), opt.values4 = indvarvals{m4}; end;
-if isempty(opt.variable1), opt.values1 = { '' }; end;
-if isempty(opt.variable2), opt.values2 = { '' }; end;
-if isempty(opt.variable3), opt.values3 = { '' }; end;
-if isempty(opt.variable4), opt.values4 = { '' }; end;
+m1 = strmatch(opt.variable1, indvars, 'exact'); if isempty(m1), opt.variable1 = ''; end
+m2 = strmatch(opt.variable2, indvars, 'exact'); if isempty(m2), opt.variable2 = ''; end
+m3 = strmatch(opt.variable3, indvars, 'exact'); if isempty(m3), opt.variable3 = ''; end
+m4 = strmatch(opt.variable4, indvars, 'exact'); if isempty(m4), opt.variable4 = ''; end
+if isempty(opt.values1) && ~isempty(opt.variable1), opt.values1 = indvarvals{m1}; end
+if isempty(opt.values2) && ~isempty(opt.variable2), opt.values2 = indvarvals{m2}; end
+if isempty(opt.values3) && ~isempty(opt.variable3), opt.values3 = indvarvals{m3}; end
+if isempty(opt.values4) && ~isempty(opt.variable4), opt.values4 = indvarvals{m4}; end
+if isempty(opt.variable1), opt.values1 = { '' }; end
+if isempty(opt.variable2), opt.values2 = { '' }; end
+if isempty(opt.variable3), opt.values3 = { '' }; end
+if isempty(opt.variable4), opt.values4 = { '' }; end
 
 % preselect data
 % --------------
@@ -267,8 +271,8 @@ if ~isempty(opt.datselect)
         [ dattmp dattrialstmp ] = std_selectdataset( STUDY, ALLEEG, opt.datselect{ind}, opt.datselect{ind+1});
         datselect      = intersect_bc(datselect, dattmp);
         dattrialselect = intersectcell(dattrialselect, dattrialstmp);
-    end;
-end;
+    end
+end
 datselect = intersect_bc(datselect, strmatchmult(allsubjects, datsubjects));
 
 des.name              = opt.name;
@@ -278,53 +282,53 @@ if ~isempty(opt.variable1)
     des.variable(1).value   = opt.values1;
     des.variable(1).vartype = opt.vartype1;
     des.variable(1).pairing  = paired{m1};
-end;
+end
 if ~isempty(opt.variable2)
     des.variable(2).label   = opt.variable2;
     des.variable(2).value   = opt.values2;
     des.variable(2).vartype = opt.vartype2;
     des.variable(2).pairing  = paired{m2};
-end;
+end
 if ~isempty(opt.variable3)
     des.variable(3).label   = opt.variable3;
     des.variable(3).value   = opt.values3;
     des.variable(3).vartype = opt.vartype3;
     des.variable(3).pairing  = paired{m3};
-end;
+end
 if ~isempty(opt.variable4)
     des.variable(4).label   = opt.variable4;
     des.variable(4).value   = opt.values4;
     des.variable(4).vartype = opt.vartype4;
     des.variable(4).pairing  = paired{m4};
-end;
+end
 des.include             = opt.datselect;
 des.cases.label = 'subject';
 des.cases.value = opt.subjselect;
-if isempty(des.cases.value) des.cases.value = STUDY.subject; end;
+if isempty(des.cases.value) des.cases.value = STUDY.subject; end
 
 fieldorder = { 'name' 'filepath' 'variable' 'cases' 'include' };
-if ~isfield(des, 'variable'), des.variable = []; end;
+if ~isfield(des, 'variable'), des.variable = []; end
 des        = orderfields(des, fieldorder);
 try, 
     STUDY.design = orderfields(STUDY.design, fieldorder);
 catch,
     STUDY.design = [];
-end;
+end
 
 if ~isfield(STUDY, 'design') || isempty(STUDY.design)
     STUDY.design = des;
 else
     STUDY.design(designind) = des;  % fill STUDY.design
-end;
+end
 
 % remove empty variables
 if designind <= length(STUDY.design)
     for iVar = length(STUDY.design(designind).variable):-1:1
         if isempty(STUDY.design(designind).variable(iVar).label)
             STUDY.design(designind).variable(iVar) = [];
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % select the new design in the STUDY output
 % -----------------------------------------
@@ -345,8 +349,8 @@ if nargin > 2
 else
     for index = 1:length(a)
         res{index} = intersect_bc(a{index}, b{index});
-    end;
-end;
+    end
+end
 
 % perform multi strmatch
 % ----------------------
@@ -354,13 +358,13 @@ function res = strmatchmult(a, b);
     res = [];
     for index = 1:length(a)
         res = [ res strmatch(a{index}, b, 'exact')' ];
-    end;
+    end
 
 % remove blanks
 % -------------
 function res = rmblk(a);
-    if iscell(a), a = cell2str(a); end;
-    if ~isstr(a), a = num2str(a); end;
+    if iscell(a), a = cell2str(a); end
+    if ~isstr(a), a = num2str(a); end
     res = a;
     res(find(res == ' ')) = '_';
     res(find(res == '\')) = '_';    
@@ -373,12 +377,12 @@ function strval = cell2str(vals);
     strval = vals{1};
     for ind = 2:length(vals)
         strval = [ strval ' - ' vals{ind} ];
-    end;
+    end
 
 function tmpfile = checkfilelength(tmpfile);
     if length(tmpfile) > 120,
         tmpfile = tmpfile(1:120);
-    end;
+    end
 
 function myfprintf(verbose, varargin);
-    if strcmpi(verbose, 'on'), fprintf(varargin{:}); end;
+    if strcmpi(verbose, 'on'), fprintf(varargin{:}); end
