@@ -90,7 +90,7 @@ function [result, userdat, strhalt, resstruct, instruct] = inputgui( varargin);
 if nargin < 2
    help inputgui;
    return;
-end;	
+end	
 
 % decoding input and backward compatibility
 % -----------------------------------------
@@ -100,7 +100,7 @@ else
     options = { 'geometry' 'uilist' 'helpcom' 'title' 'userdata' 'mode' 'geomvert' };
     options = { options{1:length(varargin)}; varargin{:} };
     options = options(:)';
-end;
+end
 
 % checking inputs
 % ---------------
@@ -120,7 +120,7 @@ g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'mode'     ''                    []      'normal'; ...
                            'geomvert' 'real'                []       [] ...
                           }, 'inputgui');
-if isstr(g), error(g); end;
+if isstr(g), error(g); end
 
 if isempty(g.getresult)
     if isstr(g.mode)
@@ -132,85 +132,85 @@ if isempty(g.getresult)
             g.geometry = {};
             for row = 1:length(oldgeom)
                 g.geometry = { g.geometry{:} ones(1, oldgeom(row)) };
-            end;
+            end
         end
         
         % skip a line
-        if strcmpi(g.skipline, 'on'),   
+        if strcmpi(g.skipline, 'on')  
             g.geometry = { g.geometry{:} [1] };
             if ~isempty(g.geom)
                 for ind = 1:length(g.geom)
                     g.geom{ind}{2} = g.geom{ind}{2}+1; % add one row
-                end;
+                end
                 g.geom = { g.geom{:} {1 g.geom{1}{2} [0 g.geom{1}{2}-2] [1 1] } };
-            end;
+            end
             g.uilist   = { g.uilist{:}, {} };
-        end; 
+        end
         
         % add buttons
-        if strcmpi(g.addbuttons, 'on'), 
+        if strcmpi(g.addbuttons, 'on')
             g.geometry = { g.geometry{:} [1 1 1 1] };
             if ~isempty(g.geom)
                 for ind = 1:length(g.geom)
                     g.geom{ind}{2} = g.geom{ind}{2}+1; % add one row
-                end;
+                end
                 g.geom = { g.geom{:} ...
                       {4 g.geom{1}{2} [0 g.geom{1}{2}-1] [1 1] }, ... 
                       {4 g.geom{1}{2} [1 g.geom{1}{2}-1] [1 1] }, ... 
                       {4 g.geom{1}{2} [2 g.geom{1}{2}-1] [1 1] }, ...
                       {4 g.geom{1}{2} [3 g.geom{1}{2}-1] [1 1] } };
-            end;
+            end
             if ~isempty(g.helpcom)
                 if ~iscell(g.helpcom)
                     g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', g.helpbut, 'tag', 'help', 'callback', g.helpcom } {} };
                 else
                     g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
                     g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
-                end;
+                end
             else
                 g.uilist = { g.uilist{:}, {} {} };
-            end;
+            end
             g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
             g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-        end;
+        end
         
         % add the three buttons (CANCEL HELP OK) at the bottom of the GUI
         % ---------------------------------------------------------------
         if ~isempty(g.geom)
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos );
+            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos );
         elseif isempty(g.geomvert)
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos );
+            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos );
         else
-            if strcmpi(g.skipline, 'on'),  g.geomvert = [g.geomvert(:)' 1]; end;
-            if strcmpi(g.addbuttons, 'on'),g.geomvert = [g.geomvert(:)' 1]; end;
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
-        end;
+            if strcmpi(g.skipline, 'on'),  g.geomvert = [g.geomvert(:)' 1]; end
+            if strcmpi(g.addbuttons, 'on'),g.geomvert = [g.geomvert(:)' 1]; end
+            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
+        end
     else 
         fig = g.mode;
         set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
         allobj = findobj('parent',fig);
         allobj = allobj(end:-1:1);
-    end;
+    end
 
     % evaluate command before waiting?
     % --------------------------------
-    if ~isempty(g.eval), eval(g.eval); end;
+    if ~isempty(g.eval), eval(g.eval); end
     instruct = outstruct(allobj); % Getting default values in the GUI. 
     
     % create figure and wait for return
     % ---------------------------------
-    if isstr(g.mode) & (strcmpi(g.mode, 'plot') | strcmpi(g.mode, 'return') )
+    if isstr(g.mode) && (strcmpi(g.mode, 'plot') || strcmpi(g.mode, 'return') )
         if strcmpi(g.mode, 'plot')
            return; % only plot and returns
-        end;
+        end
     else 
         waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
-    end;
+    end
 else
     fig = g.getresult;
     allobj = findobj('parent',fig);
     allobj = allobj(end:-1:1);
-end;
+end
 
 result    = {};
 userdat   = [];
@@ -224,13 +224,10 @@ if ~(ishandle(fig)), return; end % Check if figure still exist
 strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
 [resstruct,result] = outstruct(allobj); % Output parameters  
 userdat = get(fig, 'userdata');
-% if nargout >= 4
-% 	resstruct = myguihandles(fig, g);
-% end;
 
 if isempty(g.getresult) && isstr(g.mode) && ( strcmp(g.mode, 'normal') || strcmp(g.mode, 'return') )
 	close(fig);
-end;
+end
 drawnow; % for windows
 
 % function for gui res (deprecated)
@@ -243,9 +240,9 @@ drawnow; % for windows
 % 				 case 'edit', g = setfield(g, get(h(index), 'tag'), get(h(index), 'string'));
 % 				 case { 'value' 'radio' 'checkbox' 'listbox' 'popupmenu' 'radiobutton'  }, ...
 % 					  g = setfield(g, get(h(index), 'tag'), get(h(index), 'value'));
-%                 end;
-% 			catch, end; 
-% 		end;
+%                 end
+% 			catch, end
+% 		end
 
 function [resstructout, resultout] = outstruct(allobj)
 counter   = 1;
@@ -255,28 +252,40 @@ resstructout = [];
 for index=1:length(allobj)
     if isnumeric(allobj), currentobj = allobj(index);
     else                  currentobj = allobj{index};
-    end;
-    if isnumeric(currentobj) | ~isprop(currentobj,'GetPropertySpecification') % To allow new object handles
-        try,
+    end
+    if isnumeric(currentobj) || ~isprop(currentobj,'GetPropertySpecification') % To allow new object handles
+        try
             objstyle = get(currentobj, 'style');
             switch lower( objstyle )
                 case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' 'radio' }
                     resultout{counter} = get( currentobj, 'value');
-                    if ~isempty(get(currentobj, 'tag')), resstructout = setfield(resstructout, get(currentobj, 'tag'), resultout{counter}); end;
+                    if ~isempty(get(currentobj, 'tag')), 
+                        try
+                            resstructout = setfield(resstructout, get(currentobj, 'tag'), resultout{counter}); 
+                        catch
+                            fprintf('Warning: tag "%" may not be use as field in output structure', get(currentobj, 'tag'));
+                        end
+                    end
                     counter = counter+1;
                 case 'edit'
                     resultout{counter} = get( currentobj, 'string');
-                    if ~isempty(get(currentobj, 'tag')), resstructout = setfield(resstructout, get(currentobj, 'tag'), resultout{counter}); end;
+                    if ~isempty(get(currentobj, 'tag')), 
+                        try
+                            resstructout = setfield(resstructout, get(currentobj, 'tag'), resultout{counter});                         
+                        catch
+                            fprintf('Warning: tag "%" may not be use as field in output structure', get(currentobj, 'tag'));
+                        end
+                    end
                     counter = counter+1;
-            end;
-        catch, end;
+            end
+        catch, end
     else
         ps              = currentobj.GetPropertySpecification;
         resultout{counter} = arg_tovals(ps,false);
         count = 1;
         while isfield(resstructout, ['propgrid' int2str(count)])
             count = count + 1;
-        end;
+        end
         resstructout = setfield(resstructout, ['propgrid' int2str(count)], arg_tovals(ps,false));
-    end;
-end;
+    end
+end
