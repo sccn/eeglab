@@ -32,24 +32,27 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = std_rebuilddesign(STUDY, ALLEEG, designind);
+function STUDY = std_rebuilddesign(STUDY, ALLEEG, designind)
 
 if nargin < 2
     help std_rebuilddesign;
     return;
-end;
+end
 
 if nargin < 3
     designind = 1:length(STUDY.design);
-end;
+end
 
 disp('Rebuilding designs...');
-[indvars indvarvals] = std_getindvar(STUDY);
+[indvars, indvarvals] = std_getindvar(STUDY);
 for indDesign = designind
     
     % find out if some independent variables or independent 
     % variable values have been removed
     tmpdesign = STUDY.design(indDesign);
+    if isempty(tmpdesign.cases.value) || isempty(tmpdesign.cases.value{1})
+        tmpdesign.cases.value = STUDY.subject;
+    end
     for iVar = length(tmpdesign.variable):-1:1
         indVar = strmatch(tmpdesign.variable(iVar).label, indvars, 'exact');
         if isempty(indVar)
@@ -61,20 +64,20 @@ for indDesign = designind
                  fprintf('Design %d: removing independent variable "%s"\n', indDesign, tmpdesign.variable(iVar).label);
                  tmpdesign.variable(iVar) = []; % remove independent var
             else tmpdesign.variable(iVar).value = tmpvals;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     STUDY = std_makedesign(STUDY, ALLEEG, indDesign, tmpdesign);
-end;
+end
 
 STUDY = std_selectdesign(STUDY, ALLEEG, STUDY.currentdesign);
 
 % take the intersection for independent variables
 % -----------------------------------------------
-function a = myintersect(a,b);
+function a = myintersect(a,b)
 
-    if isempty(b) || isempty(a), a = {}; return; end;
+    if isempty(b) || isempty(a), a = {}; return; end
     
     for index = length(a):-1:1
         if isstr(a{index})
@@ -82,12 +85,12 @@ function a = myintersect(a,b);
             if isempty(res)
                  a{index} = [];
             else a(index) = res;
-            end;
+            end
         elseif iscell(a{index})
             a{index} = intersect_bc(a{index}, b);
         elseif isnumeric(a{index})
             a{index} = intersect_bc(a{index}, [ b{:} ]);
-        end;
-        if isempty(a{index}), a(index) = []; end;
-    end;
+        end
+        if isempty(a{index}), a(index) = []; end
+    end
         
