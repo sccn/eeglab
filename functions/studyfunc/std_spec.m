@@ -289,7 +289,7 @@ end
 
 % compute spectral decomposition
 % ------------------------------
-if strcmpi(g.logtrials, 'notset'), if strcmpi(g.specmode, 'fft') g.logtrials = 'on'; else g.logtrials = 'off'; end end
+if strcmpi(g.logtrials, 'notset'), if strcmpi(g.specmode, 'fft') g.logtrials = 'on'; else g.logtrials = 'off'; end; end
 if strcmpi(g.logtrials, 'on'), datatype = 'SPECTRUMLOG'; else datatype = 'SPECTRUMABS'; end
 if strcmpi(g.specmode, 'psd')
     if strcmpi(g.savetrials, 'on') || strcmpi(g.logtrials, 'on')
@@ -444,15 +444,15 @@ if (nargin < 1 || nargin > 2)
 end
 
 if (~(isscalar (m) && (m == fix (m)) && (m > 0)))
-    error ("hamming: M must be a positive integer");
+    error ('hamming: M must be a positive integer');
 end
 
 N = m - 1;
 if (nargin == 2)
     switch (opt)
-        case "periodic"
+        case 'periodic'
             N = m;
-        case "symmetric"
+        case 'symmetric'
             % Default option, same as no option specified.
         otherwise
             error ('hamming: window type must be either "periodic" or "symmetric"');
@@ -466,5 +466,4 @@ else
     c = 0.54 - 0.46 * cos (2 * pi * (0 : m)' / N);
 end
 
-end
 
