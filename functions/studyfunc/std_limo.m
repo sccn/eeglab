@@ -345,6 +345,7 @@ for s = 1:nb_subjects
     OUTEEG.icasphere  = ALLEEG(index(1)).icasphere;
     OUTEEG.chanlocs   = ALLEEG(index(1)).chanlocs;
     OUTEEG.etc        = ALLEEG(index(1)).etc;
+    OUTEEG.times      = ALLEEG(index(1)).times;
     
     % update EEG.etc
     OUTEEG.etc.merged{1} = ALLEEG(index(1)).filename;
