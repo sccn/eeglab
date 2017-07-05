@@ -306,7 +306,7 @@ if ~isempty(regions)
             in_a_region = 1;
         end;
         if (~regions(index) | index == length(regions)) & in_a_region
-            tmpreg(2) = times(index);
+            tmpreg(2) = times(min(length(times), index));
             in_a_region = 0;
             if strcmpi(highlightmode, 'background')
                 tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
