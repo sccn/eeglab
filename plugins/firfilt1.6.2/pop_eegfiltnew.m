@@ -215,7 +215,11 @@ end
 
 % Plot frequency response
 if plotfreqz
-    freqz(b, 1, 8192, EEG.srate);
+    try
+        freqz(b, 1, 8192, EEG.srate);
+    catch
+        warning( 'Plotting of frequency response requires signal processing toolbox.' )
+    end
 end
 
 % Filter
