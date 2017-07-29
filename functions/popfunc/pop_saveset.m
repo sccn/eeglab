@@ -169,7 +169,9 @@ if strcmpi(g.savemode, 'resave')
             pop_saveset(EEG(index), 'savemode', 'resave');
             EEG(index).saved = 'yes';
         end;
-        com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+        if nargout > 1
+            com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+        end
         return;
     end;
     
@@ -314,8 +316,9 @@ if isnumeric(EEG.data) && v(1) < 7
     EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
 end;
 EEG.saved = 'justloaded';
-
-com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+if nargout > 1
+    com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+end
 return;
 
 function num = popask( text )
