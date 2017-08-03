@@ -401,6 +401,8 @@ if YDIR == -1, YDIR = 'down'; end;     % and read by other plotting functions
 if ~exist('DEFAULT_SRATE'), DEFAULT_SRATE = 250; end;            % 250 Hz
 if ~exist('DEFAULT_TIMLIM'), DEFAULT_TIMLIM = [-1000 2000]; end; % [-1 2] s epochs
 
+if ~exist('DEFAULT_COLORMAP'), DEFAULT_COLORMAP = 'jet(256)'; end; % Default colormap
+
 % Constants set here:
 % ------------------
 ERSP_CAXIS_LIMIT = 0;           % 0 -> use data limits; else positive value
@@ -569,7 +571,8 @@ end
     'caption'       'string'    []           ''; ...
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
-    'cycleinc'      'string'   {'linear','log'}        'linear'
+    'cycleinc'      'string'    {'linear','log'}        'linear'
+    'colormap'      'string'    []            DEFAULT_COLORMAP;...
     }, 'newtimef', 'ignore');
 if isstr(g), error(g); end;
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
@@ -1489,7 +1492,7 @@ end;
 if g.plot
     % verboseprintf(g.verbose, '\nNow plotting...\n');
     set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
-    colormap(jet(256));
+    colormap(g.colormap);
     pos = get(gca,'position');
     q = [pos(1) pos(2) 0 0];
     s = [pos(3) pos(4) pos(3) pos(4)];
