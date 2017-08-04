@@ -38,15 +38,37 @@ for iPlugin = length(plugin):-1:1
     if plugin(iPlugin).installed && ~strcmpi(plugin(iPlugin).status, 'deactivated'),  installedFlag  = true; end;
     if strcmpi(plugin(iPlugin).status, 'deactivated'), deactivatedFlag = true; end;
 end;
-
+ %---
+ % Initialize fields install/remove
+ if ~isstruct(type)
+     newInstallFlag  = false;
+     installedFlag   = false;
+     deactivatedFlag = false;
+     for iPlugin = length(allPlugins):-1:1
+         if ~allPlugins(iPlugin).installed
+             newInstallFlag = true;
+             allPlugins(iPlugin).install = 0;
+             allPlugins(iPlugin).remove  = 0;
+         end;
+         if allPlugins(iPlugin).installed && ~strcmpi(allPlugins(iPlugin).status, 'deactivated')
+             installedFlag  = true;
+             allPlugins(iPlugin).install = 0;
+             allPlugins(iPlugin).remove  = 0;
+         end;
+         if strcmpi(allPlugins(iPlugin).status, 'deactivated')
+             deactivatedFlag = true;
+             allPlugins(iPlugin).install = 0;
+             allPlugins(iPlugin).remove  = 0;
+         end;
+     end;
+ end
+ %---
+ 
 uilist   = {};
 geom     = {};
 geomvert = [];
 pluginIndices = [];
-callback = [ 'tmptag = get(gcbo, ''tag'');' ...
-             'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
-             'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', tmptag), ''value'', 0); end; clear tmptag;' ];
-
+         
 % ------------------
 % plugins to install
 % ------------------
@@ -64,6 +86,8 @@ if newInstallFlag
     geomvert = [1 1];
     for iRow = 1:length(plugin)
         if ~plugin(iRow).installed && ~strcmpi(plugin(iRow).status, 'deactivated')
+            pluginIndices = [ pluginIndices  iRow + (page-1)*pluginsPerPage ];
+            
             % text for description
             description = plugin(iRow).description;
             if length(description) > maxchar+2
@@ -74,8 +98,11 @@ if newInstallFlag
             
             userdata = '';
             if plugin(iRow).installed && plugin(iRow).installorupdate, userdata = 'colortored'; end;
+            
+            callbacktoinstall = ['tmpobj = get(gcbf, ''userdata''); tmpobj(' int2str(pluginIndices(end)) ').install = ~tmpobj(' int2str(pluginIndices(end)) ').install; set(gcbf, ''userdata'', tmpobj); clear tmpobj;'];
+            
             uilist = { uilist{:}, ...
-                { 'style' 'checkbox' 'string' '' 'value'  0 'enable' 'on' }, ...
+                { 'style' 'checkbox' 'string' '' 'value'  allPlugins(pluginIndices(end)).install 'enable' 'on' 'callback' callbacktoinstall}, ...
                 { 'style' 'checkbox' 'string' '' 'visible' 'off' }, ...
                 { 'style' 'text' 'string' plugin(iRow).name }, ...
                 { 'style' 'text' 'string' plugin(iRow).version 'tag' 'latestversion' 'userdata' userdata }, ...
@@ -84,7 +111,6 @@ if newInstallFlag
                 { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
-            pluginIndices = [ pluginIndices iRow ];
         end;
     end;
 end;
@@ -105,6 +131,8 @@ if installedFlag
     geomvert = [geomvert 1 1 1];
     for iRow = 1:length(plugin)
         if plugin(iRow).installed && ~strcmpi(plugin(iRow).status, 'deactivated')
+            pluginIndices = [ pluginIndices  iRow + (page-1)*pluginsPerPage ];
+            
             % text for description
             description = plugin(iRow).description;
             if length(description) > maxchar+2
@@ -120,9 +148,26 @@ if installedFlag
             else
                 textnew = description;
             end;
+            
+            callbackinstall = ['tmptag = get(gcbo, ''tag'');' ...
+                               'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
+                               'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', tmptag), ''value'', 0); end; clear tmptag;'...         
+                               'tmpobj = get(gcbf, ''userdata'');'...
+                               'tmpobj(' int2str(pluginIndices(end)) ').install = ~tmpobj(' int2str(pluginIndices(end)) ').install; set(gcbf, ''userdata'', tmpobj);'...
+                               'if tmpobj(' int2str(pluginIndices(end)) ').install, tmpobj(' int2str(pluginIndices(end)) ').remove  = 0; end; set(gcbf, ''userdata'', tmpobj);'...                       
+                               'clear tmpobj;'];
+                           
+            callbackremove = ['tmptag = get(gcbo, ''tag'');' ...
+                              'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
+                              'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', tmptag), ''value'', 0); end; clear tmptag;'...         
+                              'tmpobj = get(gcbf, ''userdata'');'...
+                              'tmpobj(' int2str(pluginIndices(end)) ').remove = ~tmpobj(' int2str(pluginIndices(end)) ').remove; set(gcbf, ''userdata'', tmpobj);'...
+                              'if tmpobj(' int2str(pluginIndices(end)) ').remove, tmpobj(' int2str(pluginIndices(end)) ').install  = 0; end; set(gcbf, ''userdata'', tmpobj);'...                       
+                              'clear tmpobj;'];
+                           
             uilist = { uilist{:}, ...
-                { 'style' 'checkbox' 'string' '' 'value' 0 'enable' fastif(plugin(iRow).installorupdate, 'on', 'off') 'tag' [ 'cb1' int2str(iRow) ] 'callback' callback }, ...
-                { 'style' 'checkbox' 'string' '' 'enable' 'on' 'tag' [ 'cb2' int2str(iRow) ] 'callback' callback }, ...
+                { 'style' 'checkbox' 'string' '' 'value' allPlugins(pluginIndices(end)).install 'enable' fastif(plugin(iRow).installorupdate, 'on', 'off') 'tag' [ 'cb1' int2str(iRow) ] 'callback' callbackinstall }, ...
+                { 'style' 'checkbox' 'string' '' 'value' allPlugins(pluginIndices(end)).remove  'enable' 'on' 'tag' [ 'cb2' int2str(iRow) ] 'callback' callbackremove }, ...
                 { 'style' 'text' 'string' plugin(iRow).name }, ...
                 { 'style' 'text' 'string' plugin(iRow).currentversion 'tag' 'latestversion'}, ...
                 { 'style' 'text' 'string' int2str(plugin(iRow).downloads) }, ...
@@ -130,7 +175,6 @@ if installedFlag
                 { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
-            pluginIndices = [ pluginIndices iRow ];
         end;
     end;
 end;
@@ -154,6 +198,8 @@ if deactivatedFlag
     geomvert = [geomvert 1 1 1];
     for iRow = 1:length(plugin)
         if strcmpi(plugin(iRow).status, 'deactivated')
+            pluginIndices = [ pluginIndices  iRow + (page-1)*pluginsPerPage ];
+            
             % text for description
             description = plugin(iRow).description;
             if length(description) > maxchar+2
@@ -162,9 +208,26 @@ if deactivatedFlag
             
             userdata = '';
             enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
+            
+            callbackinstall = ['tmptag = get(gcbo, ''tag'');' ...
+                               'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
+                               'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', tmptag), ''value'', 0); end; clear tmptag;'...         
+                               'tmpobj = get(gcbf, ''userdata'');'...
+                               'tmpobj(' int2str(pluginIndices(end)) ').install = ~tmpobj(' int2str(pluginIndices(end)) ').install; set(gcbf, ''userdata'', tmpobj);'...
+                               'if tmpobj(' int2str(pluginIndices(end)) ').install, tmpobj(' int2str(pluginIndices(end)) ').remove  = 0; end; set(gcbf, ''userdata'', tmpobj);'...                       
+                               'clear tmpobj;'];
+                           
+            callbackremove = ['tmptag = get(gcbo, ''tag'');' ...
+                              'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
+                              'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', tmptag), ''value'', 0); end; clear tmptag;'...         
+                              'tmpobj = get(gcbf, ''userdata'');'...
+                              'tmpobj(' int2str(pluginIndices(end)) ').remove = ~tmpobj(' int2str(pluginIndices(end)) ').remove; set(gcbf, ''userdata'', tmpobj);'...
+                              'if tmpobj(' int2str(pluginIndices(end)) ').remove, tmpobj(' int2str(pluginIndices(end)) ').install  = 0; end; set(gcbf, ''userdata'', tmpobj);'...                       
+                              'clear tmpobj;'];
+                
             uilist = { uilist{:}, ...
-                { 'style' 'checkbox' 'string' '' 'tag' [ 'cb1' int2str(iRow) ] 'callback' callback }, ...
-                { 'style' 'checkbox' 'string' '' 'tag' [ 'cb2' int2str(iRow) ] 'callback' callback }, ...
+                { 'style' 'checkbox' 'string' '' 'value'  allPlugins(pluginIndices(end)).install 'tag' [ 'cb1' int2str(iRow) ] 'callback' callbackinstall }, ...
+                { 'style' 'checkbox' 'string' '' 'value'  allPlugins(pluginIndices(end)).remove  'tag' [ 'cb2' int2str(iRow) ] 'callback' callbackremove }, ...
                 { 'style' 'text' 'string' plugin(iRow).name }, ...
                 { 'style' 'text' 'string' plugin(iRow).version 'tag' 'latestversion' }, ...
                 { 'style' 'text' 'string' int2str(plugin(iRow).downloads) }, ...                
@@ -172,7 +235,6 @@ if deactivatedFlag
                 { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
-            pluginIndices = [ pluginIndices iRow ];
         end;
     end;
 end;
@@ -203,7 +265,7 @@ if 1
     uilist = { uilist{:},    { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
     geom     = { geom{:} [1] [1 1 1 1] };
     geomvert = [ geomvert 1 1];    
-    res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr, 'addbuttons', 'off', 'skipline', 'off', 'userdata', allPlugins);
+    [res plugin] = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr, 'addbuttons', 'off', 'skipline', 'off', 'userdata', allPlugins);
     
     try, restartEeglabFlag = evalin('base', 'restartEeglabFlag;'); catch, end;
     evalin('base', 'clear restartEeglabFlag;');
@@ -212,13 +274,6 @@ else
     res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr);
 end;
 if isempty(res), return; end;
-
-% decode inputs
-% -------------
-for iRow = 1:length(pluginIndices)
-    plugin(pluginIndices(iRow)).install = res{(iRow-1)*2+1};
-    plugin(pluginIndices(iRow)).remove  = res{(iRow-1)*2+2};
-end;
 
 % install plugins
 % ---------------
@@ -277,4 +332,3 @@ function str = myweb(url);
     %else
         str = [ 'web(''' url ''', ''-browser'');' ];
     %end;
-    
