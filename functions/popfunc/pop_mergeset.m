@@ -361,9 +361,9 @@ end
 % -----------------
 if nargout > 1
     if exist('indices') == 1
-        com = sprintf('EEG = pop_mergeset( %s, [%s], %d);', inputname(1), int2str(indices), keepall);
+        com = sprintf('EEG = pop_mergeset( ALLEEG, [%s], %d);', int2str(indices), keepall);
     else
-        com = sprintf('EEG = pop_mergeset( %s, %s, %d);', inputname(1), inputname(2), keepall);
+        com = sprintf('EEG = pop_mergeset( ALLEEG, EEG, %d);', keepall);
     end
  end
 
