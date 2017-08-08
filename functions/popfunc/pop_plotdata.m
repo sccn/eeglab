@@ -186,8 +186,8 @@ else % ydir == -1
 end
 
 switch nargin
-	case {0, 1, 2, 3}, com = sprintf('pop_plotdata(%s, %d, %s, [1:%d], ''%s'', %d, %d, [%g %g]);', inputname(1), typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials,ydir,ymin,ymax);
-	case 4, com = sprintf('pop_plotdata(%s, %d, %s, %s, ''%s'', %d, %d, [%g %g]);', inputname(1), typeplot, vararg2str(indices), vararg2str(trials), plottitle, singletrials,ydir,ymin,ymax);
+	case {0, 1, 2, 3}, com = sprintf('pop_plotdata(EEG, %d, %s, [1:%d], ''%s'', %d, %d, [%g %g]);', typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials,ydir,ymin,ymax);
+	case 4, com = sprintf('pop_plotdata(EEG, %d, %s, %s, ''%s'', %d, %d, [%g %g]);', typeplot, vararg2str(indices), vararg2str(trials), plottitle, singletrials,ydir,ymin,ymax);
 end;
 
 fprintf([com '\n']);

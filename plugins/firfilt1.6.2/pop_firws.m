@@ -149,7 +149,7 @@ function [EEG, com, b] = pop_firws(EEG, varargin)
     end
 
     % History string
-    com = sprintf('%s = pop_firws(%s', inputname(1), inputname(1));
+    com = sprintf('EEG = pop_firws(EEG');
     for c = fieldnames(args)'
         if ischar(args.(c{:}))
             com = [com sprintf(', ''%s'', ''%s''', c{:}, args.(c{:}))];

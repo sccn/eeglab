@@ -191,5 +191,5 @@ else
 	eegplot( tmpdata, 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
 end;
-com = [ com sprintf('pop_eegplot( %s, %d, %d, %d);', inputname(1), icacomp, superpose, reject) ]; 
+com = [ com sprintf('pop_eegplot( EEG, %d, %d, %d);', icacomp, superpose, reject) ]; 
 return;

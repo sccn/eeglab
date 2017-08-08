@@ -130,7 +130,7 @@ end;
 % return the string command
 % -------------------------
 fprintf('pop_eventstat: extracting events...\n');
-varargout{1} = sprintf('pop_eventstat( %s, %s );', inputname(1), vararg2str({eventfield type latrange percent}));
+varargout{1} = sprintf('pop_eventstat( EEG, %s );', vararg2str({eventfield type latrange percent}));
 com          = sprintf('%s signalstat( typevals, 1, dlabel, percent, dlabel2 ); %s', outstr);
 
 eval(com)	

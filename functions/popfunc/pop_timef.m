@@ -203,7 +203,7 @@ if length( options ) < 2
     options = '';
 end;
 if nargin < 4
-    varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, %s, %s %s);', inputname(1), typeproc, num, ...
+    varargout{1} = sprintf('figure; pop_timef( EEG, %d, %d, %s, %s %s);', typeproc, num, ...
                            vararg2str({tlimits}), vararg2str({cycles}), options);
 end;
 com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);

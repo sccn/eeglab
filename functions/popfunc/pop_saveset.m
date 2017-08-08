@@ -170,7 +170,7 @@ if strcmpi(g.savemode, 'resave')
             EEG(index).saved = 'yes';
         end;
         if nargout > 1
-            com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+            com = sprintf('EEG = pop_saveset( EEG, %s);', vararg2str(options));
         end
         return;
     end;
@@ -317,7 +317,7 @@ if isnumeric(EEG.data) && v(1) < 7
 end;
 EEG.saved = 'justloaded';
 if nargout > 1
-    com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+    com = sprintf('EEG = pop_saveset( EEG, %s);', vararg2str(options));
 end
 return;
 

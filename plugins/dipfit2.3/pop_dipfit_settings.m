@@ -351,7 +351,7 @@ if 0
     
 end;
 
-com = sprintf('%s = pop_dipfit_settings( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+com = sprintf('EEG = pop_dipfit_settings( EEG, %s);', vararg2str(options));
 
 % test for wrong parameters
 % -------------------------

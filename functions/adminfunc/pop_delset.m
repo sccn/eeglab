@@ -75,5 +75,6 @@ for i = set_in
 	end;
 end;
     
-command = sprintf('%s = pop_delset( %s, [%s] );', inputname(1), inputname(1), int2str(set_in));
+% command = sprintf('%s = pop_delset( %s, [%s] );', inputname(1), inputname(1), int2str(set_in));
+command = sprintf('EEG = pop_delset( EEG, [%s] );', int2str(set_in));
 return;

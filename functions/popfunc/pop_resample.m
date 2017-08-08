@@ -246,7 +246,7 @@ fprintf('resampling finished\n');
 
 EEG.setname = [EEG.setname ' resampled'];
 
-command = sprintf('EEG = pop_resample( %s, %d);', inputname(1), freq);
+command = sprintf('EEG = pop_resample( EEG, %d);', freq);
 return;
 
 % resample if resample is not present

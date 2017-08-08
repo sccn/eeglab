@@ -86,11 +86,11 @@ if ~isempty(EEG.chanlocs)
 	posf = round( (timerange(2)/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
 	if length( options ) < 2
     	timtopo( mean(SIGTMP(:,posi:posf,:),3), EEG.chanlocs, 'limits', [timerange(1) timerange(2) 0 0], 'plottimes', topotime, 'chaninfo', EEG.chaninfo);
-        com = sprintf('figure; pop_timtopo(%s, [%s], [%s], ''%s'');', inputname(1), num2str(timerange), num2str(topotime), plottitle);
+        com = sprintf('figure; pop_timtopo(EEG, [%s], [%s], ''%s'');', num2str(timerange), num2str(topotime), plottitle);
 	else
 		com = sprintf('timtopo( mean(SIGTMP(:,posi:posf,:),3), EEG.chanlocs, ''limits'', [timerange(1) timerange(2) 0 0], ''plottimes'', topotime, ''chaninfo'', EEG.chaninfo %s);', options);
 		eval(com)
-	    com = sprintf('figure; pop_timtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(topotime), plottitle, options);
+	    com = sprintf('figure; pop_timtopo(EEG, [%s], [%s], ''%s'' %s);', num2str(timerange), num2str(topotime), plottitle, options);
 	end;		
 else
 	fprintf('Cannot make plot without channel locations\n');

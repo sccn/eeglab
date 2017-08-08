@@ -69,5 +69,5 @@ EEG.averef = 'Yes';
 EEG.icaact = [];
 EEG = eeg_checkset(EEG);
 
-com = sprintf('%s = pop_averef( %s, %d);', inputname(1), inputname(1), confirm);
+com = sprintf('EEG = pop_averef( EEG, %d);', confirm);
 return;

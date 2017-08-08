@@ -83,7 +83,7 @@ if length(chanorcomp) > 1
     for index = chanorcomp
         pop_prop(EEG, typecomp, index, 0, spec_opt);  % call recursively for each chanorcomp
     end;
-	com = sprintf('pop_prop( %s, %d, [%s], NaN, %s);', inputname(1), ...
+	com = sprintf('pop_prop( EEG, %d, [%s], NaN, %s);',...
                   typecomp, int2str(chanorcomp), vararg2str( { spec_opt } ));
     return;
 end;
@@ -331,9 +331,9 @@ if ishandle(winhandle)
 		set(hval, 'enable', 'off');
 	end;
 	
-	com = sprintf('pop_prop( %s, %d, %d, 0, %s);', inputname(1), typecomp, chanorcomp, vararg2str( { spec_opt } ) );
+	com = sprintf('pop_prop( EEG, %d, %d, 0, %s);', typecomp, chanorcomp, vararg2str( { spec_opt } ) );
 else
-	com = sprintf('pop_prop( %s, %d, %d, NaN, %s);', inputname(1), typecomp, chanorcomp, vararg2str( { spec_opt } ) );
+	com = sprintf('pop_prop( EEG, %d, %d, NaN, %s);', typecomp, chanorcomp, vararg2str( { spec_opt } ) );
 end;
 
 return;

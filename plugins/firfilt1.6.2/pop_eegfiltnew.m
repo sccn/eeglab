@@ -233,6 +233,6 @@ end
 
 
 % History string
-com = sprintf('%s = pop_eegfiltnew(%s, %s);', inputname(1), inputname(1), vararg2str({locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz}));
+com = sprintf('EEG = pop_eegfiltnew(EEG, %s);', vararg2str({locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz}));
 
 end

@@ -100,6 +100,6 @@ tmp = [ tmpevent.latency ];
 EEG.event = EEG.event(indexsort);
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
-command = sprintf('%s = pop_loaddat(%s, %s, %d);', inputname(1), inputname(1), fullFileName, no_rt); 
+command = sprintf('EEG = pop_loaddat(EEG, %s, %d);', fullFileName, no_rt); 
 
 return;

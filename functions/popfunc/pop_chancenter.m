@@ -99,5 +99,6 @@ chanlocs = convertlocs(chanlocs, 'cart2all');
 if ~isempty(omitchans)
     disp('Important warning: the location of omitted channels has not been modified');
 end;
-
-com = sprintf('%s = pop_chancenter( %s, %s);', inputname(1), inputname(1), vararg2str({ center omitchans }));
+if nargout > 2
+    com = sprintf('%s = pop_chancenter( %s, %s);', inputname(1), inputname(1), vararg2str({ center omitchans }));
+end

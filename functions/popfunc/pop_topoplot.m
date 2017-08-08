@@ -384,8 +384,8 @@ set(allobj(1:countobj-1), 'visible', 'on');
 figure(curfig);
 axcopy(curfig, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
-com = [com sprintf('pop_topoplot(%s,%d, %s);', ...
-                   inputname(1), typeplot, vararg2str({arg2 topotitle rowcols plotdip outoptions{:} }))];
+com = [com sprintf('pop_topoplot(EEG, %d, %s);', ...
+                   typeplot, vararg2str({arg2 topotitle rowcols plotdip outoptions{:} }))];
 return;
 
 		

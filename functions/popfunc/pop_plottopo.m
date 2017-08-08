@@ -110,11 +110,11 @@ else
 end;
 
 if ~isempty(addoptions)
-	com = sprintf('figure; pop_plottopo(%s, %s, ''%s'', %d, %s);', ...
-				  inputname(1), vararg2str(channels), plottitle, singletrials, vararg2str(addoptions));
+	com = sprintf('figure; pop_plottopo(EEG, %s, ''%s'', %d, %s);', ...
+				  vararg2str(channels), plottitle, singletrials, vararg2str(addoptions));
 else
-	com = sprintf('figure; pop_plottopo(%s, %s, ''%s'', %d);', ...
-				  inputname(1), vararg2str(channels), plottitle, singletrials);
+	com = sprintf('figure; pop_plottopo(EEG, %s, ''%s'', %d);', ...
+				  vararg2str(channels), plottitle, singletrials);
 end;
 
 return;

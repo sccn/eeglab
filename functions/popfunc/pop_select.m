@@ -648,7 +648,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % generate command
 % ----------------
 if nargout > 1
-com = sprintf('EEG = pop_select( %s,%s);', inputname(1), vararg2str(args));
+    com = sprintf('EEG = pop_select( EEG, %s);', vararg2str(args));
 end
 
 return;

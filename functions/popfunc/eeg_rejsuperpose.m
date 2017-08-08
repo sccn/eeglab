@@ -111,8 +111,8 @@ end;
 EEG.reject.rejglobal = rejglobal;
 EEG.reject.rejglobalE = rejglobalE;
 
-com =sprintf('%s = eeg_rejsuperpose( %s, %d, %d, %d, %d, %d, %d, %d, %d);', ...
-	  inputname(1), inputname(1), ~typerej, Rmanual, Rthres, Rconst, Rent, Rkurt, Rfreq, Rothertype);
+com =sprintf('EEG = eeg_rejsuperpose( EEG, %d, %d, %d, %d, %d, %d, %d, %d);', ...
+	   ~typerej, Rmanual, Rthres, Rconst, Rent, Rkurt, Rfreq, Rothertype);
 
 return;
 

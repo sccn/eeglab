@@ -132,4 +132,4 @@ STUDY = STUDYTMP;
 
 % history
 % -------
-com = sprintf('[STUDY EEG] = pop_savestudy( %s, %s, %s);', inputname(1), inputname(2), vararg2str(options));
+com = sprintf('[STUDY EEG] = pop_savestudy( STUDY, EEG, %s);', vararg2str(options));

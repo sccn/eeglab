@@ -278,7 +278,7 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
             ALLEEG(dats{index}(idat)).saved = 'yes';
         end;
     end;
-    com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
+    com = sprintf('EEG = pop_runica(EEG, %s);', ...
               vararg2str({ 'icatype' g.icatype 'concatcond' 'on' 'options' g.options }) );
     return;
 else
@@ -506,7 +506,7 @@ else
 end;
 
 if nargin < 2 || selectamica
-    com = sprintf('%s = pop_runica(%s, %s);', inputname(1), inputname(1),  vararg2str(g.options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
+    com = sprintf('EEG = pop_runica(EEG, %s);', vararg2str(g.options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
 end;
 
 return;

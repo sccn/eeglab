@@ -119,7 +119,7 @@ end;
 % return the string command
 % -------------------------
 %fprintf('Pop_signalstat: computing statistics...\n');
-varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, cnum);
+varargout{1} = sprintf('pop_signalstat( EEG, %d, %d );', typeproc, cnum);
 
 
 plotloc = 0;

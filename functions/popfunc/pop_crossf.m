@@ -198,8 +198,8 @@ end;
 if length( options ) < 2
     options = '';
 end;
-varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
-          inputname(1), typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
+varargout{1} = sprintf('figure; pop_crossf( EEG, %d, %d, %d, [%s], [%s] %s);', ...
+          typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
 
 %options = [ options ', ''ydir'', ''norm''' ];
 com = sprintf( '%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);

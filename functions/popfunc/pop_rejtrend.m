@@ -207,9 +207,7 @@ if ~isempty(rej)
     end;
 end;
 
-%com = sprintf('Indexes = pop_rejtrend( %s, %d, [%s], %s, %s, %s, %d, %d);', ...
-%   inputname(1), icacomp, num2str(elecrange),  num2str(winsize), num2str(minslope), num2str(minstd), superpose, reject ); 
-com = [ com sprintf('%s = pop_rejtrend(%s,%s);', inputname(1), ...
-		inputname(1), vararg2str({icacomp,elecrange,winsize,minslope,minstd,superpose,reject})) ]; 
+com = [ com sprintf('EEG = pop_rejtrend(EEG,%s);', ...
+		vararg2str({icacomp,elecrange,winsize,minslope,minstd,superpose,reject})) ]; 
 
 return;

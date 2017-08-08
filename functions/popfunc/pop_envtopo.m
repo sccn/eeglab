@@ -148,12 +148,12 @@ end;
 % ------------------------
 if length( options ) < 2, options = ''; end;
 if length(EEG) == 1
-    varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(%s, [%s] %s);', ...
-                                   inputname(1), num2str(timerange), options);
+    varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(EEG, [%s], %s);', ...
+                                   num2str(timerange), options);
 else
     if exist('subindices')
-        varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(%s([%s]), [%s] %s);', ...
-                                   inputname(1), int2str(subindices), num2str(timerange), options);
+        varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(EEG([%s]), [%s] %s);', ...
+                                   int2str(subindices), num2str(timerange), options);
     end;
 end;
 options = optionsplot;

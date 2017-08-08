@@ -381,8 +381,7 @@ EEG = eeg_checkset(EEG, 'makeur');
 if isempty(filename) & nargout == 2
     disp('Pop_importepoch: cannot generate command string'); return;
 else 
-	com = sprintf('%s = pop_importepoch( %s, ''%s'', %s);', inputname(1), inputname(1), ...
-                  filename, vararg2str( { fieldlist options{:} }));
+	com = sprintf('EEG = pop_importepoch( EEG, ''%s'', %s);',filename, vararg2str( { fieldlist options{:} }));
 end;
 
 % interpret the variable name

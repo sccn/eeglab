@@ -177,7 +177,7 @@ end;
 % [[n1:n2]' alllats(n1:n2)' [event2(n1:n2).latency]' alllats(n1:n2)'-[event2(n1:n2).latency]' otherorilatencies(n1:n2)' a']
 % figure; ev = 17; range = [-1000:1000]; plot(EEG.data(1,EEG.event(ev).latency+range)); hold on; plot(tmpdata(1,tmpevent(EEG.event(ev).urevent).latency+range+696), 'r'); grid on;
 
-com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2str({ regions })); 
+com = sprintf('EEG = eeg_eegrej( EEG, %s);', vararg2str({ regions })); 
 
 % combine regions if necessary
 % it should not be necessary but a 

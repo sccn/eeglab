@@ -473,7 +473,7 @@ end;
 
 % generate output command
 % -----------------------
-com = sprintf('pop_headplot(%s, %d, %s, ''%s'', [%s], %s);', inputname(1), typeplot, vararg2str(arg2), ...
+com = sprintf('pop_headplot(EEG, %d, %s, ''%s'', [%s], %s);', typeplot, vararg2str(arg2), ...
               topotitle, int2str(rowcols), vararg2str( pop_options ) );
 if compute_file, com = [ 'EEG = ' com ]; end;
 if nbgraph== 1,  com = [ 'figure; ' com ]; rotate3d(gcf); end;

@@ -359,11 +359,13 @@ end
 
 % build the command
 % -----------------
-if exist('indices') == 1
-    com = sprintf('EEG = pop_mergeset( %s, [%s], %d);', inputname(1), int2str(indices), keepall);
-else
-    com = sprintf('EEG = pop_mergeset( %s, %s, %d);', inputname(1), inputname(2), keepall);
-end
+if nargout > 1
+    if exist('indices') == 1
+        com = sprintf('EEG = pop_mergeset( %s, [%s], %d);', inputname(1), int2str(indices), keepall);
+    else
+        com = sprintf('EEG = pop_mergeset( %s, %s, %d);', inputname(1), inputname(2), keepall);
+    end
+ end
 
 return
 

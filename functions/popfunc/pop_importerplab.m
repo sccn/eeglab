@@ -194,7 +194,7 @@ warning(wb);
 
 % return the string command
 % -------------------------
-com = sprintf('%s = pop_importerplab( %s, ''%s'',''%s'', %d);', inputname(1), inputname(1), file1, file2, ncbins);
+com = sprintf('EEG = pop_importerplab( EEG, ''%s'',''%s'', %d);', file1, file2, ncbins);
 
 function str = recodebin(str)
 

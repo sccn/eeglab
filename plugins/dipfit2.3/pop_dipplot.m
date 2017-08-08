@@ -191,6 +191,6 @@ else
 end;
     
 if nargin < 3
-    com = sprintf('pop_dipplot( %s,%s);', inputname(1), vararg2str({ comps options{:}}));
+    com = sprintf('pop_dipplot( EEG, %s);', vararg2str({ comps options{:}}));
 end;
 return;

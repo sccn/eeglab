@@ -84,7 +84,5 @@ if format0_1
 end;
 EEG = pop_select( EEG, 'notrial', tmprej);
 
-%com = sprintf( '%s = pop_rejepoch( %s, find(%s.reject.rejglobal), 0);', inputname(1), ...
-%			inputname(1), inputname(1));	
-com = sprintf( '%s = pop_rejepoch( %s, %s);', inputname(1), inputname(1), vararg2str({ tmprej 0 }));		
+com = sprintf( 'EEG = pop_rejepoch( EEG, %s);', vararg2str({ tmprej 0 }));		
 return;

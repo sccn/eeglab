@@ -238,6 +238,6 @@ if ~usefft & plotfreqz & exist('b') == 1
     freqz(b, 1, [], EEG.srate);
 end
 
-com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s], %s, %s, ''%s'', %d);', inputname(1), inputname(1), ...
+com = sprintf( 'EEG = pop_eegfilt( EEG, %s, %s, [%s], [%s], %s, %s, ''%s'', %d);',...
     num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ), num2str(usefft), num2str(plotfreqz), firtype, causal);
 return

@@ -76,7 +76,7 @@ function [EEG, com] = pop_firma(EEG, varargin)
     EEG = firfilt(EEG, b);
 
     % History string
-    com = sprintf('%s = pop_firma(%s', inputname(1), inputname(1));
+    com = sprintf('EEG = pop_firma(EEG');
     for c = fieldnames(args)'
         if ischar(args.(c{:}))
             com = [com sprintf(', ''%s'', ''%s''', c{:}, args.(c{:}))];

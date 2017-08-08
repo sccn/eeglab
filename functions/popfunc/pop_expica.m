@@ -65,6 +65,6 @@ else
 end;
 save(filename, '-ascii', 'tmpmat');
 
-com = sprintf('pop_expica(%s, ''%s'', ''%s'');', inputname(1), whichica, filename); 
+com = sprintf('pop_expica(EEG, ''%s'', ''%s'');', whichica, filename); 
 
 return;

@@ -67,7 +67,7 @@ else
 end;
 fclose(fid);
 
-if iscell(allcoms)
+if iscell(allcoms) && nargout == 1
     com = sprintf('pop_saveh( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
 else
     com = sprintf('pop_saveh( EEG.history, ''%s'', ''%s'');', curfilename, curfilepath);

@@ -69,5 +69,5 @@ ALLEEG = eeg_store(ALLEEG, eeg_retrieve(ALLEEG, set_in), set_out);
 EEG    = eeg_retrieve(ALLEEG, set_out);
 CURRENTSET = set_out;
 
-com = sprintf('[ALLEEG EEG CURRENTSET] = pop_copyset( %s, %d, %d);', inputname(1), set_in, set_out);
+com = sprintf('[ALLEEG EEG CURRENTSET] = pop_copyset( ALLEEG, %d, %d);', set_in, set_out);
 return;

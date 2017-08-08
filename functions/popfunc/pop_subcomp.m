@@ -158,6 +158,5 @@ try,
     EEG.dipfit.model = EEG.dipfit.model(goodinds);
 catch, end;
 
-com = sprintf('%s = pop_subcomp( %s, [%s], %d);', inputname(1), inputname(1), ...
-   int2str(components), plotag);
+com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(components), plotag);
 return;

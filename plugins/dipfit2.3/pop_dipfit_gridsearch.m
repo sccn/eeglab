@@ -138,6 +138,4 @@ if nargin < 2
 
   % FIXME reject is not being used at the moment
   disp('Done');
-  com = sprintf('%s = pop_dipfit_gridsearch(%s, %s);', ...
-                inputname(1), inputname(1), vararg2str( { select xgrid, ygrid, zgrid reject }));
-  
+  com = sprintf('EEG = pop_dipfit_gridsearch(EEG, %s);', vararg2str( { select xgrid, ygrid, zgrid reject }));

@@ -532,7 +532,7 @@ for index =1:2:length(args)
 		argsout = { argsout{:} args{index}  args{index+1}};
 	end;
 end;
-com = sprintf('EEG = pop_selectevent( %s, %s);', inputname(1), vararg2str(argsout));
+com = sprintf('EEG = pop_selectevent( EEG, %s);', vararg2str(argsout));
 
 % chop the text so that it fits into the description window
 % ---------------------------------------------------------

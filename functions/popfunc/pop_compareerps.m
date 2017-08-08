@@ -73,5 +73,7 @@ end;
 % ------------------
 plottopo( tracing, ALLEEG(setlist(1)).chanlocs, ALLEEG(setlist(1)).pnts, [ALLEEG(setlist(1)).xmin ALLEEG(setlist(1)).xmax 0 0]*1000, plottitle, chansubset );
 
-com = sprintf('figure; pop_compareerps( %s, [%s], [%s], ''%s'');', inputname(1), num2str(setlist), num2str(chansubset), plottitle);
+if nargout == 1
+    com = sprintf('figure; pop_compareerps( %s, [%s], [%s], ''%s'');', inputname(1), num2str(setlist), num2str(chansubset), plottitle);
+end
 return;

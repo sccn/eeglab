@@ -66,4 +66,4 @@ if ~(strcmp(unit, 'samples') || strcmp(unit, 'seconds'))
 
 eeg_eventtable(EEG, 'dispTable', false, 'exportFile', filename, 'unit', unit);
 
-com = sprintf('pop_expevents(%s, ''%s'', ''%s'');', inputname(1), filename, unit); 
+com = sprintf('pop_expevents(EEG, ''%s'', ''%s'');', filename, unit); 

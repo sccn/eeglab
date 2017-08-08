@@ -292,4 +292,4 @@ end;
 
 % generate the output command
 % ---------------------------
-com = sprintf('%s = pop_reref( %s, %s);', inputname(1), inputname(1), vararg2str({ref, options{:}}));
+com = sprintf('EEG = pop_reref( EEG, %s);', vararg2str({ref, options{:}}));

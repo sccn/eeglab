@@ -226,4 +226,4 @@ EEG = eeg_checkset(EEG, 'makeur');
 
 % generate the output command
 % ---------------------------
-com = sprintf('%s = pop_importevent( %s, %s);', inputname(1), inputname(1), vararg2str(args));
+com = sprintf('EEG = pop_importevent( EEG, %s);', vararg2str(args));

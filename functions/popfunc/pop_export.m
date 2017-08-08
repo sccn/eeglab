@@ -204,5 +204,5 @@ else
 end;
 fclose(fid);
 
-com = sprintf('pop_export(%s,%s);', inputname(1), vararg2str({ filename, options{:} })); 
+com = sprintf('pop_export(EEG,%s);', vararg2str({ filename, options{:} })); 
 return;

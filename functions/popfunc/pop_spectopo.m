@@ -313,7 +313,7 @@ end;
 
 % plot the data and generate output and history commands
 % ------------------------------------------------------
-popcom = sprintf('figure; pop_spectopo(%s, %d, [%s], ''%s'' %s);', inputname(1), dataflag, num2str(timerange), processflag, options);
+popcom = sprintf('figure; pop_spectopo(EEG, %d, [%s], ''%s'' %s);', dataflag, num2str(timerange), processflag, options);
 switch processflag
 	case { 'EEG' 'eeg' }, SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
 	            com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate %s);', outstr, spectopooptions); 

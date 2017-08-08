@@ -184,6 +184,6 @@ if isempty(EEG.event), align = NaN; end;
 EEG = pop_importevent(EEG, 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
                            'delim', 9, 'align', align, 'fields', fields, varargin{:});
 
-command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield latfield durfield align })); 
+command = sprintf('EEG = pop_importpres(EEG, %s);', vararg2str({ filename typefield latfield durfield align })); 
 
 return;

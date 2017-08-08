@@ -293,7 +293,6 @@ if strcmp(g.delchan, 'on')
 end;
 
 if nargin < 2
-    command = sprintf('%s = pop_chanevent(%s, %s);', inputname(1), inputname(1), ...
-                      vararg2str({ chan options{:} })); 
+    command = sprintf('EEG = pop_chanevent(EEG, %s);', vararg2str({ chan options{:} })); 
 end;
 return;

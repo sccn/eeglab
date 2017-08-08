@@ -384,7 +384,7 @@ elseif nargin>=3
       
       % should the following string be put into com? ->NOT SUPPORTED
       % --------------------------------------------------------
-      com = sprintf('%s = dipfit_nonlinear(%s,%s)\n', inputname(1), inputname(1), vararg2str(arg));
+      com = sprintf('EEG = dipfit_nonlinear(EEG,%s)\n', vararg2str(arg));
       
       % this GUI always requires two sources in the dipole model
       % first put the original model back in and then replace the dipole parameters that have been fitted

@@ -384,7 +384,7 @@ end;
 
 % generate text command
 % ---------------------
-com = sprintf('%s = pop_epoch( %s, { ', inputname(1), inputname(1));
+com = sprintf('EEG = pop_epoch( EEG, { ');
 for j=1:length(events);
     if isstr( events{j} )   com = sprintf('%s ''%s'' ', com, events{j} );
     else                    com = sprintf('%s [%s] ',   com, num2str(events{j}) );

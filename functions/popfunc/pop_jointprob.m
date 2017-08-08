@@ -264,8 +264,8 @@ if ~isempty(rej)
 end;
 nrej = sum(rej);
 
-com = [ com sprintf('%s = pop_jointprob(%s,%s);', inputname(1), ...
-		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject, vistype, [],plotflag})) ]; 
+com = [ com sprintf('EEG = pop_jointprob(EEG,%s);', ...
+		vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject, vistype, [],plotflag})) ]; 
 if nargin < 3 & nargout == 2
 	locthresh = com;
 end;

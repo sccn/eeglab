@@ -586,7 +586,7 @@ if nargin<2
     % transfer events
     % ---------------
     if ~isempty(userdata{2})
-        com = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{2}));
+        com = sprintf('EEG = pop_editeventvals(EEG,%s);', vararg2str(userdata{2}));
     end;
     if isempty(findstr('''sort''', com))
         if ~isempty(userdata{2}) % some modification have been done

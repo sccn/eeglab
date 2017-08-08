@@ -294,7 +294,8 @@ for inddataset = 1:length(ALLEEG)
                     end;
                     if ~isfield(EEG.chanlocs, 'X') || isempty(EEG.chanlocs(1).X)
                         EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
-                        res = [ inputname(1) ' = eeg_checkset('  inputname(1) ', ''chanlocs_homogeneous'' ); ' ];
+%                         res = [ inputname(1) ' = eeg_checkset('  inputname(1) ', ''chanlocs_homogeneous'' ); ' ];
+                        res = ['EEG = eeg_checkset(EEG, ''chanlocs_homogeneous'' ); ' ];
                     end;
                 case 'chanlocsize',
                     if ~isempty(EEG.chanlocs)
@@ -726,7 +727,8 @@ for inddataset = 1:length(ALLEEG)
                 end;
                 if ~ischar(EEG.data), EEG.data = 'in set file'; end;
                 
-                res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
+                % res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
+                res = ['EEG = eeg_checkset( EEG, ''savedata'');'];
             end;
         end;
     end;

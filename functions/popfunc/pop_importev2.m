@@ -70,6 +70,6 @@ if mean(oldeventlats(1:len) - neweventlats(1:len)) > 1
     error('Wrong alignment of ev2 file with data');
 end;
 
-command = sprintf('%s = pop_importev2(%s, %s);', inputname(1), inputname(1), filename); 
+command = sprintf('EEG = pop_importev2(EEG, %s);', filename); 
 
 return;

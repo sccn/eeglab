@@ -477,7 +477,7 @@ EEGOUT = eeg_checkset(EEGOUT);
 % generate the output command
 % ---------------------------
 if nargout > 1
-    com = sprintf( '%s = pop_editset(%s', inputname(1), inputname(1) );
+    com = sprintf('EEG = pop_editset(EEG');
     for i=1:2:length(args)
         if ~isempty( args{i+1} )
             if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );

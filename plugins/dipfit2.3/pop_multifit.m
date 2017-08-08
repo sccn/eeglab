@@ -214,7 +214,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         pop_dipplot(EEG, 'DIPFIT', plotcomps, g.plotopt{:});
     end;
     
-    com = sprintf('%s = pop_multifit(%s, %s);', inputname(1), inputname(1), vararg2str({ comps options{:}}));
+    com = sprintf('EEG = pop_multifit(EEG, %s);', vararg2str({ comps options{:}}));
     return;
     
 % get electrode positions from eeglag

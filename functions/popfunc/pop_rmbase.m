@@ -170,10 +170,8 @@ EEG.data = reshape( EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 EEG.icaact = [];
 
 if ~isempty(timerange)
-	com = sprintf('%s = pop_rmbase( %s, [%s]);', inputname(1), inputname(1), ...
-			num2str(timerange));
+	com = sprintf('EEG = pop_rmbase( EEG, [%s]);',num2str(timerange));
 else
-	com = sprintf('%s = pop_rmbase( %s, [], %s);', inputname(1), inputname(1), ...
-			vararg2str({pointrange}));
+	com = sprintf('EEG = pop_rmbase( EEG, [], %s);',vararg2str({pointrange}));
 end;			
 return;

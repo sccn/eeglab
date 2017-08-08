@@ -374,7 +374,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate the output command
 % ---------------------------
-com = sprintf('%s = pop_editeventfield( %s, %s);', inputname(1), inputname(1), vararg2str(args));
+com = sprintf('EEG = pop_editeventfield( EEG, %s);', vararg2str(args));
 
 % interpret the variable name
 % ---------------------------

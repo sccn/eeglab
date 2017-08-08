@@ -72,7 +72,7 @@ if length(compnum) > PLOTPERFIG
         pop_selectcomps(EEG, compnum([index:min(length(compnum),index+PLOTPERFIG-1)]));
     end;
 
-    com = [ 'pop_selectcomps(' inputname(1) ', ' vararg2str(compnum) ');' ];
+    com = [ 'pop_selectcomps(EEG, ' vararg2str(compnum) ');' ];
     return;
 end;
 
@@ -157,7 +157,7 @@ for ri = compnum
          end
 		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',...
                            [X Y+sizewy sizewx sizewy*0.25].*s+q, 'tag', ['comp' num2str(ri)]);
-        command = sprintf('pop_prop( %s, 0, %d, gcbo, { ''freqrange'', [1 50] });', inputname(1), ri); %RMC command = sprintf('pop_prop( %s, 0, %d, %3.15f, { ''freqrange'', [1 50] });', inputname(1), ri, button);
+        command = sprintf('pop_prop( EEG, 0, %d, gcbo, { ''freqrange'', [1 50] });', ri);
 		set( button, 'callback', command );
 	end;
 	set( button, 'backgroundcolor', eval(fastif(EEG.reject.gcompreject(ri), COLREJ,COLACC)), 'string', int2str(ri)); 	
@@ -190,5 +190,5 @@ if ~exist('fig','var')
 		    %		' end; pop_compproj(%d,%d,1); close(gcf); eeg_retrieve(%d); eeg_updatemenu; '], rejtrials, set_in, set_out, fastif(rejtrials, set_out, set_in), set_out, set_in));
 end;
 
-com = [ 'pop_selectcomps(' inputname(1) ', ' vararg2str(compnum) ');' ];
+com = [ 'pop_selectcomps(EEG, ' vararg2str(compnum) ');' ];
 return;		
