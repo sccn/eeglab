@@ -379,8 +379,7 @@ else
 end;
 
 if nargin < 3 & nargout == 1
-    erp1 = sprintf('pop_comperp( %s, %d, %s);', inputname(1), ...
-                  flag, vararg2str({ datadd datsub options{:} }) );
+    erp1 = sprintf('pop_comperp( ALLEEG, %d, %s);', flag, vararg2str({ datadd datsub options{:} }) );
 end;
 return;
 
