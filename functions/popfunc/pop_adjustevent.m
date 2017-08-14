@@ -4,8 +4,8 @@
 % >> EEG = pop_adjustevent(EEG,20);
 % >> EEG = pop_adjustevent(EEG,20,'eventtype',{'rt'});
 % >> EEG = pop_adjustevent(EEG,20,'eventtype',{'rt','square'});
-% >> EEG = pop_adjustevent(EEG,20,'eventnums', [4 5 6 7 ]);
-% >> EEG = pop_adjustevent(EEG,20,'eventnums', [5 20]);
+% >> EEG = pop_adjustevent(EEG,20,'eventnums', [4 5 6 7 ]); % adjust events with these numbers
+% >> EEG = pop_adjustevent(EEG,20,'eventrange', [5 20]);    % adjust events with numbers in this range
 %
 % Graphic interface:
 %    "Offset Value (ms)"        - [edit box] See input 'offset'.
