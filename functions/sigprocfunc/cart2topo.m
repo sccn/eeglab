@@ -110,7 +110,7 @@ y = -y(:);
 z = z(:);
 
 if any(z < 0)
-    disp('WARNING: some electrodes lie below the z=0 plane, result may be innacurate')
+    disp('WARNING: some electrodes lie below the z=0 plane, result may be inacurate')
     disp('         Instead use cart2sph() then sph2topo().')
 end;
 if strcmp(g.gui, 'on')
