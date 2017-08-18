@@ -14,7 +14,7 @@
 %                'invdist'/'v4' uses inverse distance on the scalp
 %                'spherical' uses superfast spherical interpolation. 
 %                'spacetime' uses griddata3 to interpolate both in space 
-%                and time (very slow and cannot be interupted).
+%                and time (very slow and cannot be interrupted).
 % Output: 
 %     EEGOUT   - data set with bad electrode data replaced by
 %                interpolated data
