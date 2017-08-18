@@ -43,7 +43,7 @@ if isfield(chans, 'shrink')
 end;
 
 disp('WARNING: ELECTRODE COORDINATES MUST BE WITH NOSE ALONG THE +X DIMENSION TO BE EXPORTED')
-disp('         IF NOT, THE EXPORTED FILE COORDINATES MAY BE INNACURATE')
+disp('         IF NOT, THE EXPORTED FILE COORDINATES MAY BE INACURATE')
 
 % get infos from readlocs
 % -----------------------
