@@ -44,7 +44,7 @@
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 % 'logfile'   = [filename] save all message in a log file in addition to showing them
 %               on screen (default -> none)
-% 'interput'  = ['on'|'off'] draw interupt figure. Default is off.
+% 'interrupt' = ['on'|'off'] draw interrupt figure. Default is off.
 % 'rndreset'  = ['on'|'off'] reset the random seed. Default is off (although it
 %               used to be on prior to 2015. This means that ICA will always return.
 %               the same decomposition unless this option is set to 'on'.
@@ -184,7 +184,7 @@ SIGNCOUNT_STEP       = 2;         % extblocks increment factor
 
 DEFAULT_SPHEREFLAG   = 'on';      % use the sphere matrix as the default
                                   %   starting weight matrix
-DEFAULT_INTERUPT     = 'off';     % figure interuption
+DEFAULT_INTERRUPT    = 'off';     % figure interruption
 DEFAULT_PCAFLAG      = 'off';     % don't use PCA reduction
 DEFAULT_POSACTFLAG   = 'off';     % don't use posact(), to save space -sm 7/05
 DEFAULT_VERBOSE      = 1;         % write ascii info to calling screen
@@ -218,7 +218,7 @@ weights    = 0;                      % defaults defined below
 ncomps     = chans;
 biasflag   = DEFAULT_BIASFLAG;
 
-interupt   = DEFAULT_INTERUPT;
+interrupt  = DEFAULT_INTERRUPT;
 extended   = DEFAULT_EXTENDED;
 extblocks  = DEFAULT_EXTBLOCKS;
 kurtsize   = MAX_KURTSIZE;
@@ -288,17 +288,17 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
          chans = ncomps;
-       elseif strcmp(Keyword,'interupt') 
+       elseif strcmp(Keyword,'interupt') || strcmp(Keyword,'interrupt') 
          if ~isstr(Value)
-           fprintf('runica(): interupt value must be on or off')
+           fprintf('runica(): interrupt value must be on or off')
            return
          else 
            Value = lower(Value);
            if ~strcmp(Value,'on') & ~strcmp(Value,'off'),
-             fprintf('runica(): interupt value must be on or off')
+             fprintf('runica(): interrupt value must be on or off')
              return
            end
-           interupt = Value;
+           interrupt = Value;
          end
      elseif strcmp(Keyword,'posact') 
          if ~isstr(Value)
@@ -836,16 +836,16 @@ else
 end                                % a position dependent on the system clock
 warning('on', 'MATLAB:RandStream:ActivatingLegacyGenerators')
 
-% interupt figure
+% interrupt figure
 % --------------- 
-if strcmpi(interupt, 'on')
+if strcmpi(interrupt, 'on')
     fig = figure('visible', 'off');
     supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press button to interrupt runica()' }, ...
-              {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'setappdata(gcf, ''run'', 0);' } );
+              {'style' 'pushbutton' 'string' 'Interrupt' 'callback' 'setappdata(gcf, ''run'', 0);' } );
     set(fig, 'visible', 'on');
     setappdata(gcf, 'run', 1);
     
-    if strcmpi(interupt, 'on')
+    if strcmpi(interrupt, 'on')
         drawnow;
     end;
 end;
@@ -857,7 +857,7 @@ if biasflag & extended
         timeperm=randperm(datalength); % shuffle data order at each step
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            if strcmpi(interupt, 'on')
+            if strcmpi(interrupt, 'on')
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
@@ -1029,7 +1029,7 @@ if biasflag & ~extended
         timeperm=randperm(datalength); % shuffle data order at each step
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            if strcmpi(interupt, 'on')
+            if strcmpi(interrupt, 'on')
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
@@ -1149,7 +1149,7 @@ if ~biasflag & extended
         timeperm=randperm(datalength); % shuffle data order at each step through data
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            if strcmpi(interupt, 'on')
+            if strcmpi(interrupt, 'on')
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
@@ -1316,7 +1316,7 @@ if ~biasflag & ~extended
         timeperm=randperm(datalength); % shuffle data order at each step
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            if strcmpi(interupt, 'on')
+            if strcmpi(interrupt, 'on')
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
@@ -1435,7 +1435,7 @@ if ~biasflag & ~extended
 end
 %% Finalize Computed Data for Output
   
-if strcmpi(interupt, 'on')
+if strcmpi(interrupt, 'on')
     close(fig);
 end;
 
