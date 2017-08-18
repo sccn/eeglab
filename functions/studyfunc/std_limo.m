@@ -109,8 +109,7 @@ addpath([root filesep 'external']);
 addpath([root filesep 'help']);
 
 % Checking fieldtrip paths
-global PLUGINLIST;
-if isempty(find(strncmpi('Fieldtrip',{PLUGINLIST.plugin},9), 1)) || strcmp(PLUGINLIST(find(strncmpi('Fieldtrip',{PLUGINLIST.plugin},9), 1)).status,'deactivated')
+if ~exist('ft_prepare_neighbours')
     error('std_limo error: Fieldtrip extension must be installed');
 end
 
@@ -149,7 +148,7 @@ if isempty(opt.chanloc) && isempty(opt.neighbormat)
         disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
         limoChanlocs = [];
         flag_ok = 0;
-    end;
+    end
 else
     limostruct.expected_chanlocs   = opt.chanloc;
     limostruct.channeighbstructmat = opt.neighbormat;
@@ -170,19 +169,20 @@ model.cont_files = [];
 if isempty(STUDY.design(design_index).filepath)
     STUDY.design(design_index).filepath = STUDY.filepath;
 end
-unique_subjects = unique({STUDY.datasetinfo.subject});
-nb_subjects   = length(unique_subjects);
+unique_subjects = STUDY.design(design_index).cases.value';
+nb_subjects     = length(unique_subjects);
 
 for s = 1:nb_subjects
     nb_sets(s) = numel(find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject})));
 end
 
-% Checking that all subjects use the same sets (should not happen)
-% -------------------------------------------------------------------------
-if length(unique(nb_sets)) ~= 1
-   error('different numbers of datasets (.set) used across subjects - cannot go further')
-else
-   nb_sets = unique(nb_sets);
+% find out if the channels are interpolated
+% -----------------------------------------
+interpolated = zeros(1,length(STUDY.datasetinfo));
+for iDat = 1:length(STUDY.datasetinfo)
+    fileName = fullfile(STUDY.datasetinfo(iDat).filepath, [ STUDY.datasetinfo(iDat).subject '.' opt.measure ]);
+    tmpChans = load('-mat', fileName, 'labels');
+    if length(tmpChans.labels) > ALLEEG(iDat).nbchan, interpolated(iDat) = 1; end        
 end
 
 % simply reshape to read columns
@@ -261,7 +261,6 @@ end
 
 % Check if the measures has been computed
 % -------------------------------------------------------------------------
-
 for nsubj = 1 : length(unique_subjects)
     inds     = find(strcmp(unique_subjects{nsubj},{STUDY.datasetinfo.subject}));
     
@@ -299,6 +298,7 @@ else
     error('std_limo: Define a valid design');
 end
 % -------------------------------------------------------------------------
+mergedChanlocs = eeg_mergelocs(ALLEEG.chanlocs);
 for s = 1:nb_subjects     
     filename = [ STUDY.datasetinfo(order{s}(1)).subject '_limo_file_tmp' num2str(design_index) '.set'];
     index = [STUDY.datasetinfo(order{s}).index];
@@ -337,15 +337,20 @@ for s = 1:nb_subjects
     end
     
     filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
-    OUTEEG.filepath   = filepath_tmp;
-    OUTEEG.filename   = filename;
-    OUTEEG.srate      = ALLEEG(index(1)).srate;
-    OUTEEG.icaweights = ALLEEG(index(1)).icaweights;
-    OUTEEG.icasphere  = ALLEEG(index(1)).icasphere;
-    OUTEEG.icasphere  = ALLEEG(index(1)).icasphere;
-    OUTEEG.chanlocs   = ALLEEG(index(1)).chanlocs;
-    OUTEEG.etc        = ALLEEG(index(1)).etc;
-    OUTEEG.times      = ALLEEG(index(1)).times;
+    OUTEEG.filepath    = filepath_tmp;
+    OUTEEG.filename    = filename;
+    OUTEEG.srate       = ALLEEG(index(1)).srate;
+    OUTEEG.icaweights  = ALLEEG(index(1)).icaweights;
+    OUTEEG.icasphere   = ALLEEG(index(1)).icasphere;
+    OUTEEG.icachansind = ALLEEG(index(1)).icachansind;
+    OUTEEG.etc         = ALLEEG(index(1)).etc;
+    OUTEEG.times       = ALLEEG(index(1)).times;
+    if any(interpolated)
+        OUTEEG.chanlocs    = mergedChanlocs;
+        OUTEEG.etc.interpolatedchannels = setdiff([1:length(OUTEEG.chanlocs)], std_chaninds(OUTEEG, { ALLEEG(index(1)).chanlocs.labels }));
+    else
+        OUTEEG.chanlocs    = ALLEEG(index(1)).chanlocs;
+    end
     
     % update EEG.etc
     OUTEEG.etc.merged{1} = ALLEEG(index(1)).filename;
@@ -639,47 +644,51 @@ if isempty(find(procstatus==0))
     nbootval   = 0;
     tfceval    = 0;
     
-    filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-                                                                ,'type'          ,model.defaults.type ...
-                                                                ,'tfce'          ,tfceval...
-                                                                ,'analysis_type' ,'fullchan'...
-                                                                ,'parameters'    ,{[1:nparams]}...
-                                                                ,'limofiles'     ,{LIMO_files.Beta}...;
-                                                                ,'folderprefix'  ,foldername...
-                                                                ,'folderpath'    ,LIMO_files.LIMO);
-    testype    = cell([length(filesout),1]);
-    testype(:) = {'ttest'};
-    for i = 1: nparams
-        testname{i,1}   = [testype{i} '_parameter' num2str(i)];
+    try
+        filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                                    ,'type'          ,model.defaults.type ...
+                                                                    ,'tfce'          ,tfceval...
+                                                                    ,'analysis_type' ,'fullchan'...
+                                                                    ,'parameters'    ,{[1:nparams]}...
+                                                                    ,'limofiles'     ,{LIMO_files.Beta}...;
+                                                                    ,'folderprefix'  ,foldername...
+                                                                    ,'folderpath'    ,LIMO_files.LIMO);
+        testype    = cell([length(filesout),1]);
+        testype(:) = {'ttest'};
+        for i = 1: nparams
+            testname{i,1}   = [testype{i} '_parameter' num2str(i)];
+        end
+
+        % 2- Computing Paired ttest for each combination of parameters
+        ncomb        = combnk(1:nparams,2);
+        limofiles{1} = LIMO_files.Beta;
+        limofiles{2} = LIMO_files.Beta;
+
+        for i = 1:size(ncomb,1)
+            tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
+            mkdir(LIMO_files.LIMO,tmpname);
+            folderpath       = fullfile(LIMO_files.LIMO,tmpname);
+            filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                                                ,'type'          ,model.defaults.type ...
+                                                                                ,'tfce'          ,tfceval...
+                                                                                ,'analysis_type' ,'fullchan'...
+                                                                                ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
+                                                                                ,'limofiles'     ,limofiles...
+                                                                                ,'folderpath'    ,folderpath);
+            testype{end+1}      = 'p_ttest';
+            testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
+        end
+        % Assigning Level 2 info to STUDY
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
+
+        for i = 1:size(filesout,2)
+            STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).filename = filesout{1,i};
+            STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).guiname  = testname{i,1};
+        end
+    catch,
+        disp('2nd level LIMO function failed - call from the command line');
     end
-    
-    % 2- Computing Paired ttest for each combination of parameters
-    ncomb        = combnk(1:nparams,2);
-    limofiles{1} = LIMO_files.Beta;
-    limofiles{2} = LIMO_files.Beta;
-    
-    for i = 1:size(ncomb,1)
-        tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
-        mkdir(LIMO_files.LIMO,tmpname);
-        folderpath       = fullfile(LIMO_files.LIMO,tmpname);
-        filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
-                                                                            ,'type'          ,model.defaults.type ...
-                                                                            ,'tfce'          ,tfceval...
-                                                                            ,'analysis_type' ,'fullchan'...
-                                                                            ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
-                                                                            ,'limofiles'     ,limofiles...
-                                                                            ,'folderpath'    ,folderpath);
-        testype{end+1}      = 'p_ttest';
-        testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
-    end
-    % Assigning Level 2 info to STUDY
-    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
-    
-    for i = 1:size(filesout,2)
-        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).filename = filesout{1,i};
-        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).guiname  = testname{i,1};
-    end
-end
+ end
 
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
