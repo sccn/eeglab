@@ -173,7 +173,12 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           % update interface
           % ----------------
           tmpobj = findobj('parent', gcf, 'tag', allfields{index});
-          set(tmpobj, 'string', num2str(value,5), 'enable', enable);
+          if isnumeric(value)
+              set(tmpobj, 'string', num2str(value,5), 'enable', enable);
+          else % for strings and cells
+              set(tmpobj, 'string', value, 'enable', enable);
+          end
+          
       end;
       
       % update original
@@ -293,8 +298,8 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           field    = tmparg;
           objfield = findobj('parent', gcf, 'tag', field);
           editval     = get(objfield, 'string');
-          if ~isempty(editval) & ~isempty(str2num(editval)), editval = str2num(editval); end;
-
+          if ~isempty(editval) && ~isempty(str2num(editval)), editval = str2num(editval); end;
+          
           % update history
           % --------------
           oldcom = { oldcom{:},'changefield',{ valnum field editval }};
