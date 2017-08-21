@@ -334,7 +334,7 @@ for curfield = tmpfields'
 		                          disp(['pop_editeventfield(): creating new field ''' curfield{1} '''' ]);
 		                      end;
                               try
-                                  EEG.event = setstruct(EEG.event, curfield{1}, g.indices, [ tmparray{:} ]);
+                                  EEG.event = setstruct(EEG.event, curfield{1}, g.indices, tmparray);
                               catch,
                                   error('Wrong size for input array');
                               end;
@@ -433,13 +433,25 @@ return;
     
 function var = setstruct( var, fieldname, indices, values )
     if exist('indices') ~= 1, indices = 1:length(var); end;
-    if length(values) > 1
-        for index = 1:length(indices)
-            var = setfield(var, {indices(index)}, fieldname, values(index));
+    if iscell(values)
+        if length(values) > 1
+            for index = 1:length(indices)
+                var = setfield(var, {indices(index)}, fieldname, values{index});
+            end;
+        else
+            for index = 1:length(indices)
+                var = setfield(var, {indices(index)}, fieldname, values{1});
+            end;
+        end; 
+    else % Code below may be unused
+        if length(values) > 1
+            for index = 1:length(indices)
+                var = setfield(var, {indices(index)}, fieldname, values(index));
+            end;
+        else
+            for index = 1:length(indices)
+                var = setfield(var, {indices(index)}, fieldname, values);
+            end;
         end;
-    else
-        for index = 1:length(indices)
-            var = setfield(var, {indices(index)}, fieldname, values);
-        end;
-    end;
+    end
 return;
