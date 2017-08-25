@@ -1,4 +1,4 @@
-% eventalign - function called by pop_importevent() to find the best 
+% eventalign - function called by pop_importevent() to find the best
 %              sampling rate ratio to align 2 arrays of data events.
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, Dec 2003
@@ -21,11 +21,15 @@
 
 function mindiff = eventalign(factor, a, b, measure)
 
-       diffarray = abs(factor*a-b)';
-       [allmins poss] = min(diffarray);
-       
-       if strcmpi(measure, 'mean')
-           mindiff = mean(allmins);
-       else
-           mindiff = median(allmins);
-       end;
+if length(factor) == 2
+    diffarray = abs(factor(1)*a-b+factor(2))';
+else
+    diffarray = abs(factor*a-b)';
+end
+allmins = min(diffarray);
+
+if strcmpi(measure, 'mean')
+    mindiff = mean(allmins);
+else
+    mindiff = median(allmins);
+end
