@@ -301,16 +301,16 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         end;
         
         try
-            newfactor = fminsearch('eventalign',1,[],newlat, oldlat, optimmeas);
+            newfactor = fminsearch('eventalign',[1 0],[],newlat, oldlat, optimmeas);
         catch 
             newfactor = fminsearch('eventalign',1,[],[],newlat, oldlat, optimmeas); % Octave
         end;
-        fprintf('Best sampling rate ratio found is %1.7f. Below latencies after adjustment\n', newfactor);
-        if newfactor > 1.01 | newfactor < 0.99
+        fprintf('Best sampling rate ratio found is %1.7f (shift of %1.1f sample). Below latencies after adjustment\n', newfactor(1), newfactor(2));
+        if newfactor(1) > 1.01 | newfactor(1) < 0.99
             disp('Difference is more than 1%, something is wrong; ignoring ratio');
             newfactor = 1;
         else
-            difference1 = eventalign( 1        , newlat, oldlat, optimmeas);
+            difference1 = eventalign( [1  0]   , newlat, oldlat, optimmeas);
             difference2 = eventalign( newfactor, newlat, oldlat, optimmeas);
             fprintf('The average difference before correction was %f sample points\n', difference1);
             fprintf('The average difference after correction is %f sample points\n', difference2);
@@ -320,30 +320,33 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         %[allmins poss] = min(diffarray);
         %figure; hist(allmins);
     else
-        newfactor = 1;
-    end;
-    if ~isnan( align.val ) & newfactor ~= 1 
+        newfactor = [1 0];
+    end
+    if ~isnan( align.val ) && newfactor(1) ~= 1 
         if align.val >= 0
             latfirstevent = event(1).latency;
         else
             latfirstevent = event(-align.val+1).latency;
-        end;
-        for index = setdiff_bc(indices, 1)
-            event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
-        end;
+        end
+        for index = indices
+            event(index).latency = (event(index).latency-latfirstevent)*newfactor(1)+latfirstevent+newfactor(2);
+        end
+%         for index = setdiff_bc(indices, 1)
+%             event(index).latency = round(event(index).latency-latfirstevent)*newfactor(1)+latfirstevent+newfactor(2);
+%         end
         if ~isempty(oldevents)
             fprintf('Old event latencies (10 first): %s ...\n', int2str(round([ oldevents(1:min(10, length(oldevents))).latency ])));
             fprintf('New event latencies (10 first): %s ...\n', int2str(round([ event(1:min(10, length(event))).latency ])));
-        end;
+        end
     else
         % must add one (because first sample point has latency 0
         % ------------------------------------------------------
         if ~isnan(timeunit)
             for index = indices
                 event(index).latency = round((event(index).latency+1)*1000*newfactor)/1000;
-            end;
-        end;
-    end;        
+            end
+        end
+    end        
 
          
 %% create new field names
@@ -355,9 +358,8 @@ function epochfield = getnewfields( epochfield, nbfields )
                epochfield =  { epochfield{:} [ 'var' int2str(count) ] };
                nbfields = nbfields-1;
        else    count = count+1;
-       end;                    
+       end                  
    end     
-return;
 
 %%
 % ----------------------
@@ -372,4 +374,3 @@ function var = setstruct( var, fieldname, indices, values )
             var = setfield(var, {indices(index)}, fieldname, '');
         end
     end
-return;
