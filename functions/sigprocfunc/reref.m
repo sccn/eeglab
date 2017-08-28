@@ -108,6 +108,7 @@ g = finputcheck(varargin, { 'icaweight'   'real'    []          [];
                             'icaweights'  'real'    []          [];
                             'icasphere'   'real'    []          [];
                             'icachansind' 'integer'    []       [];
+                            'interpchan'  {''}      []          [];
                             'method'     'string'  { 'standard','withref' }  'standard';
                             'refstate'   { 'string','integer' } { { 'common','averef' } [1 size(data,1)] }     'common'; % ot used but kept for backward compatib.
                             'exclude'    'integer' [1 size(data,1)]          [];
