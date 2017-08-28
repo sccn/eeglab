@@ -181,6 +181,59 @@ if isstr(ref), ref = { ref }; end;
 if iscell(ref), ref = eeg_chaninds(EEG, ref); end;
 optionscall = options;
 
+g = struct(optionscall{:});
+if ~isfield(g, 'exclude'),       g.exclude       = [];    end;
+if ~isfield(g, 'keepref'),       g.keepref       = 'off'; end;
+if ~isfield(g, 'refloc') ,       g.refloc        = [];    end;
+if ~isfield(g, 'interpchan') ,   g.interpchan    = 'off'; end;
+if ~isfield(g, 'addrefchannel'), g.addrefchannel = 0;     end;
+
+%--- Interpolation code START
+interpflag = 0;
+if ~isequal('off', g.interpchan )
+    
+    % Case no channel provided, infering them from urchanlocs field
+    if isempty(g.interpchan) 
+        try
+            eegtypeindx0 = strmatch('EEG',{EEG.urchanlocs.type});
+            eegtypeindx1 = strmatch('EEG',{EEG.chanlocs.type});
+        catch
+            fprintf(2,'pop_reref error: Unable to check for deleted channels. Missing field ''type'' in channel location \n');
+            return;
+        end
+        
+        chan2interp = setdiff_bc({EEG.urchanlocs(eegtypeindx0).labels}, {EEG.chanlocs(eegtypeindx1).labels});       
+        if isempty(chan2interp)
+            fprintf('pop_reref message: No removed channel found. Halting interpolation and moving forward...\n');
+        else
+           chan2interpindx = find(cell2mat(cellfun(@(x) ismember(x, chan2interp), {EEG.urchanlocs.labels}, 'UniformOutput', 0)));  
+           chanlocs2interp =  EEG.urchanlocs(chan2interpindx);
+           interpflag = 1;
+        end
+    
+    % Case where channel loc structure is provided    
+    elseif isstrcut(g.interpchan) 
+        chanlocs2interp = g.interpchan;
+        interpflag = 1;
+    
+    % Case where channel index is provided    
+    elseif isreal(g.interpchan)
+        chanlocs2interp = EEG.chanlocs(g.interpchan);
+        interpflag = 1;
+        
+    % invalid case    
+    else
+        error('pop_reref error: Invalid arguments for option ''interpchan'' ');
+    end
+    
+    if interpflag
+        EEG = pop_interp(EEG, chanlocs2interp, 'spherical');
+        interpindx = find(cell2mat(cellfun(@(x) ismember(x, {chanlocs2interp.labels}), {EEG.chanlocs.labels}, 'UniformOutput', 0))); 
+        % EEG.icaweights = [];
+    end
+end
+%--- interpolation code END
+
 % include channel location file
 % -----------------------------
 if ~isempty(EEG.chanlocs)
@@ -190,11 +243,13 @@ end;
 nchans = EEG.nbchan;
 fprintf('Re-referencing data\n');
 oldchanlocs = EEG.chanlocs;
+
 [EEG.data EEG.chanlocs refchan ] = reref(EEG.data, ref, optionscall{:});
-g = struct(optionscall{:});
-if ~isfield(g, 'exclude'), g.exclude = []; end;
-if ~isfield(g, 'keepref'), g.keepref = 'off'; end;
-if ~isfield(g, 'refloc') , g.refloc  = []; end;
+
+% If interpolation was done... then remove channels
+if interpflag
+    EEG = pop_select(EEG, 'nochannel', interpindx);
+end
 
 % deal with reference
 % -------------------
