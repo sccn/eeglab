@@ -371,7 +371,7 @@ elseif nargin>=3
       fig = figure('visible', 'off');
       supergui( fig, {1 1}, [], ...
         {'style' 'text' 'string' 'Press button below to stop fitting' }, ...
-        {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
+        {'style' 'pushbutton' 'string' 'Interrupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
       drawnow;
       % start the dipole fitting
       try
