@@ -199,7 +199,7 @@ for ci = chan
     % apply preprocessing
     % -------------------
     if ~isempty(g.oper)
-        if any( g.oper == '=' )
+        if ~any( g.oper == '=' )
              g.oper = [ 'X = ' g.oper ';' ];
         else g.oper = [ g.oper ';' ];
         end
