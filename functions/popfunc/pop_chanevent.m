@@ -50,7 +50,12 @@
 %                    (capital) X. For example, 'X>3' will test the value of X 
 %                    at each time point (returning 1 if the data channel value 
 %                    is larger than 3, and 0 otherwise). You may also use 
-%                    any function (Ex: 'myfunction(X)').
+%                    any function (Ex: 'myfunction(X)'). If an equal character
+%                    is not present, this function preprend 'X=' to your 
+%                    expression before evaluating it. Otherwise it just 
+%                    evaluate the expression. For example, one may use
+%                    'if X(1)>100,X(1)=0;end; X(find(X>100))=X(find(X>100)-1);'
+%                    to remove spike artifacts in the data.
 %   'duration'     - ['on'|'off'] extract event duration. This option can only be
 %                    used when extracting events on leading edges. Event will last
 %                    until next trailing-edge (down) event { 'off' }.
