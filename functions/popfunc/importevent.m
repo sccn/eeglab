@@ -30,8 +30,13 @@
 % Optional oldevent input:
 %  'append'   - ['yes'|'no'] 'yes' = Append events to the current events in 
 %               the EEG dataset {default}: 'no' = Erase the previous events.
-%  'indices'  - {integer vector] Vector indicating the indices of the events to
-%               modify. 
+%               Note that if the event file does not contain latency
+%               information and the existing event do, the new events
+%               fields are added to the existing structure.
+%  'indices'  - [integer vector] Vector indicating the indices of the events to
+%               modify. This is only valid for the 'append','no' condition.
+%  'targetevent' - [type list] Modify only certain event indices with a
+%               given type. This overwrite the indices array above.
 %  'align'    - [num] Align the first event latency to the latency of existing 
 %               event number (num), and check latency consistency. 
 %               A value of 0 indicates that the first events of the pre-defined 
@@ -98,20 +103,27 @@ I = [];
 if ~isempty(oldevent), allfields = fieldnames(oldevent);
 else                   allfields = {}; end;
     
-g = finputcheck( varargin, { 'fields'    'cell'     []         {};
-                         'skipline'  'integer'  [0 Inf]    0;
-                         'indices'   'integer'  [1 Inf]    [];
-                         'append'    'string'   {'yes';'no';'''yes''';'''no''' }         'yes';
-                         'timeunit'  'real'     []         1;
-                         'event'     { 'cell';'real';'string' }     []    [];
-                         'align'     'integer'  []         NaN;
-                         'optimalign' 'string'  { 'on';'off' }         'on';
-                         'optimoffset' 'string'  { 'on';'off' }        'off';
-                         'optimmeas'  'string'  { 'median';'mean' }         'mean';
-                         'delim'     {'integer';'string'}   []         char([9 32 44])}, 'importevent');
+g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
+                         'skipline'    'integer'  [0 Inf]               0;
+                         'indices'     'integer'  [1 Inf]               [];
+                         'append'      'string'   {'yes';'no';'''yes''';'''no''' }         'yes';
+                         'timeunit'    'real'     []                    1;
+                         'event'       { 'cell';'real';'string' }  []   [];
+                         'align'       'integer'  []                    NaN;
+                         'targetevent' {'integer';'cell'}  []           [];
+                         'optimalign'  'string'  { 'on';'off' }         'on';
+                         'optimoffset' 'string'  { 'on';'off' }         'off';
+                         'optimmeas'   'string'  { 'median';'mean' }    'mean';
+                         'delim'       {'integer';'string'}   []        char([9 32 44])}, 'importevent');
 if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
 g.delim = char(g.delim);    
+
+% match specific events
+% ---------------------
+if ~isempty(g.targetevent)
+    [~, g.indices] = pop_selectevent(EEG, 'type', g.targetevent, 'deleteevents', 'off', 'deleteepochs', 'off');
+end
 
 % call from pop_importevent
 % -------------------------
@@ -162,8 +174,16 @@ else
     g.oldevents = [];
 end;
 
+
 tmpfields = fieldnames(g);
 event = oldevent;
+
+% check if latency is present in the array
+latencypresent = ~isempty(strmatch('latency', g.fields));
+if ~latencypresent && isfield(oldevent, 'latency')
+    g.append = 'no';
+end
+
 %% scan all the fields of g
 % ------------------------
 for curfield = tmpfields'
@@ -175,19 +195,31 @@ for curfield = tmpfields'
             switch g.append 
                 case { '''no''' 'no' } % ''no'' for backward compatibility
                       if isstr(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
-                      event = load_file_or_array( g.event, g.skipline, g.delim );
-                      allfields = g.fields(1:min(length(g.fields), size(event,2)));
-                      event = eeg_eventformat(event, 'struct', allfields);
+                      tmparray = load_file_or_array( g.event, g.skipline, g.delim );
+                      if length(tmparray) == length(event)
+                         disp('Adding new field to event structure');
+                         for eventfield = 1:size(tmparray,2)
+                             event = setstruct( event, g.fields{eventfield}, [1:length(event)], { tmparray{:,eventfield} });
+                         end
+                      else
+                          if ~latencypresent && isfield(oldevent, 'latency')
+                              error('Cannot add new field to event structure');
+                          end
+                          allfields = g.fields(1:min(length(g.fields), size(tmparray,2)));
+                          event = eeg_eventformat(tmparray, 'struct', allfields);
+                      end
 					  % generate ori fields
 					  % -------------------
-                      if ~isnan(g.timeunit)
+                      if ~isnan(g.timeunit) && latencypresent
                           for index = 1:length(event)
                               event(index).init_index = index;
                               event(index).init_time  = event(index).latency*g.timeunit;
                           end;
                       end;
-                      event = recomputelatency( event, 1:length(event), srate, ...
-                                                    g.timeunit, g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
+                      if latencypresent
+                          event = recomputelatency( event, 1:length(event), srate, ...
+                                                        g.timeunit, g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
+                      end
                 case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
@@ -195,7 +227,7 @@ for curfield = tmpfields'
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
                       if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(event); end;
                       if length(g.indices) ~= size(tmparray,1)
-                            error('Set error: number of row in file does not match the number of event given as input'); 
+                          error('Set error: number of row in file does not match the number of event given as input'); 
                       end;
 
                       % add field
@@ -214,8 +246,10 @@ for curfield = tmpfields'
                           event(index+offset).init_index = index;
                           event(index+offset).init_time  = event(index+offset).latency*g.timeunit;
                       end;
-                      event = recomputelatency( event, g.indices, srate, g.timeunit, ...
-                                                    g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
+                      if latencypresent
+                          event = recomputelatency( event, g.indices, srate, g.timeunit, ...
+                                                        g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
+                      end
             end;
       end;
 end;
@@ -226,7 +260,7 @@ end;
 
 %% remove the events wit out-of-bound latencies
 % --------------------------------------------
-if isfield(event, 'latency')
+if isfield(event, 'latency') && latencypresent
     try 
         res = cellfun('isempty', { event.latency });
         res = find(res);
