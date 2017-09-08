@@ -115,6 +115,18 @@ else
     options = varargin;
 end;
 
+% In case of FIF files convert EEG channel units to mV
+[trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
+if strcmpi(filext,'.fif')
+    eegchanindx = find(strcmpi(dat.chantype,'eeg'));
+    if ~all(strcmpi(dat.chanunit(eegchanindx),'mv'))
+        fprintf('Forcing EEG channel units to ''mV'' ...... \n');
+        dat.chanunit(eegchanindx) = {'mV'};
+    else
+        fprintf('EEG channel units already in ''mV'' \n');
+    end
+end
+
 % decode imput parameters
 % -----------------------
 g = finputcheck( options, { 'samples'      'integer' [1 Inf]    [];
