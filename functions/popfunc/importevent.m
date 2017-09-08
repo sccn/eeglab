@@ -19,7 +19,8 @@
 %
 % Optional file or array input:
 %  'fields'   - [Cell array] List of the name of each user-defined column, 
-%               optionally followed by a description. Ex: { 'type', 'latency' }
+%               optionally followed by a description. Ex: { 'type',
+%               'latency' }
 %  'skipline' - [Interger] Number of header rows to skip in the text file 
 %  'timeunit' - [ latency unit rel. to seconds ]. Default unit is 1 = seconds. 
 %               NaN indicates that the latencies are given in time points.
@@ -44,6 +45,9 @@
 %               preferable if events are missing in the event file.
 %  'optimalign' - ['on'|'off'] Optimize the sampling rate of the new events so 
 %               they best align with old events. Default is 'on'.
+%  'optimoffset' - ['on'|'off'] Optimize the offset of the new events so 
+%               they best align with old events. Default is 'off' (for
+%               backward compatibility).
 %
 % Outputs:
 %   eventstruct - Event structure containing imported events
@@ -102,6 +106,7 @@ g = finputcheck( varargin, { 'fields'    'cell'     []         {};
                          'event'     { 'cell';'real';'string' }     []    [];
                          'align'     'integer'  []         NaN;
                          'optimalign' 'string'  { 'on';'off' }         'on';
+                         'optimoffset' 'string'  { 'on';'off' }        'off';
                          'optimmeas'  'string'  { 'median';'mean' }         'mean';
                          'delim'     {'integer';'string'}   []         char([9 32 44])}, 'importevent');
 if isstr(g), error(g); end;
@@ -182,7 +187,7 @@ for curfield = tmpfields'
                           end;
                       end;
                       event = recomputelatency( event, 1:length(event), srate, ...
-                                                    g.timeunit, g.align, g.oldevents, g.optimalign, g.optimmeas);
+                                                    g.timeunit, g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
                 case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
@@ -210,7 +215,7 @@ for curfield = tmpfields'
                           event(index+offset).init_time  = event(index+offset).latency*g.timeunit;
                       end;
                       event = recomputelatency( event, g.indices, srate, g.timeunit, ...
-                                                    g.align, g.oldevents, g.optimalign, g.optimmeas);
+                                                    g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
             end;
       end;
 end;
@@ -251,7 +256,7 @@ return;
 
 %% update latency values
 % ---------------------
-function event = recomputelatency( event, indices, srate, timeunit, align, oldevents, optimalign, optimmeas)
+function event = recomputelatency( event, indices, srate, timeunit, align, oldevents, optimalign, optimmeas, optimoffset)
 
     % update time unit 
     % ----------------
@@ -299,18 +304,24 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             newlat = newlat-newlat(1-align.val);
             oldlat = oldlat-oldlat(1);
         end;
-        
+        initcond = [1];
+        if strcmpi(optimoffset, 'on')
+            initcond = [initcond 0];
+        end
         try
-            newfactor = fminsearch('eventalign',[1 0],[],newlat, oldlat, optimmeas);
+            newfactor = fminsearch('eventalign',initcond,[],newlat, oldlat, optimmeas);
         catch 
-            newfactor = fminsearch('eventalign',1,[],[],newlat, oldlat, optimmeas); % Octave
+            newfactor = fminsearch('eventalign',initcond,[],[],newlat, oldlat, optimmeas); % Octave
         end;
+        if length(newfactor) == 1
+            newfactor = [newfactor 0]; % add 0 offset
+        end
         fprintf('Best sampling rate ratio found is %1.7f (shift of %1.1f sample). Below latencies after adjustment\n', newfactor(1), newfactor(2));
-        if newfactor(1) > 1.01 | newfactor(1) < 0.99
+        if newfactor(1) > 1.01 || newfactor(1) < 0.99
             disp('Difference is more than 1%, something is wrong; ignoring ratio');
-            newfactor = 1;
+            newfactor(1) = 1;
         else
-            difference1 = eventalign( [1  0]   , newlat, oldlat, optimmeas);
+            difference1 = eventalign( initcond , newlat, oldlat, optimmeas);
             difference2 = eventalign( newfactor, newlat, oldlat, optimmeas);
             fprintf('The average difference before correction was %f sample points\n', difference1);
             fprintf('The average difference after correction is %f sample points\n', difference2);
