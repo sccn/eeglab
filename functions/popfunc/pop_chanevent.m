@@ -194,7 +194,11 @@ for ci = chan
     % apply preprocessing
     % -------------------
     if ~isempty(g.oper)
-        try, eval( [ 'X = ' g.oper ';' ]);
+        if any( g.oper == '=' )
+             g.oper = [ 'X = ' g.oper ';' ];
+        else g.oper = [ g.oper ';' ];
+        end
+        try, eval( g.oper );
         catch, error('pop_chanevent: error executing preprocessing string');
         end;
     end;    
