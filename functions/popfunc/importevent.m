@@ -35,8 +35,6 @@
 %               fields are added to the existing structure.
 %  'indices'  - [integer vector] Vector indicating the indices of the events to
 %               modify. This is only valid for the 'append','no' condition.
-%  'targetevent' - [type list] Modify only certain event indices with a
-%               given type. This overwrite the indices array above.
 %  'align'    - [num] Align the first event latency to the latency of existing 
 %               event number (num), and check latency consistency. 
 %               A value of 0 indicates that the first events of the pre-defined 
@@ -110,7 +108,6 @@ g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
                          'timeunit'    'real'     []                    1;
                          'event'       { 'cell';'real';'string' }  []   [];
                          'align'       'integer'  []                    NaN;
-                         'targetevent' {'integer';'cell'}  []           [];
                          'optimalign'  'string'  { 'on';'off' }         'on';
                          'optimoffset' 'string'  { 'on';'off' }         'off';
                          'optimmeas'   'string'  { 'median';'mean' }    'mean';
@@ -118,12 +115,6 @@ g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
 if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
 g.delim = char(g.delim);    
-
-% match specific events
-% ---------------------
-if ~isempty(g.targetevent)
-    [~, g.indices] = pop_selectevent(EEG, 'type', g.targetevent, 'deleteevents', 'off', 'deleteepochs', 'off');
-end
 
 % call from pop_importevent
 % -------------------------
