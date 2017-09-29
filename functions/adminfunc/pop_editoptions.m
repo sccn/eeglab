@@ -69,7 +69,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function com = pop_editoptions(varargin);
+function com = pop_editoptions(varargin)
 
 com = '';
 
@@ -78,8 +78,8 @@ if nargin > 0
     if ~isstr(varargin{1})
         datasets_in_memory = varargin{1};
         varargin = {};
-    end;
-end;
+    end
+end
 
 % parse the eeg_options file
 % ----------------------------
@@ -92,13 +92,13 @@ else
     if ~isempty(EEGOPTION_PATH)
          homefolder = EEGOPTION_PATH;
     elseif ispc
-         if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end;
+         if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end
          homefolder = deblank(evalc('!echo %USERPROFILE%'));
     else homefolder = '~';
-    end;
+    end
     filename = fullfile(homefolder, 'eeg_options.m');
     eegoptionbackup = which('eeg_optionsbackup.m');
-end;
+end
 fid = fopen( filename, 'r+'); % existing file
 storelocal = 0;
 if	fid == -1
@@ -107,23 +107,23 @@ if	fid == -1
     fid = fopen( fullfile(filepath, filename), 'w'); % new file possible?
     if fid == -1
         error([ 'Cannot write into HOME folder: ' homefolder 10 'You may specify another folder for the eeg_option.m' 10 'file by editing the icadefs.m file' ]);
-    end;
+    end
     fclose(fid);
     delete(fullfile(filepath, filename));
 
     % read variables values and description
     % --------------------------------------
-    [ header opt ] = eeg_readoptions( eegoptionbackup ); 
+    [ header, opt ] = eeg_readoptions( eegoptionbackup ); 
 else 
-    [filepath filename ext] = fileparts(filename);
+    [filepath, filename, ext] = fileparts(filename);
     filename  = [ filename ext ];
     fprintf('Using option file in directory %s\n', filepath);
     
     % read variables values and description
     % --------------------------------------
-    [ header opt ] = eeg_readoptions( eegoptionbackup ); 
-    [ header opt ] = eeg_readoptions( fid, opt  ); % use opt from above as default
-end;
+    [ header, opt ] = eeg_readoptions( eegoptionbackup ); 
+    [ header, opt ] = eeg_readoptions( fid, opt  ); % use opt from above as default
+end
 
 if nargin < 2
     geometry = { [6 1] };
@@ -153,7 +153,7 @@ if nargin < 2
            
         % create the gui for this variable
         % --------------------------------
-        if strcmpi(opt(index).varname, 'option_storedisk') & datasets_in_memory
+        if strcmpi(opt(index).varname, 'option_storedisk') && datasets_in_memory
             cb_nomodif = [ 'set(gcbo, ''value'', ~get(gcbo, ''value''));' ...
                            'warndlg2(strvcat(''This option may only be modified when at most one dataset is stored in memory.''));' ];
             
@@ -163,7 +163,7 @@ if nargin < 2
             cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2([''You have selected the option to disable'' 10 ''Matlab toolboxes. Use with caution.'' 10 ''Matlab toolboxes will be removed from'' 10 ''your path. Unlicking this option later will not'' 10 ''add back the toolboxes. You will need'' 10 ''to add them back manually. If you are unsure'' 10 ''if you want to disable Matlab toolboxes'' 10 ''deselect the option now.'' ]); end;' ];
         else
             cb_nomodif = '';
-        end;
+        end
         
         if ~isempty(opt(index).value)
             if opt(index).value <= 1
@@ -174,12 +174,12 @@ if nargin < 2
                 uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
                              { 'Style', 'edit', 'string', num2str(opt(index).value), 'callback' cb_nomodif } { } }; 
                 geometry = { geometry{:} [3 0.5 0.1] };
-            end;
+            end
         else
             uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'fontweight' 'bold', 'horizontalalignment', 'left' }, { } { } }; 
             geometry = { geometry{:} [4 0.3 0.1] };
-        end;
-    end;
+        end
+    end
 
     % change option file
     uilist = { uilist{:} {} ...
@@ -187,13 +187,9 @@ if nargin < 2
                  { 'Style', 'text', 'string', tmpfile 'tag' 'filename'  }, ...
                  {} { 'Style', 'pushbutton', 'string', '...'  'callback' cb_file } };
     geometry = { geometry{:} [1] [1 6 0.1 0.8] };
-    [results userdat ] = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()', ...
+    [results, userdat ] = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()', ...
                         [], 'normal');
-    if ~isempty(userdat)
-        filepath = fileparts(userdat);
-        args = { 'filename' filename };
-    end;
-    if length(results) == 0, return; end;
+    if isempty(results), return; end
    
     % decode inputs
     % -------------
@@ -203,13 +199,13 @@ if nargin < 2
         if ~isempty(opt(index).varname)
             args = {  args{:}, opt(index).varname, results{count} }; 
             count = count+1;
-        end;
-    end;
+        end
+    end
 else 
     % no interactive inputs
     % ---------------------
     args = varargin;
-end;
+end
 
         
 % change default folder option
@@ -219,7 +215,7 @@ if ~isempty(W_MAIN)
     tmpuserdata    = get(W_MAIN, 'userdata');
     tmpuserdata{3} = filepath;
     set(W_MAIN, 'userdata', tmpuserdata);
-end;
+end
         
 % decode inputs
 % -------------
@@ -232,15 +228,15 @@ for index = 1:2:length(args)
             opt(ind).value = ~args{index+1};
         else
             error(['Variable name ''' args{index} ''' is invalid']);
-        end;
+        end
     else
         if strcmpi(args{index}, 'option_cachesize')
             opt(ind).value = str2num(args{index+1});
         else
             opt(ind).value = args{index+1};
-        end;
-    end;
-end;        
+        end
+    end
+end        
 
 % write to eeg_options file
 % -------------------------
@@ -248,15 +244,15 @@ fid = fopen( fullfile(filepath, filename), 'w');
 addpath(filepath);
 if fid == -1
 	error('File writing error, check writing permission');
-end;
+end
 fprintf(fid, '%s\n', header);
 for index = 1:length(opt)
     if isempty(opt(index).varname)
         fprintf( fid, '%% %s\n', opt(index).description);
     else
         fprintf( fid, '%s = %d ; %% %s\n', opt(index).varname, opt(index).value, opt(index).description);
-    end;
-end;
+    end
+end
 fclose(fid);    
 % clear it from the MATLAB function cache
 clear(fullfile(filepath,filename));
@@ -266,7 +262,7 @@ clear(fullfile(filepath,filename));
 com = 'pop_editoptions(';
 for index = 1:2:length(args)
     com = sprintf( '%s ''%s'', %d,', com, args{index}, args{index+1});
-end;
+end
 com = [com(1:end-1) ');'];   
 wtmp = warning;
 warning off;
@@ -278,10 +274,10 @@ function  chopedtext = choptext( tmptext )
     chopedtext = '';
     while length(tmptext) > 30
           blanks = findstr( tmptext, ' ');
-          [tmp I] = min( abs(blanks - 30) );
+          [tmp, I] = min( abs(blanks - 30) );
           chopedtext = [ chopedtext ''' 10 ''' tmptext(1:blanks(I)) ];
           tmptext  = tmptext(blanks(I)+1:end);
-    end;    
+    end    
     chopedtext = [ chopedtext ''' 10 ''' tmptext];
     chopedtext = chopedtext(7:end);
 return;
@@ -289,7 +285,7 @@ return;
 function num = popask( text )
 	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
-	 switch lower(ButtonName),
+	 switch lower(ButtonName)
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
-	 end;
+	 end
