@@ -96,7 +96,7 @@ function [STUDY, erpdata, alltimes, pgroup, pcond, pinter] = std_erpplot(STUDY, 
 if nargin < 2
     help std_erpplot;
     return;
-end;
+end
 erpdata = []; alltimes = []; 
 pgroup = []; pcond = []; pinter = [];
 
@@ -107,29 +107,20 @@ dsubtype = '';
 for ind = 1:2:length(varargin)
     if strcmpi(varargin{ind}, 'datatype')
         dtype = varargin{ind+1}; 
-    end;
-end;
+    end
+end
 if strcmpi(dtype(1:3), 'erp' )
-    if length(dtype) > 3, dsubtype = dtype(4:end); dtype = 'erp'; end;
+    if length(dtype) > 3, dsubtype = dtype(4:end); dtype = 'erp'; end
 elseif strcmpi(dtype(1:4), 'spec')
-    if length(dtype) > 4, dsubtype = dtype(5:end); dtype = 'spec'; end;
-end;
+    if length(dtype) > 4, dsubtype = dtype(5:end); dtype = 'spec'; end
+end
 
 % get parameters
 % --------------
 eval( [ 'tmp = pop_' dtype 'params(STUDY, varargin{:});' ...
         'params = tmp.etc.' dtype 'params; clear tmp;' ] );
 statstruct.etc = STUDY.etc; 
-statstruct.design = STUDY.design; %added by behnam
-statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
-stats = statstruct.etc.statistics;
-stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
-if isempty(STUDY.design(STUDY.currentdesign).variable)
-    stats.paired = { };
-else
-    stats.paired = { STUDY.design(STUDY.currentdesign).variable(:).pairing };
-end;
 
 % potentially missing fields
 % --------------------------
@@ -138,8 +129,8 @@ defaultval = { [] 'off' [] [] [] [] };
 for ind=1:length(fields)
     if ~isfield(params, fields{ind}), 
         params = setfield(params, fields{ind}, defaultval{ind}); 
-    end;
-end;
+    end
+end
 
 % decode parameters
 % -----------------
@@ -148,9 +139,9 @@ if isempty(varargin)
     options.channels = { tmplocs.labels };
 else
     options = mystruct(varargin);
-end;
+end
 options = myrmfield( options, myfieldnames(params));
-options = myrmfield( options, myfieldnames(stats));
+options = myrmfield( options, myfieldnames(statstruct.etc.statistics));
 options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward compatibility
 opt = finputcheck( options, ...
                              { 'design'      'integer' []              STUDY.currentdesign;
@@ -168,36 +159,43 @@ opt = finputcheck( options, ...
                                'noplot'      'string'  { 'on','off' }  'off';
                                'topoplotopt' 'cell'    {}              { 'style' 'both' };
                                'subject'     'string'  []              '' }, 'std_erpplot');
-if isstr(opt), error(opt); end;
-if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
-if ~isempty(params.topofreq) && strcmpi(opt.datatype, 'spec'),  params.topotime  = params.topofreq; end;
-if ~isempty(params.freqrange), params.timerange = params.freqrange; end;
+if isstr(opt), error(opt); end
+if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end
+if ~isempty(params.topofreq) && strcmpi(opt.datatype, 'spec'),  params.topotime  = params.topofreq; end
+if ~isempty(params.freqrange), params.timerange = params.freqrange; end
 datatypestr = upper(opt.datatype);
-if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
+if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end
 
 % =======================================================================
 % below this line, all the code should be non-specific to ERP or spectrum
 % =======================================================================
 allconditions  = {};
 allgroups      = {};
-if length(STUDY.design(STUDY.currentdesign).variable) > 0, allconditions = STUDY.design(STUDY.currentdesign).variable(1).value; end;
-if length(STUDY.design(STUDY.currentdesign).variable) > 1, allgroups     = STUDY.design(STUDY.currentdesign).variable(2).value; end;
+if length(STUDY.design(opt.design).variable) > 0, allconditions = STUDY.design(opt.design).variable(1).value; end
+if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(opt.design).variable(2).value; end
 
 % for backward compatibility
 % --------------------------
-if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
+stats = statstruct.etc.statistics;
+stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
+if isempty(STUDY.design(opt.design).variable)
+    stats.paired = { };
+else
+    stats.paired = { STUDY.design(opt.design).variable(:).pairing };
+end
+if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end
 if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt.comps)))
     if strcmpi(stats.condstats, 'on') || strcmpi(stats.groupstats, 'on')
         stats.groupstats = 'off';
         stats.condstats   = 'off'; 
         disp('No statistics for single subject/component, to get statistics compute single-trial measures'); 
-    end;
-end;
+    end
+end
 
 if ~isnan(params.topotime) & length(opt.channels) < 5
     warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
-end;
+end
 
 plotcurveopt = {};
 if length(opt.clusters) > 1
@@ -206,14 +204,14 @@ if length(opt.clusters) > 1
     params.plotgroups     = 'together';
     stats.condstats  = 'off'; 
     stats.groupstats = 'off';
-end;
+end
 % if length(opt.channels) > 1 && strcmpi(opt.plotconditions, 'together') && strcmpi(opt.plotgroups, 'together')
 %     plotcurveopt = { 'figure' 'off' }; 
 %     opt.plotconditions = 'together';
 %     opt.plotgroups     = 'together';
 %     opt.condstats  = 'off'; 
 %     opt.groupstats = 'off';
-% end;
+% end
 alpha    = fastif(strcmpi(stats.mode, 'eeglab'), stats.eeglab.alpha, stats.fieldtrip.alpha);
 mcorrect = fastif(strcmpi(stats.mode, 'eeglab'), stats.eeglab.mcorrect, stats.fieldtrip.mcorrect);
 method   = fastif(strcmpi(stats.mode, 'eeglab'), stats.eeglab.method, ['Fieldtrip ' stats.fieldtrip.method ]);
@@ -223,6 +221,7 @@ plotcurveopt = { plotcurveopt{:} ...
    'unitx'           opt.unitx, ...
    'filter',         params.filter, ...
    'plotgroups',     params.plotgroups, ...
+   'effect',         stats.effect, ...
    'plotconditions', params.plotconditions };
 
 % channel plotting
@@ -238,13 +237,13 @@ if ~isempty(opt.channels)
     else
         [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype], 'rmsubjmean', params.subtractsubjectmean);
-    end;
+    end
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
         for index = 1:length(erpdata(:))
             erpdata{index} = squeeze(mean(erpdata{index},2));
-        end;
-    end;
-    if isempty(erpdata), return; end;
+        end
+    end
+    if isempty(erpdata), return; end
 
     % select specific time    
     % --------------------
@@ -254,23 +253,23 @@ if ~isempty(opt.channels)
         for condind = 1:length(erpdata(:))
             if ~isempty(erpdata{condind})
                 erpdata{condind} = mean(erpdata{condind}(ti1:ti2,:,:),1);
-            end;
-        end;
-    end;
+            end
+        end
+    end
 
     % compute statistics
     % ------------------
     if (isempty(params.topotime) || any(isnan(params.topotime))) && length(alpha) > 1
         alpha = alpha(1);
-    end;
+    end
     if ~isempty(params.topotime) && all(~isnan(params.topotime))
          statstruct = std_prepare_neighbors(statstruct, ALLEEG, 'channels', opt.channels);
          stats.fieldtrip.channelneighbor = statstruct.etc.statistics.fieldtrip.channelneighbor;
-    end;
-    [pcond pgroup pinter] = std_stat(erpdata, stats);
-    if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
-    if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end; % topo plotting for single subject
-    if strcmpi(opt.noplot, 'on') return; end;
+    end
+    [pcond, pgroup, pinter] = std_stat(erpdata, stats);
+    if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end % single subject STUDY                                
+    if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end % topo plotting for single subject
+    if strcmpi(opt.noplot, 'on') return; end
     
     % get titles (not included in std_erspplot because it is not possible
     % to merge channels for that function
@@ -283,7 +282,7 @@ if ~isempty(opt.channels)
         chanlabels(2,end) = {''};
         locs(1).labels = [ chanlabels{:} ];
         locs(2:end) = [];
-    end;
+    end
     [alltitles alllegends ] = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                              'statistics', method, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
                              'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
@@ -297,21 +296,21 @@ if ~isempty(opt.channels)
         std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'plotstderr', opt.plotstderr, ...
             'condnames', allconditions, 'groupnames', allgroups, plotcurveopt{:});
-    end;
+    end
 
     set(gcf,'name',['Channel ' datatypestr ]);
     axcopy(gca);
 else 
     % plot component
     % --------------
-    if length(opt.clusters) > 1, figure('color', 'w'); end;
+    if length(opt.clusters) > 1, figure('color', 'w'); end
     nc = ceil(sqrt(length(opt.clusters)));
     nr = ceil(length(opt.clusters)/nc);
     comp_names = {};
     
     for index = 1:length(opt.clusters)
 
-        if length(opt.clusters) > 1, subplot(nr,nc,index); end;
+        if length(opt.clusters) > 1, subplot(nr,nc,index); end
         if strcmpi(opt.datatype, 'erp')
             [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
                     'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
@@ -323,16 +322,16 @@ else
 %         else
 %             [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
 %                         'rmsubjmean', params.subtractsubjectmean, 'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
-        end;
-        if isempty(erpdata), return; end;
+        end
+        if isempty(erpdata), return; end
 
         % plot specific component
         % -----------------------
         if ~isempty(opt.comps)
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
-            for iDat = 1:length(erpdata(:)), erpdata{iDat} = erpdata{iDat}(:,opt.comps); end;
-        end;
+            for iDat = 1:length(erpdata(:)), erpdata{iDat} = erpdata{iDat}(:,opt.comps); end
+        end
         
         % remove NaNs and generate labels
         % -------------------------------
@@ -347,21 +346,21 @@ else
             else
                 tmpSubjects = subjects;
                 comps       = STUDY.cluster(opt.clusters(index)).comps;
-            end;
+            end
             for iKeep = 1:length(tmpSubjects)
                 sbtitles{iDat}{iKeep} = [ tmpSubjects{iKeep}  '/IC' num2str(comps(iKeep)) ];
-            end;
-        end;
+            end
+        end
         sbtitles = reshape(sbtitles, size(erpdata2));
         
         [pcond pgroup pinter] = std_stat(erpdata2, stats);
-        if strcmpi(opt.noplot, 'on'), return; end;
+        if strcmpi(opt.noplot, 'on'), return; end
             
         [alltitles alllegends ] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                                  'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
                                  'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
         
-        if length(opt.clusters) > 1 && index < length(opt.clusters), alllegends = {}; end;
+        if length(opt.clusters) > 1 && index < length(opt.clusters), alllegends = {}; end
         std_plotcurve(alltimes, erpdata2, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, 'plotstderr', opt.plotstderr, ...
                                           'titles', alltitles, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'plotsubjects', opt.plotsubjects, plotcurveopt{:});
@@ -378,7 +377,7 @@ else
 
         end
 %--------------------------------------------------------------------------
-    end;
+    end
     tmpgcf = gcf;
     set(tmpgcf,'name', ['Component ' datatypestr ] );
     if axcopyflag
@@ -387,7 +386,7 @@ else
             axcopy(haxis(i));
         end
     end 
-end;
+end
 
 % remove fields and ignore fields who are absent
 % ----------------------------------------------
@@ -396,8 +395,8 @@ function s = myrmfield(s, f);
 for index = 1:length(f)
     if isfield(s, f{index})
         s = rmfield(s, f{index});
-    end;
-end;
+    end
+end
 
 % convert to structure (but take into account cells)
 % --------------------------------------------------
@@ -406,11 +405,11 @@ function s = mystruct(v);
 for index=1:length(v)
     if iscell(v{index})
         v{index} = { v{index} };
-    end;
-end;
+    end
+end
 try
     s = struct(v{:});
-catch, error('Parameter error'); end;
+catch, error('Parameter error'); end
 
 % convert to structure (but take into account cells)
 % --------------------------------------------------
@@ -420,11 +419,11 @@ s = fieldnames(v);
 if isfield(v, 'eeglab')
     s2 = fieldnames(v.eeglab);
     s = { s{:} s2{:} };
-end;
+end
 if isfield(v, 'fieldtrip')
     s3 = fieldnames(v.fieldtrip);
     for index=1:length(s3)
         s3{index} = [ 'fieldtrip' s3{index} ];
-    end;
+    end
     s = { s{:} s3{:} };
-end;
+end
