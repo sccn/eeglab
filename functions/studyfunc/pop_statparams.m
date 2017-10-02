@@ -91,19 +91,14 @@ com = '';
 if isfield(STUDY, 'etc')
     if ~isfield(STUDY.etc, 'statistics') STUDY.etc.statistics = default_stats([]);
     else                                 STUDY.etc.statistics = default_stats(STUDY.etc.statistics);
-    end;
+    end
     if length(varargin) == 1 && strcmpi(varargin{1}, 'default')
         return;
-    end;
-end;
+    end
+end
 
 if isempty(varargin) && ~isempty(STUDY)
-    if ~exist('ft_freqstatistics'), fieldtripInstalled = false; else fieldtripInstalled = true; end;
-    
-    opt.enablecond  = 'off';
-    opt.enablegroup = 'off';
-    if length(STUDY.design(STUDY.currentdesign).variable) > 0 && length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, opt.enablecond  = 'on'; end;
-    if length(STUDY.design(STUDY.currentdesign).variable) > 1 && length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, opt.enablegroup = 'on'; end;   
+    if ~exist('ft_freqstatistics'), fieldtripInstalled = false; else fieldtripInstalled = true; end
     opt.enablesingletrials = 'on';
     
     % encode parameters
@@ -112,6 +107,7 @@ if isempty(varargin) && ~isempty(STUDY)
     eeglabStatvalues    = { 'param' 'perm' 'bootstrap' };
     fieldtripStatvalues = { 'analytic' 'montecarlo' };
     mCorrectList        = { 'none' 'bonferoni' 'holms' 'fdr' 'max' 'cluster' };
+    marginal   = fastif(strcmpi(paramstruct.effect, 'main'), 0, 1);
     condstats   = fastif(strcmpi(paramstruct.condstats, 'on'), 1, 0);
     groupstats  = fastif(strcmpi(paramstruct.groupstats,'on'), 1, 0);
     statmode    = fastif(strcmpi(paramstruct.singletrials,'on'), 1, 0);
@@ -119,8 +115,8 @@ if isempty(varargin) && ~isempty(STUDY)
     fieldtripThresh = fastif(isnan(paramstruct.fieldtrip.alpha),'exact', num2str(paramstruct.fieldtrip.alpha));
     eeglabStat      = strmatch(paramstruct.eeglab.method, eeglabStatvalues);
     fieldtripStat   = strmatch(paramstruct.fieldtrip.method, fieldtripStatvalues);
-    if isempty(eeglabStat)   , error('Unknown statistical method for EEGLAB'); end;
-    if isempty(fieldtripStat), error('Unknown statistical method for Fieldtrip'); end;
+    if isempty(eeglabStat)   , error('Unknown statistical method for EEGLAB'); end
+    if isempty(fieldtripStat), error('Unknown statistical method for Fieldtrip'); end
     eeglabRand      = fastif(isempty(paramstruct.eeglab.naccu), 'auto', num2str(paramstruct.eeglab.naccu));
     fieldtripRand   = fastif(isempty(paramstruct.fieldtrip.naccu), 'auto', num2str(paramstruct.fieldtrip.naccu));
     eeglabMcorrect    = strmatch(paramstruct.eeglab.mcorrect, mCorrectList);
@@ -135,8 +131,6 @@ if isempty(varargin) && ~isempty(STUDY)
     cb_help_neighbor = 'pophelp(''ft_prepare_neighbours'');';
     cb_help_cluster  = 'pophelp(''ft_statistics_montecarlo'');';
     cb_textSyntax    = 'try, eval( [ ''{'' get(gcbo, ''string'') ''};'' ]); catch, warndlg2(''Syntax error''); end;';
-    if strcmpi(opt.enablecond , 'off') && condstats  == 1, condstats  = 0; end;
-    if strcmpi(opt.enablegroup, 'off') && groupstats == 1, groupstats = 0; end;
     
     % callback for randomization selection
     % ------------------------------------
@@ -191,7 +185,7 @@ if isempty(varargin) && ~isempty(STUDY)
     
     if strcmpi(paramstruct.mode, 'eeglab'), evalstr = enable_eeglab;
     else                                    evalstr = enable_fieldtrip;
-    end;
+    end
     inds = findstr('gcbf', evalstr);
     evalstr(inds+2) = [];
     
@@ -203,12 +197,13 @@ if isempty(varargin) && ~isempty(STUDY)
     else
         strFieldtrip = 'Use Fieldtrip statistics';
         fieldtripEnable = 'on';
-    end;
+    end
     
     opt.uilist = { ...
         {'style' 'text'        'string' 'General statistical parameters' 'fontweight' 'bold' } ...
-        {} {'style' 'checkbox' 'string' 'Compute 1st independent variable statistics' 'value' condstats  'enable' opt.enablecond  'callback' cb_select_fieldtrip 'tag' 'condstats' } ...
-        {} {'style' 'checkbox' 'string' 'Compute 2nd independent variable statistics' 'value' groupstats 'enable' opt.enablegroup 'callback' cb_select_fieldtrip  'tag' 'groupstats' } ...
+        {} {'style' 'checkbox' 'string' 'Plot marginal statistics (unckeck to plot main effect)' 'value' marginal  'tag' 'marginal' } ...
+        {} {'style' 'checkbox' 'string' 'Compute 1st independent variable statistics if any' 'value' condstats  'callback' cb_select_fieldtrip 'tag' 'condstats' } ...
+        {} {'style' 'checkbox' 'string' 'Compute 2nd independent variable statistics if any' 'value' groupstats 'callback' cb_select_fieldtrip 'tag' 'groupstats' } ...
         {} {'style' 'checkbox' 'string' 'Use single trials instead of subject averages' 'value' statmode 'tag' 'singletrials' 'enable' opt.enablesingletrials } ...
         {} ...
         {'style' 'checkbox'     'string' 'Use EEGLAB statistics' 'fontweight' 'bold' 'tag' 'but_eeglab' 'callback' cb_select_eeglab } ...
@@ -236,27 +231,28 @@ if isempty(varargin) && ~isempty(STUDY)
     
     if eeglabStat == 3,
         eval(combootstrap);
-    end;
+    end
     
     cbline = [0.07 1.1];
     otherline = [ 0.7 0.6 .5];
     eeglabline = [ 0.7 0.6 .5];
-    opt.geometry = { [1] cbline cbline cbline [1] [1] [0.07 0.51 0.34 0.13] [0.07 0.6 0.25 0.13] ...
+    opt.geometry = { [1] cbline cbline cbline cbline [1] [1] [0.07 0.51 0.34 0.13] [0.07 0.6 0.25 0.13] ...
         [1] [1] [0.07 0.51 0.34 0.13] [0.07 0.6 0.25 0.13] [0.13 0.4 0.4 0.1] [0.13 0.4 0.4 0.1]  };
     
-    [out_param userdat tmp res] = inputgui( 'geometry' , opt.geometry, 'uilist', opt.uilist, ...
+    [out_param, userdat, tmp, res] = inputgui( 'geometry' , opt.geometry, 'uilist', opt.uilist, ...
                                             'title', 'Set statistical parameters -- pop_statparams()','eval', evalstr);
-    if isempty(res), return; end;
+    if isempty(res), return; end
     
     % decode paramters
     % ----------------
-    if res.groupstats,   res.groupstats   = 'on';  else res.groupstats = 'off';  end;
-    if res.condstats ,   res.condstats    = 'on';  else res.condstats  = 'off';  end;
-    if res.singletrials, res.singletrials = 'on';  else res.singletrials = 'off';  end;
+    if res.marginal,    res.effect       = 'marginal'; else res.effect = 'main';  end
+    if res.groupstats,   res.groupstats   = 'on';  else res.groupstats = 'off';  end
+    if res.condstats ,   res.condstats    = 'on';  else res.condstats  = 'off';  end
+    if res.singletrials, res.singletrials = 'on';  else res.singletrials = 'off';  end
     res.eeglabalpha    = str2num(res.eeglabalpha);
     res.fieldtripalpha = str2num(res.fieldtripalpha);
-    if isempty(res.eeglabalpha)   ,res.eeglabalpha = NaN;    end;
-    if isempty(res.fieldtripalpha),res.fieldtripalpha = NaN; end;
+    if isempty(res.eeglabalpha)   ,res.eeglabalpha = NaN;    end
+    if isempty(res.fieldtripalpha),res.fieldtripalpha = NaN; end
     res.stateeglab         = eeglabStatvalues{res.stateeglab};
     res.statfieldtrip      = fieldtripStatvalues{res.statfieldtrip};
     res.eeglabmcorrect     = mCorrectList{res.eeglabmcorrect};
@@ -265,7 +261,7 @@ if isempty(varargin) && ~isempty(STUDY)
     res.eeglabnaccu        = str2num(res.eeglabnaccu);
     if ~isstr(res.fieldtripnaccu) || ~strcmpi(res.fieldtripnaccu, 'all')
         res.fieldtripnaccu     = str2num(res.fieldtripnaccu);
-    end;
+    end
     
     % build command call
     % ------------------
@@ -276,46 +272,47 @@ if isempty(varargin) && ~isempty(STUDY)
             '                 nonparametric permutation tests instead.\n']);
         res.stateeglab = 'perm';
     end
-    if ~strcmpi( res.groupstats,   paramstruct.groupstats),    options = { options{:} 'groupstats' res.groupstats }; end;
-    if ~strcmpi( res.condstats ,   paramstruct.condstats ),    options = { options{:} 'condstats'  res.condstats  }; end;
-    if ~strcmpi( res.singletrials, paramstruct.singletrials ), options = { options{:} 'singletrials'  res.singletrials }; end;
-    if ~strcmpi( res.mode              , paramstruct.mode),                options = { options{:} 'mode' res.mode }; end; % statistics
-    if ~isequal( res.eeglabnaccu       , paramstruct.eeglab.naccu),        options = { options{:} 'naccu'    res.eeglabnaccu }; end;
-    if ~strcmpi( res.stateeglab        , paramstruct.eeglab.method),       options = { options{:} 'method' res.stateeglab }; end; % statistics
-    if ~strcmpi( res.eeglabmcorrect    , paramstruct.eeglab.mcorrect),     options = { options{:} 'mcorrect' res.eeglabmcorrect }; end;
-    if ~isequal( res.fieldtripnaccu    , paramstruct.fieldtrip.naccu),     options = { options{:} 'fieldtripnaccu' res.fieldtripnaccu }; end;
-    if ~strcmpi( res.statfieldtrip     , paramstruct.fieldtrip.method),    options = { options{:} 'fieldtripmethod' res.statfieldtrip }; end;
-    if ~strcmpi( res.fieldtripmcorrect , paramstruct.fieldtrip.mcorrect),  options = { options{:} 'fieldtripmcorrect' res.fieldtripmcorrect }; end;
-    if ~strcmpi( res.clusterstat       , paramstruct.fieldtrip.clusterparam),  options = { options{:} 'fieldtripclusterparam' res.clusterstat }; end;
-    if ~strcmpi( res.clusterchan       , paramstruct.fieldtrip.channelneighborparam),  options = { options{:} 'fieldtripchannelneighborparam' res.clusterchan }; end;
+    if ~strcmpi( res.effect,       paramstruct.effect),        options = { options{:} 'effect' res.effect }; end
+    if ~strcmpi( res.groupstats,   paramstruct.groupstats),    options = { options{:} 'groupstats' res.groupstats }; end
+    if ~strcmpi( res.condstats ,   paramstruct.condstats ),    options = { options{:} 'condstats'  res.condstats  }; end
+    if ~strcmpi( res.singletrials, paramstruct.singletrials ), options = { options{:} 'singletrials'  res.singletrials }; end
+    if ~strcmpi( res.mode              , paramstruct.mode),                options = { options{:} 'mode' res.mode }; end % statistics
+    if ~isequal( res.eeglabnaccu       , paramstruct.eeglab.naccu),        options = { options{:} 'naccu'    res.eeglabnaccu }; end
+    if ~strcmpi( res.stateeglab        , paramstruct.eeglab.method),       options = { options{:} 'method' res.stateeglab }; end % statistics
+    if ~strcmpi( res.eeglabmcorrect    , paramstruct.eeglab.mcorrect),     options = { options{:} 'mcorrect' res.eeglabmcorrect }; end
+    if ~isequal( res.fieldtripnaccu    , paramstruct.fieldtrip.naccu),     options = { options{:} 'fieldtripnaccu' res.fieldtripnaccu }; end
+    if ~strcmpi( res.statfieldtrip     , paramstruct.fieldtrip.method),    options = { options{:} 'fieldtripmethod' res.statfieldtrip }; end
+    if ~strcmpi( res.fieldtripmcorrect , paramstruct.fieldtrip.mcorrect),  options = { options{:} 'fieldtripmcorrect' res.fieldtripmcorrect }; end
+    if ~strcmpi( res.clusterstat       , paramstruct.fieldtrip.clusterparam),  options = { options{:} 'fieldtripclusterparam' res.clusterstat }; end
+    if ~strcmpi( res.clusterchan       , paramstruct.fieldtrip.channelneighborparam),  options = { options{:} 'fieldtripchannelneighborparam' res.clusterchan }; end
     if ~(isnan(res.eeglabalpha(1)) && isnan(paramstruct.eeglab.alpha(1))) && ~isequal(res.eeglabalpha, paramstruct.eeglab.alpha) % threshold
         options = { options{:} 'alpha' res.eeglabalpha };
-    end;
+    end
     if ~(isnan(res.fieldtripalpha(1)) && isnan(paramstruct.fieldtrip.alpha(1))) && ~isequal(res.fieldtripalpha, paramstruct.fieldtrip.alpha) % threshold
         options = { options{:} 'fieldtripalpha' res.fieldtripalpha };
-    end;
+    end
     
     if ~isempty(options)
         STUDY = pop_statparams(STUDY, options{:});
         com = sprintf('STUDY = pop_statparams(STUDY, %s);', vararg2str( options ));
-    end;
+    end
 else
     % interpret parameters
     % --------------------
     if isfield(STUDY, 'etc')
          paramstruct = STUDY.etc.statistics; isstudy = true;
     else paramstruct = STUDY;
-         if isempty(paramstruct), paramstruct = default_stats([]); end;
+         if isempty(paramstruct), paramstruct = default_stats([]); end
          isstudy = false;
-    end;
+    end
     
     if isempty(varargin) || strcmpi(varargin{1}, 'default')
         paramstruct = default_stats(paramstruct);
     else
         for index = 1:2:length(varargin)
             v = varargin{index};
-            if strcmpi(v, 'statistics'), v = 'method'; end; % backward compatibility
-            if strcmpi(v, 'threshold' ), v = 'alpha';  end; % backward compatibility
+            if strcmpi(v, 'statistics'), v = 'method'; end % backward compatibility
+            if strcmpi(v, 'threshold' ), v = 'alpha';  end % backward compatibility
             
             if strcmpi(v, 'alpha') || strcmpi(v, 'method') || strcmpi(v, 'naccu') || strcmpi(v, 'mcorrect') 
                 paramstruct = setfield(paramstruct, 'eeglab', v, varargin{index+1});
@@ -324,42 +321,43 @@ else
                 paramstruct = setfield(paramstruct, 'fieldtrip', v2, varargin{index+1});
                 if strcmpi(v2, 'channelneighborparam')
                     paramstruct.fieldtrip.channelneighbor = []; % reset neighbor matrix if parameter change
-                end;
+                end
             else
                 if (~isempty(paramstruct) && ~isempty(strmatch(v, fieldnames(paramstruct), 'exact'))) || ~isstudy
                     paramstruct = setfield(paramstruct, v, varargin{index+1});
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end
     
     if isfield(STUDY, 'etc')
          STUDY.etc.statistics = paramstruct; 
     else STUDY = paramstruct;
-    end;
-end;
+    end
+end
 
 % default parameters
 % ------------------
 function paramstruct = default_stats(paramstruct)
 
-if ~isfield(paramstruct, 'groupstats'),    paramstruct.groupstats = 'off';  end;
-if ~isfield(paramstruct, 'condstats' ),    paramstruct.condstats  = 'off';  end;
-if ~isfield(paramstruct, 'singletrials' ), paramstruct.singletrials = 'off'; end;
-if ~isfield(paramstruct, 'mode' ),         paramstruct.mode         = 'eeglab'; end;
-if ~isfield(paramstruct, 'eeglab'),        paramstruct.eeglab       = []; end;
-if ~isfield(paramstruct, 'fieldtrip'),     paramstruct.fieldtrip    = []; end;
-if ~isfield(paramstruct.eeglab, 'naccu'),    paramstruct.eeglab.naccu = []; end;
-if ~isfield(paramstruct.eeglab, 'alpha' ),   paramstruct.eeglab.alpha = NaN; end;
-if ~isfield(paramstruct.eeglab, 'method'),   paramstruct.eeglab.method = 'param'; end;
-if ~isfield(paramstruct.eeglab, 'mcorrect'), paramstruct.eeglab.mcorrect = 'none'; end;
-if ~isfield(paramstruct.fieldtrip, 'naccu'),  paramstruct.fieldtrip.naccu = []; end;
-if ~isfield(paramstruct.fieldtrip, 'method'), paramstruct.fieldtrip.method = 'analytic'; end;
-if ~isfield(paramstruct.fieldtrip, 'alpha'),  paramstruct.fieldtrip.alpha  = NaN; end;
-if ~isfield(paramstruct.fieldtrip, 'mcorrect'),   paramstruct.fieldtrip.mcorrect = 'none'; end;
-if ~isfield(paramstruct.fieldtrip, 'clusterparam'),   paramstruct.fieldtrip.clusterparam = '''clusterstatistic'',''maxsum'''; end;
-if ~isfield(paramstruct.fieldtrip, 'channelneighbor'),   paramstruct.fieldtrip.channelneighbor = []; end;
-if ~isfield(paramstruct.fieldtrip, 'channelneighborparam'),   paramstruct.fieldtrip.channelneighborparam = '''method'',''triangulation'''; end;
-if strcmpi(paramstruct.eeglab.mcorrect, 'benferoni'), paramstruct.eeglab.mcorrect = 'bonferoni'; end;
-if strcmpi(paramstruct.eeglab.mcorrect,    'no'), paramstruct.eeglab.mcorrect = 'none'; end;
-if strcmpi(paramstruct.fieldtrip.mcorrect, 'no'), paramstruct.fieldtrip.mcorrect = 'none'; end;
+if ~isfield(paramstruct, 'effect'),        paramstruct.effect     = 'main'; end
+if ~isfield(paramstruct, 'groupstats'),    paramstruct.groupstats = 'off';  end
+if ~isfield(paramstruct, 'condstats' ),    paramstruct.condstats  = 'off';  end
+if ~isfield(paramstruct, 'singletrials' ), paramstruct.singletrials = 'off'; end
+if ~isfield(paramstruct, 'mode' ),         paramstruct.mode         = 'eeglab'; end
+if ~isfield(paramstruct, 'eeglab'),        paramstruct.eeglab       = []; end
+if ~isfield(paramstruct, 'fieldtrip'),     paramstruct.fieldtrip    = []; end
+if ~isfield(paramstruct.eeglab, 'naccu'),    paramstruct.eeglab.naccu = []; end
+if ~isfield(paramstruct.eeglab, 'alpha' ),   paramstruct.eeglab.alpha = NaN; end
+if ~isfield(paramstruct.eeglab, 'method'),   paramstruct.eeglab.method = 'param'; end
+if ~isfield(paramstruct.eeglab, 'mcorrect'), paramstruct.eeglab.mcorrect = 'none'; end
+if ~isfield(paramstruct.fieldtrip, 'naccu'),  paramstruct.fieldtrip.naccu = []; end
+if ~isfield(paramstruct.fieldtrip, 'method'), paramstruct.fieldtrip.method = 'analytic'; end
+if ~isfield(paramstruct.fieldtrip, 'alpha'),  paramstruct.fieldtrip.alpha  = NaN; end
+if ~isfield(paramstruct.fieldtrip, 'mcorrect'),   paramstruct.fieldtrip.mcorrect = 'none'; end
+if ~isfield(paramstruct.fieldtrip, 'clusterparam'),   paramstruct.fieldtrip.clusterparam = '''clusterstatistic'',''maxsum'''; end
+if ~isfield(paramstruct.fieldtrip, 'channelneighbor'),   paramstruct.fieldtrip.channelneighbor = []; end
+if ~isfield(paramstruct.fieldtrip, 'channelneighborparam'),   paramstruct.fieldtrip.channelneighborparam = '''method'',''triangulation'''; end
+if strcmpi(paramstruct.eeglab.mcorrect, 'benferoni'), paramstruct.eeglab.mcorrect = 'bonferoni'; end
+if strcmpi(paramstruct.eeglab.mcorrect,    'no'), paramstruct.eeglab.mcorrect = 'none'; end
+if strcmpi(paramstruct.fieldtrip.mcorrect, 'no'), paramstruct.fieldtrip.mcorrect = 'none'; end
