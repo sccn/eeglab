@@ -183,12 +183,14 @@ if ~isstr(varargin{1})
     fig_arg{2}    = length(STUDY.changrp);
         
     std_line = [0.9 0.35 0.9];
-    geometry = { [4] [1] [0.6 0.35 0.1 0.1 0.9] std_line std_line std_line std_line std_line std_line  };
+    geometry = { [0.8 3] [1] [0.6 0.35 0.1 0.1 0.9] std_line std_line std_line std_line std_line std_line  };
     str_name       = sprintf('STUDY name ''%s'' - ''%s''', STUDY.name, STUDY.design(STUDY.currentdesign).name);
     if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
              
+    % list of designs
     uilist   = { ...
-        {'style' 'text' 'string' str_name 'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} ...
+        {'style' 'text'       'string' 'Select design:' 'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} ...
+        {'style' 'popupmenu'  'string' { STUDY.design.name } 'FontWeight' 'Bold' 'tag' 'design' } { } ...
         {'style' 'text'       'string' 'Select channel to plot' 'FontWeight' 'Bold' } ...
         {'style' 'pushbutton' 'string' 'Sel. all' 'callback' sel_all_chans } {} {} ...
         {'style' 'text'       'string' 'Select subject(s) to plot' 'FontWeight' 'Bold'} ...
@@ -251,6 +253,7 @@ else
     cls      = userdat{1}{3};
     allchans = userdat{1}{4};
     
+    design  = get(findobj('parent', hdl, 'tag', 'design')      , 'value');
     changrp = get(findobj('parent', hdl, 'tag', 'chan_list')   , 'value');
     onechan = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value');
    
@@ -261,7 +264,7 @@ else
                 changrpstr = allchans(changrp);
                 plotting_option = varargin{1};
                 plotting_option = [ plotting_option(1:end-4) 'plot' ];
-                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ');' ];
+                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''design'', ' int2str(design) ');' ];
                  % update Study history
                 eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 userdat{1}{2} = STUDY;
@@ -282,10 +285,10 @@ else
                 plotting_option = [ plotting_option(9:end) 'plot' ];
                 if onechan(1) ~= 1  % check that not all onechan in channel are requested
                      subject = STUDY.design(STUDY.currentdesign).cases.value{onechan-1};
-                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
+                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''', ''design'', ' int2str(design) ' );' ];
                      eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                  else
-                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'' );' ];
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'', ''design'', ' int2str(design) ' );' ];
                     eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
                  end;
                 userdat{1}{2} = STUDY;
