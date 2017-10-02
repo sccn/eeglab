@@ -172,6 +172,7 @@ end;
                         'recompute'     'string'      { 'on','off' }        'off';
                         'getparams'     'string'      { 'on','off' }        'off';
                         'savefile'      'string'      { 'on','off' }        'on';
+                        'parallel'      'string'      { 'on','off' }        'on';
                         'timewindow'    'real'                  []          [];    % ignored, deprecated
                         'fileout'       'string'                []          '';
                         'timelimits'    'real'                  []          [EEG(1).xmin EEG(1).xmax]*1000;
@@ -301,7 +302,14 @@ usesingle = option_single;
 
 % CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
 disp('Computing time/frequency decomposition...');
-parfor k = 1:length(g.indices)  % for each (specified) component/channel
+numWorkers = 0;
+if strcmpi(g.parallel, 'yes') && ~exist('parpool')
+    poolobj = gcp('nocreate')
+    if ~isempty(poolobj)
+        numWorkers = poolobj.NumWorkers;
+    end
+end
+parfor (k = 1:length(g.indices),numWorkers)  % for each (specified) component/channel
     %if k>size(X,1), break; end; % happens for components
     if powbaseexist
         tmpparams = parameters;
