@@ -122,12 +122,7 @@ end;
 % get parameters
 % --------------
 statstruct.etc = STUDY.etc; 
-statstruct.design = STUDY.design; %added by behnam
-statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
-stats = statstruct.etc.statistics;
-stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
-stats.paired = { STUDY.design(STUDY.currentdesign).variable(:).pairing };
 
 % potentially missing fields
 % --------------------------
@@ -152,7 +147,7 @@ end;
 % -----------------------
 options = mystruct(varargin);
 options = myrmfield( options, myfieldnames(params));
-options = myrmfield( options, myfieldnames(stats));
+options = myrmfield( options, myfieldnames(statstruct.etc.statistics));
 options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward compatibility
 [ opt moreparams ] = finputcheck( options, { ...
                                'design'      'integer' [] STUDY.currentdesign;
@@ -181,8 +176,8 @@ end;
 
 allconditions  = {};
 allgroups      = {};
-if length(STUDY.design(STUDY.currentdesign).variable) > 0, allconditions = STUDY.design(STUDY.currentdesign).variable(1).value; end;
-if length(STUDY.design(STUDY.currentdesign).variable) > 1, allgroups     = STUDY.design(STUDY.currentdesign).variable(2).value; end;
+if length(STUDY.design(opt.design).variable) > 0, allconditions = STUDY.design(opt.design).variable(1).value; end;
+if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(opt.design).variable(2).value; end;
 
 % for backward compatibility
 % --------------------------
@@ -198,6 +193,9 @@ if isempty(opt.plottf) && ~isempty(params.topofreq) && ~isempty(params.topotime)
 else params.plottf = opt.plottf;
 end;
 %if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end; %deprecated
+stats = statstruct.etc.statistics;
+stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
+stats.paired = { STUDY.design(opt.design).variable(:).pairing };
 if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt.comps)))
     if strcmpi(stats.condstats, 'on') || strcmpi(stats.groupstats, 'on')
         stats.groupstats = 'off';
@@ -217,6 +215,7 @@ method   = fastif(strcmpi(stats.mode, 'eeglab'), stats.eeglab.method, ['Fieldtri
 plottfopt = { ...
    'ersplim',     opt.caxis, ...
    'threshold',   alpha, ...
+   'effect',      stats.effect, ...
    'maskdata',    params.maskdata };
 if ~isempty(params.plottf) && length(opt.channels) < 5
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
