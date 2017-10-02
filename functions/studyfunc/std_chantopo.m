@@ -52,7 +52,7 @@ pinter = [];
 if nargin < 2
     help std_chantopo;
     return;
-end;
+end
 
 opt = finputcheck( varargin, { 'ylim'        'real'    []              [];
                                'titles'      'cell'    []              cell(20,20);
@@ -61,56 +61,68 @@ opt = finputcheck( varargin, { 'ylim'        'real'    []              [];
                                'groupstats'  'cell'    []              {};
                                'condstats'   'cell'    []              {};
                                'interstats'  'cell'    []              {};
+                               'effect'      'string' { 'main','marginal' }   'marginal';
                                'subplotpos'  'integer' []              [];
                                'topoplotopt' 'cell'    []              { 'style', 'both' };
                                'binarypval'  'string'  { 'on','off' }  'on';
                                'datatype'    'string'  { 'ersp','itc','erp','spec' }    'erp';
                                'caxis'       'real'    []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
-if isstr(opt), error(opt); end;
-if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
-if isnan(opt.threshold), opt.binarypval = 'off'; end;
-if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = opt.topoplotopt; end;
+if isstr(opt), error(opt); end
+if ~isempty(opt.ylim), opt.caxis = opt.ylim; end
+if isnan(opt.threshold), opt.binarypval = 'off'; end
+if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = opt.topoplotopt; end
 
 % remove empty entries
 datapresent = ~cellfun(@isempty, data);
-for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; opt.titles(c,:) = []; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end;
-for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; opt.titles(:,g) = []; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end;
+for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; opt.titles(c,:) = []; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end
+for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; opt.titles(:,g) = []; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end
 
 nc = size(data,1);
 ng = size(data,2);
 if nc >= ng, opt.transpose = 'on';
 else         opt.transpose = 'off';
-end;
+end
 
 % plotting paramters
 % ------------------
-if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
-if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
+if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end
+if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end
 if ~isempty(opt.subplotpos), 
-     if strcmpi(opt.transpose, 'on'), opt.subplotpos = opt.subplotpos([2 1 4 3]); end;
+     if strcmpi(opt.transpose, 'on'), opt.subplotpos = opt.subplotpos([2 1 4 3]); end
      addr = opt.subplotpos(1);
      addc = opt.subplotpos(2);
      posr = opt.subplotpos(4);
      posc = opt.subplotpos(3);
 else posr = 0;
      posc = 0;
-end;
+end
 
 % compute significance mask
 % -------------------------
-if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
-
-if ~isnan(opt.threshold(1)) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
-    pcondplot  = opt.condstats;
-    pgroupplot = opt.groupstats;
-    pinterplot = pinter;
-    maxplot = 1;
-else
-    for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
-    for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;
-    if ~isempty(pinter), pinterplot = -log10(pinter); end;
-    maxplot = 3;
-end;
+pinterplot = {};
+if strcmpi(opt.effect, 'marginal')
+    if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
+        pcondplot  = opt.condstats;
+        pgroupplot = opt.groupstats;
+        maxplot = 1;
+    else
+        for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end
+        for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end
+        maxplot = 3;
+    end
+elseif strcmpi(opt.effect, 'main') && ~isempty(opt.interstats)
+    if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
+        pcondplot  = { opt.interstats{1} };
+        pgroupplot = { opt.interstats{2} };
+        pinterplot = opt.interstats{3};
+        maxplot = 1;
+    else
+        if ~isempty(opt.interstats{1}), pcondplot  = { -log10(opt.interstats{1}) }; end
+        if ~isempty(opt.interstats{2}), pgroupplot = { -log10(opt.interstats{2}) }; end
+        if ~isempty(opt.interstats{3}), pinterplot = -log10(opt.interstats{3}); end
+        maxplot = 3;
+    end
+end
 
 % adjust figure size
 % ------------------
@@ -121,7 +133,7 @@ if isempty(opt.subplotpos)
     pos = get(fig, 'position');
     if strcmpi(opt.transpose, 'off'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
     else                              set(gcf, 'position', pos);
-    end;
+    end
 end
 
 % topoplot
@@ -129,35 +141,38 @@ end
 tmpc = [inf -inf];
 for c = 1:nc
     for g = 1:ng
-        hdl(c,g) = mysubplot(nc+addr, ng+addc, g + posr + (c-1+posc)*(ng+addc), opt.transpose);
+        hdl(c,g) = mysubplot(nc+addr, ng+addc, c, g, opt.transpose);
         if ~isempty(data{c,g})
             tmpplot = double(mean(data{c,g},3));
             if ~all(isnan(tmpplot))
-                if ~isreal(tmpplot), error('This function cannot plot complex values'); end;
+                if ~isreal(tmpplot), error('This function cannot plot complex values'); end
                 topoplot( tmpplot, opt.chanlocs, opt.topoplotopt{:});
                 if isempty(opt.caxis)
                     tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
                 else 
                     caxis(opt.caxis);
-                end;
+                end
                 title(opt.titles{c,g}, 'interpreter', 'none'); 
             else
                 axis off;
-            end;
+            end
         else
             axis off;
-        end;
+        end
 
         % statistics accross groups
         % -------------------------
-        if g == ng & ng > 1 & ~isempty(opt.groupstats)
-            hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + posr + 1 + (c-1+posc)*(ng+addc), opt.transpose);
-            topoplot( pgroupplot{c}, opt.chanlocs, opt.ptopoopt{:});
-            title(opt.titles{c,g+1}); 
-            caxis([-maxplot maxplot]);
-        end;
-    end;
-end;
+        if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && c == 1)
+            if g == ng && ng > 1 && ~isempty(opt.groupstats)
+                if strcmpi(opt.effect, 'main') && nc>1, centerc = nc/2-0.5; else centerc = 0; end
+                hdl(c,g+1) = mysubplot(nc+addr, ng+addc, c+centerc, ng + 1, opt.transpose);
+                topoplot( pgroupplot{c}, opt.chanlocs, opt.ptopoopt{:});
+                title(opt.titles{c,g+1});
+                caxis([-maxplot maxplot]);
+            end
+        end
+    end
+end
         
 % color scale
 % -----------
@@ -166,29 +181,32 @@ if isempty(opt.caxis)
         for g = 1:ng
             axes(hdl(c,g));
             caxis(tmpc);
-        end;
-    end;
-end;
+        end
+    end
+end
 
 for g = 1:ng
     % statistics accross conditions
     % -----------------------------
-    if ~isempty(opt.condstats) && nc > 1
-        hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + posr + (c+posc)*(ng+addc), opt.transpose);
-        topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
-        title(opt.titles{nc+1,g}); 
-        caxis([-maxplot maxplot]);
-    end;
-end;
+    if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && g == 1)
+        if ~isempty(opt.condstats) && nc > 1
+            if strcmpi(opt.effect, 'main') && ng>1, centerg = ng/2-0.5; else centerg = 0; end
+            hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, nc+addr, g+centerg, opt.transpose);
+            topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
+            title(opt.titles{nc+1,g});
+            caxis([-maxplot maxplot]);
+        end
+    end
+end
 
 % statistics accross group and conditions
 % ---------------------------------------
-if ~isempty(opt.condstats) && ~isempty(opt.groupstats) && ng > 1 && nc > 1
-    hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + posr + 1 + (c+posc)*(ng+addc), opt.transpose);
+if ~isempty(opt.condstats) && ~isempty(opt.groupstats) && ng > 1 && nc > 1 && ~isempty(pinterplot)
+    hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, nc+addr, ng+1, opt.transpose);
     topoplot( pinterplot, opt.chanlocs, opt.ptopoopt{:});
     title(opt.titles{nc+1,ng+1}); 
     caxis([-maxplot maxplot]);
-end;    
+end    
 
 % color bars
 % ----------
@@ -197,16 +215,16 @@ cbar_standard(opt.datatype, ng);
 if isnan(opt.threshold(1)) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
     axes(hdl(end,end));
     cbar_signif(ng, maxplot);
-end;
+end
 
 % remove axis labels
 % ------------------
 for c = 1:size(hdl,1)
     for g = 1:size(hdl,2)
-        if g ~= 1 && size(hdl,2) ~=1, ylabel(''); end;
-        if c ~= size(hdl,1) && size(hdl,1) ~= 1, xlabel(''); end;
-    end;
-end;
+        if g ~= 1 && size(hdl,2) ~=1, ylabel(''); end
+        if c ~= size(hdl,1) && size(hdl,1) ~= 1, xlabel(''); end
+    end
+end
 
 % colorbar for ERSP and scalp plot
 % --------------------------------
@@ -219,7 +237,7 @@ function cbar_standard(datatype, ng);
     if strcmpi(datatype, 'itc')
          cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
     else cbar(tmp, 0, tmpc, 5);
-    end;
+    end
 
 % colorbar for significance
 % -------------------------
@@ -244,11 +262,12 @@ function cbar_signif(ng, maxplot);
 
 % mysubplot (allow to transpose if necessary)
 % -------------------------------------------
-function hdl = mysubplot(nr,nc,ind,transp);
+function hdl = mysubplot(nr,nc,r,c,subplottype)
 
-    r = ceil(ind/nc);
-    c = ind -(r-1)*nc;
-    if strcmpi(transp, 'on'), hdl = subplot(nc,nr,(c-1)*nr+r);
-    else                      hdl = subplot(nr,nc,(r-1)*nc+c);
-    end;
-
+    cmargin = 0.2/nc;
+    rmargin = 0.2/nr;
+    if strcmpi(subplottype, 'transpose') || strcmpi(subplottype, 'on'),   hdl = subplot('position',[(r-1)/nr+rmargin (nc-c)/nc+cmargin 1/nr-2*rmargin 1/nc-2*cmargin]);
+    elseif strcmpi(subplottype, 'normal') || strcmpi(subplottype, 'off'), hdl = subplot('position',[(c-1)/nc+cmargin (nr-r)/nr+rmargin 1/nc-2*cmargin 1/nr-2*rmargin]);
+    elseif strcmpi(subplottype, 'noplot'), hdl = gca;
+    else error('Unknown subplot type');
+    end
