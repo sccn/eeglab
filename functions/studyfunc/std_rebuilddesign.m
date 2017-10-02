@@ -52,6 +52,8 @@ for indDesign = designind
     tmpdesign = STUDY.design(indDesign);
     if isempty(tmpdesign.cases.value) || isempty(tmpdesign.cases.value{1})
         tmpdesign.cases.value = STUDY.subject;
+    else
+        tmpdesign.cases.value = intersect(tmpdesign.cases.value, STUDY.subject);
     end
     for iVar = length(tmpdesign.variable):-1:1
         indVar = strmatch(tmpdesign.variable(iVar).label, indvars, 'exact');
