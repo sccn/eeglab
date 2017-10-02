@@ -359,9 +359,9 @@ else
             try,
                 ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
                 tmpstruct = struct(ersp_params{:});
-                [ tmpX tmpt tmpf ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
+                [ tmpX, tmpt, tmpf, ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'parallel', 'off', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
                 std_plottf(tmpt, tmpf, { tmpX });
-            catch, warndlg2('Error while calling function, check parameters'); end;
+            catch, warndlg2('Error while calling function, check syntax'); end;
                 
         case 'testerpimage'
             try,
