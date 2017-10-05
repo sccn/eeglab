@@ -155,7 +155,7 @@ if ~iscell(dipplotargs) % convert input
 else 
     dipplotargs = { dipplotargs{:} 'coordformat' g.coordformat };
 end;
-struct = dipplot(dipplotargs{:}, 'plot', g.dipplot);
+struct = dipplot(dipplotargs{:}, 'plot', g.dipplot, 'density', 'off');
 if nargout == 0
     drawnow;
 end;
