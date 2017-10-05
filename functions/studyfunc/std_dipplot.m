@@ -69,7 +69,8 @@ figureon = 1; % plot on a new figure
 mode = 'apart';
 
 STUDY = pop_dipparams(STUDY, 'default');
-opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'spheres','on'};
+
+opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
 
 %, 'spheres', 'on'
 groupval = 'off';
@@ -90,6 +91,10 @@ for k = 3:2:nargin
             end
             if length(cls) == 1, mode = 'apart'; else mode = 'together'; end;
         case 'comps'
+            if strcmpi(STUDY.etc.dipparams.density, 'on')
+                disp('Single dipole should not be plotted using dipole density, reverting to dipole plotting');
+                opt_dipplot{end} = 'off';
+            end
             STUDY = std_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1}, opt_dipplot{:});
             return;
         case 'plotsubjects', % do nothing
@@ -97,12 +102,24 @@ for k = 3:2:nargin
         case 'groups', groupval = varargin{k-1};
         case 'figure'
             if strcmpi(varargin{k-1},'off') 
+                if strcmpi(STUDY.etc.dipparams.density, 'on')
+                    disp('Cannot plot dipole density within figure, reverting to dipole plotting');
+                    opt_dipplot{end} = 'off';
+                end
                 opt_dipplot{end + 1} = 'gui';
                 opt_dipplot{end + 1} = 'off';
                 figureon = 0;
             end
     end
 end
+
+if strcmpi(mode, 'together')
+    if strcmpi(STUDY.etc.dipparams.density, 'on')
+        disp('Cannot plot dipole density within figure, reverting to dipole plotting');
+        opt_dipplot{end} = 'off';
+    end
+end
+
 % select clusters to plot
 % -----------------------
 if isempty(cls)
