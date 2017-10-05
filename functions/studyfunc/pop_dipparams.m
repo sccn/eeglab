@@ -41,32 +41,37 @@ if isempty(varargin)
     val_axistight = fastif(strcmpi(STUDY.etc.dipparams.axistight,'on'), 1, 0);
     val_projimg   = fastif(strcmpi(STUDY.etc.dipparams.projimg,'on'), 1, 0);
     val_projlines = fastif(strcmpi(STUDY.etc.dipparams.projlines,'on'), 1, 0);
+    val_density   = fastif(strcmpi(STUDY.etc.dipparams.density,'on'), 1, 0);
     
     uilist = { ...
-        {'style' 'checkbox' 'tag' 'axistight' 'value' val_axistight } { 'style' 'text'  'string' 'Plot closest MRI slide'      } ...
+        {'style' 'checkbox' 'tag' 'density'   'value' val_density   } { 'style' 'text'  'string' 'Plot dipoles density'        } ...
         {'style' 'checkbox' 'tag' 'projlines' 'value' val_projlines } { 'style' 'text'  'string' 'Plot projection lines'       } ...
-        {'style' 'checkbox' 'tag' 'projimg'   'value' val_projimg   } { 'style' 'text'  'string' 'Plot dipoles projections'    } };
+        {'style' 'checkbox' 'tag' 'projimg'   'value' val_projimg   } { 'style' 'text'  'string' 'Plot dipoles projections'    } ...
+        {'style' 'checkbox' 'tag' 'axistight' 'value' val_axistight } { 'style' 'text'  'string' 'Plot closest MRI slide'      } ...
+        };
 
-    [out_param userdat tmp res] = inputgui( 'geometry' , { [0.1 1]  [0.1 1]  [0.1 1] }, 'uilist', uilist, 'geomvert', [1 1 1], ...
+    [out_param, userdat, tmp, res] = inputgui( 'geometry' , { [0.2 1]  [0.2 1]  [0.2 1] [0.2 1] }, 'uilist', uilist, 'geomvert', [1 1 1 1], ...
                                             'title', 'ERP plotting options -- pop_dipparams()');
-    if isempty(res), return; end;
+    if isempty(res), return; end
     
     % decode inputs
     % -------------
     res.axistight = fastif(res.axistight, 'on', 'off');
     res.projimg   = fastif(res.projimg  , 'on', 'off');
     res.projlines = fastif(res.projlines, 'on', 'off');
+    res.density   = fastif(res.density,   'on', 'off');
     
     % build command call
     % ------------------
     options = {};
-    if ~strcmpi( res.axistight, STUDY.etc.dipparams.axistight), options = { options{:} 'axistight' res.axistight }; end;
-    if ~strcmpi( res.projimg,   STUDY.etc.dipparams.projimg  ), options = { options{:} 'projimg'   res.projimg   }; end;
-    if ~strcmpi( res.projlines, STUDY.etc.dipparams.projlines), options = { options{:} 'projlines' res.projlines }; end;
+    if ~strcmpi( res.axistight, STUDY.etc.dipparams.axistight), options = { options{:} 'axistight' res.axistight }; end
+    if ~strcmpi( res.projimg,   STUDY.etc.dipparams.projimg  ), options = { options{:} 'projimg'   res.projimg   }; end
+    if ~strcmpi( res.projlines, STUDY.etc.dipparams.projlines), options = { options{:} 'projlines' res.projlines }; end
+    if ~strcmpi( res.density  , STUDY.etc.dipparams.density),   options = { options{:} 'density'   res.density   }; end
     if ~isempty(options)
         STUDY = pop_dipparams(STUDY, options{:});
         com = sprintf('STUDY = pop_dipparams(STUDY, %s);', vararg2str( options ));
-    end;
+    end
 else
     if strcmpi(varargin{1}, 'default')
         STUDY = default_params(STUDY);
@@ -74,13 +79,14 @@ else
         for index = 1:2:length(varargin)
             if ~isempty(strmatch(varargin{index}, fieldnames(STUDY.etc.dipparams), 'exact'))
                 STUDY.etc.dipparams = setfield(STUDY.etc.dipparams, varargin{index}, varargin{index+1});
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 
 function STUDY = default_params(STUDY)
-    if ~isfield(STUDY.etc, 'dipparams'), STUDY.etc.dipparams = []; end;
-    if ~isfield(STUDY.etc.dipparams, 'axistight'),        STUDY.etc.dipparams.axistight = 'off'; end;
-    if ~isfield(STUDY.etc.dipparams, 'projimg'),          STUDY.etc.dipparams.projimg   = 'off'; end;
-    if ~isfield(STUDY.etc.dipparams, 'projlines'),        STUDY.etc.dipparams.projlines = 'off'; end;
+    if ~isfield(STUDY.etc, 'dipparams'), STUDY.etc.dipparams = []; end
+    if ~isfield(STUDY.etc.dipparams, 'axistight'),        STUDY.etc.dipparams.axistight = 'off'; end
+    if ~isfield(STUDY.etc.dipparams, 'projimg'),          STUDY.etc.dipparams.projimg   = 'off'; end
+    if ~isfield(STUDY.etc.dipparams, 'projlines'),        STUDY.etc.dipparams.projlines = 'off'; end
+    if ~isfield(STUDY.etc.dipparams, 'density'),          STUDY.etc.dipparams.density   = 'off'; end
