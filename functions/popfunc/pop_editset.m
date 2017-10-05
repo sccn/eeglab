@@ -395,7 +395,7 @@ for curfield = tmpfields'
 								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
                              else
-  								 EEGOUT.icaweights = varname;
+  								 EEGOUT.icasphere = varname;
 								 EEGOUT.icawinv = [];                                 
 							 end;
                          end;
