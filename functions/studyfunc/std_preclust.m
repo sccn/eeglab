@@ -254,8 +254,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     data(si,:) = std_readtopo(ALLEEG, idat, icomp, scalpmodif, 'preclust');
                 end;
                 
-            % select ica dipoles
-            % ------------------
+            % select ica equivalent dipole locations
+            % --------------------------------------
             case 'dipoles'
                 for si = 1:size(STUDY.cluster(cluster_ind).sets,2)
                     idat  = STUDY.datasetinfo(STUDY.cluster(cluster_ind).sets(1,si)).index;
@@ -275,6 +275,38 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             end
                         end
                         data(si,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
+                    catch
+                        error([ sprintf('Some dipole information is missing (e.g. component %d of dataset %d)', icomp, idat) 10 ...
+                            'Components are not assigned a dipole if residual variance is too high so' 10 ...
+                            'in the STUDY info editor, remember to select component by residual' 10 ...
+                            'variance (column "select by r.v.") prior to preclustering them.' ]);
+                    end
+                end
+
+            % select ica equivalent dipole moments
+            % ------------------------------------
+            case 'moments'
+                for si = 1:size(STUDY.cluster(cluster_ind).sets,2)
+                    idat  = STUDY.datasetinfo(STUDY.cluster(cluster_ind).sets(1,si)).index;
+                    icomp = STUDY.cluster(cluster_ind).comps(si);
+                    fprintf('Pre-clustering array row %d, adding dipole moment for dataset %d component %d...\n', si, idat, icomp);
+                    try
+                        % select among 3 sub-options
+                        % --------------------------
+                        ldip = 1;
+                        if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
+                            if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
+                                    && any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
+                                % find the leftmost dipole
+                                [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
+                            elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:))
+                                ldip = 2; % the leftmost dipole is the only one that exists
+                            end
+                        end
+                        posxyz = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
+                        momxyz = ALLEEG(idat).dipfit.model(icomp).momxyz(ldip,:);
+                        if sum(posxyz .* momxyz) < 0, momxyz = -momxyz; end % make dipole pointing outward
+                        data(si,:) = momxyz;
                     catch
                         error([ sprintf('Some dipole information is missing (e.g. component %d of dataset %d)', icomp, idat) 10 ...
                             'Components are not assigned a dipole if residual variance is too high so' 10 ...
