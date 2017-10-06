@@ -37,8 +37,7 @@
 %               volume (dim 1: left to right; dim 2: anterior-posterior; dim 3: 
 %               superior-inferior). Use 'coregist' to coregister electrodes
 %               with the MRI. {default: 'mri'} 
-%  'verbose' - ['on'|'off'] comment on operations on command line {default:
-%  'on'}.
+%  'verbose' - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %  'plot'    - ['on'|'off'] only return outputs                  {default: 'off'}.
 %
 % Plotting options:
@@ -87,6 +86,8 @@
 %  'camera'   - ['auto'|'set'] camera position. 'auto' is the default and 
 %               an option using camera zoom. 'set' is a fixed view that
 %               does not depend on the content being plotted.
+%  'density'  - ['on'|'off'] plot dipole density instead of dipoles. {Default: 
+%               'off'}
 %
 % Outputs:
 %   sources   - EEG.source structure with two extra fiels 'mnicoord' and 'talcoord'
@@ -183,6 +184,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'camera'    'string'   { 'auto' 'set' }   'auto';
                                  'coordformat' 'string' { 'MNI' 'spherical' 'CTF' 'auto' } 'auto';
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
+                                 'density'   'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
                                  'summary'   'string'   { 'on2' 'on' 'off' '3d' }     'off';
@@ -212,6 +214,18 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     %                             'coreg'     'real'     []                  [];
 
     if isstr(g), error(g); end;
+    if strcmpi(g.density, 'on')
+        % remove first dipole if different color
+        if ~isempty(g.color) && iscell(g.color) && length(g.color)>1
+            if ~isequal(g.color{end}, g.color{end-1})
+                disp('Note: removing centroid before plotting dipole density');
+                sourcesori(end) = [];
+            end
+        end
+        dipoledensity(sourcesori, 'coordformat', g.coordformat);
+        return
+    end
+    
     if strcmpi(g.holdon, 'on'), g.gui = 'off'; end;
     if length(g.dipolesize) == 1, g.dipolesize = repmat(g.dipolesize, [1 length(sourcesori)]); end;
     
