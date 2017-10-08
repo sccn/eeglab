@@ -144,6 +144,7 @@ for c = 1:nc
         hdl(c,g) = mysubplot(nc+addr, ng+addc, c, g, opt.transpose);
         if ~isempty(data{c,g})
             tmpplot = double(mean(data{c,g},3));
+            if ~isreal(tmpplot(1)), tmpplot = abs(tmpplot); end % comes second for processing single trials
             if ~all(isnan(tmpplot))
                 if ~isreal(tmpplot), error('This function cannot plot complex values'); end
                 topoplot( tmpplot, opt.chanlocs, opt.topoplotopt{:});
