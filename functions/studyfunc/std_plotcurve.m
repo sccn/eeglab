@@ -240,7 +240,7 @@ end
 % compute significance mask
 % --------------------------
 pinterplot = {};
-if strcmpi(opt.effect, 'marginal')
+if strcmpi(opt.effect, 'marginal') || ng == 1 || nc == 1
     if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
         pcondplot  = opt.condstats;
         pgroupplot = opt.groupstats;
@@ -262,6 +262,11 @@ elseif strcmpi(opt.effect, 'main') && ~isempty(opt.interstats)
         if ~isempty(opt.interstats{3}), pinterplot = -log10(opt.interstats{3}); end
         maxplot = 3;
     end
+else
+    pcondplot  = { };
+    pgroupplot = { };
+    pinterplot = { };
+    maxplot = 1;
 end
 
 % labels
@@ -514,21 +519,26 @@ end
     
 % statistics accross group and conditions
 % ---------------------------------------
-if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1 && ~isempty(pinterplot)
+if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1 
     mysubplot(ncplot+addr, ngplot+addc, ncplot+addr, ngplot + 1, opt.subplot);
-    if ~isnan(opt.threshold)
-         if strcmpi(opt.plottopo, 'on')
-              metaplottopo({zeros(size(pinterplot')) pinterplot'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                  'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, end});
-         else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pinterplot,2), 'ylim', [0.1 1], 'title', opt.titles{end, end}, statopt{:});
-              xlabel(xlab); ylabel('-log10(p)');
+    if ~isempty(pinterplot)
+        if ~isnan(opt.threshold)
+             if strcmpi(opt.plottopo, 'on')
+                  metaplottopo({zeros(size(pinterplot')) pinterplot'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
+                      'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, end});
+             else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pinterplot,2), 'ylim', [0.1 1], 'title', opt.titles{end, end}, statopt{:});
+                  xlabel(xlab); ylabel('-log10(p)');
+            end
+        else
+             if strcmpi(opt.plottopo, 'on')
+                  metaplottopo(pinterplot', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
+                      'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, end});
+             else plotcurve(allx, mean(pinterplot,2), 'title', opt.titles{end, end}, statopt{:});
+             end
         end
     else
-         if strcmpi(opt.plottopo, 'on')
-              metaplottopo(pinterplot', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                  'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, end});
-         else plotcurve(allx, mean(pinterplot,2), 'title', opt.titles{end, end}, statopt{:});
-         end
+        text(0,0.6, [ 'Plot main effect ' 10 'to see interaction' 10 '("Stat" button option)']);
+        axis off;
     end
 end  
 

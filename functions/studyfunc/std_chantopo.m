@@ -100,7 +100,7 @@ end
 % compute significance mask
 % -------------------------
 pinterplot = {};
-if strcmpi(opt.effect, 'marginal')
+if strcmpi(opt.effect, 'marginal') || ng == 1 || nc == 1
     if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
         pcondplot  = opt.condstats;
         pgroupplot = opt.groupstats;
