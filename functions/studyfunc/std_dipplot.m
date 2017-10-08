@@ -70,7 +70,7 @@ mode = 'apart';
 
 STUDY = pop_dipparams(STUDY, 'default');
 
-opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
+opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'spheres', 'on', 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
 
 %, 'spheres', 'on'
 groupval = 'off';
