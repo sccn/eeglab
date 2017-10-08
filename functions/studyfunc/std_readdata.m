@@ -191,11 +191,19 @@ for iSubj = 1:length(subjectList)
     end
 end
 
-% if single trials put channels in 2nd dim and trials in last dim
+% if single trials, swap the last 2 dim (put channels before trials)
 if strcmpi(opt.singletrials, 'on') && length(opt.channels) > 1
-    for iCase = 1:length(dataTmp)
-        for iItem = 1:length(dataTmp{1}(:))
-            dataTmp{iCase}{iItem} = permute(dataTmp{iCase}{iItem}, [1 3 2]);
+    if ndims(dataTmp{1}{1}) == 3
+        for iCase = 1:length(dataTmp)
+            for iItem = 1:length(dataTmp{1}(:))
+                dataTmp{iCase}{iItem} = permute(dataTmp{iCase}{iItem}, [1 3 2]);
+            end
+        end
+    else
+        for iCase = 1:length(dataTmp)
+            for iItem = 1:length(dataTmp{1}(:))
+                dataTmp{iCase}{iItem} = permute(dataTmp{iCase}{iItem}, [1 2 4 3]);
+            end
         end
     end
 end
@@ -320,9 +328,17 @@ function dataout = processtf(dataSubject, xvals, datatype, singletrials, g)
             dataout = squeeze(mean(dataout, 3));
         end
     else
+        dataout = dataSubject;
         if strcmpi(singletrials, 'off')
             if ~isfield(g, 'itctype'), g.itctype = 'phasecoher'; end
-            dataout = newtimefitc(dataSubject, g.itctype);
+            if ndims(dataSubject) == 4
+                dataSubject = permute(dataSubject, [4 1 2 3]);
+                dataout = newtimefitc(dataSubject, g.itctype);
+                dataout = permute(dataout, [2 3 1]);
+            else
+                dataout = newtimefitc(dataSubject, g.itctype);
+            end
+            dataout = abs(dataout); % required for plotting scalp topo
         end
     end
   
