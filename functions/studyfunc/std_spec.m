@@ -62,12 +62,6 @@
 %                  'pmtm' and 'pbug' which use multitaper and the Burg 
 %                  method to compute spectrum respectively. NOTE THAT SOME
 %                  OF THESE OPTIONS REQUIRE THE SIGNAL PROCESSING TOOLBOX.
-%   'speccompat'  - ['v13'|'v14'] enforces backward compatibility with
-%                  version 13 of EEGLAB. Default is 'v14'. For the 'specmode'
-%                  option 'fft', EEGLAB 14 and later version detrend the data
-%                  and apply hamming taper to it. EEGLAB 13 and earlier 
-%                  remove the baseline from the data and apply a hamming  
-%                  taper but only for continuous data.
 %   'epochlim'   - [min max] for FFT on continuous data, extract data
 %                  epochs with specific epoch limits in seconds (see also
 %                  'epochrecur' below). Default is [0 1].
@@ -90,6 +84,11 @@
 %   'nw'         - [integer] number of tapers for the 'pmtm' spectral
 %                  method. Default is 4.
 %   'burgorder'  - [integet] order for the Burg spectral method.
+%
+% Changes between EEGLAB 14 and EEGLAB 15:
+% For the 'specmode' option 'fft', EEGLAB 14 and later version detrend the 
+% data and apply hamming taper to it. EEGLAB 13 and earlier remove the 
+% baseline from the data and apply a hamming taper but only for continuous data.
 %
 % Other optional spectral parameters:
 %   All optional parameters to the spectopo function may be provided to this 
@@ -163,7 +162,6 @@ end
                                       'continuous' 'string'  { 'on','off' } 'off';
                                       'logtrials'  'string'  { 'on','off' 'notset' } 'notset';
                                       'savefile'   'string'  { 'on','off' } 'on';
-                                      'speccompat'   'string'  { 'v13','v14' } 'v14';
                                       'epochlim'   'real'    []         [0 1];
                                       'trialindices' { 'integer','cell' } []         [];
                                       'epochrecur' 'real'    []         0.5;
@@ -351,25 +349,19 @@ elseif strcmpi(g.specmode, 'pburg')
     if strcmpi(g.savetrials, 'off'), X = mean(X,3); end
 else % fft mode
     %
-    if strcmpi(g.speccompat, 'v14')
-        if size(X,3) > 1
-            for iTrial = 1:size(X,3)
-                X(:,:,iTrial) = detrend(X(:,:,iTrial)')';
-            end
-        else
-            X = detrend(X')';
+    if size(X,3) > 1
+        for iTrial = 1:size(X,3)
+            X(:,:,iTrial) = detrend(X(:,:,iTrial)')';
         end
-        try
-            X = bsxfun(@times, X, hamming(size(X,2))'); % apply hamming window even for data trials (not the case in EEGLAB 13)
-        catch
-            X = bsxfun(@times, X, hamming2(size(X,2))');
-        end
-        disp('Warning: std_spec function has changed (see help), for backward compatbility use the ''v13'' option');
     else
-        if oritrials == 1 || strcmpi(g.continuous, 'on')
-            X = bsxfun(@times, X, hamming(size(X,2))');
-        end
+        X = detrend(X')';
     end
+    try
+        X = bsxfun(@times, X, hamming(size(X,2))'); % apply hamming window even for data trials (not the case in EEGLAB 13)
+    catch
+        X = bsxfun(@times, X, hamming2(size(X,2))');
+    end
+    disp('Warning: std_spec function computation has changed since version 14 (see help message)');
     %end
     if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
     tmp   = fft(X, g.nfft, 2);
