@@ -352,12 +352,13 @@ if ~isstr(varargin{1})
     if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
     if length(cls) > 1, vallist = 1; else vallist = 2; end;
     geomline = [1 0.35 1];
-    geometry = { [4 .1 .1 .1 .1] [1] geomline geomline geomline geomline geomline geomline geomline geomline ...
+    geometry = { [0.8 3] [1] geomline geomline geomline geomline geomline geomline geomline geomline ...
                  geomline geomline [1] geomline geomline geomline };
     geomvert = [ 1 .5 1 3 1 1 1 1 1 1 1 1 1 1 1 1];
     uilist   = { ...
-        {'style' 'text' 'string' str_name ...
-            'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} {} {} {} {} ...
+        {'style' 'text'       'string' 'Select design:' 'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} ...
+        {'style' 'popupmenu'  'string' { STUDY.design.name } 'FontWeight' 'Bold' 'tag' 'design' 'value' STUDY.currentdesign  } ...
+        { } ...
         {'style' 'text'       'string' 'Select cluster to plot' 'FontWeight' 'Bold' } {} ...
         {'style' 'text'       'string' 'Select component to plot        ' 'FontWeight' 'Bold'} ...
         {'style' 'listbox'    'string' show_options 'value' vallist 'tag' 'clus_list' 'Callback' show_clust } ...
@@ -425,9 +426,10 @@ if ~isstr(varargin{1})
 else
     hdl = varargin{2};  %figure handle
     userdat = get(varargin{2}, 'userdat');    
-    ALLEEG = userdat{1}{1};
-    STUDY = userdat{1}{2};
-    cls = userdat{1}{3};
+    ALLEEG  = userdat{1}{1};
+    STUDY   = userdat{1}{2};
+    cls     = userdat{1}{3};
+    design  = get(findobj('parent', hdl, 'tag', 'design')      , 'value');
     
     clus     = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
     comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
@@ -445,10 +447,10 @@ else
                 if (clus ~= 1 ) %specific cluster
                     if comp_ind(1) ~= 1  % check that not all comps in cluster are requested
                         subject = STUDY.datasetinfo( STUDY.cluster(cls(clus-1)).sets(1,comp_ind-1)).subject;
-                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''comps'', ' num2str(comp_ind-1) ' );' ];
+                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''comps'', ' num2str(comp_ind-1) ', ''design'', ' int2str(design) ' );' ];
                         eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                      else
-                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''plotsubjects'', ''on'' );' ];
+                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''design'', ' int2str(design) ', ''plotsubjects'', ''on'' );' ];
                         eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                     end
                 else
@@ -464,7 +466,7 @@ else
                                if strcmpi(STUDY.cluster(cls(k)).name, clust_name)
                                    cind = comp_ind(ci) - num_comps; % component index in the cluster
                                    subject = STUDY.datasetinfo( STUDY.cluster(cls(k)).sets(1,cind)).subject;
-                                   a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ', ''comps'',' num2str(cind) ' );' ];
+                                   a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ', ''design'', ' int2str(design) ', ''comps'',' num2str(cind) ' );' ];
                                    eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                                    break;
                                else
@@ -482,7 +484,7 @@ else
                 plotting_option = [ plotting_option(1:end-4) 'plot' ];
                 if (clus ~= 1 ) % specific cluster option
                     if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ');' ];
+                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''design'', ' int2str(design) ');' ];
                         eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                     end
                 else % all clusters
@@ -494,7 +496,7 @@ else
                             tmpcls = [ tmpcls cls(k)];
                         end
                     end
-                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) ']);' ];
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) '], ''design'', ' int2str(design) ');' ];
                     %if strcmpi(plotting_option, 'dipplot'), a = [a(1:end-2) ',''mode'', ''together'');' ]; end;
                     eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 end
@@ -935,7 +937,7 @@ else
         end
     catch
         eeglab_error;
-    end;        
+    end       
 end
 
 function newname = renameclust(oldname, newname);
