@@ -93,15 +93,15 @@ allerpimage = [];
     'sorttype'       ''           {}                    '';
     'sortwin'        ''           {}                    [];
     'sortfield'      ''           {}                    'latency';
-    'concatenate'   'string'      { 'on','off' }        'off';
+    'concatenate'   'string'      { 'on'  }             'on';
     'trialinfo'     'struct'      []                    struct([]);
     'savetrials'    'string'      { 'on','off' }        'on'; % obsolete (never used)
     'erpimageopt'   'cell'        {}                    {}}, ...
     'std_erpimage', 'ignore');
-if isstr(opt), error(opt); end;
-if length(EEG) == 1 && isempty(opt.trialindices), opt.trialindices = { [1:EEG.trials] }; end;
-if isempty(opt.trialindices), opt.trialindices = cell(length(EEG)); end;
-if ~iscell(opt.trialindices), opt.trialindices = { opt.trialindices }; end;
+if isstr(opt), error(opt); end
+if length(EEG) == 1 && isempty(opt.trialindices), opt.trialindices = { [1:EEG.trials] }; end
+if isempty(opt.trialindices), opt.trialindices = cell(length(EEG)); end
+if ~iscell(opt.trialindices), opt.trialindices = { opt.trialindices }; end
 if isempty(opt.channels)
     if isfield(EEG,'icaweights')
         numc = size(EEG(1).icaweights,1);
@@ -111,11 +111,11 @@ if isempty(opt.channels)
     if isempty(opt.components)
         opt.components = 1:numc;
     end
-end;
+end
 
 % filename
 % --------
-if isempty(opt.fileout), opt.fileout = fullfile(EEG(1).filepath, EEG(1).filename(1:end-4)); end;
+if isempty(opt.fileout), opt.fileout = fullfile(EEG(1).filepath, EEG(1).filename(1:end-4)); end
 if ~isempty(opt.channels)
     filenameshort = [ opt.fileout '.daterpim'];
     prefix = 'chan';
@@ -127,17 +127,17 @@ if ~isempty(opt.channels)
             for ind = 2:length(EEG)
                 if ~isequal(eeg_chaninds(EEG(ind), opt.channels, 0), opt.indices)
                     error([ 'Channel information must be consistant when ' 10 'several datasets are merged for a specific design' ]);
-                end;
-            end;
-        end;
+                end
+            end
+        end
     else
         opt.indices = opt.channels;
-    end;
+    end
 else
     opt.indices = opt.components;
     filenameshort = [ opt.fileout '.icaerpim'];
     prefix = 'comp';
-end;
+end
 filename = filenameshort;
 
 % ERP information found in datasets
@@ -154,24 +154,24 @@ if strcmpi(opt.concatenate, 'off')
     if isempty(opt.channels)
          X = eeg_getdatact(EEG, 'component', opt.indices, 'trialindices', opt.trialindices );
     else X = eeg_getdatact(EEG, 'channel'  , opt.indices, 'trialindices', opt.trialindices, 'rmcomps', opt.rmcomps, 'interp', opt.interp);
-    end;
+    end
     if ~isempty(opt.sorttype)
          events = eeg_getepochevent(EEG, 'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield, 'trials', opt.trialindices);
     else events = [];
-    end;
+    end
         
     % reverse engeeneering the number of lines for ERPimage
     finallines = opt.nlines;
     if ~isempty(events)
          if all(isnan(events))
              error('Cannot sort trials for one of the dataset');
-         end;
+         end
          lastx  = sum(~isnan(events));
     else lastx  = size(X,3);
-    end;
+    end
     if lastx < finallines + floor((opt.smoothing-1)/2) + 3
         error('The default number of ERPimage lines is too large for one of the dataset');
-    end;
+    end
     firstx = 1;
     xwidth = opt.smoothing;
     %xadv   = lastx/finallines;
@@ -192,46 +192,46 @@ if strcmpi(opt.concatenate, 'off')
                     
                     if nout ~= noutreal
                         error('Wrong conversion 2');
-                    end;
+                    end
                     
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end
     
     clear tmperpimage eventvals;
     for index = 1:size(X,1)
         [tmpX tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
-        if isempty(events), tmpevents = []; end;
+        if isempty(events), tmpevents = []; end
         eventvals{index}   = tmpevents;
         tmperpimage{index} = tmpX';
-    end;
+    end
     allerpimage.events = eventvals{1};
     for index = 1:size(X,1)
         allerpimage.([ prefix int2str(opt.indices(index)) ]) = tmperpimage{index};
-    end;
+    end
 else
     % generate dynamic loading commands
     % ---------------------------------
     for dat = 1:length(EEG)
-        filenames{dat} = fullfile(EEG(1).filepath, EEG(1).filename);
-    end;
+        filenames{dat} = fullfile(EEG(dat).filepath, EEG(dat).filename);
+    end
     allerpimage.times = EEG(1).times;
     for index = 1:length(opt.indices)
         if ~isempty(opt.channels)
              com = sprintf('squeeze(eeg_getdatact(%s, ''interp'', chanlocsforinterp));', vararg2str( { filenames 'channel'  , opt.indices(index), 'rmcomps', opt.rmcomps, 'trialindices', opt.trialindices } ));
         else com = sprintf('squeeze(eeg_getdatact(%s));', vararg2str( { filenames 'component', opt.indices(index), 'trialindices', opt.trialindices } ));
-        end;
+        end
         allerpimage = setfield(allerpimage, [ prefix int2str(opt.indices(index)) ], com);
-    end;
+    end
     allerpimage = setfield(allerpimage, 'chanlocsforinterp', opt.interp);
     if ~isempty(opt.sorttype)
          events = eeg_getepochevent(EEG, 'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield, 'trials', opt.trialindices);
          %geteventcom = sprintf('eeg_getepochevent(%s);', vararg2str( { filenames 'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield } ));
     else events = [];
-    end;
+    end
     allerpimage = setfield(allerpimage, 'events', events);
-end;
+end
 allerpimage.times       = EEG(1).times;
 allerpimage.parameters  = varargin;
 allerpimage.datatype    = 'ERPIMAGE';
@@ -248,12 +248,12 @@ if strcmpi(opt.savefile, 'on')
         tmpchanlocs = EEG(1).chanlocs;
         allerpimage.labels = opt.channels;
         std_savedat(filename, allerpimage);
-    end;
-end;
+    end
+end
 
 % compute full file names
 % -----------------------
 function res = computeFullFileName(filePaths, fileNames);
 for index = 1:length(fileNames)
     res{index} = fullfile(filePaths{index}, fileNames{index});
-end;
+end
