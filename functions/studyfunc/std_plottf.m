@@ -236,7 +236,7 @@ for c = 1:nc
         hdl(c,g) = mysubplot(nc+addr, ng+addc, c, g, opt.transpose);
         if ~isempty(data{c,g})
             tmpplot = mean(data{c,g},3);
-            if ~isreal(tmpplot(1)), tmpplot = abs(tmpplot); end
+            if ~isreal(tmpplot(1)), tmpplot = abs(tmpplot); end % comes second for processing single trials
             if statmask, 
                 if ~isempty(opt.condstats), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
                 else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
