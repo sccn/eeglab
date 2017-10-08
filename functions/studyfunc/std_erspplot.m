@@ -97,7 +97,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, allersp, alltimes, allfreqs, pgroup, pcond, pinter events] = std_erspplot(STUDY, ALLEEG, varargin)
+function [STUDY, allersp, alltimes, allfreqs, pgroup, pcond, pinter, events] = std_erspplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_erspstatplot;
@@ -221,6 +221,7 @@ plottfopt = { ...
    'maskdata',    params.maskdata };
 if ~isempty(params.plottf) && length(opt.channels) < 5
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
+    allersp = {}; alltimes = []; allfreqs = []; pgroup = []; pcond = []; pinter = []; events  = [];
     return;
 end    
 
