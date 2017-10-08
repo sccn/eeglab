@@ -850,9 +850,11 @@ if ismatlab
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
     
-    limo_chn = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Channels)' , 'userdata', onstudy,'Tag','limochan');
-    uimenu( limo_chn,  'Label', 'Estimate Model Parameters (Channels)'         , 'userdata', onstudy, 'CallBack', cb_limorunchan);
-    uimenu( limo_chn,  'Label', 'Linear Model Results (Channels)'              , 'userdata', onstudy, 'CallBack', cb_limoreschan);
+    if exist('limo_eeg') == 2
+        limo_chn = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Channels)' , 'userdata', onstudy,'Tag','limochan');
+        uimenu( limo_chn,  'Label', 'Estimate Model Parameters (Channels)'         , 'userdata', onstudy, 'CallBack', cb_limorunchan);
+        uimenu( limo_chn,  'Label', 'Linear Model Results (Channels)'              , 'userdata', onstudy, 'CallBack', cb_limoreschan);
+    end
     
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
     clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
@@ -860,10 +862,12 @@ if ismatlab
     uimenu( clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
     
-    limo_comp = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Components)' , 'userdata', onstudy,'Tag','limocomp');
-    uimenu( limo_comp,  'Label', 'Estimate Model Parameters (Components)'         , 'userdata', onstudy, 'CallBack', cb_limoruncomp);
-    uimenu( limo_comp,  'Label', 'Linear Model Results (Components)'              , 'userdata', onstudy, 'CallBack', cb_limorescomp);
-
+    if exist('limo_eeg') == 2
+        limo_comp = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Components)' , 'userdata', onstudy,'Tag','limocomp');
+        uimenu( limo_comp,  'Label', 'Estimate Model Parameters (Components)'         , 'userdata', onstudy, 'CallBack', cb_limoruncomp);
+        uimenu( limo_comp,  'Label', 'Linear Model Results (Components)'              , 'userdata', onstudy, 'CallBack', cb_limorescomp);
+    end
+    
     if ~iseeglabdeployed2
         %newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
