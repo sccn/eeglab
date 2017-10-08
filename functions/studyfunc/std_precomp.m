@@ -120,7 +120,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     if nargin < 2
         help std_precomp;
         return;
-    end;
+    end
     
     if nargin == 2
         chanlist = 'channels'; % default to clustering the whole STUDY 
@@ -154,9 +154,9 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'customclusters'    'integer' []                 [];
                                 'erpimparams'       'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
-    if isstr(g), error(g); end;
-    if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end;
-    if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end;
+    if isstr(g), error(g); end
+    if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end
+    if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end
     
     % union of all channel structures
     % -------------------------------
@@ -170,12 +170,12 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 chanlist = {};
                 for index = 1:length(STUDY.datasetinfo)
                     chanlist = { chanlist{:} [1:size(ALLEEG(STUDY.datasetinfo(index).index).icaweights,1)] };
-                end;
+                end
             else
                 chanlist = { STUDY.datasetinfo.comps };
-            end;
-        end;
-    end;
+            end
+        end
+    end
     if isempty(chanlist)
         alllocs = eeg_mergelocs(ALLEEG.chanlocs);
         chanlist = { alllocs.labels };
@@ -184,7 +184,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         [tmp c1 c2] = intersect_bc( lower({ alllocs.labels }), lower(chanlist));
         [tmp c2] = sort(c2);
         alllocs = alllocs(c1(c2));
-    end;
+    end
     
     % test if interp and reconstruct channel list
     % -------------------------------------------
@@ -197,15 +197,15 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             STUDY.changrp = [];
             STUDY = std_changroup(STUDY, ALLEEG, chanlist);
             g.interplocs = struct([]);
-        end;
-    end;
+        end
+    end
     
     % components or channels
     % ----------------------
     if strcmpi(computewhat, 'channels')
          curstruct = STUDY.changrp;
     else curstruct = STUDY.cluster;
-    end;
+    end
         
     % compute custom measure
     % ----------------------
@@ -225,12 +225,12 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             else
                 if length(inds)>1 && ~isequal(chanlist{inds})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
-                end;
+                end
                 tmpData = feval(g.customfunc, ALLEEG(inds), 'components', chanlist{inds(1)}, opts{:}, addopts{:}, g.customparams{:});
-            end;
+            end
             customRes{iSubj} = resTmp;
-        end;
-    end;
+        end
+    end
 
     % compute ERPs
     % ------------
@@ -239,10 +239,10 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         % check dataset consistency
         % -------------------------
         allPnts = [ALLEEG(:).pnts];
-        if iscell(allPnts), allPnts = [ allPnts{:} ]; end;
+        if iscell(allPnts), allPnts = [ allPnts{:} ]; end
         if length(unique(allPnts)) > 1
             error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
-        end;
+        end
 
         allSubjects = { STUDY.datasetinfo.subject };
         uniqueSubjects = unique(allSubjects);
@@ -259,15 +259,15 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             else
                 if length(inds)>1 && ~isequal(chanlist{inds})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
-                end;
+                end
                 std_erp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:}, g.erpparams{:});
-            end;
-        end;
+            end
+        end
         if isfield(curstruct, 'erpdata')
             curstruct = rmfield(curstruct, 'erpdata');
             curstruct = rmfield(curstruct, 'erptimes');
-        end;
-    end;
+        end
+    end
     
     % compute spectrum
     % ----------------
@@ -288,15 +288,15 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             else
                 if length(inds)>1 && ~isequal(chanlist{inds})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
-                end;
+                end
                 std_spec(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:}, g.specparams{:});
-            end;
-        end;
+            end
+        end
         if isfield(curstruct, 'specdata')
             curstruct = rmfield(curstruct, 'specdata');
             curstruct = rmfield(curstruct, 'specfreqs');
-        end;
-    end;
+        end
+    end
 
     % compute spectrum
     % ----------------
@@ -305,10 +305,10 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         % check dataset consistency
         % -------------------------
         allPnts = [ALLEEG(:).pnts];
-        if iscell(allPnts), allPnts = [ allPnts{:} ]; end;
+        if iscell(allPnts), allPnts = [ allPnts{:} ]; end
         if length(unique(allPnts)) > 1
             error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
-        end;
+        end
 
         if isempty(g.erpimparams), 
             tmpparams = {};
@@ -317,7 +317,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         else
             tmpparams      = fieldnames(g.erpimparams); tmpparams = tmpparams';
             tmpparams(2,:) = struct2cell(g.erpimparams);
-        end;
+        end
         
         % loop accross subjects
         allSubjects = { STUDY.datasetinfo.subject };
@@ -335,18 +335,18 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             else
                 if length(inds)>1 && ~isequal(chanlist{inds})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
-                end;
+                end
                 std_erpimage(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
-            end;
-        end;
+            end
+        end
         
        if isfield(curstruct, 'erpimdata')
             curstruct = rmfield(curstruct, 'erpimdata');
             curstruct = rmfield(curstruct, 'erpimtimes');
             curstruct = rmfield(curstruct, 'erpimtrials');
             curstruct = rmfield(curstruct, 'erpimevents');
-        end;
-    end;
+        end
+    end
     
     % compute component scalp maps
     % ----------------------------
@@ -362,8 +362,8 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 ind2 = STUDY.datasetinfo(inds(index2)).index;
                 if isequal(ALLEEG(ind1).icawinv, ALLEEG(ind2).icawinv)
                     found = ind2;
-                end;
-            end;
+                end
+            end
             
             % make link if duplicate
             % ----------------------
@@ -371,7 +371,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 desset = STUDY.design(g.design).cell(g.cell);
                 [path,tmp] = fileparts(desset.filebase);
             else path = ALLEEG(index).filepath;
-            end;
+            end
             
             fprintf('Computing/checking topo file for dataset %d\n', ind1);
             if ~isempty(found)
@@ -381,16 +381,16 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 std_savedat(tmpfile1, tmp);
             else
                 std_topo(ALLEEG(index), chanlist{index}, 'none', 'recompute', g.recompute,'fileout',path);
-            end;
-        end;
+            end
+        end
         if isfield(curstruct, 'topo')
             curstruct = rmfield(curstruct, 'topo');
             curstruct = rmfield(curstruct, 'topox');
             curstruct = rmfield(curstruct, 'topoy');
             curstruct = rmfield(curstruct, 'topoall');
             curstruct = rmfield(curstruct, 'topopol');
-        end;
-    end;
+        end
+    end
     
     % compute ERSP and ITC
     % --------------------
@@ -398,16 +398,16 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         
         % check dataset consistency
         allPnts = [ALLEEG(:).pnts];
-        if iscell(allPnts), allPnts = [ allPnts{:} ]; end;
+        if iscell(allPnts), allPnts = [ allPnts{:} ]; end
         if length(unique(allPnts)) > 1
             error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
-        end;
+        end
         
         % options
         if strcmpi(g.ersp, 'on') & strcmpi(g.itc, 'on'), type = 'both';
         elseif strcmpi(g.ersp, 'on')                   , type = 'ersp';
         else                                             type = 'itc';
-        end;
+        end
         if isempty(g.erspparams), 
             tmpparams = {};
         elseif iscell(g.erspparams), 
@@ -415,7 +415,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         else
             tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
             tmpparams(2,:) = struct2cell(g.erspparams);
-        end;
+        end
         
         % loop accross subjects
         allSubjects = { STUDY.datasetinfo.subject };
@@ -433,37 +433,41 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             else
                 if length(inds)>1 && ~isequal(chanlist{inds})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
-                end;
+                end
                 std_ersp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
-            end;
-        end;
+            end
+        end
         
         % remove saved data if any
         if isfield(curstruct, 'erspdata')
             curstruct = rmfield(curstruct, 'erspdata');
             curstruct = rmfield(curstruct, 'ersptimes');
             curstruct = rmfield(curstruct, 'erspfreqs');
-        end;
+        end
         if isfield(curstruct, 'itcdata')
             curstruct = rmfield(curstruct, 'itcdata');
             curstruct = rmfield(curstruct, 'itctimes');
             curstruct = rmfield(curstruct, 'itcfreqs');
-        end;
+        end
         
-    end;
+    end
 
+    % empty cache
+    % -----------
+    STUDY.cache = [];
+    
     % components or channels
     % ----------------------
     if strcmpi(computewhat, 'channels')
          STUDY.changrp = curstruct;
     else STUDY.cluster = curstruct;
-    end;
+    end
     
     return;
         
     % find components in cluster for specific dataset
     % -----------------------------------------------
-    function rmcomps = getclustcomps(STUDY, rmclust, settmpind);    
+    function rmcomps = getclustcomps(STUDY, rmclust, settmpind)
     
         rmcomps   = cell(1,length(settmpind));
         for idat = 1:length(settmpind) % scan dataset for which to find component clusters
@@ -473,13 +477,13 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 indmatch = find(sets(:) == settmpind(idat));
                 indmatch = ceil(indmatch/size(sets,1)); % get the column number
                 rmcomps{idat} = [rmcomps{idat} comps(indmatch(:)') ];
-            end;
+            end
             rmcomps{idat} = sort(rmcomps{idat});
-        end;
+        end
         
     % make option array and channel list (which depend on interp) for any type of measure
     % ----------------------------------------------------------------------
-    function [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, idat, g);
+    function [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, idat, g)
         
         opts = { };
 
@@ -487,18 +491,18 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             rmcomps = cell(1,length(idat));
             if ~isempty(g.rmclust)
                 rmcomps = getclustcomps(STUDY, g.rmclust, idat);
-            end;
+            end
             if strcmpi(g.rmicacomps, 'on')
                 for ind = 1:length(idat)
                     rmcomps{ind} = union_bc(rmcomps{ind}, find(ALLEEG(idat(ind)).reject.gcompreject));
-                end;
+                end
             elseif strcmpi(g.rmicacomps, 'processica')
                 for ind = 1:length(idat)
                     rmcomps{ind} = union_bc(rmcomps{ind}, find(~ALLEEG(idat(ind)).reject.gcompreject));
-                end;
-            end;
+                end
+            end
             opts = { opts{:} 'rmcomps' rmcomps };
-        end;
+        end
         if strcmpi(g.interp, 'on')
             tmpchanlist = chanlist;
             allocs = eeg_mergelocs(ALLEEG.chanlocs);
@@ -512,14 +516,14 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             chanlocs = { tmpchanlocs.labels };
             for i=1:length(chanlist)
                 newchanlist = [ newchanlist strmatch(chanlist{i}, chanlocs, 'exact') ];
-            end;
+            end
             tmpchanlocs =  ALLEEG(idat(1)).chanlocs;
             tmpchanlist = { tmpchanlocs(newchanlist).labels };
-        end;
+        end
         
     % compute full file names
     % -----------------------
-    function res = computeFullFileName(filePaths, fileNames);
+    function res = computeFullFileName(filePaths, fileNames)
         for index = 1:length(fileNames)
             res{index} = fullfile(filePaths{index}, fileNames{index});
-        end;
+        end
