@@ -127,7 +127,7 @@ statstruct = pop_statparams(statstruct, varargin{:});
 fields     = { 'filter' 'subtractsubjectmean' 'timerange' 'freqrange' 'topotime' 'topofreq' 'averagechan'};
 defaultval = { [] 'off' [] [] [] [] };
 for ind=1:length(fields)
-    if ~isfield(params, fields{ind}), 
+    if ~isfield(params, fields{ind})
         params = setfield(params, fields{ind}, defaultval{ind}); 
     end
 end
@@ -171,8 +171,10 @@ if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end
 % =======================================================================
 allconditions  = {};
 allgroups      = {};
-if length(STUDY.design(opt.design).variable) > 0, allconditions = STUDY.design(opt.design).variable(1).value; end
-if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(opt.design).variable(2).value; end
+condname       = '';
+groupname      = '';
+if length(STUDY.design(opt.design).variable) > 0, allconditions = STUDY.design(opt.design).variable(1).value; condname  = STUDY.design(opt.design).variable(1).label; end
+if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(opt.design).variable(2).value; groupname = STUDY.design(opt.design).variable(2).label;  end
 
 % for backward compatibility
 % --------------------------
@@ -232,10 +234,10 @@ if ~isempty(opt.channels)
     chaninds = 1:length(opt.channels);
 
     if strcmpi(opt.datatype, 'erp')
-        [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
+        [STUDY, erpdata, alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     else
-        [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
+        [STUDY, erpdata, alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype], 'rmsubjmean', params.subtractsubjectmean);
     end
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
@@ -248,8 +250,8 @@ if ~isempty(opt.channels)
     % select specific time    
     % --------------------
     if ~isempty(params.topotime) & ~isnan(params.topotime)
-        [tmp ti1] = min(abs(alltimes-params.topotime(1)));
-        [tmp ti2] = min(abs(alltimes-params.topotime(end)));
+        [tmp, ti1] = min(abs(alltimes-params.topotime(1)));
+        [tmp, ti2] = min(abs(alltimes-params.topotime(end)));
         for condind = 1:length(erpdata(:))
             if ~isempty(erpdata{condind})
                 erpdata{condind} = mean(erpdata{condind}(ti1:ti2,:,:),1);
@@ -283,9 +285,10 @@ if ~isempty(opt.channels)
         locs(1).labels = [ chanlabels{:} ];
         locs(2:end) = [];
     end
-    [alltitles alllegends ] = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
+    [alltitles, alllegends ] = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                              'statistics', method, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
-                             'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
+                             'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, ...
+                             'condgroup', params.plotconditions, 'effect', stats.effect, 'factor1', condname, 'factor2', groupname);
 
     % plot
     % ----
@@ -312,10 +315,10 @@ else
 
         if length(opt.clusters) > 1, subplot(nr,nc,index); end
         if strcmpi(opt.datatype, 'erp')
-            [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
+            [STUDY, erpdata, alltimes] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
                     'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
         else
-            [STUDY erpdata alltimes] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
+            [STUDY, erpdata, alltimes] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
                     'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype], 'rmsubjmean', params.subtractsubjectmean);
 %             [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
 %                         'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
@@ -353,12 +356,13 @@ else
         end
         sbtitles = reshape(sbtitles, size(erpdata2));
         
-        [pcond pgroup pinter] = std_stat(erpdata2, stats);
+        [pcond, pgroup, pinter] = std_stat(erpdata2, stats);
         if strcmpi(opt.noplot, 'on'), return; end
             
-        [alltitles alllegends ] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
+        [alltitles, alllegends ] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                                  'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
-                                 'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
+                                 'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions, ...
+                                 'effect', stats.effect, 'factor1', condname, 'factor2', groupname);
         
         if length(opt.clusters) > 1 && index < length(opt.clusters), alllegends = {}; end
         std_plotcurve(alltimes, erpdata2, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, 'plotstderr', opt.plotstderr, ...
@@ -367,7 +371,7 @@ else
 %--------------------------------------------------------------------------                                      
         if all([strcmp(opt.plotsubjects,'on') strcmp(opt.detachplots,'on')])
             
-             [alltitlestmp tmp] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', 'off', 'cond2stat', 'off', ...
+             [alltitlestmp] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', 'off', 'cond2stat', 'off', ...
                                  'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
                                  'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
                              
@@ -390,7 +394,7 @@ end
 
 % remove fields and ignore fields who are absent
 % ----------------------------------------------
-function s = myrmfield(s, f);
+function s = myrmfield(s, f)
 
 for index = 1:length(f)
     if isfield(s, f{index})
@@ -400,7 +404,7 @@ end
 
 % convert to structure (but take into account cells)
 % --------------------------------------------------
-function s = mystruct(v);
+function s = mystruct(v)
 
 for index=1:length(v)
     if iscell(v{index})
@@ -413,7 +417,7 @@ catch, error('Parameter error'); end
 
 % convert to structure (but take into account cells)
 % --------------------------------------------------
-function s = myfieldnames(v);
+function s = myfieldnames(v)
 
 s = fieldnames(v);
 if isfield(v, 'eeglab')

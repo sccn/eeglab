@@ -102,7 +102,7 @@ function [STUDY, allersp, alltimes, allfreqs, pgroup, pcond, pinter events] = st
 if nargin < 2
     help std_erspstatplot;
     return;
-end;
+end
 
 % find datatype and default options
 % ---------------------------------
@@ -110,14 +110,14 @@ dtype = 'ersp';
 for ind = 1:2:length(varargin)
     if strcmpi(varargin{ind}, 'datatype')
         dtype = varargin{ind+1}; 
-    end;
-end;
+    end
+end
 if strcmpi(dtype, 'erpim')
      STUDY  = pop_erpimparams(STUDY, varargin{:});
      params = STUDY.etc.erpimparams;
 else STUDY  = pop_erspparams( STUDY, varargin{:});
      params = STUDY.etc.erspparams;
-end;
+end
 
 % get parameters
 % --------------
@@ -140,8 +140,8 @@ fields     = { 'freqrange'     [];
 for ind=1:size(fields,1)
     if ~isfield(params, fields{ind,1}), 
         params = setfield(params, fields{ind,1}, fields{ind,2}); 
-    end;
-end;
+    end
+end
 
 % decode input parameters
 % -----------------------
@@ -164,20 +164,22 @@ options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward com
                                'plotmode'    'string'  { 'normal','condensed','none' }  'normal';
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');
-if isstr(opt), error(opt); end;
-if strcmpi(opt.noplot, 'on'), opt.plotmode = 'none'; end;
+if isstr(opt), error(opt); end
+if strcmpi(opt.noplot, 'on'), opt.plotmode = 'none'; end
 if isempty(opt.caxis), 
     if strcmpi(opt.datatype, 'ersp')
          opt.caxis = params.ersplim;
     elseif strcmpi(opt.datatype, 'itc') && ~isempty(params.itclim)
         opt.caxis = [-params.itclim(end) params.itclim(end)];
-    end;
-end;
+    end
+end
 
 allconditions  = {};
 allgroups      = {};
-if length(STUDY.design(opt.design).variable) > 0, allconditions = STUDY.design(opt.design).variable(1).value; end;
-if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(opt.design).variable(2).value; end;
+condname       = '';
+groupname      = '';
+if length(STUDY.design(opt.design).variable) > 0, allconditions = STUDY.design(opt.design).variable(1).value; condname  = STUDY.design(opt.design).variable(1).label; end
+if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(opt.design).variable(2).value; groupname = STUDY.design(opt.design).variable(2).label; end
 
 % for backward compatibility
 % --------------------------
@@ -187,12 +189,12 @@ if strcmpi(opt.datatype, 'erpim'),
     valunit = 'trials'; 
 else
     valunit = 'Hz';
-end;
+end
 if isempty(opt.plottf) && ~isempty(params.topofreq) && ~isempty(params.topotime) && ~isnan(params.topofreq(1)) && ~isnan(params.topotime(1))
      params.plottf = [ params.topofreq(1) params.topofreq(end) params.topotime(1) params.topotime(end) ];
 else params.plottf = opt.plottf;
-end;
-%if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end; %deprecated
+end
+%if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end %deprecated
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
 stats.paired = { STUDY.design(opt.design).variable(:).pairing };
@@ -201,13 +203,13 @@ if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt
         stats.groupstats = 'off';
         stats.condstats  = 'off'; 
         disp('No statistics for single subject/component'); 
-    end;
-end;
+    end
+end
 
 if length(opt.comps) == 1
     stats.condstats = 'off'; stats.groupstats = 'off'; 
     disp('Statistics cannot be computed for single component');
-end;
+end
 
 alpha    = fastif(strcmpi(stats.mode, 'eeglab'), stats.eeglab.alpha, stats.fieldtrip.alpha);
 mcorrect = fastif(strcmpi(stats.mode, 'eeglab'), stats.eeglab.mcorrect, stats.fieldtrip.mcorrect);
@@ -220,7 +222,7 @@ plottfopt = { ...
 if ~isempty(params.plottf) && length(opt.channels) < 5
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
-end;    
+end    
 
 % plot single scalp map
 % ---------------------
@@ -243,8 +245,8 @@ if ~isempty(opt.channels)
         else
             opt.subbaseline = 'on';
             disp('Warning: when using single-trial statistics, a common baseline is forced accross all conditions');
-        end;
-    end;
+        end
+    end
     
     %[STUDY allersp alltimes allfreqs tmp events unitPower] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
     %    'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
@@ -259,7 +261,7 @@ if ~isempty(opt.channels)
         if length(params.plottf) < 3, 
             params.plottf(3:4) = params.plottf(2);
             params.plottf(2)   = params.plottf(1);
-        end;
+        end
         [tmp fi1] = min(abs(allfreqs-params.plottf(1)));
         [tmp fi2] = min(abs(allfreqs-params.plottf(2)));
         [tmp ti1] = min(abs(alltimes-params.plottf(3)));
@@ -267,7 +269,7 @@ if ~isempty(opt.channels)
         for index = 1:length(allersp(:))
             allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2);
             allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
-        end;
+        end
         
         % prepare channel neighbor matrix for Fieldtrip
         statstruct = std_prepare_neighbors(statstruct, ALLEEG, 'channels', opt.channels);
@@ -275,36 +277,36 @@ if ~isempty(opt.channels)
         
         params.plottf = { params.plottf(1:2) params.plottf(3:4) };
         [pcond pgroup pinter] = std_stat(allersp, stats);
-        if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
+        if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end % single subject STUDY                                
     else
         [pcond pgroup pinter] = std_stat(allersp, stats);
         if (~isempty(pcond ) && (size( pcond{1},1) == 1 || size( pcond{1},2) == 1)) || ...
            (~isempty(pgroup) && (size(pgroup{1},1) == 1 || size(pgroup{1},2) == 1)), 
             pcond = {}; pgroup = {}; pinter = {}; 
             disp('No statistics possible for single subject STUDY');
-        end; % single subject STUDY                                
+        end % single subject STUDY                                
     end
 
     % average single trials
     % ---------------------
     if strcmpi(opt.datatype, 'ersp')
         if strcmpi(params.singletrials, 'on')
-            if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end;
-            if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end;
-        end;
+            if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
+            if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
+        end
         if  strcmpi(params.subbaseline, 'on')
             % see above for rational for baseline
             paramsersp.singletrials = params.singletrials;
             paramsersp.commonbase   = params.subbaseline;
             [allersp,basesamples,basevals] = newtimefbaseln(allersp, alltimes, paramsersp);
-        end;
+        end
         % transform to log
         if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
             tmpsize = size(allersp);
             allersp = cellfun(@(x)10*log10(x), allersp(:), 'uniformoutput', false);
             allersp = reshape(allersp, tmpsize);
-        end;
-    end;
+        end
+    end
     
     % plot specific channel(s)
     % ------------------------
@@ -315,61 +317,63 @@ if ~isempty(opt.channels)
         if ~isempty(params.plottf)
             alltitles = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                                      'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
-                                     'subject', opt.subject, 'valsunit', { valunit 'ms' }, 'vals', params.plottf, 'datatype', upper(opt.datatype));
+                                     'subject', opt.subject, 'valsunit', { valunit 'ms' }, 'vals', params.plottf, 'datatype', upper(opt.datatype), ...
+                                     'effect', stats.effect, 'factor1', condname, 'factor2', groupname);
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                           'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
         else
-            if length(opt.channels) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
+            if length(opt.channels) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
             if length(locs) == 1 && size(allersp{1},3) > 1
                 % channels should be in 3rd dim; reshape data to put subjects in the 4th dim if number of channels is 1 
                 for index = 1:length(allersp(:))
                     allersp{index} = reshape(allersp{index}, size(allersp{index},1), size(allersp{index},2), 1, size(allersp{index},3));
-                end;
-            end;
+                end
+            end
             
             nc = ceil(sqrt(length(opt.channels)));
             nr = ceil(length(opt.channels)/nc);
             for index = 1:length(locs)
-                if length(opt.channels) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
+                if length(opt.channels) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end
                 tmpersp = cell(size(allersp));
                 for ind = 1:length(allersp(:))
                     if ~isempty(allersp{ind})
                         tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:));
                         tmpersp{ind} = permute(tmpersp{ind}, [2 1 3]); % somehow time/freq are swapped in ntimes = nfreqs
-                    end;
-                end;
+                    end
+                end
                 alltitles = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                     'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs(index).labels }, ...
-                    'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
+                    'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode, ...
+                    'effect', stats.effect, 'factor1', condname, 'factor2', groupname);
                 std_plottf(alltimes, allfreqs, tmpersp, 'datatype', opt.datatype, 'titles', alltitles, ...
                     'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
                     opt.plotmode, 'unitcolor', unitPower, 'chanlocs', ALLEEG(1).chanlocs, 'events', events, plottfopt{:});
-            end;
-        end;
-    end;
+            end
+        end
+    end
 else
     
-    if length(opt.clusters) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
+    if length(opt.clusters) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
     nc = ceil(sqrt(length(opt.clusters)));
     nr = ceil(length(opt.clusters)/nc);
     comp_names = {};
 
     if length(opt.clusters) > 1 && ( strcmpi(stats.condstats, 'on') || strcmpi(stats.groupstats, 'on'))
         stats.condstats = 'off'; stats.groupstats = 'off';
-    end;
+    end
     
     for index = 1:length(opt.clusters)
 
         [STUDY allersp alltimes allfreqs tmp events unitPower] = std_readersp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'infotype', opt.datatype, ...
             'component', opt.comps, 'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
-        if length(opt.clusters) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
+        if length(opt.clusters) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end
 
         % plot specific component
         % -----------------------
         if ~isempty(opt.comps)
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
-        end;
+        end
 
         % select specific time and freq
         % -----------------------------
@@ -377,7 +381,7 @@ else
             if length(params.plottf) < 3, 
                 params.plottf(3:4) = params.plottf(2);
                 params.plottf(2) = params.plottf(1);
-            end;
+            end
             [tmp fi1] = min(abs(allfreqs-params.plottf(1)));
             [tmp fi2] = min(abs(allfreqs-params.plottf(2)));
             [tmp ti1] = min(abs(alltimes-params.plottf(3)));
@@ -385,26 +389,27 @@ else
             for index = 1:length(allersp(:))
                 allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2)'; % transposed because otherwise time/freq are inverted
                 allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
-            end;
+            end
         end
 
         [pcond pgroup pinter] = std_stat(allersp, stats);
 
         % plot specific component
         % -----------------------
-        if index == length(opt.clusters), opt.legend = 'on'; end;
+        if index == length(opt.clusters), opt.legend = 'on'; end
         if ~strcmpi(opt.plotmode, 'none')
             alltitles = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                                      'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
-                                     'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
+                                     'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode, ...
+                                     'effect', stats.effect, 'factor1', condname, 'factor2', groupname);
             
             std_plottf(alltimes, allfreqs, allersp, 'datatype', opt.datatype, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
                                            opt.plotmode, 'titles', alltitles, ...
                                           'events', events, 'unitcolor', unitPower, 'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % remove fields and ignore fields who are absent
 % ----------------------------------------------
@@ -413,8 +418,8 @@ function s = myrmfield(s, f);
 for index = 1:length(f)
     if isfield(s, f{index})
         s = rmfield(s, f{index});
-    end;
-end;
+    end
+end
 
 % convert to structure (but take into account cells)
 % --------------------------------------------------
@@ -423,11 +428,11 @@ function s = mystruct(v);
 for index=1:length(v)
     if iscell(v{index})
         v{index} = { v{index} };
-    end;
-end;
+    end
+end
 try
     s = struct(v{:});
-catch, error('Parameter error'); end;
+catch, error('Parameter error'); end
 
 % convert to structure (but take into account cells)
 % --------------------------------------------------
@@ -437,30 +442,30 @@ s = fieldnames(v);
 if isfield(v, 'eeglab')
     s2 = fieldnames(v.eeglab);
     s = { s{:} s2{:} };
-end;
+end
 if isfield(v, 'fieldtrip')
     s3 = fieldnames(v.fieldtrip);
     for index=1:length(s3)
         s3{index} = [ 'fieldtrip' s3{index} ];
-    end;
+    end
     s = { s{:} s3{:} };
-end;
+end
         
 % remove ERSP baseline
 % ---------------------
 function ersp = removeerspbaseline(ersp, timevals, baseline)
 
-    if length(baseline(1)) == 1, baseline = [ timevals(1) baseline ]; end;
+    if length(baseline(1)) == 1, baseline = [ timevals(1) baseline ]; end
     if size(baseline,2) == 2
         baseln = [];
         for index = 1:size(baseline,1)
             tmptime   = find(timevals >= baseline(index,1) & timevals <= baseline(index,2));
             baseln = union_bc(baseln, tmptime);
-        end;
+        end
         if length(baseln)==0
             disp( [ 'Probable error: There are no sample points found in the default baseline.' ] );
         end
-    end;
+    end
 
     try
         len = length(ersp(:));
@@ -468,16 +473,16 @@ function ersp = removeerspbaseline(ersp, timevals, baseline)
             if ~isempty(ersp{index})
                 if index == 1, meanpowbase = abs(mean(ersp{index}(:,baseln,:),2));
                 else           meanpowbase = meanpowbase + abs(mean(ersp{index}(:,baseln,:),2));
-                end;
-            end;
-        end;
+                end
+            end
+        end
     catch,
         error([ 'Problem while subtracting common ERSP baseline.' 10 ...
                 'Common baseline subtraction is performed based on' 10 ...
                 'pairing settings in your design. Most likelly, one' 10 ...
                 'independent variable should not have its data paired.' ]);
-    end;
+    end
 
     for g = 1:length(ersp(:))
         ersp{g} = bsxfun(@minus, ersp{g}, meanpowbase);
-    end;
+    end
