@@ -13,13 +13,10 @@
 % Erpimage plotting options:
 %  'timerange'   - [min max] erpim/ITC plotting latency range in ms. 
 %                  {default: the whole output latency range}.
-%  'trialrange'  - [min max] erpim/ITC plotting frequency range in ms. 
-%                  {default: the whole output frequency range}
 %  'topotime'    - [float] plot scalp map at specific time. A time range may
 %                  also be provide and the erpim will be averaged over the
 %                  given time range. Requires 'topofreq' below to be set.
-%  'topotrial'  - [float] plot scalp map at specific trial in ERPimage. As 
-%                  above a trial range may also be provided.
+%  'colorlimits' - [min max] color limits.
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 
@@ -53,45 +50,41 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Plot scalp map at time [ms]' 'visible' vis} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.topotime) 'tag' 'topotime' 'visible' vis } ...
-        {'style' 'text'       'string' 'Trial range [Low High]'} ...
-        {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.trialrange) 'tag' 'trialrange' } ...
-        {'style' 'text'       'string' 'Plot scalp map at trial(s)' 'visible' vis} ...
-        {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.topotrial) 'tag' 'topotrial' 'visible' vis } ...
         {'style' 'text'       'string' 'Color limits [Low High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.colorlimits) 'tag' 'colorlimits' } ...
         {'style' 'text'       'string' '' } ...
         {'style' 'text'       'string' '' } };
+%         {'style' 'text'       'string' 'Trial range [Low High]'} ...
+%         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.trialrange) 'tag' 'trialrange' } ...
+%         {'style' 'text'       'string' 'Plot scalp map at trial(s)' 'visible' vis} ...
+%         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.topotrial) 'tag' 'topotrial' 'visible' vis } ...
     evalstr = 'set(findobj(gcf, ''tag'', ''erpim''), ''fontsize'', 12);';
     cbline = [0.07 1.1];
     otherline = [ 0.6 .4 0.6 .4];
-    geometry = { 1 otherline otherline otherline };
-    enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
-    enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
+    geometry = { 1 otherline otherline };
+    if length(STUDY.design(STUDY.currentdesign).variable) > 0 && length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, enablecond  = 'on'; end
+    if length(STUDY.design(STUDY.currentdesign).variable) > 1 && length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, enablegroup = 'on'; end   
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                             'title', 'Set Erpimage plotting parameters -- pop_erpimparams()', 'eval', evalstr);
-    if isempty(res), return; end;
+    if isempty(res), return; end
     
     % decode input
     % ------------
     res.topotime    = str2num( res.topotime );
-    res.topotrial   = str2num( res.topotrial );
     res.timerange   = str2num( res.timerange );
-    res.trialrange  = str2num( res.trialrange );
     res.colorlimits = str2num( res.colorlimits );
     
     % build command call
     % ------------------
     options = {};
-    if ~isequal(res.topotime  ,  STUDY.etc.erpimparams.topotime),    options = { options{:} 'topotime'    res.topotime    }; end;
-    if ~isequal(res.topotrial,   STUDY.etc.erpimparams.topotrial),   options = { options{:} 'topotrial'   res.topotrial   }; end;
-    if ~isequal(res.timerange ,  STUDY.etc.erpimparams.timerange),   options = { options{:} 'timerange'   res.timerange   }; end;
-    if ~isequal(res.trialrange,  STUDY.etc.erpimparams.trialrange),  options = { options{:} 'trialrange'  res.trialrange  }; end;
-    if ~isequal(res.colorlimits, STUDY.etc.erpimparams.colorlimits), options = { options{:} 'colorlimits' res.colorlimits }; end;
+    if ~isequal(res.topotime  ,  STUDY.etc.erpimparams.topotime),    options = { options{:} 'topotime'    res.topotime    }; end
+    if ~isequal(res.timerange ,  STUDY.etc.erpimparams.timerange),   options = { options{:} 'timerange'   res.timerange   }; end
+    if ~isequal(res.colorlimits, STUDY.etc.erpimparams.colorlimits), options = { options{:} 'colorlimits' res.colorlimits }; end
     if ~isempty(options)
         STUDY = pop_erpimparams(STUDY, options{:});
         com = sprintf('STUDY = pop_erpimparams(STUDY, %s);', vararg2str( options ));
-    end;
+    end
 else
     if strcmpi(varargin{1}, 'default')
         STUDY = default_params(STUDY);
@@ -107,44 +100,41 @@ else
                         STUDY.etc.erpimparams.erpimageopt{2*inderpimopt} = varargin{index+1};
                     else
                         STUDY.etc.erpimparams.erpimageopt = { STUDY.etc.erpimparams.erpimageopt{:} varargin{index}, varargin{index+1} };
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+                    end
+                end
+            end
+        end
+    end
+end
 
 % scan clusters and channels to remove erpimdata info if timerange etc. have changed
 % ---------------------------------------------------------------------------------
-if ~isequal(STUDY.etc.erpimparams.timerange, TMPSTUDY.etc.erpimparams.timerange) | ... 
-    ~isequal(STUDY.etc.erpimparams.trialrange, TMPSTUDY.etc.erpimparams.trialrange)
+if ~isequal(STUDY.etc.erpimparams.timerange, TMPSTUDY.etc.erpimparams.timerange)
     rmfields = { 'erpimdata' 'erpimtimes' 'erpimtrials' 'erpimevents' };
     for iField = 1:length(rmfields)
         if isfield(STUDY.cluster, rmfields{iField})
             STUDY.cluster = rmfield(STUDY.cluster, rmfields{iField});
-        end;
+        end
         if isfield(STUDY.changrp, rmfields{iField})
             STUDY.changrp = rmfield(STUDY.changrp, rmfields{iField});
-        end;
-    end;   
-end;
+        end
+    end   
+end
 
 function STUDY = default_params(STUDY)
-    if ~isfield(STUDY.etc, 'erpimparams'), STUDY.etc.erpimparams = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'erpimageopt'),  STUDY.etc.erpimparams.erpimageopt = {}; end;
-    if ~isfield(STUDY.etc.erpimparams, 'sorttype'   ),  STUDY.etc.erpimparams.sorttype    = ''; end;
-    if ~isfield(STUDY.etc.erpimparams, 'sortwin'    ),  STUDY.etc.erpimparams.sortwin     = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'sortfield'  ),  STUDY.etc.erpimparams.sortfield   = 'latency'; end;
+    if ~isfield(STUDY.etc, 'erpimparams'), STUDY.etc.erpimparams = []; end
+    if ~isfield(STUDY.etc.erpimparams, 'erpimageopt'),  STUDY.etc.erpimparams.erpimageopt = {}; end
+    if ~isfield(STUDY.etc.erpimparams, 'sorttype'   ),  STUDY.etc.erpimparams.sorttype    = ''; end
+    if ~isfield(STUDY.etc.erpimparams, 'sortwin'    ),  STUDY.etc.erpimparams.sortwin     = []; end
+    if ~isfield(STUDY.etc.erpimparams, 'sortfield'  ),  STUDY.etc.erpimparams.sortfield   = 'latency'; end
 
-    if ~isfield(STUDY.etc.erpimparams, 'rmcomps'    ),  STUDY.etc.erpimparams.rmcomps     = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'interp'     ),  STUDY.etc.erpimparams.interp      = []; end;
+    if ~isfield(STUDY.etc.erpimparams, 'rmcomps'    ),  STUDY.etc.erpimparams.rmcomps     = []; end
+    if ~isfield(STUDY.etc.erpimparams, 'interp'     ),  STUDY.etc.erpimparams.interp      = []; end
     
-    if ~isfield(STUDY.etc.erpimparams, 'timerange'  ),  STUDY.etc.erpimparams.timerange   = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'trialrange' ),  STUDY.etc.erpimparams.trialrange  = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'topotime'   ),  STUDY.etc.erpimparams.topotime    = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'topotrial' ),   STUDY.etc.erpimparams.topotrial   = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'colorlimits'),  STUDY.etc.erpimparams.colorlimits = []; end;
+    if ~isfield(STUDY.etc.erpimparams, 'timerange'  ),  STUDY.etc.erpimparams.timerange   = []; end
+    if ~isfield(STUDY.etc.erpimparams, 'topotime'   ),  STUDY.etc.erpimparams.topotime    = []; end
+    if ~isfield(STUDY.etc.erpimparams, 'colorlimits'),  STUDY.etc.erpimparams.colorlimits = []; end
 
-    if ~isfield(STUDY.etc.erpimparams, 'concatenate'),  STUDY.etc.erpimparams.concatenate = 'off'; end;
-    if ~isfield(STUDY.etc.erpimparams, 'nlines'),       STUDY.etc.erpimparams.nlines      = 20; end;
-    if ~isfield(STUDY.etc.erpimparams, 'smoothing'),    STUDY.etc.erpimparams.smoothing   = 10; end;
+    if ~isfield(STUDY.etc.erpimparams, 'concatenate'),  STUDY.etc.erpimparams.concatenate = 'off'; end
+    if ~isfield(STUDY.etc.erpimparams, 'nlines'),       STUDY.etc.erpimparams.nlines      = 20; end
+    if ~isfield(STUDY.etc.erpimparams, 'smoothing'),    STUDY.etc.erpimparams.smoothing   = 10; end
