@@ -109,7 +109,7 @@ STUDY = pop_erpimparams(STUDY, 'default');
     'design'        'integer' []             STUDY.currentdesign;    
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
-    'trialrange'    'real'    []             STUDY.etc.erpimparams.trialrange;
+    'trialrange'    'real'    []             []; % deprecated
     'freqrange'     'real'    []             STUDY.etc.erspparams.freqrange;
     'timerange'     'real'    []             NaN;
     'singletrials'  'string'  { 'on','off' } 'off';
