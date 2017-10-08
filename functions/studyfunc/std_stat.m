@@ -209,8 +209,8 @@ else
         opt.paired  = sort(opt.paired); % put 'off' first if present
         [F, df, pval] = statcondfieldtrip(data, 'paired', opt.paired{1}, params{:});
         for index = 1:length(pval)
-            pinter{index}     = applymask(F{inter}, opt.fieldtrip);
-            statsinter{index} = squeeze(F.stat{index});
+            pinter{index}     = applymask(F, opt.fieldtrip);
+            statsinter{index} = squeeze(F.stat);
         end
     else
         pinter = {};
