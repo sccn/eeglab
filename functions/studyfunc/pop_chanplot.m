@@ -257,6 +257,9 @@ else
     design  = get(findobj('parent', hdl, 'tag', 'design')      , 'value');
     changrp = get(findobj('parent', hdl, 'tag', 'chan_list')   , 'value');
     onechan = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value');
+	if ~std_checkdesign(STUDY, design)
+        return;
+    end
    
     try
         switch  varargin{1}
@@ -269,7 +272,7 @@ else
                  % update Study history
                 eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 userdat{1}{2} = STUDY;
-                set(hdl, 'userdat',userdat); 
+                set(hdl, 'userdat',userdat);
 
             case {'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchanerpimage' }
                 changrpstr    = allchans(changrp);

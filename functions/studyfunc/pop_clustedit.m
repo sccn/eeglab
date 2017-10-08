@@ -430,6 +430,9 @@ else
     STUDY   = userdat{1}{2};
     cls     = userdat{1}{3};
     design  = get(findobj('parent', hdl, 'tag', 'design')      , 'value');
+	if ~std_checkdesign(STUDY, design)
+        return;
+    end
     
     clus     = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
     comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
