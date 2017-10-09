@@ -250,7 +250,7 @@ if strcmpi(opt.factor1stat, 'on')
             all_titles{rown, c2} = [ value2str(opt.factor2vals{c2}) ' ' basicstat ];
         end
     else
-        all_titles{rown, 1} = [ opt.factor2 ' ' basicstat ]; 
+        all_titles{rown, 1} = [ opt.factor1 ' ' basicstat ]; 
     end
 end
 coln = size(all_titles,2);
@@ -261,7 +261,7 @@ if strcmpi(opt.factor2stat, 'on')
             all_titles{c1, coln} = [ value2str(opt.factor1vals{c1}) ' ' basicstat ];   
         end
     else
-        all_titles{1, coln} = [ opt.factor1 ' ' basicstat ];   
+        all_titles{1, coln} = [ opt.factor2 ' ' basicstat ];   
     end
 end
 if ~strcmpi(opt.effect, 'marginal') && (strcmpi(opt.factor1stat, 'on') || strcmpi(opt.factor2stat, 'on') && rown > 1 && coln > 1)
