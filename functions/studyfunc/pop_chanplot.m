@@ -104,6 +104,9 @@ if ~isstr(varargin{1})
             pathwarn = 'on';
         end;
     end;
+    if isempty(STUDY.filepath) && exist(STUDY.datasetinfo(1).filename) == 2
+        pathwarn = 'off';
+    end
     if strcmpi(pathwarn, 'on')
         warndlg2(strvcat('You have changed your working path and data files are', ...
                          'no longer available; Cancel, and go back to your STUDY folder'), 'warning');
