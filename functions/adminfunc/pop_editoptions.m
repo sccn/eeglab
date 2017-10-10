@@ -72,6 +72,7 @@
 function com = pop_editoptions(varargin)
 
 com = '';
+argsoutput = {};
 
 datasets_in_memory = 0;
 if nargin > 0
@@ -207,7 +208,6 @@ else
     args = varargin;
 end
 
-        
 % change default folder option
 % ----------------------------
 W_MAIN = findobj('tag', 'EEGLAB');
@@ -216,27 +216,32 @@ if ~isempty(W_MAIN)
     tmpuserdata{3} = filepath;
     set(W_MAIN, 'userdata', tmpuserdata);
 end
-        
+
 % decode inputs
 % -------------
 for index = 1:2:length(args)
     ind = strmatch(args{index}, { opt.varname }, 'exact');
     if isempty(ind)
         if strcmpi(args{index}, 'option_savematlab')
-            disp('pop_editoptions: option_savematlab is obsolete, use option_savetwofiles instead'); 
+            disp('pop_editoptions: option_savematlab is obsolete, use option_savetwofiles instead');
             ind = strmatch('option_savetwofiles', { opt.varname }, 'exact');
-            opt(ind).value = ~args{index+1};
         else
             error(['Variable name ''' args{index} ''' is invalid']);
         end
-    else
-        if strcmpi(args{index}, 'option_cachesize')
-            opt(ind).value = str2num(args{index+1});
-        else
-            opt(ind).value = args{index+1};
-        end
     end
-end        
+    
+    % case for 'option_cachesize'
+    if strcmpi(args{index}, 'option_cachesize') && isstr(args{index+1})
+        args{index+1}  = str2num(args{index+1});
+    end
+    
+    % overwrite only if different
+    if args{index+1} ~= opt(ind).value 
+        opt(ind).value    = args{index+1};
+        argsoutput{end+1} = args{index};   % for history
+        argsoutput{end+1} = args{index+1}; % for history
+    end  
+end
 
 % write to eeg_options file
 % -------------------------
@@ -259,11 +264,15 @@ clear(fullfile(filepath,filename));
 
 % generate the output text command
 % --------------------------------
-com = 'pop_editoptions(';
-for index = 1:2:length(args)
-    com = sprintf( '%s ''%s'', %d,', com, args{index}, args{index+1});
+if ~isempty(argsoutput)
+    com = 'pop_editoptions(';
+    for index = 1:2:length(argsoutput)
+        com = sprintf( '%s ''%s'', %d,', com, argsoutput{index}, argsoutput{index+1});
+    end
+    com = [com(1:end-1) ');'];
+else
+    disp('pop_editoptions: Options were not modified');
 end
-com = [com(1:end-1) ');'];   
 wtmp = warning;
 warning off;
 clear functions
