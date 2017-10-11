@@ -281,6 +281,20 @@ function spectrum = removemeanspectrum(spectrum, meanpowbase)
 % ---------------
 function datavals = reorganizedata(dataTmp, dim)
     datavals = cell(size(dataTmp{1}));
+    
+    % check second dim for ERPimage
+    allsizes = [];
+    for iItem=1:length(dataTmp(:))
+        allsize2 = cellfun(@(x)size(x,2), dataTmp{iItem});
+        allsize2( allsize2 == 0 ) = [];
+        allsizes = [ allsizes allsize2 ];
+    end
+    if length(unique(allsizes(:))) > 1
+        warning('Discrepency between the number of lines - this could be an important bug if you are not plotting ERP-image');
+    end
+    allsizes = min(allsizes(:));
+    
+    % copy data
     for iItem=1:length(dataTmp{1}(:)')
         numItems    = sum(cellfun(@(x)size(x{iItem},dim)*(size(x{iItem},1) > 1), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
         ind         = find(~cellfun(@(x)isempty(x{iItem}), dataTmp)); 
@@ -288,7 +302,8 @@ function datavals = reorganizedata(dataTmp, dim)
             ind = ind(1);
             switch dim
                 case 2, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) numItems], 'single'); 
-                case 3, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) numItems], 'single'); 
+%                case 3, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) numItems], 'single'); 
+                case 3, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) allsizes, numItems], 'single'); 
                 case 4, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) size(dataTmp{ind}{iItem},3) numItems], 'single'); 
             end
         end
@@ -300,7 +315,17 @@ function datavals = reorganizedata(dataTmp, dim)
                 numItems = size(dataTmp{iCase}{iItem},dim) * (size(dataTmp{iCase}{iItem},1) > 1); % the size > 1 allows to detect empty array which have a non-null last dim
                 switch dim
                     case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
-                    case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
+                    case 3, 
+                        % special case for ERPimage - one line missing
+                        % or one line too many
+                        if size(datavals{iItem},2) == size(dataTmp{iCase}{iItem},2)+1
+                            dataTmp{iCase}{iItem}(:,end+1) = dataTmp{iCase}{iItem}(:,end); % duplicate last line
+                            warning('ERPimage discrepency between the number of lines')
+                        elseif size(datavals{iItem},2) == size(dataTmp{iCase}{iItem},2)-1
+                            dataTmp{iCase}{iItem}(:,end) = [];
+                            warning('ERPimage discrepency between the number of lines')
+                        end
+                        datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
                     case 4, datavals{iItem}(:,:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
                 end
                 count = count+numItems;
