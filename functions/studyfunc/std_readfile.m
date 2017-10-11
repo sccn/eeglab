@@ -294,16 +294,22 @@ for index = 1:length(chan)
 
     % load data
     warning('off', 'MATLAB:MatFile:OlderFormat');
-    if isstr(fileData.(fieldToRead))
-        if ~isfield(fileData, 'chanlocsforinterp'), error('Missing field in ERPimage STUDY file, try recomputing them'); end
+    if isstr(fileData.(fieldToRead)) % special ERP-image
+        try
+            fileData.chanlocsforinterp; % isfield does not work becauce fileData is a MatFile
+        catch, error('Missing field in ERPimage STUDY file, try recomputing them'); 
+        end
         chanlocsforinterp = fileData.chanlocsforinterp;
-        fileData.(fieldToRead) = eval( fileData.(fieldToRead) );
-    end
-    if ndims(fileData.(fieldToRead)) == 2
-        tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
+        tmpFieldData = eval( fileData.(fieldToRead) );
+        tmpFieldData = tmpFieldData(indBegin1:indEnd1,trials);
         if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
-    else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
-        if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, :, subTrials); end
+    else
+        if ndims(fileData.(fieldToRead)) == 2
+            tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
+            if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
+        else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
+            if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, :, subTrials); end
+        end
     end
     warning('on', 'MATLAB:MatFile:OlderFormat');
 
