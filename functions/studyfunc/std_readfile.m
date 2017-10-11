@@ -156,9 +156,6 @@ if v6Flag
          fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
     else fileData = load('-mat', [ fileBaseName fileExt ], 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
     end
-    if isfield(fileData, 'events')
-        fileData.parameters = {fileData.parameters{:} 'events' fileData.events};
-    end
     warning('on', 'MATLAB:load:variableNotFound');
 end
 
@@ -314,6 +311,10 @@ for index = 1:length(chan)
         end
         tmpFieldData = tmpFieldData(indBegin1:indEnd1,trials);
         if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
+        if ~isempty(fileData.events), 
+            events = fileData.events(trials);
+            if ~isempty(subTrials), events = events(subTrials); end
+        end
     else
         if ndims(fileData.(fieldToRead)) == 2
             tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
