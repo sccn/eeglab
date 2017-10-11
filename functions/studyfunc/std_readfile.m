@@ -261,6 +261,9 @@ function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, opti
 % --------------------------------
 function [ fieldData events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
 
+persistent tmpcache;
+persistent hashcode;
+
 if length(chan) > 1
 %    error('This function can only read one channel at a time');
 end
@@ -300,7 +303,15 @@ for index = 1:length(chan)
         catch, error('Missing field in ERPimage STUDY file, try recomputing them'); 
         end
         chanlocsforinterp = fileData.chanlocsforinterp;
-        tmpFieldData = eval( fileData.(fieldToRead) );
+        
+        % caching for ERPimage only
+        if isequal(hashcode, fileData.(fieldToRead)) 
+            tmpFieldData = tmpcache;
+        else 
+            tmpFieldData = eval( fileData.(fieldToRead) );
+            tmpcache = tmpFieldData;
+            hashcode = fileData.(fieldToRead);
+        end
         tmpFieldData = tmpFieldData(indBegin1:indEnd1,trials);
         if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
     else
