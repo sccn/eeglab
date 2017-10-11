@@ -348,7 +348,7 @@ function dataout = processerpim(dataSubject, xvals, datatype, singletrials, g)
 
     if ~isfield(g, 'nlines'), finallines = 10; else finallines = g.nlines; end
     if ~isfield(g, 'smoothing'), smoothing = 10; else smoothing = g.smoothing; end
-    if ~isfield(g, 'events'), events = 10; else events = g.events; end
+    if ~isfield(g, 'events'), events = []; else events = g.events; end
     
     % remove all fields and create new parameter list
     fieldList = { 'nlines' 'smoothing' 'sorttype' 'sortwin' 'sortfield' 'channels' ...
