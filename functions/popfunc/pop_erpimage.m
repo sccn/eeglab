@@ -208,7 +208,6 @@ end;
 if popup
 	% get contextual help
 	% -------------------
-    clear functions;
     erpimagefile = which('erpimage.m');
 	[txt2 vars2] = gethelpvar(erpimagefile);
 	txt  = { txt2{:}};
