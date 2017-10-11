@@ -90,13 +90,16 @@ dtype = opt.datatype;
 % get the file extension
 % ----------------------
 tmpDataType = opt.datatype;
-if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc'), 
+if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc')
     tmpDataType = 'timef'; 
-    if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end
-    if isempty(opt.freqrange), opt.timerange = STUDY.etc.specparams.freqrange; end
-else
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end
     if isempty(opt.freqrange), opt.timerange = STUDY.etc.erspparams.freqrange; end
+elseif strcmpi(opt.datatype, 'erpim')
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erpimparams.timerange;  end
+elseif strcmpi(opt.datatype, 'erp')    
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end
+elseif strcmpi(opt.datatype, 'spec')    
+    if isempty(opt.freqrange), opt.timerange = STUDY.etc.specparams.freqrange; end
 end
 if ~isempty(opt.channels), fileExt = [ '.dat' tmpDataType ];
 else                       fileExt = [ '.ica' tmpDataType ];
@@ -120,9 +123,8 @@ end
 
 % options
 % -------
-if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
-else                      opts = { 'freqlimits', opt.freqrange };
-end
+if ~isempty(opt.timerange), opts = { 'timelimits', opt.timerange }; end
+if ~isempty(opt.freqrange), opts = { 'freqlimits', opt.freqrange }; end
 opts = { opts{:} 'singletrials' opt.singletrials };
 
 for iSubj = 1:length(subjectList)
@@ -158,8 +160,8 @@ for iSubj = 1:length(subjectList)
     
     % read all channels/components at once
     hashcode = gethashcode(std_serialize(bigstruct));
-    [STUDY.cache tmpstruct] = eeg_cache(STUDY.cache, hashcode);
-
+    [STUDY.cache, tmpstruct] = eeg_cache(STUDY.cache, hashcode);
+    
     if ~isempty(tmpstruct)
         dataTmp{iSubj}   = tmpstruct{1};
         xvals            = tmpstruct{2};
@@ -170,8 +172,8 @@ for iSubj = 1:length(subjectList)
         datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
         fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
         if ~isempty(opt.channels)
-             [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
-        else [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
+             [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
+        else [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
         end
 
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') % ERP or spectrum
@@ -179,13 +181,14 @@ for iSubj = 1:length(subjectList)
                 dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
             end
         elseif strcmpi(opt.datatype, 'erpim')
-            dataTmp{iSubj} = cellfun(@(x)processerpim(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
+            %dataTmp{iSubj} = cellfun(@(x)processerpim(x, xvals, params), dataTmp{iSubj}, 'uniformoutput', false);
+            for iCond = 1:length(dataTmp{iSubj}(:))
+                if all(isnan(eventsTmp{iSubj}{iCond})), eventsTmp{iSubj}{iCond} = []; end
+                [dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}] = processerpim(dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}, xvals, params);
+            end
             yvals = 1:size(dataTmp{iSubj}{1},2);
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
-        end
-        if ~isempty(eventsTmp{iSubj}{1}) && strcmpi(opt.singletrials, 'off')
-            eventsTmp{iSubj} = cellfun(@(x)squeeze(mean(x)), eventsTmp{iSubj}, 'uniformoutput', false);
         end
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params });
     end
@@ -213,14 +216,14 @@ if strcmpi(opt.datatype, 'erp') || strcmpi(opt.datatype, 'spec')
      if length(opt.channels) > 1, dim = 3; else dim = 2; end
 else if length(opt.channels) > 1, dim = 4; else dim = 3; end
 end
-%datavals = reorganizedata2(dataTmp, eventsTmp);
-%events   = [];
+
+% check that all ERPimages have the same number of lines
 if strcmpi(opt.datatype, 'erpim')
-    dataTmp = checkdataerpimage(dataTmp);
+    [dataTmp,eventsTmp] = checkdataerpimage(dataTmp,eventsTmp);
 end
 
 datavals = reorganizedata(dataTmp, dim);
-events   = reorganizedata(eventsTmp, 1);
+events   = reorganizedata(eventsTmp, 2);
 
 % fix component polarity if necessary
 % -----------------------------------
@@ -314,9 +317,9 @@ function datavals = reorganizedata(dataTmp, dim)
         end
     end
     
-% reorganize data
-% ---------------
-function dataTmp = checkdataerpimage(dataTmp)
+% check data for ERPIMAGE
+% -----------------------
+function [dataTmp,eventTmp] = checkdataerpimage(dataTmp, eventTmp)
     
     % check second dim for ERPimage
     allsizes = [];
@@ -327,6 +330,8 @@ function dataTmp = checkdataerpimage(dataTmp)
     end
     if length(unique(allsizes(:))) > 1
         disp('********* Discrepency between the number of lines in ERP-image');
+    else
+        return;
     end
     commonSize = min(allsizes(:));
     
@@ -337,9 +342,11 @@ function dataTmp = checkdataerpimage(dataTmp)
                 % special case for ERPimage - one line missing or one line too many
                 if size(dataTmp{iCase}{iItem},2)+1 == commonSize
                     dataTmp{iCase}{iItem}(:,end+1) = dataTmp{iCase}{iItem}(:,end); % duplicate last line
+                    eventTmp{iCase}{iItem}(end+1) = eventTmp{iCase}{iItem}(end); % duplicate last line
                     disp('******** ERPimage discrepency between the number of lines detected and corrected')
                 elseif size(dataTmp{iCase}{iItem},2)-1 == commonSize
                     dataTmp{iCase}{iItem}(:,end) = [];
+                    eventTmp{iCase}{iItem}( end) = [];
                     disp('******** ERPimage discrepency between the number of lines detected and corrected')
                 end
                 if size(dataTmp{iCase}{iItem},2) ~= commonSize
@@ -385,11 +392,10 @@ function dataout = processtf(dataSubject, xvals, datatype, singletrials, g)
   
 % call erpimage
 % -------------
-function dataout = processerpim(dataSubject, xvals, datatype, singletrials, g)
+function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
 
     if ~isfield(g, 'nlines'), finallines = 10; else finallines = g.nlines; end
     if ~isfield(g, 'smoothing'), smoothing = 10; else smoothing = g.smoothing; end
-    if ~isfield(g, 'events'), events = []; else events = g.events; end
     
     % remove all fields and create new parameter list
     fieldList = { 'nlines' 'smoothing' 'sorttype' 'sortwin' 'sortfield' 'channels' ...
@@ -421,5 +427,9 @@ function dataout = processerpim(dataSubject, xvals, datatype, singletrials, g)
     nlines = (lastx-xwidth)/(nout-0.5)*i; % make it imaginary
     %nlines = ceil(lastx/((lastx-firstx+1-xwidth)/(nout-1)));
            
-    dataout = erpimage(dataSubject, events, xvals, '', smoothing, nlines, 'noplot', 'on', params{:});
-    
+    [dataout, eventout] = erpimage(dataSubject, events, xvals, '', smoothing, nlines, 'noplot', 'on', params{:});
+    if ~isempty(events)
+        eventout = eventout'; % needs to be a column vector
+    else
+        eventout = [];
+    end
