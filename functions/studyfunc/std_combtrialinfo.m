@@ -70,9 +70,21 @@ else
     try
         trialinfo = [ datasetinfo(inds(:)').trialinfo ];
     catch
-        datasetinfo(inds(:)').trialinfo
-        error( [ 'Trial information field differ for subject ' datasetinfo(inds(1)).subject ' (see above)' ]);
-    end;
+        warning( [ 'Trial information (event) field differ for subject ' datasetinfo(inds(1)).subject '...attempting to create missing event fields' ]);
+        % creating missing fields
+        allFields = {};
+        for iInd = inds(:)'
+            allFields = union(allFields, fieldnames(datasetinfo(iInd).trialinfo));
+        end
+        for iInd = inds(:)'
+            for iField = 1:length(allFields)
+                if ~isfield(datasetinfo(iInd).trialinfo, allFields{iField})
+                    datasetinfo(iInd).trialinfo(1).(allFields{iField}) = [];
+                end
+            end
+        end
+        trialinfo = [ datasetinfo(inds(:)').trialinfo ];
+    end
     nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
 end;
 
