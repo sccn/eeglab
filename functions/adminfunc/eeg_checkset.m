@@ -417,7 +417,7 @@ for inddataset = 1:length(ALLEEG)
                         % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
                         % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
                         difffield = fieldnames(EEG.event);
-                        difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')));
+                        difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')|strcmp(difffield,'begintime')));
                         for index = 1:length(difffield)
                             tmpevent  = EEG.event;
                             allvalues = { tmpevent.(difffield{index}) };
