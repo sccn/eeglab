@@ -287,8 +287,9 @@ end
 normtmpdmat = nan(size(tmpdmat));
 for iCol = 1:size(tmpdmat,2)
     dmat_den = (max(tmpdmat(:,iCol))-min(tmpdmat(:,iCol)));
+    if length(unique(tmpdmat(:,iCol))) <= 2, tmpdmat(:,iCol) = ~tmpdmat(:,iCol); end % flip colors
     if dmat_den ~= 0
-    normtmpdmat(:,iCol) = (tmpdmat(:,iCol)-min(tmpdmat(:,iCol)))/dmat_den;
+        normtmpdmat(:,iCol) = (tmpdmat(:,iCol)-min(tmpdmat(:,iCol)))/dmat_den;
     else
          normtmpdmat(:,iCol) = deal(max(tmpdmat(:,iCol)));
     end
@@ -360,4 +361,4 @@ if isnumeric(val)
     val = num2str(val);
 end
 set(handles.edit_dispclick, 'String', val, ...
-                             'ForegroundColor'  , [1 1 1]);
+                             'ForegroundColor'  , [0 0 0]);
