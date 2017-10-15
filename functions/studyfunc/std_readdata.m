@@ -123,6 +123,7 @@ end
 
 % options
 % -------
+opts = {};
 if ~isempty(opt.timerange), opts = { 'timelimits', opt.timerange }; end
 if ~isempty(opt.freqrange), opts = { 'freqlimits', opt.freqrange }; end
 opts = { opts{:} 'singletrials' opt.singletrials };
