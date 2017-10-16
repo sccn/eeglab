@@ -226,7 +226,7 @@ if isstr(filename)
 		disp('Pop_importepoch WARNING: FILE AND ARRAY WITH THE SAME NAME, LOADING FILE');
 	end;
     %values = load_file_or_array( filename, g.headerlines );
-    values = loadtxt( filename, 'skipline', g.headerlines, 'delim', 9);
+    values = loadtxt( filename, 'skipline', g.headerlines, 'delim', 9, 'blankcell', 'off');
 else
     values = filename;
     filename = inputname(2);
