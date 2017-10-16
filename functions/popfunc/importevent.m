@@ -379,7 +379,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         % ------------------------------------------------------
         if ~isnan(timeunit)
             for index = indices
-                event(index).latency = round((event(index).latency+1)*1000*newfactor)/1000;
+                event(index).latency = round((event(index).latency+1)*1000*newfactor(1)+newfactor(2))/1000;
             end
         end
     end        
