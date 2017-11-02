@@ -1203,7 +1203,7 @@ end;
 if strcmpi(g.scale, 'log') && ~any(isnan(g.powbase)), g.powbase = 10.^(g.powbase/10); end; 
 P = newtimeftrialbaseln(P, timesout, 'baseline', g.baseline, 'basenorm', g.basenorm, 'trialbase', g.trialbase);
 [P, baseln, mbase] = newtimefbaseln(P, timesout, 'baseline', g.baseline, 'basenorm', g.basenorm, ...
-                                   'verbose', g.verbose, 'powbase', g.powbase,'singletrials','on');
+                                   'verbose', g.verbose, 'powbase', g.powbase, 'trialbase', g.trialbase, 'singletrials','on');
 % ----------------
 % phase amp option
 % ----------------
