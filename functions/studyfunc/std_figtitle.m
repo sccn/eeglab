@@ -96,8 +96,8 @@ if ~isempty(opt.condnames),  opt.factor1vals = opt.condnames; end
 if ~isempty(opt.cond2names), opt.factor2vals = opt.cond2names; end
 if ~isempty(opt.condstat),   opt.factor1stat = opt.condstat; end
 if ~isempty(opt.cond2stat),  opt.factor2stat = opt.cond2stat; end
-if ~isempty(opt.cond2stat),  opt.factor1grouped = opt.cond2stat; end
-if ~isempty(opt.condgroup),  opt.factor2grouped = opt.cond2group; end
+if ~isempty(opt.condgroup),  opt.factor1grouped = opt.condgroup; end
+if ~isempty(opt.cond2group), opt.factor2grouped = opt.cond2group; end
 
 if ~iscell(opt.vals),       opt.vals       = { opt.vals }; end
 ncori  = length(opt.factor1vals);
@@ -111,18 +111,19 @@ if strcmpi(opt.plotsubjects, 'on')
 end
 if strcmpi(opt.factor1grouped,  'on'), opt.factor1grouped =  'together'; end
 if strcmpi(opt.factor2grouped, 'on'), opt.factor2grouped = 'together'; end
-    
-if strcmpi(opt.factor1grouped,  'together') &&  strcmpi(opt.factor2stat, 'on'),  opt.factor1grouped  = 'apart'; end
-if strcmpi(opt.factor2grouped, 'together') &&  strcmpi(opt.factor1stat , 'on') , opt.factor2grouped = 'apart'; end
+
+if strcmpi(opt.factor1grouped, 'together') &&  strcmpi(opt.factor2stat, 'on') && length(opt.factor2vals) > 1, opt.factor1grouped = 'apart'; end
+if strcmpi(opt.factor2grouped, 'together') &&  strcmpi(opt.factor1stat, 'on') && length(opt.factor1vals) > 1, opt.factor2grouped = 'apart'; end
 if ~( strcmpi(opt.factor1grouped,  'together') && strcmpi(opt.factor2grouped, 'together') )
     if strcmpi(opt.factor1grouped, 'together') && ~isempty(opt.factor1vals), alllegends = opt.factor1vals; opt.factor1vals = ''; end
     if strcmpi(opt.factor2grouped, 'together') && ~isempty(opt.factor2vals), alllegends = opt.factor2vals; opt.factor2vals = ''; end
 end
+
 if ~iscell(opt.valsunit),   opt.valsunit   = { opt.valsunit }; end
 if ~iscell(opt.chanlabels), opt.chanlabels = { opt.chanlabels }; end
-if ~iscell(opt.factor1vals),  opt.factor1vals  = { opt.factor1vals }; end
+if ~iscell(opt.factor1vals), opt.factor1vals  = { opt.factor1vals }; end
 if ~iscell(opt.factor2vals), opt.factor2vals = { opt.factor2vals }; end
-if isempty(opt.factor1vals),  opt.factor1vals{1}  = ''; end
+if isempty(opt.factor1vals), opt.factor1vals{1}  = ''; end
 if isempty(opt.factor2vals), opt.factor2vals{1} = ''; end
 
 for c1 = 1:length(opt.factor1vals)
