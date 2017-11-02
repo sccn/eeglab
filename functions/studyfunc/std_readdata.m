@@ -127,8 +127,10 @@ opts = {};
 if ~isempty(opt.timerange), opts = { 'timelimits', opt.timerange }; end
 if ~isempty(opt.freqrange), opts = { 'freqlimits', opt.freqrange }; end
 opts = { opts{:} 'singletrials' opt.singletrials };
+fprintf('Reading subjects'' data or looking up measure values in EEGLAB cache\n');
 
 for iSubj = 1:length(subjectList)
+    fprintf('.');
     
     % check cache
     bigstruct = [];
@@ -194,6 +196,7 @@ for iSubj = 1:length(subjectList)
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params });
     end
 end
+fprintf('\n');
 
 % if single trials, swap the last 2 dim (put channels before trials)
 if strcmpi(opt.singletrials, 'on') && length(opt.channels) > 1
