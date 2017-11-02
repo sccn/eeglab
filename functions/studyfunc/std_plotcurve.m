@@ -109,6 +109,9 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
 % opt.figure =  'off'; % test by nima
 if isstr(opt), error(opt); end
 opt.singlesubject = 'off';
+
+nc = size(data,1);
+ng = size(data,2);
 if length(opt.chanlocs) > 1, opt.plottopo = 'on'; end
 if strcmpi(opt.plottopo, 'on') && size(data{1},3) == 1, opt.singlesubject = 'on'; end
 %if size(data{1},2) == 1,                              opt.singlesubject = 'on'; end
@@ -117,6 +120,10 @@ if any(any(cellfun('size', data, 2)==1)), opt.groupstats = {}; opt.condstats = {
 if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups      = 'apart';
+    opt.plotconditions  = 'apart';
+end
+if strcmpi(opt.effect, 'main') && nc > 1 && ng > 1
+    opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
 end
 if strcmpi(opt.plotconditions, 'together') &&  ~isempty(opt.groupstats), opt.plotconditions = 'apart'; end
@@ -190,8 +197,6 @@ if strcmpi(opt.plotsubjects, 'off'), tmpcol = coldata'; tmpcol = tmpcol(:)'; end
 
 % number of columns and rows to plot
 % ----------------------------------
-nc = size(data,1);
-ng = size(data,2);
 if strcmpi(opt.plotgroups, 'together'),      ngplot = 1; else ngplot = ng; end
 if strcmpi(opt.plotconditions,  'together'), ncplot = 1; else ncplot = nc; end     
 if nc >= ng, opt.subplot = 'transpose';
@@ -222,10 +227,6 @@ if strcmpi(opt.singlesubject, 'off') ...
         opt.plotgroups = 'apart';
         opt.plotconditions  = 'apart';
     end
-end
-if strcmpi(opt.effect, 'main')
-    opt.plotgroups = 'apart';
-    opt.plotconditions  = 'apart';
 end
 
 % resize data to match points x channels x subjects
@@ -290,6 +291,7 @@ if strcmpi(opt.figure, 'on')
     if strcmpi(opt.plotconditions , 'together') pos(4) = 200*(1+addr);
     else                                        pos(4) = 200*(nc+addr);
     end
+    if all(pos(3:4) == 200), pos(3:4) = 400; end % double figure size if 1x1
     if strcmpi(opt.subplot, 'transpose'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
     else                                  set(gcf, 'position', pos);
     end
