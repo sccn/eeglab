@@ -92,7 +92,7 @@ for ind = 1:length(PP(:))
     % -----------------------
     if isnan(g.powbase(1))
         verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-        if strcmpi(g.singletrials, 'on')
+        if strcmpi(g.singletrials, 'on') && strcmpi(g.trialbase, 'off')
             if ndims(P) == 4, Pmean  = mean(P, 4); % average power over trials (channels x freq x time x trials)
             else              Pmean  = mean(P, 3); % average power over trials (freq x time x trials)
             end;
@@ -104,6 +104,7 @@ for ind = 1:length(PP(:))
     else
         verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
         mbase    = g.powbase;
+        mstd     = [];
         if size(mbase,1) == 1 % if input was a row vector, flip to be a column
             mbase = mbase';
         end;
@@ -145,6 +146,13 @@ if ~strcmpi(g.trialbase, 'on') % full or off
         end;
     end;
 end;
+for ind = 1:length(allMbase(:))
+    if ndims(allMbase{ind}) > 2
+        % The baseline is only used for plotting purposes
+        % It is different from version EEGLAB v14 (not to be used)
+        allMbase{ind} = mean(allMbase{ind},3);
+    end
+end
 mbase = allMbase;
 if ~iscell(PPori)
     PP = PP{1}; 
