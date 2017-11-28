@@ -108,6 +108,8 @@ if length(EEG) > 1
     return;
 end;
 
+flag_timerange = 1;
+
 if exist('pointrange') ~= 1 && ~isempty(timerange)
     if (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
         error('pop_rmbase(): Bad time range');
@@ -117,6 +119,7 @@ end;
 
 if isempty(timerange)
     timerange = [ EEG(1).xmin*1000 EEG(1).xmax*1000];
+    flag_timerange = 0;
 end;
 
 if exist('pointrange') ~= 1 || isempty(pointrange)
@@ -125,11 +128,17 @@ if exist('pointrange') ~= 1 || isempty(pointrange)
     end;
     pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):ceil((timerange(2)/1000-EEG.xmin)*EEG.srate);
     if pointrange(end) > EEG.pnts, pointrange(end) = EEG.pnts; end;
+    flag_timerange = 1;
 end;	
 
 if ~isempty(pointrange) && ((min(pointrange) < 1) || (max( pointrange ) > EEG.pnts))
    error('pop_rmbase(): Wrong point range');
 end;
+
+if ~flag_timerange
+    timerangeall = timerange(1):(1/EEG.srate*1000):timerange(2);
+    timerange = timerangeall(minmax(pointrange));
+end
 
 fprintf('pop_rmbase(): Removing baseline...\n');
 %
@@ -169,7 +178,7 @@ end;
 EEG.data = reshape( EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 EEG.icaact = [];
 
-if ~isempty(timerange)
+if flag_timerange %~isempty(timerange)
 	com = sprintf('EEG = pop_rmbase( EEG, [%s]);',num2str(timerange));
 else
 	com = sprintf('EEG = pop_rmbase( EEG, [], %s);',vararg2str({pointrange}));
