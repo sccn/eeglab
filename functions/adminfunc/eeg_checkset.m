@@ -55,7 +55,7 @@
 %   EEG.xmin         - epoch start latency|time (in sec. relative to the
 %                      time-locking event at time 0)
 %   EEG.xmax         - epoch end latency|time (in seconds)
-%   EEG.times        - vector of latencies|times in seconds (one per time point)
+%   EEG.times        - vector of latencies|times in miliseconds (one per time point)
 %   EEG.ref          - ['common'|'averef'|integer] reference channel type or number
 %   EEG.history      - cell array of ascii pop-window commands that created
 %                      or modified the dataset
