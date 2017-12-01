@@ -67,9 +67,14 @@ end;
 try,
     delim  = folder(end);
     template_models(1).name     = 'Spherical Four-Shell (BESA)';
-    template_models(1).hdmfile  = fullfile(folder, 'standard_BESA', 'standard_BESA.mat');
-    template_models(1).mrifile  = fullfile(folder, 'standard_BESA', 'avg152t1.mat');
-    template_models(1).chanfile = fullfile(folder, 'standard_BESA', 'standard-10-5-cap385.elp');
+    if isdeployed
+        baseFolderBesa = ctfroot;
+    else
+        baseFolderBesa = fullfile(folder, 'standard_BESA');
+    end
+    template_models(1).hdmfile  = fullfile(baseFolderBesa, 'standard_BESA.mat');
+    template_models(1).mrifile  = fullfile(baseFolderBesa, 'avg152t1.mat');
+    template_models(1).chanfile = fullfile(baseFolderBesa, 'standard-10-5-cap385.elp');
     template_models(1).coordformat = 'spherical';
     template_models(1).coord_transform(1).transform = [ ];
     template_models(1).coord_transform(1).keywords  = { 'standard-10-5-cap385' };
@@ -81,9 +86,14 @@ try,
     template_models(1).coord_transform(4).keywords  = { 'egi' 'elp' };
 
     template_models(2).name     = 'Boundary Element Model (MNI)';
-    template_models(2).hdmfile  = fullfile(folder, 'standard_BEM', 'standard_vol.mat' );
-    template_models(2).mrifile  = fullfile(folder, 'standard_BEM', 'standard_mri.mat' );
-    template_models(2).chanfile = fullfile(folder, 'standard_BEM', 'elec', 'standard_1005.elc' );
+    if isdeployed
+        baseFolderBEM = ctfroot;
+    else
+        baseFolderBEM = fullfile(folder, 'standard_BEM');
+    end
+    template_models(2).hdmfile  = fullfile(baseFolderBEM, 'standard_vol.mat' );
+    template_models(2).mrifile  = fullfile(baseFolderBEM, 'standard_mri.mat' );
+    template_models(2).chanfile = fullfile(baseFolderBEM, 'elec', 'standard_1005.elc' );
     template_models(2).coordformat = 'MNI';
     template_models(2).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
     template_models(2).coord_transform(1).keywords  = { 'standard_1005' };
@@ -95,9 +105,9 @@ try,
     template_models(2).coord_transform(4).keywords  = { 'egi' 'elp' };
     
     template_models(3).name     = 'Spherical Four-Shell (custom conductances - see DIPFIT wiki)';
-    template_models(3).hdmfile  = fullfile(folder, 'standard_BESA', 'standard_SCCN.mat');
-    template_models(3).mrifile  = fullfile(folder, 'standard_BESA', 'avg152t1.mat');
-    template_models(3).chanfile = fullfile(folder, 'standard_BESA', 'standard-10-5-cap385.elp');
+    template_models(3).hdmfile  = fullfile(baseFolderBesa, 'standard_SCCN.mat');
+    template_models(3).mrifile  = fullfile(baseFolderBesa, 'avg152t1.mat');
+    template_models(3).chanfile = fullfile(baseFolderBesa, 'standard-10-5-cap385.elp');
     template_models(3).coordformat = 'spherical';
     template_models(3).coord_transform(1).transform = [ ];
     template_models(3).coord_transform(1).keywords  = { 'standard-10-5-cap385' };
@@ -109,9 +119,9 @@ try,
     template_models(3).coord_transform(4).keywords  = { 'egi' 'elp' };
     
     template_models(4).name     = 'Boundary Element Model (custom conductances - see DIPFIT wiki)';
-    template_models(4).hdmfile  = fullfile(folder, 'standard_BEM', 'standard_vol_SCCN.mat' );
-    template_models(4).mrifile  = fullfile(folder, 'standard_BEM', 'standard_mri.mat' );
-    template_models(4).chanfile = fullfile(folder, 'standard_BEM', 'elec', 'standard_1005.elc' );
+    template_models(4).hdmfile  = fullfile(baseFolderBEM, 'standard_vol_SCCN.mat' );
+    template_models(4).mrifile  = fullfile(baseFolderBEM, 'standard_mri.mat' );
+    template_models(4).chanfile = fullfile(baseFolderBEM, 'elec', 'standard_1005.elc' );
     template_models(4).coordformat = 'MNI';
     template_models(4).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
     template_models(4).coord_transform(1).keywords  = { 'standard_1005' };
@@ -121,7 +131,10 @@ try,
     template_models(4).coord_transform(3).keywords  = { 'gsn' 'sfp' };
     template_models(4).coord_transform(4).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
     template_models(4).coord_transform(4).keywords  = { 'egi' 'elp' };
-    
+
+    % Set DipoleDensity path
+    DIPOLEDENSITY_STDBEM = fullfile(baseFolderBEM, 'standard_vol.mat');
+
 catch,
     disp('Warning: problem when setting paths for dipole localization');
 end;
@@ -148,6 +161,3 @@ rejectstr    = '40';	% in percent
 xgridstr     = sprintf('linspace(-%d,%d,11)', floor(meanradius), floor(meanradius));
 ygridstr     = sprintf('linspace(-%d,%d,11)', floor(meanradius), floor(meanradius));
 zgridstr     = sprintf('linspace(0,%d,6)', floor(meanradius));
-
-% Set DipoleDensity path
-DIPOLEDENSITY_STDBEM = fullfile(folder, 'standard_BEM', 'standard_vol.mat');
