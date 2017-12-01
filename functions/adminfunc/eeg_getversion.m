@@ -26,24 +26,28 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 
-function [vers, versnum, releaseDate] = eeg_getversion;
+function [vers, versnum, releaseDate] = eeg_getversion
 
 vers = '';
-filepath = fileparts(which('eeglab.m'));
-filename = dir(fullfile(filepath, 'Contents.m'));
+versnum = 0;
+releaseDate = '';
+if ~isdeployed
+    filepath = fileparts(which('eeglab.m'));
+    filename = dir(fullfile(filepath, 'Contents.m'));
 
-releaseDate = filename.date;
+    releaseDate = filename.date;
 
-if isempty(filename), return; end;
+    if isempty(filename), return; end;
 
-fid = fopen(fullfile(filepath, filename.name), 'r');
-fgetl(fid);
-versionline = fgetl(fid);
-vers = versionline(11:end);
-fclose(fid);
+    fid = fopen(fullfile(filepath, filename.name), 'r');
+    fgetl(fid);
+    versionline = fgetl(fid);
+    vers = versionline(11:end);
+    fclose(fid);
 
-tmpvers = vers;
-if isempty(str2num(tmpvers(end))), tmpvers(end) = []; end;
-indsDot = find(tmpvers == '.' );
-tmpvers(indsDot(2:end)) = [];
-versnum = str2num(tmpvers);
+    tmpvers = vers;
+    if isempty(str2num(tmpvers(end))), tmpvers(end) = []; end;
+    indsDot = find(tmpvers == '.' );
+    tmpvers(indsDot(2:end)) = [];
+    versnum = str2num(tmpvers);
+end
