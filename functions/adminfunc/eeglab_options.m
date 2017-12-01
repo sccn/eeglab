@@ -25,16 +25,14 @@
 % load local file
 % ---------------
 homefolder = '';
-try,    
+try 
     %clear eeg_options; % note: we instead clear this function handle in pop_editoptions()
     
+    eeg_optionsbackup;
     if iseeglabdeployed
-        com1 = readtxtfile(fullfile(eeglabexefolder, 'eeg_optionsbackup.txt'));
         com2 = readtxtfile(fullfile(eeglabexefolder, 'eeg_options.txt'));
-        eval( com1 );
         eval( com2 );
     else
-        eeg_optionsbackup;
         icadefs;
         
         % folder for eeg_options file (also update the pop_editoptions)
@@ -44,7 +42,7 @@ try,
              if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end;
              homefolder = deblank(evalc('!echo %USERPROFILE%'));
         else homefolder = '~';
-        end;
+        end
         
         option_file = fullfile(homefolder, 'eeg_options.m');
         oldp = pwd;
@@ -54,14 +52,14 @@ try,
             else
                 tmpp2 = fileparts(which('eeglab_options.m'));
                 cd(tmpp2);
-            end;
-        catch, end;
+            end
+        catch, end
         eeg_options; % default one with EEGLAB
         cd(oldp);
-    end;
+    end
     option_savematlab = ~option_savetwofiles;
     
 catch 
     lasterr
     disp('Warning: could not access the local eeg_options file');
-end;
+end
