@@ -80,16 +80,14 @@ if nargin < 2 & EEG(1).trials > 1
 
 	% decode parameters
 	% -----------------
-	if numel(result) < 2 | ((isempty(result{1}) | strcmp(result{1},'[]') ) ...
-                           & (isempty(result{2}) | strcmp(result{2},'[]')))
-       timerange = [num2str(EEG(1).xmin*1000) num2str(EEG(1).xmax*1000)]; % whole epoch latency range
-       fprintf('pop_rmbase(): using whole epoch as baseline.\n');
-
-       % fprintf('pop_rmbase(): baseline limits must be specified.\n');
-       % return; end;
+    if numel(result) < 2 | ((isempty(result{1}) | strcmp(result{1},'[]') ) ...
+            & (isempty(result{2}) | strcmp(result{2},'[]')))
+        timerange = [EEG(1).xmin*1000 EEG(1).xmax*1000]; % whole epoch latency range
+        pointrange = [];
+        fprintf('pop_rmbase(): using whole epoch as baseline.\n');
     else
-      timerange = eval( [ '[' result{1} ']' ] );
-      pointrange = eval( [ '[' result{2} ']' ] );
+        timerange  = eval( [ '[' result{1} ']' ] );
+        pointrange = eval( [ '[' result{2} ']' ] );
     end
 elseif nargin < 2 & EEG(1).trials == 1
 	% popup window parameters
