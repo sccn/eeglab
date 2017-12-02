@@ -25,8 +25,10 @@
 %   "Add current reference channel back to the data" - [edit box] When 
 %                 re-referencing the data, checking this checkbox
 %                 reconstitutes the data for the previous reference
-%                 channel. If the location for this channel  was not 
-%                 defined, it can be specified using the text box below.
+%                 channel. If the location for this channel or the channel is
+%                 not present, it first needs to be defined in the channel
+%                 editor (additional channel defined as reference and not 
+%                 associated with data).
 % Inputs:
 %   EEG         - input dataset
 %   ref         - reference: []             = convert to average reference
@@ -300,7 +302,10 @@ if ~isempty(g.refloc)
     allinds = [];
     tmpchaninfo = EEG.chaninfo;
     for iElec = 1:length(g.refloc)
-         allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
+        if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
+            error('There is no such reference channel');
+        end
+        allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
     end;
     EEG.chaninfo.nodatchans(allinds) = [];
 end;
