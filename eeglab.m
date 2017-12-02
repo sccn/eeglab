@@ -275,6 +275,7 @@ if ~iseeglabdeployed2
         end;
     end;
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
+    myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
     myaddpath( eeglabpath, ['@mmo' filesep 'mmo.m'], 'functions');
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'      ]);
     myaddpath( eeglabpath, 'supergui.m',       [ 'functions' filesep 'guifunc'          ]);
@@ -532,7 +533,7 @@ cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'
 cb_study1      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');' e_load_study]; 
 cb_study2      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]; 
 cb_studyerp    = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_studyerp;' e_load_study]; 
-cb_loadstudy   = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;' e_load_study]; 
+cb_loadstudy   = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy; if ~isempty(LASTCOM), STUDYTMP = std_renamestudyfiles(STUDYTMP, ALLEEGTMP); end;' e_load_study]; 
 cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study];
 cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);'                                e_load_study];
 cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
@@ -569,7 +570,7 @@ cb_interp      = [ check      '[EEG LASTCOM] = pop_interp(EEG); '  e_newset];
 cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
 cb_eegplot     = [ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);'   e_hist];
 cb_epoch       = [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_newset];
-cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_newset];
+cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_store];
 cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store];
 cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
 %cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
@@ -590,7 +591,6 @@ cb_rejsup2     = [ checkepoch '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1
                    '[EEG LASTCOM] = pop_rejepoch(EEG);' e_newset];
 
 cb_selectcomps = [ checkicaplot  '[EEG LASTCOM] = pop_selectcomps(EEG);'  e_store];
-cb_findmatchingrejcomps = [ checkicaplot  '[EEG LASTCOM] = pop_findmatchingrejcomps(EEG);'  e_store];
 cb_rejmenu2    = [ checkepochica 'pop_rejmenu(EEG, 0); LASTCOM ='''';'    e_hist];
 cb_eegplotrej2 = [ checkica      '[LASTCOM] = pop_eegplot(EEG, 0);'       e_hist];
 cb_eegthresh2  = [ checkepochica '[TMP LASTCOM] = pop_eegthresh(EEG, 0); clear TMP;' e_hist];
@@ -644,10 +644,6 @@ cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, AL
 cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'                e_plot_study];
 cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_plot_study];
 cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_plot_study];
-cb_limorunchan = [ nocheck '[STUDYTMP LASTCOM]= pop_limo(STUDY, ALLEEG,''dat'');' e_plot_study];
-cb_limoreschan = [ nocheck 'pop_limoresults(STUDY,''dat'');' e_hist];
-cb_limoruncomp = [ nocheck '[STUDYTMP LASTCOM]= pop_limo(STUDY, ALLEEG,''ica'');' e_plot_study];
-cb_limorescomp = [ nocheck 'pop_limoresults(STUDY,''ica'');' e_hist];
 % 
 % % add STUDY plugin menus
 % if exist('eegplugin_stderpimage')
@@ -792,7 +788,6 @@ if ismatlab
     uimenu( rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
     uimenu( rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
     uimenu( rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
-    uimenu( rej_m2, 'Label', 'Reject matches to known ICs'         , 'userdata', ondata , 'CallBack', cb_findmatchingrejcomps);    
     uimenu( rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
     uimenu( rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
     uimenu( rej_m2, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh2);
@@ -849,13 +844,12 @@ if ismatlab
     uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
-    
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
     clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
     uimenu( clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
     uimenu( clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
-        
+
     if ~iseeglabdeployed2
         %newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
@@ -878,7 +872,7 @@ if ismatlab
         uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     end;
 
-    uimenu( help_m, 'Label', 'EEGLAB tutorial'                            , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+    uimenu( help_m, 'Label', 'EEGLAB tutorial'                               , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
     uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end;
 
@@ -886,20 +880,8 @@ if iseeglabdeployed2
     disp('Adding FIELDTRIP toolbox functions');
     disp('Adding BIOSIG toolbox functions');
     disp('Adding FILE-IO toolbox functions');
-    funcname = {  'eegplugin_VisEd' ...
-                  'eegplugin_eepimport' ...
-                  'eegplugin_bdfimport' ...
-                  'eegplugin_brainmovie' ...
-                  'eegplugin_bva_io' ...
-                  'eegplugin_ctfimport' ...
-                  'eegplugin_dipfit' ...
-                  'eegplugin_erpssimport' ...
-                  'eegplugin_fmrib' ...
-                  'eegplugin_iirfilt' ...
-                  'eegplugin_ascinstep' ...
-                  'eegplugin_loreta' ...
-                  'eegplugin_miclust' ...
-                  'eegplugin_4dneuroimaging' };
+    funcname = {  'eegplugin_dipfit' ...
+                  'eegplugin_firfilt' };
     for indf = 1:length(funcname)
         try 
             vers = feval(funcname{indf}, gcf, trystrs, catchstrs);
@@ -1075,6 +1057,7 @@ eventsub_m  = findobj('parent', event_m);
 editsub_m   = findobj('parent', edit_m);
 exportsub_m = findobj('parent', exportm);
 filter_m    = findobj('parent', filter_m);
+
 icadefs; % containing PLUGINMENUCOLOR
 if length(fourthsub_m) > 11, set(fourthsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
@@ -1104,7 +1087,6 @@ try
     %newerVersionMenu = uimenu(help_m, 'Label', 'Upgrade to the Latest Version', 'visible', 'off', 'userdata', 'startup:on;study:on');
     
     % set the callback to bring up the updater GUI
-    icadefs; % for getting background color
     eeglabFolder = fileparts(mywhich('eeglab.m'));
     %eeglabUpdater.menuItemHandle = []; %newerVersionMenu;
     %eeglabUpdater.menuItemCallback = {@command_on_update_menu_click, eeglabUpdater, eeglabFolder, true, BACKEEGLABCOLOR};
@@ -1141,14 +1123,12 @@ try
                     warning( sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
                         eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
                         'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
-                        floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, ...
-                        [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_13' ]));
+                        floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl));
                 else
                     warning( sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
                         eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
                         'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
-                        eeglabv, eeglabUpdater.downloadUrl, ...
-                        [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_13' ]));
+                        eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl));
                 end;
                 warning('backtrace', stateWarning.state);
 
@@ -1170,7 +1150,7 @@ try
                 stop(eeglabtimers);
                 delete(eeglabtimers);
             end;
-            % This is disabled because it cause Matlab to freeze in case
+            % This is disabled because it cause Matlab to hang in case
             % there is no connection or the connection is available but not
             % usable
             % start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end; clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
@@ -1232,8 +1212,18 @@ if ~isempty(hh)
     disp('EEGLAB warning: there can be only one EEGLAB window, closing old one');
     close(hh);
 end;
+
+% determine the text for the revision
+[txtVersion, numVersion ] = eeg_getversion;
+if ~isempty(numVersion)
+    txtVersion = [ 'EEGLAB v' txtVersion ];
+else
+    txtVersion = [ 'EEGLAB ' txtVersion ];    
+end
+
+% create figures
 if strcmpi(onearg, 'remote')
-    figure(	'name', [ 'EEGLAB v' eeg_getversion ], ... 
+    figure(	'name', txtVersion, ... 
 	'numbertitle', 'off', ...
 	'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) 30 ], ...
 	'color', COLOR, ...
@@ -1247,7 +1237,7 @@ W_MAIN = figure('Units','points', ...
 ... %	'Colormap','gray', ...
 	'PaperPosition',[18 180 576 432], ...
 	'PaperUnits','points', ...
-	'name', [ 'EEGLAB v' eeg_getversion ], ... 
+	'name', txtVersion, ... 
 	'numbertitle', 'off', ...
 	'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ], ...
 	'color', COLOR, ...
@@ -1960,9 +1950,10 @@ elseif any(strcmp(menustatus, 'continuous_dataset'))
     
     set(allmenus, 'enable', 'on');  
     eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''continuous:off''))), allstrs);');  
-    set(allmenus(indmatchvar), 'enable', 'off');  
-end;
+    set(allmenus(indmatchvar), 'enable', 'off');
 
+    
+end;
 if any(strcmp(menustatus, 'chanloc_absent'))
     
     eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''chanloc:on''))), allstrs);');  
@@ -1994,6 +1985,7 @@ set(g.win0, 'position', [poswin0(1:2) extwin0(3) extwin0(4)]);
 
 % adjust all font sizes (RMC fix MATLAB 2014 compatibility)
 % -------------------
+icadefs;
 handlesname = fieldnames(g);
 for i = 1:length(handlesname)
     if isprop(eval(['g.' handlesname{i}]),'Style') & ~strcmp(handlesname{i},'win0')
@@ -2065,9 +2057,7 @@ function addpathifnotexist(newpath, functionname);
     tmpp = mywhich(functionname);
         
     if isempty(tmpp)
-        if exist(newpath) == 7
-            addpath(newpath);
-        end;
+        addpath(newpath);
     end;
     
 % find a function path and add path if not present
