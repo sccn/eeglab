@@ -63,8 +63,8 @@ end;
 if nargin < 2 & EEG(1).trials > 1
 	% popup window parameters
 	% -----------------------
-    defaultbase = [num2str(EEG(1).xmin*1000) ' 0'];
-    if EEG(1).xmin*1000 >= 0
+    defaultbase = [num2str(EEG(1).times(1)) ' 0'];
+    if EEG(1).times(1) >= 0
         defaultbase = '[ ]';
     end;
     uilist = { { 'style' 'text' 'string' 'Baseline latency range ([min max] in ms) ([ ] = whole epoch):' } ...
@@ -80,16 +80,16 @@ if nargin < 2 & EEG(1).trials > 1
 
 	% decode parameters
 	% -----------------
-    if numel(result) < 2 | ((isempty(result{1}) | strcmp(result{1},'[]') ) ...
-            & (isempty(result{2}) | strcmp(result{2},'[]')))
-        timerange = [EEG(1).xmin*1000 EEG(1).xmax*1000]; % whole epoch latency range
+    if numel(result) < 2 || ((isempty(result{1}) || strcmp(result{1},'[]') ) ...
+            && (isempty(result{2}) || strcmp(result{2},'[]')))
+        timerange = [ EEG(1).times(1) EEG(1).times(end) ]; % whole epoch latency range
         pointrange = [];
         fprintf('pop_rmbase(): using whole epoch as baseline.\n');
     else
         timerange  = eval( [ '[' result{1} ']' ] );
         pointrange = eval( [ '[' result{2} ']' ] );
     end
-elseif nargin < 2 & EEG(1).trials == 1
+elseif nargin < 2 && EEG(1).trials == 1
 	% popup window parameters
 	% -----------------------
     resp = questdlg2(strvcat('Remove mean of each data channel'), 'pop_rmbase', 'Cancel', 'Ok', 'Ok');
@@ -106,42 +106,24 @@ if length(EEG) > 1
     return;
 end;
 
-flag_timerange = 1;
-
-if exist('pointrange') ~= 1 && ~isempty(timerange)
-    if (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
+flag_timerange = 1; % provide timerange as input (so use in history)
+if ~isempty(timerange)
+    if timerange(1) < EEG.times(1) || timerange(end) > EEG.times(end)
         error('pop_rmbase(): Bad time range');
     end;
-    pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
-end;
-
-if isempty(timerange)
-    timerange = [ EEG(1).xmin*1000 EEG(1).xmax*1000];
+    pointrange = find( EEG.times >= timerange(1) & EEG.times <= timerange(2));
+elseif ~isempty(pointrange)
     flag_timerange = 0;
-end;
-
-if exist('pointrange') ~= 1 || isempty(pointrange)
-    if ~isempty(timerange) && (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
-        error('pop_rmbase(): Bad time range');
-    end;
-    pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):ceil((timerange(2)/1000-EEG.xmin)*EEG.srate);
+    if pointrange(1) < 1, pointrange(1) = 1; end;
     if pointrange(end) > EEG.pnts, pointrange(end) = EEG.pnts; end;
-    flag_timerange = 1;
-end;	
-
-if ~isempty(pointrange) && ((min(pointrange) < 1) || (max( pointrange ) > EEG.pnts))
-   error('pop_rmbase(): Wrong point range');
+else
+    pointrange = [1:EEG.pnts];
 end;
 
-if ~flag_timerange
-    timerangeall = timerange(1):(1/EEG.srate*1000):timerange(2);
-    timerange = timerangeall(minmax(pointrange));
-end
-
-fprintf('pop_rmbase(): Removing baseline...\n');
 %
 % Respect excised data boundaries if continuous data
 % ---------------------------------------------------
+fprintf('pop_rmbase(): Removing baseline...\n');
 if EEG.trials == 1 && ~isempty(EEG.event) ...
                      && isfield(EEG.event, 'type') ...
                         && isstr(EEG.event(1).type)
