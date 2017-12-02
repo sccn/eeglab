@@ -1,0 +1,178 @@
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration build-checksum="2303697546" file="/data/matlab/eeglabcompile/eeglab.prj" location="/data/matlab/eeglabcompile" name="eeglab" preferred-package-location="/data/matlab/eeglabcompile/eeglab/for_redistribution" preferred-package-type="package.type.app" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>eeglab</param.appname>
+    <param.icon />
+    <param.icons />
+    <param.version>1.0</param.version>
+    <param.authnamewatermark />
+    <param.email />
+    <param.company />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.guid />
+    <param.installpath.string>/eeglab/</param.installpath.string>
+    <param.installpath.combo>option.installpath.systemwideapp</param.installpath.combo>
+    <param.logo />
+    <param.install.notes>In the following directions, replace MCR_ROOT by the directory where the MATLAB Runtime is installed on the target machine.
+
+If the environment variable DYLD_LIBRARY_PATH is undefined, set it to the concatenation of the following strings:
+
+    MCR_ROOT/v92/runtime/maci64:
+    MCR_ROOT/v92/sys/os/maci64:
+    MCR_ROOT/v92/bin/maci64
+
+If it is defined, set it to the concatenation of these strings:
+
+    ${LD_LIBRARY_PATH}: 
+    MCR_ROOT/v92/runtime/maci64:
+    MCR_ROOT/v92/sys/os/maci64:
+    MCR_ROOT/v92/bin/maci64</param.install.notes>
+    <param.target.install.notes />
+    <param.intermediate>${PROJECT_ROOT}/eeglab/for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}/eeglab/for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}/eeglab/for_redistribution</param.output>
+    <param.logdir>${PROJECT_ROOT}/eeglab</param.logdir>
+    <param.enable.clean.build>false</param.enable.clean.build>
+    <param.user.defined.mcr.options />
+    <param.target.type>subtarget.standalone</param.target.type>
+    <param.support.packages />
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>false</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.windows.command.prompt>false</param.windows.command.prompt>
+    <param.create.log>false</param.create.log>
+    <param.log.file />
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.version />
+      <param.authnamewatermark />
+      <param.email />
+      <param.company />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.guid />
+      <param.installpath.string />
+      <param.installpath.combo />
+      <param.logo />
+      <param.target.install.notes />
+      <param.intermediate />
+      <param.files.only />
+      <param.output />
+      <param.logdir />
+      <param.enable.clean.build />
+      <param.user.defined.mcr.options />
+      <param.target.type />
+      <param.support.packages />
+      <param.web.mcr />
+      <param.package.mcr />
+      <param.no.mcr />
+      <param.web.mcr.name />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.windows.command.prompt />
+      <param.create.log />
+      <param.log.file />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}/eeglab.m</file>
+    </fileset.main>
+    <fileset.resources>
+      <file>${PROJECT_ROOT}/Contents.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj</file>
+      <file>${PROJECT_ROOT}/functions/@memmapdata</file>
+      <file>${PROJECT_ROOT}/functions/@mmo</file>
+      <file>${PROJECT_ROOT}/functions/guifunc</file>
+      <file>${PROJECT_ROOT}/functions/miscfunc</file>
+      <file>${PROJECT_ROOT}/functions/popfunc</file>
+      <file>${PROJECT_ROOT}/functions/resources</file>
+      <file>${PROJECT_ROOT}/functions/sigprocfunc</file>
+      <file>${PROJECT_ROOT}/functions/statistics</file>
+      <file>${PROJECT_ROOT}/functions/studyfunc</file>
+      <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
+      <file>${PROJECT_ROOT}/plugins</file>
+    </fileset.resources>
+    <fileset.package />
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}/functions/adminfunc/+up/updater.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/biosigpathfirst.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/biosigpathlast.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_checkchanlocs.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_checkset.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_eval.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_getdatact.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_getversion.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_global.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_hist.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_options.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_optionsbackup.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_retrieve.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_store.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eegh.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeglab_error.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeglab_options.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/eeglabexefolder.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/error_bc.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/gethelpvar.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/getkeyval.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/intersect_bc.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/is_sccn.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/iseeglabdeployed.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/ismatlab.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/ismember_bc.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_askinstall.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_convert.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_getweb.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_install.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_reactivate.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlread.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlreadwrite.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlsize.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlwrite.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/pop_delset.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/removepath.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/setdiff_bc.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/union_bc.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/unique_bc.m</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc/vararg2str.m</file>
+    </fileset.depfun>
+    <build-deliverables>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglabcompile/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_eeglab.sh" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/run_eeglab.sh</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="eeglab.app" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/eeglab.app</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>/Applications/MATLAB_R2017a.app</root>
+      <toolboxes>
+        <toolbox name="matlabcoder" />
+      </toolboxes>
+      <toolbox>
+        <matlabcoder>
+          <enabled>true</enabled>
+        </matlabcoder>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>true</unix>
+      <mac>true</mac>
+      <windows>false</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.12.6</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>maci64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
