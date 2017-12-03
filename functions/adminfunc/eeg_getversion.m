@@ -36,3 +36,4 @@ tmpvers = vers;
 if isempty(str2num(tmpvers(end))), tmpvers(end) = []; end;
 indsDot = find(tmpvers == '.' );
 tmpvers(indsDot(2:end)) = [];
+versnum = str2num(tmpvers);
