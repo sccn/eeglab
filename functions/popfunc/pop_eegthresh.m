@@ -197,6 +197,10 @@ if calldisp
     else
         eegplot( icaacttmp, 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
     end;
+    
+    % Wait for the figure
+    waitfor( findobj('Tag', 'EEGPLOT'));
+    
 else 
     if reject == 1
         EEG = pop_rejepoch(EEG, rej, 0);
