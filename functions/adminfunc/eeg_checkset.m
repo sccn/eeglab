@@ -357,6 +357,20 @@ for inddataset = 1:length(ALLEEG)
                             
                     end;
                     
+                    % Removing events with NaN latency
+                    % --------------------------------
+                    if isfield(EEG.event, 'latency')
+                        nanindex = find(isnan([ EEG.event.latency ]));
+                        if ~isempty(nanindex)
+                            EEG.event(nanindex) = [];
+                            trialtext = '';
+                             for inan = 1:length(nanindex)
+                                 trialstext = [trialtext ' ' num2str(nanindex(inan))];
+                             end
+                            disp(sprintf(['eeg_checkset: Event(s) with NaN latency were deleted \nDeleted event index(es):[' trialstext ']']));
+                        end  
+                    end
+                    
                     % remove the events which latency are out of boundary
                     % ---------------------------------------------------
                     if isfield(EEG.event, 'latency')
