@@ -1036,8 +1036,9 @@ else
     PLUGINLIST = pluginlist;
     
 end; % iseeglabdeployed2
-% Path exception for BIOSIG (sending BIOSIG down into the path)
-biosigpathlast; % fix str2double issue
+% Path exception for BIOSIG and Fieltrip (Overshadowing functions are moved down in the path)
+plugin_pathlast('str2double','biosig'); % fix str2double issue
+plugin_pathlast('dpss','fieldtrip','external/signal/dpss_hack');
 
 if ~ismatlab, return; end;
 % add other import ...
