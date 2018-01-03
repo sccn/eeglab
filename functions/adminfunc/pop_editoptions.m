@@ -86,8 +86,8 @@ end
 % ----------------------------
 eeglab_options;
 if iseeglabdeployed
-    filename = fullfile(eeglabexefolder,'eeg_options.txt');
-    eegoptionbackup = fullfile(eeglabexefolder,'eeg_optionsbackup.txt');
+    filename = fullfile( ctfroot, 'functions', 'adminfunc', 'eeg_options.txt');
+    eegoptionbackup = fullfile( ctfroot, 'functions', 'adminfunc', 'eeg_optionsbackup.txt');
 else
     % folder for eeg_options file (also update the eeglab_options)
     if ~isempty(EEGOPTION_PATH)
@@ -100,6 +100,7 @@ else
     filename = fullfile(homefolder, 'eeg_options.m');
     eegoptionbackup = which('eeg_optionsbackup.m');
 end
+
 fid = fopen( filename, 'r+'); % existing file
 storelocal = 0;
 if	fid == -1
@@ -184,10 +185,8 @@ if nargin < 2
 
     % change option file
     uilist = { uilist{:} {} ...
-                 { 'Style', 'text', 'string', 'Option file:' 'fontweight', 'bold' }, ...
-                 { 'Style', 'text', 'string', tmpfile 'tag' 'filename'  }, ...
-                 {} { 'Style', 'pushbutton', 'string', '...'  'callback' cb_file } };
-    geometry = { geometry{:} [1] [1 6 0.1 0.8] };
+                 { 'Style', 'text', 'string', 'Edit the EEGOPTION_PATH variable of functions/sigprocfunc/icadefs.m to change where the option file is saved' } };
+    geometry = { geometry{:} [1] [1] };
     [results, userdat ] = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()', ...
                         [], 'normal');
     if isempty(results), return; end
