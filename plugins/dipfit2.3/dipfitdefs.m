@@ -29,7 +29,7 @@
 % this file is not a function but a script and is included in the dipfit_XXX functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-try,
+try
     if ~isfield(EEG, 'chanlocs')
     error('No electrode locations defined');
     end
@@ -39,7 +39,8 @@ try,
     end
     nchan = length(EEG(1).chanlocs);
     ncomp = size(EEG(1).icawinv, 2);
-catch, nchan = 0; end;
+catch, nchan = 0; 
+end
 
 % create one-sphere model
 % defaultvolume.r = meanradius;
@@ -62,9 +63,9 @@ if ~iseeglabdeployed
     folder = which('pop_dipfit_settings');
     folder = folder(1:end-21);
 else
-    folder = ctfroot;
-end;
-try,
+    folder = fullfile(ctfroot, 'plugins', 'dipfit2.3');
+end
+try
     delim  = folder(end);
     template_models(1).name     = 'Spherical Four-Shell (BESA)';
     template_models(1).hdmfile  = fullfile(folder, 'standard_BESA', 'standard_BESA.mat');
@@ -125,9 +126,9 @@ try,
     % Set DipoleDensity path
     DIPOLEDENSITY_STDBEM = fullfile(folder, 'standard_BEM', 'standard_vol.mat');
 
-catch,
+catch
     disp('Warning: problem when setting paths for dipole localization');
-end;
+end
 
 template_models(5).name        = 'CTF MEG';
 template_models(5).coordformat = 'CTF';
