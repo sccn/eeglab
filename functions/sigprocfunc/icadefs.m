@@ -137,8 +137,12 @@ clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
 % ----------------------------------------------------------------------
 
 % INSERT location of ica executable (LINUX ONLY) for binica.m below
-eeglab_p = fileparts(which('eeglab'));
-ICABINARY = fullfile(eeglab_p, 'functions', 'resources', 'ica_linux'); 
+if ~isdeployed
+    eeglab_p = fileparts(which('eeglab'));
+    ICABINARY = fullfile(eeglab_p, 'functions', 'resources', 'ica_linux'); 
+else
+    ICABINARY = fullfile(ctfroot, 'ica_linux'); 
+end
 
 try
     set(0,'defaultaxesfontsize',AXES_FONTSIZE);
