@@ -205,10 +205,6 @@ if nargin < 3 % Open GUI input window
     defaultmat = { 'mheadnew.mat' 'colin27headmesh.mat' };
     defaultloc = { 'mheadnew.xyz' 'colin27headmesh.xyz' };
     defaulttransform = { transform [0 -15 -15 0.05 0 -1.57 100 88 110] };
-    if iseeglabdeployed
-        defaultmat = fullfile(eeglabexefolder, defaultmat);
-        defaultloc = fullfile(eeglabexefolder, defaultloc);
-    end;
     userdatatmp = { EEG.chanlocs EEG.chaninfo };
     if isempty(EEG.filename)
         splfile     = fullfile(pwd, 'tmp.spl');
