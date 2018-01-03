@@ -431,12 +431,12 @@ for inddataset = 1:length(ALLEEG)
                         % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
                         % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
                         difffield = fieldnames(EEG.event);
-                        difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')|strcmp(difffield,'begintime')));
+                        difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')|strcmp(difffield,'egikeys')|strcmp(difffield,'egikeysbackup')|strcmp(difffield,'begintime')));
                         for index = 1:length(difffield)
                             tmpevent  = EEG.event;
                             allvalues = { tmpevent.(difffield{index}) };
                             try
-                            	valempt = cellfun('isempty', allvalues);
+                                valempt = cellfun('isempty', allvalues);
                             catch
                                 valempt = mycellfun('isempty', allvalues);
                             end;
@@ -458,7 +458,7 @@ for inddataset = 1:length(ALLEEG)
                                 % ---------------------
                                 indexevent = find(~valempt);
                                 arraytmpinfo(allepochs(indexevent)) = allvalues(indexevent);
-                                    
+                                
                                 % uniformize content for all epochs
                                 % ---------------------------------
                                 indexevent = find(valempt);
@@ -469,7 +469,7 @@ for inddataset = 1:length(ALLEEG)
                                     fprintf(['eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
                                     fprintf(['              filling with values of other events in the same epochs\n']);
                                 end;
-                            end;
+                            end
                         end;
                     end;
                     if isempty(EEG.event), return; end;
@@ -479,32 +479,29 @@ for inddataset = 1:length(ALLEEG)
                     fnames = fieldnames(EEG.event);
                     for fidx = 1:length(fnames)
                         fname = fnames{fidx};
-                        tmpevent  = EEG.event;
-                        allvalues = { tmpevent.(fname) };
-                        try
-                            % find indices of numeric values among values of this event property
-                            valreal = ~cellfun('isclass', allvalues, 'char');
-                        catch
-                            valreal = mycellfun('isclass', allvalues, 'double');
-                        end;
-                        
-                        format = 'ok';
-                        if ~all(valreal) % all valreal ok
-                            format = 'str';
-                            if all(valreal == 0) % all valreal=0 ok
-                                format = 'ok';
+                        if ~strcmpi(fname, 'egikeys') && ~strcmpi(fname, 'egikeysbackup')
+                            tmpevent  = EEG.event;
+                            allvalues = { tmpevent.(fname) };
+                            try
+                                % find indices of numeric values among values of this event property
+                                valreal = ~cellfun('isclass', allvalues, 'char');
+                            catch
+                                valreal = mycellfun('isclass', allvalues, 'double');
                             end;
-                        end;
-                        if strcmp(format, 'str')
-                            fprintf('eeg_checkset note: value format of event field ''%s'' made uniform\n', fname);
-                            % get the field content
-                            % ---------------------
-                            for indexevent = 1:length(EEG.event)
-                                if valreal(indexevent)
-                                    EEG.event = setfield(EEG.event, { indexevent }, fname, num2str(allvalues{indexevent}) );
+                            
+                            format = 'ok';
+                            if ~all(valreal) % all valreal ok
+                                format = 'str';
+                                if all(valreal == 0) % all valreal=0 ok
+                                    format = 'ok';
                                 end;
                             end;
-                        end;
+                            if strcmp(format, 'str')
+                                fprintf('eeg_checkset note: event field format ''%s'' made uniform\n', fname);
+                                allvalues = cellfun(@num2str, allvalues, 'uniformoutput', false);
+                                [EEG.event(valreal).(fname)] = deal(allvalues{find(valreal)});
+                            end;
+                        end
                     end;
                     
                     % check boundary events
