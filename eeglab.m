@@ -192,7 +192,7 @@ end;
 % --------------------------------------
 eeglabpath = mywhich('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
-if nargin < 1
+if nargin < 1 && ~isdeployed
     eeglabpath2 = '';
     if strcmpi(eeglabpath, pwd) || strcmpi(eeglabpath(1:end-1), pwd) 
         cd('functions');
@@ -234,7 +234,7 @@ end;
 
 % test for local SCCN copy
 % ------------------------
-if ~iseeglabdeployed2
+if ~isdeployed
     addpathifnotinlist(eeglabpath);
     if exist( fullfile( eeglabpath, 'functions', 'adminfunc') ) ~= 7
         warning('EEGLAB subfolders not found');
@@ -255,7 +255,7 @@ end;
 
 % add paths
 % ---------
-if ~iseeglabdeployed2
+if ~isdeployed
     tmp = which('eeglab_data.set');
     if ~isempty(which('eeglab_data.set')) && ~isempty(which('GSN-HydroCel-32.sfp'))
         warning backtrace off;
@@ -403,7 +403,7 @@ try, eval('colordef white;'); catch end;
 
 % default option folder
 % ---------------------
-if ~iseeglabdeployed2
+if ~isdeployed
     eeglab_options;
     fprintf('eeglab: options file is %s%seeg_options.m\n', homefolder, filesep);
 end;
@@ -487,7 +487,7 @@ if exist('icalab')
     disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
 end;
 
-if ~iseeglabdeployed2
+if ~isdeployed
     % check for older version of Fieldtrip and presence of topoplot
     % -------------------------------------------------------------
     if ismatlab
@@ -850,7 +850,7 @@ if ismatlab
     uimenu( clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
-    if ~iseeglabdeployed2
+    if ~isdeployed
         %newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
         uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
@@ -876,10 +876,7 @@ if ismatlab
     uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end;
 
-if iseeglabdeployed2
-    disp('Adding FIELDTRIP toolbox functions');
-    disp('Adding BIOSIG toolbox functions');
-    disp('Adding FILE-IO toolbox functions');
+if isdeployed
     funcname = {  'eegplugin_dipfit' ...
                   'eegplugin_firfilt' };
     for indf = 1:length(funcname)
@@ -1035,7 +1032,8 @@ else
     global PLUGINLIST;
     PLUGINLIST = pluginlist;
     
-end; % iseeglabdeployed2
+end;
+
 % Path exception for BIOSIG (sending BIOSIG down into the path)
 biosigpathlast; % fix str2double issue
 
@@ -2080,15 +2078,6 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         %disp([ 'Adding new path ' tmpnewpath ]);
         addpathifnotinlist(tmpnewpath);
     end;
-
-function val = iseeglabdeployed2;
-%val = 1; return;
-if exist('isdeployed')
-     val = isdeployed;
-else val = 0;
-end;
-
-function buildhelpmenu;
     
 % parse plugin function name
 % --------------------------
