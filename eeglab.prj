@@ -1,17 +1,17 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="2303697546" file="/data/matlab/eeglabcompile/eeglab.prj" location="/data/matlab/eeglabcompile" name="eeglab" preferred-package-location="/data/matlab/eeglabcompile/eeglab/for_redistribution" preferred-package-type="package.type.app" target="target.ezdeploy.standalone" target-name="Application Compiler">
-    <param.appname>eeglab</param.appname>
+  <configuration file="/data/matlab/eeglab/eeglab.prj" location="/data/matlab/eeglab" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
-    <param.version>1.0</param.version>
-    <param.authnamewatermark />
-    <param.email />
+    <param.version>15.0</param.version>
+    <param.authnamewatermark>Arnaud Delorme and Scott Makeig</param.authnamewatermark>
+    <param.email>eeglab@sccn.ucsd.edu</param.email>
     <param.company />
-    <param.summary />
-    <param.description />
-    <param.screenshot />
+    <param.summary>EEGLAB Matlab toolbox for processing continuous and event-related EEG, MEG and other electrophysiological data</param.summary>
+    <param.description>EEGLAB is an interactive Matlab toolbox for processing continuous and event-related EEG, MEG and other electrophysiological data incorporating independent component analysis (ICA), time/frequency analysis, artifact rejection, event-related statistics, and several useful modes of visualization of the averaged and single-trial data.</param.description>
+    <param.screenshot>${PROJECT_ROOT}/functions/resources/EEGLAB_compile_splash.jpg</param.screenshot>
     <param.guid />
-    <param.installpath.string>/eeglab/</param.installpath.string>
+    <param.installpath.string>/EEGLAB/</param.installpath.string>
     <param.installpath.combo>option.installpath.systemwideapp</param.installpath.combo>
     <param.logo />
     <param.install.notes>In the following directions, replace MCR_ROOT by the directory where the MATLAB Runtime is installed on the target machine.
@@ -44,18 +44,12 @@ If it is defined, set it to the concatenation of these strings:
     <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
     <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
     <param.windows.command.prompt>false</param.windows.command.prompt>
-    <param.create.log>false</param.create.log>
-    <param.log.file />
+    <param.create.log>true</param.create.log>
+    <param.log.file>eeglab_log.txt</param.log.file>
     <unset>
       <param.icon />
       <param.icons />
-      <param.version />
-      <param.authnamewatermark />
-      <param.email />
       <param.company />
-      <param.summary />
-      <param.description />
-      <param.screenshot />
       <param.guid />
       <param.installpath.string />
       <param.installpath.combo />
@@ -76,17 +70,12 @@ If it is defined, set it to the concatenation of these strings:
       <param.package.mcr.name />
       <param.no.mcr.name />
       <param.windows.command.prompt />
-      <param.create.log />
-      <param.log.file />
     </unset>
     <fileset.main>
       <file>${PROJECT_ROOT}/eeglab.m</file>
     </fileset.main>
     <fileset.resources>
-      <file>${PROJECT_ROOT}/Contents.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj</file>
-      <file>${PROJECT_ROOT}/functions/@memmapdata</file>
-      <file>${PROJECT_ROOT}/functions/@mmo</file>
+      <file>${PROJECT_ROOT}/functions/adminfunc</file>
       <file>${PROJECT_ROOT}/functions/guifunc</file>
       <file>${PROJECT_ROOT}/functions/miscfunc</file>
       <file>${PROJECT_ROOT}/functions/popfunc</file>
@@ -95,57 +84,24 @@ If it is defined, set it to the concatenation of these strings:
       <file>${PROJECT_ROOT}/functions/statistics</file>
       <file>${PROJECT_ROOT}/functions/studyfunc</file>
       <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
-      <file>${PROJECT_ROOT}/plugins</file>
+      <file>${PROJECT_ROOT}/plugins/Fileio170623</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit2.3</file>
+      <file>${PROJECT_ROOT}/plugins/firfilt1.6.2</file>
     </fileset.resources>
-    <fileset.package />
-    <fileset.depfun>
-      <file>${PROJECT_ROOT}/functions/adminfunc/+up/updater.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/biosigpathfirst.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/biosigpathlast.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_checkchanlocs.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_checkset.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_eval.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_getdatact.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_getversion.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_global.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_hist.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_options.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_optionsbackup.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_retrieve.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeg_store.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eegh.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeglab_error.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeglab_options.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/eeglabexefolder.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/error_bc.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/gethelpvar.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/getkeyval.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/intersect_bc.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/is_sccn.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/iseeglabdeployed.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/ismatlab.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/ismember_bc.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_askinstall.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_convert.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_getweb.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_install.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_reactivate.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlread.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlreadwrite.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlsize.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/plugin_urlwrite.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/pop_delset.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/removepath.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/setdiff_bc.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/union_bc.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/unique_bc.m</file>
-      <file>${PROJECT_ROOT}/functions/adminfunc/vararg2str.m</file>
-    </fileset.depfun>
+    <fileset.package>
+      <file>${PROJECT_ROOT}/1ST_README.txt</file>
+      <file>${PROJECT_ROOT}/eeglablicense.txt</file>
+      <file>${PROJECT_ROOT}/functions/resources/eeglab_run_this_one_on_osx</file>
+      <file>${PROJECT_ROOT}/functions/resources/eeglab_run_this_one_on_windows.bat</file>
+      <file>${PROJECT_ROOT}/sample_data</file>
+      <file>${PROJECT_ROOT}/sample_locs</file>
+    </fileset.package>
+    <fileset.depfun />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/splash.png</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglabcompile/eeglab/for_testing/readme.txt</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_eeglab.sh" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/run_eeglab.sh</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="eeglab.app" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/eeglab.app</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/data/matlab/eeglab/eeglab/for_testing/run_EEGLAB.sh</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglab/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/data/matlab/eeglab/eeglab/for_testing/EEGLAB.app</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglab/eeglab/for_testing/splash.png</file>
     </build-deliverables>
     <workflow />
     <matlab>
