@@ -786,10 +786,20 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
 % get mesh information
 % --------------------
 function [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(meshfile);
+if isdeployed
+    addpath( fullfile( ctfroot, 'functions', 'resources') );
+end
         
 if ~isstruct(meshfile)
     if ~exist(meshfile)
-        error(sprintf('headplot(): mesh file "%s" not found\n',meshfile));
+        if isdeployed
+            meshfile = fullfile( ctfroot, 'functions', 'resources', meshfile);
+            if ~exist(meshfile)
+                error(sprintf('headplot(): deployed mesh file "%s" not found\n',meshfile));
+            end
+        else
+            error(sprintf('headplot(): mesh file "%s" not found\n',meshfile));
+        end
     end
     fprintf('Loaded mesh file %s\n',meshfile);
     try
