@@ -791,11 +791,9 @@ else
                         try
                             EEG = eeg_emptyset; % for dipfitdefs
                             dipfitdefs;
-                            tmpp = which('eeglab.m');
-                            tmpp = fullfile(fileparts(tmpp), 'functions', 'resources', 'Standard-10-5-Cap385_witheog.elp');
-                            userdatatmp = { template_models(1).chanfile template_models(2).chanfile  tmpp };
+                            userdatatmp = { template_models(1).chanfile template_models(2).chanfile 'Standard-10-5-Cap385_witheog.elp' }; % last file in the path (see eeglab.m)
                             clear EEG;
-                        catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385_witheog.elp' };
+                        catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385_witheog.elp' }; % files are in the path (see eeglab.m)
                         end;
 
                         % other commands for help/load
