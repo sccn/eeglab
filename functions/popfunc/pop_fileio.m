@@ -56,7 +56,7 @@ if nargin < 1
         if filename(1) == 0 return; end;
         filename = fullfile(filepath, filename);
     else
-        filename = uigetfile('*.*', 'Choose a folder -- pop_fileio()'); 
+        filename = uigetdir('*.*', 'Choose a folder -- pop_fileio()'); 
         drawnow;
         if filename(1) == 0 return; end;
     end;
@@ -101,6 +101,9 @@ if nargin < 1
     
     result = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
     if length(result) == 0 return; end;
+    if dat.nTrials <= 1
+        result = { result{1:2} [] result{3:end} };
+    end
 
     options = {};
     if length(result) == 3, result = { result{1:2} '' result{3}}; end;
