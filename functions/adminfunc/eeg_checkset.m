@@ -207,6 +207,11 @@ if length(EEG) > 1
                     end;
                 else res = 'no';
                 end;
+                
+                % Field 'datachan in 'urchanlocs' is removed, if exist
+                if isfield(EEG, 'urchanlocs') && ~isempty(EEG.urchanlocs) && isfield(EEG.urchanlocs, 'datachan')
+                        EEG.urchanlocs = rmfield(EEG.urchanlocs, 'datachan');
+                end           
                 return;
                 
             case 'icaconsist'  % test ICA decomposition consistency
