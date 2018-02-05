@@ -57,7 +57,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     end;
     
     if isstruct(bad_elec)
-        
+       
         % add missing channels in interpolation structure
         % -----------------------------------------------
         lab1 = { bad_elec.labels };
@@ -65,9 +65,17 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab2 = { tmpchanlocs.labels };
         [tmp tmpchan] = setdiff_bc( lab2, lab1);
         tmpchan = sort(tmpchan);
+        
+        % From 'bad_elec' using only fields present on EEG.chanlocs
+        fields = fieldnames(bad_elec);
+        [tmp, indx1] = setxor(fields,fieldnames(EEG.chanlocs)); clear tmp;
+        if ~isempty(indx1)
+            bad_elec = rmfield(bad_elec,fields(indx1));
+            fields = fieldnames(bad_elec);
+        end
+        
         if ~isempty(tmpchan)
             newchanlocs = [];
-            fields = fieldnames(bad_elec);
             for index = 1:length(fields)
                 if isfield(bad_elec, fields{index})
                     for cind = 1:length(tmpchan)
