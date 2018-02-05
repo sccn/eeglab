@@ -12,7 +12,9 @@
 %                   then on optional field2. Arg dir1 indicates the sort 
 %                   direction (0 = increasing, 1 = decreasing).
 %   'changefield' - {num field value} Insert the given value into the specified 
-%                   field in event num. (Ex: {34 'latency' 320.4})
+%                   field in event num. (Ex: {34 'latency' 320.4}). Note
+%                   that for latency event latencies are in millisecond
+%                   compared to the time locking event not in data samples.
 %   'changeevent' - {num value1 value2 value3 ...} Change the values of
 %                   all fields in event num.
 %   'add','append','insert' - {num value1 value2 value3 ...} Insert event
