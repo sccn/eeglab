@@ -244,7 +244,7 @@ if ~isequal('off', g.interpchan )
         end
     
     % Case where channel loc structure is provided    
-    elseif isstrcut(g.interpchan) 
+    elseif isstruct(g.interpchan) 
         chanlocs2interp = g.interpchan;
         interpflag = 1;
     
