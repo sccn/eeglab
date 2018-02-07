@@ -186,7 +186,7 @@ if nargin < 2
     if restag.ave,               ref = []; end;
     if restag.rerefstr           
         if isempty(restag.reref)
-            warndlg2('Abording: you must enter one or more reference channels'); 
+            warndlg2('Aborting: you must enter one or more reference channels'); 
             return;
         else
             ref = eeg_chaninds(EEG, restag.reref); 
@@ -216,12 +216,25 @@ if ~isequal('off', g.interpchan )
         try
             if g.enforcetype
                 eegtypeindx0 = strmatch('EEG',{EEG.urchanlocs.type});
+                eegtypeindx1 = strmatch('EEG',{EEG.chanlocs.type});
             else
                 eegtypeindx0 = [1:length(EEG.urchanlocs)]';
-            end
-            eegtypeindx1 = strmatch('EEG',{EEG.chanlocs.type});
+                eegtypeindx1 = [1:length(EEG.chanlocs)]';
+                
+                % Excluding fiducials if exist
+                indxfid_urch = find(strcmp({'fid'},lower({EEG.urchanlocs.type})));
+                indxfid_ch   = find(strcmp({'fid'},lower({EEG.chanlocs.type})));
+                
+                if ~isempty(indxfid_urch), eegtypeindx0(indxfid_urch) = []; end                
+                if ~isempty(indxfid_ch),   eegtypeindx1(indxfid_ch)   = []; end
+            end     
         catch
             fprintf(2,'pop_reref error: Unable to check for deleted channels. Missing field ''type'' in channel location \n');
+            return;
+        end
+        
+        if isempty(eegtypeindx0) || isempty(eegtypeindx1)
+            fprintf(2,'pop_reref error: Unable to get channel type from this data. Check field ''type'' on EEG.urchanlocs or EEG.chanlocs. \n');
             return;
         end
         
