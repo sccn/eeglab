@@ -104,7 +104,6 @@ if nargin < 1
     if dat.nTrials <= 1
         result = { result{1:2} [] result{3:end} };
     end
-
     options = {};
     if length(result) == 3, result = { result{1:2} '' result{3}}; end;
     if ~isempty(result{1}), options = { options{:} 'channels' eval( [ '[' result{1} ']' ] ) }; end;
@@ -112,7 +111,6 @@ if nargin < 1
     if ~isempty(result{3}), options = { options{:} 'trials'   eval( [ '[' result{3} ']' ] ) }; end;
     if ~isempty(result{4}), options = { options{:} 'dataformat' formats{result{4}} }; end;
     if result{5}, options = { options{:} 'memorymapped' fastif(result{5}, 'on', 'off') }; end;
-    
 else
     dat = ft_read_header(filename);
     options = varargin;
@@ -176,6 +174,28 @@ EEG.trials          = dat.nTrials;
 EEG.pnts            = dat.nSamples;
 if isfield(dat, 'label') && ~isempty(dat.label)
     EEG.chanlocs = struct('labels', dat.label);
+    
+    % START ----------- Extracting EEG channel location
+    % Note: Currently for extensions where FT is able to generate valid 'labels' and 'elec' structure (e.g. FIF)
+    %If more formats, add them below
+    try
+        if isfield(dat,'elec')
+            eegchanindx = find(ft_chantype(dat, 'eeg'));
+            if ~isempty(eegchanindx)
+                for ichan = 1:length(eegchanindx)
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'X' dat.elec.chanpos(ichan,1) 'type' 'EEG'});
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Y' dat.elec.chanpos(ichan,2) 'type' 'EEG'});
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Z' dat.elec.chanpos(ichan,3) 'type' 'EEG'});                   
+                end
+                EEG = pop_chanedit(EEG, 'eval','chans = pop_chancenter( chans, [],[])');
+            else
+                fprintf('pop_fileio: Unable to find EEG channels to extract location\n');
+            end
+        end
+    catch
+        fprintf('pop_fileio: Unable to import channel location\n');
+    end
+    % END ----------- Extracting EEG channel location
 end
 
 % extract events
