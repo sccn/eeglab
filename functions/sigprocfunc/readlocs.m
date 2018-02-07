@@ -75,7 +75,7 @@
 %   'center'    - [(1,3) real array or 'auto'] center of xyz coordinates for conversion 
 %                 to spherical or polar, Specify the center of the sphere here, or 'auto'. 
 %                 This uses the center of the sphere that best fits all the electrode 
-%                 locations read. {default: [0 0 0]}
+%                 locations read. {default: [0 0 0]}. [Deprecated]
 % Outputs:
 %   eloc        - structure containing the channel names and locations (if present).
 %                 It has three fields: 'eloc.labels', 'eloc.theta' and 'eloc.radius' 
