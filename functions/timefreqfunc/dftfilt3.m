@@ -150,22 +150,25 @@ sp=1/srate; % Rey added this line (i.e., sampling period).
 % compute wavelet
 for index = 1:length(freqs)
     fk=freqs(index);
-    if strcmpi(type, 'morlet') % Morlet. 
+    if strcmpi(type, 'morlet') % Morlet.
+        fk=fk/srate; % Normalize frequency for textbook equations as in TB97
         sigf=fk/cycles(index); % Computing time and frequency standard deviations, resolutions, and normalization constant. 
         sigt=1./(2*pi*sigf);
         A=1./sqrt(sigt*sqrt(pi));
-        timeresol(index)=2*sigt;
-        freqresol(index)=2*sigf;
+        timeresol(index)=2*sigt/srate; % sec
+        freqresol(index)=2*sigf*srate; % Hz
         if isempty(winsize) % bases will be a cell array.        
-            tneg=[-sp:-sp:-sigt*timesupport/2];
-            tpos=[0:sp:sigt*timesupport/2];
-            t=[fliplr(tneg) tpos];
+%             tneg=[-sp:-sp:-sigt*timesupport/2];
+%             tpos=[0:sp:sigt*timesupport/2];
+%             t=[fliplr(tneg) tpos];
+            t = (0:floor(sigt*timesupport/2)*2)-floor(sigt*timesupport/2); % Always odd; backward compatible
             psi=A.*(exp(-(t.^2)./(2*(sigt^2))).*exp(2*i*pi*fk*t));
             wavelet{index}=psi;  % These are the wavelets with variable number of samples based on temporal standard deviations (sigt).
         else % bases will be a matrix.
-            tneg=[-sp:-sp:-sp*winsize/2];
-            tpos=[0:sp:sp*winsize/2];
-            t=[fliplr(tneg) tpos];
+%             tneg=[-sp:-sp:-sp*winsize/2];
+%             tpos=[0:sp:sp*winsize/2];
+%             t=[fliplr(tneg) tpos];
+            t = (0:floor(winsize/2)*2)-floor(winsize/2); % Always odd; backward compatible
             psi=A.*(exp(-(t.^2)./(2*(sigt^2))).*exp(2*i*pi*fk*t));
             wavelet(index,:)=psi; % These are the wavelets with the same length.                                 
             % This is useful for doing time-frequency analysis as a matrix vector or matrix matrix multiplication.
