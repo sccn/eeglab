@@ -139,6 +139,20 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
             end;
             chanlocs = convertlocs(chanlocs, 'cart2all');
         end;
+        
+        % rotate X-Y plane 
+        % ----------------
+        if strcmpi(type, 'z')
+            curx   = mean([ chanlocs(chans).X ]);
+            cury   = mean([ chanlocs(chans).Y ]);
+            newz = val;
+            rotangle = solvesystem(curx, cury, newz);
+            
+            for chanind = 1:length(chanlocs)
+                [chanlocs(chanind).X chanlocs(chanind).Y]= rotation(chanlocs(chanind).X, chanlocs(chanind).Y, rotangle);
+            end;
+            chanlocs = convertlocs(chanlocs, 'cart2all');
+        end;
     
     end;
         
