@@ -768,40 +768,6 @@ else
                     error('Wrong value for nose direction');
                 end;
                 
-                % Performing channel rotation (start)
-                % ------------------------------------------------------
-                if strcmpi(chaninfo.nosedir, '+x')
-                    rotate = 0;
-                elseif all(isfield(chans,{'X','Y','theta','sph_theta'}))
-                    disp(['Note for expert users: Nose direction is now set from ''' upper(chaninfo.nosedir)  ''' to default +X in EEG.chanlocs']);
-                    if strcmpi(chaninfo.nosedir, '+y')
-                        rotate = 270;
-                    elseif strcmpi(chaninfo.nosedir, '-x')
-                        rotate = 180;
-                    else
-                        rotate = 90;
-                    end;
-                    % Rotate here. 
-                    for index = 1:length(chans)
-                        rotategrad = rotate/180*pi;
-                        coord = (chans(index).Y + chans(index).X*sqrt(-1))*exp(sqrt(-1)*-rotategrad);
-                        chans(index).Y = real(coord);
-                        chans(index).X = imag(coord);
-                        if ~isempty(chans(index).theta)
-                            chans(index).theta     = chans(index).theta    -rotate;
-                            chans(index).sph_theta = chans(index).sph_theta+rotate;
-                            if chans(index).theta    <-180, chans(index).theta    =chans(index).theta    +360; end;
-                            if chans(index).sph_theta>180 , chans(index).sph_theta=chans(index).sph_theta-360; end;
-                        else
-                            chans(index).theta     = [];
-                            chans(index).sph_theta = [];
-                        end;
-                    end;
-                    chaninfo.nosedir = '+X';
-                end;
-                % --------------------------------------------------
-                % END
-                
             case { 'lookup' 'lookupgui' }
                 if strcmpi(lower(args{curfield}), 'lookupgui')
                     standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
