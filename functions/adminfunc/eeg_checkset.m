@@ -1091,27 +1091,27 @@ for inddataset = 1:length(ALLEEG)
         % force Nosedir to +X (done here because of DIPFIT)
         % -------------------
         if isfield(EEG.chaninfo, 'nosedir')
-            if strcmpi(EEG.chaninfo.nosedir, '+x')
-                rotate = 0;
-            elseif all(isfield(EEG.chanlocs,{'X','Y','theta','sph_theta'}))
-                disp('EEG checkset note for expert users: Noze direction now set to default +X in EEG.chanlocs and EEG.dipfit.');
-                if strcmpi(EEG.chaninfo.nosedir, '+y')
+            if ~strcmpi(EEG.chaninfo.nosedir, '+x') && all(isfield(EEG.chanlocs,{'X','Y','theta','sph_theta'})) 
+                disp(['Note for expert users: Nose direction is now set from ''' upper(EEG.chaninfo.nosedir)  ''' to default +X in EEG.chanlocs']);
+                [tmp chaninfo chans] = eeg_checkchanlocs(EEG.chanlocs, EEG.chaninfo); % Merge all channels for rotation (FID and data channels)
+                if strcmpi(chaninfo.nosedir, '+y')
                     rotate = 270;
-                elseif strcmpi(EEG.chaninfo.nosedir, '-x')
+                elseif strcmpi(chaninfo.nosedir, '-x')
                     rotate = 180;
-                else rotate = 90;
+                else
+                    rotate = 90;
                 end;
-                for index = 1:length(EEG.chanlocs)
-                    if ~isempty(EEG.chanlocs(index).theta)
-                        rotategrad = rotate/180*pi;
-                        coord = (EEG.chanlocs(index).Y + EEG.chanlocs(index).X*sqrt(-1))*exp(sqrt(-1)*-rotategrad);
-                        EEG.chanlocs(index).Y = real(coord);
-                        EEG.chanlocs(index).X = imag(coord);
-                        
-                        EEG.chanlocs(index).theta     = EEG.chanlocs(index).theta    -rotate;
-                        EEG.chanlocs(index).sph_theta = EEG.chanlocs(index).sph_theta+rotate;
-                        if EEG.chanlocs(index).theta    <-180, EEG.chanlocs(index).theta    =EEG.chanlocs(index).theta    +360; end;
-                        if EEG.chanlocs(index).sph_theta>180 , EEG.chanlocs(index).sph_theta=EEG.chanlocs(index).sph_theta-360; end;
+                for index = 1:length(chans)
+                    rotategrad = rotate/180*pi;
+                    coord = (chans(index).Y + chans(index).X*sqrt(-1))*exp(sqrt(-1)*-rotategrad);
+                    chans(index).Y = real(coord);
+                    chans(index).X = imag(coord);
+
+                    if ~isempty(chans(index).theta)
+                        chans(index).theta     = chans(index).theta    -rotate;
+                        chans(index).sph_theta = chans(index).sph_theta+rotate;
+                        if chans(index).theta    <-180, chans(index).theta    =chans(index).theta    +360; end;
+                        if chans(index).sph_theta>180 , chans(index).sph_theta=chans(index).sph_theta-360; end;
                     end;
                 end;
                 
@@ -1124,8 +1124,9 @@ for inddataset = 1:length(ALLEEG)
                     end;
                 end;
                 
-            end;
-            EEG.chaninfo.nosedir = '+X';
+                chaninfo.nosedir = '+X';
+                [EEG.chanlocs EEG.chaninfo] = eeg_checkchanlocs(chans, chaninfo); % Update FID in chaninfo and remove them from chanlocs
+            end;            
         end;
         
         % general checking of channels
