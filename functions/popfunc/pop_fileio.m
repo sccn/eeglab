@@ -116,18 +116,6 @@ else
     options = varargin;
 end;
 
-% In case of FIF files convert EEG channel units to mV
-[trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
-if strcmpi(filext,'.fif')
-    eegchanindx = find(strcmpi(dat.chantype,'eeg'));
-    if ~all(strcmpi(dat.chanunit(eegchanindx),'mv'))
-        fprintf('Forcing EEG channel units to ''mV'' ...... \n');
-        dat.chanunit(eegchanindx) = {'mV'};
-    else
-        fprintf('EEG channel units already in ''mV'' \n');
-    end
-end
-
 % decode imput parameters
 % -----------------------
 g = finputcheck( options, { 'samples'      'integer' [1 Inf]    [];
@@ -142,6 +130,21 @@ if isstr(g), error(g); end;
 EEG = eeg_emptyset;
 fprintf('Reading data ...\n');
 dataopts = {};
+% In case of FIF files convert EEG channel units to mV in FT options
+[trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
+if strcmpi(filext,'.fif')
+    eegchanindx = find(strcmpi(dat.chantype,'eeg'));
+    if ~isempty(eegchanindx) && isfield (dat,'chanunit')
+        if ~all(strcmpi(dat.chanunit(eegchanindx),'uv'))
+            fprintf('Forcing EEG channel units to ''uV'' ...... \n');
+            chanunitval = dat.chanunit;
+            chanunitval(eegchanindx) = {'uV'};
+            dataopts = { dataopts{:} 'chanunit', chanunitval};
+        else
+            fprintf('EEG channel units already in ''uV'' \n');
+        end  
+    end
+end
 if ~isempty(g.samples ), dataopts = { dataopts{:} 'begsample', g.samples(1), 'endsample', g.samples(2)}; end;
 if ~isempty(g.trials  ), dataopts = { dataopts{:} 'begtrial', g.trials(1), 'endtrial', g.trials(2)}; end;
 if ~strcmpi(g.dataformat, 'auto'), dataopts = { dataopts{:} 'dataformat' g.dataformat }; end;
