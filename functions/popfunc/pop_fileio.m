@@ -130,7 +130,7 @@ if isstr(g), error(g); end;
 EEG = eeg_emptyset;
 fprintf('Reading data ...\n');
 dataopts = {};
-% In case of FIF files convert EEG channel units to mV in FT options
+% In case of FIF files convert EEG channel units to uV in FT options
 [trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
 if strcmpi(filext,'.fif')
     eegchanindx = find(strcmpi(dat.chantype,'eeg'));

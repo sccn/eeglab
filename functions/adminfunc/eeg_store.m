@@ -1,4 +1,4 @@
-% eeg_store() - store specified EEG dataset(s) in the ALLEG variable 
+% eeg_store() - store specified EEG dataset(s) in the ALLEEG variable 
 %               containing all current datasets, after first checking 
 %               dataset consistency using eeg_checkset().
 %
