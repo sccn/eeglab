@@ -14,7 +14,7 @@
 %   'epochconsist' - if EEG contains several datasets, check whether they have
 %                    identical epoch lengths and time limits.
 %   'chanconsist'  - if EEG contains several datasets, check whether they have
-%                    the same number of channela and channel labels.
+%                    the same number of channels and channel labels.
 %   'data'         - check whether EEG contains data (EEG.data)
 %   'loaddata'     - load data array (if necessary)
 %   'savedata'     - save data array (if necessary - see EEG.saved below)
@@ -209,8 +209,8 @@ if length(EEG) > 1
                 end;
                 
                 % Field 'datachan in 'urchanlocs' is removed, if exist
-                if isfield(EEG, 'urchanlocs') && ~isempty(EEG.urchanlocs) && isfield(EEG.urchanlocs, 'datachan')
-                        EEG.urchanlocs = rmfield(EEG.urchanlocs, 'datachan');
+                if isfield(EEG, 'urchanlocs') && ~all(cellfun(@isempty,{EEG.urchanlocs})) && isfield([EEG.urchanlocs], 'datachan')
+                        [EEG.urchanlocs] = deal(rmfield([EEG.urchanlocs], 'datachan'));
                 end           
                 return;
                 
@@ -1148,6 +1148,11 @@ for inddataset = 1:length(ALLEEG)
     %    end;
     %    disp('eeg_checkset note: creating backup chanlocs structure (urchanlocs)');
     %end;
+    
+    % Field 'datachan in 'urchanlocs' is removed, if exist    
+    if isfield(EEG, 'urchanlocs') && ~isempty(EEG.urchanlocs) && isfield(EEG.urchanlocs, 'datachan')
+        EEG.urchanlocs = rmfield(EEG.urchanlocs, 'datachan');
+    end
     
     % check reference
     % ---------------
