@@ -186,9 +186,10 @@ if isfield(dat, 'label') && ~isempty(dat.label)
             eegchanindx = find(ft_chantype(dat, 'eeg'));
             if ~isempty(eegchanindx)
                 for ichan = 1:length(eegchanindx)
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'X' dat.elec.chanpos(ichan,1) 'type' 'EEG'});
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Y' dat.elec.chanpos(ichan,2) 'type' 'EEG'});
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Z' dat.elec.chanpos(ichan,3) 'type' 'EEG'});                   
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'X'    dat.elec.chanpos(ichan,1)});
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Y'    dat.elec.chanpos(ichan,2)});
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Z'    dat.elec.chanpos(ichan,3)});
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'type' 'EEG'}); 
                 end
                 EEG.urchanlocs = EEG.chanlocs;
                 EEG = pop_chanedit(EEG, 'eval','chans = pop_chancenter( chans, [],[])');
