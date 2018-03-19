@@ -200,13 +200,6 @@ if isempty(chans) || all(~ishandle(chans))
         orichaninfo = [];
     end;
     
-    % Checking for flag to replace 'urchanloc' field
-    indx_tmp = find(strcmp(varargin,'rplurchanloc'));
-    flag_replurchan = 0;
-     if ~isempty(indx_tmp)
-         flag_replurchan = varargin{indx_tmp+1};
-     end
-    
     % insert "no data channels" in channel structure
     % ----------------------------------------------
     nbchan = length(chans);
@@ -224,6 +217,13 @@ if isempty(chans) || all(~ishandle(chans))
 
     oldchaninfo = chaninfo;
 end;
+
+% Checking for flag to replace 'urchanloc' field
+indx_tmp = find(strcmp(varargin,'rplurchanloc'));
+flag_replurchan = 0;
+if ~isempty(indx_tmp)
+    flag_replurchan = varargin{indx_tmp+1};
+end
 
 if nargin < 3
 
@@ -346,7 +346,7 @@ if nargin < 3
         { 'Style', 'pushbutton', 'string', 'Look up locs',                'callback', 'pop_chanedit(gcbf,[], ''lookupgui'', []);' }, ...
         { 'Style', 'pushbutton', 'string', 'Save (as .ced)',              'callback', 'pop_chanedit(gcbf,[], ''save'',[]);' } ...
         { 'Style', 'pushbutton', 'string', 'Save (other types)',          'callback', 'pop_chanedit(gcbf,[], ''saveothers'',[]);' } ...
-        { 'Style', 'checkbox'  , 'string', 'Overwrite Original Channels (if exist)', 'callback', cb_rplurchan, 'tag'   , 'rplurchan',  'value', 0  }...
+        { 'Style', 'checkbox'  , 'string', 'Overwrite Original Channels', 'callback', cb_rplurchan, 'tag'   , 'rplurchan',  'value', flag_replurchan }...
         };
 
     % evaluation of command below is required to center text (if
@@ -378,6 +378,8 @@ if nargin < 3
     if ~isempty(userdata.commands)
         com = sprintf('%s=pop_chanedit(%s, %s);', inputname(1), inputname(1), vararg2str(userdata.commands));
     end;
+    % Updating flag
+    flag_replurchan = results{15};
 else
     
     % call from command line or from a figure
@@ -400,8 +402,9 @@ else
     for curfield = 1:2:length(args)
         switch lower(args{curfield})
             case 'rplurchanloc'
-                args{curfield} = 'rplurchanloc';
-                args{ curfield+1 } =   0;
+                if flag_replurchan, urchans = eeg_checkchanlocs(chans, chaninfo); end;
+                args{curfield}     = 'rplurchanloc';
+                args{ curfield+1 } =  flag_replurchan;
             case 'return'
                 [tmpchans] = eeg_checkchanlocs(chans);
                 if nchansori ~= 0 & nchansori ~= length(tmpchans)
@@ -827,7 +830,8 @@ else
                             { } ...
                             { 'style' 'edit'       'string' userdatatmp{1} 'tag' 'elec' } ...
                             { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
-                            { 'Style', 'checkbox', 'value', 1, 'string','Overwrite Original Channels' } };
+                            { } };
+%                             { 'Style', 'checkbox', 'value', 0, 'string','Overwrite Original Channels' } };
 
                         res = inputgui( { 1 [1 0.3] [1 0.3] 1 }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1 1] );
                         if ~isempty(res)
@@ -835,8 +839,8 @@ else
                             args{ curfield   } = 'lookup';
                             args{ curfield+1 } = res{2};
                             args{ curfield+2 } = 'rplurchanloc';
-                            args{ curfield+3 } = res{3};
-                            flag_replurchan    = res{3};
+%                             args{ curfield+3 } = res{3};
+%                             flag_replurchan    = res{3};
                             com = args;
                         else
                             return;
@@ -889,7 +893,7 @@ else
                 else
                     chaninfo.nosedir = '+X';
                 end;
-                if flag_replurchan, urchans = chans; end;
+                if flag_replurchan, urchans = eeg_checkchanlocs(chans, chaninfo); end;
                 for index = 1:length(chans)
                     chans(index).urchan    = index;
                     chans(index).ref       = '';
@@ -943,7 +947,7 @@ else
                  EEG(index).chaninfo = chaninfo;
              end;
              % Updating urchanlocs            
-             if (flag_replurchan && ~isempty(urchans)) || (isempty(EEG.urchanlocs) && ~isempty(urchans)), EEG.urchanlocs = urchans; end;
+             if flag_replurchan && ~isempty(urchans), EEG.urchanlocs = urchans; end;
              EEG = eeg_checkset(EEG); % for channel orientation
          else
              disp('Channel structure size not consistent with the data so changes will be ignored');
