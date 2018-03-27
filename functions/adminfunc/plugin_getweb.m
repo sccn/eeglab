@@ -53,7 +53,7 @@ for iRow = 1:length(plugin)
         
     % get number of downloads
     if ~isempty(stats)
-        indMatch = strmatch(plugin(iRow).name, stats{1}, 'exact');
+        indMatch = strmatch(lower(plugin(iRow).name), lower(stats{1}), 'exact');
         if ~isempty(indMatch)
              plugin(iRow).downloads = stats{2}(indMatch(1));
              if length(stats) > 2 && ~isempty(stats{3}{indMatch(1)})
