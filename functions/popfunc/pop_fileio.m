@@ -3,9 +3,13 @@
 % Usage:
 %   >> OUTEEG = pop_fileio; % pop up window
 %   >> OUTEEG = pop_fileio( filename );
+%   >> OUTEEG = pop_fileio( header, dat, evt );
 %
 % Inputs:
 %   filename - [string] file name
+%   header   - fieldtrip data header 
+%   data     - fieldtrip raw data
+%   evt      - fieldtrip event structure
 %
 % Optional inputs:
 %   'channels'   - [integer array] list of channel indices
@@ -45,6 +49,8 @@ command = '';
 
 if ~plugin_askinstall('Fileio', 'ft_read_data'), return; end;
 
+alldata = [];
+event   = [];
 if nargin < 1
 	% ask user
     ButtonName = questdlg2('Do you want to import a file or a folder?', ...
@@ -112,18 +118,42 @@ if nargin < 1
     if ~isempty(result{4}), options = { options{:} 'dataformat' formats{result{4}} }; end;
     if result{5}, options = { options{:} 'memorymapped' fastif(result{5}, 'on', 'off') }; end;
 else
-    dat = ft_read_header(filename);
-    options = varargin;
-end;
+    if ~isstruct(filename)
+        dat = ft_read_header(filename);
+        options = varargin;
+    else
+        dat = filename;
+        filename = '';
+        alldata = varargin{1};
+        options = {};
+        if nargin >= 4
+             event = varargin{2};
+        end
+    end
+end
+
+% In case of FIF files convert EEG channel units to mV
+if ischar(filename)
+    [trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
+    if strcmpi(filext,'.fif')
+        eegchanindx = find(strcmpi(dat.chantype,'eeg'));
+        if ~all(strcmpi(dat.chanunit(eegchanindx),'mv'))
+            fprintf('Forcing EEG channel units to ''mV'' ...... \n');
+            dat.chanunit(eegchanindx) = {'mV'};
+        else
+            fprintf('EEG channel units already in ''mV'' \n');
+        end
+    end
+end
 
 % decode imput parameters
 % -----------------------
-g = finputcheck( options, { 'samples'      'integer' [1 Inf]    [];
-                            'trials'       'integer' [1 Inf]    [];
-                            'channels'     'integer' [1 Inf]    [];
-                            'dataformat'   'string'  {}         'auto';
-                            'memorymapped' 'string'  { 'on';'off' } 'off' }, 'pop_fileio');
-if isstr(g), error(g); end;
+g = struct(options{:});
+if ~isfield(g, 'samples'), g.samples = []; end
+if ~isfield(g, 'trials'), g.trials = []; end
+if ~isfield(g, 'channels'), g.channels = []; end
+if ~isfield(g, 'dataformat'), g.dataformat = 'auto'; end
+if ~isfield(g, 'memorymapped'), g.memorymapped = 'off'; end
 
 % import data
 % -----------
@@ -148,9 +178,11 @@ end
 if ~isempty(g.samples ), dataopts = { dataopts{:} 'begsample', g.samples(1), 'endsample', g.samples(2)}; end;
 if ~isempty(g.trials  ), dataopts = { dataopts{:} 'begtrial', g.trials(1), 'endtrial', g.trials(2)}; end;
 if ~strcmpi(g.dataformat, 'auto'), dataopts = { dataopts{:} 'dataformat' g.dataformat }; end;
-if strcmpi(g.memorymapped, 'off')
+if strcmpi(g.memorymapped, 'off') || ~isempty(alldata)
     if ~isempty(g.channels), dataopts = { dataopts{:} 'chanindx', g.channels }; end;
-    alldata = ft_read_data(filename, 'header', dat, dataopts{:});
+    if isempty(alldata)
+        alldata = ft_read_data(filename, 'header', dat, dataopts{:});
+    end
 else
     % read memory mapped file
     g.datadims = [ dat.nChans dat.nSamples dat.nTrials ];
@@ -206,9 +238,14 @@ end
 % extract events
 % --------------
 disp('Reading events...');
-try
-    event = ft_read_event(filename, dataopts{:});
-catch, disp(lasterr); event = []; end;
+if isempty(event)
+    try
+        event = ft_read_event(filename, dataopts{:});
+    catch
+        disp(lasterr); 
+        event = []; 
+    end
+end
 if ~isempty(event)
     subsample = 0;
     
@@ -225,20 +262,26 @@ if ~isempty(event)
         end;
     end;
     
-    EEG = eeg_checkset(EEG, 'eventconsistency');
-else 
+    if exist('eeg_checkset')
+        EEG = eeg_checkset(EEG, 'eventconsistency');
+    end
+else
     disp('Warning: no event found. Events might be embeded in a data channel.');
     disp('         To extract events, use menu File > Import Event Info > From data channel');
-end;
+end
 
 % convert data to single if necessary
 % -----------------------------------
-EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
+if exist('eeg_checkset')
+    EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
+end
 
 % history
 % -------
-if isempty(options)
-    command = sprintf('EEG = pop_fileio(''%s'');', filename); 
-else
-    command = sprintf('EEG = pop_fileio(''%s'', %s);', filename, vararg2str(options)); 
-end;    
+if ischar(filename)
+    if isempty(options)
+        command = sprintf('EEG = pop_fileio(''%s'');', filename);
+    else
+        command = sprintf('EEG = pop_fileio(''%s'', %s);', filename, vararg2str(options));
+    end
+end
