@@ -191,8 +191,8 @@ if isfield(dat, 'label') && ~isempty(dat.label)
                     EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Z'    dat.elec.chanpos(ichan,3)});
                     EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'type' 'EEG'}); 
                 end
+                EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
                 EEG.urchanlocs = EEG.chanlocs;
-                EEG = pop_chanedit(EEG, 'eval','chans = pop_chancenter( chans, [],[])');
             else
                 fprintf('pop_fileio: Unable to find EEG channels to extract location\n');
             end
