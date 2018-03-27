@@ -609,7 +609,9 @@ else
                 if ~isempty(strmatch( tmpargs{2}, { 'X' 'Y' 'Z' 'theta' 'radius' 'sph_theta' 'sph_phi' 'sph_radius'}))
                      if ~isnumeric(tmpargs{3}), tmpargs{3} = str2num(tmpargs{3}); end;
                 end;
-                eval([ 'chans(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' reformat(tmpargs{3} ) ';' ]);
+                for paramChan = 2:2:length(tmpargs)
+                    eval([ 'chans(' int2str(tmpargs{1}) ').'  tmpargs{paramChan} '=' reformat(tmpargs{paramChan+1} ) ';' ]);
+                end
             case { 'insert' 'add' 'append' }
                 tmpargs = args{ curfield+1 };
                 allfields = fieldnames(chans);
