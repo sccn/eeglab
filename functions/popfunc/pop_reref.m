@@ -38,14 +38,11 @@
 % Optional inputs:
 %   'interpchan'  - [channel location structure | integer array | [] | 'off']
 %                   Channels to interpolate prior to re-referencing the data. If [],
-%                   channels will be found by comparing all the channels in the current
-%                   EEG.chanlocs structure against EEG.urchanlocs. A channel location 
-%                   structure of the channels to be interpolated can be provided as an
-%                   input, as well as the index of the channels into the EEG.urchanlocs.
+%                   channels will be found by comparing all the channels (type = EEG) 
+%                   in the current EEG.chanlocs structure against EEG.urchanlocs. A channel 
+%                   location  structure of the channels to be interpolated can be provided 
+%                   as an input, as well as the index of the channels into the EEG.urchanlocs.
 %                   Default:'off'
-%   'enforcetype' - [0|1] Given the option 'interpchan', this option will
-%                   enforce the finding of the removed channels of type 'EEG' exclusively.
-%                   Default:0 -> Do not enforce type 'EEG'.
 %   'exclude'     - [integer array] List of channels to exclude. Default: none.
 %   'keepref'     - ['on'|'off'] keep the reference channel. Default: 'off'.
 %   'refloc'      - [structure] Previous reference channel structure. Default: none.
@@ -214,19 +211,23 @@ if ~isequal('off', g.interpchan )
     % Case no channel provided, infering them from urchanlocs field
     if isempty(g.interpchan) 
         try
-            if g.enforcetype
-                eegtypeindx0 = strmatch('EEG',{EEG.urchanlocs.type});
-                eegtypeindx1 = strmatch('EEG',{EEG.chanlocs.type});
-            else
+            urchantype  = {EEG.urchanlocs.type};
+            chanloctype = {EEG.chanlocs.type};
+            if  any(cellfun(@isempty,urchantype)) || any(cellfun(@isempty,chanloctype))
                 eegtypeindx0 = [1:length(EEG.urchanlocs)]';
                 eegtypeindx1 = [1:length(EEG.chanlocs)]';
-                
                 % Excluding fiducials if exist
-                indxfid_urch = find(strcmp({'fid'},lower({EEG.urchanlocs.type})));
-                indxfid_ch   = find(strcmp({'fid'},lower({EEG.chanlocs.type})));
-                
-                if ~isempty(indxfid_urch), eegtypeindx0(indxfid_urch) = []; end                
-                if ~isempty(indxfid_ch),   eegtypeindx1(indxfid_ch)   = []; end
+                try
+                    indxfid_urch = find(strcmpi({'fid'},urchantype));
+                    indxfid_ch   = find(strcmpi({'fid'},chanloctype));
+                    if ~isempty(indxfid_urch), eegtypeindx0(indxfid_urch) = []; end
+                    if ~isempty(indxfid_ch),   eegtypeindx1(indxfid_ch)   = []; end
+                catch
+                    fprintf('pop_reref message: Unable to find fiducials...\n');
+                end
+            else   
+                eegtypeindx0 = strmatch('EEG',urchantype);
+                eegtypeindx1 = strmatch('EEG',chanloctype);    
             end     
         catch
             fprintf(2,'pop_reref error: Unable to check for deleted channels. Missing field ''type'' in channel location \n');
