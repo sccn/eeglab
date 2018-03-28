@@ -29,7 +29,8 @@
 %   'chanlocsize'  - check the EEG.chanlocs structure length; show warning if
 %                    necessary.
 %   'chanlocs_homogeneous' - check whether EEG contains consistent channel
-%                            information; if not, correct it.
+%                            information; if not, correct it.This option
+%                            calls eeg_checkchanlocs.
 %   'eventconsistency'     - check whether EEG.event information are consistent;
 %                            rebuild event* subfields of the 'EEG.epoch' structure
 %                            (can be time consuming).
@@ -289,7 +290,7 @@ for inddataset = 1:length(ALLEEG)
                             'For channel file format, see ''>> help readlocs'' from the command line.'), 'Error');
                         return;
                     end;
-                case 'chanlocs_homogeneous',
+                case 'chanlocs_homogeneous',                    
                     tmplocs = EEG.chanlocs;
 	                if isempty(tmplocs) || ~isfield(tmplocs, 'theta') || all(cellfun('isempty', { tmplocs.theta }))
                         errordlg2( strvcat('This functionality requires channel location information.', ...
@@ -298,9 +299,9 @@ for inddataset = 1:length(ALLEEG)
                         return;
                     end;
                     if ~isfield(EEG.chanlocs, 'X') || isempty(EEG.chanlocs(1).X)
-                        EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
-%                         res = [ inputname(1) ' = eeg_checkset('  inputname(1) ', ''chanlocs_homogeneous'' ); ' ];
-                        res = ['EEG = eeg_checkset(EEG, ''chanlocs_homogeneous'' ); ' ];
+                        EEG = eeg_checkchanlocs(EEG);
+                        % EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
+                        res = ['EEG = eeg_checkset(EEG, ''chanlocs_homogeneous''); ' ];
                     end;
                 case 'chanlocsize',
                     if ~isempty(EEG.chanlocs)
