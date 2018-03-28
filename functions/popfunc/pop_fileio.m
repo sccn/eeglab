@@ -132,20 +132,6 @@ else
     end
 end
 
-% In case of FIF files convert EEG channel units to mV
-if ischar(filename)
-    [trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
-    if strcmpi(filext,'.fif')
-        eegchanindx = find(strcmpi(dat.chantype,'eeg'));
-        if ~all(strcmpi(dat.chanunit(eegchanindx),'mv'))
-            fprintf('Forcing EEG channel units to ''mV'' ...... \n');
-            dat.chanunit(eegchanindx) = {'mV'};
-        else
-            fprintf('EEG channel units already in ''mV'' \n');
-        end
-    end
-end
-
 % decode imput parameters
 % -----------------------
 g = struct(options{:});
@@ -218,10 +204,7 @@ if isfield(dat, 'label') && ~isempty(dat.label)
             eegchanindx = find(ft_chantype(dat, 'eeg'));
             if ~isempty(eegchanindx)
                 for ichan = 1:length(eegchanindx)
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'X'    dat.elec.chanpos(ichan,1)});
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Y'    dat.elec.chanpos(ichan,2)});
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'Z'    dat.elec.chanpos(ichan,3)});
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan)  'type' 'EEG'}); 
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'EEG'});
                 end
                 EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
                 EEG.urchanlocs = EEG.chanlocs;
