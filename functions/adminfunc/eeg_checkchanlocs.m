@@ -2,8 +2,8 @@
 %                  of an EEGLAB dataset.
 %
 % Usage:
-%  >> EEG = eeg_checkchanlocs( EEG, 'key1', value1, 'key2', value2, ... ); 
-%  >> [chanlocs chaninfo] = eeg_checkchanlocs( chanlocs, chaninfo, 'key1', value1, 'key2', value2, ... ); 
+%  >> EEG = eeg_checkchanlocs(EEG); 
+%  >> [chanlocs chaninfo] = eeg_checkchanlocs( chanlocs, chaninfo);
 %
 % Inputs:
 %   EEG      - EEG dataset
@@ -167,6 +167,16 @@ end;
 % -------------
 if isfield(chanedit, 'sph_phi_besa'  ), chanedit = rmfield(chanedit, 'sph_phi_besa'); end;
 if isfield(chanedit, 'sph_theta_besa'), chanedit = rmfield(chanedit, 'sph_theta_besa'); end;
+
+% Populating  channel location fields with all coordinates systems
+if (any( cellfun('isempty',{ chanedit.X })) || any( cellfun('isempty', { chanedit.theta})) || any( cellfun('isempty', { chanedit.sph_theta}))) &&...
+   (any(~cellfun('isempty',{ chanedit.X })) || any(~cellfun('isempty', { chanedit.theta})) || any(~cellfun('isempty', { chanedit.sph_theta})))
+    try
+        chanedit = convertlocs(chanedit,'auto');
+    catch
+        disp('eeg_checkchanlocs: Unable to convert electrode locations between coordinate systems');
+    end
+end
 
 % reconstruct the chans structure
 % -------------------------------
