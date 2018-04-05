@@ -39,16 +39,23 @@ if nargin < 1
    return;
 end;
 
+fields = fieldnames(model);
+indxtmp = strfind(fields, 'rv');
+rvindx = find(not(cellfun('isempty', indxtmp))); % Do not use contain(). It is not backward-compatible.
+
 for i=1:length(model)
   if model(i).rv>reject
-    % reject this dipole model by replacing it by an empty model
-    dipout(i).posxyz = [];
-    dipout(i).momxyz = [];
-    dipout(i).rv  = 1;
+    % reject this dipole model by replacing it by an empty model  
+    for ifield =1:length(fields)
+        if ifielf ~= rvindx
+            dipout(i).(fields{ifield})  = [];
+        else
+            dipout(i).rv  = 1;
+        end
+    end
   else
-    dipout(i).posxyz = model(i).posxyz;
-    dipout(i).momxyz = model(i).momxyz;
-    dipout(i).rv     = model(i).rv;
+    for ifield =1:length(fields)
+        dipout(i).(fields{ifield})  = model(i).(fields{ifield});
+    end
   end
 end
-

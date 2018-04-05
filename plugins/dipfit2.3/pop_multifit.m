@@ -9,7 +9,7 @@
 %  comps    - indices component to fit. Empty is all components.
 %
 % Optional inputs:
-%  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles contrain in
+%  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles constrain in
 %                symmetry. Default is 1.
 %  'dipplot'   - ['on'|'off'] plot dipoles. Default is 'off'.
 %  'plotopt'   - [cell array] dipplot() 'key', 'val' options. Default is
