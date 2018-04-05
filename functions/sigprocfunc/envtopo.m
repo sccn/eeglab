@@ -66,6 +66,8 @@
 %                  {default|[] -> standard Matlab color order}
 %  'fillcomp'  = int_vector>0 -> fill the numbered component envelope(s) with 
 %                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
+% 'plotproj'   = [1|0] Plot channel projections if only one component projection is
+%                   plotted. {default: 0}
 % 'fillcolor'  = Three elements RGB vector of the color to fill the component envelope
 %                   if 'fillcomp' is set. {default|[.815 .94 1] %light blue} 
 %  'vert'      = vector of times (in ms) at which to plot vertical dashed lines 
@@ -210,15 +212,17 @@ if nargin <= 2 | isstr(varargin{1})
 				  'topoarg'       'real'     []                       0;  
 				  'sumenv'        'string'   {'on','off','fill'}      'fill';
                   'axisoff'       'real'     [0.6 0.75]               0.6;
-                  'fillcolor'         'real' []                       [.815 .94 1];
-                  'limcontribweight'  'real' []                        1.2;
-                  'vertweight'        'real' []                        2};
+                  'fillcolor'     'real'     []                       [.815 .94 1];
+                  'limcontribweight'  'real' []                       1.2;
+                  'plotproj'          'real' [0 1]                    0;          
+                  'vertweight'        'real' []                       2};
 
 	% Note: Above, previous 'pvaf' arguments 'on' -> 'pv', 'off' -> 'rv'
 	%       for backwards compatibility 11/2004 -sm
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
 	if isstr(g), error(g); end;
+    if g.plotproj && strcmp(g.sumenv, 'fill'), g.sumenv = 'on'; end;
 
 else % dprecated - old style input args
 	if nargin > 3,    g.chanlocs = varargin{1};
@@ -887,15 +891,20 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill') %%%%%%%% if 'sunvenv' %%%%
     set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
 
  else % if no 'fill'
+     if ntopos ==1 && g.plotproj
+         hold on; pproj = plot(times,sumproj);
+         set(pproj,'Tag','line_allprojections');
+     end
     tmp = matsel(sumenv,frames,0,2,0);
     p=plot(times,tmp);% plot the min
     hold on
-    set(p,'color',g.fillcolor);
-    set(p,'linewidth',2);
+    set(p,'color',g.fillcolor,'Tag','line_envelope_2');
+    set(p,'linewidth',3);
     p=plot(times,matsel(sumenv,frames,0,1,0));% plot the max
-    set(p,'linewidth',2);
-    set(p,'color',g.fillcolor);
+    set(p,'linewidth',3);
+    set(p,'color',g.fillcolor,'Tag','line_envelope_2');
  end
+ 
  set(p,'Tag','patch_envelope');
 end
 
