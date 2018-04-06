@@ -166,7 +166,7 @@ if nargin < 2
     %                'else' ...
     %                '  set(findobj(gcbf, ''tag'', ''origin''), ''enable'', ''on'');' ...
     %                'end;' ];
-    valmodel     = 1;
+    valmodel    = 2; % default model now MNI
     userdata    = [];
     if isfield(EEG.chaninfo, 'filename')
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), valmodel = 1; end;
@@ -265,15 +265,12 @@ if nargin < 2
     optiongui = { 'geometry', geomhorz, 'uilist', elements, 'helpcom', 'pophelp(''pop_dipfit_settings'')', ...
                   'title', 'Dipole fit settings - pop_dipfit_settings()', ...
                   'userdata', userdata, 'geomvert', geomvert 'eval' 'pop_dipfit_settings(''setmodel'');' };
-	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
+	[result, userdat2, strhalt, outstruct] = inputgui( optiongui{:});
     if isempty(result), return; end;
-    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; else return; end;
     
-    while test_wrong_parameters(currentfig)
-    	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
-        if isempty(result), return; end;
+    if test_wrong_parameters(outstruct)
+    	return;
     end;
-    close(currentfig);
 
     % decode GUI inputs
     % -----------------
@@ -355,17 +352,18 @@ com = sprintf('EEG = pop_dipfit_settings( EEG, %s);', vararg2str(options));
 
 % test for wrong parameters
 % -------------------------
-function bool = test_wrong_parameters(hdl)
+function bool = test_wrong_parameters(result)
 
-    coreg1 = get( findobj( hdl, 'tag', 'coregtext')    , 'string' );
-    coreg2 = get( findobj( hdl, 'tag', 'coregcheckbox'), 'value' );
-    meg    = get( findobj( hdl, 'tag', 'coord'), 'value' );
+    coreg1 = result.coregtext;
+    coreg2 = result.coregcheckbox; 
+    meg    = result.coord; 
     
     bool = 0;
     if meg == 3, return; end;
     if coreg2 == 0 & isempty(coreg1)
-         bool = 1; warndlg2(strvcat('You must co-register your channel locations', ...
-                                    'with the head model (Press buttun, "Manual Co-Reg".', ...
+         bool = 1; warndlg2(strvcat('INCORRECT SETTINGS - SELECT THIS MENU AGAIN', ...
+                                    'You must co-register your channel locations', ...
+                                    'with the head model (Press button, "Manual Co-Reg".', ...
                                     'and follow instructions); To bypass co-registration,', ...
                                     'check the checkbox " No Co-Reg".'), 'Error');
     end;
