@@ -1332,23 +1332,25 @@ if ismatlab
                { 'style', 'text', 'tag', 'win12', 'string', 'Dataset size (Mb)', 'userdata', 'datinfo' } ...
                { 'style', 'text', 'tag', 'val12', 'string', ' ', 'userdata', 'datinfo' } {} };
     supergui(gcf, geometry, [], listui{:});
-    geometry = { [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] };
+    geometry = { [1] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1 0.01] [1] };
     listui = { { } ...
-               { } ...
-               { 'style', 'text', 'tag', 'mainwin1', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin2', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin3', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin4', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin5', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin6', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin7', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin8', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin9', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin10', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin11', 'string', ' ', 'userdata', 'fullline' } ...
-               { 'style', 'text', 'tag', 'mainwin12', 'string', ' ', 'userdata', 'fullline' }  ...
-               { 'style', 'text', 'tag', 'mainwin13', 'string', ' ', 'userdata', 'fullline' } {} };
-    supergui(gcf, geometry, [], listui{:});
+               { 'style', 'text', 'tag', 'mainwin0', 'string', ' ', 'userdata', 'fullline' } { } ...
+               { 'style', 'text', 'tag', 'mainwin1', 'string', ' ', 'userdata', 'fullline' } { } ...
+               { 'style', 'text', 'tag', 'mainwin2', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin3', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin4', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin5', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin6', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin7', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin8', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin9', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin10', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin11', 'string', ' ', 'userdata', 'fullline' } { }  ...
+               { 'style', 'text', 'tag', 'mainwin12', 'string', ' ', 'userdata', 'fullline' } { }   ...
+               { 'style', 'text', 'tag', 'mainwin13', 'string', ' ', 'userdata', 'fullline' } { } {} };
+    firstElemHeight = 1;
+    if ispc, firstElemHeight = 1.7; end
+    supergui(gcf, geometry, [firstElemHeight 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1], listui{:});
 
     titleh   = findobj('parent', gcf, 'tag', 'win0');
     alltexth = findobj('parent', gcf, 'style', 'text');
@@ -1892,19 +1894,20 @@ else
 	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'on');
 	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'off');
 	set( g.win0, 'String', 'No current dataset');
+	set( g.mainwin0, 'String', 'Suggested steps to get started', 'fontweight', 'bold');
 	set( g.mainwin1, 'String', '- Create a new or load an existing dataset:');
 	set( g.mainwin2, 'String', '   Use "File > Import data"           (new)'); 
-	set( g.mainwin3, 'String', '   Or  "File > Load existing dataset" (old)');
-	set( g.mainwin4, 'String', '- If new,');
-	set( g.mainwin5, 'String', '  "File > Import epoch info" (data epochs) else');
-	set( g.mainwin6, 'String', '  "File > Import event info" (continuous data)');
-	set( g.mainwin7, 'String',  '  "Edit > Dataset info" (add/edit dataset info)');
-	set( g.mainwin8, 'String', '  "File > Save dataset" (save dataset)');
-	set( g.mainwin9, 'String', '- Prune data: "Edit > Select data"');
-	set( g.mainwin10,'String', '- Reject data: "Tools > Reject continuous data"');
-	set( g.mainwin11,'String', '- Epoch data: "Tools > Extract epochs"');
-	set( g.mainwin12,'String', '- Remove baseline: "Tools > Remove baseline"');
-	set( g.mainwin13,'String', '- Run ICA:    "Tools > Run ICA"');
+	set( g.mainwin3, 'String', '   Or  "File > Load existing dataset" (load)');
+	set( g.mainwin4, 'String', '   (find tutorial data in sample_data folder)');
+	set( g.mainwin5, 'String', '- If newly imported raw dataset');
+	set( g.mainwin6, 'String', '  "Edit > Channel locations" (look up locations)');
+	set( g.mainwin7, 'String', '  "File > Import event info" (for continuous data)');
+	set( g.mainwin8, 'String', '- Filter data: "Tools > Filter data"');
+	set( g.mainwin9, 'String', '- Reject data: "Tools > Reject continuous data"');
+	set( g.mainwin10,'String', '- Run ICA: "Tools > Run ICA" (can take time)');
+	set( g.mainwin11,'String', '- Reject by ICA: "Tools > Reject data using ICA"');
+	set( g.mainwin12,'String', '- Epoch data: "Tools > Extract epochs"');
+	set( g.mainwin13,'String', '- Plot ERP: "Plot > Channel ERP > In scalp array"');
 end;
 
 % ERPLAB 
@@ -1983,16 +1986,16 @@ set(g.win0, 'position', [poswin0(1:2) extwin0(3) extwin0(4)]);
 
 % adjust all font sizes (RMC fix MATLAB 2014 compatibility)
 % -------------------
-icadefs;
-handlesname = fieldnames(g);
-for i = 1:length(handlesname)
-    if isprop(eval(['g.' handlesname{i}]),'Style') & ~strcmp(handlesname{i},'win0')
-        propval = get(eval(['g.' handlesname{i}]), 'Style');
-        if strcmp(propval,'text')
-            set(eval(['g.' handlesname{i}]),'FontSize',TEXT_FONTSIZE);
-        end
-    end
-end
+% icadefs;
+% handlesname = fieldnames(g);
+% for i = 1:length(handlesname)
+%     if isprop(eval(['g.' handlesname{i}]),'Style') & ~strcmp(handlesname{i},'win0')
+%         propval = get(eval(['g.' handlesname{i}]), 'Style');
+%         if strcmp(propval,'text')
+%             set(eval(['g.' handlesname{i}]),'FontSize',TEXT_FONTSIZE);
+%         end
+%     end
+% end
 
 return;
 
