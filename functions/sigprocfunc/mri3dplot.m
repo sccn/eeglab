@@ -84,7 +84,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     translucency    = 0.5;    % default alpha value
     mri_lim         = 85;     % +/- axis limits of MNI head image
     
-    g = finputcheck( varargin, { 'mriview'   { 'string','cell' }  { { 'sagital','axial','coronal','top','side','rear' } {} }   'top';
+    g = finputcheck( varargin, { 'mriview'   { 'string','cell' 'real' }  { { 'sagital','axial','coronal','top','side','rear' } {} [] }   'top';
                         'mixmode'   'string'   { 'add','overwrite','min' }     'add';
                         'mrislices' 'float'    []                        [];
                         'view'      'float'    []                        [];
