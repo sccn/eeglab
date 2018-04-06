@@ -136,6 +136,12 @@ if nargin < 2
   warning backtrace on;
   EEGOUT.dipfit.model  = dipfit_reject(EEGOUT.dipfit.model, reject);
 
+  try 
+    EEGOUT = eeg_compatlas(EEGOUT);
+  catch
+    disp('Fail to look up brain areas');
+  end
+  
   % FIXME reject is not being used at the moment
   disp('Done');
   com = sprintf('EEG = pop_dipfit_gridsearch(EEG, %s);', vararg2str( { select xgrid, ygrid, zgrid reject }));

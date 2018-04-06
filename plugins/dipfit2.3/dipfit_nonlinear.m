@@ -127,4 +127,9 @@ EEG.dipfit.model(cfg.component).datapot   = source.Vdata;
 EEG.dipfit.model(cfg.component).rv        = source.dip.rv;
 %EEG.dipfit.model(cfg.component).rv = sum((source.Vdata - source.Vmodel).^2) / sum( source.Vdata.^2 );
 
+try 
+    EEG = eeg_compatlas(EEG, 'components', cfg.component);
+catch
+    disp('Fail to look up brain areas');
+end
 EEGOUT = EEG;
