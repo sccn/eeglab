@@ -252,7 +252,7 @@ end;
       % if chan_locs(2) > 5
       %     axwidth = 0.66/(chan_locs(2)+1);
       % end
-  else
+  elseif isnan(axwidth)
       axheight = DEFAULT_AXHEIGHT;
       axwidth =  DEFAULT_AXWIDTH;
   end
