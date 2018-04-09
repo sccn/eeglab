@@ -100,15 +100,15 @@ end;
 switch fieldbox
     case 'preprocessing'
         for index = 1:EEG.trials
-            header.trial{index}  = EEG.header(:,:,index);
+            header.trial{index}  = EEG.data(:,:,index);
             header.time{index}   = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
         end;
         header.label   = { tmpchanlocs(1:EEG.nbchan).labels };
         
         
     case 'timelockanalysis'
-        header.avg  = mean(EEG.header, 3);
-        header.var  = std(EEG.header, [], 3).^2;
+        header.avg  = mean(EEG.data, 3);
+        header.var  = std(EEG.data, [], 3).^2;
         header.time = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
         header.label   = { tmpchanlocs(1:EEG.nbchan).labels };
         
@@ -139,6 +139,9 @@ switch fieldbox
         tmpchanlocs    = EEG.chanlocs;
         header.topolabel = { tmpchanlocs(EEG.icachansind).labels };
         header.topo      = EEG.icawinv;
+		% Copy weights & sphere, too
+    	header.weights = EEG.icaweights;
+    	header.sphere  = EEG.icasphere;
         
     case { 'chanloc' 'chanloc_withfid' }
         
