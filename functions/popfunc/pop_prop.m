@@ -88,9 +88,17 @@ if length(chanorcomp) > 1
     return;
 end;
 
-if chanorcomp < 1 | chanorcomp > EEG.nbchan % should test for > number of components ??? -sm
+% should test for > number of components ??? -sm. 
+% yes (max num components is not necessarily same as nbchan). -jri
+if typecomp == 1,
+  maxChanorcomp = EEG.nbchan;
+else
+  maxChanorcomp = size(EEG.icaweights, 1);
+end
+
+if chanorcomp < 1 || chanorcomp > maxChanorcomp 
    error('Component index out of range');
-end;   
+end;  
 
 % assumed input is chanorcomp
 % -------------------------
