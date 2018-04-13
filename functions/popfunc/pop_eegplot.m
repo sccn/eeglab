@@ -116,7 +116,7 @@ if nargin < 3 & EEG.trials > 1
 
 end;
 
-if EEG.trials > 1
+if EEG.trials > 1 && ~isempty(EEG.reject)
     if icacomp == 1 macrorej  = 'EEG.reject.rejmanual';
         			macrorejE = 'EEG.reject.rejmanualE';
     else			macrorej  = 'EEG.reject.icarejmanual';
