@@ -199,7 +199,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
       
       
      case 'string'
-      if ~isstr(tmpval)
+      if ~isstr(tmpval) && ~isempty(tmpval)
           g = [ callfunc 'error: argument ''' fieldname ''' must be a string' ]; return;
       end;
       if ~isempty(fieldval)
