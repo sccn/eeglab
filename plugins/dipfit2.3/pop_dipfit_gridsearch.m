@@ -78,9 +78,9 @@ end
 dipfitdefs
 if strcmpi(EEG.dipfit.coordformat, 'CTF')
     maxrad = 8.5;
-    xgridstr     = sprintf('linspace(-%2.1f,%2.1f,11)', maxrad, maxrad);
-    ygridstr     = sprintf('linspace(-%2.1f,%2.1f,11)', maxrad, maxrad);
-    zgridstr     = sprintf('linspace(0,%2.1f,6)', maxrad);
+    xgridstr     = sprintf('linspace(-%2.1f,%2.1f,24)', maxrad, maxrad);
+    ygridstr     = sprintf('linspace(-%2.1f,%2.1f,24)', maxrad, maxrad);
+    zgridstr     = sprintf('linspace(0,%2.1f,12)', maxrad);
 end;
 if nargin < 2
   % get the default values and filenames
