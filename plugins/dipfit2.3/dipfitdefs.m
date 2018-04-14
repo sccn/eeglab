@@ -149,6 +149,6 @@ defaultelectrodes = sprintf('1:%d', nchan);
 
 % defaults for GUI pop_dipfit_batch dialogs
 rejectstr    = '40';	% in percent
-xgridstr     = sprintf('linspace(-%d,%d,11)', floor(meanradius), floor(meanradius));
-ygridstr     = sprintf('linspace(-%d,%d,11)', floor(meanradius), floor(meanradius));
-zgridstr     = sprintf('linspace(0,%d,6)', floor(meanradius));
+xgridstr     = sprintf('linspace(-%d,%d,24)', floor(meanradius), floor(meanradius));
+ygridstr     = sprintf('linspace(-%d,%d,24)', floor(meanradius), floor(meanradius));
+zgridstr     = sprintf('linspace(0,%d,12)', floor(meanradius));
