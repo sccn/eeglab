@@ -109,6 +109,11 @@ if strcmpi(opt.plotsubjects, 'on')
     opt.factor1grouped  = 'apart';
     opt.factor2grouped = 'apart';
 end
+if strcmpi(opt.effect, 'main') && ncori > 1 && nc2ori > 1 && (strcmpi(opt.factor1stat, 'on') || strcmpi(opt.factor2stat, 'on'))
+    opt.factor1grouped = 'apart';
+    opt.factor2grouped = 'apart';
+end
+
 if strcmpi(opt.factor1grouped,  'on'), opt.factor1grouped =  'together'; end
 if strcmpi(opt.factor2grouped, 'on'), opt.factor2grouped = 'together'; end
 

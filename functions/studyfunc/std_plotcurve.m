@@ -122,7 +122,7 @@ if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups      = 'apart';
     opt.plotconditions  = 'apart';
 end
-if strcmpi(opt.effect, 'main') && nc > 1 && ng > 1
+if strcmpi(opt.effect, 'main') && nc > 1 && ng > 1 && (~isempty(opt.groupstats) || ~isempty(opt.condstats))
     opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
 end
