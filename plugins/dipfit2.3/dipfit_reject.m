@@ -47,7 +47,7 @@ for i=1:length(model)
   if model(i).rv>reject
     % reject this dipole model by replacing it by an empty model  
     for ifield =1:length(fields)
-        if ifielf ~= rvindx
+        if ifield ~= rvindx
             dipout(i).(fields{ifield})  = [];
         else
             dipout(i).rv  = 1;
