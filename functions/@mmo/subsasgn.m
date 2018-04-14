@@ -44,20 +44,6 @@ if obj.transposed, ss = transposeindices(obj, ss); end;
 % ---------------------
 ncopies = checkworkspace(obj);
 if ncopies < 2
-    if isempty(inputname(1))
-        vers = version;
-        indp = find(vers == '.');
-        if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end;
-        indp = find(vers == '.');
-        vers = str2num(vers(1:indp(2)-1));
-        if vers >= 7.13 
-            % the problem with Matlab 2012a/2011b is that if the object called is
-            % in a field of a structure (empty inputname), the evaluation
-            % in the caller of the object variable is empty in 2012a. A bug
-            % repport has been submitted to Matlab - Arno
-            ncopies = ncopies + 1;
-        end;
-    end;
     s = evalin('caller', 'whos');
     for index = 1:length(s)
         if strcmpi(s(index).class, 'struct') || strcmpi(s(index).class, 'cell')
@@ -92,6 +78,7 @@ if isempty(val)
     for index = 1:length(ss(1).subs)
         if ~isstr(ss(1).subs{index}) % can only be ":"
             nonSingleton(end+1) = index;
+            if islogical( ss(1).subs{index}),  ss(1).subs{index} = find( ss(1).subs{index}); end
             ss2(1).subs{index} = setdiff_bc([1:newdim1(index)], ss(1).subs{index}); % invert selection
         end;
     end;
