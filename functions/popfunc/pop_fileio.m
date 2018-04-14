@@ -126,7 +126,7 @@ else
         filename = '';
         alldata = varargin{1};
         options = {};
-        if nargin >= 4
+        if nargin >= 3
              event = varargin{2};
         end
     end
@@ -234,6 +234,7 @@ if ~isempty(event)
     
     if ~isempty(g.samples), subsample = g.samples(1); end;
     
+    EEG.event = event;
     for index = 1:length(event)
         offset = fastif(isempty(event(index).offset), 0, event(index).offset);
         EEG.event(index).type     = event(index).value;
@@ -244,6 +245,9 @@ if ~isempty(event)
             EEG.event(index).epoch = ceil(EEG.event(index).latency/EEG.pnts);        
         end;
     end;
+    EEG.event = rmfield(EEG.event, 'sample');
+    EEG.event = rmfield(EEG.event, 'value');
+    EEG.event = rmfield(EEG.event, 'offset');
     
     if exist('eeg_checkset')
         EEG = eeg_checkset(EEG, 'eventconsistency');
