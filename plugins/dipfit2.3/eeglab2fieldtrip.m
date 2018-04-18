@@ -5,7 +5,7 @@
 %
 % Inputs:
 %   EEG       - [struct] EEGLAB structure
-%   fieldbox  - ['preprocessing'|'freqanalysis'|'timelockanalysis'|'companalysis']
+%   fieldbox  - ['preprocessing'|'freqanalysis'|'timelockanalysis'|'componentanalysis']
 %   transform - ['none'|'dipfit'] transform channel locations for DIPFIT
 %               using the transformation matrix in the field
 %               'coord_transform' of the dipfit substructure of the EEG
@@ -57,7 +57,7 @@ header.fsample = EEG.srate;
 % position. This is not supported by EEGLAB, but it is supported by FIELDTRIP.
 
 if strcmpi(fieldbox, 'chanloc_withfid')
-    % insert "no header channels" in channel structure
+    % insert "no data channels" in channel structure
     % ----------------------------------------------
     if isfield(EEG.chaninfo, 'nodatchans') && ~isempty( EEG.chaninfo.nodatchans )
         chanlen = length(EEG.chanlocs);
