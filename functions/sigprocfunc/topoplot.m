@@ -271,6 +271,7 @@ COLORARRAY2 = { [gb 0] [gb 1/4] [gb 2/4] [gb 3/4] [gb 1] };
 %%%%%% Dipole defaults %%%%%%%%%%%%
 DIPOLE  = [];           
 DIPNORM   = 'on';
+DIPNORMMAX = 'off';
 DIPSPHERE = 85;
 DIPLEN    = 1;
 DIPSCALE  = 1;
@@ -453,8 +454,19 @@ if nargs > 2
                 DIPOLE = Value;
             case 'dipsphere'
                 DIPSPHERE = Value;
-            case 'dipnorm'
-                DIPNORM = Value;
+            case {'dipnorm', 'dipnormmax'}
+                if strcmp(Param,'dipnorm')
+                    DIPNORM = Value;
+                    if strcmpi(Value,'on')
+                        DIPNORMMAX = 'off';
+                    end
+                else
+                    DIPNORMMAX = Value;
+                    if strcmpi(Value,'on')
+                        DIPNORM = 'off';
+                    end
+                end
+                
             case 'diplen'
                 DIPLEN = Value;
             case 'dipscale'
@@ -1585,6 +1597,14 @@ if ~isempty(DIPOLE)
         for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
         end;
+    elseif strcmpi(DIPNORMMAX, 'on')     
+        for inorm =  1: size(DIPOLE,1)
+            normtmp(inorm) = norm(DIPOLE(inorm,3:4)); % Max norm of projection on XY
+        end
+        maxnorm = max(normtmp);
+        for index = 1:size(DIPOLE,1)
+            DIPOLE(index,3:4) = DIPOLE(index,3:4)/maxnorm*0.2;
+        end; 
     end;
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
 
