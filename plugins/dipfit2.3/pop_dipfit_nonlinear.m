@@ -99,6 +99,11 @@ elseif nargin==1
     end
   end
   
+  % Check valid EEG.dipfit.current
+  if EEG.dipfit.current > length(EEG.dipfit.model)
+      EEG.dipfit.current = 1;
+  end
+  
   % verify the size of each dipole model
   for i=select
     if ~isfield(EEG.dipfit.model, 'posxyz') | length(EEG.dipfit.model) < i | isempty(EEG.dipfit.model(i).posxyz)
