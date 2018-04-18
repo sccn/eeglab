@@ -57,6 +57,9 @@
 %                                   'ersp', and 'itc' measures.  
 %                    'abso'    =  [0|1] 1 = use absolute values of topoplot(), gradient, or 
 %                                   Laplacian maps {default: 1}
+%                    'erpfilter' = [double] Perform low pass filter on ERPs
+%                                  at the frequency provided. This is done ONLY for
+%                                  preclustering purposes and do not act on the data. Input unit: Hz
 %                    'funarg'  =  [cell array] optional function arguments for mean spectrum 
 %                                   calculation (>> help spectopo) {default: none}
 % Outputs:
@@ -181,6 +184,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         weight = 1;
         freqrange = [];
         timewindow = [];
+        erpfilter  = [];
         abso = 1;
         fun_arg = [];
         savetrials = 'off';
@@ -200,6 +204,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     timewindow = varargin{index}{subind+1};
                 case 'abso'
                     abso = varargin{index}{subind+1};
+                case 'erpfilter'
+                    erpfilter = varargin{index}{subind+1};
                 case 'savetrials'
                     error('You may now use the function std_precomp to precompute measures');
                 case 'cycles'
@@ -235,7 +241,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             % select ica component ERPs
             % -------------------------
             case 'erp',
-                [STUDY data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'datatype', 'erp', 'componentpol', 'off');
+                [STUDY data, datatime] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'datatype', 'erp', 'componentpol', 'off');
+                % Filtering data to be plotted
+                if ~isempty(erpfilter), data = {myfilt(data{:}, 1000/(datatime(2)-datatime(1)), 0, erpfilter)}; end;       
                 data = data{1}';
                 
             % select ica component spectrum
@@ -450,3 +458,28 @@ function cluster = checkcentroidfield(cluster, varargin);
             end;
         end;
     end;
+    
+    % rapid filtering for ERP (from std_plotcurve)
+% -----------------------
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass); 
+    bscorrect = 1;
+    if bscorrect
+        % Getting initial baseline
+        bs_val1  =  mean(tmpdata,1);
+        bs1      = repmat(bs_val1, size(tmpdata,1), 1);
+    end
+    
+    % Filtering
+    tmpdata2 = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3)*size(tmpdata,4));
+    tmpdata2 = eegfiltfft(tmpdata2',srate, lowpass, highpass)';
+    tmpdata2 = reshape(tmpdata2, size(tmpdata,1), size(tmpdata,2), size(tmpdata,3), size(tmpdata,4));
+    
+    if bscorrect
+        % Getting after-filter baseline
+        bs_val2  =  mean(tmpdata2,1);
+        bs2      = repmat(bs_val2, size(tmpdata2,1), 1);
+        
+        % Correcting the baseline
+        realbs = bs1-bs2;
+        tmpdata2 = tmpdata2 + realbs;
+    end
