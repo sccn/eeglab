@@ -97,7 +97,7 @@ end;
 % -------------------------
 allalgs   = { 'runica' 'binica' 'jader' 'jadeop' 'jade_td_p' 'MatlabshibbsR' 'fastica' ...
               'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'evd24' 'sons' 'sobi' 'ng_ol' ...
-              'acsobiro' 'acrsobibpf' 'pearson_ica' 'egld_ica' 'eeA' 'tfbss' 'icaML' 'icaMS' }; % do not use egld_ica => too slow
+              'acsobiro' 'acrsobibpf' 'pearson_ica' 'egld_ica' 'eeA' 'tfbss' 'icaML' 'icaMS' 'picard' }; % do not use egld_ica => too slow
 selectalg = {};
 linenb    = 1;
 count     = 1;
@@ -159,6 +159,7 @@ if nargin < 2 | selectamica
                      { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
                      { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
     geometry = { [2 1.5] [2 1.5] [2 1 1 1] };
+    geomvert = [ 1.5 1 1];
     if length(ALLEEG) > 1
         cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
         cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
@@ -168,6 +169,7 @@ if nargin < 2 | selectamica
                      { 'style' 'text'       'string' 'Concatenate datasets for the same subject and session (check=yes)?' }, ...
                      { 'style' 'checkbox'   'string' '' 'value' 1 'tag' 'concat2' 'callback' cb2 } };
         geometry = { geometry{:} [ 2 0.2 ] [ 2 0.2 ]};
+        geomvert = [ geomvert 1 1];
     end;                 
     % channel types
     % -------------
@@ -198,7 +200,7 @@ if nargin < 2 | selectamica
     
     % gui
     % ---
-    result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
+    result       = inputgui( 'geometry', geometry, 'geomvert', geomvert, 'uilist', promptstr, ...
                              'helpcom', 'pophelp(''pop_runica'')', ...
                              'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes } );
     if length(result) == 0 return; end;        
@@ -429,6 +431,8 @@ switch lower(g.icatype)
         else
             return;
         end;
+     case 'picard' 
+        [tmp, EEG.icaweights] = picard( tmpdata, 'verbose', true, g.options{:});
      case 'pearson_ica' 
         if isempty(g.options)
             disp('Warning: EEGLAB default for pearson ICA is 1000 iterations and epsilon=0.0005');
@@ -506,8 +510,12 @@ else
 end;
 
 if nargin < 2 || selectamica
-    com = sprintf('EEG = pop_runica(EEG, %s);', vararg2str(g.options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
-end;
+    if ~isempty(g.options)
+        com = sprintf('EEG = pop_runica(EEG, ''icatype'', ''%s'', %s);', g.icatype, vararg2str(g.options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
+    else
+        com = sprintf('EEG = pop_runica(EEG, ''icatype'', ''%s'');',g.icatype );
+    end
+end
 
 return;
 
