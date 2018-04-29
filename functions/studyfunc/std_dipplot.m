@@ -470,6 +470,11 @@ if strcmpi(mode, 'multicolor')
   dipplot(cluster_dip_models, options{:});
   set(fig_h, 'resize','on');
   
+  %data cursor will show component label
+  datacursormode on
+  dcm = datacursormode(gcf);
+  set(dcm,'Enable','on', 'UpdateFcn', @componentText)
+  
 end % multicolor. Supporting functions at end of file
 
 % ========================================================================================
@@ -746,8 +751,18 @@ function [cluster_dip_models, options] = dipgroups(ALLEEG, STUDY, cls, comp_to_d
             options{1,n+1} = dipnames;
         end
     end
-        
+    
+% ========================================================================================
+% multicolor mode support functions
+function str = componentText(~,obj)
+% look up component name--used in data cursor callback in 'multicolor' mode
+try
+  str = obj.Target.UserData.name;
+  h=findall(gcf,'type','hggroup');
+  h(1).FontSize = 14;
+catch
+  str = '';
+end
 
-   
 
 
