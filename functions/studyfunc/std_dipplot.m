@@ -19,11 +19,12 @@
 %   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
 %                'all'  -> plot all the components in the cluster 
 %                {default: 'all'}.
-%   'mode'     - ['together'|'apart'] Display all requested cluster on one 
+%   'mode'     - ['together'|'apart'|'multicolor'] Display all requested cluster on one 
 %                figure ('together') or separate figures ('apart'). 
-%                'together'-> plot all 'clusters' in one figure (without the gui).
-%                'apart'   -> plot each cluster in a separate figure. Note that
-%                this parameter has no effect if the 'comps' option (above) is used.
+%                'together'-> plot all 'clusters' individuall in one multi-pane figure (without the gui).
+%                'apart'   -> plot each cluster in a separate figure. 
+%                'multicolor' -> plot all clusters in one figure, 
+%                Note that this parameter has no effect if the 'comps' option (above) is used.
 %                {default: 'together'}
 %   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
 %                figure ('off'). If 'figure','off' does not display gui controls,
@@ -31,6 +32,10 @@
 %                {default: 'on'}. 
 %   'groups'   - ['on'|'off'] use different colors for different groups.
 %                {default: 'off'}.
+%   'dipcolor' - [cell vector] color for dipoles in each cluster. (multicolor mode)
+%   'dipsize'  - [numeric vector] size for each cluster. (multicolor mode)
+%                {default if unspecified: will automatically color/size each
+%                cluster}
 % Outputs:
 %   STUDY      - the input STUDY set structure modified with plotted cluster 
 %                mean dipole, to allow quick replotting (unless cluster means 
@@ -44,6 +49,8 @@
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 %          'groups' added by Makoto Miyakoshi on June 2012.
+%          'multicolor' mode added by John Iversen to draw all clusters on
+%           a single panel, with each cluster indicated by different color/size dipoles.
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 08, 2005, hilit@sccn.ucsd.edu
 %
@@ -72,6 +79,8 @@ STUDY = pop_dipparams(STUDY, 'default');
 
 opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'spheres', 'on', 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
 
+dipcolor = [];
+dipsize = [];
 %, 'spheres', 'on'
 groupval = 'off';
 for k = 3:2:nargin
@@ -110,6 +119,10 @@ for k = 3:2:nargin
                 opt_dipplot{end + 1} = 'off';
                 figureon = 0;
             end
+      case 'dipcolor'
+        dipcolor = varargin{k-1};
+      case 'dipsize'
+        dipsize = varargin{k-1};
     end
 end
 
@@ -204,8 +217,12 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                options{end+1} = 'meshdata';
                options{end+1} = ALLEEG(abset).dipfit.hdmfile;
            end
-           if ndip < 6 && strcmpi(options{1}, 'projlines') && length(cls) == 1 % less than 6 dipoles, project lines 
+           %enable both lines and images to be projected; increase #dipole limits
+           if ndip < 20 && strcmpi(options{1}, 'projlines') && length(cls) == 1
                options{2} = 'on';
+           end
+           if ndip < 20 && strcmpi(options{5}, 'projimg') && length(cls) == 1
+             options{6} = 'on';
            end
            
            if figureon
@@ -320,6 +337,143 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
    end %finished going over all clusters
    set(fig_h, 'resize','on');
 end % finished case of 'all' clusters
+
+% ========================================================================================
+% multicolor mode
+%   all clusters are plotted in the same axis, with each cluster indicated by color/size
+%   also enable 'data cursor' so that in data tip mode, clicking on a dipole
+%    will display its name
+if strcmpi(mode, 'multicolor')
+  N = length(cls);
+  %%%%%%%%%%%%%%%%%%%%% color list %%%%%%%%%%%%%%%%%%%%%
+  % This color list was developped for std_envtopo
+  % modified from dipgroups below
+  colors{1}  = [1 1 1];            % White
+  colors{2}  = [1 1 0];            % Yellow
+  colors{3}  = [1 0 1];            % Fuchsia
+  colors{4}  = [1 0 0];            % Red
+  colors{5}  = [0.875 0.875 0.875]; % Silver
+  colors{6}  = [0.5 0.5 0.5];      % Gray
+  colors{7}  = [0.5 0.5 0];        % Olive
+  colors{8}  = [0.5 0 0.5];        % Purple
+  colors{9}  = [0.5 0 0];          % Maroon
+  colors{10} = [0 1 1];            % Aqua
+  colors{11} = [0 1 0];            % Lime
+  colors{12} = [0 0.5 0.5];        % Teal
+  colors{13} = [0 0.5 0];          % Green
+  colors{14} = [0 0 1];            % Blue
+  colors{15} = [0 0 0.5];          % Navy
+  colors{16} = [0 0 0];            % Black
+  % Choosing and sorting 13 colors for clusters: Red, Green, Blue,
+  % Fuchsia, Lime, Aqua, Maroon, Olive, Purple, Teal, Navy, Gray, and White
+  colors = colors([4 13 14 3 11 10 9 7 8 12 15 6 1 ]);
+  fig_h = figure;
+  orient tall
+  set(fig_h,'Color', 'black');
+  set(fig_h,'Name', 'All clusters dipoles','NumberTitle','off');
+  set(fig_h, 'resize','off');
+  
+  idx = 0; %cumulative dipole index
+  clear cluster_dip_models;
+  for l = 1:N %loop over clusters
+    len = length(STUDY.cluster(cls(l)).comps);
+    max_r = 0;
+    
+    %color, size for every cluster can be passed as arguments, or
+    %automatically iterate through a set of colors/sizes
+    if ~isempty(dipcolor)
+      clusterColors{l} = dipcolor{idx};
+    else
+      colorIndex = mod(l-1, length(colors))+1;
+      clusterColors{l} = colors{colorIndex};
+    end
+    
+    if ~isempty(dipsize)
+      clusterSizes(l) = dipsize(idx);
+    else
+      %after rotating through color list once, change size of dipole
+      if l <= length(colors)
+        clusterSizes(l) = 30;
+      elseif l <= 2*length(colors)
+        clusterSizes(l) = 20;
+      else
+        clusterSizes(l) = 15;
+      end
+    end
+    
+    if ~isfield(STUDY.cluster(cls(l)),'dipole')
+      STUDY = std_centroid(STUDY,ALLEEG, cls(l), 'dipole');
+    elseif isempty(STUDY.cluster(cls(l)).dipole)
+      STUDY = std_centroid(STUDY,ALLEEG, cls(l), 'dipole');
+    end
+    clustStartIdx = idx + 1;
+    
+    for k = 1:len %loop over components within a cluster
+      idx = idx + 1;
+      abset = STUDY.datasetinfo(STUDY.cluster(cls(l)).sets(1,k)).index;
+      subjname = STUDY.datasetinfo(STUDY.cluster(cls(l)).sets(1,k)).subject;
+      if ~isfield(ALLEEG(abset), 'dipfit')
+        warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
+        return;
+      end
+      comp = STUDY.cluster(cls(l)).comps(k);
+      cluster_dip_models(idx).posxyz = ALLEEG(abset).dipfit.model(comp).posxyz;
+      cluster_dip_models(idx).momxyz = ALLEEG(abset).dipfit.model(comp).momxyz;
+      cluster_dip_models(idx).rv = ALLEEG(abset).dipfit.model(comp).rv;
+      if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
+        if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
+          load('-mat', ALLEEG(abset).dipfit.hdmfile);
+          max_r = max(max_r, max(vol.r));
+        else % old version of dipfit
+          max_r = max(max_r,max(ALLEEG(abset).dipfit.vol.r));
+        end
+      end
+      
+      dip_color{idx} = clusterColors{l};
+      dip_size(idx) = clusterSizes(l);
+      dip_label{idx} = sprintf('Cls %d (%s IC%d)',cls(l), subjname, comp);
+    end % finished going over cluster comps
+    
+    %add the cluster centroid
+    clustEndIdx = idx;
+    STUDY.cluster(cls(l)).dipole = computecentroid(cluster_dip_models(clustStartIdx:clustEndIdx));
+    idx = idx + 1;
+    cluster_dip_models(idx) = STUDY.cluster(cls(l)).dipole;
+    dip_color(idx) = {'k'};
+    dip_size(idx) = 10;
+    dip_label{idx} = sprintf('Cls %d centroid',cls(l));
+    clusterLabels{l} = sprintf('Cls %d',cls(l));
+    
+  end %loop over clusters
+  
+  options = opt_dipplot;
+  options{end + 1} =  'gui';
+  options{end + 1} =  'off';
+  options{end+1} =  'mri';
+  options{end+1} =  ALLEEG(abset).dipfit.mrifile;
+  options{end+1} =  'coordformat';
+  options{end+1} =  ALLEEG(abset).dipfit.coordformat;
+  options{end+1} = 'color';
+  options{end+1} = dip_color;
+  options{end+1} = 'dipolesize';
+  options{end+1} = dip_size;
+  options{end+1} = 'dipnames';
+  options{end+1} = dip_label;
+  if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
+    options{end+1} = 'sphere';
+    options{end+1} = max_r;
+  else
+    options{end+1} = 'meshdata';
+    options{end+1} = ALLEEG(abset).dipfit.hdmfile;
+  end
+  
+  dipplot(cluster_dip_models, options{:});
+  set(fig_h, 'resize','on');
+  
+end % multicolor. Supporting functions at end of file
+
+% ========================================================================================
+
 % std_plotcompdip() - Commandline function, to visualizing cluster components dipoles. 
 %                   Displays the dipoles of specified cluster components with the cluster mean 
 %                   dipole on separate figures. 
