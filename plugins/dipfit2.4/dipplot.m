@@ -6,9 +6,9 @@
 %
 % Inputs:
 %   sources   -  structure array of dipole information: can contain
-%                either BESA or DIPFIT dipole information. BESA dipole
-%                information are still supported but may disapear in the 
-%                future. For DIPFIT
+%                either BESA or DIPFIT or FIELDTRIP dipole information.
+%                BESA dipole information are still supported but may disapear
+%                in the future. For DIPFIT
 %                   sources.posxyz: contains 3-D location of dipole in each 
 %                                   column. 2 rows indicate 2 dipoles.
 %                   sources.momxyz: contains 3-D moments for dipoles above.
@@ -160,6 +160,12 @@
 %     is currently being modified
 % - Gca 'userdata' stores imqge names and position
 
+%  JRI: added support for fieldtrip dipole 'source' structure
+%   (handles regional and moving dipoles. for regional (moving moment),
+%       plots only point in time with lowest rv. For moving (moving
+%       position and moment) plots a dipole 'track'
+%   dipplot(source,'mri',data.mri,'coordformat','MNI','projlines','on')
+
 function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     DEFAULTVIEW = [0 0 1];
@@ -172,6 +178,43 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % reading and testing arguments
     % -----------------------------
     sources = sourcesori;
+
+    % Handle fieldtrip dipole types
+    % get sources from fieldtrip dipolefitting output, add new options
+    %   field 'dipmodel'
+    %           regional:   plots each dipole as a separate component (min-rv)
+    %           moving:     plots a dipole 'track' for each dipole
+    if isfield(sources,'dip')
+      if length(sources.dip) == 1
+        varargin{end+1} = 'dipmodel';
+        varargin{end+1} = 'regional';
+        %regional fit: single location, timevarying moment, plot minrv moment
+        nDip = size(sources.dip.pos,1);
+        for i = 1:nDip,
+          [~,iminrv] = min(sources.dip.rv);
+          sourcesori(i).posxyz = sources.dip.pos(i,:);
+          sourcesori(i).momxyz = sources.dip.mom((i-1)*3+[1:3]) / 1e6;
+          sourcesori(i).momxyz = sourcesori(i).momxyz(:)'; %row
+          sourcesori(i).rv = sources.dip.rv(iminrv);
+          sourcesori(i).pot = sources.dip.pot(:,iminrv); %not used, I expect
+        end
+      else %moving fit, timevarying location & moment. Convert to multiple dips
+        %assumes only a single dipole at every time, however (for now)
+        varargin{end+1} = 'dipmodel';
+        varargin{end+1} = 'moving';
+        for i = 1:length(sources.dip)
+          tmp = sources.dip(i);
+          tmp.posxyz = tmp.pos;
+          [~,iminrv] = min(tmp.rv);
+          %tmp.momxyz = tmp.mom(:,iminrv)' / 1e6;
+          tmp.momxyz = reshape(tmp.mom,[],3) / 1e6; %FIXME temporary hack to enable 2 dipoles
+          tmp.rv = tmp.rv(iminrv);
+          if i==1, sourcesori=tmp; else sourcesori(i) = tmp; end
+        end
+      end
+    end
+    sources = sourcesori;
+
     if ~isstruct(sources)
         updatedipplot(sources(1)); 
         % sources countain the figure handler
@@ -432,7 +475,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
-                    'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata 'axistight' g.axistight };
+                    'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata 'axistight' g.axistight ...
+                    'dipnames', g.dipnames};
         pos1 = [0 0 0.5 0.5];
         pos2 = [0 0.5 0.5 .5];
         pos3 = [.5 .5 0.5 .5]; if strcmp(g.summary, 'on2'), tmp = pos1; pos1 =pos3; pos3 = tmp; end;
@@ -815,7 +859,13 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %
             if isfield(sources, 'component')
                 if strcmp(g.num, 'on')
-                    h = text(xx,  yy,  zz, [ '  ' int2str(sources(index).component)]);
+                    %use custom labels for each dipole if available
+                    if ~isempty(g.dipnames) && length(g.dipnames)>=index
+                        label = g.dipnames{index};
+                    else
+                        label = [ 'dipole' int2str(sources(index).component) ];
+                    end
+                    h = text(xx,  yy,  zz, [ '  ' label]);
                     set(h, 'userdata', dipstruct, 'tag', tag, 'fontsize', g.dipolesize(index)/2 );
                     if ~strcmpi(g.image, 'besa'), set(h, 'color', 'w'); end;
                 end;

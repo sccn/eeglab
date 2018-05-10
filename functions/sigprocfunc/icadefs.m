@@ -50,21 +50,6 @@ VERS = str2num(tmpvers(1:indp(2)-1));
 % font size
 tmpComputer   = computer;
 tmpScreenSize = get(0, 'ScreenSize');
-retinaDisplay = false;
-if tmpScreenSize(3) == 1440 && ( tmpScreenSize(3) == 878 || tmpScreenSize(3) == 900 )
-    retinaDisplay = true;
-end;
-    
-% retinaDisplay = false; % uncoment this line if not retina display
-if retinaDisplay && strcmpi(tmpComputer(1:3), 'MAC')
-    W_MAIN = findobj('tag', 'EEGLAB');
-    if isempty(W_MAIN)
-        disp('Mac OSX retina display detected. If this is not the case uncoment line 58 of icadefs.m');
-    end;
-    GUI_FONTSIZE  = 18; % graphic interface font size
-    AXES_FONTSIZE = 18; % Axis labels and legend font size
-    TEXT_FONTSIZE = 18; % Miscellaneous font sizes
-end
 
 % Graph Definitions
 DEFAULT_COLORMAP = 'jet';
@@ -89,22 +74,46 @@ if VERS < 8.04
     TEXT_FONTSIZE_L = TEXT_FONTSIZE + 2; % Miscellaneous font sizes Large
     
 elseif VERS >= 8.04
+  
     if strcmpi(tmpComputer(1:3), 'MAC')
+      
         PLOT_LINEWIDTH   = 1;
         PLOT_LINEWIDTH_S = 0.5;
+      
+        %scale up fontsizes on higher resolution mac screens
+        retinaDisplay = false;
+        if tmpScreenSize(3) >= 1920 % bump fontsize only for the highest retina res settings
+          retinaDisplay = true; %comment this out if you don't want fontsizes increased at high display resolutions
+          W_MAIN = findobj('tag', 'EEGLAB');
+          if isempty(W_MAIN)
+            disp('Mac OSX retina display detected. If this is not desired comment out line 83 of icadefs.m');
+          end;
+        end;
         
         % AXES FONTSIZE
-        AXES_FONTSIZE   = 9;                 % Axis labels and legend font size
+        if retinaDisplay
+          AXES_FONTSIZE   = 12;                 % Axis labels and legend font size
+        else
+          AXES_FONTSIZE   = 9;                 % Axis labels and legend font size
+        end
         AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
         AXES_FONTSIZE_L = 12.5;              % Axis labels and legend font size Large
         
         % GUI FONTSIZE
-        GUI_FONTSIZE    = 12;                % graphic interface font size
+        if retinaDisplay
+          GUI_FONTSIZE    = 14;                % graphic interface font size
+        else
+          GUI_FONTSIZE    = 12;                % graphic interface font size
+        end
         GUI_FONTSIZE_S  = GUI_FONTSIZE - 2; % graphic interface font size Small
         GUI_FONTSIZE_L  = GUI_FONTSIZE + 2; % graphic interface font size Large
         
         % TEXT FONTSIZE
-        TEXT_FONTSIZE   = 12;                 % Miscellaneous font sizes
+        if retinaDisplay
+          TEXT_FONTSIZE   = 14;                 % Miscellaneous font sizes
+        else
+          TEXT_FONTSIZE   = 12;                 % Miscellaneous font sizes
+        end
         TEXT_FONTSIZE_S = TEXT_FONTSIZE - 2; % Miscellaneous font sizes Small
         TEXT_FONTSIZE_L = TEXT_FONTSIZE + 4; % Miscellaneous font sizes Large
     else

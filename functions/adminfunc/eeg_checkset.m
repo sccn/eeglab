@@ -1090,8 +1090,19 @@ for inddataset = 1:length(ALLEEG)
         end;
         
         % force Nosedir to +X (done here because of DIPFIT)
+        % NB: modified TOPOPLOT now handles MNI coordinates directly, so do
+        %   not modify chanlocs if dipoles are in MNI coordinate frame.
+        % Reason: permanently modifying chanlocs is not desirable, as it breaks
+        %   other 3d data (head models, headshape, dipoles, etc). Instead, this
+        %   could be handled only in plotting if necessary,
+        %   respecting dipfit.coord_transform and EEG.chaninfo.nosedir.
         % -------------------
-        if isfield(EEG.chaninfo, 'nosedir')
+        try
+            isMNI = strcmp(EEG.dipfit.coordformat,'MNI');
+        catch
+            isMNI = false;
+        end
+        if isfield(EEG.chaninfo, 'nosedir') && ~isMNI
             if ~strcmpi(EEG.chaninfo.nosedir, '+x') && all(isfield(EEG.chanlocs,{'X','Y','theta','sph_theta'})) 
                 disp(['Note for expert users: Nose direction is now set from ''' upper(EEG.chaninfo.nosedir)  ''' to default +X in EEG.chanlocs']);
                 [tmp chaninfo chans] = eeg_checkchanlocs(EEG.chanlocs, EEG.chaninfo); % Merge all channels for rotation (FID and data channels)
