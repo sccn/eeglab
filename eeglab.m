@@ -257,7 +257,7 @@ end;
 % ---------
 if ~isdeployed
     tmp = which('eeglab_data.set');
-    if ~isempty(which('eeglab_data.set')) && ~isempty(which('GSN-HydroCel-32.sfp'))
+    if ~isempty(which('eeglab_data.set')) && ~isempty(which('Standard-10-10-Cap47.ced'))
         warning backtrace off;
         warning(sprintf([ '\n\nPath Warning: It appears that you have added the path to all of the\n' ...
             'subfolders to EEGLAB. This may create issues with some EEGLAB extensions\n' ...
