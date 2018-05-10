@@ -7,9 +7,6 @@
 %   EEGIN   - input dataset
 %   command - [string] eeglab command
 %
-% Global variables used:
-%   EEGOUT  - output dataset with updated history field
-%
 % Author: Arnaud Delorme, SCCN/INC/UCSD, Dec 2003
 %
 % See also: eegh(), eeglab()
