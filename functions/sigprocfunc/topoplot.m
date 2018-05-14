@@ -1580,6 +1580,7 @@ if ~isempty(DIPOLE)
         DIPOLE(:,2) =  tmp.posxyz(:,1)/DIPSPHERE; %  x -> y
         DIPOLE(:,3) = -tmp.momxyz(:,2);
         DIPOLE(:,4) =  tmp.momxyz(:,1);
+        DIPOLE(:,5) =  tmp.momxyz(:,3);
     else
         DIPOLE(:,1) = -tmp(:,2);                    % same for vector input
         DIPOLE(:,2) =  tmp(:,1);
@@ -1599,11 +1600,11 @@ if ~isempty(DIPOLE)
         end;
     elseif strcmpi(DIPNORMMAX, 'on')     
         for inorm =  1: size(DIPOLE,1)
-            normtmp(inorm) = norm(DIPOLE(inorm,3:4)); % Max norm of projection on XY
+            normtmp(inorm) = norm(DIPOLE(inorm,3:5)); % Max norm of projection on XY
         end
-        maxnorm = max(normtmp);
+        [maxnorm,maxnormindx] = max(normtmp);
         for index = 1:size(DIPOLE,1)
-            DIPOLE(index,3:4) = DIPOLE(index,3:4)/maxnorm*0.2;
+            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:4))*0.2*normtmp(index)/normtmp(maxnormindx);
         end; 
     end;
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
