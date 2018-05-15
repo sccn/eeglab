@@ -878,7 +878,8 @@ end;
 
 if isdeployed
     funcname = {  'eegplugin_dipfit' ...
-                  'eegplugin_firfilt' };
+                  'eegplugin_firfilt' ...
+                  'eegplugin_musemonitor' };
     for indf = 1:length(funcname)
         try 
             vers = feval(funcname{indf}, gcf, trystrs, catchstrs);
