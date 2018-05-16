@@ -139,6 +139,12 @@
 
 function varargout = eeglab( onearg )
 
+ver = version;
+if strcmpi(ver, '9.4.0.813654 (R2018a)')
+    disp('Link to install <a href="https://www.mathworks.com/downloads/web_downloads/download_update?release=R2018a&s_tid=ebrg_R2018a_2_1757132">2018a Update 2</a>');
+    errordlg( [ 'You are running Matlab version R2018a, which has important bugs' 10 'Matlab crashes when running EEGLAB in this vesion of Matlab' 10 'Install 2018a Update 2 to fix the issue (link on the command line)' ]);
+end
+
 if nargout > 0
     varargout = { [] [] 0 {} [] };
     %[ALLEEG, EEG, CURRENTSET, ALLCOM]
