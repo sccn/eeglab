@@ -32,19 +32,22 @@
 
 % global variables
 % ----------------
-global EEG;		% current dataset 
-global ALLEEG;		% all datasets
-global CURRENTSET;	% current set index
+globalvars = who('global');
+if ~isempty(strmatch('ALLCOM', globalvars, 'exact')) || exist('ALLCOM') ~= 1
+    global EEG;		% current dataset 
+    global ALLEEG;		% all datasets
+    global CURRENTSET;	% current set index
 
-%global W_MAIN;		% main window
-%global H_MAIN;		% main window
-%global EEGMENU;		% main menu
-global ALLCOM;		% all commands (history)
-global LASTCOM;		% last command
-global STUDY;
-global CURRENTSTUDY;
-global PLUGINLIST;
+    %global W_MAIN;		% main window
+    %global H_MAIN;		% main window
+    %global EEGMENU;		% main menu
+    global ALLCOM;		% all commands (history)
+    global LASTCOM;		% last command
+    global STUDY;
+    global CURRENTSTUDY;
+    global PLUGINLIST;
 
-if exist('eegplugin_erplab.m')
-    global ALLERP; % Javier Lopez-Calderon for ERPLAB
-end;
+    if exist('eegplugin_erplab.m')
+        global ALLERP; % Javier Lopez-Calderon for ERPLAB
+    end
+end
