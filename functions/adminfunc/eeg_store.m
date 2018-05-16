@@ -148,9 +148,9 @@ if ~isempty( ALLEEG )
 	catch
 		allfields = fieldnames( EEG );
 		for i=1:length( allfields )
-			eval( ['ALLEEG(' int2str(storeSetIndex) ').' allfields{i} ' = EEG.' allfields{i} ';' ]);
+			ALLEEG(storeSetIndex).(allfields{i}) = EEG.(allfields{i});
 		end;	
-        if ~isfield(EEG, 'datfile') & isfield(ALLEEG, 'datfile')
+        if ~isfield(EEG, 'datfile') && isfield(ALLEEG, 'datfile')
             ALLEEG(storeSetIndex).datfile = '';
         end;
 	end;
