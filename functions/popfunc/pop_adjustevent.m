@@ -177,9 +177,9 @@ end
 % Shifting events
 switch g.direction
     case 'forward'
-       tmpevents = num2cell([EEG.event(indx2shift).latency]+g.offset);
+       tmpevents = num2cell([EEG.event(indx2shift).latency]+round(g.offset/1000*EEG.srate));
     case 'backward'
-        tmpevents = num2cell([EEG.event(indx2shift).latency]-g.offset);
+        tmpevents = num2cell([EEG.event(indx2shift).latency]-round(g.offset/1000*EEG.srate));
 end
 [EEG.event(indx2shift).latency] = tmpevents{:};
 
