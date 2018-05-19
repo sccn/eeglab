@@ -2,7 +2,7 @@
 %             and shift data by the filter's group delay
 %
 % Usage:
-%   >> EEG = firfilt(EEG, b, nFrames);
+%   >> EEG = firfilt(EEG, b, nFrames, chaninds);
 %
 % Inputs:
 %   EEG           - EEGLAB EEG structure
@@ -10,6 +10,7 @@
 %
 % Optional inputs:
 %   nFrames       - number of frames to filter per block {default 1000}
+%   chaninds      - channel indices {default all}
 %
 % Outputs:
 %   EEG           - EEGLAB EEG structure
@@ -41,13 +42,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function EEG = firfilt(EEG, b, nFrames)
+function EEG = firfilt(EEG, b, nFrames, chaninds)
 
 if nargin < 2
     error('Not enough input arguments.');
 end
 if nargin < 3 || isempty(nFrames)
     nFrames = 1000;
+end
+if nargin < 4
+    chaninds = 1:size(EEG.data,1);
 end
 
 % Filter's group delay
@@ -75,23 +79,23 @@ for iDc = 1:(length(dcArray) - 1)
 
         % Pad beginning of data with DC constant and get initial conditions
         ziDataDur = min(groupDelay, dcArray(iDc + 1) - dcArray(iDc));
-        [temp, zi] = filter(b, 1, double([EEG.data(:, ones(1, groupDelay) * dcArray(iDc)) ...
-                                  EEG.data(:, dcArray(iDc):(dcArray(iDc) + ziDataDur - 1))]), [], 2);
+        [temp, zi] = filter(b, 1, double([EEG.data(chaninds, ones(1, groupDelay) * dcArray(iDc)) ...
+                                  EEG.data(chaninds, dcArray(iDc):(dcArray(iDc) + ziDataDur - 1))]), [], 2);
 
         blockArray = [(dcArray(iDc) + groupDelay):nFrames:(dcArray(iDc + 1) - 1) dcArray(iDc + 1)];
         for iBlock = 1:(length(blockArray) - 1)
 
             % Filter the data
-            [EEG.data(:, (blockArray(iBlock) - groupDelay):(blockArray(iBlock + 1) - groupDelay - 1)), zi] = ...
-                filter(b, 1, double(EEG.data(:, blockArray(iBlock):(blockArray(iBlock + 1) - 1))), zi, 2);
+            [EEG.data(chaninds, (blockArray(iBlock) - groupDelay):(blockArray(iBlock + 1) - groupDelay - 1)), zi] = ...
+                filter(b, 1, double(EEG.data(chaninds, blockArray(iBlock):(blockArray(iBlock + 1) - 1))), zi, 2);
 
             % Update progress indicator
             [step, strLength] = mywaitbar((blockArray(iBlock + 1) - groupDelay - 1), size(EEG.data, 2), step, nSteps, strLength);
         end
 
         % Pad end of data with DC constant
-        temp = filter(b, 1, double(EEG.data(:, ones(1, groupDelay) * (dcArray(iDc + 1) - 1))), zi, 2);
-        EEG.data(:, (dcArray(iDc + 1) - ziDataDur):(dcArray(iDc + 1) - 1)) = ...
+        temp = filter(b, 1, double(EEG.data(chaninds, ones(1, groupDelay) * (dcArray(iDc + 1) - 1))), zi, 2);
+        EEG.data(chaninds, (dcArray(iDc + 1) - ziDataDur):(dcArray(iDc + 1) - 1)) = ...
             temp(:, (end - ziDataDur + 1):end);
 
         % Update progress indicator

@@ -7,7 +7,10 @@
 % Inputs:
 %   chanlocs  - channel location structure
 %   chanlist  - list of channels, numerical indices [1 2 3 ...] or string 
-%               'cz pz fz' or cell array { 'cz' 'pz' 'fz' }
+%               'cz pz fz' or cell array { 'cz' 'pz' 'fz' }. Can also be 
+%               a list of channel types (see below)
+%   field     - ['labels'|'type'] channel field to match. Default is
+%               'labels'
 %
 % Outputs:
 %   chaninds  - integer array with the list of channel indices
@@ -33,18 +36,21 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ chaninds chanlist ] = eeg_decodechan(chanlocs, chanstr);
+function [ chaninds, chanlist ] = eeg_decodechan(chanlocs, chanstr, field)
 
 if nargin < 2
     help eeg_decodechan;
     return;
-end;
+end
+if nargin < 3
+    field = 'labels';
+end
 
 if isempty(chanlocs) && isstr(chanstr)
     chaninds = str2num(chanstr);
     chanlist = chaninds;
     return;
-end;
+end
     
 if isstr(chanstr)
     % convert chanstr
@@ -59,7 +65,7 @@ if isstr(chanstr)
         c = chanstr(sp(i)+1:sp(i+1)-1);
         if ~isempty(c)
             chanlist{end+1} = c;
-            if isnan(str2double(chanlocs(1).labels)) % channel labels are not numerical
+            if isnan(str2double(chanlocs(1).(field))) % channel labels are not numerical
                 if ~isnan(str2double(c))
                     chanlistnum(end+1) = str2double(c);
                 end;
@@ -100,7 +106,7 @@ if all(chanval) > 0
     chanlist = chanval;
 else
     chaninds = [];
-    alllabs  = lower({ chanlocs.labels });
+    alllabs  = lower({ chanlocs.(field) });
     chanlist = lower(chanlist);
     for ind = 1:length(chanlist)
         indmatch = find(strcmp(alllabs,chanlist{ind})); %#ok<STCI>
@@ -123,7 +129,7 @@ else
 end;
 chaninds = sort(chaninds);
 if ~isempty(chanlocs)
-    chanlist = { chanlocs(chaninds).labels };
+    chanlist = { chanlocs(chaninds).(field) };
 else
     chanlist = {};
 end;

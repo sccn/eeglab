@@ -139,9 +139,14 @@
 
 function varargout = eeglab( onearg )
 
+ver = version;
+if strcmpi(ver, '9.4.0.813654 (R2018a)')
+    disp('Link to install <a href="https://www.mathworks.com/downloads/web_downloads/download_update?release=R2018a&s_tid=ebrg_R2018a_2_1757132">2018a Update 2</a>');
+    errordlg( [ 'You are running Matlab version R2018a, which has important bugs' 10 'Matlab crashes when running EEGLAB in this vesion of Matlab' 10 'Install 2018a Update 2 to fix the issue (link on the command line)' ]);
+end
+
 if nargout > 0
     varargout = { [] [] 0 {} [] };
-    %[ALLEEG, EEG, CURRENTSET, ALLCOM]
 end;
 
 % check Matlab version
@@ -257,7 +262,7 @@ end;
 % ---------
 if ~isdeployed
     tmp = which('eeglab_data.set');
-    if ~isempty(which('eeglab_data.set')) && ~isempty(which('GSN-HydroCel-32.sfp'))
+    if ~isempty(which('eeglab_data.set')) && ~isempty(which('Standard-10-10-Cap47.ced'))
         warning backtrace off;
         warning(sprintf([ '\n\nPath Warning: It appears that you have added the path to all of the\n' ...
             'subfolders to EEGLAB. This may create issues with some EEGLAB extensions\n' ...
@@ -335,11 +340,8 @@ else
     eeglab_options;
 end;
 
-if nargin == 1 && strcmp(onearg, 'redraw')
-    if evalin('base', 'exist(''EEG'')', '0') == 1
-        evalin('base', 'eeg_global;');
-    end;
-end;
+% declare the variables as global
+evalin('base', 'eeg_global;');
 eeg_global;
 
 % remove empty datasets in ALLEEG
@@ -359,9 +361,13 @@ evalin('caller', comtmp, '');
     
 evalin('base', 'eeg_global;');
 if nargin < 1 | exist('EEG') ~= 1
-	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM STUDY;
+	EEG = [];
+    ALLEEG = [];
+    CURRENTSET = [];
+    ALLCOM = [];
+    LASTCOM = [];
+    STUDY =[];
     CURRENTSTUDY = 0;
-	eeg_global;
 	EEG = eeg_emptyset;
 	eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
     if ismatlab && get(0, 'screendepth') <= 8
@@ -399,7 +405,7 @@ else
     onearg = 'rebuild';
 end;
 ALLCOM = ALLCOM;
-try, eval('colordef white;'); catch end;
+try, colordef('white'); catch end;
 
 % default option folder
 % ---------------------
@@ -878,7 +884,8 @@ end;
 
 if isdeployed
     funcname = {  'eegplugin_dipfit' ...
-                  'eegplugin_firfilt' };
+                  'eegplugin_firfilt' ...
+                  'eegplugin_musemonitor' };
     for indf = 1:length(funcname)
         try 
             vers = feval(funcname{indf}, gcf, trystrs, catchstrs);

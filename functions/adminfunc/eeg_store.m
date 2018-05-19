@@ -48,8 +48,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% uses the global variable EEG ALLEEG CURRENTSET 
-
 % store set
 % ------------------
 function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, varargin);
@@ -150,9 +148,9 @@ if ~isempty( ALLEEG )
 	catch
 		allfields = fieldnames( EEG );
 		for i=1:length( allfields )
-			eval( ['ALLEEG(' int2str(storeSetIndex) ').' allfields{i} ' = EEG.' allfields{i} ';' ]);
+			ALLEEG(storeSetIndex).(allfields{i}) = EEG.(allfields{i});
 		end;	
-        if ~isfield(EEG, 'datfile') & isfield(ALLEEG, 'datfile')
+        if ~isfield(EEG, 'datfile') && isfield(ALLEEG, 'datfile')
             ALLEEG(storeSetIndex).datfile = '';
         end;
 	end;

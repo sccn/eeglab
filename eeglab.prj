@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration file="/data/matlab/eeglab/eeglab.prj" location="/data/matlab/eeglab" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration file="/data/matlab/eeglabcompile/eeglab.prj" location="/data/matlab/eeglabcompile" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
@@ -85,8 +85,9 @@ If it is defined, set it to the concatenation of these strings:
       <file>${PROJECT_ROOT}/functions/studyfunc</file>
       <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
       <file>${PROJECT_ROOT}/plugins/Fileio170623</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit2.3</file>
-      <file>${PROJECT_ROOT}/plugins/firfilt1.6.2</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit2.4</file>
+      <file>${PROJECT_ROOT}/plugins/firfilt1.6.3</file>
+      <file>${PROJECT_ROOT}/plugins/musemonitor1.00</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/1ST_README.txt</file>
@@ -98,10 +99,10 @@ If it is defined, set it to the concatenation of these strings:
     </fileset.package>
     <fileset.depfun />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/data/matlab/eeglab/eeglab/for_testing/run_EEGLAB.sh</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglab/eeglab/for_testing/readme.txt</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/data/matlab/eeglab/eeglab/for_testing/EEGLAB.app</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglab/eeglab/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglabcompile/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/run_EEGLAB.sh</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/data/matlab/eeglabcompile/eeglab/for_testing/EEGLAB.app</file>
     </build-deliverables>
     <workflow />
     <matlab>
@@ -124,7 +125,7 @@ If it is defined, set it to the concatenation of these strings:
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.12.6</osver>
+      <osver>10.13.4</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>

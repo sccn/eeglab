@@ -13,7 +13,10 @@
 %                      an array of indices
 %   'select'         - selection of channel. Can take as input all the
 %                      outputs of this function.
-%   'selectionmode' - selection mode 'multiple' or 'single'. See listdlg2().
+%   'field'          - ['type'|'labels'] information to select. Default is 
+%                      'labels'
+%   'handle'         - [handle] update handle (GUI)
+%   'selectionmode'  - selection mode 'multiple' or 'single'. See listdlg2().
 %
 % Output:
 %   chanlist      - indices of selected channels
@@ -44,32 +47,35 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     if nargin < 1
         help pop_chansel;
         return;
-    end;
-    if isempty(chans), disp('Empty input'); return; end;
+    end
+    if isempty(chans), disp('Empty input'); return; end
     if isnumeric(chans),
         for c = 1:length(chans)
             newchans{c} = num2str(chans(c));
-        end;
+        end
         chans = newchans;
-    end;
+    end
     chanlist    = [];
     chanliststr = {};
     allchanstr  = '';
     
-    g = finputcheck(varargin, { 'withindex'     {  'integer';'string' } { [] {'on' 'off'} }   'off';
-                                'select'        { 'cell';'string';'integer' } [] [];
+    g = finputcheck(varargin, { 'withindex'     '' [] 'off';
+                                'select'        '' [] [];
+                                'handle'        '' [] [];
+                                'field'         'string' [] 'labels';
                                 'selectionmode' 'string' { 'single';'multiple' } 'multiple'});
-    if isstr(g), error(g); end;
+    if isstr(g), error(g); end
     if ~isstr(g.withindex), chan_indices = g.withindex; g.withindex = 'on';
     else                    chan_indices = 1:length(chans);
-    end;
-    if isstruct(chans), chans = { chans.labels }; end;
+    end
+    if isstruct(chans), chans = { chans.(g.field) }; end
+    if strcmpi(g.field, 'type'), chans = unique_bc(chans); end;
         
     % convert selection to integer
     % ----------------------------
     if isstr(g.select) & ~isempty(g.select)
         g.select = parsetxt(g.select);
-    end;
+    end
     if iscell(g.select) & ~isempty(g.select)
         if isstr(g.select{1})
             tmplower = lower( chans );
@@ -77,12 +83,12 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
                 matchind = strmatch(lower(g.select{index}), tmplower, 'exact');
                 if ~isempty(matchind), g.select{index} = matchind;
                 else error( [ 'Cannot find ''' g.select{index} '''' ] );
-                end;
-            end;
-        end;
+                end
+            end
+        end
         g.select = [ g.select{:} ];
-    end;
-    if ~isnumeric( g.select ), g.select = []; end;
+    end
+    if ~isnumeric( g.select ), g.select = []; end
     
     % add index to channel name
     % -------------------------
@@ -95,16 +101,16 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
                 tmpfieldnames{index} = [ num2str(chan_indices(index)) '  -  ' num2str(tmpstr(index)) ]; 
             else
                 tmpfieldnames{index} = num2str(tmpstr(index)); 
-            end;
-        end;
+            end
+        end
     else
         tmpfieldnames = chans;
         if strcmpi(g.withindex, 'on')
             for index=1:length(tmpfieldnames), 
                 tmpfieldnames{index} = [ num2str(chan_indices(index)) '  -  ' tmpfieldnames{index} ]; 
-            end;
-        end;
-    end;
+            end
+        end
+    end
     [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift|Ctrl to', 'select several)'), ...
                 'ListString', tmpfieldnames, 'initialvalue', g.select, 'selectionmode', g.selectionmode);   
     if tmp == 0
@@ -113,7 +119,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         return;
     else
         allchanstr = chans(chanlist);
-    end;
+    end
     
     % test for spaces
     % ---------------
@@ -122,8 +128,8 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         tmpstrs = [ allchanstr{:} ];
         if ~isempty( find(tmpstrs == ' ')) | ~isempty( find(tmpstrs == 9))
             spacepresent = 1;
-        end;
-    end;
+        end
+    end
     
     % get concatenated string (if index)
     % -----------------------
@@ -137,10 +143,14 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
                     chanliststr = [ chanliststr '''' allchanstr{index} ''' ' ];
                 else
                     chanliststr = [ chanliststr allchanstr{index} ' ' ];
-                end;
-            end;
+                end
+            end
             chanliststr = chanliststr(1:end-1);
-        end;
-    end;
+        end
+    end
+    
+    if ~isempty(g.handle)
+        set(g.handle, 'string', chanliststr);
+    end
        
     return;

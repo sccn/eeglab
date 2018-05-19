@@ -7,7 +7,10 @@
 % Inputs:
 %   EEG           - EEGLAB EEG structure
 %   b             - vector of filter coefficients
+%
+% Optional inputs:
 %   causal        - scalar boolean perform causal filtering {default 0}
+%   nFrames       - number of frames to filter per block {default 1000}
 %
 % Outputs:
 %   EEG           - EEGLAB EEG structure
@@ -40,13 +43,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function EEG = firfiltsplit(EEG, b, causal)
+function EEG = firfiltsplit(EEG, b, causal, chaninds)
 
 if nargin < 3 || isempty(causal)
     causal = 0;
 end
 if nargin < 2
     error('Not enough input arguments.');
+end
+if nargin < 3
+    chaninds = 1:size(EEG.data,1);
 end
 
 % Find data discontinuities and reshape epoched data
@@ -61,7 +67,7 @@ end
 for iDc = 1:(length(dcArray) - 1)
 
     % Filter segment
-    EEG.data(:, dcArray(iDc):dcArray(iDc + 1) - 1) = firfiltdcpadded(b, EEG.data(:, dcArray(iDc):dcArray(iDc + 1) - 1)', causal)';
+    EEG.data(chaninds, dcArray(iDc):dcArray(iDc + 1) - 1) = firfiltdcpadded(b, EEG.data(chaninds, dcArray(iDc):dcArray(iDc + 1) - 1)', causal)';
 
 end
 
