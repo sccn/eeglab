@@ -557,6 +557,7 @@ cb_quit        = [ 'close(gcf); disp(''To save the EEGLAB command history  >> po
 cb_editset     = [ check      '[EEG LASTCOM] = pop_editset(EEG);'        e_store];
 cb_editeventf  = [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG);' e_store];
 cb_editeventv  = [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);'  e_store];
+cb_adjustevents= [ checkevent '[EEG LASTCOM] = pop_adjustevents(EEG);'   e_store];
 cb_comments    = [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store];
 cb_chanedit    = [ 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
                    'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
@@ -757,6 +758,7 @@ if ismatlab
     uimenu( edit_m, 'Label', 'Dataset info'                           , 'userdata', ondata, 'CallBack', cb_editset);
     uimenu( edit_m, 'Label', 'Event fields'                           , 'userdata', ondata, 'CallBack', cb_editeventf);
     uimenu( edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
+    uimenu( edit_m, 'Label', 'Adjust event latencies'                 , 'userdata', ondata, 'CallBack', cb_adjustevents);
     uimenu( edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
     uimenu( edit_m, 'Label', 'Channel locations'                      , 'userdata', ondata, 'CallBack', cb_chanedit);
     uimenu( edit_m, 'Label', 'Select data'                            , 'userdata', ondata, 'CallBack', cb_select, 'Separator', 'on');
