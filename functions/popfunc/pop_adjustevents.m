@@ -1,4 +1,4 @@
-% pop_adjustevent() - Adjust event offset of all (or specified) events
+% pop_adjustevents() - Adjust event offset of all (or specified) events
 %
 % Usage:
 % >> EEG = pop_adjustevent(EEG); % launch a GUI
@@ -38,18 +38,21 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG,com] = pop_adjustevent(EEG,varargin)
+function [EEG,com] = pop_adjustevents(EEG,varargin)
 com = [];
 
 % Call help
 if nargin <1 
-    help pop_adjustevent;
+    help pop_adjustevents;
     return;
 end
 
 % GUI if inputs not provided
 if nargin < 2
     srate = EEG.srate;
+    cback_time   = ['set(findobj(''tag'', ''edit_samples''),    ''string'', num2str(str2num(get(gcbo,''string''))*' num2str(srate) '))'];
+    cback_sample = ['set(findobj(''tag'', ''edit_time''),       ''string'', num2str(str2num(get(gcbo,''string''))/' num2str(srate) '))'];
+    
     cbevent = ['if ~isfield(EEG.event, ''type'')' ...
         '   errordlg2(''No type field'');' ...
         'else' ...
@@ -70,15 +73,15 @@ if nargin < 2
         { 'style' 'edit' 'string'  ''   'tag' 'events' } ...
         { 'style' 'pushbutton' 'string' '...' 'callback' cbevent } ...
         { 'style' 'text' 'string' 'Add in milliseconds (can be negative)'} ...
-        { 'style' 'edit' 'string'  '' 'tag' 'edit_time'} ...
+        { 'style' 'edit' 'string'  '' 'tag' 'edit_time'  'callback' cback_time} ...
         { }...
         { 'style' 'text' 'string' 'Or add in samples'} ...
-        { 'style' 'edit' 'string'  '' 'tag' 'edit_samples'}...
+        { 'style' 'edit' 'string'  '' 'tag' 'edit_samples' 'callback' cback_sample}...
         { }...
         };
         
     uigeom = { [1 0.7 0.5] [1 0.7 0.5] [1 0.7 0.5]};
-    result = inputgui( 'uilist', uilist, 'geometry', uigeom, 'title', 'Adjust event latencies - pop_adjustevent()');
+    result = inputgui( 'uilist', uilist, 'geometry', uigeom, 'title', 'Adjust event latencies - pop_adjustevents()');
     if isempty(result) return; end
     
     % Collecting inputs
@@ -152,5 +155,5 @@ end
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 if nargout > 1
-    com = sprintf('[EEG,com] = pop_adjustevent(EEG, %s);', vararg2str(options));
+    com = sprintf('[EEG,com] = pop_adjustevents(EEG, %s);', vararg2str(options));
 end
