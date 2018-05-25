@@ -69,9 +69,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG selectedregions precompstruct com ] = pop_rejcont(EEG, varargin);
+function [EEG, selectedregions, precompstruct, com ] = pop_rejcont(EEG, varargin);
 
 com = '';
+selectedregions = [];
+precompstruct = [];
 if nargin < 1
     help pop_rejcont;
     return;
