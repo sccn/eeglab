@@ -1,6 +1,10 @@
 % pop_topoplot() - Plot scalp map(s) in a figure window. If number of input
 %                  arguments is less than 3, pop up an interactive query window.
 %                  Makes (possibly repeated) calls to topoplot().
+%                  If 'EEG.chanmatrix exists, will use the topoplot() 'gridplot' option 
+%                  to plot the data on the indicated channel matrix instead of plotting 
+%                  on the head (see 'grid plot' on >> help topoplot).
+
 % Usage:
 %   >> pop_topoplot( EEG); % pops up a parameter query window
 %   >> pop_topoplot( EEG, typeplot, items, title, plotdip, options...); % no pop-up
@@ -162,6 +166,12 @@ end;
 % ------------------
 outoptions = { options{:} }; % for command
 options    = { options{:} 'masksurf' 'on' };
+
+% plot grid plots instead of head plots
+%-------------------------------------
+if exists(EEG.chanmatrix)
+   options = { options{:} 'gridplot' EEG.chanmatrix};
+end
 
 % find maplimits
 % --------------
