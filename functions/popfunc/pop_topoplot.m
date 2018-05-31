@@ -169,7 +169,7 @@ options    = { options{:} 'masksurf' 'on' };
 
 % plot grid plots instead of head plots
 %-------------------------------------
-if exists(EEG.chanmatrix)
+if isfield(EEG, 'chanmatrix') && ~isempty(EEG.chanmatrix)
    options = { options{:} 'gridplot' EEG.chanmatrix};
 end
 
