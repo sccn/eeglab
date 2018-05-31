@@ -106,7 +106,13 @@ classdef updater < handle
             nameValuePairs = [{'currentVersionNumber' num2str(obj.currentVersionNumber) 'matlabVersion' version 'OS' osType} nameValuePairs];
             
             try
-                [xmlString successfullRead] = plugin_urlread([obj.xmlFileUrl], 'get', nameValuePairs);
+                tic;
+                [xmlString, successfullRead] = plugin_urlread([obj.xmlFileUrl], 'get', nameValuePairs);
+                t = toc;
+                if t > 5
+                    disp('Sorry for the wait. EEGLAB was trying to check for updates but the internet is down.');
+                    disp('(you may disable this option using menu item File > Memory and other options)');
+                end
             catch
                 successfullRead = false;
             end;
