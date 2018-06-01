@@ -38,10 +38,11 @@
 %                       'chantype'. Ex. 'EEG' or {'EEG','EOG'} {default: all, or 'plotchans' arg}
 %   'plotgrid'        - [channels] Plot channel data in one or more rectangular grids, as 
 %                       specified by [channels],  a position matrix of channel numbers defining 
-%                       the topographic locations of the channels in the grid. Zero values are 
-%                       given the figure background color; negative integers, the color of the 
-%                       polarity-reversed channel values.  Ex: >> figure; ...
-%                        >> topoplot(values,'chanlocs','plotgrid',[11 12 0; 13 14 15]);
+%                       the topographic locations of the channels in the
+%                       grid. Zero values are ignored (given the figure background color); 
+%                       negative integers, the color of the polarity-reversed channel values.  
+%                       Ex: >> figure; ...
+%                             >> topoplot(values,'chanlocs','plotgrid',[11 12 0; 13 14 15]);
 %                       % Plot a (2,3) grid of data values from channels 11-15 with one empty 
 %                       grid cell (top right) {default: no grid plot} 
 %   'nosedir'         - ['+X'|'-X'|'+Y'|'-Y'] direction of nose {default: '+X'}
@@ -1095,7 +1096,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
          if gc > 0
               gridvalues(j,k) = Values(gc);
          elseif gc < 0
-              gridvalues(j,k) = -Values(gc);
+              gridvalues(j,k) = -Values(abs(gc));
          else 
               gridvalues(j,k) = nan; % not-a-number = no value
          end
