@@ -1,9 +1,10 @@
 % pop_topoplot() - Plot scalp map(s) in a figure window. If number of input
 %                  arguments is less than 3, pop up an interactive query window.
 %                  Makes (possibly repeated) calls to topoplot().
-%                  If 'EEG.chanmatrix exists, will use the topoplot() 'gridplot' option 
+% 
+%                  If field 'EEG.chanmatrix' exists, will use the topoplot() 'plotgrid' option 
 %                  to plot the data on the indicated channel matrix instead of plotting 
-%                  on the head (see 'grid plot' on >> help topoplot).
+%                  on the head (see 'plotgrid' in >> help topoplot).
 
 % Usage:
 %   >> pop_topoplot( EEG); % pops up a parameter query window
@@ -28,9 +29,9 @@
 %
 % Optional Key-Value Pair Inputs
 %   'colorbar' - ['on' or 'off'] Switch to turn colorbar on or off. {Default: 'on'}
-%   options  - optional topoplot() arguments. Separate using commas. 
-%              Example 'style', 'straight'. See >> help topoplot
-%              for further details. {default: none}
+%   options   - optional topoplot() arguments. Separate using commas. 
+%               Example 'style', 'straight'. See >> help topoplot
+%               for further details. {default: none}
 %
 % Note:
 %   A new figure is created automatically only when the pop_up window is 
@@ -75,7 +76,7 @@ end;
 if typeplot == 0 & isempty(EEG.icasphere)
    disp('Error: no ICA data for this set, first run ICA'); return;
 end;   
-if isempty(EEG.chanlocs)
+if isempty(EEG.chanlocs) && ~isfield(EEG, 'chanmatrix')
    disp('Error: cannot plot topography without channel location file'); return;
 end;   
 
@@ -169,8 +170,20 @@ options    = { options{:} 'masksurf' 'on' };
 
 % plot grid plots instead of head plots
 %-------------------------------------
-if isfield(EEG, 'chanmatrix') && ~isempty(EEG.chanmatrix)
-   options = { options{:} 'gridplot' EEG.chanmatrix};
+isaninteger = @(x) mod(x, 1) == 0;
+if isfield(EEG, 'chanmatrix')
+    if isempty(EEG.chanmatrix)
+        if exist('curfig','var') && ishandle(curfig), close(curfig); end
+        disp('Error: EEG.chanmatrix is empty. See >> help topoplot');return;
+    end
+    if ~all(isaninteger(EEG.chanmatrix(:)))
+        if exist('curfig','var') && ishandle(curfig), close(curfig); end
+        disp('Error: EEG.chanmatrix must contain channel indices. See >> help topoplot');return;
+    end
+    options = { options{:} 'gridplot' EEG.chanmatrix};
+elseif isempty(EEG.chanlocs)
+    if exist('curfig','var') && ishandle(curfig), close(curfig); end
+    disp('Error: cannot plot topography without channel location file'); return;
 end
 
 % find maplimits
@@ -198,10 +211,6 @@ end;
 SIZEBOX = 150;
 
 fprintf('Plotting...\n');
-if isempty(EEG.chanlocs)
-	fprintf('Error: set has no channel location file\n');
-	return;
-end;
 
 % Check if pop_topoplot input 'colorbar' was called, and don't send it to topoplot
 loc = strmatch('colorbar', options(1:2:end), 'exact');
