@@ -605,6 +605,7 @@ if isempty(find(strcmp(varargin,'colormap')))
 else
     cmap = colormap;
 end
+if strcmp(noplot,'on'), close(gcf); end
 cmaplen = size(cmap,1);
 
 if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
