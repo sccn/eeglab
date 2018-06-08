@@ -225,6 +225,17 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
              options{6} = 'on';
            end
            
+           % Dealing with projection lines
+           if strcmpi(options{2},'on')
+               projlinesvect = ones(1,length(cluster_dip_models));
+           elseif strcmpi(options{2},'off') && strcmp(STUDY.etc.dipparams.centrline,'on')
+               projlinesvect = zeros(1,length(cluster_dip_models));
+               projlinesvect(end) = 1;
+           elseif strcmpi(options{2},'off')
+               projlinesvect = zeros(1,length(cluster_dip_models));
+           end
+           options{2} = projlinesvect;
+           
            if figureon
                dipplot(cluster_dip_models, options{:});
                fig_h = gcf;
@@ -312,6 +323,18 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
             options{end+1} = 'meshdata';
             options{end+1} = ALLEEG(abset).dipfit.hdmfile;
         end
+        
+        % Dealing with projection lines
+        if strcmpi(options{2},'on')
+            projlinesvect = ones(1,length(cluster_dip_models));
+        elseif strcmpi(options{2},'off') && strcmp(STUDY.etc.dipparams.centrline,'on')
+            projlinesvect = zeros(1,length(cluster_dip_models));
+            projlinesvect(end) = 1;
+        elseif strcmpi(options{2},'off')
+            projlinesvect = zeros(1,length(cluster_dip_models));
+        end
+           options{2} = projlinesvect;
+        
         subplot(rowcols(1),rowcols(2),l) , 
         dipplot(cluster_dip_models, options{:});
         title([ STUDY.cluster(cls(l)).name ' (' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) ' Ss, '  num2str(length(STUDY.cluster(cls(l)).comps)),' ICs)'],'color','white');
@@ -374,6 +397,7 @@ if strcmpi(mode, 'multicolor')
   set(fig_h, 'resize','off');
   
   idx = 0; %cumulative dipole index
+  centroidIdx = [];
   clear cluster_dip_models;
   for l = 1:N %loop over clusters
     len = length(STUDY.cluster(cls(l)).comps);
@@ -438,6 +462,7 @@ if strcmpi(mode, 'multicolor')
     clustEndIdx = idx;
     STUDY.cluster(cls(l)).dipole = computecentroid(cluster_dip_models(clustStartIdx:clustEndIdx));
     idx = idx + 1;
+    centroidIdx(end+1) = idx;
     cluster_dip_models(idx) = STUDY.cluster(cls(l)).dipole;
     dip_color(idx) = {'k'};
     dip_size(idx) = 10;
@@ -466,6 +491,17 @@ if strcmpi(mode, 'multicolor')
     options{end+1} = 'meshdata';
     options{end+1} = ALLEEG(abset).dipfit.hdmfile;
   end
+  
+  % Dealing with projection lines
+  if strcmpi(options{2},'on')
+      projlinesvect = ones(1,length(cluster_dip_models));
+  elseif strcmpi(options{2},'off') && strcmp(STUDY.etc.dipparams.centrline,'on')
+      projlinesvect = zeros(1,length(cluster_dip_models));
+      projlinesvect(centroidIdx) = 1;
+  elseif strcmpi(options{2},'off')
+      projlinesvect = zeros(1,length(cluster_dip_models));
+  end
+  options{2} = projlinesvect;
   
   dipplot(cluster_dip_models, options{:});
   set(fig_h, 'resize','on');
