@@ -140,14 +140,14 @@ if strcmpi(mode, 'apart')
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
-                    title([subject '/' 'ic' num2str(comp)   ], 'interpreter', 'none');
+                    title([subject '/' 'IC' num2str(comp)   ], 'interpreter', 'none');
                     colormap(DEFAULT_COLORMAP);
                     %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
-                    title([subject '/' 'ic' num2str(comp)], 'interpreter', 'none');
+                    title([subject '/' 'IC' num2str(comp)], 'interpreter', 'none');
                     colormap(DEFAULT_COLORMAP);
                     %waitbar(k/(len+1),h_wait)
                 end
