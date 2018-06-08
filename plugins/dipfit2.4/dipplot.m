@@ -66,9 +66,16 @@
 %                white otherwise.) Default is 'off'.
 %  'projimg'  - ['on'|'off'] Project dipole(s) onto the 2-D images, for use
 %               in making 3-D plots {Default 'off'}
-%  'projlines' - ['on'|'off'] Plot lines connecting dipole with 2-D projection.
+%  'projlines' - ['on'|'off'|boolean_array] Plot lines connecting dipole with 2-D 
+%                projection. This input can also be a boolean array with dimension
+%                equal to the number of dipoles to plot. [0] no projection
+%                lines plotted. [1] ploting projection lines. 
 %                Color is dashed black for BESA head and dashed black for the
 %                MNI brain {Default 'off'}
+% 'projwidth'  - [real|array] Line width of the dipole projection lines. This can
+%                be a single value for all the dipoles lines or an array with dimensions
+%                equal to the number of of dipoles specifying the line width of each line.
+%                {Default: dipolesize * 0.3 }
 %  'projcol'   - [color] color for the projected line {Default is same as dipole}
 %  'dipolesize' - Size of the dipole sphere(s). This option may also contain one
 %               value per dipole {Default: 30}
@@ -221,42 +228,43 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         return
    end;
     
-    %                             key        type       range             default
-    g = finputcheck( varargin, { 'color'     ''         []                  [];
-                                 'axistight' 'string'   { 'on' 'off' }     'off';
-                                 'camera'    'string'   { 'auto' 'set' }   'auto';
-                                 'coordformat' 'string' { 'MNI' 'spherical' 'CTF' 'auto' } 'auto';
-                                 'drawedges' 'string'   { 'on' 'off' }     'off';
-                                 'density'   'string'   { 'on' 'off' }     'off';
-                                 'mesh'      'string'   { 'on' 'off' }     'off';
-                                 'gui'       'string'   { 'on' 'off' }     'on';
-                                 'summary'   'string'   { 'on2' 'on' 'off' '3d' }     'off';
-                                 'verbose'   'string'   { 'on' 'off' }     'on';
-                                 'view'      'real'     []                 [0 0 1];
-                                 'rvrange'   'real'     [0 Inf]             [];
-                                 'transform' 'real'     [0 Inf]             [];
-                                 'normlen'   'string'   { 'on' 'off' }     'off';
-                                 'num'       'string'   { 'on' 'off' }     'off';
-                                 'cornermri' 'string'   { 'on' 'off' }     'off';
-                                 'mri'       { 'string' 'struct' } []      '';
-                                 'dipnames'   'cell'     []                  {};
-                                 'projimg'   'string'   { 'on' 'off' }     'off';
-                                 'projcol'   ''         []       [];
-                                 'projlines' 'string'   { 'on' 'off' }     'off';
-                                 'pointout'  'string'   { 'on' 'off' }     'off';
-                                 'holdon'    'string'   { 'on' 'off' }     'off';
-                                 'dipolesize' 'real'    [0 Inf]             30;
-                                 'dipolelength' 'real'  [0 Inf]             1;
-                                 'sphere'    'real'   [0 Inf]               1;
-                                 'spheres'   'string'  {'on' 'off'}         'off';
-                                 'links'     'real'   []                    [];
-                                 'image'     { 'string' 'real' } []         'mri';
-                                 'plot'      'string'   { 'on' 'off' }      'on';
-                                 'meshdata'  { 'string' 'cell' } []         '' }, 'dipplot');
+    %                             key           type       range             default
+    g = finputcheck( varargin, { 'color'        ''         []                 [];
+                                 'axistight'    'string'   { 'on' 'off' }     'off';
+                                 'camera'       'string'   { 'auto' 'set' }   'auto';                                 
+                                 'drawedges'    'string'   { 'on' 'off' }     'off';
+                                 'density'      'string'   { 'on' 'off' }     'off';
+                                 'mesh'         'string'   { 'on' 'off' }     'off';
+                                 'gui'          'string'   { 'on' 'off' }     'on';                          
+                                 'verbose'      'string'   { 'on' 'off' }     'on';
+                                 'view'         'real'     []                 [0 0 1];
+                                 'rvrange'      'real'     [0 Inf]            [];
+                                 'transform'    'real'     [0 Inf]            [];
+                                 'normlen'      'string'   { 'on' 'off' }     'off';
+                                 'num'          'string'   { 'on' 'off' }     'off';
+                                 'cornermri'    'string'   { 'on' 'off' }     'off';                                
+                                 'dipnames'     'cell'     []                 {};
+                                 'projimg'      'string'   { 'on' 'off' }     'off';
+                                 'projcol'      ''         []                 [];
+                                 'projwidth'    'real'     []                 [];
+                                 'projlines'    ''         []                 'off';
+                                 'pointout'     'string'   { 'on' 'off' }     'off';
+                                 'holdon'       'string'   { 'on' 'off' }     'off';
+                                 'dipolesize'   'real'     [0 Inf]            30;
+                                 'dipolelength' 'real'     [0 Inf]            1;
+                                 'sphere'       'real'     [0 Inf]            1;
+                                 'spheres'      'string'   {'on' 'off'}       'off';
+                                 'links'        'real'     []                 [];
+                                 'plot'         'string'   { 'on' 'off' }     'on';
+                                 'mri'          {'string' 'struct' } []       '';
+                                 'image'        { 'string' 'real' }  []       'mri'; 
+                                 'summary'      'string'   { 'on2' 'on' 'off' '3d' }          'off';
+                                 'coordformat'  'string'   { 'MNI' 'spherical' 'CTF' 'auto' } 'auto';
+                                 'meshdata'     { 'string' 'cell' }  []         '' },        'dipplot');
     %                             'std'       'cell'     []                  {}; 
     %                             'coreg'     'real'     []                  [];
 
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end
     if strcmpi(g.density, 'on')
         % remove first dipole if different color
         if ~isempty(g.color) && iscell(g.color) && length(g.color)>1
@@ -269,14 +277,28 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         return
     end
     
-    if strcmpi(g.holdon, 'on'), g.gui = 'off'; end;
-    if length(g.dipolesize) == 1, g.dipolesize = repmat(g.dipolesize, [1 length(sourcesori)]); end;
+    if strcmpi(g.holdon, 'on'), g.gui = 'off'; end
+    if length(g.dipolesize) == 1, g.dipolesize = repmat(g.dipolesize, [1 length(sourcesori)]); end
     
     g.zoom = 1500;
 
     if strcmpi(g.image, 'besa')
         error('BESA image not supported any more. Use EEGLAB version 4.512 or earlier. (BESA dipoles can still be plotted in MNI brain.)');
-    end;
+    end
+    
+    % Dealing with projection lines
+    if ischar(g.projlines)
+        if strcmpi(g.projlines, 'on')
+            g.projlinesmat = ones(1,length(sources));
+        else 
+            if ~strcmpi(g.projlines, 'off')
+                fprintf(['dipplot: Invalid argument ''' g.projlines ''' for ''projlines'' option. Ignoring input and setting option to ''off''\n']);
+            end
+            g.projlinesmat = zeros(1,length(sources));
+        end
+    elseif all(size(g.projlines) == [1 length(sources)])
+        g.projlinesmat = g.projlines;
+    end
     
     % trying to determine coordformat
     % -------------------------------
@@ -468,6 +490,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             g.projcol{index} =  g.projcol{index}/2;
         end;
     end;
+    
+     % Projection linewidth
+    if isempty(g.projwidth), g.projwidth = repmat(g.dipolesize/7.5/5,1,length(sources)); end
+    if length(g.projwidth) == 1, g.projwidth = repmat(g.projwidth, [1 length(sourcesori)]); end
     
     % build summarized figure
     % -----------------------
@@ -831,25 +857,25 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto axes %%%%%%%%%%%%%%%%%%%%%%%%%
             %
-            if strcmpi(g.projlines, 'on')                
+            if g.projlinesmat(index)          
                 clear h;
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 h(1) = line( [xx tmp1xx]', [yy tmp1yy]', [zz tmp1zz]);
                 set(h(1), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize(index)/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.projwidth(index));
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 h(2) = line( [xx tmp2xx]', [yy tmp2yy]', [zz tmp2zz]);
                 set(h(2), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize(index)/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.projwidth(index));
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 h(3) = line( [xx tmp3xx]', [yy tmp3yy]', [zz tmp3zz]);
                 set(h(3), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize(index)/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.projwidth(index));
                 if ~isempty(g.projcol)
                     set(h, 'color', g.projcol{index});
                 end;
