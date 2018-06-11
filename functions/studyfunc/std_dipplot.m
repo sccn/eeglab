@@ -335,9 +335,14 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
         end
            options{2} = projlinesvect;
         
-        subplot(rowcols(1),rowcols(2),l) , 
+        hsbplot = subplot(rowcols(1),rowcols(2),l);
+        % Creating new axis for title only
+        set(hsbplot,'visible','off');
+        htitle = title([ STUDY.cluster(cls(l)).name ' (' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(l)).comps)),' ICs)'],'color','white','Visible', 'on');
+        if rowcols(1)> 1, set(htitle,'Position', get(htitle,'Position')+ [0 0.05 0].*get(htitle,'Position') ); end
+        axes('Position', get(hsbplot,'Position'),'Color', 'black');
         dipplot(cluster_dip_models, options{:});
-        title([ STUDY.cluster(cls(l)).name ' (' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) ' Ss, '  num2str(length(STUDY.cluster(cls(l)).comps)),' ICs)'],'color','white');
+
         %diptitle = [STUDY.cluster(cls(l)).name ', ' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) 'Ss'];
         %title(diptitle, 'Color', 'white');
         % Complex axcopy
