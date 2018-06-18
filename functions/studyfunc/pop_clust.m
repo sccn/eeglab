@@ -176,6 +176,9 @@ if isempty(varargin) %GUI call
         if ~isempty(findstr(clus_alg, 'Kmeans ')), clus_alg = 'kmeans'; end;
         if ~isempty(findstr(clus_alg, 'Neural ')), clus_alg = 'neural network'; end;
         
+        % Cleaning cache
+        STUDY.cache = [];
+        
         disp('Clustering ...');
         
         switch clus_alg
