@@ -89,7 +89,16 @@ else
 end;
 
 for iDat = 1:length(inds)
-    [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
-    [trialinfo(nvals(iDat):nvals(iDat+1)-1).group    ] = deal( datasetinfo(inds(iDat)).group     );
-    [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
+    % Checking if field do not exist or if exist and is empty
+    if ~isfield(trialinfo,'condition') || (isfield(trialinfo,'condition') && any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).condition})))
+        [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
+    end
+    
+    if ~isfield(trialinfo,'group') || (isfield(trialinfo,'group') && any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).group})))
+        [trialinfo(nvals(iDat):nvals(iDat+1)-1).group    ] = deal( datasetinfo(inds(iDat)).group     );
+    end
+    
+    if ~isfield(trialinfo,'session') || (isfield(trialinfo,'session') && any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).session})))      
+        [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
+    end
 end;
