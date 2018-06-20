@@ -78,10 +78,10 @@ if isempty(STUDY.etc.preclust)
     error('No pre-clustering information, pre-cluster first!');
 end;
 
-% check that the path to the stat toolbox comes first (conflict
-% with Fieldtrip)
-kmeansPath = fileparts(which('kmeans'));
-if ~isempty(kmeansPath)
+% Check that path to the stats toolbox comes first (conflict with Fieldtrip)
+flagstats = strcmp(regexp(which('kmeans'), '(?<=[\\/]toolbox[\\/])[^\\/]+', 'match', 'once'),'stats');
+if ~flagstats
+    kmeansPath = fileparts(which('kmeans'));
     rmpath(kmeansPath);
     addpath(kmeansPath);
 end;
