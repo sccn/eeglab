@@ -239,8 +239,10 @@ if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && st
     if isempty(componentPol)
         disp('Cluster topographies absent - cannot adjust single component ERP polarities');
     end
-    for iItem = 1:length(datavals)
-        datavals{iItem} = bsxfun(@times, datavals{iItem}, componentPol);
+    for iItem = 1:length(datavals(:))
+        if ~isempty(datavals{iItem})
+            datavals{iItem} = bsxfun(@times, datavals{iItem}, componentPol);
+        end
     end
 end
 
