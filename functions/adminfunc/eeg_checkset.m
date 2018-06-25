@@ -437,7 +437,7 @@ for inddataset = 1:length(ALLEEG)
                         % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
                         % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
                         difffield = fieldnames(EEG.event);
-                        difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')|strcmp(difffield,'egikeys')|strcmp(difffield,'egikeysbackup')|strcmp(difffield,'begintime')));
+                        difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')|strcmp(difffield,'mffkeys')|strcmp(difffield,'mffkeysbackup')|strcmp(difffield,'begintime')));
                         for index = 1:length(difffield)
                             tmpevent  = EEG.event;
                             allvalues = { tmpevent.(difffield{index}) };
@@ -485,7 +485,7 @@ for inddataset = 1:length(ALLEEG)
                     fnames = fieldnames(EEG.event);
                     for fidx = 1:length(fnames)
                         fname = fnames{fidx};
-                        if ~strcmpi(fname, 'egikeys') && ~strcmpi(fname, 'egikeysbackup')
+                        if ~strcmpi(fname, 'mffkeys') && ~strcmpi(fname, 'mffkeysbackup')
                             tmpevent  = EEG.event;
                             allvalues = { tmpevent.(fname) };
                             try
@@ -528,9 +528,11 @@ for inddataset = 1:length(ALLEEG)
                             indDoublet = find(bounds(2:end)-bounds(1:end-1)==0);
                             if ~isempty(indDoublet)
                                 disp('Warning: duplicate boundary event removed');
-                                for indBound = 1:length(indDoublet)
-                                    EEG.event(boundsInd(indDoublet(indBound)+1)).duration = EEG.event(boundsInd(indDoublet(indBound)+1)).duration+EEG.event(boundsInd(indDoublet(indBound))).duration;
-                                end;
+                                if isfield(EEG.event, 'duration')
+                                    for indBound = 1:length(indDoublet)
+                                        EEG.event(boundsInd(indDoublet(indBound)+1)).duration = EEG.event(boundsInd(indDoublet(indBound)+1)).duration+EEG.event(boundsInd(indDoublet(indBound))).duration;
+                                    end
+                                end
                                 EEG.event(boundsInd(indDoublet)) = [];
                             end;
                         end;
