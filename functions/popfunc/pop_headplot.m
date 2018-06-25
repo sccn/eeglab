@@ -206,11 +206,18 @@ if nargin < 3 % Open GUI input window
     defaultloc = { 'mheadnew.xyz' 'colin27headmesh.xyz' };
     defaulttransform = { transform [0 -15 -15 0.05 0 -1.57 100 88 110] };
     userdatatmp = { EEG.chanlocs EEG.chaninfo };
-    if isempty(EEG.filename)
-        splfile     = fullfile(pwd, 'tmp.spl');
+    if isdeployed
+        basefolder = [ getenv('HOME')  getenv('USERPROFILE') ];
+    elseif ~isempty(EEG.filepath)
+        basefolder = EEG.filepath;
     else
-        splfile     = [fullfile(pwd, EEG.filename(1:length(EEG.filename)-3)),'spl'];
-    end;
+        basefolder = pwd;        
+    end
+    if isempty(EEG.filename)
+        splfile     = fullfile(basefolder, 'tmp.spl');
+    else
+        splfile     = [fullfile(basefolder, EEG.filename(1:length(EEG.filename)-3)),'spl'];
+    end
 	txt = { { 'style' 'text'        'string' 'Co-register channel locations with head mesh and compute a mesh spline file (each scalp montage needs a headplot() spline file)' 'fontweight' 'bold' } ...
             { 'style' 'checkbox'    'string' 'Use the following spline file or structure' 'userdata' 'loadfile' 'tag' 'loadcb' 'callback' cb_load 'value' ~compute_file } ...
             { 'style' 'edit'        'string' fastif(typeplot, EEG.splinefile, EEG.icasplinefile)  'userdata' 'load' 'tag' 'load' 'enable' enableload } ...
