@@ -141,7 +141,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'scalp'       'string'  { 'on','off' }     'off';
                                 'allcomps'    'string'  { 'on','off' }     'off';
                                 'itc'         'string'  { 'on','off' }     'off';
-                                'savetrials'  'string'  { 'on'       }     'on'; % change for EEGLAB 14
+                                'savetrials'  'string'  { 'on'       }     'on'; % change for EEGLAB 15
                                 'rmicacomps'  'string'  { 'on','off','processica' }     'off';
                                 'cell'        'integer' []                 [];
                                 'design'      'integer' []                 STUDY.currentdesign;
