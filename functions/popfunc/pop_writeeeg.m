@@ -35,16 +35,8 @@ function [command] = pop_writeeeg(EEG, filename, varargin)
 command = '';
 
 % enforce use the str2double of Biosig
+if ~plugin_askinstall('Biosig', 'sopen'), return; end;
 biosigpathfirst
-
-% Check for BIOSIG Toolbox
-global PLUGINLIST
- if ~isempty(PLUGINLIST) && ~any(strcmpi({PLUGINLIST.plugin}','biosig'))
-     fprintf(2,'pop_writeeeg error: This function requires you to install <a href="http://biosig.sourceforge.net/index.html">BIOSIG Toolbox</a> plug-in. \n');
-     return;
- elseif isempty(PLUGINLIST)
-     warning('pop_writeeeg check for <a href="http://biosig.sourceforge.net/index.html">BIOSIG Toolbox</a> could not be performed.');
- end
 
 if nargin < 2
     if EEG.trials > 1
