@@ -29,8 +29,8 @@
 %   'neighbormat' - Neighborhood matrix of electrodes. Must be used with 'chanloc', 
 %                   or it will be ignored. If this option is used, it will
 %                   ignore 'neighboropt' if used.
-%   'freqlim'     - Frequency trimming
-%   'timelim'     - Time trimming
+%   'freqlim'     - Frequency trimming in Hz
+%   'timelim'     - Time trimming in millisecond
 %      
 % Outputs:
 %  STUDY     - modified STUDY structure (the STUDY.design now contains a list
@@ -68,6 +68,9 @@ function [STUDY, LIMO_files] = std_limo(STUDY,ALLEEG,varargin)
 
 LIMO_files = [];
 
+if isempty(STUDY.filepath)
+    STUDY.filepath = pwd;
+end
 cd(STUDY.filepath);
 if nargin < 2
     help std_limo;
