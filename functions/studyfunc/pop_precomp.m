@@ -336,11 +336,13 @@ else
             end
             
         case 'testspec'
-            try,
+            %try,
                 spec_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'spec_params'), 'string') '}' ]); 
 
                 TMPEEG = eeg_checkset(ALLEEG(1), 'loaddata');
-                [ X f ] = std_spec(TMPEEG, 'channels', { TMPEEG.chanlocs(1).labels }, 'trialindices', { [1:min(20,TMPEEG.trials)] }, 'recompute', 'on', 'savefile', 'off', spec_params{:});
+                [ X f ] = std_spec(TMPEEG, 'channels', { TMPEEG.chanlocs(1).labels }, 'trialindices', { [1:min(20,TMPEEG.trials)] }, 'recompute', 'on', 'savefile', 'off', 'trialinfo', struct('condition', ''), spec_params{:});
+                if ndims(X) > 2, X = mean(X,3); end
+                X = 10*log10(X);
                 figure; plot(f, X); 
                 xlabel('Frequencies (Hz)');
                 ylabel('Power');
@@ -354,7 +356,7 @@ else
                                                          'after computation'));
                 icadefs;
                 set(gcf, 'color', BACKCOLOR);
-            catch, warndlg2('Error while calling function, check parameters'); end;
+            %catch, warndlg2('Error while calling function, check parameters'); end;
 
         case 'testersp'
             try,
