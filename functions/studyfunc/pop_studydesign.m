@@ -52,7 +52,6 @@ if nargin < 3 && ~isstr(STUDY)
     usrdat.design      = STUDY.design;
     usrdat.filepath    = STUDY.filepath;
     for ind = 1:length(usrdat.design)
-        usrdat.design(ind).deletepreviousfiles = 0;
         for iVar = length(usrdat.design(ind).variable):-1:1
             if isempty(usrdat.design(ind).variable(iVar).label)
                 usrdat.design(ind).variable(iVar) = [];
@@ -102,8 +101,8 @@ if nargin < 3 && ~isstr(STUDY)
                { 'style' 'pushbutton' 'string' 'Edit'   'callback' cb_editvar } ...
                { 'style' 'pushbutton' 'string' 'Delete' 'callback' cb_delvar } ...
                { 'style' 'listbox'    'string' usrdat.subjects 'tag' 'lbsubj' 'min' 0 'max' 2 'value' 1 'callback' cb_selectsubj } ...
-               { 'style' 'listbox'    'string' ''  'tag' 'lbfact0' 'value' 2 } ...
-               { 'style' 'checkbox'   'string' 'Delete all pre-computed datafiles for this STUDY design' 'tag' 'chk_del' 'callback' cb_lbval } };
+               { 'style' 'listbox'    'string' ''  'tag' 'lbfact0' 'value' 2 } };
+%               { 'style' 'checkbox'   'string' 'Delete all pre-computed datafiles' 'tag' 'chk_del' 'callback' cb_lbval } };
 %               { 'style' 'checkbox'  'string' 'Paired statistics' 'tag' 'lbpair0' 'callback' cb_lbval } ...
 %               { 'style' 'checkbox'  'string' 'Paired statistics' 'tag' 'lbpair1' 'callback' cb_lbval } ...
 %               { 'style' 'pushbutton' 'string' 'Plot'   'callback' cb_plotdmat} ...
@@ -118,7 +117,7 @@ if nargin < 3 && ~isstr(STUDY)
                  {3 ht [3.20 1.15] [0.8  1] } ... % Delete
                  {3 ht [1 4.4]   [3 1] } ...
                  ...
-                 {3 ht [0.93 5.4+h2] [3.15 5.6] } ...
+                 {3 ht [0.93 5.4+h2] [3.15 5.1] } ...
                  {3 ht [3.3  6+h2]   [0.5 1] } ...    % Subject text
                  {3 ht [1    6+h2]   [1 1] } ...      % Indep variables 
                  {3 ht [1.95 6.2+h2] [0.4 1] } ...    % New
@@ -127,9 +126,8 @@ if nargin < 3 && ~isstr(STUDY)
                  {3 ht [2.85 6.2+h2] [0.45 1] } ...   % Delete
                  {3 ht [3.3  7+h2  ] [0.7 3] } ...    % listbox subject  
                  {3 ht [1    7+h2  ] [2.3 3] } ...    % listbox variable
-                 {3 ht [1    9.8+h2] [3 1] } ...
                  };
-
+% {3 ht [1    9.8+h2] [3 1] } ...
 
     for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;            
     streval = [ 'pop_studydesign(''selectdesign'', gcf);' ];    
@@ -148,10 +146,9 @@ if nargin < 3 && ~isstr(STUDY)
         end;
     end;
     for index = 1:length(des)
-        tmpdes  = rmfield(des(index), 'deletepreviousfiles');
+        tmpdes  = des(index);
         if ~isfield(tmpdes.variable, 'vartype'), tmpdes.variable(1).vartype = []; end; 
-        rmfiles = fastif(des(index).deletepreviousfiles, 'limited', 'off');
-        if index > length(STUDY.design) || ~isequal(STUDY.design(index), tmpdes) || strcmpi(rmfiles, 'on')
+        if index > length(STUDY.design) || ~isequal(STUDY.design(index), tmpdes)
             fprintf('Updating/creating STUDY design %d\n', index);
             
             if isfield(tmpdes, 'variable')
@@ -162,7 +159,7 @@ if nargin < 3 && ~isstr(STUDY)
                 end;
             end;
             
-            [STUDY com] = std_makedesign(STUDY, ALLEEG, index, tmpdes, 'delfiles', rmfiles);
+            [STUDY com] = std_makedesign(STUDY, ALLEEG, index, tmpdes);
             allcom = [ allcom 10 com ];
         else
             fprintf('STUDY design %d not modified\n', index);
@@ -227,7 +224,6 @@ elseif isstr(STUDY)
         case 'updategui', % update the study information (whenever the user click on a button)
             val = min(val, length(des));
             set(findobj(fig, 'tag', 'listboxdesign'), 'string', { des.name }, 'value', val );
-            set(findobj(fig, 'tag', 'chk_del'), 'value', des(val).deletepreviousfiles);
             set(findobj(fig, 'tag', 'edit_storedir'), 'string', des(val).filepath);
             set(findobj(fig, 'tag', 'edit_selectdattrials'),  'string', vararg2str( des(val).include ));
             
