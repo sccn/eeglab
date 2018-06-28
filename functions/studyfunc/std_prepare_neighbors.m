@@ -100,6 +100,8 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
         end
         warning off;
         if isfield(EEG.chanlocs, 'theta') && ~isempty(EEG.chanlocs(1).theta)
+            tmpcfg = rmfield(tmpcfg, 'cfg');
+            tmpcfg = rmfield(tmpcfg, 'label');
             cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg);
             neighbors = cfg.neighbors;
         else
