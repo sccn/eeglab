@@ -879,6 +879,7 @@ if ismatlab
     uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end;
 
+statusconnection = 1;
 if isdeployed
     funcname = {  'eegplugin_dipfit' ...
                   'eegplugin_firfilt' ...
@@ -941,6 +942,18 @@ else
     % ------------------
     dircontent  = dir(fullfile(p, 'plugins'));
     dircontent  = { dircontent.name };
+    
+    pluginstats = [];
+	if option_checkversion
+        disp('Retrieving plugin versions from server...');
+        [stats, statusconnection] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_withversion.php');
+        if statusconnection == 1
+            stats = textscan(stats, '%s%d%s%s');
+            pluginstats.name    = stats{1};
+            pluginstats.version = stats{3};
+        end
+    end
+    
     for index = 1:length(dircontent)
 
         % find function
@@ -1025,8 +1038,19 @@ else
                 if strcmpi(status, 'ok')
                     if isempty(vers), vers = pluginlist(plugincount).versionfunc; end;
                     if isempty(vers), vers = '?'; end;
-                    fprintf('EEGLAB: adding "%s" v%s (see >> help %s)\n', ...
+                    fprintf('EEGLAB: adding "%s" v%s (see >> help %s)', ...
                         pluginlist(plugincount).plugin, vers, funcname);
+                    if ~isempty(pluginstats)
+                        indPlugin = strmatch(pluginlist(plugincount).plugin, pluginstats.name, 'exact');
+                        if length(indPlugin) == 1
+                            if ~strcmpi(vers, pluginstats.version{indPlugin})
+                                fprintf(2, ' - new version %s available\n', pluginstats.version{indPlugin});
+                            else fprintf('\n');
+                            end
+                        else fprintf('\n');
+                        end
+                    else fprintf('\n');
+                    end
                 end;
                 pluginlist(plugincount).status       = status;
                 plugincount = plugincount+1;
@@ -1096,7 +1120,7 @@ end;
 
 %% automatic updater
 try
-    [dummy eeglabVersionNumber currentReleaseDateString] = eeg_getversion;
+    [dummy, eeglabVersionNumber, currentReleaseDateString] = eeg_getversion;
     if isempty(eeglabVersionNumber)
         eeglabVersionNumber = 'dev';
     end;
@@ -1119,7 +1143,7 @@ try
     if length(stackVar) == 1
         if option_checkversion
             eeglabUpdater.checkForNewVersion({'eeglab_event' 'setup'});
-            if strcmpi(eeglabVersionNumber, 'dev')
+            if strcmpi(eeglabVersionNumber, 'dev') && statusconnection
                 return;
             end;
             newMajorRevision = 0;
