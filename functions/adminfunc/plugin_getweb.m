@@ -2,7 +2,7 @@ function plugin = plugin_getweb(type, pluginOri, mode)
 
 if nargin < 1, help plugin_getweb; return; end;
 if nargin < 2, pluginOri = []; end;
-if nargin < 3, mode = 'merge'; end; % 'merge' or 'newlist'
+if nargin < 3, mode = 'merge'; end; % 'merge' or 'newlist' or 'update'
 
 % convert plugin list format if necessary
 if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end;
@@ -47,6 +47,7 @@ if ~isempty(pluginOri)
 else currentNames = {};
 end;
 allMatch = [];
+allMatchPluginInd = [];
 for iRow = 1:length(plugin)
     % fix links
     if isfield(plugin, 'zip'), plugin(iRow).zip = strrep(plugin(iRow).zip, '&amp;', '&'); end;
@@ -86,9 +87,14 @@ for iRow = 1:length(plugin)
             plugin(iRow).installorupdate = 1;
         end;
         allMatch = [ allMatch indMatch(:)' ];
+        allMatchPluginInd = [allMatchPluginInd iRow];
     end;
     
 end;
+
+if strcmpi(mode, 'update')
+    plugin = plugin(allMatchPluginInd);
+end
 
 % put all the installed plugins first
 % -----------------------------------
