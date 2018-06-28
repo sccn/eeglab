@@ -395,7 +395,7 @@ if nargin == 1
         if ~ismatlab,return; end;
 		W_MAIN = findobj('tag', 'EEGLAB');
         close(W_MAIN);
-        eeglab;
+        eeglab redraw;
         return;
     else
         fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
@@ -508,16 +508,10 @@ if ~isdeployed
 end;
 
 cb_importdata  = [ nocheck '[EEG LASTCOM] = pop_importdata;'   e_newset ];
-cb_readegi     = [ nocheck '[EEG LASTCOM] = pop_readegi;'      e_newset ];
-cb_readsegegi  = [ nocheck '[EEG LASTCOM] = pop_readsegegi;'   e_newset ];
-cb_readegiepo  = [ nocheck '[EEG LASTCOM] = pop_importegimat;' e_newset ];
-cb_loadbci     = [ nocheck '[EEG LASTCOM] = pop_loadbci;'      e_newset ];
-cb_snapread    = [ nocheck '[EEG LASTCOM] = pop_snapread;'     e_newset ]; 
 cb_loadcnt     = [ nocheck '[EEG LASTCOM] = pop_loadcnt;'      e_newset ]; 
 cb_loadeeg     = [ nocheck '[EEG LASTCOM] = pop_loadeeg;'      e_newset ]; 
 cb_biosig      = [ nocheck '[EEG LASTCOM] = pop_biosig; '      e_newset ]; 
 cb_fileio      = [ nocheck '[EEG LASTCOM] = pop_fileio; '      e_newset ]; 
-cb_fileio2     = [ nocheck '[EEG LASTCOM] = pop_fileiodir;'   e_newset ]; 
 
 cb_importepoch = [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);'   e_store ];
 cb_loaddat     = [ checkepoch   '[EEG LASTCOM]= pop_loaddat(EEG);'        e_store ]; 
@@ -699,13 +693,9 @@ if ismatlab
     set_m    = uimenu( W_MAIN,   'Label', 'Datasets'                                , 'userdata', ondatastudy);
     help_m   = uimenu( W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
 
-    uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata);
+    uimenu( neuro_m, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
+    uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata, 'separator', 'on');
     %uimenu( neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Netstation binary simple file'    , 'CallBack', cb_readegi,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Multiple seg. Netstation files'   , 'CallBack', cb_readsegegi); 
-    uimenu( neuro_m, 'Label', 'From Netstation Matlab files'          , 'CallBack', cb_readegiepo); 
-    uimenu( neuro_m, 'Label', 'From BCI2000 ASCII file'               , 'CallBack', cb_loadbci,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Snapmaster .SMA file'             , 'CallBack', cb_snapread,   'Separator', 'on'); 
     uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file'              , 'CallBack', cb_loadcnt,    'Separator', 'on'); 
     uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file'              , 'CallBack', cb_loadeeg); 
 
@@ -722,7 +712,9 @@ if ismatlab
     uimenu( event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
     uimenu( event_m, 'Label', 'From Neuroscan .ev2 file'              , 'CallBack', cb_importev2); ;
     uimenu( event_m, 'Label', 'From ERPLAB text files'                , 'CallBack', cb_importerplab); 
-    uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export);
+
+    uimenu( exportm, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
+    uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export, 'separator', 'on');
     uimenu( exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
     uimenu( exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2);
     uimenu( exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
@@ -1044,6 +1036,23 @@ else
     global PLUGINLIST;
     PLUGINLIST = pluginlist;
     
+    % add menus for plugins to install
+    % --------------------------------
+    if ~exist('mff_import', 'file')
+        neuro_m = findobj(W_MAIN, 'tag', 'import data');
+        cb_mff = [ 'if ~plugin_askinstall(''mffmatlabio'', ''mff_import''), return; end;' ...
+                   'eval(char(get(findobj(''label'', ''Import Philips .mff file''), ''callback'')));' ];
+        uimenu( neuro_m, 'Label', 'Import Philips .mff file', 'CallBack', cb_mff, 'separator', 'on');
+    end
+    if ~exist('pop_loadbva', 'file')
+        neuro_m = findobj(W_MAIN, 'tag', 'import data');
+        cb_bva1 = [ 'if ~plugin_askinstall(''bva-io'', ''pop_loadbva''), return; end;' ...
+                   'eval(char(get(findobj(''label'', ''From Brain Vis. Rec. .vhdr file''), ''callback'')));' ];
+        cb_bva2 = [ 'if ~plugin_askinstall(''bva-io'', ''pop_loadbva''), return; end;' ...
+                   'eval(char(get(findobj(''label'', ''From Brain Vis. Anal. Matlab file''), ''callback'')));' ];
+        uimenu( neuro_m, 'Label', 'From Brain Vis. Rec. .vhdr file', 'CallBack', cb_bva1, 'separator', 'on');
+        uimenu( neuro_m, 'Label', 'From Brain Vis. Anal. Matlab file', 'CallBack', cb_bva2);
+    end
 end;
 
 % Path exception for BIOSIG (sending BIOSIG down into the path)
@@ -1071,7 +1080,7 @@ filter_m    = findobj('parent', filter_m);
 icadefs; % containing PLUGINMENUCOLOR
 if length(fourthsub_m) > 11, set(fourthsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
-if length(importsub_m) > 9,  set(importsub_m(1:end-9) , 'foregroundcolor', PLUGINMENUCOLOR); end;
+if length(importsub_m) > 4,  set(importsub_m(1:end-4) , 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(epochsub_m ) > 3 , set(epochsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(eventsub_m ) > 4 , set(eventsub_m (1:end-4 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(exportsub_m) > 4 , set(exportsub_m(1:end-4 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
@@ -1980,6 +1989,10 @@ if any(strcmp(menustatus, 'ica_absent'))
     
 end;
 
+% allways off
+eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''enable:off''))), allstrs);');  
+set(allmenus(indmatchvar), 'enable', 'off');
+    
 % --------------------------------
 % Javier Lopez-Calderon for ERPLAB
 if any(strcmp(menustatus, 'erp_dataset'))    
