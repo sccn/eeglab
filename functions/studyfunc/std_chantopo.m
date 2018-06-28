@@ -211,12 +211,16 @@ end
 
 % color bars
 % ----------
+if isnan(opt.threshold(1)) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
+    try
+        axes(hdl(end,end));
+        cbar_signif(ng, maxplot);
+    catch
+        cbar_signif(ng, maxplot);
+    end
+end
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng);
-if isnan(opt.threshold(1)) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
-    axes(hdl(end,end));
-    cbar_signif(ng, maxplot);
-end
 
 % remove axis labels
 % ------------------
