@@ -14,6 +14,39 @@
 %
 % Optional inputs: same as std_limo()
 %
+% Graphical interface:
+%   "See GLM factors" - [push button] See all the GLM factors or columns in
+%                   the design matrix. This list depends on your study
+%                   design. Adding contrast will change this list. In
+%                   practice, it is important to understand that every
+%                   single factor will be fitted by the GLM, and the choice
+%                   of these factors in critical. It is recommended to
+%                   include as many factors as possible, especially because
+%                   this allows you to define new contrast later on without
+%                   having to recompute the GLM on each subject (as long as
+%                   these new contrast do not involve new factors).
+%
+%  "Input data to use for the GLM" - [pop up meny] measure to use as input
+%                   for the GLM. Currently, only "ERP" and "spectrum" are 
+%                   supported.
+%
+%  "Optimization method" - [pop up meny] may be Ordinary Least Square (OLS) 
+%                   or Weighted Least Square (WTS). WTS should be used as it 
+%                   is more robust. It is slower though. OLS is a standard
+%                   least square solution and WTS is a least square solution
+%                   that automatically exclude some outlier trials.
+%
+%  "Options"        - [edit box] additional options. These are given
+%                   directly as input to the std_limo.m function. They may
+%                   be ['freqlim', value] frequency trimming in Hz or 
+%                   ['timelim', value] time trimming in millisecond. These
+%                   allow to speed up computation by not including all the
+%                   data as input. Example: 'timelim', [-50 650] only
+%                   include data within the -50 ms and 650 ms for ERPs.
+%
+% "Erase previous model" - [checkbox] erase previous model for this
+%                   measure.
+%
 % Outputs:
 %   STUDY       - an EEGLAB STUDY set of loaded EEG structures
 %
@@ -69,23 +102,23 @@ if nargin < 4
                      'end;' ];
     
     uilist = { ...
-        {'style' 'text'       'string' [ 'LInear MOdeling of EEG data of design' int2str(STUDY.currentdesign) ] 'fontweight' 'bold' 'fontsize', 12} ...
-        {'style' 'text'       'string' [ '(Use STUDY design interface to switch to a different design)' ] } {} ...
+        {'style' 'text'       'string' 'LInear MOdeling of EEG data' 'fontweight' 'bold' 'fontsize', 12} ...
+        {'style' 'pushbutton' 'string' 'See GLM factors' 'callback' 'pop_listfactors(STUDY, ''addconstant'', ''on'');' } {} ...
         {'style' 'text'       'string' 'Input data to use for the GLM' } ...
         {'style' 'popupmenu'  'string' dataMeasures 'tag' 'measure' 'callback' cb_measure} ...
-        {'style' 'text'       'string' 'Options' } ...
-        {'style' 'edit'       'string' '' 'tag' 'options' } ...
         {'style' 'text'       'string' 'Optimization method' } ...
         {'style' 'popupmenu'  'string' methods 'tag' 'method' } ...
-        {'style' 'checkbox'   'string' 'Erase previous model for this design and measure' 'tag' 'erase' 'value' true } ...
+        {'style' 'text'       'string' 'Options' } ...
+        {'style' 'edit'       'string' '' 'tag' 'options' } ...
+        {'style' 'checkbox'   'string' 'Erase previous model' 'tag' 'erase' 'value' true } ...
         };
     
-    cline = [1.1 1.1];
-    geometry = { 1 1 1 cline cline cline 1 };
-    geomvert = [ 1 1 1 1     1     1     1 ];
+    cline = [1.1 0.8];
+    geometry = { [1.6 1] 1 cline cline cline 1 };
+    geomvert = [ 1 1 1     1     1     1 ];
         
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'geomvert', geomvert, ...
-                                            'title', 'LInear MOdeling of EEG data -- pop_limo()');
+                                            'title', 'LInear MOdeling of EEG data -- pop_limo()', 'helpcom', 'pophelp(''pop_limo'');');
     if isempty(res), return; end;
     opttmp  = eval( [ '{ ' res.options ' }' ]);
     options = { 'method' methods{res.method} 'measure' fileMeasures{measureflagindx,res.measure} opttmp{:} 'erase' fastif(res.erase, 'on', 'off') 'splitreg' 'off' };
