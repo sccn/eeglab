@@ -1,11 +1,11 @@
-% std_lm_getvars() - Retrieve categorical and continuous variables from a
+% std_lm_getvars() - Retrieve categorical or continuous variables from a
 %                    design in the STUDY structure to build the regressors
 %
 % Usage:
-%   >>  [catvar,varnames,StartEndIndx] =
-%       std_lm_getvars(STUDY,ALLEEG,'S01','design_indx',1);
-%   >>  [catvar,varnames,StartEndIndx] =
-%       std_lm_getvars(STUDY,ALLEEG,'S01','design_indx',1,'vartype','cat');
+%   >>  [var_matrix,catvar_info] =
+%       std_lm_getvars(STUDY,'S01','design_indx',1);
+%   >>  [var_matrix,catvar_info] =
+%       std_lm_getvars(STUDY,'S01','design_indx',1,'vartype','cat');
 %
 % Inputs:
 %      STUDY       - studyset structure containing some or all files in ALLEEG
@@ -15,8 +15,6 @@
 % Optional inputs:
 %      vartype      - Categoricals ('cat') or continuous ('cont')
 %      design_indx  - Index of the design in he STUDY structure
-%      factors      - Name of the variables(factors) to pull out. If not
-%                     provided, will use all the factors availables in the design.
 %
 % Outputs:
 % var_matrix   - Variables retrieved from the design specified in the STUDY.
@@ -72,8 +70,6 @@ catch
 end;
 
 try, g.design;         catch, g.design      = 1 ;       end; % By default will be use the fisrt design if not especified
-try, g.factors;        catch, g.factors     = '';       end; % If not provided it will use all the factors
-try, g.setindx;        catch, g.setindx     = '';       end; % if not provided it will look for all the Sets that belong to this Subject
 try, g.vartype;        catch, g.vartype     = 'cat';    end; % 'cat' or 'cont'
 
 %% cat/cont defs
@@ -92,39 +88,28 @@ end
 %% Checking setindex and valid subject
 %  -----------------------------------
 CurrentSubIndxDataset   = find(strcmp({STUDY.datasetinfo.subject},subject));
-if isempty(subject)
+if isempty(CurrentSubIndxDataset)
     error('std_lm_getcatvars() error: A valid subject must be provided');
 end
-
-if ~isempty(g.setindx)
-    if sum(ismember(CurrentSubIndxDataset, g.setindx)) == 0
-        error('std_lm_getcatvars() error: Indices of sets does not match the subject provided ');
-    end
-else
-    g.setindx = CurrentSubIndxDataset;
-end
+g.setindx = CurrentSubIndxDataset;
 
 %% Getting factors
 %  ---------------
-if isempty(g.factors)
-    varindx   = find(strcmp({STUDY.design(g.design).variable.vartype},vartype));
-    for i = 1:length(varindx)
-        if strcmp(g.vartype,'cat')
-            if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
-                g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value;
-            else
-                g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value{:};
-            end
+varindx   = find(strcmp({STUDY.design(g.design).variable.vartype},vartype));
+for i = 1:length(varindx)
+    if strcmp(g.vartype,'cat')
+        if ~iscell(STUDY.design(g.design).variable(varindx(i)).value{1})
+            g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value;
         else
-            g.factors{i} = STUDY.design(g.design).variable(varindx(i)).label;
+            g.factors{i} = STUDY.design(g.design).variable(varindx(i)).value{:};
         end
+    else
+        g.factors{i} = STUDY.design(g.design).variable(varindx(i)).label;
     end
-    % Cleaning  'g.factors' from empty cells
-    for i = 1 : length(g.factors)
-        if isempty(g.factors{i}) | strcmp(g.factors{i},''), g.factors(i) = []; end;
-    end
-else
-    % Place to check consistency of factors input
+end
+% Cleaning  'g.factors' from empty cells
+for i = 1 : length(g.factors)
+    if isempty(g.factors{i}) || all(strcmp(g.factors{i},'')), g.factors(i) = []; end;
 end
 
 %% Number of trials and index
