@@ -19,12 +19,22 @@
 % varargin - Pairs of inputs ,varname(string),varvalues . (see Usage)
 %
 % Optional inputs:
+%   ['var']    - [cell or array] ['var'] is the name of one independent
+%                variable followed by a value or a list of value for this
+%                variable. To obtain values for a continuous variable,
+%                use '' for all the values or a range '0<100' to get values
+%                within a given range (see example below).
 %
 % Outputs:
-%   trialinfo   - 
-%
-% See also:
+%   trialind   - trial indices 
+%   cont       - optional continuous variable value for these indices 
 %   
+% Example:
+%   >>  trialindsx = std_gettrialsind('testnewstudyfile.mat', 'type', { 'C' 'X' 'Y' }, ...
+%                                     'load', [0 1 2 3 4 5 6], 'uncertainty1',[1 2])
+%   >>  trialindsx = std_gettrialsind('testnewstudyfile.mat', 'load', [0 1 2 3 4 5 6])
+%   >>  [trialindsx cont] = std_gettrialsind('testnewstudyfile.mat', 'load', [0 1 2 3 4 5 6], ...
+%                                      'duration', '0<100', 'rt', '')
 % Authors: Arnaud Delorme
 %          Ramon Martinez-Cancino
 %          
