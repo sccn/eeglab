@@ -91,6 +91,7 @@ else
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
           'splitreg'       'string'  { 'on','off' }   'off';
+          'interaction'    'string'  { 'on','off' }   'off';
           'freqlim'        'real'    []               [] ;
           'timelim'        'real'    []               [] ;
           'neighboropt'    'cell'    {}               {} ;
@@ -333,7 +334,7 @@ for s = 1:nb_subjects
     % ************* PLURAL IMPORTANT IN FILE? continuous_variable.txt vs continuous_variables.txt
     filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
-    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'filepath', filepath_tmp); 
+    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction, 'filepath', filepath_tmp); 
 
     % copy results
     model.cat_files{s}  = catMat;
