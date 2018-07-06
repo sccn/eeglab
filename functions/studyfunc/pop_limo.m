@@ -20,13 +20,29 @@
 %                   design. Adding contrast will change this list. In
 %                   practice, it is important to understand that every
 %                   single factor will be fitted by the GLM, and the choice
-%                   of these factors in critical. It is recommended to
+%                   of these factors is critical. It is recommended to
 %                   include as many factors as possible, especially because
 %                   this allows you to define new contrast later on without
 %                   having to recompute the GLM on each subject (as long as
 %                   these new contrast do not involve new factors).
 %
-%  "Input data to use for the GLM" - [pop up meny] measure to use as input
+%  "Interaction model for categorical indep. var." - When using more than 
+%                   one categorical variable, clicking this option forces
+%                   to have factors which are the conjonction of the
+%                   different independent var. values. This is useful if
+%                   you want to calculate interactions at the group level
+%                   (even for simple ERP analysis, to compute interactions 
+%                   between conditions, you need to have the ERP for the 
+%                   conjunction of these values of the different 
+%                   conditions). This is the default.
+%
+%  "Split regressions (continuous indep. var.)" - This options allows to
+%                   split continuous variables for the different
+%                   categorical variables. This is useful to compute ANCOVA
+%                   (interaction between continuous and categorical
+%                   variables) at the group level. 
+%
+%  "Input data to use for the GLM" - [pop up menu] measure to use as input
 %                   for the GLM. Currently, only "ERP" and "spectrum" are 
 %                   supported.
 %
@@ -100,10 +116,14 @@ if nargin < 4
                      'else,' ...
                      '   set(findobj(gcbf, ''tag'', ''options''), ''string'', ''''''freqlim'''', [1 25]'');' ...
                      'end;' ];
-    
+    cb_listfactors = [ 'pop_listfactors(STUDY, ''gui'', ''on'', ' ...
+                               '''splitreg''   , fastif(get(findobj(gcbf, ''tag'', ''splitreg''   ), ''value''), ''on'', ''off''),' ...
+                               '''interaction'', fastif(get(findobj(gcbf, ''tag'', ''interaction''), ''value''), ''on'', ''off''));' ];
     uilist = { ...
         {'style' 'text'       'string' 'LInear MOdeling of EEG data' 'fontweight' 'bold' 'fontsize', 12} ...
-        {'style' 'pushbutton' 'string' 'See GLM factors' 'callback' 'pop_listfactors(STUDY, ''addconstant'', ''on'');' } {} ...
+        {'style' 'pushbutton' 'string' 'See GLM factors' 'callback' cb_listfactors } ...
+        {'style' 'checkbox'   'string' 'Interaction model for categorical indep. var.' 'value' 1 'tag' 'interaction' } ...
+        {'style' 'checkbox'   'string' 'Split regressions (continuous indep. var.)' 'tag' 'splitreg' } {} ...
         {'style' 'text'       'string' 'Input data to use for the GLM' } ...
         {'style' 'popupmenu'  'string' dataMeasures 'tag' 'measure' 'callback' cb_measure} ...
         {'style' 'text'       'string' 'Optimization method' } ...
@@ -114,14 +134,20 @@ if nargin < 4
         };
     
     cline = [1.1 0.8];
-    geometry = { [1.6 1] 1 cline cline cline 1 };
-    geomvert = [ 1 1 1     1     1     1 ];
+    geometry = { [1.6 1] 1 1 1 cline cline cline 1 };
+    geomvert = [ 1 1 1     1 1 1     1     1 ];
         
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'geomvert', geomvert, ...
                                             'title', 'LInear MOdeling of EEG data -- pop_limo()', 'helpcom', 'pophelp(''pop_limo'');');
     if isempty(res), return; end;
     opttmp  = eval( [ '{ ' res.options ' }' ]);
-    options = { 'method' methods{res.method} 'measure' fileMeasures{measureflagindx,res.measure} opttmp{:} 'erase' fastif(res.erase, 'on', 'off') 'splitreg' 'off' };
+    if length(opttmp) > 0 && isnumeric(opttmp{1})
+        error([ 'Wrong options. Options must be in the format' 10 '''key'', val. For example ''timelim'', [-100 600]' ]);
+    end
+    options = { 'method' methods{res.method} 'measure' fileMeasures{measureflagindx,res.measure} opttmp{:} ...
+                'erase'       fastif(res.erase, 'on', 'off') ...
+                'splitreg'    fastif(res.splitreg, 'on', 'off') ...
+                'interaction' fastif(res.interaction, 'on', 'off') };
 else
     options = varargin;
 end
