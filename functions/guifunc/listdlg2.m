@@ -72,7 +72,7 @@ listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'max', m
 
 if ~isempty(g.promptstring)
 	geometry = {[1] geometry{:}};
-	geomvert = [1 geomvert];
+	geomvert = [2 geomvert];
 	listui = { { 'Style', 'text', 'string', g.promptstring } listui{:}};
 end;
 [tmp tmp2 allobj] = supergui( fig, geometry, geomvert, listui{:} );
