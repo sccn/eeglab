@@ -9,9 +9,13 @@
 %   des     - existing design
 %
 % Optional Inputs:
-%   'addconstant' - ['on'|'off'] add the constant at the end of the list
-%                   (default:on)
 %   'gui'         - ['on'|'off'] pop-up gui to show the list (default:off)
+%   'splitreg'   - ['on'|'off'] split regression for different categorical
+%                  factors. Default is 'off'.
+%   'interaction' - ['on'|'off'] compute interaction when using different
+%                  categorical variables. This allows computing interactions
+%                  between these variables at the second level. Default 
+%                  is 'on'.
 % 
 % Author: Arnaud Delorme, UCSD, 2018
 
@@ -37,8 +41,9 @@ if nargin < 1
     help pop_listfactors;
 end 
 
-g = finputcheck(varargin, { 'addconstant' 'string' { 'on' 'off' } 'off';
-                            'gui'         'string' { 'on' 'off' } 'on'});
+g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
+                            'splitreg'    'string' { 'on','off' } 'off';
+                            'interaction' 'string' { 'on','off' } 'on' });
 if isstr(g)
     error(g);
 end
@@ -47,7 +52,7 @@ if isfield(des,'design')
     des = des.design;
 end
 
-allFactors = {};
+allFactors = {}; % (strings) still used to find unique values
 allFactorsStruct = [];
 count = 1;
 for iDes = 1:length(des)
@@ -74,12 +79,6 @@ for iDes = 1:length(des)
     end
 end
 
-% add constant (for GUI)
-if strcmpi(g.addconstant, 'on')
-    allFactorsStruct(count).vartype = 'constant';
-    allFactors{count} = 'Constant';
-end
-
 % remove duplicates
 if length(allFactors) ~= length(unique(allFactors))
     [~, inds ] = unique(allFactors);
@@ -91,10 +90,29 @@ end
 % redorders factors so that all variables are grouped
 
 if strcmpi(g.gui, 'on')
-    warndlg2(strvcat(allFactors), 'List of factors');
+    [~,~,des] = std_limodesign(allFactorsStruct,[], 'desconly', 'on', 'splitreg', g.splitreg, 'interaction', g.interaction);
+    
+    % generate categorical labels
+    allLabels = {};
+    count     = 1;
+    for iCat = 1:length(des.categorival)
+        for iVal = 1:length(des.categorival{iCat})
+            allLabels{count} = formatcond(des.categorival{iCat}{iVal});
+            count = count+1;
+        end
+    end
+    for iCont = 1:length(des.continuous)
+        allLabels{count} = formatcond(des.continuous{iCont});
+        count = count+1;
+    end
+    
+    % add constant (for GUI)
+    allLabels{count} = 'constant';
+    
+    warndlg2(strvcat(allLabels), 'List of factors');
 end
 
-% convert values to string
+% convert nested values to linear sequence
 function res = getstrval(vals)
 
 res = {};
@@ -108,4 +126,20 @@ if iscell(vals) || (isnumeric(vals) && length(vals) > 1)
     end
 else
     res =  { vals };
+end
+
+% format string
+function str = formatcond(cellVal)
+
+for iItem = 1:2:length(cellVal)
+    if isempty(cellVal{iItem+1}) % continuous var
+         tmpFactor = sprintf('%s (continuous)', cellVal{iItem});
+    elseif isnumeric(cellVal{iItem+1})
+         tmpFactor = sprintf('%s = %d', cellVal{iItem}, cellVal{iItem+1});
+    else tmpFactor = sprintf('%s = %s', cellVal{iItem}, cellVal{iItem+1});
+    end
+    if iItem == 1
+         str = tmpFactor;
+    else str = sprintf('%s & %s', str, tmpFactor);
+    end
 end
