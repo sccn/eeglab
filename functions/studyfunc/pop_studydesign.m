@@ -67,12 +67,13 @@ if nargin < 3 && ~isstr(STUDY)
         end;
     end;
         
+    cb_selectsubj   = 'pop_studydesign(''selectsubj'', gcbf);';
+    cb_setsubj      = 'pop_studydesign(''setsubj'', gcbf);';
     cb_rename       = 'pop_studydesign(''rename'', gcbf);';
     cb_add          = 'pop_studydesign(''add'', gcbf);';
     cb_del          = 'pop_studydesign(''del'', gcbf);';
     cb_listboxfact1 = 'pop_studydesign(''selectfact'', gcf, 0);';
     cb_listboxfact2 = 'pop_studydesign(''selectfact'', gcf, 1);';
-    cb_selectsubj   = 'pop_studydesign(''selectsubj'', gcbf);';
     cb_lbval        = 'pop_studydesign(''updategui'', gcbf);';
     cb_selectdesign = 'pop_studydesign(''selectdesign'', gcbf);';
     cb_selectdata   = 'pop_studydesign(''selectdatatrials'', gcbf);';
@@ -81,52 +82,60 @@ if nargin < 3 && ~isstr(STUDY)
     cb_newvar       = 'pop_studydesign(''newvar'', gcbf);';
     cb_editvar      = 'pop_studydesign(''editvar'', gcbf);';
     cb_delvar       = 'pop_studydesign(''delvar'', gcbf);';
+    cb_list         = 'pop_studydesign(''list'', gcbf);';
     cb_plotdmat     = 'pop_studydesign(''plotdmat'', gcbf);';
     cb_importgvar   = 'pop_studydesign(''importgvar'', gcbf);';
     
     icadefs;
-    uilist = { { 'style' 'text'       'string' 'Select STUDY design' 'fontweight' 'bold' } ...
+%               { 'style' 'text'       'string' 'Subjects' 'fontweight' 'bold' } ...
+%               { 'style' 'listbox'    'string' usrdat.subjects 'tag' 'lbsubj' 'min' 0 'max' 2 'value' 1 'callback' cb_selectsubj } ...
+    uilist = { ...
+               { 'style' 'text'       'string' 'Include these subjects (default all)' 'fontweight' 'bold' } ...
+               { 'style' 'edit'       'string' '' 'tag' 'subjects' 'callback' cb_setsubj } ...
+               { 'style' 'pushbutton' 'string' '...' 'callback' cb_selectsubj } ...
+               { 'style' 'text'       'string' 'Group-level contrast' 'fontweight' 'bold' } ...
                { 'style' 'listbox'    'string' { usrdat.design.name } 'tag' 'listboxdesign' 'callback' cb_selectdesign 'value' STUDY.currentdesign } ...
                { 'style' 'pushbutton' 'string' 'New'    'callback' cb_add } ...
                { 'style' 'pushbutton' 'string' 'Rename' 'callback' cb_rename } ...
                { 'style' 'pushbutton' 'string' 'Delete' 'callback' cb_del } ...
-               { 'style' 'pushbutton' 'string' 'Subj. design mat.' 'callback' cb_plotdmat } ...
-               { 'style' 'checkbox'   'string' 'Resave STUDY' 'tag' 'chk_save' 'value' 1 } ...
                ...
-               { 'panel' 'title' 'Edit selected design' 'fontweight' 'bold' 'backgroundcolor' GUIBACKCOLOR } ...
-               { 'style' 'text'       'string' 'Subjects' 'fontweight' 'bold' } ...
+               { 'panel' 'title' 'Edit contrast independent variables' 'fontweight' 'bold' 'backgroundcolor' GUIBACKCOLOR } ...
                { 'style' 'text'       'string' 'Independent variables' 'fontweight' 'bold' } ...
-               { 'style' 'pushbutton' 'string' 'New'    'callback' cb_newvar } ...
-               { 'style' 'pushbutton' 'string' 'Import' 'callback' cb_editvar } ...
+               { 'style' 'pushbutton' 'string' 'New' 'callback' cb_newvar } ...
                { 'style' 'pushbutton' 'string' 'Edit'   'callback' cb_editvar } ...
                { 'style' 'pushbutton' 'string' 'Delete' 'callback' cb_delvar } ...
-               { 'style' 'listbox'    'string' usrdat.subjects 'tag' 'lbsubj' 'min' 0 'max' 2 'value' 1 'callback' cb_selectsubj } ...
-               { 'style' 'listbox'    'string' ''  'tag' 'lbfact0' 'value' 2 } };
+               { 'style' 'pushbutton' 'string' 'List all factors' 'callback'  cb_list } ...
+               { 'style' 'listbox'    'string' ''  'tag' 'lbfact0' 'value' 2 } ...
+               { 'style' 'checkbox'   'string' 'Resave STUDY' 'tag' 'chk_save' 'value' 1 }  };
 %               { 'style' 'checkbox'   'string' 'Delete all pre-computed datafiles' 'tag' 'chk_del' 'callback' cb_lbval } };
 %               { 'style' 'checkbox'  'string' 'Paired statistics' 'tag' 'lbpair0' 'callback' cb_lbval } ...
 %               { 'style' 'checkbox'  'string' 'Paired statistics' 'tag' 'lbpair1' 'callback' cb_lbval } ...
 %               { 'style' 'pushbutton' 'string' 'Plot'   'callback' cb_plotdmat} ...
 
-    ht = 10;
-    h2 = 0.5;
-    geometry = { {3 ht [1 1] [1 1] } ...
-                 {3 ht [1 2] [3 2.6] } ...
-                 {3 ht [2.15 1.15] [0.4 1] } ... % Import
-                 {3 ht [2.45 1.15] [0.5  1] } ... % Edit
-                 {3 ht [2.85 1.15] [0.45 1] } ... % Delete
-                 {3 ht [3.20 1.15] [0.8  1] } ... % Delete
-                 {3 ht [1 4.4]   [3 1] } ...
+    ht = 11.5;
+    h2 = 1.1;
+    h1 = 1.5;
+    geometry = { {3 ht [1    1]    [2 1] } ...
+                 {3 ht [2.45 1]    [1.1 1] } ...
+                 {3 ht [3.6  1]    [0.4 1] } ...
                  ...
-                 {3 ht [0.93 5.4+h2] [3.15 5.1] } ...
-                 {3 ht [3.3  6+h2]   [0.5 1] } ...    % Subject text
-                 {3 ht [1    6+h2]   [1 1] } ...      % Indep variables 
-                 {3 ht [1.95 6.2+h2] [0.4 1] } ...    % New
-                 {3 ht [2.25 6.2+h2] [0.4 1] } ...    % Import
-                 {3 ht [2.55 6.2+h2]  [0.4  1] } ...  % Edit
-                 {3 ht [2.85 6.2+h2] [0.45 1] } ...   % Delete
-                 {3 ht [3.3  7+h2  ] [0.7 3] } ...    % listbox subject  
-                 {3 ht [1    7+h2  ] [2.3 3] } ...    % listbox variable
+                 {3 ht [1    h1+1]    [1 1] } ...
+                 {3 ht [1    h1+2]    [3 2.6] } ...
+                 {3 ht [2.85 h1+1.15] [0.4  1] } ... % Edit
+                 {3 ht [3.15 h1+1.15] [0.5  1] } ... % Raname
+                 {3 ht [3.55 h1+1.15] [0.45 1] } ... % Delete
+                 ...
+                 {3 ht [1    h2+5.4] [3 5.1] } ...
+                 {3 ht [1.07 h2+6  ] [1 1] } ...      % Indep variables 
+                 {3 ht [2.20 h2+6.2] [0.4  1] } ...    % New
+                 {3 ht [2.50 h2+6.2] [0.4  1] } ...    % Edit
+                 {3 ht [2.80 h2+6.2] [0.45 1] } ...   % Delete
+                 {3 ht [3.15 h2+6.2] [0.75 1] } ...   % List var
+                 {3 ht [1.07 h2+7  ] [2.85 3] } ...   % listbox variable
+                 {3 ht [1    h2+11 ] [3 1] } ...
                  };
+%                 {3 ht [3.3  6+h2]   [0.5 1] } ...    % Subject text
+%                 {3 ht [3.3  7+h2  ] [0.7 3] } ...    % listbox subject  
 % {3 ht [1    9.8+h2] [3 1] } ...
 
     for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;            
@@ -183,6 +192,7 @@ elseif isstr(STUDY)
     usrdat = get(fig, 'userdata');
     datinfo  = usrdat.datasetinfo;
     des      = usrdat.design;
+    subjects = usrdat.subjects;
     filepath = usrdat.filepath;
     val = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
     
@@ -200,8 +210,39 @@ elseif isstr(STUDY)
         % case 'selectdatatrialssel', % select in the GUI above
         % case 'selectdatatrialsadd', % add new selection in the GUI above
         
+        case 'selectsubj', 
+            strSubj = get(findobj(fig, 'tag', 'subjects'), 'string');
+            if ~isempty(strSubj)
+                res = str2cell(strSubj);
+                selected = eeg_chaninds(struct('labels', subjects), res);
+            else
+                selected = 1:length(subjects);
+            end
+            [inds, strSubj, cellSubj] = pop_chansel(struct('labels', subjects), 'select', selected);
+            if length(inds) == length(subjects)
+                strSubj = '';
+            end
+            set(findobj(fig, 'tag', 'subjects'), 'string', strSubj);
+            for iDes = 1:length(des)
+                des(iDes).cases.value = cellSubj;
+            end
+            
+        case 'setsubj', 
+            strSubj = get(findobj(fig, 'tag', 'subjects'), 'string');
+            res = str2cell(strSubj);
+            if ~isempty(setdiff(res, subjects))
+                set(findobj(fig, 'tag', 'subjects'), 'string', '');
+                warndlg2('Unknown subject(s) - check syntax');
+                res = subjects';
+            end
+            for iDes = 1:length(des)
+                des(iDes).cases.value = res;
+            end
+        
         case 'add', % Add new study design
             des(end+1) = des(val);
+            des(end).variable = [];
+            des(end).limo     = [];
             des(end).name = sprintf('Design %d', length(des));
             set(findobj(fig, 'tag', 'listboxdesign'), 'string', { des.name }, 'value', length(des));
             
@@ -291,11 +332,6 @@ elseif isstr(STUDY)
             fig     = usrdat.parent;
             val     = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             des(val).include{end+1} = { usrdat.factors{val1} usrdat.factorvals{val1}(val2) };
-                        
-        case 'selectsubj', % select specific subjects
-            valSubj  = get(findobj(fig, 'tag', 'lbsubj'), 'value');
-            cellSubj = get(findobj(fig, 'tag', 'lbsubj'), 'string');
-            des(val).cases.value = cellSubj(valSubj);
             
         case 'updateinclude', % Add button in the GUI above
             try
@@ -312,6 +348,11 @@ elseif isstr(STUDY)
             if res(1) == 0, return; end;
             des(val).filepath = res;
             
+        case 'list'
+            val1   = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
+            val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
+            pop_listfactors(des(val1));
+
         case 'delvar'
             val1   = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
@@ -366,6 +407,14 @@ elseif isstr(STUDY)
         set(findobj(fig, 'tag', 'lbfact0'), 'value', length(des(val).variable));
     end;
 end;
+
+function res = str2cell(strSubj)
+    res = textscan(strSubj, '%s');
+    res = res{1};
+    for iRes = 1:length(res)
+        res{iRes}(res{iRes} == '''') = [];
+    end
+    res = res';
 
 function res = strmatchmult(a, b);
     if isempty(b), res = []; return; end;
