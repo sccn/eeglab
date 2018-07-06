@@ -90,6 +90,44 @@ for k = 1:length(STUDY.datasetinfo)
     STUDY.datasetinfo(k).filepath = ALLEEG(k).filepath;
 end
 
+% check for old study format
+if ~isempty(STUDY.design)
+    if isfield(STUDY.design, 'cell')
+        txt = [ 'You are loading a STUDY from a previous version of EEGLAB.' 10 ...
+                'Most study settings are backward compatible but require that' 10 ... 
+                'you recompute the measure data files. For more information about' 10 ...
+                'the new STUDY design, see http://sccn.ucsd.edu/wiki/Eeglab15.' ];
+        dbs = dbstack;
+        if length(dbs) == 1 % means that it was called from the command line or call back
+            warndlg2(txt);
+        else
+            fprintf(2,[txt 10]);
+        end
+    end
+end
+
+% check if old study format has different subjects
+if ~isempty(STUDY.design)
+    cases = {STUDY.design.cases};
+    if ~all(cellfun(@(x)isequal(x, cases{end}), cases))
+        dbs = dbstack;
+        txt = [ 'You are loading a STUDY from a previous version of EEGLAB' 10 ...
+                'that has designs with different subjects included. It is' 10 ....
+                'no longer possible to have different subjects included in' 10 ...
+                'different designs (to do so create a separate study). All' 10 ....
+                'designs have been changed to include the same subjects' 10 ...
+                'as design number 1.' ];
+        if length(dbs) == 1 % means that it was called from the command line or call back
+            warndlg2(txt);
+        else
+            fprintf(2,[txt 10]);
+        end
+        for iDes = 2:length(STUDY.design)
+            STUDY.design(iDes).cases = STUDY.design(1).cases;
+        end
+    end
+end                      
+
 if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; end;
 if isempty(varargin)
      [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG, 'popup');
