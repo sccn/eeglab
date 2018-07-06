@@ -330,10 +330,10 @@ end
 factors = pop_listfactors(STUDY.design, 'gui', 'off');
 for s = 1:nb_subjects     
     % save continuous and categorical data files
-    % ************* PLURAL IMPORTANT? continuous_variable.txt vs continuous_variables.txt
+    % ************* PLURAL IMPORTANT IN FILE? continuous_variable.txt vs continuous_variables.txt
     filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
-    [catMat,contMat,limodesign] = std_limosavedesignfiles(filepath_tmp, factors, trialinfo, 'splitreg', opt.splitreg); 
+    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'filepath', filepath_tmp); 
 
     % copy results
     model.cat_files{s}  = catMat;
