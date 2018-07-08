@@ -76,7 +76,7 @@ cd(STUDY.filepath);
 if nargin < 2
     help std_limo;
     return;
-end;
+end
 
 warning('off', 'MATLAB:lang:cannotClearExecutingFunction');
 if isstr(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}, 'datspec') || strcmpi(varargin{1}, 'icaerp')|| strcmpi(varargin{1}, 'icaspec'))
@@ -332,16 +332,18 @@ factors = pop_listfactors(STUDY.design, 'gui', 'off');
 for s = 1:nb_subjects     
     % save continuous and categorical data files
     % ************* PLURAL IMPORTANT IN FILE? continuous_variable.txt vs continuous_variables.txt
-    filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
+    %filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
-    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction, 'filepath', filepath_tmp); 
+    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction); %, 'filepath', filepath_tmp); 
 
     % copy results
     model.cat_files{s}  = catMat;
     model.cont_files{s} = contMat;
-    STUDY.limo.subjects{s} = limodesign;
-    STUDY.limo.subjects{s}.subject = unique_subjects{s};
-    STUDY.limo.subjects{s}.model   = model;
+    STUDY.limo.categorical             = limodesign.categorical;
+    STUDY.limo.continuous              = limodesign.continuous;
+    STUDY.limo.subjects(s).subject     = unique_subjects{s};
+    STUDY.limo.subjects(s).cat_file    = catMat;
+    STUDY.limo.subjects(s).cont_file   = contMat;
 end
     
 % transpose
@@ -405,10 +407,11 @@ model.defaults.method = opt.method;                  % default is OLS - to be up
 model.defaults.Level= 1;                             % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % future version will allow other techniques
 
-limocontrast.mat = [];
+limocontrast.mat = []; %{ [1 1 -1 -1] [ 1 -1] };
 [LIMO_files, procstatus] = limo_batch('model specification',model,limocontrast,STUDY);
+STUDY.limo.model    = model;
 STUDY.limo.datatype = Analysis;
-STUDY.limo.chanloc  = LIMO_files.expected_chanlocs;
+STUDY.limo.chanloc  = limoChanlocs.expected_chanlocs;
 
 %LIMO_files.expected_chanlocs = limoChanlocs;
 %procOK = find(procstatus);
