@@ -90,9 +90,9 @@ for iOpt = 1:length(alloptionsinter)
 end
 alloptionsinter = { alloptionsinter }; % 1 condition only
 if strcmpi(opt.interaction, 'on')
-    limodesign.categorival = alloptionsinter;
+    limodesign.categorical = alloptionsinter;
 else
-    limodesign.categorival = alloptions;
+    limodesign.categorical = alloptions;
 end
 
 % build design matrix for categorical var.
@@ -100,9 +100,9 @@ end
 if strcmpi(opt.desconly, 'off')
     col = 1;
     catMat = zeros(length(trialinfo),1);
-    for iVar = 1:length(alloptions)
-        for iVal = 1:length(alloptions{iVar})
-            [trialindsx, eventvals] = std_gettrialsind(trialinfo, alloptions{iVar}{iVal}{:});
+    for iVar = 1:length(limodesign.categorical)
+        for iVal = 1:length(limodesign.categorical{iVar})
+            trialindsx = std_gettrialsind(trialinfo, limodesign.categorical{iVar}{iVal}{:});
             catMat(trialindsx, iVar) = iVal;
         end
     end
@@ -130,12 +130,10 @@ if ~isempty(contVar)
     end
     
     if strcmpi(opt.desconly, 'off')
-        
         % build continuous design matrix
         for iVar = 1:length(limodesign.continuous)
             [trialindsx, eventvals] = std_gettrialsind(trialinfo, limodesign.continuous{iVar}{:});
-            contMat(:         ,iVar) = NaN;
-            contMat(trialindsx,iVar) = eventvals;
+            contMat(trialindsx,iVar) = eventvals; % non selected values are assigned 0
         end
 
         % z-score columns if they are split - same as limo_split_continuous(catMat, contMat)
