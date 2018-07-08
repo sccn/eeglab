@@ -95,9 +95,9 @@ if strcmpi(g.gui, 'on')
     % generate categorical labels
     allLabels = {};
     count     = 1;
-    for iCat = 1:length(des.categorival)
-        for iVal = 1:length(des.categorival{iCat})
-            allLabels{count} = formatcond(des.categorival{iCat}{iVal});
+    for iCat = 1:length(des.categorical)
+        for iVal = 1:length(des.categorical{iCat})
+            allLabels{count} = formatcond(des.categorical{iCat}{iVal});
             count = count+1;
         end
     end
