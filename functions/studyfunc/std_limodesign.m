@@ -84,11 +84,16 @@ end
 
 % compute interactions if necessary
 % ---------------------------------
-alloptionsinter = inter(alloptions);
-for iOpt = 1:length(alloptionsinter)
-    alloptionsinter{iOpt} = [ alloptionsinter{iOpt}{:} ];
+if length(alloptions) > 1
+    alloptionsinter = inter(alloptions);
+    for iOpt = 1:length(alloptionsinter)
+        alloptionsinter{iOpt} = [ alloptionsinter{iOpt}{:} ];
+    end
+    alloptionsinter = { alloptionsinter }; % 1 condition only
+else
+    alloptionsinter = alloptions;
 end
-alloptionsinter = { alloptionsinter }; % 1 condition only
+limodesign.continuous = {};
 if strcmpi(opt.interaction, 'on')
     limodesign.categorical = alloptionsinter;
 else
