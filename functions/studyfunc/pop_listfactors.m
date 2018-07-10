@@ -91,13 +91,13 @@ end
 
 if strcmpi(g.gui, 'on')
     [~,~,des] = std_limodesign(allFactorsStruct,[], 'desconly', 'on', 'splitreg', g.splitreg, 'interaction', g.interaction);
-    
+
     % generate categorical labels
     allLabels = {};
     count     = 1;
     for iCat = 1:length(des.categorical)
         for iVal = 1:length(des.categorical{iCat})
-            allLabels{count} = formatcond(des.categorical{iCat}{iVal});
+            allLabels{count} = [ int2str(count) '. ' formatcond(des.categorical{iCat}{iVal}) ];
             count = count+1;
         end
     end
@@ -107,7 +107,7 @@ if strcmpi(g.gui, 'on')
     end
     
     % add constant (for GUI)
-    allLabels{count} = 'constant';
+    allLabels{count} = [ int2str(count) '. Constant' ];
     
     warndlg2(strvcat(allLabels), 'List of factors');
 end
