@@ -146,8 +146,13 @@ if isempty(opt.chanloc) && isempty(opt.neighbormat)
         if  ~isfield(STUDY.etc,'statistic')
             STUDY = pop_statparams(STUDY, 'default');
         end
-        [~,~,limoChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-        chanlocname = 'limo_gp_level_chanlocs.mat';
+        
+        try
+            [~,~,limoChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
+            chanlocname = 'limo_gp_level_chanlocs.mat';
+        catch neighbors_error
+            errordlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created')
+        end
     else
         disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
         limoChanlocs = [];
