@@ -116,7 +116,7 @@ warning off MATLAB:hg:uicontrol:ParameterValuesMustBeValid
 
 % decoding input and backward compatibility
 % -----------------------------------------
-if isstr(varargin{1})
+if ischar(varargin{1})
     options = varargin;
 else
     options = { 'fig'      varargin{1} 'geomhoriz' varargin{2} ...
@@ -137,7 +137,7 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'spacing'   'real'   []      [0.02 0.01];
                            'inseth'    'real'   []      0.02; % x border absolute (5% of width)
                            'insetv'    'real'   []      0.02 }, 'supergui');
-if isstr(g), error(g); end
+if ischar(g), error(g); end
 if ~isempty(g.geomhoriz)
     maxcount = sum(cellfun('length', g.geomhoriz));
     if maxcount ~= length(g.uilist)
@@ -282,10 +282,10 @@ for counter = 1:maxcount
             end;
             
             % position adjustment depending on GUI type
-            if isstr(currentelem{2}) && strcmpi(currentelem{2}, 'popupmenu')
+            if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'popupmenu')
                 posy = posy-height/5;
             end;
-            if isstr(currentelem{2}) && strcmpi(currentelem{2}, 'text')
+            if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'text')
                 posy = posy+height/5;
             end;
                 

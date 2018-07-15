@@ -80,7 +80,7 @@ elseif nargin == 1
 	if isempty( command )
 		return;
 	end;
-	if isstr( command )
+	if ischar( command )
         if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end;
 		if isempty(ALLCOM)
 			ALLCOM = { command };

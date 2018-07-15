@@ -415,14 +415,14 @@ for inddataset = 1:length(ALLEEG)
                         % -------------------------------
                         removeevent = [];
                         try, tmpevent = EEG.event; allepochs = [ tmpevent.epoch ];
-                            removeevent = find( allepochs < 1 | allepochs > EEG.trials);
+                            removeevent = find( allepochs < 1 || allepochs > EEG.trials);
                             if ~isempty(removeevent)
                                 disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch numbers and were removed']);
                             end;
                         catch,
                             for indexevent = 1:length(EEG.event)
                                 if isempty( EEG.event(indexevent).epoch ) || ~isnumeric(EEG.event(indexevent).epoch) ...
-                                        | EEG.event(indexevent).epoch < 1 || EEG.event(indexevent).epoch > EEG.trials
+                                        || EEG.event(indexevent).epoch < 1 || EEG.event(indexevent).epoch > EEG.trials
                                     removeevent = [removeevent indexevent];
                                     disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has an invalid epoch number: removed']);
                                 end;
@@ -599,7 +599,7 @@ for inddataset = 1:length(ALLEEG)
                     % build epoch structure
                     % ---------------------
                     try,
-                        if EEG.trials > 1 & ~isempty(EEG.event)
+                        if EEG.trials > 1 && ~isempty(EEG.event)
                             % erase existing event-related fields
                             % ------------------------------
                             if ~isfield(EEG,'epoch')
@@ -689,7 +689,7 @@ for inddataset = 1:length(ALLEEG)
     
     % checking history and convert if necessary
     % -----------------------------------------
-    if isfield(EEG, 'history') & size(EEG.history,1) > 1
+    if isfield(EEG, 'history') && size(EEG.history,1) > 1
         allcoms = cellstr(EEG.history);
         EEG.history = deblank(allcoms{1});
         for index = 2:length(allcoms)
@@ -699,7 +699,7 @@ for inddataset = 1:length(ALLEEG)
     
     % read data if necessary
     % ----------------------
-    if ischar(EEG.data) & nargin > 1
+    if ischar(EEG.data) && nargin > 1
         if strcmpi(varargin{1}, 'loaddata')
             
             EEG.data = eeg_getdatact(EEG);
@@ -722,7 +722,7 @@ for inddataset = 1:length(ALLEEG)
         
         % save data
         % ---------
-        if strcmpi(varargin{1}, 'savedata') & option_storedisk
+        if strcmpi(varargin{1}, 'savedata') && option_storedisk
             error('eeg_checkset: cannot call savedata any more');
             
             % the code below is deprecated
@@ -739,7 +739,7 @@ for inddataset = 1:length(ALLEEG)
                 % saving dataset
                 % --------------
                 filename = fullfile(EEG(1).filepath, EEG(1).filename);
-                if ~ischar(EEG.data) & option_single, EEG.data = single(EEG.data); end;
+                if ~ischar(EEG.data) && option_single, EEG.data = single(EEG.data); end;
                 v = version;
                 if str2num(v(1)) >= 7, save( filename, '-v6', '-mat', 'EEG'); % Matlab 7
                 else                   save( filename, '-mat', 'EEG');
@@ -759,12 +759,12 @@ for inddataset = 1:length(ALLEEG)
         EEG.icawinv    = double(EEG.icawinv); % required for dipole fitting, otherwise it crashes
         EEG.icaweights = double(EEG.icaweights);
         EEG.icasphere  = double(EEG.icasphere);
-        if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
+        if ~isempty(findstr(v, 'R11')) || ~isempty(findstr(v, 'R12')) || ~isempty(findstr(v, 'R13'))
             EEG.data       = double(EEG.data);
             EEG.icaact     = double(EEG.icaact);
         else
             try,
-                if isa(EEG.data, 'double') & option_single
+                if isa(EEG.data, 'double') && option_single
                     EEG.data       = single(EEG.data);
                     EEG.icaact     = single(EEG.icaact);
                 end;
@@ -787,7 +787,7 @@ for inddataset = 1:length(ALLEEG)
             EEG.nbchan = size(EEG.data,1);
         end;
         
-        if (ndims(EEG.data)) < 3 & (EEG.pnts > 1)
+        if (ndims(EEG.data)) < 3 && (EEG.pnts > 1)
             if mod(size(EEG.data,2), EEG.pnts) ~= 0
                 if popask( [ 'eeg_checkset error: the number of frames does not divide the number of columns in the data.'  10 ...
                         'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the command line)'])
@@ -842,7 +842,7 @@ for inddataset = 1:length(ALLEEG)
     % ----------------------
     if ~isfield(EEG, 'event'), EEG.event = []; res = com; end;
     if ~isempty(EEG.event)
-        if EEG.trials > 1 & ~isfield(EEG.event, 'epoch')
+        if EEG.trials > 1 && ~isfield(EEG.event, 'epoch')
             if popask( [ 'eeg_checkset error: the event info structure does not contain an ''epoch'' field.'  ...
                     'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)'])
                 error('eeg_checkset error(): user abort');
@@ -862,7 +862,7 @@ for inddataset = 1:length(ALLEEG)
     if isempty(EEG.event)
         EEG.eventdescription = {};
     end;
-    if ~isfield(EEG, 'eventdescription') | ~iscell(EEG.eventdescription)
+    if ~isfield(EEG, 'eventdescription') || ~iscell(EEG.eventdescription)
         EEG.eventdescription = cell(1, length(fieldnames(EEG.event)));
         res = com;
     else
@@ -876,14 +876,14 @@ for inddataset = 1:length(ALLEEG)
     end;
     % create urevent if continuous data
     % ---------------------------------
-    %if ~isempty(EEG.event) & ~isfield(EEG, 'urevent')
+    %if ~isempty(EEG.event) && ~isfield(EEG, 'urevent')
     %    EEG.urevent = EEG.event;
     %   disp('eeg_checkset note: creating the original event table (EEG.urevent)');
     %    for index = 1:length(EEG.event)
     %        EEG.event(index).urevent = index;
     %    end;
     %end;
-    if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'urevent')
+    if isfield(EEG, 'urevent') && isfield(EEG.urevent, 'urevent')
         EEG.urevent = rmfield(EEG.urevent, 'urevent');
     end;
     
@@ -976,7 +976,7 @@ for inddataset = 1:length(ALLEEG)
                         %error('eeg_checkset error: invalid weight and sphere array sizes');
                     end;
                 end;
-                if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
+                if isempty(EEG.icaact) || (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) || (size(EEG.icaact,2) ~= size(EEG.data,2))
                     EEG.icaweights = double(EEG.icaweights);
                     EEG.icawinv = double(EEG.icawinv);
                     
@@ -1022,7 +1022,7 @@ for inddataset = 1:length(ALLEEG)
             EEG.icasphere = [];
         end;
         if option_computeica
-            if ~isempty(EEG.icaact) & ndims(EEG.icaact) < 3 & (EEG.trials > 1)
+            if ~isempty(EEG.icaact) && ndims(EEG.icaact) < 3 && (EEG.trials > 1)
                 disp( [ 'eeg_checkset note: independent component made 3-D' ]);
                 res = com;
                 EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
@@ -1162,7 +1162,7 @@ for inddataset = 1:length(ALLEEG)
     if ~isfield(EEG, 'ref')
         EEG.ref = 'common';
     end;
-    if ischar(EEG.ref) & strcmpi(EEG.ref, 'common')
+    if ischar(EEG.ref) && strcmpi(EEG.ref, 'common')
         if length(EEG.chanlocs) > EEG.nbchan
             disp('Extra common reference electrode location detected');
             EEG.ref = EEG.nbchan+1;
@@ -1177,7 +1177,7 @@ for inddataset = 1:length(ALLEEG)
         try
             % check if dipfitdefs is present
             dipfitdefs;
-	        if isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile')
+	        if isfield(EEG.dipfit, 'vol') && ~isfield(EEG.dipfit, 'hdmfile')
 		        if exist('pop_dipfit_settings')
 		            disp('Old DIPFIT structure detected: converting to DIPFIT 2 format');
 		            EEG.dipfit.hdmfile     = template_models(1).hdmfile;
@@ -1253,7 +1253,7 @@ for inddataset = 1:length(ALLEEG)
     if ~isfield(EEG, 'comments')   EEG.comments   = ''; res = com; end;
     if ~isfield(EEG, 'etc'     )   EEG.etc        = []; res = com; end;
     if ~isfield(EEG, 'urevent' )   EEG.urevent    = []; res = com; end;
-    if ~isfield(EEG, 'ref') | isempty(EEG.ref) EEG.ref = 'common'; res = com; end;
+    if ~isfield(EEG, 'ref') || isempty(EEG.ref) EEG.ref = 'common'; res = com; end;
     
     % create fields if absent
     % -----------------------

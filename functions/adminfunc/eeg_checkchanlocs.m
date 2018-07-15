@@ -74,7 +74,7 @@ plotrad  = [];
 if isfield(chanedit, 'plotrad'),
     plotrad = chanedit(1).plotrad;
     chanedit = rmfield(chanedit, 'plotrad');
-    if isstr(plotrad) & ~isempty(str2num(plotrad)), plotrad = str2num(plotrad); end;
+    if isstr(plotrad) && ~isempty(str2num(plotrad)), plotrad = str2num(plotrad); end;
     chaninfo.plotrad = plotrad;
 end;
 if isfield(chanedit, 'shrink') && ~isempty(chanedit(1).shrink)
@@ -221,13 +221,13 @@ if nargin < 3, nchans = length(chans); end;
 complicated = false;        % whether we need complicated treatment of datachans & co further down the road.....
 
 if isfield(chans,'type')
-    mask = strcmpi({chans.type},'FID') | strcmpi({chans.type},'IGNORE');
+    mask = strcmpi({chans.type},'FID') || strcmpi({chans.type},'IGNORE');
     if any(mask)
         [chans(mask).datachan] = deal(0);
         complicated = true;
     end
 end
-if length(chans) > nchans & nchans ~= 0 % reference at the end of the structure
+if length(chans) > nchans && nchans ~= 0 % reference at the end of the structure
     chans(end).datachan = 0;
     complicated = true;
 end;
