@@ -178,7 +178,7 @@ if nargin < 2
     if ~isempty( result{7}), options = { options{:} 'headerlines' eval(result{7}) }; end; 
     if ~result{8}, options = { options{:} 'clearevents' 'off'}; end; 
 else 
-    if ~isempty(varargin) & ~isstr(varargin{1})
+    if ~isempty(varargin) & ~ischar(varargin{1})
         % old call compatibility
         options = { 'latencyfields' varargin{1} };
         if nargin > 4
@@ -201,7 +201,7 @@ g = finputcheck( options, { 'typefield'      'string'   []       ''; ...
                             'timeunit'       'real'     [0 Inf]  1/EEG.srate; ...
                             'headerlines'    'integer'  [0 Inf]  0; ...
                             'clearevents'    'string'   {'on';'off'}  'on'}, 'pop_importepoch');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % check duration field
 % --------------------
@@ -219,7 +219,7 @@ end;
 % convert filename
 % ----------------
 fprintf('Pop_importepoch: Loading file or array...\n');
-if isstr(filename)
+if ischar(filename)
 	% check filename
 	% --------------
 	if exist(filename) == 2 & evalin('base', ['exist(''' filename ''')']) == 1
@@ -248,7 +248,7 @@ end;
 otherfieldlist = setdiff_bc( fieldlist, g.latencyfields);
 otherfieldlist = setdiff_bc( otherfieldlist, g.typefield);
 for index = 1:length(g.durationfields)
-    if isstr(g.durationfields{index})
+    if ischar(g.durationfields{index})
         otherfieldlist = setdiff_bc( otherfieldlist, g.durationfields{index});
     end;
 end;

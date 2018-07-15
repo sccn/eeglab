@@ -115,7 +115,7 @@ g = finputcheck(varargin, { 'icaweight'   'real'    []          [];
                             'refloc'     { 'cell','struct' }  { [] [] }   {};
                             'keepref'    'string'  {'on','off' }             'off';
                             'elocs'      {'integer','struct'}  []            [] });
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if ~isempty(g.icaweight)
     g.icaweights = g.icaweight;
 end;
@@ -127,7 +127,7 @@ if ~isempty(g.icaweights)
         disp('         of the mean reference value (which is now output argument 5)');
     end;
 end;
-if isstr(ref), ref = { ref }; end;
+if ischar(ref), ref = { ref }; end;
 if iscell(ref), ref = eeg_chaninds(g.elocs, ref); end;
 if ~isempty(ref)
     if ref > size(data,1)

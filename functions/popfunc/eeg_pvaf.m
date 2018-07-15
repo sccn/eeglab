@@ -66,7 +66,7 @@ g = finputcheck(varargin, { 'artcomps'   'integer'    []         [];
                             'chans'      'integer'    []         [];
                             'fraction'   'real'       []         1;
                             'plot'       'string'     { 'on';'off';'def' } 'def' }, 'eeg_pvaf');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 numcomps = size(EEG.icaact,1);
 if round(g.fraction*EEG.pnts*EEG.trials)<1

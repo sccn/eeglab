@@ -240,7 +240,7 @@ else % no interactive inputs
     % --------------------------------------------------------------
     for index=1:2:length(args)
         if iscell(args{index+1}), args{index+1} = { args{index+1} }; end; % double nested 
-        if isstr(args{index+1})   args{index+1} = args{index+1}; % string 
+        if ischar(args{index+1})   args{index+1} = args{index+1}; % string 
         end;
     end;                
 end;
@@ -258,7 +258,7 @@ try, g.indices;       catch, g.indices = [1:length(EEG.event)]; end;
 try, g.delold; 	      catch, g.delold = 'no'; end;
 try, g.timeunit; 	  catch, g.timeunit = 1; end;
 try, g.delim; 	      catch, g.delim = char([9 32]); end;
-if isstr(g.indices), g.indices = eval([ '[' g.indices ']' ]); end;
+if ischar(g.indices), g.indices = eval([ '[' g.indices ']' ]); end;
 
 tmpfields = fieldnames(g);
 % scan all the fields of g
@@ -393,7 +393,7 @@ return;
 % interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
-    if isstr(varname)
+    if ischar(varname)
         if exist(varname) == 2 % mean that it is a filename
                                % --------------------------
             array = loadtxt( varname, 'skipline', skipline, 'delim', delim);

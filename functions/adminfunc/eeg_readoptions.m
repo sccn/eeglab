@@ -46,7 +46,7 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
         opt_backup = [];
     end;
     
-    if isstr(filename)
+    if ischar(filename)
          fid = fopen(filename, 'r');
     else fid = filename;
     end;

@@ -148,7 +148,7 @@ opt = finputcheck(options, { 'threshold'     { 'real';'cell' }  []    10;
                              'taper'         'string' { 'none' 'hamming' } 'none';
                              'overlap'       'real'   []    0.25;
                              'epochlength'   'real'   []    0.5 }, 'pop_rejcont');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 if ~iscell(opt.threshold) && length(opt.threshold) == 2 && ...
     iscell(opt.freqlimit) && length(opt.freqlimit) == 2
     opt.threshold = { opt.threshold(1) opt.threshold(2) };

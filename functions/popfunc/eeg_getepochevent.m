@@ -132,7 +132,7 @@ opt = finputcheck(options, { 'type'       { 'string';'cell' } { [] [] } '';
                              'timewin'    'real'              []        [-Inf Inf];
                              'fieldname'  'string'            []        'latency';
                              'trials'     { 'real';'cell' }   []        [] }, 'eeg_getepochevent');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 if iscell(opt.trials) && ~isempty(opt.trials), opt.trials = opt.trials{1}; end;
 
 if isempty(opt.timewin)
@@ -164,13 +164,13 @@ end;
 % convert types
 % -------------
 for indextype=1:length(opt.type)
-     if isstr(opt.type{indextype}) & isnumeric(EEG.event(1).type)
+     if ischar(opt.type{indextype}) & isnumeric(EEG.event(1).type)
          if ~isempty(str2num(opt.type{indextype}))   
 			 opt.type{indextype} = str2num(opt.type{indextype}); 
 		 else
 			 error('eeg_getepochevent: string type cannot be found in numeric event type array');
 		 end;		 
-	 elseif isnumeric(opt.type{indextype}) & isstr(EEG.event(1).type)
+	 elseif isnumeric(opt.type{indextype}) & ischar(EEG.event(1).type)
 		  opt.type{indextype} = num2str(opt.type{indextype});
 	 end;
 end;
@@ -182,7 +182,7 @@ if ~isempty(opt.type)
     tmpevent  = EEG.event;
 	for indextype=1:length(opt.type)
 		typeval = opt.type{indextype};
-		if isstr(typeval)
+		if ischar(typeval)
 			Ieventtmp = [Ieventtmp strmatch(typeval, { tmpevent.type }, 'exact')' ];
 		else
 			Ieventtmp = [Ieventtmp find(typeval == [ tmpevent.type ] ) ];
@@ -245,7 +245,7 @@ else
     for index = 1:length(Ieventtmp)
         eval( [ 'val = EEG.event(Ieventtmp(index)).' opt.fieldname ';']);
         if ~isempty(val)
-            if isstr(val)
+            if ischar(val)
                 val = ascii2num(val);
                 %val_tmp = double(val);  % force epochval output to be numerical
                 % **Turn string into number that will sort in alphebetical order**

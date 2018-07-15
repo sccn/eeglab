@@ -206,16 +206,16 @@ if ~isempty( events )
     tmpevent = EEG.event;
     tmpeventtype  = { tmpevent.type };
     if iscell(events)
-		if isstr(EEG.event(1).type)
+		if ischar(EEG.event(1).type)
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
-				if ~isstr( tmpevent ), tmpevent = num2str( tmpevent ); end;
+				if ~ischar( tmpevent ), tmpevent = num2str( tmpevent ); end;
 				Ieventtmp = [ Ieventtmp ; strmatch(tmpevent, tmpeventtype, 'exact') ];
 			end;
 		else
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
-				if isstr( tmpevent ),tmpevent = str2num( tmpevent ); end;
+				if ischar( tmpevent ),tmpevent = str2num( tmpevent ); end;
 				if isempty( tmpevent ), error('pop_epoch(): string entered in a numeric field'); end;
 				Ieventtmp = [ Ieventtmp find(tmpevent == [ tmpeventtype{:} ]) ];
 			end;
@@ -364,7 +364,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % check for boundary events
 % -------------------------
 disp('pop_epoch(): checking epochs for data discontinuity');
-if ~isempty(EEG.event) & isstr(EEG.event(1).type)
+if ~isempty(EEG.event) & ischar(EEG.event(1).type)
     tmpevent = EEG.event;
 	boundaryindex = strmatch('boundary', { tmpevent.type });
 	if ~isempty(boundaryindex)
@@ -386,14 +386,14 @@ end;
 % ---------------------
 com = sprintf('EEG = pop_epoch( EEG, { ');
 for j=1:length(events);
-    if isstr( events{j} )   com = sprintf('%s ''%s'' ', com, events{j} );
+    if ischar( events{j} )   com = sprintf('%s ''%s'' ', com, events{j} );
     else                    com = sprintf('%s [%s] ',   com, num2str(events{j}) );
     end;
 end;
 com = sprintf('%s }, [%s]', com, num2str(lim)); 
 for i=1:2:length(args)
     if ~isempty( args{i+1} )
-        if isstr( args{i+1} )   com = sprintf('%s, ''%s'', ''%s''', com, args{i}, args{i+1} );
+        if ischar( args{i+1} )   com = sprintf('%s, ''%s'', ''%s''', com, args{i}, args{i+1} );
         else                    com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
         end;
     end;    

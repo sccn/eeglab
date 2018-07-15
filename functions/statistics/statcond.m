@@ -176,7 +176,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                                      'variance'   'string'    { 'homogenous','inhomogenous' }    'inhomogenous'; 
                                      'returnresamplingarray' 'string'    { 'on','off' }      'off'; 
                                      'verbose'    'string'    { 'on','off' }      'on' }, 'statcond');
-        if isstr(g), error(g); end;
+        if ischar(g), error(g); end;
     else
         g = struct(varargin{:});
         if ~isfield(g, 'naccu'),     g.naccu = 200; end;

@@ -61,7 +61,7 @@ end;
 % decoding options for backward compatibility
 % -------------------------------------------
 options = {};
-if length(varargin) > 0 && ~isstr(varargin{1})
+if length(varargin) > 0 && ~ischar(varargin{1})
     % STUDY, IDX, algorithm, parentClusterNumber
     if isnumeric(ALLEEG)
         options = { options{:} 'clusterind' ALLEEG };
@@ -80,7 +80,7 @@ opt = finputcheck(options, { 'name'             'string'   []  'Cls';
                              'algorithm'        'cell'     []  {};
                              'ignore0'          'string'   { 'on','off' }  'off';
                              'centroid'         'real'     []  [] }, 'std_createclust');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 % opt.clusterind - index of cluster for each component. Ex: 63 components and 2
 % clusters: opt.clusterind will be a 61x1 vector of 1 and 2 (and 0=outlisers)

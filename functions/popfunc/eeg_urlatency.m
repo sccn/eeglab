@@ -45,7 +45,7 @@ function latout = eeg_urlatency( events, latin );
     
     boundevents = { events.type };
     latout      = latin;
-    if ~isempty(boundevents) & isstr(boundevents{1})
+    if ~isempty(boundevents) & ischar(boundevents{1})
         indbound = strmatch('boundary', boundevents);
         
         if isfield(events, 'duration') & ~isempty(indbound)

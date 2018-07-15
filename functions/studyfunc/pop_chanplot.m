@@ -82,7 +82,7 @@ function [STUDY, com] = pop_chanplot(varargin)
 
 icadefs;
 com = [];
-if ~isstr(varargin{1})
+if ~ischar(varargin{1})
     if nargin < 2
         error('pop_chanplot(): You must provide ALLEEG and STUDY structures');
     end

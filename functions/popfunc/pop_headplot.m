@@ -272,7 +272,7 @@ if nargin < 3 % Open GUI input window
     options = {};
     if result{1},               options = { options{:} 'load'    result{2} };
     else
-        if ~isstr(result{5})    result{5} = defaultmat{result{5}}; end;
+        if ~ischar(result{5})    result{5} = defaultmat{result{5}}; end;
         if isempty(result{7})   setupopt = { result{4} 'meshfile' result{5} };  % no coreg
         else                    setupopt = { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) };
                                 fprintf('Transformation matrix: %s\n', result{7});

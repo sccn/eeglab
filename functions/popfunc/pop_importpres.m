@@ -65,7 +65,7 @@ end;
 if nargin < 5
     durfield = '';
 end;
-if nargin >= 5 & ~isstr(durfield)
+if nargin >= 5 & ~ischar(durfield)
     if nargin >= 6
         varargin = { align varargin{:} };
     end;

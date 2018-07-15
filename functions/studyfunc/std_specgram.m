@@ -112,7 +112,7 @@ end;
                                          'timerange'  'real'    []             [];
                                          'filter'     'real'    []             []}, ...    % 11 points
                                          'eeg_specgram', 'ignore');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 if isfield(EEG,'icaweights')
    numc = size(EEG.icaweights,1);
 else
@@ -357,7 +357,7 @@ function pntslat = eeg_urpnts(EEG);
 function pntslat = eeg_urlatency(EEG, pntslat);
 
     if isempty(EEG.event), return; end;
-    if ~isstr(EEG.event(1).type), return; end;
+    if ~ischar(EEG.event(1).type), return; end;
     
     tmpevent = EEG.event;
     bounds = strmatch('boundary', { tmpevent.type })

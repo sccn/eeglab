@@ -129,7 +129,7 @@ g = finputcheck(varargin, { 'subjind'     'integer'  []               [];
                             'volmesh_fname' 'string'  []  'volmesh_local.mat';
                             'mri'         { 'struct','string' } [] '';
                             'norm2JointProb' 'string'  { 'on','off' } 'off'});
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if ~strcmpi(g.method, 'alldistance') & isempty(g.subjind)
     error('Subject indices are required for this method');
 end;
@@ -240,7 +240,7 @@ if isempty(g.mri) % default MRI file
     load('-mat', template_models(1).mrifile); % load mri variable
     g.mri = mri;
 end
-if isstr(g.mri)
+if ischar(g.mri)
     try, 
         mri = load('-mat', g.mri);
         mri = mri.mri;

@@ -50,7 +50,7 @@ MAX_RADIUS = 0.5;
 % --------------------------------
 % Read the electrode location file
 % --------------------------------
-if isstr(locs_file) % a locs file
+if ischar(locs_file) % a locs file
         [tmpeloc labels Th Rd ind] = readlocs(locs_file,'filetype', ...
                                               'loc');
         [x,y] = pol2cart(Th/180*pi,Rd); % See Bug 149

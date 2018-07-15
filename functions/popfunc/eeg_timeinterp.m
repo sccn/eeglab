@@ -53,7 +53,7 @@ function EEG = eeg_timeinterp( EEG, samples, varargin);
                                   'elecinds'    'integer'   []       [1:EEG.nbchan]; ...
                                   'epochcont'   'string'    { 'on';'off' }  'off' }, 'eeg_timeinterp');
 
-    if isstr(opt), error(opt); end;
+    if ischar(opt), error(opt); end;
     
     srange = samples(2)-samples(1);
     data   = EEG.data;

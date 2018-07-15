@@ -296,14 +296,14 @@ end
 fieldtrip = 0;
 if nargin < 2, loc_file = []; end;
 if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end;
-if isstr(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end;
+if ischar(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end;
 if fieldtrip
     error('Wrong calling format, are you trying to use the topoplot Fieldtrip function?');
 end;
 
 nargs = nargin;
 if nargs == 1
-  if isstr(Values)
+  if ischar(Values)
     if any(strcmp(lower(Values),{'example','demo'}))
       fprintf(['This is an example of an electrode location file,\n',...
                'an ascii file consisting of the following four columns:\n',...
@@ -355,7 +355,7 @@ if nargs > 2
     for i = 1:2:length(varargin)
         Param = varargin{i};
         Value = varargin{i+1};
-        if ~isstr(Param)
+        if ~ischar(Param)
             error('Flag arguments must be strings')
         end
         Param = lower(Param);
@@ -383,7 +383,7 @@ if nargs > 2
             case 'emarkercolors'
                 COLORARRAY = Value;
             case {'interplimits','headlimits'}
-                if ~isstr(Value)
+                if ~ischar(Value)
                     error('''interplimits'' value must be a string')
                 end
                 Value = lower(Value);
@@ -421,7 +421,7 @@ if nargs > 2
                 MASKSURF = Value;
             case 'circgrid'
                 CIRCGRID = Value;
-                if isstr(CIRCGRID) | CIRCGRID<100
+                if ischar(CIRCGRID) | CIRCGRID<100
                     error('''circgrid'' value must be an int > 100');
                 end
             case 'style'
@@ -519,23 +519,23 @@ if nargs > 2
                 shrinkfactor = Value;
             case 'intrad'
                 intrad = Value;
-                if isstr(intrad) | (intrad < MINPLOTRAD | intrad > 1)
+                if ischar(intrad) | (intrad < MINPLOTRAD | intrad > 1)
                     error('intrad argument should be a number between 0.15 and 1.0');
                 end
             case 'plotrad'
                 plotrad = Value;
-                if isstr(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
+                if ischar(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
                     error('plotrad argument should be a number between 0.15 and 1.0');
                 end
             case 'headrad'
                 headrad = Value;
-                if isstr(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
+                if ischar(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
                     headrad = 0;       % undocumented 'no head' alternatives
                 end
                 if isempty(headrad) % [] -> none also
                     headrad = 0;
                 end
-                if ~isstr(headrad)
+                if ~ischar(headrad)
                     if ~(headrad==0) & (headrad < MINPLOTRAD | headrad>1)
                         error('bad value for headrad');
                     end
@@ -565,7 +565,7 @@ if nargs > 2
                 end;
             case 'noplot'
                 noplot = Value;
-                if ~isstr(noplot)
+                if ~ischar(noplot)
                     if length(noplot) ~= 2
                         error('''noplot'' location should be [radius, angle]')
                     else
@@ -576,7 +576,7 @@ if nargs > 2
                 end
             case 'gridscale'
                 GRID_SCALE = Value;
-                if isstr(GRID_SCALE) | GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 32
+                if ischar(GRID_SCALE) | GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 32
                     error('''gridscale'' value must be integer > 32.');
                 end
             case {'plotgrid','gridplot'}
@@ -664,7 +664,7 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
-  if isstr(loc_file)
+  if ischar(loc_file)
       [tmpeloc labels Th Rd indices] = readlocs( loc_file);
   elseif isstruct(loc_file) % a locs struct
       [tmpeloc labels Th Rd indices] = readlocs( loc_file );
@@ -769,7 +769,7 @@ end;
 %
 if isempty(plotrad) & isfield(tmpeloc, 'plotrad'), 
     plotrad = tmpeloc(1).plotrad; 
-    if isstr(plotrad)                        % plotrad shouldn't be a string
+    if ischar(plotrad)                        % plotrad shouldn't be a string
         plotrad = str2num(plotrad)           % just checking
     end
     if plotrad < MINPLOTRAD | plotrad > 1.0
@@ -794,7 +794,7 @@ else
      plotrad = intrad;
   end
 end                                           % don't interpolate channels with Rd > 1 (below head)
-if isstr(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
+if ischar(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
    error('plotrad must be between 0.15 and 1.0');
 end
 
@@ -822,7 +822,7 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
     if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
         shrinkfactor = tmpeloc(1).shrink;
         if strcmpi(VERBOSE,'on')
-            if isstr(shrinkfactor)
+            if ischar(shrinkfactor)
                 fprintf('Automatically shrinking coordinates to lie above the head perimter.\n');
             else                
                 fprintf('Automatically shrinking coordinates by %3.2f\n', shrinkfactor);
@@ -830,7 +830,7 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
         end
     end;
     
-    if isstr(shrinkfactor)
+    if ischar(shrinkfactor)
         if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force') | strcmpi(shrinkfactor, 'auto')  
             if abs(headrad-rmax) > 1e-2
              fprintf('     NOTE -> the head cartoon will NOT accurately indicate the actual electrode locations\n');
@@ -1035,7 +1035,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%% Calculate colormap limits %%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  if isstr(MAPLIMITS)
+  if ischar(MAPLIMITS)
     if strcmp(MAPLIMITS,'absmax')
       amax = max(max(abs(Zi)));
       amin = -amax;
@@ -1106,7 +1106,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     %
     %%%%%%%%%%% reset color limits for grid plot %%%%%%%%%%%%%%%%%%%%%%%%%
     %
-    if isstr(MAPLIMITS) 
+    if ischar(MAPLIMITS) 
       if strcmp(MAPLIMITS,'maxmin') | strcmp(MAPLIMITS,'minmax')
         amin = min(min(gridvalues(~isnan(gridvalues))));
         amax = max(max(gridvalues(~isnan(gridvalues))));
@@ -1356,7 +1356,7 @@ if headrad > 0                         % if cartoon head to be plotted
 headx = [[rx(:)' rx(1) ]*(hin+hwidth)  [rx(:)' rx(1)]*hin];
 heady = [[ry(:)' ry(1) ]*(hin+hwidth)  [ry(:)' ry(1)]*hin];
 
-if ~isstr(HEADCOLOR) | ~strcmpi(HEADCOLOR,'none')
+if ~ischar(HEADCOLOR) | ~strcmpi(HEADCOLOR,'none')
    %ringh= patch(headx,heady,ones(size(headx)),HEADCOLOR,'edgecolor',HEADCOLOR,'linewidth', HLINEWIDTH); hold on
    headx = [rx(:)' rx(1)]*hin;
    heady = [ry(:)' ry(1)]*hin;
@@ -1390,7 +1390,7 @@ end
   EarY  = [q+.0555 q+.0775 q+.0783 q+.0746 q+.0555 -.0055 -.0932 -.1313 -.1384 -.1199];
   sf    = headrad/plotrad;                                          % squeeze the model ears and nose 
                                                                     % by this factor
-  if ~isstr(HEADCOLOR) | ~strcmpi(HEADCOLOR,'none')
+  if ~ischar(HEADCOLOR) | ~strcmpi(HEADCOLOR,'none')
     plot3([basex;tiphw;0;-tiphw;-basex]*sf,[base;tip-tipr;tip;tip-tipr;base]*sf,...
          2*ones(size([basex;tiphw;0;-tiphw;-basex])),...
          'Color',HEADCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose

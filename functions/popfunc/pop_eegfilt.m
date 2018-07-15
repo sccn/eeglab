@@ -174,7 +174,7 @@ end;
 options = {options{:} revfilt firtype causal};
 
 if EEG.trials == 1
-    if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
+    if ~isempty(EEG.event) & isfield(EEG.event, 'type') & ischar(EEG.event(1).type)
         tmpevent = EEG.event;
         boundaries = strmatch('boundary', { tmpevent.type });
         if isempty(boundaries)

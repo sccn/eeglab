@@ -48,7 +48,7 @@ end;
     'trialbase'     'string'    {'on','off','full'} 'off';
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimeftrialbaseln', 'ignore');
-if isstr(g) error(g); return; end;
+if ischar(g) error(g); return; end;
 PP = PPori; if ~iscell(PP), PP = { PP }; end;
 
 % ---------------

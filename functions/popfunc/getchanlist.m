@@ -48,7 +48,7 @@ function chanlist = getchanlist(chanlocs, type)
     
     % search channel types
     % --------------------
-    if isstr(type), type = { type }; end;
+    if ischar(type), type = { type }; end;
     type = lower(type);
     chanlist = [];
     alltypes = lower({ chanlocs.type });

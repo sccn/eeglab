@@ -164,16 +164,16 @@ buf_size = chan * pnts ;			% size in shorts
 
 % set tags for conditions
 % -----------------------
-if isstr(chanlist) && strcmpi(chanlist, 'all'), chanlist = [1:chan]; end;
-if isstr(TrialList) && strcmpi(TrialList, 'all'),	trialtagI     = 1; else trialtagI     = 0; end;
-if isstr(acceptype) && strcmpi(acceptype, 'all'),	acceptagI     = 1; else acceptagI     = 0; end;
-if isstr(typerange) && strcmpi(typerange, 'all'), 	typetagI      = 1; else typetagI      = 0; end;
-if isstr(responsetype) && strcmpi(responsetype, 'all'),	responsetagI  = 1; else responsetagI  = 0; end;
-if isstr(rtrange) && strcmpi(rtrange, 'all'), 	rttagI        = 1; else rttagI        = 0; end;
+if ischar(chanlist) && strcmpi(chanlist, 'all'), chanlist = [1:chan]; end;
+if ischar(TrialList) && strcmpi(TrialList, 'all'),	trialtagI     = 1; else trialtagI     = 0; end;
+if ischar(acceptype) && strcmpi(acceptype, 'all'),	acceptagI     = 1; else acceptagI     = 0; end;
+if ischar(typerange) && strcmpi(typerange, 'all'), 	typetagI      = 1; else typetagI      = 0; end;
+if ischar(responsetype) && strcmpi(responsetype, 'all'),	responsetagI  = 1; else responsetagI  = 0; end;
+if ischar(rtrange) && strcmpi(rtrange, 'all'), 	rttagI        = 1; else rttagI        = 0; end;
 
 count_selected = 1;
 fprintf('Reserving array (can take some time)\n');
-if isstr(TrialList)
+if ischar(TrialList)
     signal = zeros( chan, pnts*nsweeps);
 else
     signal = zeros( chan, pnts*length(TrialList));

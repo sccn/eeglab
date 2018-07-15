@@ -64,8 +64,8 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
                                 'handle'        '' [] [];
                                 'field'         'string' [] 'labels';
                                 'selectionmode' 'string' { 'single';'multiple' } 'multiple'});
-    if isstr(g), error(g); end
-    if ~isstr(g.withindex), chan_indices = g.withindex; g.withindex = 'on';
+    if ischar(g), error(g); end
+    if ~ischar(g.withindex), chan_indices = g.withindex; g.withindex = 'on';
     else                    chan_indices = 1:length(chans);
     end
     if isstruct(chans), chans = { chans.(g.field) }; end
@@ -73,11 +73,11 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         
     % convert selection to integer
     % ----------------------------
-    if isstr(g.select) & ~isempty(g.select)
+    if ischar(g.select) & ~isempty(g.select)
         g.select = parsetxt(g.select);
     end
     if iscell(g.select) & ~isempty(g.select)
-        if isstr(g.select{1})
+        if ischar(g.select{1})
             tmplower = lower( chans );
             for index = 1:length(g.select)
                 matchind = strmatch(lower(g.select{index}), tmplower, 'exact');

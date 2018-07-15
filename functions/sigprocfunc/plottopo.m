@@ -122,8 +122,8 @@ if nargin < 1
 end
 
 if length(varargin) > 0
-    if length(varargin) == 1 | ~isstr(varargin{1}) | isempty(varargin{1}) | ...
-        (length(varargin)>2 &  ~isstr(varargin{3}))
+    if length(varargin) == 1 | ~ischar(varargin{1}) | isempty(varargin{1}) | ...
+        (length(varargin)>2 &  ~ischar(varargin{3}))
         options = { 'chanlocs' varargin{1} };
         if nargin > 2, options = { options{:} 'frames' varargin{2} }; end;
         if nargin > 3, options = { options{:} 'limits' varargin{3} }; end;
@@ -158,7 +158,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'ydir'      'integer'               [-1 1]      DEFAULT_SIGN;
                     'vert'      'float'                 []          [];
                     'hori'      'float'                 []          []});
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 data = reshape(data, size(data,1), size(data,2), size(data,3));    
 %if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); end;
 
@@ -176,7 +176,7 @@ else
 end;
 if isempty(g.chans) | g.chans == 0
    g.chans = 1:size(data,1);
-elseif ~isstr(g.chans)
+elseif ~ischar(g.chans)
    g.chans = g.chans;
 end
 
@@ -278,7 +278,7 @@ end;
 %     %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %
 %     if isempty(g.channames)
-%         if ~isstr(g.chans) 
+%         if ~ischar(g.chans) 
 %             % g.channames = zeros(MAXPLOTDATACHANS,4);
 %             % for c=1:length(g.chans),
 %             %     g.channames(c,:)= sprintf('%4d',g.chans(c));
@@ -286,7 +286,7 @@ end;
 %             if length(g.chans) > 1 | g.chans(1) ~= 0
 %                 g.channames = num2str(g.chans(:));                   %%CJH
 %             end;
-%         else % isstr(g.chans)
+%         else % ischar(g.chans)
 %             chid = fopen(g.chans,'r');
 %             if chid <3,
 %                 fprintf('plottopo(): cannot open file %s.\n',g.chans);
@@ -299,7 +299,7 @@ end;
 %             % fid=fopen('fgetl.m');
 %             % while 1
 %             %   line = fgetl(fid);
-%             %   if ~isstr(line), break, end
+%             %   if ~ischar(line), break, end
 %             %     disp(line)
 %             %   end
 %             % end
@@ -328,7 +328,7 @@ end;
     %
     %%%%%%%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
-    if isstr(g.colors) % filename for backward compatibility but not documented
+    if ischar(g.colors) % filename for backward compatibility but not documented
         cid = fopen(g.colors,'r');
         % fprintf('cid = %d\n',cid);
         if cid <3,
@@ -607,7 +607,7 @@ end;
             ymn = min([ymax ymin]);
             ymx = max([ymax ymin]);
             if isempty(g.plotfunc)
-                if isstr(tmpcolor{1}) & length(tmpcolor) > 1
+                if ischar(tmpcolor{1}) & length(tmpcolor) > 1
                     plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), tmpcolor{1}, tmpcolor{2:end});   
                 else
                     plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   

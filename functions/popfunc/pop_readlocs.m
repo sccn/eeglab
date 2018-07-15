@@ -73,7 +73,7 @@ if nargin < 1
    rmindex    = [];
    count      = 1;
    for index = 1:length(formatinfo)
-       if ~isstr(formatinfo{index})
+       if ~ischar(formatinfo{index})
            for index2 = 1:length(formatinfo{index})
                indexformat = strmatch(formatinfo{index}{index2}, listcolformat, 'exact');
                indexlist(count, index2) = indexformat;

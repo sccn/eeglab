@@ -185,7 +185,7 @@ if nargin < 2
    return
 end
 
-if nargin <= 2 | isstr(varargin{1})
+if nargin <= 2 | ischar(varargin{1})
 	% 'key' 'val' sequences
 	fieldlist = { 'chanlocs'      ''         []                       [] ;
 				  'title'         'string'   []                       '';
@@ -221,43 +221,43 @@ if nargin <= 2 | isstr(varargin{1})
 	%       for backwards compatibility 11/2004 -sm
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
-	if isstr(g), error(g); end;
+	if ischar(g), error(g); end;
     if g.plotproj && strcmp(g.sumenv, 'fill'), g.sumenv = 'on'; end;
 
 else % dprecated - old style input args
 	if nargin > 3,    g.chanlocs = varargin{1};
 	else              g.chanlocs = [];
 	end;
-        if isstr(varargin{2}), help envtopo; return; end
+        if ischar(varargin{2}), help envtopo; return; end
 	if nargin > 4,	  g.limits = varargin{2};
 	else              g.limits = 0; % [];
 	end;
-        if isstr(varargin{3}), help envtopo; return; end
+        if ischar(varargin{3}), help envtopo; return; end
 	if nargin > 5,    g.compnums = varargin{3};
 	else              g.compnums = [];
 	end;
-        if ~isstr(varargin{4}), help envtopo; return; end
+        if ~ischar(varargin{4}), help envtopo; return; end
 	if nargin > 6,    g.title = varargin{4};
 	else              g.title = '';
 	end;
-        if isstr(varargin{5}), help envtopo; return; end
+        if ischar(varargin{5}), help envtopo; return; end
 	if nargin > 7,    g.plotchans = varargin{5};
 	else              g.plotchans = [];
 	end;
-        if isstr(varargin{6}), help envtopo; return; end
+        if ischar(varargin{6}), help envtopo; return; end
 	if nargin > 8,    g.voffsets = varargin{6};
 	else              g.voffsets = [];
 	end;
-        if isstr(varargin{7}), help envtopo; return; end
+        if ischar(varargin{7}), help envtopo; return; end
 	if nargin > 9,    g.colorfile = varargin{7};
 	else              g.colorfile = '';
 	                  g.colors = '';
 	end;
-        if isstr(varargin{8}), help envtopo; return; end
+        if ischar(varargin{8}), help envtopo; return; end
 	if nargin > 10,   g.fillcomp = varargin{8};
 	else              g.fillcom = 0;
 	end;
-        if isstr(varargin{9}), help envtopo; return; end
+        if ischar(varargin{9}), help envtopo; return; end
 	if nargin > 11,   g.vert = varargin{9};
 	else              g.vert = [];
 	end;
@@ -299,7 +299,7 @@ if frames > MAX_FRAMES
    error('number of data frames to plot too large!');
 end
 
-if isstr(g.chanlocs)
+if ischar(g.chanlocs)
     g.chanlocs = readlocs(g.chanlocs);  % read channel location information
     if length(g.chanlocs) ~= chans
      fprintf(...
@@ -421,7 +421,7 @@ ENVCOLORS = strvcat('w..','r..','g..','b..','m..','c..','r..','g..','b..','m..',
 
 if isempty(g.colorfile)
     g.colorfile = ENVCOLORS; % use default color order above
-elseif ~isstr(g.colorfile)
+elseif ~ischar(g.colorfile)
       error('Color file name must be a string.');
 end
 if strcmpi(g.colorfile,'bold')

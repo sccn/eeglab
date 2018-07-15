@@ -44,7 +44,7 @@ end
 g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
                             'splitreg'    'string' { 'on','off' } 'off';
                             'interaction' 'string' { 'on','off' } 'on' });
-if isstr(g)
+if ischar(g)
     error(g);
 end
 

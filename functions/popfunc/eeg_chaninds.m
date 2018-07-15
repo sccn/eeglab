@@ -46,7 +46,7 @@ function finalinds = eeg_chaninds(EEG, channames, errorifnotfound);
     
     % decode string if necessary
     % --------------------------
-    if isstr(channames)
+    if ischar(channames)
         channames = parsetxt( channames );
     end;
 

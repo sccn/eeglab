@@ -44,7 +44,7 @@ if nargin<1
     return;
 end;
 zs = [];
-if isstr(elpfile)
+if ischar(elpfile)
     if nargin > 1
         zs = arg2;
     end;

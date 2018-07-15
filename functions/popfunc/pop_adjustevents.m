@@ -112,7 +112,7 @@ end
 g = finputcheck(options, { 'addms'       'real'  []    [];
                            'addsamples'  'real'  []    [];
                            'eventtypes'  {'cell' 'string'}  []    {}});
-if isstr(g)
+if ischar(g)
     error(g);
 end
 if ~iscell(g.eventtypes)

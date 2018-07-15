@@ -197,7 +197,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-    if ~isstr(colors)
+    if ~ischar(colors)
         fprintf('envproj(): color file name must be a string.\n');
         return
     end
@@ -246,7 +246,7 @@ fprintf('\n');
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isstr(titl)
+if ~ischar(titl)
   if titl==0,
     titl = ' ';
   else

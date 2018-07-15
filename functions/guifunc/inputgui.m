@@ -94,7 +94,7 @@ end
 
 % decoding input and backward compatibility
 % -----------------------------------------
-if isstr(varargin{1})
+if ischar(varargin{1})
     options = varargin;
 else
     options = { 'geometry' 'uilist' 'helpcom' 'title' 'userdata' 'mode' 'geomvert' };
@@ -120,10 +120,10 @@ g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'mode'     ''                    []      'normal'; ...
                            'geomvert' 'real'                []       [] ...
                           }, 'inputgui');
-if isstr(g), error(g); end
+if ischar(g), error(g); end
 
 if isempty(g.getresult)
-    if isstr(g.mode)
+    if ischar(g.mode)
         fig = figure('visible', 'off');
         set(fig, 'name', g.title);
         set(fig, 'userdata', g.userdata);
@@ -199,7 +199,7 @@ if isempty(g.getresult)
     
     % create figure and wait for return
     % ---------------------------------
-    if isstr(g.mode) && (strcmpi(g.mode, 'plot') || strcmpi(g.mode, 'return') )
+    if ischar(g.mode) && (strcmpi(g.mode, 'plot') || strcmpi(g.mode, 'return') )
         if strcmpi(g.mode, 'plot')
            return; % only plot and returns
         end
@@ -225,7 +225,7 @@ strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
 [resstruct,result] = outstruct(allobj); % Output parameters  
 userdat = get(fig, 'userdata');
 
-if isempty(g.getresult) && isstr(g.mode) && ( strcmp(g.mode, 'normal') || strcmp(g.mode, 'return') )
+if isempty(g.getresult) && ischar(g.mode) && ( strcmp(g.mode, 'normal') || strcmp(g.mode, 'return') )
 	close(fig);
 end
 drawnow; % for windows

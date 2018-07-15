@@ -75,7 +75,7 @@ for k = 3:2:nargin
                     cls = 2:length(STUDY.cluster);
                 end
             else
-                if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
+                if ischar(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
                     error('std_topoplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
@@ -84,7 +84,7 @@ for k = 3:2:nargin
         case 'plotsubjects' % legacy
             mode = 'apart';
         case 'comps'
-            if isstr( varargin{k-1} ), mode = 'apart'; 
+            if ischar( varargin{k-1} ), mode = 'apart'; 
             else STUDY = std_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1}); return;
             end;
         case 'mode' % Plotting mode 'together' / 'apart'

@@ -78,7 +78,7 @@ function plotcurve( times, R, varargin);
                              'plottopo'      'real'    []                        [];
                              'linewidth'     'real'    []                        2;
                              'marktimes'     'real'    []                        [] });
-   if isstr(g), error(g); end;
+   if ischar(g), error(g); end;
   % keyboard;
    if isempty(g.colors), g.colors = { 'r' 'g' 'b' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
                    'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' }; end;
@@ -162,7 +162,7 @@ function plotcurve( times, R, varargin);
            set(tmp, 'color', tmpcol, 'linestyle', tmpstyle); 
            
            if ~isempty(g.traceinfo)
-               if isstr(g.traceinfo) && strcmpi(g.traceinfo, 'on')
+               if ischar(g.traceinfo) && strcmpi(g.traceinfo, 'on')
                    set(tmp, 'ButtonDownFcn', [ 'disp(''Trace ' int2str(ind) ''');' ]);
                elseif iscell(g.traceinfo)
                    try

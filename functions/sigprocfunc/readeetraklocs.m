@@ -46,7 +46,7 @@ function chanlocs = readeetraklocs( filename )
     indlabels = [];
     indpos    = [];
     for ind = 1:size(locs,1)
-        if isstr(locs{ind,1}) 
+        if ischar(locs{ind,1}) 
             if strcmpi(locs{ind,1}, 'Labels')
                 indlabels = ind;
             end;

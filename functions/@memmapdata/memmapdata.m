@@ -30,7 +30,7 @@
 function dataout = memmapdata(data, datadims);
 
     dataout.fileformat = 'normal';
-    if isstr(data)
+    if ischar(data)
         if length(data) > 3
             if strcmpi('.dat', data(end-3:end))
                 dataout.fileformat = 'transposed';

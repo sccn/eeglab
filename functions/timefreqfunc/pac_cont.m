@@ -153,7 +153,7 @@ g = finputcheck(varargin, ...
     'vert'          'real'     []                    [];
     'winsize'       'integer'  [0 Inf]                   max(pow2(nextpow2(frame)-3),4) }, 'pac');
 
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 if ~isempty(g.filterphase)
      x_freqphase = feval(g.filterphase, X(:)');

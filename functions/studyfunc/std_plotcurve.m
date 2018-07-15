@@ -107,7 +107,7 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'plotconditions'    'string' { 'together','apart' }  'apart' }, 'std_plotcurve');
 
 % opt.figure =  'off'; % test by nima
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 opt.singlesubject = 'off';
 
 nc = size(data,1);
@@ -128,7 +128,7 @@ if strcmpi(opt.effect, 'main') && nc > 1 && ng > 1 && (~isempty(opt.groupstats) 
 end
 if strcmpi(opt.plotconditions, 'together') &&  ~isempty(opt.groupstats), opt.plotconditions = 'apart'; end
 if strcmpi(opt.plotgroups,     'together') &&  ~isempty(opt.condstats) , opt.plotgroups     = 'apart'; end
-if isstr(opt.legend), opt.legend = {}; end
+if ischar(opt.legend), opt.legend = {}; end
 if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end
 if length(data(:)) == length(opt.legend(:)), 
     opt.legend = reshape(opt.legend, size(data))'; 

@@ -134,7 +134,7 @@ g = finputcheck(varargin, { 'freqs'    'real'   [0 Inf]    [2.5 50 50];
                             'erpout'   'real'   []             [];
                             'tfopt'    'cell'   []             {};
                             'erpimopt' 'cell'   []             {} });
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 fprintf('Generating %d frequencies in log scale (ignore message on linear scale)\n', g.freqs(2));
 g.freqs = logscale(g.freqs(1), g.freqs(3), g.freqs(2));

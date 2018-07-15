@@ -58,18 +58,18 @@ function [handles] = plotsphere(pos, rad, varargin);
                                 'proj'     'real'              []         [];
                                 'colormap' 'real'              []         jet(64);
                                 'projcol'  { 'real','string' } []         [0 0 0] }, 'plotsphere');
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end;
     
     % decode color if necessary
     % -------------------------
-    if ~isstr(g.color) & length(g.color) == 1
+    if ~ischar(g.color) & length(g.color) == 1
         g.color = g.colormap(g.color,:);
-    elseif isstr(g.color)
+    elseif ischar(g.color)
         g.color = strcol2real(g.color);
     end;
-    if ~isstr(g.projcol) & length(g.projcol) == 1
+    if ~ischar(g.projcol) & length(g.projcol) == 1
         g.projcol = g.colormap(g.projcol,:);
-    elseif isstr(g.projcol)
+    elseif ischar(g.projcol)
         g.projcol = strcol2real(g.projcol);
     end;
             

@@ -286,7 +286,7 @@ end;
 
 % add boundaries if continuous data
 % ----------------------------------
-if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
+if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & ischar(EEG.event(1).type)
 	tmpevent = EEG.event;
     boundaries = strmatch('boundary', {tmpevent.type});
 	if ~isempty(boundaries)

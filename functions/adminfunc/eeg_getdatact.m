@@ -57,7 +57,7 @@ end;
 
 % reading data from several datasets and concatening it
 % -----------------------------------------------------
-if iscell(EEG) || (~isstr(EEG) && length(EEG) > 1)
+if iscell(EEG) || (~ischar(EEG) && length(EEG) > 1)
     % decode some arguments
     % ---------------------
     trials  = cell(1,length(EEG));
@@ -108,7 +108,7 @@ end;
 
 % if string load dataset
 % ----------------------
-if isstr(EEG)
+if ischar(EEG)
     EEG = pop_loadset('filename', EEG, 'loadmode', 'info');
 end;
 
@@ -123,7 +123,7 @@ opt = finputcheck(varargin, { ...
     'trialindices' {'integer','cell'} { {} {} } [];
     'rmcomps'      {'integer','cell'} { {} {} } [] }, 'eeg_getdatact');
 
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 channelNotDefined = 0;
 if isempty(opt.channel), opt.channel = [1:EEG.nbchan]; channelNotDefined = 1;
 elseif isequal(opt.channel, [1:EEG.nbchan]) && ~isempty(opt.interp) channelNotDefined = 1;
@@ -142,7 +142,7 @@ end;
 % get data boundaries if continuous data
 % --------------------------------------
 boundaries = [];
-if nargout > 1 && EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type') && isstr(EEG.event(1).type)
+if nargout > 1 && EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
     if ~isempty(opt.samples)
         disp('WARNING: eeg_getdatact.m, boundaries are not accurate when selecting data samples');
     end;

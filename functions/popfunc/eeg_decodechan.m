@@ -46,13 +46,13 @@ if nargin < 3
     field = 'labels';
 end
 
-if isempty(chanlocs) && isstr(chanstr)
+if isempty(chanlocs) && ischar(chanstr)
     chaninds = str2num(chanstr);
     chanlist = chaninds;
     return;
 end
     
-if isstr(chanstr)
+if ischar(chanstr)
     % convert chanstr
     % ---------------
     chanstr(find(chanstr == ']')) = [];

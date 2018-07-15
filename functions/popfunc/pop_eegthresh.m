@@ -140,15 +140,15 @@ if nargin < 3
     reject       = result{7};
 end;
 
-if isstr(elecrange) % convert arguments if they are in text format
+if ischar(elecrange) % convert arguments if they are in text format
     calldisp = 1;
     elecrange = eval( [ '[' elecrange ']' ]  );
     negthresh = eval( [ '[' negthresh ']' ]  );
     posthresh = eval( [ '[' posthresh ']' ]  );
-    if isstr(starttime)
+    if ischar(starttime)
         starttime = eval( [ '[' starttime ']' ]  );
     end;
-    if isstr(endtime)
+    if ischar(endtime)
         endtime   = eval( [ '[' endtime ']' ]  );
     end;
 else

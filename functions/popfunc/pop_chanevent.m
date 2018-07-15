@@ -176,7 +176,7 @@ listcheck = { 'edge'      'string'     { 'both';'leading';'trailing'}     'both'
               'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
               'nbtype'    'integer'    [1 NaN]                             NaN };
 g = finputcheck( options, listcheck, 'pop_chanedit');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % check inut consistency
 % ----------------------

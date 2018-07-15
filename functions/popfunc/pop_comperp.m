@@ -196,7 +196,7 @@ g = finputcheck( options, ...
                    'tplotopt' 'cell'     []              {};
                    'mode'     'string'  {'ave';'rms'}    'ave';
                    'multcmp'  'integer'  [0 Inf]         [] });
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if length(datadd) == 1
     disp('Cannot perform statistics using only 1 dataset');
     g.alpha = [];

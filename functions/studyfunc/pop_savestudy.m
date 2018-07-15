@@ -49,7 +49,7 @@ if length(STUDY) >1, error('pop_savestudy(): cannot save multiple STUDY sets'); 
 % backward compatibility
 % ----------------------
 if nargin > 1 
-    if isstr(EEG)
+    if ischar(EEG)
         options = { EEG varargin{:} };
     else
         options = varargin;
@@ -77,7 +77,7 @@ end
 g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
                             'filepath'   'string'   []     STUDY.filepath;
                             'savemode'   'string'   { 'standard','resave' } 'standard' });
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % fields to remove
 % ----------------

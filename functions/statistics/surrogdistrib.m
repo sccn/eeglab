@@ -51,7 +51,7 @@ if ~strcmpi(varargin{1}, 'precomp')
                                   'method'     'string'    { 'perm','permutation','bootstrap' }  'perm';
                                   'pairing'    'string'    { 'on','off' }      'on';
                                   'precomp'    'cell'      {} {} }, 'surrogdistrib');
-    if isstr(opt), error(opt); end;
+    if ischar(opt), error(opt); end;
     if strcmpi(opt.method, 'permutation'), opt.method = 'perm'; end;
     if strcmpi(opt.method, 'bootstrap'), bootflag = 1;
     else                                 bootflag = 0;

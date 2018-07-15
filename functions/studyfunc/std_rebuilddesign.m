@@ -82,7 +82,7 @@ function a = myintersect(a,b)
     if isempty(b) || isempty(a), a = {}; return; end
     
     for index = length(a):-1:1
-        if isstr(a{index})
+        if ischar(a{index})
             res = intersect_bc(a(index), b);
             if isempty(res)
                  a{index} = [];

@@ -95,7 +95,7 @@ if isempty(val)
     % ----------------------------
     nonSingleton = [];
     for index = 1:length(subs)
-        if ~isstr(subs{index}) % can only be ":"
+        if ~ischar(subs{index}) % can only be ":"
             nonSingleton(end+1) = index;
             subs2 = setdiff_bc([1:newdim1(index)], subs{index}); % invert selection
         end;

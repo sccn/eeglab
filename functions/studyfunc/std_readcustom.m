@@ -59,7 +59,7 @@ function [ returndata ] = std_readcustom(STUDY, ALLEEG, fileext, varargin)
                                             'datafield'  { 'string' 'cell' } [] {};
                                             'eegfield'   'string'            [] '';
                                             'eegrmdata'  'string'            { 'on' 'off' } 'on' }, 'std_sift', 'mode', 'ignore');
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end;
     if ~iscell(g.datafield), g.datafield = { g.datafield }; end;
     
     % Scan design and save data
@@ -96,7 +96,7 @@ function [ returndata ] = std_readcustom(STUDY, ALLEEG, fileext, varargin)
                     EEGTMPTMP.(g.eegfield) = tmpData;
                     EEGTMP(iDes) = EEGTMPTMP;
                 elseif length(g.datafield) == 1
-                    if ~isstr(tmpData.(g.datafield{1})), error('Field content cannot be a string'); end;
+                    if ~ischar(tmpData.(g.datafield{1})), error('Field content cannot be a string'); end;
                     data(iDes,:,:,:) = tmpData.(g.datafield{1});
                 elseif isfield(tmpData, 'data') && isempty(g.datafield)
                     data(iDes,:,:,:) = tmpData.data;

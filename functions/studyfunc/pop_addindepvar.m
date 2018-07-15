@@ -60,7 +60,7 @@ if isstruct(varlist)
     if cat == 2, cat = 0; end; % continuous
     if ~cat, values = []; end;
     
-elseif isstr(varlist)
+elseif ischar(varlist)
     com = varlist;
     usrdat = get(fig, 'userdata');
     
@@ -101,7 +101,7 @@ elseif isstr(varlist)
                 return;
             end;
             % combine values for string and integers
-            if isstr(usrdat.factorvals{val1}{1}) || iscell(usrdat.factorvals{val1}{1})
+            if ischar(usrdat.factorvals{val1}{1}) || iscell(usrdat.factorvals{val1}{1})
                 tmpcell = {};
                 for indCell = vals(:)'
                     if iscell(usrdat.factorvals{val1}{indCell})
@@ -135,12 +135,12 @@ function res = strmatchmult(a, b)
 function cellarray = mysort(cellarray)
     return; % was crashing for combinations of selection
             % also there is no reason the order should be different
-    if ~isempty(cellarray) && isstr(cellarray{1})
+    if ~isempty(cellarray) && ischar(cellarray{1})
         cellarray = sort(cellarray);
     end;
 
 function [cellout inds ] = mysetdiff(cell1, cell2);
-    if (~isempty(cell1) && isstr(cell1{1})) || (~isempty(cell2) && isstr(cell2{1}))
+    if (~isempty(cell1) && ischar(cell1{1})) || (~isempty(cell2) && ischar(cell2{1}))
          [ cellout inds ] = setdiff_bc(cell1, cell2);
     else [ cellout inds ] = setdiff_bc([ cell1{:} ], [ cell2{:} ]);
          cellout = mattocell(cellout);
@@ -154,7 +154,7 @@ function cellout = encodevals(cellin)
         cellout = { num2str(cellin) };
     elseif ischar(cellin{1}) || iscell(cellin{1})
         for index = 1:length(cellin)
-            if isstr(cellin{index})
+            if ischar(cellin{index})
                 cellout{index} = cellin{index};
             else
                 cellout{index} =  cellin{index}{1};

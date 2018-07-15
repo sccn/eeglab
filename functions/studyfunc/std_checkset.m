@@ -288,7 +288,7 @@ if ~studywasempty
     % ------------------------------------
     for design = 1:length(STUDY.design)
         for var = 1:length(STUDY.design(design).variable)
-            if isstr(STUDY.design(design).variable(var).pairing)
+            if ischar(STUDY.design(design).variable(var).pairing)
                 if strcmpi(STUDY.design(design).variable(var).pairing, 'paired')
                     STUDY.design(design).variable(var).pairing = 'on';
                 elseif strcmpi(STUDY.design(design).variable(var).pairing, 'unpaired')
@@ -355,7 +355,7 @@ end
 % convert combined independent variables
 % --------------------------------------
 function val = convertindvarval(val)
-if isstr(val)
+if ischar(val)
     inddash = findstr(' - ', val);
     if isempty(inddash), return; end
     inddash = [ -2 inddash length(val)+1];

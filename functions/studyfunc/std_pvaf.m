@@ -54,7 +54,7 @@ end;
                                            'rmclust' 'integer'   []   []; 
                                            'interp'  'struct'    { }   struct([]);
                                            'rmcomps' 'cell'      []    cell(1,length(ALLEEG)) }, 'std_pvaf', 'ignore');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 DES = STUDY.design(opt.design);
 for iCell = 1:length(DES.cell)

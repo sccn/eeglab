@@ -166,7 +166,7 @@ fieldlist = { 'chanlocs'      { 'string','struct' }       []       '' ;
               };
 
 [g varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % setting more defaults
 % ---------------------

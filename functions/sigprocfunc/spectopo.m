@@ -163,7 +163,7 @@ if nargin<3
    help spectopo
    return
 end
-if nargin <= 3 | isstr(varargin{1})
+if nargin <= 3 | ischar(varargin{1})
 	% 'key' 'val' sequence
 	fieldlist = { 'freq'          'real'     []                        [] ;
                   'specdata'      'real'     []                        [] ;
@@ -199,7 +199,7 @@ if nargin <= 3 | isstr(varargin{1})
                   'mapframes'     'integer'  [1:size(data,2)]         []};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
-	if isstr(g), error(g); end;
+	if ischar(g), error(g); end;
 	if ~isempty(g.freqrange), g.limits(1:2) = g.freqrange; end;
 	if ~isempty(g.weights)
 		if isempty(g.freq) | length(g.freq) > 2

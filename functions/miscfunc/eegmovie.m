@@ -114,7 +114,7 @@ opt = finputcheck(options, { 'startsec'    'real'    {}    0;
                              'time'        'string'  { 'on' 'off' }    'off';
                              'topoplotopt' 'cell'    {}    {};
                              'headplotopt' 'cell'    {}    {} }, 'eegmovie');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 if opt.minmax ==0,
 	datamin = min(min(data));
 	datamax = max(max(data));

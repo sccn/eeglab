@@ -78,7 +78,7 @@ if nargin < 2 || emptyfilename
     if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
     % pop up window to ask for file
     [filename, filepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
-    if ~isstr(filename), return; end;
+    if ~ischar(filename), return; end;
     drawnow;
     options = { 'filename' filename 'filepath' filepath };
 else
@@ -103,7 +103,7 @@ g = finputcheck(options,  { 'filename'   'string'   []     '';
                             'version'    'string'   { '6','7.3' } defaultSave;
                             'check'      'string'   { 'on','off' }     'off';
                             'savemode'   'string'   { 'resave','onefile','twofiles','' } '' });
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % current filename without the .set
 % ---------------------------------
@@ -183,7 +183,7 @@ if strcmpi(g.savemode, 'resave')
             save_as_dat_file = 1;
         end;
     end;
-    if isstr(EEG.data) & ~save_as_dat_file % data in .set file
+    if ischar(EEG.data) & ~save_as_dat_file % data in .set file
         TMP = pop_loadset(EEG.filename, EEG.filepath);
         EEG.data = TMP.data;
         data_on_disk = 1;
@@ -210,7 +210,7 @@ end;
 % -------------------------------
 tmpica       = EEG.icaact;
 EEG.icaact   = [];
-if ~isstr(EEG.data)
+if ~ischar(EEG.data)
     if ~strcmpi(class(EEG.data), 'memmapdata') && ~strcmpi(class(EEG.data), 'mmo') && ~strcmpi(class(EEG.data), 'single')
         tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
     else 
@@ -225,7 +225,7 @@ try,
     fprintf('Saving dataset...\n');
     EEG.saved = 'yes';
     if save_as_dat_file
-        if ~isstr(EEG.data)
+        if ~ischar(EEG.data)
             EEG.data = EEG.datfile;
             tmpdata = floatwrite( tmpdata, fullfile(EEG.filepath, EEG.data), 'ieee-le');
         end;

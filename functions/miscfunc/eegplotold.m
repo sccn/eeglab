@@ -82,7 +82,7 @@ end
 % Setup inputs
 % %%%%%%%%%%%%%%%%%%%%%%%%
 
-if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
+if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 
   if nargin == 7  % undocumented feature - allows position to be specd.
     posn = p6;
@@ -203,7 +203,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'XColor',DEFAULT_AXIS_COLOR,...
       'YColor',DEFAULT_AXIS_COLOR);
   
-  if isstr(titleval)      % plot title
+  if ischar(titleval)      % plot title
     title(titleval)
   elseif titleval == 2
     title(inputname(1))
@@ -758,7 +758,7 @@ else
     
     timestring = ['OBJ2 = findobj(''tag'',''electedit'');',...
 	          '[LAB1,LAB2] = uigetfile(''*'',''Electrode File'');',...
-		  'if (isstr(LAB1) & isstr(LAB2));',...
+		  'if (ischar(LAB1) & ischar(LAB2));',...
 		     'set(OBJ2,''string'',[LAB2,LAB1]);',...
 		  'end;',...
 		  'clear OBJ2 LAB1 LAB2;'];

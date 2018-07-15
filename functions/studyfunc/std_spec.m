@@ -139,7 +139,7 @@ end
 % decode inputs
 % -------------
 if ~isempty(varargin) 
-    if ~isstr(varargin{1})
+    if ~ischar(varargin{1})
         varargin = { varargin{:} [] [] };
         if all(varargin{1} > 0) 
             options = { 'components' varargin{1} 'freqrange' varargin{2} };
@@ -173,7 +173,7 @@ end
                                       'interp'     'struct'  { }        struct([]);
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
-if isstr(g), error(g); end
+if ischar(g), error(g); end
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
 if isfield(EEG,'icaweights')

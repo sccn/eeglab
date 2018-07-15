@@ -112,7 +112,7 @@ g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
                          'optimoffset' 'string'  { 'on';'off' }         'off';
                          'optimmeas'   'string'  { 'median';'mean' }    'mean';
                          'delim'       {'integer';'string'}   []        char([9 32 44])}, 'importevent');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
 g.delim = char(g.delim);    
 
@@ -120,7 +120,7 @@ g.delim = char(g.delim);
 % -------------------------
 if ~isempty(g.event)
     event = g.event;
-    if ~isstr(event)
+    if ~ischar(event)
         if size(event,2) > size(event,1), event = event'; end;
         if iscell(event)
             eventStr = cellfun(@ischar, event);
@@ -185,7 +185,7 @@ for curfield = tmpfields'
         case 'event', % load an ascii file
             switch g.append 
                 case { '''no''' 'no' } % ''no'' for backward compatibility
-                      if isstr(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
+                      if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
                       if length(tmparray) == length(event)
                          disp('Adding new field to event structure');
@@ -214,7 +214,7 @@ for curfield = tmpfields'
                 case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
-                      if isstr(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
+                      if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
                       if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(event); end;
                       if length(g.indices) ~= size(tmparray,1)
@@ -266,7 +266,7 @@ end;
 %% interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
-    if isstr(varname) & exist(varname) == 2  % mean that it is a filename
+    if ischar(varname) & exist(varname) == 2  % mean that it is a filename
                                              % --------------------------
         array = loadtxt( varname, 'skipline', skipline, 'delim', delim, 'blankcell', 'off' );
         

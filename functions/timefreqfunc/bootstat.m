@@ -101,7 +101,7 @@ if nargin < 2
 	return;
 end;
 
-if ~isstr(formula)
+if ~ischar(formula)
 	error('The second argument must be a string formula');
 end;
 
@@ -121,7 +121,7 @@ g = finputcheck(varargin, ...
 				  'dimaccu'       'integer'  [1 Inf]                  []; ...
 				  'correctp'      'real'     []                       []; ...
 				  'rboot'         'real'     []                       NaN	});
-if isstr(g)
+if ischar(g)
 	error(g);
 end;
 if isempty(g.shuffledim) & strcmpi(g.boottype, 'rand')

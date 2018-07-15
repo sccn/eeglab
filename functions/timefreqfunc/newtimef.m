@@ -447,7 +447,7 @@ if (nargin < 1)
     return
 end
 
-if isstr(data) && strcmp(data,'details')
+if ischar(data) && strcmp(data,'details')
     more on
     help timefdetails
     more off
@@ -574,7 +574,7 @@ end
     'cycleinc'      'string'    {'linear','log'}        'linear'
     'colormap'      'string'    []            DEFAULT_COLORMAP;...
     }, 'newtimef', 'ignore');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
 if strcmpi(g.basenorm, 'on'), g.scale = 'abs'; end;
 if ~strcmpi(g.itctype , 'phasecoher'), g.type = g.itctype; end;

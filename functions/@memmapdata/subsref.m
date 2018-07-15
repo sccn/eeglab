@@ -30,7 +30,7 @@ function b = subsref(a,s)
     % one dimension input
     % -------------------
     if length(s(1).subs) == 1 
-        if isstr(subs{1})
+        if ischar(subs{1})
             subs{1} = [1:size(a,1)];
             subs{2} = [1:size(a,2)];
             if ndims(a) == 3, subs{3} = [1:size(a,3)]; end;
@@ -40,9 +40,9 @@ function b = subsref(a,s)
     % two dimension input
     % -------------------
     elseif length(s(1).subs) == 2 
-        if isstr(subs{1}), subs{1} = [1:size(a,1)]; end;
+        if ischar(subs{1}), subs{1} = [1:size(a,1)]; end;
         
-        if isstr(subs{2}),
+        if ischar(subs{2}),
             subs{2} = [1:size(a,2)];
             if ndims(a) == 3, subs{3} = [1:size(a,3)]; end;
         end;
@@ -55,12 +55,12 @@ function b = subsref(a,s)
     % ---------------------
     elseif length(s(1).subs) == 3
         
-        if isstr(subs{1}), subs{1} = [1:size(a,1)]; end;
-        if isstr(subs{2}), subs{2} = [1:size(a,2)]; end;
+        if ischar(subs{1}), subs{1} = [1:size(a,1)]; end;
+        if ischar(subs{2}), subs{2} = [1:size(a,2)]; end;
         if ndims(a) == 2, 
             subs(3) = []; 
         else
-            if isstr(subs{3}), subs{3} = [1:size(a,3)]; end;
+            if ischar(subs{3}), subs{3} = [1:size(a,3)]; end;
         end;
         finaldim = cellfun('length', subs);
      

@@ -49,12 +49,12 @@ end;
 
 % read location file
 % ------------------
-if isstr(filename)
+if ischar(filename)
     locs  = loadtxt( filename );
 end;
 
-if ~isstr(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
-    if ~isstr(filename)
+if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
+    if ~ischar(filename)
         names = filename{1};
         x     = filename{2};
         y     = filename{3};
@@ -69,7 +69,7 @@ if ~isstr(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
             % find first numerical index
             % --------------------------
             index = 1;
-            while isstr( locs{index,1} )
+            while ischar( locs{index,1} )
                 index = index + 1;
             end;
 
@@ -80,7 +80,7 @@ if ~isstr(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
             chans  = reshape(chans,nchans,5);               %% Added this line in order to get x = chans(:,3)
             names  = locs(end-nchans*2+1: end-nchans, 2);
             for index = 1:length(names)
-                if ~isstr(names{index})
+                if ~ischar(names{index})
                     names{index} = int2str(names{index});
                 end;
             end;

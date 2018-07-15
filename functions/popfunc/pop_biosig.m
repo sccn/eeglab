@@ -146,7 +146,7 @@ g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'importannot'  'string'  { 'on';'off' } 'on';
                             'memorymapped' 'string'  { 'on';'off' } 'off';
                             'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % import data
 % -----------

@@ -56,7 +56,7 @@ opt = finputcheck(varargin, { 'plottype'       'integer'   [1 2 3]              
                               'chanindx'       'integer'   []                   []      ;
                               'regressor'      'cell'      []                   {};
                               'stats'          'cell'      { }                  {}}, 'std_limoresults');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 % Stats
 for i = 1:2:numel(opt.stats)

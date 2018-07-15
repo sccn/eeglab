@@ -73,7 +73,7 @@ elseif EEG.trials > 1
    error('input dataset must be continuous data (1 epoch)');
 end
 
-if nargin > 1 && ~isstr(varargin{1})
+if nargin > 1 && ~ischar(varargin{1})
     options = {};
     if nargin >= 2, options = { options{:} 'recurrence' varargin{1} }; end;
     if nargin >= 3, options = { options{:} 'limits'     varargin{2} }; end;
@@ -86,7 +86,7 @@ g = finputcheck(options, { 'recurrence'    'real'  []  1;
                             'rmbase'        'real'  []  0;
                             'eventtype'     'string' {} 'X';
                             'extractepochs' 'string' { 'on','off' } 'on' }, 'eeg_regepochs');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 if g.recurrence < 0 | g.recurrence > EEG.xmax
   error('recurrence_interval out of bounds');

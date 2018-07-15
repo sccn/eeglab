@@ -54,7 +54,7 @@ chanformat(end)    = [];
 listcolformat(end) = []; % remove chanedit
 indformat  = [];
 for index = 1:length(chanformat), 
-    if ~isstr(chanformat(index).importformat)
+    if ~ischar(chanformat(index).importformat)
         indformat = [ indformat index ];
     end;
     if isempty(chanformat(index).skipline), chanformat(index).skipline = 0; end;

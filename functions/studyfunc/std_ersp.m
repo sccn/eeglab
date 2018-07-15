@@ -148,7 +148,7 @@ end;
 X = [];
 options = {};
 if length(varargin) > 1 
-    if ~isstr(varargin{1})
+    if ~ischar(varargin{1})
         if length(varargin) > 0, options = { options{:} 'components' varargin{1} }; end;
         if length(varargin) > 1, options = { options{:} 'freqs'      varargin{2} }; end;
         if length(varargin) > 2, options = { options{:} 'timewindow' varargin{3} }; end;
@@ -185,7 +185,7 @@ end;
                         'freqscale'     'string'                []         'log';
                         'alpha'         'real'                  []          NaN;
                         'type'          'string'      { 'ersp','itc','both','ersp&itc' }  'both'}, 'std_ersp', 'ignore');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
 

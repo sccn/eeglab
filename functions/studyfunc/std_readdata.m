@@ -83,7 +83,7 @@ STUDY = pop_erspparams(STUDY, 'default');
     'component'     'integer' []             [];
     'subject'       'string'  []             '' }, ...
     'std_readdata', 'ignore');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 
 dtype = opt.datatype;
 

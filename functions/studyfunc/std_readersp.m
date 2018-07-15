@@ -121,7 +121,7 @@ STUDY = pop_erpimparams(STUDY, 'default');
     'datatype'      'string'  { 'ersp','itc','erpim' } 'ersp'; ...
     'subject'       'string'  []             '' }, ...
     'std_readersp', 'ignore');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 if ~strcmpi(opt.infotype, 'ersp'), opt.datatype = opt.infotype; end;
 if strcmpi(opt.datatype, 'erpim'), if isnan(opt.timerange), opt.timerange = STUDY.etc.erpimparams.timerange; end;
                                    opt.freqrange = opt.trialrange;

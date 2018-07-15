@@ -248,7 +248,7 @@ for i = 1:length(design.variable) % Loop per condition
     for j = 1 : length(design.variable(i).value)
 %         allvarstmp = [allvarstmp ' ' num2str(design.variable(i).value{j})];
         % --
-        if isstr(design.variable(i).value{j})
+        if ischar(design.variable(i).value{j})
             allvarstmp = [allvarstmp ' ' design.variable(i).value{j}];
         elseif iscell(design.variable(i).value{j})
             % Concat all vals

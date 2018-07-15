@@ -217,7 +217,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
   if colors ~=0,
-    if ~isstr(colors)
+    if ~ischar(colors)
        fprintf('plotdata(): color file name must be a string.\n');
        return
     end

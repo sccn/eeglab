@@ -293,7 +293,7 @@ listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
 % ----------------------------------
 % special mode for getting the info
 % ----------------------------------
-if isstr(filename) & strcmp(filename, 'getinfos')
+if ischar(filename) & strcmp(filename, 'getinfos')
    eloc = chanformat;
    labels = listcolformat;
    return;
@@ -306,10 +306,10 @@ g = finputcheck( varargin, ...
      'skiplines'   'integer' [0 Inf] 			[];
      'elecind'     'integer' [1 Inf]	    	[];
      'format'	   'cell'	 []					{} }, 'readlocs');
-if isstr(g), error(g); end;  
+if ischar(g), error(g); end;  
 if ~isempty(g.format), g.filetype = 'custom'; end;
 
-if isstr(filename)
+if ischar(filename)
    
    % format auto detection
 	% --------------------
@@ -434,7 +434,7 @@ if isstr(filename)
        % ---------------------------------
        indexbeg = 1;
        while isempty(array{indexbeg,1}) | ...
-               (isstr(array{indexbeg,1}) & array{indexbeg,1}(1) == '%' )
+               (ischar(array{indexbeg,1}) & array{indexbeg,1}(1) == '%' )
            indexbeg = indexbeg+1;
        end;
        array = array(indexbeg:end,:);
@@ -516,7 +516,7 @@ if isstr(filename)
    else 
        % remove trailing '.'
        for index = 1:length(eloc)
-           if isstr(eloc(index).labels)
+           if ischar(eloc(index).labels)
                tmpdots = find( eloc(index).labels == '.' );
                eloc(index).labels(tmpdots) = [];
            end;
@@ -591,7 +591,7 @@ end;
 %tmpnum = find(~cellfun('isclass', { eloc.labels }, 'char'));
 %disp('Converting channel labels to string');
 for index = 1:length(eloc)
-    if ~isstr(eloc(index).labels)
+    if ~ischar(eloc(index).labels)
         eloc(index).labels = int2str(eloc(index).labels);
     end;
 end;

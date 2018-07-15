@@ -116,7 +116,7 @@ opt = finputcheck( options, { 'norm'      'string'    { 'on';'off' }       'off'
                               'freqrange' 'real'      []                   [1 EEG.srate/2];
                               'elec'      'integer'   []                   [1:EEG.nbchan];
                               'threshold' 'real'   []                      400 }, 'pop_rejchan');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 % compute the joint probability
 % -----------------------------

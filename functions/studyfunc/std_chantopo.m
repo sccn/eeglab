@@ -67,7 +67,7 @@ opt = finputcheck( varargin, { 'ylim'        'real'    []              [];
                                'binarypval'  'string'  { 'on','off' }  'on';
                                'datatype'    'string'  { 'ersp','itc','erp','spec' }    'erp';
                                'caxis'       'real'    []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end
 if isnan(opt.threshold), opt.binarypval = 'off'; end
 if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = opt.topoplotopt; end

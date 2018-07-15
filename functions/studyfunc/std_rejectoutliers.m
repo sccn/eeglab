@@ -55,7 +55,7 @@ if length(varargin) > 1
             cls = 2:length(STUDY.cluster);
         end
     else
-        if isstr(varargin{1}) & strcmpi(varargin{1}, 'all')
+        if ischar(varargin{1}) & strcmpi(varargin{1}, 'all')
             cls = 2:length(STUDY.cluster);
         else
             error('std_prejectoutliers: clusters input takes either specific clusters (numeric vector) or keyword ''all''.');

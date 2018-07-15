@@ -127,7 +127,7 @@ for index = 1:length(STUDY.datasetinfo)
         
         % update dataset in EEGLAB
         % ------------------------
-        if isstr(ALLEEG(tmpind).data)
+        if ischar(ALLEEG(tmpind).data)
             tmpdata = ALLEEG(tmpind).data;
             [ ALLEEG EEG ] = eeg_store(ALLEEG, EEG, tmpind);
             ALLEEG(tmpind).data  = tmpdata;

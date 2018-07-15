@@ -112,7 +112,7 @@ end;
 selectamica = 0;
 defaultopts = [ '''extended'', 1' ] ;
 if nargin > 1
-    if isstr(varargin{1})
+    if ischar(varargin{1})
         if strcmpi(varargin{1}, 'selectamica')
             selectamica = 1;
             allalgs = { 'amica' allalgs{:} };
@@ -231,7 +231,7 @@ end;
                             'concatcond'     'string'  { 'on','off' }   'off';
                             'chanind'        { 'cell','integer' } { [] [] }        [];}, ...
                             'pop_runica', 'ignore');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if ~isempty(addoptions), g.options = { g.options{:} addoptions{:}}; end;
 
 % select datasets, create new big dataset if necessary
@@ -348,7 +348,7 @@ EEG.icachansind = g.chanind;
 % -------------------------
 pca_opt = 0;
 for i = 1:length(g.options)
-    if isstr(g.options{i})
+    if ischar(g.options{i})
         if strcmpi(g.options{i}, 'pca')
             pca_opt = 1;
         end;
@@ -419,7 +419,7 @@ switch lower(g.icatype)
         tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         fprintf('Now Running AMICA\n');
         if length(g.options) > 1
-            if isstr(g.options{2})
+            if ischar(g.options{2})
                 fprintf('See folder %s for outputs\n', g.options{2});
             end;
         end;

@@ -94,9 +94,9 @@ s = [pos(3) pos(4) pos(3) pos(4)]./100;
 
 % generating cell arrays
 % ----------------------
-if isstr(g.fontname),     tmp1(1:nblines) = {g.fontname}; g.fontname = tmp1; end;
+if ischar(g.fontname),     tmp1(1:nblines) = {g.fontname}; g.fontname = tmp1; end;
 if isnumeric(g.fontsize), tmp2(1:nblines) = {g.fontsize}; g.fontsize = tmp2; end;
-if isstr(g.fontweight),   tmp3(1:nblines) = {g.fontweight}; g.fontweight = tmp3; end;
+if ischar(g.fontweight),   tmp3(1:nblines) = {g.fontweight}; g.fontweight = tmp3; end;
 switch g.fontname{1}
     case 'courrier', CHAR_WIDTH = 11; % pixels
     case 'times', CHAR_WIDTH = 11; % pixels

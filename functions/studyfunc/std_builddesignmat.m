@@ -160,7 +160,7 @@ if expanding == 1
                 tmpdmatExpanded(trialSelect, otherCols) = 0;
     
                 % get the label for that column
-                if isstr(design.variable(varindx(iCol)).value{iUnique})
+                if ischar(design.variable(varindx(iCol)).value{iUnique})
                     colLabels{countCol} = [design.variable(varindx(iCol)).label '-' design.variable(varindx(iCol)).value{iUnique}];
                 elseif iscell(design.variable(varindx(iCol)).value{iUnique})
                     % Concat all vals

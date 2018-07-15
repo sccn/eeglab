@@ -159,7 +159,7 @@ if ~exist('vistype'  ,'var'), vistype   = 0; end;
 if ~exist('reject'   ,'var'), reject    = 0; end;
 if ~exist('superpose','var'), superpose = 1; end;
 
-if isstr(elecrange) % convert arguments if they are in text format 
+if ischar(elecrange) % convert arguments if they are in text format 
     calldisp = 1;
 	elecrange  = eval( [ '[' elecrange ']'  ]  );
 	locthresh  = eval( [ '[' locthresh ']'  ]  );

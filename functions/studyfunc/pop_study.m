@@ -78,11 +78,11 @@ end
 % type of call (gui, script or internal)
 % --------------------------------------
 mode = 'internal_command';
-if ~isstr(STUDY) %initial settings
+if ~ischar(STUDY) %initial settings
     mode = 'script';
     if nargin > 2
         for index = 1:length(varargin)
-            if isstr(varargin{index})
+            if ischar(varargin{index})
                 if strcmpi(varargin{index}, 'gui')
                     mode = 'gui';
                 end;

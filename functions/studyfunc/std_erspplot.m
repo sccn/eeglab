@@ -164,7 +164,7 @@ options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward com
                                'plotmode'    'string'  { 'normal','condensed','none' }  'normal';
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 if strcmpi(opt.noplot, 'on'), opt.plotmode = 'none'; end
 if isempty(opt.caxis), 
     if strcmpi(opt.datatype, 'ersp')

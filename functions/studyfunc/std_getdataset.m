@@ -82,7 +82,7 @@ opt = finputcheck( varargin, { 'design'  'integer'   []    STUDY.currentdesign;
                                'checkonly' 'string'   {'on' 'off'}    'off';
                                'cell'    'integer'   []    1                    }, 'std_getdataset');
 %                               'mode'   'string'   { 'channels' 'components' }  'channels';
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 if length(opt.cell) > 1
     % recursive call if more than one dataset

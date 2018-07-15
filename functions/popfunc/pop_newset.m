@@ -112,7 +112,7 @@ com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2
                     'retrieve'      'integer'    []               []; % []=none; can be multiple numbers
                     'study'         'integer'    [0 1]            0;  % important because change behavior for modified datasets
                     }, 'pop_newset', 'ignore');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 eeglab_options;
 if length(EEG) > 1
     % ***************************************************

@@ -106,7 +106,7 @@ oldpnts  = EEG.pnts;
 
 % resample for multiple channels
 % -------------------------
-if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
+if isfield(EEG, 'event') & isfield(EEG.event, 'type') & ischar(EEG.event(1).type)
     tmpevent = EEG.event;
     bounds = strmatch('boundary', { tmpevent.type });
     if ~isempty(bounds),

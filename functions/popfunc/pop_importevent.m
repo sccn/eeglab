@@ -180,7 +180,7 @@ if nargin<2
 	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end;
 	    if results{2} == 0 & ~isempty(EEG.event), args = { args{:}, 'append', 'no' }; end;
 	    if ~isempty( results{3} ), 
-            if isstr( results{3} ) && ~exist(results{3})
+            if ischar( results{3} ) && ~exist(results{3})
                 args = { args{:}, 'event', evalin('base', results{3}) }; 
             else
                 args = { args{:}, 'event', results{3} }; 
@@ -210,7 +210,7 @@ else % no interactive inputs
     % --------------------------------------------------------------
     for index=1:2:length(args)
         if iscell(args{index+1}), if iscell(args{index+1}{1}) args{index+1} = args{index+1}{1}; end; end; % double nested 
-        if isstr(args{index+1}) & length(args{index+1}) > 2 & args{index+1}(1) == '''' & args{index+1}(end) == ''''             
+        if ischar(args{index+1}) & length(args{index+1}) > 2 & args{index+1}(1) == '''' & args{index+1}(end) == ''''             
             args{index+1} = args{index+1}(2:end-1); end;
         %else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end;
         %end;

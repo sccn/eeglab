@@ -167,7 +167,7 @@ if nargin < 2
     return;
 end
 
-if ~isstr(varargin{1})
+if ~ischar(varargin{1})
     STUDY  = varargin{1};
     STUDY.etc.erpparams.topotime    = NaN; % [] for channels and NaN for components
     STUDY.etc.specparams.topofreq   = NaN; % NaN -> GUI disabled

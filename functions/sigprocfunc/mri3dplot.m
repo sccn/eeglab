@@ -100,8 +100,8 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'kernel'    'float'    []                        0; 
                         'addrow'    'integer'  []                        0;
                         'fighandle' 'integer'  []                        []});
-    if isstr(g), error(g); end;
-    if isstr(g.mriview) == 1, g.plotintersect = 'off'; end;
+    if ischar(g), error(g); end;
+    if ischar(g.mriview) == 1, g.plotintersect = 'off'; end;
     if strcmpi(g.mriview,'sagittal'),    g.mriview = 'side'; 
     elseif strcmpi(g.mriview,'axial'),   g.mriview = 'top'; 
     elseif strcmpi(g.mriview,'coronal'), g.mriview = 'rear';
@@ -109,7 +109,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     if strcmpi(g.subplot, 'on') % plot colorbar
         g.cbar = 'off';
     end;
-    if isstr(mri)
+    if ischar(mri)
          try, 
             mri = load('-mat', mri);
             mri = mri.mri;

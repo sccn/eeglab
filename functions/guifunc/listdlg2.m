@@ -31,7 +31,7 @@ if nargin < 2
 end;
 for index = 1:length(varargin)
 	if iscell(varargin{index}), varargin{index} = { varargin{index} }; end;
-	if isstr(varargin{index}), varargin{index} = lower(varargin{index}); end;
+	if ischar(varargin{index}), varargin{index} = lower(varargin{index}); end;
 end;
 g = struct(varargin{:});
 
@@ -44,7 +44,7 @@ try,  g.name;          catch, g.name = ''; end;
 
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
-if isstr(g.liststring)
+if ischar(g.liststring)
     allstr =  g.liststring;
 else
     allstr = '';

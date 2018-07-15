@@ -92,7 +92,7 @@ for k = 3:2:nargin
                     cls = 2:length(STUDY.cluster);
                 end
             else
-                if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
+                if ischar(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
                     error('std_dipplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
@@ -244,7 +244,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
            else
                dipplot(cluster_dip_models, options{:},'view', [0.5 -0.5 0.5]);
                for gind = 1:length(options) % remove the 'gui' 'off' option
-                   if isstr(options{gind}) 
+                   if ischar(options{gind}) 
                        if strfind(options{gind}, 'gui')
                            break;
                        end
@@ -348,7 +348,7 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
         % Complex axcopy
         %if l == 1
         %    for gind = 1:length(options) % remove the 'gui' 'off' option
-        %        if isstr(options{gind}) 
+        %        if ischar(options{gind}) 
         %            if strfind(options{gind}, 'gui')
         %                break;
         %            end

@@ -80,8 +80,8 @@ g = finputcheck( options, ...
                    'check'      'string'               { 'on';'off' }   'on';
                    'loadmode'   { 'string';'integer' } { { 'info' 'all' } [] }  'all';
                    'eeg'        'struct'               []   struct('data',{}) }, 'pop_loadset');
-if isstr(g), error(g); end;
-if isstr(g.filename), g.filename = { g.filename }; end;
+if ischar(g), error(g); end;
+if ischar(g.filename), g.filename = { g.filename }; end;
 
 % reloading EEG structure from disk
 % ---------------------------------
@@ -126,7 +126,7 @@ else
 
             % account for name changes etc...
             % -------------------------------
-            if isstr(EEG.data) && ~strcmpi(EEG.data, 'EEGDATA')
+            if ischar(EEG.data) && ~strcmpi(EEG.data, 'EEGDATA')
 
                 [tmp EEG.data ext] = fileparts( EEG.data ); EEG.data = [ EEG.data ext];
                 if ~isempty(tmp) && ~strcmpi(tmp, EEG.filepath)
@@ -163,7 +163,7 @@ else
             for index=1:length(EEG)
                 EEG(index).filename = '';
                 EEG(index).filepath = '';        
-                if isstr(EEG(index).data), 
+                if ischar(EEG(index).data), 
                     EEG(index).filepath = g.filepath; 
                     if length(g.filename{ifile}) > 4 && ~strcmp(g.filename{ifile}(1:end-4), EEG(index).data(1:end-4)) && strcmpi(g.filename{ifile}(end-3:end), 'sets')
                         disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
@@ -176,7 +176,7 @@ else
             if ~isfield( EEG, 'data')
                 error('pop_loadset(): not an EEG dataset file');
             end;
-            if isstr(EEG.data), EEG.filepath = g.filepath; end;
+            if ischar(EEG.data), EEG.filepath = g.filepath; end;
         end;
         
         %ALLEEGLOC = pop_newset(ALLEEGLOC, EEG, 1);
@@ -191,7 +191,7 @@ end;
 if strcmpi(g.check, 'on')
     EEG = eeg_checkset(EEG);
 end;
-if isstr(g.loadmode)
+if ischar(g.loadmode)
     if strcmpi(g.loadmode, 'all')
         EEG = eeg_checkset(EEG, 'loaddata');
     elseif strcmpi(g.loadmode, 'last')
@@ -211,7 +211,7 @@ else
     EEG.icaweights = [];
     EEG.icasphere = [];
     EEG.icawinv = [];
-    %if isstr(EEG.data)
+    %if ischar(EEG.data)
     %    EEG.datfile = EEG.data;
     %    fid = fopen(fullfile(EEG.filepath, EEG.data), 'r', 'ieee-le');
     %    fseek(fid, EEG.pnts*EEG.trials*( g.loadmode - 1), 0 );

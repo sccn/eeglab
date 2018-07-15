@@ -233,7 +233,7 @@ if (nargin < 1)
 	return
 end
 
-if isstr(X) & strcmp(X,'details')
+if ischar(X) & strcmp(X,'details')
    more on
    help timefdetails
    more off

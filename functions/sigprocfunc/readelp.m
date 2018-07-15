@@ -94,12 +94,12 @@ while 1
     tmpstr = fgetl(fid);
     while isempty(tmpstr)
         tmpstr = fgetl(fid);
-        if ~isstr(tmpstr) & tmpstr == -1
+        if ~ischar(tmpstr) & tmpstr == -1
             break;
         end; 
     end;
     
-    if ~isstr(tmpstr) & tmpstr == -1
+    if ~ischar(tmpstr) & tmpstr == -1
         break;
     end;  
 end;  

@@ -159,7 +159,7 @@ function ALLEEG = std_loadalleeg(varargin)
         EEG = eeg_checkset(EEG);
         if ~option_storedisk
             EEG = eeg_checkset(EEG, 'loaddata');
-        elseif ~isstr(EEG.data)
+        elseif ~ischar(EEG.data)
             EEG.data   = 'in set file';
             EEG.icaact = [];
         end;

@@ -83,7 +83,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
                                              'structoutput' 'string'  { 'on','off' }      'off';
 %                                             'method'    'string'    {  } 'analytic'; % 'montecarlo','analytic','stat','glm'
                                              'paired'     'string'    { 'on','off' }      'on' }, 'statcond', 'ignore');
-    if isstr(g), error(g); end;    
+    if ischar(g), error(g); end;    
     if ~isempty(g.mode), g.method = g.mode; end;
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end;
     if strcmpi(g.method, 'permutation'), g.method = 'montecarlo'; end;

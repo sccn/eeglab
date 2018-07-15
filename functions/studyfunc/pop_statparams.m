@@ -259,7 +259,7 @@ if isempty(varargin) && ~isempty(STUDY)
     res.fieldtripmcorrect  = mCorrectList{res.fieldtripmcorrect};
     res.mode               = fastif(res.but_eeglab, 'eeglab', 'fieldtrip');
     res.eeglabnaccu        = str2num(res.eeglabnaccu);
-    if ~isstr(res.fieldtripnaccu) || ~strcmpi(res.fieldtripnaccu, 'all')
+    if ~ischar(res.fieldtripnaccu) || ~strcmpi(res.fieldtripnaccu, 'all')
         res.fieldtripnaccu     = str2num(res.fieldtripnaccu);
     end
     

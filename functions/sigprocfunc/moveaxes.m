@@ -35,7 +35,7 @@ if nargin<1
   fig = gcf;
 end
 
-if ~isstr(fig)
+if ~ischar(fig)
    tmp = findobj('tag','moveaxes');
    if ~isempty(tmp)   % turn off previous moveaxes Tags 
       ax = get(tmp,'children');

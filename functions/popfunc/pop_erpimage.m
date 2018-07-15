@@ -199,8 +199,8 @@ lastcom = [];
 if nargin < 3
 	popup = 1;
 else
-	popup = isstr(channel) | isempty(channel);
-	if isstr(channel)
+	popup = ischar(channel) | isempty(channel);
+	if ischar(channel)
 		lastcom = channel;
 	end;
 end;
@@ -544,7 +544,7 @@ else
     %options = vararg2str(varargin); % NO BECAUSE OF THE CHANNEL LOCATION
     %                                  PROBLEM BELOW
 	for i=1:length( varargin )
-		if isstr( varargin{ i } )
+		if ischar( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
 		else  
 		  if ~iscell( varargin{ i } )
@@ -584,7 +584,7 @@ if ~isempty(sortingeventfield)
     % generate text for the command
     % -----------------------------
     for index = 1:length(sortingtype)
-        if isstr(sortingtype{index})
+        if ischar(sortingtype{index})
             typetxt = [typetxt ' ''' sortingtype{index} '''' ];
         else
             typetxt = [typetxt ' ' num2str(sortingtype{index}) ];
@@ -609,7 +609,7 @@ else
     sortingeventfield = '';
 end;           
 
-if isstr(projchan)
+if ischar(projchan)
     projchan = { projchan };
 end;
 if iscell(projchan) 

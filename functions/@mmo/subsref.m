@@ -43,7 +43,7 @@ function res = subsref(obj,s)
     % convert : to real sizes
     % -----------------------
     lastdim = length(subs);
-    if isstr(subs{end}) && ndims(obj) > lastdim
+    if ischar(subs{end}) && ndims(obj) > lastdim
         for index = lastdim+1:ndims(obj)
             if index > length(obj.dimensions)
                 subs{index} = 1;
@@ -53,7 +53,7 @@ function res = subsref(obj,s)
         end;
     end;
     for index = 1:length(subs)
-        if isstr(subs{index}) % can only be ":"
+        if ischar(subs{index}) % can only be ":"
             if index > length(obj.dimensions)
                 subs{index} = 1;
             else

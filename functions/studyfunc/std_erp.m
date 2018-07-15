@@ -86,7 +86,7 @@ end;
 % decode inputs
 % -------------
 if ~isempty(varargin) 
-    if ~isstr(varargin{1})
+    if ~ischar(varargin{1})
         varargin = { varargin{:} [] [] };
         if all(varargin{1} > 0) 
             options = { 'components' varargin{1} 'timerange' varargin{2} };
@@ -111,7 +111,7 @@ g = finputcheck(options, { 'components' 'integer' []         [];
                            'interp'     'struct'  { }        struct([]);
                            'timerange'  'real'    []         [];        % the timerange option is deprecated and has no effect
                            'recompute'  'string'  { 'on','off' } 'off' }, 'std_erp');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
 if isfield(EEG,'icaweights')
@@ -155,7 +155,7 @@ end
    
 % No ERP information found
 % ------------------------
-% if isstr(EEG.data)
+% if ischar(EEG.data)
 %     TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
 % else
 %     TMP = EEG;

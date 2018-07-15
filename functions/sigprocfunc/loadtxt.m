@@ -73,7 +73,7 @@ g = finputcheck( varargin, { 'convert'   'string'   { 'on';'off';'force' }   'on
                              'convertmethod' 'string'   { 'str2double';'str2num' }   'str2double';
                              'delim'     { 'integer';'string' } []               [9 32];
                              'nlines'    'integer'  []               Inf });
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if strcmpi(g.blankcell, 'off'), g.uniformdelim = 'on'; end;
 g.convert = lower(g.convert);
 g.verbose = lower(g.verbose);

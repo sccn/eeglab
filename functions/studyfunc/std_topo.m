@@ -74,7 +74,7 @@ end;
 g = finputcheck( varargin, { 'recompute'   'string'   { 'on','off' }   'off' ;...
                              'fileout'     'string'   []                EEG.filepath},...
                              'std_topo');
-% if isstr(g), error(g); end;
+% if ischar(g), error(g); end;
 
 % figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
 

@@ -1056,7 +1056,7 @@ if nargin > 6
             Signifflag = YES;
         else
             help erpimage
-            if isstr(Arg)
+            if ischar(Arg)
                 fprintf('\nerpimage(): unknown arg %s\n',Arg);
             else
                 fprintf('\nerpimage(): unknown arg %d, size(%d,%d)\n',a,size(Arg,1),size(Arg,2));
@@ -1236,7 +1236,7 @@ end
 if isnan(timelimits)
     timelimits = [min(times) max(times)];
 end
-if ~isstr(aligntime) & ~isnan(aligntime)
+if ~ischar(aligntime) & ~isnan(aligntime)
     if ~isinf(aligntime) ...
             & (aligntime < timelimits(1) | aligntime > timelimits(2))
         help erpimage
@@ -1441,8 +1441,8 @@ end;
 %% %%%%%%%%%%%%%%%%% Align data to sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-if isstr(aligntime) | ~isnan(aligntime)
-    if ~isstr(aligntime) & isinf(aligntime)
+if ischar(aligntime) | ~isnan(aligntime)
+    if ~ischar(aligntime) & isinf(aligntime)
         aligntime= median(sortvar);
         fprintf('Aligning data to median sortvar.\n');
         % Alternative below: trimmed median - ignore top/bottom 5%
@@ -1450,7 +1450,7 @@ if isstr(aligntime) | ~isnan(aligntime)
         %   aligntime= median(ssv(ceil(ntrials/20)):floor(19*ntrials/20));
     end
     
-    if ~isstr(aligntime)
+    if ~ischar(aligntime)
         fprintf('Realigned sortvar plotted at %g ms.\n',aligntime);
         aligndata=zeros(frames,ntrials); % begin with matrix of zeros()
         shifts = zeros(1,ntrials);

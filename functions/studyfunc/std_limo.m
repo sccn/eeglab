@@ -79,7 +79,7 @@ if nargin < 2
 end
 
 warning('off', 'MATLAB:lang:cannotClearExecutingFunction');
-if isstr(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}, 'datspec') || strcmpi(varargin{1}, 'icaerp')|| strcmpi(varargin{1}, 'icaspec'))
+if ischar(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}, 'datspec') || strcmpi(varargin{1}, 'icaerp')|| strcmpi(varargin{1}, 'icaspec'))
     opt.measure  = varargin{1};
     opt.design   = varargin{2};
     opt.erase    = 'on';
@@ -98,7 +98,7 @@ else
           'chanloc'        'struct'  {}               struct('no', {}); % default empty structure
           'neighbormat'    'real'    []               [] },...
           'std_limo');
-    if isstr(opt), error(opt); end
+    if ischar(opt), error(opt); end
 end
 
 Analysis     = opt.measure;

@@ -53,7 +53,7 @@ function [pval, PHAT, PCI, zerofreq] = correctfit(pval, varargin)
     g = finputcheck( varargin, { 'allpval'    'real'    [0 1]          [];
                                  'zeromode'   'string'  {'on','off'}   'on';
                                  'gamparams'  'real'    []             []}, 'correctfit');
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end;
     
     if ~isempty(g.gamparams)
         PHAT     = g.gamparams(1);

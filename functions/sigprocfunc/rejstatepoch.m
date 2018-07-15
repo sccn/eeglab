@@ -89,7 +89,7 @@ if nargin < 1
 	return;
 end;
 
-if ~isstr( signal )
+if ~ischar( signal )
 
 	if nargin < 2
 		help rejstatepoch;
@@ -122,10 +122,10 @@ if ~isstr( signal )
 		case {'on', 'off'} ;  
 		otherwise disp('Error: Normalize must be either ''on'' or ''off'''); return;
 	end;	
-	if ~isstr(g.plotcom)
+	if ~ischar(g.plotcom)
 		disp('Error: Plotcom must be a string to evaluate'); return;
 	end;	
-	if ~isstr(g.title)
+	if ~ischar(g.title)
 		disp('Error: Title must be a string'); return;
 	end;	
 	try, g.threshold*2;

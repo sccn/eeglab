@@ -36,7 +36,7 @@ if nargin == 0 || isempty(chanlocs)
     end
 end
 if nargin >= 2
-    if isstr(select)|| iscellstr(select)
+    if ischar(select)|| iscellstr(select)
         select = chnb(select,{chanlocs.labels});
     end
 end

@@ -89,14 +89,14 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
         for ind = 1:length(allfields)
             if strcmpi(allfields{ind}, 'plotitc'), adsfads; end;
             if ~isfield( params1, allfields{ind})
-                if isstr(getfield(params2, allfields{ind}))
+                if ischar(getfield(params2, allfields{ind}))
                      params1 = setfield(params1, allfields{ind}, '');
                 else params1 = setfield(params1, allfields{ind}, []);
                 end;
                 res = 'different';
             end;
             if ~isfield( params2, allfields{ind})
-                if isstr(getfield(params1, allfields{ind}))
+                if ischar(getfield(params1, allfields{ind}))
                      params2 = setfield(params2, allfields{ind}, '');
                 else params2 = setfield(params2, allfields{ind}, []);
                 end;

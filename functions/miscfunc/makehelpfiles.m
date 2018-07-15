@@ -46,7 +46,7 @@ end;
 opt = finputcheck( varargin,  { 'folder'     'string'   { }  '';
                                 'outputfile' 'string'   { }  '';
                                 'title'      'string'   { }  '' }, 'makehelpfiles');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 if isempty(opt.folder),     error('You need to specify a folder'); end;
 if isempty(opt.outputfile), error('You need to specify an output file'); end;
 

@@ -66,7 +66,7 @@ if nargin < 3
 else
 	options = [];
 	for i=1:length( varargin )
-		if isstr( varargin{ i } )
+		if ischar( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
 		else
 			options = [ options ', [' num2str(varargin{i}) ']' ];

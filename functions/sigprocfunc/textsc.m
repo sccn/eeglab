@@ -52,7 +52,7 @@ else
 end
 
 % Place the text
-if isstr(y) && isstr(x) && strcmp(lower(y),'title')  % Subplot title
+if ischar(y) && ischar(x) && strcmp(lower(y),'title')  % Subplot title
   txt = x;
   x = .5;
   tmp = text('Units','normal','String','tmp','Position',[0 0 0]);

@@ -136,8 +136,8 @@ lastcom = [];
 if nargin < 3
 	popup = 1;
 else
-	popup = isstr(num) | isempty(num);
-	if isstr(num)
+	popup = ischar(num) | isempty(num);
+	if ischar(num)
 		lastcom = num;
 	end;
 end;

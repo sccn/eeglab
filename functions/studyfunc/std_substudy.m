@@ -55,7 +55,7 @@ opt = finputcheck(varargin, { 'condition' 'cell' {}      {};
                               'group'     'cell' {}      {};
                               'rmdat'     'string' { 'on','off' }      'on';
                               'subject'   'cell' {}      {} }, 'std_substudy');
-if isstr(opt), return; end;
+if ischar(opt), return; end;
 
 % find datasets to remove
 % -----------------------

@@ -155,14 +155,14 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'customclusters'    'integer' []                 [];
                                 'erpimparams'       'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
-    if isstr(g), error(g); end
+    if ischar(g), error(g); end
     if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end
     if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end
     
     % union of all channel structures
     % -------------------------------
     computewhat = 'channels';
-    if isstr(chanlist)
+    if ischar(chanlist)
         if strcmpi(chanlist, 'channels')
             chanlist = [];
         else % components

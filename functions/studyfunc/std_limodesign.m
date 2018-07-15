@@ -63,7 +63,7 @@ opt = finputcheck( varargin, ...
       'interaction'    'string'  { 'on','off' }   'on';
       'desconly'       'string'  { 'on','off' }   'off';
       'filepath'       'string'  {            }   ''    }, 'std_limosavedesignfiles');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 % number of categorical and continuous var
 % ----------------------------------------

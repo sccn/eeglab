@@ -66,9 +66,9 @@ if nargin < 1
    return;
 end;	
 
-if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
+if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
     
-    if isstr(EEG) % GUI
+    if ischar(EEG) % GUI
         gui    = 1;
         varargin = { EEG varargin{:} };
         
@@ -623,7 +623,7 @@ function strval = reformat( val, latencycondition, trialcondition, eventnum)
             strval = [ '(' num2str(val) '-EEG.xmin)*EEG.srate+1;' ]; 
         end;
     else
-        if isstr(val), strval = [ '''' val '''' ];
+        if ischar(val), strval = [ '''' val '''' ];
         else           strval = num2str(val);
         end;
     end;
@@ -652,10 +652,10 @@ function eventtmp = checkconsistency(eventtmp, valnum, field)
     
     otherval = mod(valnum+1, length(eventtmp))+1;
     
-    if isstr(getfield(eventtmp(valnum), field)) & ~isstr(getfield(eventtmp(otherval), field))
+    if ischar(getfield(eventtmp(valnum), field)) & ~ischar(getfield(eventtmp(otherval), field))
         eventtmp(valnum) = setfield(eventtmp(valnum), field, str2num(getfield(eventtmp(valnum), field)));
     end;
-    if ~isstr(getfield(eventtmp(valnum), field)) & isstr(getfield(eventtmp(otherval), field))
+    if ~ischar(getfield(eventtmp(valnum), field)) & ischar(getfield(eventtmp(otherval), field))
         eventtmp(valnum) = setfield(eventtmp(valnum), field, num2str(getfield(eventtmp(valnum), field)));
     end;
     if strcmpi(field, 'latency') & isempty(getfield(eventtmp(valnum), field))

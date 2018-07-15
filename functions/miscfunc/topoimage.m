@@ -184,14 +184,14 @@ end
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  if isstr(channels) == 0,
+  if ischar(channels) == 0,
     % channames = zeros(MAXPLOTDATACHANS,4);
     % for c=1:length(channels),
     %     channames(c,:)= sprintf('%4d',channels(c));
     % end;
     channames = num2str(channels(:));                   %%CJH
   else,
-    if ~isstr(channels)
+    if ~ischar(channels)
        fprintf('topoimage(): channel file name must be a string.\n');
        return
     end
@@ -220,7 +220,7 @@ chans = length(channels);
 %%%%%%%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
   if colors ~=0,
-    if ~isstr(colors)
+    if ~ischar(colors)
        fprintf('topoimage(): color file name must be a string.\n');
        return
     end

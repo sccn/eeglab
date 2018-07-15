@@ -169,7 +169,7 @@ plotelecopt.electrodes3d = 'off';
 
 sqaxis     = 1;     % if non-zero, make head proportions anatomical
 title_font = 18;
-if isstr(values)
+if ischar(values)
     values   = lower(values);
     if strcmp(values,'setup')
         
@@ -191,7 +191,7 @@ if isstr(values)
                                        'ica'          'string'  { 'on','off' }             'off';
                                        'transform'    'real'    []                         DEFAULT_TRANSFORM;
                                        'comment'      'string'  []                         '' }, 'headplot', 'ignore');
-    if isstr(g), 
+    if ischar(g), 
         error(g);
     end;
     
@@ -449,7 +449,7 @@ else
        'material'     'string'            [] 'dull';
        'orilocs'    { 'string','struct' } [] '';            
        'labels'     'integer' [0 1 2]        0 }, 'headplot');
-   if isstr(g) error(g); end;
+   if ischar(g) error(g); end;
    plotelecopt.electrodes3d = g.electrodes3d;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -600,7 +600,7 @@ else
   % Set viewpoint
   %%%%%%%%%%%%%%%%%%%%%%%%%
 
-  if isstr(g.view)
+  if ischar(g.view)
     switch lower(g.view)
       case {'front','f'}
         view(-180,30)
@@ -631,7 +631,7 @@ else
         close; error(['headplot(): Invalid View value %s',g.view])
     end
   else
-      if ~isstr(g.view)
+      if ~ischar(g.view)
           [h,a] = size(g.view);
           if h~= 1 | a~=2
               close; error('headplot(): View matrix size must be (1,2).')

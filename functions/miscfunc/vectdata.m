@@ -63,7 +63,7 @@ g = finputcheck( varargin, { 'timesout'   'real'  []           [];
                              'border'     'string' { 'on','off' } 'off';
                              'avgtype'    'string' { 'const','gauss' } 'const';
                              'method'     'string' { 'linear','cubic','nearest','v4' } 'linear'});
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 if size(array,2) == 1
     array = transpose(array);

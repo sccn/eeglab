@@ -193,7 +193,7 @@ if nargin < 2
 else
     options = varargin;
 end;
-if isstr(ref), ref = { ref }; end;
+if ischar(ref), ref = { ref }; end;
 if iscell(ref), ref = eeg_chaninds(EEG, ref); end;
 optionscall = options;
 

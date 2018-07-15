@@ -234,7 +234,7 @@ end
 % Setup inputs
 % %%%%%%%%%%%%%%%%%%%%%%%%
 
-if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
+if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 
    try
        options = varargin;
@@ -337,13 +337,13 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    if length(g.winlength) > 1
    		disp('Error: winlength must be a single number'); return;
    end;	
-   if isstr(g.title) > 1
+   if ischar(g.title) > 1
    		disp('Error: title must be is a string'); return;
    end;	
-   if isstr(g.command) > 1
+   if ischar(g.command) > 1
    		disp('Error: command must be is a string'); return;
    end;	
-   if isstr(g.tag) > 1
+   if ischar(g.tag) > 1
    		disp('Error: tag must be is a string'); return;
    end;	
    if length(g.position) ~= 4
@@ -489,7 +489,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'XColor',DEFAULT_AXIS_COLOR,...
       'YColor',DEFAULT_AXIS_COLOR);
 
-  if isstr(g.eloc_file) | isstruct(g.eloc_file)  % Read in electrode names
+  if ischar(g.eloc_file) | isstruct(g.eloc_file)  % Read in electrode names
       if isstruct(g.eloc_file) & length(g.eloc_file) > size(data,1)
           g.eloc_file(end) = []; % common reference channel location
       end;
@@ -1107,7 +1107,7 @@ u(22) = uicontrol('Parent',figh, ...
   end;
       
   if ~isempty(g.events)
-      if isstr(g.events(1).type)
+      if ischar(g.events(1).type)
            [g.eventtypes tmpind indexcolor] = unique_bc({g.events.type}); % indexcolor countinas the event type
       else [g.eventtypes tmpind indexcolor] = unique_bc([ g.events.type ]);
       end;
@@ -1752,7 +1752,7 @@ else
     if ~isempty(obj)
 		eyeaxes = findobj('tag','eyeaxes','parent',figh);
 		children = get(eyeaxes,'children');
-		if isstr(obj)
+		if ischar(obj)
 			if strcmp(obj, 'off')
 				set(children, 'visible', 'off');
 				set(eyeaxes, 'visible', 'off');

@@ -50,7 +50,7 @@ MAX_RADIUS = 0.5;
 % ---------------------
 % Read the channel file
 % ---------------------
-if isstr( filename )
+if ischar( filename )
 	fid = fopen(filename); 
 	locations = fscanf(fid,'%d %f %f %s',[7 MAXCHANS]);
 	fclose(fid);

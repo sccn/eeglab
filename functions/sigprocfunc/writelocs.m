@@ -100,7 +100,7 @@ end;
 [chanformat listcolformat] = readlocs('getinfos');
 indformat  = [];
 for index = 1:length(chanformat), 
-    if ~isstr(chanformat(index).importformat)
+    if ~ischar(chanformat(index).importformat)
         indformat = [ indformat index ];
     end;
     if isempty(chanformat(index).skipline), chanformat(index).skipline = 0; end;
@@ -116,7 +116,7 @@ g = finputcheck( varargin, ...
                    'elecind'      'integer'  [1 Inf]				[];
                    'unicoord'     'string'   { 'on','off' } 	'on'; 
                    'format'		  'cell'	 []					{} }, 'writelocs');
-if isstr(g), error(g); end;  
+if ischar(g), error(g); end;  
 
 if strcmpi(g.unicoord, 'on')
     disp('Uniformizing coordinates');
@@ -177,7 +177,7 @@ for indexchan = 1:length(chans)
             error([ 'Non-existant field: ''' str '''' ]);
          end;
          eval( [ 'chanval = chans(indexchan).' str ';' ] );
-         if   isstr(chanval), fprintf(fid, '%8s', chanval);
+         if   ischar(chanval), fprintf(fid, '%8s', chanval);
          else   	
              if abs(mult*chanval) > 1E-10
                  fprintf(fid, '%8s', num2str(mult*chanval,5));

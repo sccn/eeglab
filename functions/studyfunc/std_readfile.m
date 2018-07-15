@@ -97,7 +97,7 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'triallimits'      'real'     []    []; % ERPimage only
                               'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
                               'dataindices'      'integer'  []    [] }, 'std_readdatafile');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 
 if ~isempty(opt.triallimits), opt.freqlimits = opt.triallimits; end
 if strcmpi(opt.concatenate, 'on'), opt.singletrials = 'on'; end
@@ -239,7 +239,7 @@ function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, opti
     else
         % scan independent variable values
         if isfield(designvar(1), 'vartype') && strcmpi('continuous', designvar(1).vartype)
-            if ~isstr(designvar(1).value), designvar(1).value = ''; end
+            if ~ischar(designvar(1).value), designvar(1).value = ''; end
             trialselect = { trialselect{:} designvar(1).label designvar(1).value };
             [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
             measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
@@ -294,7 +294,7 @@ for index = 1:length(chan)
 
     % load data
     warning('off', 'MATLAB:MatFile:OlderFormat');
-    if isstr(fileData.(fieldToRead)) % special ERP-image
+    if ischar(fileData.(fieldToRead)) % special ERP-image
         try
             fileData.chanlocsforinterp; % isfield does not work becauce fileData is a MatFile
         catch, error('Missing field in ERPimage STUDY file, try recomputing them'); 

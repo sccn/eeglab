@@ -150,7 +150,7 @@ if nargin < 9
     calldisp = 1;
 end
 
-if isstr(elecrange) % convert arguments if they are in text format 
+if ischar(elecrange) % convert arguments if they are in text format 
 	calldisp = 1;
 	elecrange = eval( [ '[' elecrange ']' ]  );
 	winsize   = eval( [ '[' winsize ']' ]  );

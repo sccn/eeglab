@@ -48,7 +48,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     % ----------------------
     g = finputcheck( varargin, { 'params'   'cell'    {}               {};
                                  'warning'  'string'  { 'on','off' }   'on' }, 'eeg_eval');
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end;
     
     % warning pop up
     % --------------

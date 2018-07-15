@@ -185,14 +185,14 @@ if isempty(chans) || all(~ishandle(chans))
 
     % dealing with additional parameters
     % ----------------------------------
-    if nargin > 1 && ~isstr(orichaninfo), % nothing
+    if nargin > 1 && ~ischar(orichaninfo), % nothing
         if nargin > 2
-            if ~isstr(varargin{1})
+            if ~ischar(varargin{1})
                 urchans  = varargin{1};
                 varargin = varargin(2:end);
             end;
         end;
-    elseif nargin > 1 && ~isempty(orichaninfo) && isstr(orichaninfo)
+    elseif nargin > 1 && ~isempty(orichaninfo) && ischar(orichaninfo)
         varargin = { orichaninfo varargin{:} };
         if isequal(orichaninfo, chaninfo)
             chaninfo    = [];
@@ -494,10 +494,10 @@ else
                 end;
                 try, tmpchans = args{curfield+1}{1}; tmptype = args{curfield+1}{2};catch, return; end;
                 if isempty(tmpchans) & isempty(tmptype), return; end;
-                if isstr(tmpchans)
+                if ischar(tmpchans)
                     tmpchans = eval( [ '[' tmpchans ']' ], 'settype: error in channel indices');
                 end;
-                if ~isstr(tmptype), tmptype = num2str(tmptype); end;
+                if ~ischar(tmptype), tmptype = num2str(tmptype); end;
                 for index = 1:length(tmpchans)
                     if tmpchans(index) > 0 & tmpchans(index) <= length(chans)
                         chans( tmpchans(index) ).type = tmptype;
@@ -512,10 +512,10 @@ else
                 end;
                 try, tmpchans = args{curfield+1}{1}; tmpref = args{curfield+1}{2};catch, return; end;
                 if isempty(tmpchans) & isempty(tmpref), return; end;
-                if isstr(tmpchans)
+                if ischar(tmpchans)
                     tmpchans = eval( [ '[' tmpchans ']' ], 'settype: error in channel indices');
                 end;
-                if ~isstr(tmpref), tmpref = num2str(tmpref); end;
+                if ~ischar(tmpref), tmpref = num2str(tmpref); end;
                 for index = 1:length(tmpchans)
                     if tmpchans(index) > 0 & tmpchans(index) <= length(chans)
                         chans( tmpchans(index) ).ref = tmpref;
@@ -679,7 +679,7 @@ else
                 
                 tmpargs = args{ curfield+1 };
                 if ~isempty(tmpargs),
-                    if isstr(tmpargs)
+                    if ischar(tmpargs)
                         [chans] = readlocs(tmpargs);
                         [tmp tmp2 chans]  = eeg_checkchanlocs(chans);
                         chaninfo          = [];
@@ -747,7 +747,7 @@ else
                     fprintf(fid, '%d\t',  index);
                     for field = 1:length(fields)
                         tmpval = getfield(chans, {index}, origfield{field});
-                        if isstr(tmpval)
+                        if ischar(tmpval)
                             fprintf(fid, '%s\t',  tmpval);
                         else
                             fprintf(fid, '%3.3g\t',  tmpval);
@@ -926,7 +926,7 @@ if ~isempty(fig)
                 set(obj, 'value', getfield(chans(currentpos), allfields{index}));
             else
                 tmpval = getfield(chans(currentpos), allfields{index});
-                if isstr(tmpval) && strcmpi(tmpval, '[]'), tmpval = ''; end;
+                if ischar(tmpval) && strcmpi(tmpval, '[]'), tmpval = ''; end;
                 set(obj, 'string', num2str(tmpval));
             end;
         end;
@@ -966,7 +966,7 @@ return;
 % -----------------------
 function strval = reformat( val )
 if isnumeric(val) & isempty(val), val = '[]'; end;
-if isstr(val), strval = [ '''' val '''' ];
+if ischar(val), strval = [ '''' val '''' ];
 else           strval = num2str(val);
 end;
 

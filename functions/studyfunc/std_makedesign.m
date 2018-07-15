@@ -176,7 +176,7 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'verbose'       'string'    { 'on','off' } 'on';
                               'defaultdesign' 'string'    { 'on','off','forceoff'} fastif(nargin < 3, 'on', 'off') }, ...
                               'std_makedesign', 'ignore');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end
 if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end
 if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end
@@ -364,7 +364,7 @@ function res = strmatchmult(a, b);
 % -------------
 function res = rmblk(a);
     if iscell(a), a = cell2str(a); end
-    if ~isstr(a), a = num2str(a); end
+    if ~ischar(a), a = num2str(a); end
     res = a;
     res(find(res == ' ')) = '_';
     res(find(res == '\')) = '_';    

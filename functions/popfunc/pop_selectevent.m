@@ -278,7 +278,7 @@ for index = 1:length(allfields)
 	fieldlist{end  , 2} = '';
 end;
 g = finputcheck( args, fieldlist, 'pop_selectevent');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 if isempty(g.event), g.event = [1:length(EEG.event)]; end;
 if strcmpi(g.select, 'remove'), g.select = 'inverse'; end;
 if strcmpi(g.select, 'keep'  ), g.select = 'normal'; end;
@@ -301,20 +301,20 @@ for index = 1:length(allfields)
     
 	if ~isempty(tmpvar)
 		if isnumeric(tmpvar)
-			if isstr(getfield( EEG.event, {1}, allfields{index}))
+			if ischar(getfield( EEG.event, {1}, allfields{index}))
 				for tmpind = 1:length(tmpvar)
 					tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
 				end;
 				tmpvar = tmpvartmp;
 			end;
-		elseif isstr(tmpvar) & isempty( findstr(tmpvar, '<='))
+		elseif ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
 			if isnumeric(getfield( EEG.event, {1}, allfields{index}))
 				error(['numerical values must be entered for field ''' allfields{index} '''']);
 			end;
 		end;
 	end;
 		
-	if isstr(tmpvar) & isempty( findstr(tmpvar, '<='))
+	if ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
 		tmpvar = { tmpvar };
 	end;
 
@@ -334,7 +334,7 @@ for index = 1:length(allfields)
                 Ieventtmp = unique_bc( [ Ieventtmp; tmpindex ]);
             end;
             Ievent = intersect_bc( Ievent, Ieventtmp );
-        elseif isstr( tmpvar ) % real range
+        elseif ischar( tmpvar ) % real range
             tmpevent = EEG.event;
             % ======== JRI BUGFIX 3/6/14
             %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
@@ -380,13 +380,13 @@ for index = 1:length(allfields)
     % scan each field of EEG.event (omit)
     % -----------------------------------
     tmpvar = eval(['g.omit' allfields{index} ]);
-	if eval(['isstr(EEG.event(1).' allfields{index} ')' ]) & isnumeric(tmpvar) & ~isempty(tmpvar)
+	if eval(['ischar(EEG.event(1).' allfields{index} ')' ]) & isnumeric(tmpvar) & ~isempty(tmpvar)
 		for tmpind = 1:length(tmpvar) 
 			tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
 		end;
 		tmpvar = tmpvartmp;
 	end;
-	if isstr(tmpvar) & isempty( findstr(tmpvar, '<='))
+	if ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
 		tmpvar = { tmpvar };
 	end;
     if ~isempty( tmpvar )
@@ -401,7 +401,7 @@ for index = 1:length(allfields)
                 Ieventtmp = unique_bc( [ Ieventtmp; tmpindex ]);
             end;
             Ieventrem = union_bc( Ieventrem, Ieventtmp );
-         elseif isstr( tmpvar )
+         elseif ischar( tmpvar )
             tmpevent = EEG.event;
              % ======== JRI BUGFIX 3/6/14
             %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
@@ -453,7 +453,7 @@ end;
 
 % checking if trying to remove boundary events (in continuous data)
 if isfield(EEG.event, 'type')
-    if isstr(EEG.event(1).type) & EEG.trials == 1 
+    if ischar(EEG.event(1).type) & EEG.trials == 1 
         Ieventrem = setdiff_bc([1:length(EEG.event)], Ievent );
         tmpevent  = EEG.event;
         boundaryindex = strmatch('boundary', { tmpevent(Ieventrem).type });

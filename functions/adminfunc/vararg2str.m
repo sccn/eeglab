@@ -82,7 +82,7 @@ for index = 1:length(allargs)
 	if ~isempty(inputnam{index})
 		strout = [ strout ',' inputnam{index} ];
 	else
-		if isstr( tmpvar )
+		if ischar( tmpvar )
 			if int2str(index)
 				strout = [ strout ',' tmpvar ];
 			else

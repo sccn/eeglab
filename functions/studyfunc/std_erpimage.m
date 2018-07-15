@@ -98,7 +98,7 @@ allerpimage = [];
     'savetrials'    'string'      { 'on','off' }        'on'; % obsolete (never used)
     'erpimageopt'   'cell'        {}                    {}}, ...
     'std_erpimage', 'ignore');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 if length(EEG) == 1 && isempty(opt.trialindices), opt.trialindices = { [1:EEG.trials] }; end
 if isempty(opt.trialindices), opt.trialindices = cell(length(EEG)); end
 if ~iscell(opt.trialindices), opt.trialindices = { opt.trialindices }; end

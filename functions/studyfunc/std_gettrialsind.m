@@ -101,8 +101,8 @@ for iVar = 1 :  length(varnames)
     indvarvals = queryvars.(varnames{iVar});
     
     % case of continuous variable
-    if isstr(indvarvals) && (isempty(indvarvals) || any(indvarvals == '<'))
-        if isstr(dattrials{1})
+    if ischar(indvarvals) && (isempty(indvarvals) || any(indvarvals == '<'))
+        if ischar(dattrials{1})
             error(sprintf('Type error - excepting string numerical for field %s in data file', varnames{iVar}));
         end;
         if isempty(indvarvals)
@@ -119,8 +119,8 @@ for iVar = 1 :  length(varnames)
         eventvals(end+1,:) = [ dattrials{:} ];
     else
         % case of categorical variable
-        if isstr(dattrials{1})
-            if isstr(indvarvals) indvarvals = { indvarvals }; end;
+        if ischar(dattrials{1})
+            if ischar(indvarvals) indvarvals = { indvarvals }; end;
             if ~iscell(indvarvals)
                 error(sprintf('Type error - excepting numerical values for field %s', varnames{iVar}));
             end;

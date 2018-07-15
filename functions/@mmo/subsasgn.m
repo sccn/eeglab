@@ -76,7 +76,7 @@ if isempty(val)
     nonSingleton = [];
     ss2 = ss;
     for index = 1:length(ss(1).subs)
-        if ~isstr(ss(1).subs{index}) % can only be ":"
+        if ~ischar(ss(1).subs{index}) % can only be ":"
             nonSingleton(end+1) = index;
             if islogical( ss(1).subs{index}),  ss(1).subs{index} = find( ss(1).subs{index}); end
             ss2(1).subs{index} = setdiff_bc([1:newdim1(index)], ss(1).subs{index}); % invert selection
@@ -107,7 +107,7 @@ if isempty(val)
             end;
         end;
         newdim2(nonSingleton) = newdim2(nonSingleton)-length(ss(1).subs{nonSingleton});
-        if isstr(ss2.subs{end})
+        if ischar(ss2.subs{end})
             ss2.subs{end} = [1:prod(newdim1(length(ss2.subs):end))];
         end;
         ss3 = ss2;
@@ -144,7 +144,7 @@ else
     newdim1 = obj.dimensions;
     newdim2 = newdim1;
     if length(ss(1).subs) == 1
-        if ~isstr(ss(1).subs{1}) && max(ss(1).subs{1}) > prod(newdim1)
+        if ~ischar(ss(1).subs{1}) && max(ss(1).subs{1}) > prod(newdim1)
             if length(newdim1) > 2
                 error('Attempt to grow array along ambiguous dimension.');
             end;
@@ -158,7 +158,7 @@ else
     else
         if length(newdim1) == 3 && newdim1(3) == 1, newdim1(end) = []; end;
         if length(ss(1).subs) == 2 && length(newdim1) == 3
-            if ~isstr(ss(1).subs{2}) && max(ss(1).subs{2}) > prod(newdim1(2:end))
+            if ~ischar(ss(1).subs{2}) && max(ss(1).subs{2}) > prod(newdim1(2:end))
                 error('Attempt to grow array along ambiguous dimension.');
             end;
             if isnumeric(ss(1).subs{1}), newdim2(1) = max(max(ss(1).subs{1}), newdim2(1)); end;
@@ -253,7 +253,7 @@ else
             % array, copy each channel
             for index1 = 1:size(val,1)
                 ss2(1).subs{1} = index1;
-                if isstr(ss(1).subs{1}) ss3(1).subs{1} = index1;
+                if ischar(ss(1).subs{1}) ss3(1).subs{1} = index1;
                 else                    ss3(1).subs{1} = ss(1).subs{1}(index1);
                 end;
                 tmpMMO.Data.x = builtin('subsasgn', tmpMMO.Data.x, ss3, subsref(val,ss2));

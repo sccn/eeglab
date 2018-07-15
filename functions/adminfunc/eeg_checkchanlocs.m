@@ -74,12 +74,12 @@ plotrad  = [];
 if isfield(chanedit, 'plotrad'),
     plotrad = chanedit(1).plotrad;
     chanedit = rmfield(chanedit, 'plotrad');
-    if isstr(plotrad) && ~isempty(str2num(plotrad)), plotrad = str2num(plotrad); end;
+    if ischar(plotrad) && ~isempty(str2num(plotrad)), plotrad = str2num(plotrad); end;
     chaninfo.plotrad = plotrad;
 end;
 if isfield(chanedit, 'shrink') && ~isempty(chanedit(1).shrink)
     shrinkorskirt = 1;
-    if ~isstr(chanedit(1).shrink)
+    if ~ischar(chanedit(1).shrink)
         plotrad = 0.5/(1-chanedit(1).shrink); % convert old values
     end;
     chanedit = rmfield(chanedit, 'shrink');

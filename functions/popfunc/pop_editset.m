@@ -174,7 +174,7 @@ if nargin < 2                 % if several arguments, assign values
                       '   set(findobj( ''parent'', gcbf, ''tag'', ''chanfile''), ' ...
                       '                ''string'', sprintf(''{ ALLEEG(%s).chanlocs ALLEEG(%s).chaninfo ALLEEG(%s).urchanlocs }'', res{1}, res{1}, res{1}));' ...
                       'end;' ];
-    if isstr(EEGOUT.ref)
+    if ischar(EEGOUT.ref)
         curref = EEGOUT.ref;
     else
         if length(EEGOUT.ref) > 1
@@ -265,7 +265,7 @@ else % no interactive inputs
     % Do not copy varargin
     % --------------------
     %for index=1:2:length(args)
-    %    if ~isempty(inputname(index+2)) & ~isstr(args{index+1}) & length(args{index+1})>1, 
+    %    if ~isempty(inputname(index+2)) & ~ischar(args{index+1}) & length(args{index+1})>1, 
 	%		args{index+1} = inputname(index+1); 
 	%	end;
     %end;                
@@ -325,10 +325,10 @@ for curfield = tmpfields'
         case 'chanlocs', varname = getfield(g, {1}, curfield{1});
                          if isempty(varname)
                              EEGOUT.chanlocs = [];
-                         elseif isstr(varname) & exist( varname ) == 2
+                         elseif ischar(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): channel locations file ''%s'' found\n', varname); 
                             [ EEGOUT.chanlocs lab theta rad ind ] = readlocs(varname);
-                         elseif isstr(varname)
+                         elseif ischar(varname)
                             EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
                             if iscell(EEGOUT.chanlocs)
                                 if length(EEGOUT.chanlocs) > 1, EEGOUT.chaninfo   = EEGOUT.chanlocs{2}; end;
@@ -339,7 +339,7 @@ for curfield = tmpfields'
                              EEGOUT.chanlocs = varname;
                          end;
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
-                         if isstr(varname) & exist( varname ) == 2
+                         if ischar(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): ICA weight matrix file ''%s'' found\n', varname);
                             if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end;                            
 							try, EEGOUT.icaweights = load(varname, '-ascii');
@@ -355,7 +355,7 @@ for curfield = tmpfields'
                          else
 							 if isempty(varname) 
 								 EEGOUT.icaweights = [];
-							 elseif isstr(varname)
+							 elseif ischar(varname)
 								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
                              else
@@ -369,13 +369,13 @@ for curfield = tmpfields'
         case 'icachansind', varname = getfield(g, {1}, curfield{1});
 							 if isempty(varname) 
 								 EEGOUT.icachansind = [];
-							 elseif isstr(varname)
+							 elseif ischar(varname)
 								 EEGOUT.icachansind = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
                              else
   								 EEGOUT.icachansind = varname;
 							 end;
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
-                         if isstr(varname) & exist( varname ) == 2
+                         if ischar(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): ICA sphere matrix file ''%s'' found\n', varname); 
                             if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end;
                             try, EEGOUT.icasphere = load(varname, '-ascii');
@@ -391,7 +391,7 @@ for curfield = tmpfields'
                          else
 							 if isempty(varname) 
 								 EEGOUT.icasphere = [];
-							 elseif isstr(varname)
+							 elseif ischar(varname)
 								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
                              else
@@ -435,7 +435,7 @@ for curfield = tmpfields'
 							  end;
 							 otherwise, error('pop_editset() error: unrecognized file format');
                             end;
-                         elseif isstr(varname)
+                         elseif ischar(varname)
                              % restoration command
                              %--------------------
                              try 
@@ -480,7 +480,7 @@ if nargout > 1
     com = sprintf('EEG = pop_editset(EEG');
     for i=1:2:length(args)
         if ~isempty( args{i+1} )
-            if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );
+            if ischar( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );
             else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
             end;
         else

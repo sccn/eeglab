@@ -85,7 +85,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
             eval( [ userdata.chanstr '=[];' ] );
         end;
         
-    elseif isstr(EEG)
+    elseif ischar(EEG)
         command = EEG;
         clear EEG;
         fig = bad_elec;

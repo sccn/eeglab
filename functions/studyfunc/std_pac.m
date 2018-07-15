@@ -101,7 +101,7 @@ options = {};
                         'interp'        'struct'      { }     struct([]);
                         'rmcomps'       'integer'     []      [];
                         'freqscale'     'string'      []      'log' }, 'std_pac', 'ignore');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % checking input parameters
 % -------------------------

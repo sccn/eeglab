@@ -106,7 +106,7 @@ g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
                             'channels'    'integer' [0 Inf]    [];
                             'ref'         'integer' [0 Inf]    [];
                             'rmeventchan' 'string'  { 'on';'off' } 'on' }, 'pop_biosig');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % import data
 % -----------

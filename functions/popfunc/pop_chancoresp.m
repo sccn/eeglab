@@ -53,7 +53,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     
     % process sub command
     % -------------------
-    if isstr(chans1) 
+    if ischar(chans1) 
        if strcmpi(chans1, 'pair')
            [chanlistout1, chanlistout2, thirdout, outfourth] = pair(chans2, varargin{:});
        elseif strcmpi(chans1, 'unpair')
@@ -72,7 +72,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
                                 'chaninfo1'      ''        []      []; 
                                 'chaninfo2'      ''        []      []; 
                                 'gui'            'string'  { 'on';'off' }  'on' } );
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end;
     g.chanstruct1 = chans1;
     g.chanstruct2 = chans2;
     if length(g.chanlist1) ~= length(g.chanlist2)

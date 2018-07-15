@@ -66,10 +66,10 @@ function [tval, df] = ttest2_cell(a,b,c) % assumes equal variances
     end;
     
     homogenous = 'homogenous';
-    if nargin > 1 && isstr(b)
+    if nargin > 1 && ischar(b)
         homogenous = b;
     end;
-    if nargin > 2 && isstr(c)
+    if nargin > 2 && ischar(c)
         homogenous = c;
     end;
     if iscell(a), 

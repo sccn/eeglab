@@ -53,7 +53,7 @@ classdef mmo
             % check that the file is not empty
             % --------------------------------
             if ~isempty(dataFileIn)
-                if ~isstr(dataFileIn)
+                if ~ischar(dataFileIn)
                     error('First input must be a file name');
                 end;
 

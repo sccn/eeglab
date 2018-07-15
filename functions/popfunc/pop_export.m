@@ -114,7 +114,7 @@ g = finputcheck(options, { ...
     'erp'       'string'    { 'on';'off' }     'off';
     'precision' 'integer'   [0 Inf]            7;
     'expr'      'string'    []                 '' }, 'pop_export');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % select data
 % ----------

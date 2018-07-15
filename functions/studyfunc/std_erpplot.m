@@ -159,8 +159,8 @@ opt = finputcheck( options, ...
                                'noplot'      'string'  { 'on','off' }  'off';
                                'topoplotopt' 'cell'    {}              { 'style' 'both' };
                                'subject'     'string'  []              '' }, 'std_erpplot');
-if isstr(opt), error(opt); end
-if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end
+if ischar(opt), error(opt); end
+if ischar(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end
 if ~isempty(params.topofreq) && strcmpi(opt.datatype, 'spec'),  params.topotime  = params.topofreq; end
 if ~isempty(params.freqrange), params.timerange = params.freqrange; end
 datatypestr = upper(opt.datatype);

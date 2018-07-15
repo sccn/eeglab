@@ -126,7 +126,7 @@ if nargin < 3
     % find return mode
     if isempty(get(0, 'currentfigure')), return; end;
     tmp = get(gcf, 'userdata');
-    if ~isempty(tmp) & isstr(tmp)    
+    if ~isempty(tmp) & ischar(tmp)    
         newcomments = tmp; % ok button
     else return;
     end;

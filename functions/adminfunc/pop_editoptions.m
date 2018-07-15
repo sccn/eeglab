@@ -76,7 +76,7 @@ argsoutput = {};
 
 datasets_in_memory = 0;
 if nargin > 0
-    if ~isstr(varargin{1})
+    if ~ischar(varargin{1})
         datasets_in_memory = varargin{1};
         varargin = {};
     end
@@ -230,7 +230,7 @@ for index = 1:2:length(args)
     end
     
     % case for 'option_cachesize'
-    if strcmpi(args{index}, 'option_cachesize') && isstr(args{index+1})
+    if strcmpi(args{index}, 'option_cachesize') && ischar(args{index+1})
         args{index+1}  = str2num(args{index+1});
     end
     

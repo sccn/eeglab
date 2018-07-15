@@ -166,11 +166,11 @@ if nargin < 3
 else
     if isnumeric(varargin{3}) || ~isempty(str2num(varargin{3}))
         options = {};
-        if isstr(varargin{1}), varargin{1} = str2num(varargin{1}); end;
-        if isstr(varargin{2}), varargin{2} = str2num(varargin{2}); end;
-        if isstr(varargin{3}), varargin{3} = str2num(varargin{3}); end;
-        if isstr(varargin{4}), varargin{4} = str2num(varargin{4}); end;
-        if isstr(varargin{5}), varargin{5} = str2num(varargin{5}); end;
+        if ischar(varargin{1}), varargin{1} = str2num(varargin{1}); end;
+        if ischar(varargin{2}), varargin{2} = str2num(varargin{2}); end;
+        if ischar(varargin{3}), varargin{3} = str2num(varargin{3}); end;
+        if ischar(varargin{4}), varargin{4} = str2num(varargin{4}); end;
+        if ischar(varargin{5}), varargin{5} = str2num(varargin{5}); end;
         if nargin > 2, options = { options{:} 'elecrange'   varargin{1} }; end;
         if nargin > 3, options = { options{:} 'threshold'   [ varargin{2}; varargin{3}]' }; end;
         if nargin > 5, options = { options{:} 'freqlimits'  [ varargin{4}; varargin{5}]' }; end;
@@ -190,7 +190,7 @@ opt = finputcheck( options, { 'elecrange'     'integer'  []    [1:EEG.nbchan];
                               'method'        'string'   { 'fft';'multitaper' }    'multitaper';
                               'eegplotreject' 'integer'  []    0;
                               'eegplotplotallrej' 'integer'  []    0 }, 'pop_rejspec');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 sizewin = 2^nextpow2(EEG.pnts);
 if icacomp == 1

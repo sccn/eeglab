@@ -73,7 +73,7 @@ if ~isfield(g, 'mark'),       g.mark       = [];   end;
 if ~isfield(g, 'exclude'),    g.exclude    = [];   end;
 if ~isfield(g, 'linewidth'),  g.linewidth  = 2;    end;
 if ~isfield(g, 'shrink'),     g.shrink     = 1;    end;
-if isstr(g.dotsize), g.dotsize = str2num(g.dotsize); end;
+if ischar(g.dotsize), g.dotsize = str2num(g.dotsize); end;
 if any(values == 0)
     inds = find(values == 0);
     if ~isempty( [ chanlocs(inds).theta ])
@@ -237,7 +237,7 @@ end;
 
 % special colormaps
 % -----------------
-if isstr(g.colormap) 
+if ischar(g.colormap) 
     if ~isempty(strmatch(g.colormap, { 'hsv' 'jet' 'gray' 'hot' 'cool' 'bone' ...
             'copper', 'pink' 'flag' 'prism' }, 'exact'))
     else % read text file
@@ -247,7 +247,7 @@ end;
 colormap(g.colormap);
 
 if ~isempty(g.maplimits)
-    if ~isstr(g.maplimits) && ~isempty(g.maplimits) && ~isnan(g.maplimits(1))
+    if ~ischar(g.maplimits) && ~isempty(g.maplimits) && ~isnan(g.maplimits(1))
         caxis(g.maplimits);
     end;
 end;

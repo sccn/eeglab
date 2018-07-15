@@ -239,14 +239,14 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
    for i = 1:2:length(varargin) % for each Keyword
       Keyword = varargin{i};
       Value = varargin{i+1};
-      if ~isstr(Keyword)
+      if ~ischar(Keyword)
          fprintf('runica(): keywords must be strings')
          return
       end
       Keyword = lower(Keyword); % convert upper or mixed case to lower
 
       if strcmp(Keyword,'weights') | strcmp(Keyword,'weight')
-         if isstr(Value)
+         if ischar(Value)
             fprintf(...
       'runica(): weights value must be a weight matrix or sphere')
             return
@@ -255,7 +255,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
            wts_passed =1;
          end
       elseif strcmp(Keyword,'ncomps')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): ncomps value must be an integer')
             return
          end
@@ -276,7 +276,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             fprintf('runica(): Use either PCA or ICA dimension reduction');
             return
          end
-         if isstr(Value)
+         if ischar(Value)
             fprintf(...
 'runica(): pca value should be the number of principal components to retain')
             return
@@ -289,7 +289,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
          end
          chans = ncomps;
        elseif strcmp(Keyword,'interupt') || strcmp(Keyword,'interrupt') 
-         if ~isstr(Value)
+         if ~ischar(Value)
            fprintf('runica(): interrupt value must be on or off')
            return
          else 
@@ -301,7 +301,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
            interrupt = Value;
          end
      elseif strcmp(Keyword,'posact') 
-         if ~isstr(Value)
+         if ~ischar(Value)
            fprintf('runica(): posact value must be on or off')
            return
          else 
@@ -313,7 +313,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
            posactflag = Value;
          end
       elseif strcmp(Keyword,'lrate')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): lrate value must be a number')
             return
          end
@@ -326,7 +326,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             lrate = DEFAULT_LRATE;
          end
       elseif strcmp(Keyword,'block') | strcmp(Keyword,'blocksize')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): block size value must be a number')
             return
          end
@@ -336,19 +336,19 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
          end
       elseif strcmp(Keyword,'stop') | strcmp(Keyword,'nochange') ...
                     | strcmp(Keyword,'stopping')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): stop wchange value must be a number')
             return
          end
          nochange = Value;
       elseif strcmp(Keyword,'logfile')
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('runica(): logfile value must be a string')
             return
          end
          logfile = Value;
       elseif strcmp(Keyword,'maxsteps') | strcmp(Keyword,'steps')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): maxsteps value must be an integer')
             return
          end
@@ -361,7 +361,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
       elseif strcmp(Keyword,'anneal') | strcmp(Keyword,'annealstep')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): anneal step value (%2.4f) must be a number (0,1)',Value)
             return
          end
@@ -371,7 +371,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
       elseif strcmp(Keyword,'annealdeg') | strcmp(Keyword,'degrees')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): annealdeg value must be a number')
             return
          end
@@ -385,7 +385,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
                                               
          end
       elseif strcmp(Keyword,'momentum')
-         if isstr(Value)
+         if ischar(Value)
             fprintf('runica(): momentum value must be a number')
             return
          end
@@ -396,7 +396,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
          end
       elseif strcmp(Keyword,'sphering') | strcmp(Keyword,'sphereing') ...
                 | strcmp(Keyword,'sphere')
-         if ~isstr(Value)
+         if ~ischar(Value)
            fprintf('runica(): sphering value must be on, off, or none')
            return
          else 
@@ -408,7 +408,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
            sphering = Value;
          end
       elseif strcmp(Keyword,'bias')
-         if ~isstr(Value)
+         if ~ischar(Value)
            fprintf('runica(): bias value must be on or off')
            return
          else 
@@ -429,7 +429,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
    'runica(): MATLAB Sig. Proc. Toolbox function "specgram" not found.\n')
            return
          end
-         if isstr(Value)
+         if ischar(Value)
            fprintf('runica(): specgram argument must be a vector')
            return
          end
@@ -477,7 +477,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
          Specgramflag = 1; % set flag to perform specgram()
 
       elseif strcmp(Keyword,'extended') | strcmp(Keyword,'extend')
-         if isstr(Value)
+         if ischar(Value)
            fprintf('runica(): extended value must be an integer (+/-)')
            return
          else
@@ -497,7 +497,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
            end
          end
       elseif strcmp(Keyword,'verbose') 
-         if ~isstr(Value)
+         if ~ischar(Value)
             fprintf('runica(): verbose flag value must be on or off')
             return
          elseif strcmp(Value,'on'),

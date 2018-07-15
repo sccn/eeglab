@@ -168,7 +168,7 @@ if nargin < 1                 % if several arguments, assign values
                       '   set(findobj( ''parent'', gcbf, ''tag'', ''chanfile''), ' ...
                       '                ''string'', sprintf(''{ ALLEEG(%s).chanlocs ALLEEG(%s).chaninfo ALLEEG(%s).urchanlocs }'', res{1}, res{1}, res{1}));' ...
                       'end;' ];
-    if isstr(EEGOUT.ref)
+    if ischar(EEGOUT.ref)
         curref = EEGOUT.ref;
     else
         if length(EEGOUT.ref) > 1
@@ -273,7 +273,7 @@ if nargin < 1                 % if several arguments, assign values
     %com = '';
     %for i=1:2:length(args)
     %    if ~isempty( args{i+1} )
-    %        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
+    %        if ischar( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
     %        else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
     %        end;
     %    else

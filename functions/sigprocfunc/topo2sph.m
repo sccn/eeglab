@@ -63,7 +63,7 @@ else
 	method = 2;
 end
 
-if isstr(eloc_locs)
+if ischar(eloc_locs)
 	fid = fopen(eloc_locs);
 	if fid<1
 	    fprintf('topo2sph()^G: cannot open eloc_loc file (%s)\n',eloc_locs)

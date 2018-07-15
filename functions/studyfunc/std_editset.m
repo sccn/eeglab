@@ -97,7 +97,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on','off' }  'off';
                             'rmclust'   'string'  { 'on','off' }  'on';
                             'inbrain'   'string'  { 'on','off' }  'off';
                             'commands'  'cell'    {}              {} }, 'std_editset');
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 if isempty(STUDY), STUDY.history = 'STUDY = [];'; end;
 if ~isempty(g.name),  STUDY.name  = g.name; end

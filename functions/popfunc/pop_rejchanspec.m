@@ -122,7 +122,7 @@ opt = finputcheck( options, { 'averef'    'string'    { 'on';'off' }       'off'
                               'specfreqs' 'real'   []                      [];
                               'absthresh' 'real'   []                      [];
                               'stdthresh' 'real'   []                      5 }, 'pop_rejchanspec');
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 % compute average referecne if necessary
 if strcmpi(opt.averef, 'on')

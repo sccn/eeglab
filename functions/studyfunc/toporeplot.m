@@ -166,7 +166,7 @@ end
 for i = 2:2:nargs
 	Param = eval(['p',int2str((i-2)/2 +1)]);
 	Value = eval(['v',int2str((i-2)/2 +1)]);
-	if ~isstr(Param)
+	if ~ischar(Param)
       error('Flag arguments must be strings')
 	end
 	Param = lower(Param);
@@ -179,7 +179,7 @@ for i = 2:2:nargs
 		  end
 		  colormap(Value)
 		 case {'interplimits','headlimits'}
-		  if ~isstr(Value)
+		  if ~ischar(Value)
               error('''interplimits'' value must be a string')
 		  end
 		  Value = lower(Value);
@@ -195,7 +195,7 @@ for i = 2:2:nargs
 		  MASKSURF = Value;
 		 case 'circgrid'
 		  CIRCGRID = Value;
-              if isstr(CIRCGRID) | CIRCGRID<100
+              if ischar(CIRCGRID) | CIRCGRID<100
                 error('''circgrid'' value must be an int > 100');
               end
 		 case 'style'
@@ -247,23 +247,23 @@ for i = 2:2:nargs
 		  EMARKER = Value;
 		 case 'plotrad'
 		  plotrad = Value;
-              if isstr(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
+              if ischar(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
 		     error('plotrad argument should be a number between 0.15 and 1.0');
 		  end
 		case 'intrad'
 		  intrad = Value;
-          if isstr(intrad) | (intrad < MINPLOTRAD | intrad > 1)
+          if ischar(intrad) | (intrad < MINPLOTRAD | intrad > 1)
               error('intrad argument should be a number between 0.15 and 1.0');
           end
         case 'headrad'
             headrad = Value;
-            if isstr(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
+            if ischar(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
                 headrad = 0;       % undocumented 'no head' alternatives
             end
             if isempty(headrad) % [] -> none also
                 headrad = 0;
             end
-            if ~isstr(headrad) 
+            if ~ischar(headrad) 
                 if ~(headrad==0) & (headrad < MINPLOTRAD | headrad>1)
                     error('bad value for headrad');
                 end
@@ -299,7 +299,7 @@ for i = 2:2:nargs
             end
         case 'noplot'
             noplot = Value;
-            if ~isstr(noplot)
+            if ~ischar(noplot)
                 if length(noplot) ~= 2
                     error('''noplot'' location should be [radius, angle]')
                 else
@@ -326,7 +326,7 @@ end
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if exist('loc_file')
-	if isstr(loc_file)
+	if ischar(loc_file)
 		[tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
 	else % a locs struct
 		[tmpeloc labels Th Rd indices] = readlocs(loc_file);
@@ -340,7 +340,7 @@ if exist('loc_file')
 	%
 	if isempty(plotrad) & isfield(tmpeloc, 'plotrad'), 
         plotrad = tmpeloc(1).plotrad; 
-        if isstr(plotrad)                        % plotrad shouldn't be a string
+        if ischar(plotrad)                        % plotrad shouldn't be a string
             plotrad = str2num(plotrad)           % just checking
         end
         if plotrad < MINPLOTRAD | plotrad > 1.0
@@ -356,7 +356,7 @@ if exist('loc_file')
       plotrad = max(plotrad,0.5);                 % default: plot out to the 0.5 head boundary
 	end                                           % don't plot channels with Rd > 1 (below head)
         
-	if isstr(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
+	if ischar(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
        error('plotrad must be between 0.15 and 1.0');
 	end
 end
@@ -478,7 +478,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%% Calculate colormap limits %%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   m = size(colormap,1);
-  if isstr(MAPLIMITS)
+  if ischar(MAPLIMITS)
     if strcmp(MAPLIMITS,'absmax')
       amin = -max(max(abs(Zi)));
       amax = max(max(abs(Zi)));

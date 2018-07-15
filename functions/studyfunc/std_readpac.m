@@ -57,7 +57,7 @@ end
     'timerange'  'real'    []       [] }, ...
     'std_readpac', 'ignore');
 
-if isstr(opt), error(opt); end;
+if ischar(opt), error(opt); end;
 
 %STUDY = pop_pacparams(STUDY, 'default');
 %if isempty(opt.timerange), opt.timerange = STUDY.etc.pacparams.timerange; end;

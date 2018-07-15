@@ -134,7 +134,7 @@ if ~isempty(Eventdata)
     try,
         tmpevent = EEG.event;
         alltypes = { tmpevent.type };
-        if isstr(alltypes{1})
+        if ischar(alltypes{1})
             indepoc = strmatch('epoc', lower(alltypes), 'exact');
             indtim  = strmatch('tim0', lower(alltypes), 'exact');
             

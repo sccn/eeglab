@@ -55,7 +55,7 @@ function txt = getkeyval(lastcom, var, mode, default)
 	if nargin < 3
 		mode = '';
 	end;
-	if isstr(mode) & strcmp(mode, 'present')
+	if ischar(mode) & strcmp(mode, 'present')
 		if ~isempty(findstr(var, lastcom))
 			txt = 1; return;
 		else

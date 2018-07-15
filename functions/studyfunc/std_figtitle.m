@@ -89,7 +89,7 @@ opt = finputcheck( varargin, { 'chanlabels'  {'cell','string'}   []     {};
                                'vals'        {'cell','real'}     []     {}; % just for titles
                                'valsunit'    {'cell','string'}   []     {}; % just for titles
                                'subject'     'string'            []              '' }, 'std_figtitle'); %, 'ignore');
-if isstr(opt), error(opt); end
+if ischar(opt), error(opt); end
 
 % convert
 if ~isempty(opt.condnames),  opt.factor1vals = opt.condnames; end
@@ -288,7 +288,7 @@ function pres = thresh_pres(thresh_pres);
 % -------
 function str = value2str(value)
     
-    if isstr(value)
+    if ischar(value)
         str = value;
     elseif isnumeric(value)
         if length(value) == 1

@@ -56,7 +56,7 @@ end;
     'trialbase'     'string'    {'on','off','full'} 'off'; % 'on' skip the baseline
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimefbaseln', 'ignore');
-if isstr(g) error(g); return; end;
+if ischar(g) error(g); return; end;
 PP = PPori; if ~iscell(PP), PP = { PP }; end;
 
 % ---------------
