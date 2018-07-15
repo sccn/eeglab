@@ -33,7 +33,8 @@ releaseDate = 'not specified'; % unix date -> date +"%d-%b-%y %T"
 
 % get numerical version number
 tmpvers = vers;
-if isempty(str2num(tmpvers(end))), tmpvers(end) = []; end;
+if isnan(str2double(tmpvers(end))), tmpvers(end) = []; end;
 indsDot = find(tmpvers == '.' );
 tmpvers(indsDot(2:end)) = [];
-versnum = str2num(tmpvers);
+versnum = str2double(tmpvers);
+if isnan(versnum), versnum = []; end
