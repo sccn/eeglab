@@ -97,7 +97,7 @@ if ~isempty(g.omitchans)
 end
 
 progressive = 0; % by default, progressive mode is off
-if nargin < 2 | isempty(comps)|comps==0
+if nargin < 2 || isempty(comps) || comps==0
   comps = [];
   progressive = 1;  % turn progressive mode on
 end
@@ -124,7 +124,7 @@ if max(comps) > size(EEG.icawinv,1)
    fprintf('Only %d components in this dataset. Cannot project component %d.\n',numcomps,max(comps));
    error('bad comps input');
 end
-if ~isempty(g.artcomps) & max(g.artcomps) > numcomps
+if ~isempty(g.artcomps) && max(g.artcomps) > numcomps
     help eeg_pvaf
    fprintf('Only %d components in this dataset. Cannot project artcomp %d.\n',numcomps,max(g.artcomps));
    error('bad artcomps input')
@@ -157,14 +157,14 @@ if ~isempty(g.artcomps)
       comps(c) = [];
    end
 end
-if ~isempty(g.artcomps) & min([comps g.artcomps]) < 1
+if ~isempty(g.artcomps) && min([comps g.artcomps]) < 1
    error('comps and artcomps must contain component indices');
 end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% compute variance accounted for by specified components %%%%%%%%%%%%%
 %
-if ~progressive | comp == 1 % pare out g.omitchans and artcomps from EEG.data
+if ~progressive || comp == 1 % pare out g.omitchans and artcomps from EEG.data
   if ~isempty(g.artcomps)
     EEG.data = EEG.data(chans,:) - EEG.icawinv(chans,g.artcomps)*EEG.icaact(g.artcomps,:);
   else

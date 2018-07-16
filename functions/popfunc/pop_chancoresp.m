@@ -108,7 +108,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
             rpa2 = strmatch('rpa', lower( chanstr2 ), 'exact'); if isempty(rpa2), rpa2 = strmatch('right', lower( chanstr2 ), 'exact'); end; if isempty(rpa2), rpa2 = strmatch('fidt9', lower( chanstr2 ), 'exact'); end
             g.chanlist1 = [ naz1 lpa1 rpa1 ];
             g.chanlist2 = [ naz2 lpa2 rpa2 ];
-            if length(g.chanlist1) ~= length(g.chanlist2) | length(g.chanlist1) == 0
+            if length(g.chanlist1) ~= length(g.chanlist2) || length(g.chanlist1) == 0
                 disp('Warning: could not find fiducials in at least one of the channel location structure');
                 g.chanlist1 = [];
                 g.chanlist2 = [];

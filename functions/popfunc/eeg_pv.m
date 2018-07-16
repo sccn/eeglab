@@ -38,16 +38,16 @@
 
 function [pv,pvs,pvall] = eeg_pv(EEG,comps,artcomps,omitchans,fraction,plotflag)
 
-if nargin < 1 | nargin > 6
+if nargin < 1 || nargin > 6
    help eeg_pv
    return
 end
 numcomps = size(EEG.icaact,1);
 plotit = 0;
-if nargin>5 | nargout < 1
+if nargin>5 || nargout < 1
    plotit = 1;
 end
-if nargin<5 | isempty(fraction)
+if nargin<5 || isempty(fraction)
   fraction = 1;
 end
 if fraction>1
@@ -58,7 +58,7 @@ if round(fraction*EEG.pnts*EEG.trials)<1
    error('fraction of data specified too small.')
    return
 end
-if nargin<4 | isempty(omitchans)
+if nargin<4 || isempty(omitchans)
   omitchans = [];
 end
 if nargin<3|isempty(artcomps)
@@ -80,7 +80,7 @@ if ~isempty(omitchans)
 end
 
 progressive = 0; % by default, progressive mode is off
-if nargin < 2 | isempty(comps)|comps==0
+if nargin < 2 || isempty(comps)|comps==0
   comps = [];
   progressive = 1;  % turn progressive mode on
 end
@@ -107,7 +107,7 @@ if max(comps) > size(EEG.icawinv,1)
    fprintf('Only %d components in this dataset. Cannot project component %d.\n',numcomps,max(comps));
    error('bad comps input');
 end
-if ~isempty(artcomps) & max(artcomps) > numcomps
+if ~isempty(artcomps) && max(artcomps) > numcomps
     help eeg_pv
    fprintf('Only %d components in this dataset. Cannot project artcomp %d.\n',numcomps,max(artcomps));
    error('bad artcomps input')
@@ -140,14 +140,14 @@ if ~isempty(artcomps)
       comps(c) = [];
    end
 end
-if ~isempty(artcomps) & min([comps artcomps]) < 1
+if ~isempty(artcomps) && min([comps artcomps]) < 1
    error('comps and artcomps must contain component indices');
 end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% compute variance accounted for by specified components %%%%%%%%%%%%%
 %
-if ~progressive | comp == 1 % pare out omitchans and artcomps from EEG.data
+if ~progressive || comp == 1 % pare out omitchans and artcomps from EEG.data
   if ~isempty(artcomps)
     EEG.data = EEG.data(chans,:) - EEG.icawinv(chans,artcomps)*EEG.icaact(artcomps,:);
   else

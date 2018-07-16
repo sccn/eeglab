@@ -99,7 +99,7 @@ if g.squeeze>1
   return
 end
 
-if ~isempty(g.center) & size(g.center,2) ~= 3
+if ~isempty(g.center) && size(g.center,2) ~= 3
   fprintf('Warning: Center must be [x y z].\n');
   return
 end
@@ -131,7 +131,7 @@ z = z./radius;
 r = x; th=x;
 
 for n=1:size(x,1)
-  if x(n)==0 & y(n)==0
+  if x(n)==0 && y(n)==0
     r(n) = 0;
   else
     r(n)  = pi/2-atan(z(n)./sqrt(x(n).^2+y(n).^2));

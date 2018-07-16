@@ -195,7 +195,7 @@ end
 
 % plot electrodes as dots
 % -----------------------
-if strcmpi(g.electrodes, 'on') | strcmpi(g.electrodes, 'labels')
+if strcmpi(g.electrodes, 'on') || strcmpi(g.electrodes, 'labels')
     rad = sqrt(x.^2 + y.^2);
     x(find(rad > g.headrad)) = [];
     y(find(rad > g.headrad)) = [];

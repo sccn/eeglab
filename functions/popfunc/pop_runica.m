@@ -102,7 +102,7 @@ selectalg = {};
 linenb    = 1;
 count     = 1;
 for index = length(allalgs):-1:1
-    if exist(allalgs{index}) ~= 2 & exist(allalgs{index}) ~= 6
+    if exist(allalgs{index}) ~= 2 && exist(allalgs{index}) ~= 6
         allalgs(index) = [];
     end
 end
@@ -128,7 +128,7 @@ end
 % popup window parameters
 % -----------------------
 fig = [];
-if nargin < 2 | selectamica
+if nargin < 2 || selectamica
     commandchans = [ 'tmpchans = get(gcbf, ''userdata'');' ...
                      'tmpchans = tmpchans{1};' ...
                      'set(findobj(gcbf, ''tag'', ''chantype''), ''string'', ' ...
@@ -239,11 +239,11 @@ if ~isempty(addoptions), g.options = { g.options{:} addoptions{:}}; end
 if length(g.dataset) == 1
     EEG = ALLEEG(g.dataset);
     EEG = eeg_checkset(EEG, 'loaddata');
-elseif length(ALLEEG) > 1 & ~strcmpi(g.concatenate, 'on') & ~strcmpi(g.concatcond, 'on')
+elseif length(ALLEEG) > 1 && ~strcmpi(g.concatenate, 'on') && ~strcmpi(g.concatcond, 'on')
     [ ALLEEG com ] = eeg_eval( 'pop_runica', ALLEEG, 'warning', 'off', 'params', ...
            { 'icatype' g.icatype 'options' g.options 'chanind' g.chanind } );
     return;
-elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
+elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
     allsubjects = { ALLEEG.subject };
     allsessions = { ALLEEG.session };
     allgroups   = { ALLEEG.group };
@@ -378,7 +378,7 @@ end
 switch lower(g.icatype)
     case 'runica' 
         try, if ismatlab, g.options = {  g.options{:}, 'interrupt', 'on' }; end; catch, end; 
-        if tmprank == size(tmpdata,1) | pca_opt
+        if tmprank == size(tmpdata,1) || pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001,  g.options{:} );
         else 
             if nargin < 2
@@ -409,7 +409,7 @@ switch lower(g.icatype)
             error('Pop_runica(): binary ICA executable not found. Edit icadefs.m file to specify the ICABINARY location');
         end
         tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
-        if tmprank == size(tmpdata,1) | pca_opt
+        if tmprank == size(tmpdata,1) || pca_opt
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
             disp(['Data rank (' int2str(tmprank) ') is smaller than the number of channels (' int2str(size(tmpdata,1)) ').']);

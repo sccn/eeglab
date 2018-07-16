@@ -62,7 +62,7 @@ if nargin < 6
 	return;
 end
 
-if ~ischar(formula) & ~iscell(formula)
+if ~ischar(formula) && ~iscell(formula)
 	error('The first argument must be a string formula or cell array of string');
 end
 if ischar(formula)
@@ -72,7 +72,7 @@ if ischar(bootside)
 	bootside = { bootside };
 end
 for index = 1:length(bootside)
-	if ~strcmpi(bootside, 'both') & ~strcmpi(bootside, 'upper')
+	if ~strcmpi(bootside, 'both') && ~strcmpi(bootside, 'upper')
 		error('Bootside must be either ''both'' or ''upper''');
 	end
 end;	
@@ -84,7 +84,7 @@ for index = 1:length(condboot)
 end;	
 		
 for index = 1:length(varargin)
-	if ~iscell(varargin) | length(varargin{index}) ~=2
+	if ~iscell(varargin) || length(varargin{index}) ~=2
 		error('Except for the first arguments, all other arguments given to the function must be cell arrays of two numerical array');
 	end
 end

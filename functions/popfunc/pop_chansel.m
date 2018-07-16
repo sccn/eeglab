@@ -73,10 +73,10 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         
     % convert selection to integer
     % ----------------------------
-    if ischar(g.select) & ~isempty(g.select)
+    if ischar(g.select) && ~isempty(g.select)
         g.select = parsetxt(g.select);
     end
-    if iscell(g.select) & ~isempty(g.select)
+    if iscell(g.select) && ~isempty(g.select)
         if ischar(g.select{1})
             tmplower = lower( chans );
             for index = 1:length(g.select)
@@ -126,14 +126,14 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     spacepresent = 0;
     if ~isnumeric(chans{1})
         tmpstrs = [ allchanstr{:} ];
-        if ~isempty( find(tmpstrs == ' ')) | ~isempty( find(tmpstrs == 9))
+        if ~isempty( find(tmpstrs == ' ')) || ~isempty( find(tmpstrs == 9))
             spacepresent = 1;
         end
     end
     
     % get concatenated string (if index)
     % -----------------------
-    if strcmpi(g.withindex, 'on') | spacepresent
+    if strcmpi(g.withindex, 'on') || spacepresent
         if isnumeric(chans{1})
             chanliststr = num2str(celltomat(allchanstr));
         else

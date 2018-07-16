@@ -78,11 +78,11 @@ if isempty(hs) || all([~any(strcmpi({toolbx.Name},'statistics toolbox')), ~any(s
     istats=0;
 end
 
-if (nargin<8 & nargin>5) & min(size(map))~=1
+if (nargin<8 && nargin>5) && min(size(map))~=1
 		error('signalstat(): the map input must be a vector')
 end
 
-if nargin<7 & nargin>5
+if nargin<7 && nargin>5
 	disp('signalstat(): no location file for the topographic map')
 	help signalstat;
 	return
@@ -100,7 +100,7 @@ if nargin>3
 	if isempty(percent)
 		percent=5;
 	end
-	if any(percent > 100) | any(percent < 0)
+	if any(percent > 100) || any(percent < 0)
 		error('signalstat(): percent must be between 0 and 100');
 	end
 end
@@ -109,7 +109,7 @@ if nargin < 4
 	percent = 5;
 end
 
-if (nargin < 3 | isempty(dlabel))
+if (nargin < 3 || isempty(dlabel))
 	dlabel='Potential [V]';
 end
 		
@@ -121,7 +121,7 @@ if ~isnumeric(plotlab)
 	error('signalstat(): plotlab must be numeric');
 end
 
-if plotlab ~= 0 & plotlab ~= 1
+if plotlab ~= 0 && plotlab ~= 1
 		error('signalstat(): plotlab must be 0 or 1');
 end
 if nargin < 1
@@ -284,7 +284,7 @@ if plotlab
   
   if istats
 	  set(gca,'XTick',[])	  
-  elseif ~istats & strcmp(dlabel,'Potential [V]')
+  elseif ~istats && strcmp(dlabel,'Potential [V]')
 	  set(gca,'XTick',[-125, -75, -25, 0, 25, 75,  125],...
 			  'XTickLabel',['-125' ; ' -75' ; ' -25' ; '  0 ' ; ' 25 ' ; ' 75 ' ; ' 125'])
   end

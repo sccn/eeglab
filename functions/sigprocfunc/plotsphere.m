@@ -62,12 +62,12 @@ function [handles] = plotsphere(pos, rad, varargin);
     
     % decode color if necessary
     % -------------------------
-    if ~ischar(g.color) & length(g.color) == 1
+    if ~ischar(g.color) && length(g.color) == 1
         g.color = g.colormap(g.color,:);
     elseif ischar(g.color)
         g.color = strcol2real(g.color);
     end
-    if ~ischar(g.projcol) & length(g.projcol) == 1
+    if ~ischar(g.projcol) && length(g.projcol) == 1
         g.projcol = g.colormap(g.projcol,:);
     elseif ischar(g.projcol)
         g.projcol = strcol2real(g.projcol);

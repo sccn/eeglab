@@ -48,9 +48,9 @@ if ~isfield(EEG,'etc')
    error('EEG.etc field not found - no old ICA weights in dataset');
 end
 
-if ~isfield(EEG.etc,'oldicaweights') & nargin < 3
+if ~isfield(EEG.etc,'oldicaweights') && nargin < 3
    error('EEG.etc.oldicaweights field not found - no old ICA weights in dataset');
-elseif nargout < 2 & nargin < 3
+elseif nargout < 2 && nargin < 3
    if length(EEG.etc.oldicaweights) > 1
       fprintf('EEG.etc.oldicaweights contains %d weight matrices\n',length(EEG.etc.oldicaweights));
       EEG.etc.oldicaweights
@@ -60,9 +60,9 @@ elseif nargout < 2 & nargin < 3
    end
 end
 
-if ~isfield(EEG.etc,'oldicasphere') & nargin < 3
+if ~isfield(EEG.etc,'oldicasphere') && nargin < 3
    fprintf('EEG.etc.oldicasphere field not found - no old ICA sphere matrix in dataset');
-elseif nargout < 2 & nargin < 3
+elseif nargout < 2 && nargin < 3
   fprintf('\n');
   if length(EEG.etc.oldicasphere) > 1
    fprintf('EEG.etc.oldicasphere  contains %d weight matrices\n',length(EEG.etc.oldicasphere));

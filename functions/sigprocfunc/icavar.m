@@ -46,7 +46,7 @@ if nargin<2
    return
 end
 
-if size(weights,2) ~= size(sphere,1) | size(sphere,2) ~= size(data,1)
+if size(weights,2) ~= size(sphere,1) || size(sphere,2) ~= size(data,1)
    fprintf('icavar() - sizes of weights, sphere, and data incompatible.\n')
    whos data weights sphere
    return

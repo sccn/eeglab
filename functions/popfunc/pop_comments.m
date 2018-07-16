@@ -126,7 +126,7 @@ if nargin < 3
     % find return mode
     if isempty(get(0, 'currentfigure')), return; end
     tmp = get(gcf, 'userdata');
-    if ~isempty(tmp) & ischar(tmp)    
+    if ~isempty(tmp) && ischar(tmp)    
         newcomments = tmp; % ok button
     else return;
     end
@@ -136,7 +136,7 @@ else
     if iscell(newcomments)
         newcomments = strvcat(newcomments{:});
     end
-    if nargin > 3 & concat == 1
+    if nargin > 3 && concat == 1
         newcomments = strvcat(comments, newcomments);
     end
     return;
@@ -153,7 +153,7 @@ if nargout > 1
         else
             allsame = 0;
         end
-        if allsame & ~isempty(comments)
+        if allsame && ~isempty(comments)
              com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', vararg2str(newcomments(index+1:end,:)));
         else 
             com =sprintf('EEG.comments = pop_comments('''', '''', %s);', vararg2str(newcomments));     

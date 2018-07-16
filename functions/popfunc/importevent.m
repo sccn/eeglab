@@ -266,7 +266,7 @@ end
 %% interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
-    if ischar(varname) & exist(varname) == 2  % mean that it is a filename
+    if ischar(varname) && exist(varname) == 2  % mean that it is a filename
                                              % --------------------------
         array = loadtxt( varname, 'skipline', skipline, 'delim', delim, 'blankcell', 'off' );
         
@@ -316,7 +316,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         fprintf(align.txt);
         fprintf('New event latencies (10 first): %s ...\n', int2str(round([ event(1:min(10, length(event))).latency ])));
     end
-    if strcmpi(optimalign, 'on') & ~isempty(oldevents)
+    if strcmpi(optimalign, 'on') && ~isempty(oldevents)
         newlat = [ event.latency     ];
         oldlat = [ oldevents.latency ];
        

@@ -59,7 +59,7 @@ if exist('forceversion')
     head.version = forceversion;
 end
 
-if ~( head.version >= 2 & head.version <= 7 ),
+if ~( head.version >= 2 && head.version <= 7 ),
         error('EGI Simple Binary Versions 2-7 supported only.');
 end
 

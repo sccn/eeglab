@@ -295,7 +295,7 @@ end
 % -------------------------------
 fieldtrip = 0;
 if nargin < 2, loc_file = []; end
-if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end
+if isstruct(Values) || ~isstruct(loc_file), fieldtrip == 1; end
 if ischar(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end
 if fieldtrip
     error('Wrong calling format, are you trying to use the topoplot Fieldtrip function?');
@@ -344,7 +344,7 @@ end
 if isempty(loc_file)
   loc_file = 0;
 end
-if isnumeric(loc_file) & loc_file == 0
+if isnumeric(loc_file) && loc_file == 0
   loc_file = DEFAULT_ELOC;
 end
 
@@ -362,7 +362,7 @@ if nargs > 2
         switch Param
             case 'conv'
                 CONVHULL = lower(Value);
-                if ~strcmp(CONVHULL,'on') & ~strcmp(CONVHULL,'off')
+                if ~strcmp(CONVHULL,'on') && ~strcmp(CONVHULL,'off')
                     error('Value of ''conv'' must be ''on'' or ''off''.');
                 end
             case 'colormap'
@@ -372,12 +372,12 @@ if nargs > 2
                 colormap(Value)
             case 'plotdisk'
                 PLOTDISK = lower(Value);
-                if ~strcmp(PLOTDISK,'on') & ~strcmp(PLOTDISK,'off')
+                if ~strcmp(PLOTDISK,'on') && ~strcmp(PLOTDISK,'off')
                     error('Value of ''plotdisk'' must be ''on'' or ''off''.');
                 end
             case 'intsquare'
                 INTSQUARE = lower(Value);
-                if ~strcmp(INTSQUARE,'on') & ~strcmp(INTSQUARE,'off')
+                if ~strcmp(INTSQUARE,'on') && ~strcmp(INTSQUARE,'off')
                     error('Value of ''intsquare'' must be ''on'' or ''off''.');
                 end
             case 'emarkercolors'
@@ -387,7 +387,7 @@ if nargs > 2
                     error('''interplimits'' value must be a string')
                 end
                 Value = lower(Value);
-                if ~strcmp(Value,'electrodes') & ~strcmp(Value,'head')
+                if ~strcmp(Value,'electrodes') && ~strcmp(Value,'head')
                     error('Incorrect value for interplimits')
                 end
                 INTERPLIMITS = Value;
@@ -402,7 +402,7 @@ if nargs > 2
                 CHANINFO = Value;
                 if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end
                 if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end
-                if isfield(CHANINFO, 'plotrad') & isempty(plotrad), plotrad = CHANINFO.plotrad; end
+                if isfield(CHANINFO, 'plotrad') && isempty(plotrad), plotrad = CHANINFO.plotrad; end
                 if isfield(CHANINFO, 'chantype')
                     chantype = CHANINFO.chantype;
                     if ischar(chantype), chantype = cellstr(chantype); end
@@ -421,7 +421,7 @@ if nargs > 2
                 MASKSURF = Value;
             case 'circgrid'
                 CIRCGRID = Value;
-                if ischar(CIRCGRID) | CIRCGRID<100
+                if ischar(CIRCGRID) || CIRCGRID<100
                     error('''circgrid'' value must be an int > 100');
                 end
             case 'style'
@@ -430,11 +430,11 @@ if nargs > 2
                 CONTOURNUM = Value;
             case 'electrodes'
                 ELECTRODES = lower(Value);
-                if strcmpi(ELECTRODES,'pointlabels') | strcmpi(ELECTRODES,'ptslabels') ...
+                if strcmpi(ELECTRODES,'pointlabels') || strcmpi(ELECTRODES,'ptslabels') ...
                         | strcmpi(ELECTRODES,'labelspts') | strcmpi(ELECTRODES,'ptlabels') ...
                         | strcmpi(ELECTRODES,'labelpts')
                     ELECTRODES = 'labelpoint'; % backwards compatability
-                elseif strcmpi(ELECTRODES,'pointnumbers') | strcmpi(ELECTRODES,'ptsnumbers') ...
+                elseif strcmpi(ELECTRODES,'pointnumbers') || strcmpi(ELECTRODES,'ptsnumbers') ...
                         | strcmpi(ELECTRODES,'numberspts') | strcmpi(ELECTRODES,'ptnumbers') ...
                         | strcmpi(ELECTRODES,'numberpts')  | strcmpi(ELECTRODES,'ptsnums')  ...
                         | strcmpi(ELECTRODES,'numspts')
@@ -484,7 +484,7 @@ if nargs > 2
             case 'emarker'
                 if ischar(Value)
                     EMARKER = Value;
-                elseif ~iscell(Value) | length(Value) > 4
+                elseif ~iscell(Value) || length(Value) > 4
                     error('''emarker'' argument must be a cell array {marker color size linewidth}')
                 else
                     EMARKER = Value{1};
@@ -499,7 +499,7 @@ if nargs > 2
                     EMARKERLINEWIDTH = Value{4};
                 end
             case 'emarker2'
-                if ~iscell(Value) | length(Value) > 5
+                if ~iscell(Value) || length(Value) > 5
                     error('''emarker2'' argument must be a cell array {chans marker color size linewidth}')
                 end
                 EMARKER2CHANS = abs(Value{1}); % ignore channels < 0
@@ -519,24 +519,24 @@ if nargs > 2
                 shrinkfactor = Value;
             case 'intrad'
                 intrad = Value;
-                if ischar(intrad) | (intrad < MINPLOTRAD | intrad > 1)
+                if ischar(intrad) || (intrad < MINPLOTRAD || intrad > 1)
                     error('intrad argument should be a number between 0.15 and 1.0');
                 end
             case 'plotrad'
                 plotrad = Value;
-                if ischar(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
+                if ischar(plotrad) || (plotrad < MINPLOTRAD || plotrad > 1)
                     error('plotrad argument should be a number between 0.15 and 1.0');
                 end
             case 'headrad'
                 headrad = Value;
-                if ischar(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
+                if ischar(headrad) && ( strcmpi(headrad,'off') || strcmpi(headrad,'none') )
                     headrad = 0;       % undocumented 'no head' alternatives
                 end
                 if isempty(headrad) % [] -> none also
                     headrad = 0;
                 end
                 if ~ischar(headrad)
-                    if ~(headrad==0) & (headrad < MINPLOTRAD | headrad>1)
+                    if ~(headrad==0) && (headrad < MINPLOTRAD || headrad>1)
                         error('bad value for headrad');
                     end
                 elseif  ~strcmpi(headrad,'rim')
@@ -576,7 +576,7 @@ if nargs > 2
                 end
             case 'gridscale'
                 GRID_SCALE = Value;
-                if ischar(GRID_SCALE) | GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 32
+                if ischar(GRID_SCALE) || GRID_SCALE ~= round(GRID_SCALE) || GRID_SCALE < 32
                     error('''gridscale'' value must be integer > 32.');
                 end
             case {'plotgrid','gridplot'}
@@ -649,13 +649,13 @@ if isempty(Values)
    STYLE = 'blank';
 end
 [r,c] = size(Values);
-if r>1 & c>1,
+if r>1 && c>1,
   error('input data must be a single vector');
 end
 Values = Values(:); % make Values a column vector
 ContourVals = ContourVals(:); % values for contour
 
-if ~isempty(intrad) & ~isempty(plotrad) & intrad < plotrad
+if ~isempty(intrad) && ~isempty(plotrad) && intrad < plotrad
    error('intrad must be >= plotrad');
 end
 
@@ -688,10 +688,10 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 if ~isempty(plotchans)
     plotchans = intersect_bc(plotchans, indices);
 end
-if ~isempty(Values) & ~strcmpi( STYLE, 'blank') & isempty(plotchans)
+if ~isempty(Values) && ~strcmpi( STYLE, 'blank') && isempty(plotchans)
     plotchans = indices;
 end
-if isempty(plotchans) & strcmpi( STYLE, 'blank')
+if isempty(plotchans) && strcmpi( STYLE, 'blank')
     plotchans = indices;
 end
 
@@ -707,7 +707,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% filter channels used for components %%%%%%%%%%%%%%%%%%%%% 
 %
-if isfield(CHANINFO, 'icachansind') & ~isempty(Values) & length(Values) ~= length(tmpeloc)
+if isfield(CHANINFO, 'icachansind') && ~isempty(Values) && length(Values) ~= length(tmpeloc)
 
     % test if ICA component
     % ---------------------
@@ -759,7 +759,7 @@ x         = x(plotchans);
 y         = y(plotchans);
 labels    = labels(plotchans); % remove labels for electrodes without locations
 labels    = strvcat(labels); % make a label string matrix
-if ~isempty(Values) & length(Values) > 1
+if ~isempty(Values) && length(Values) > 1
     Values      = Values(plotchans);
     ContourVals = ContourVals(plotchans);
 end
@@ -767,16 +767,16 @@ end
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if isempty(plotrad) & isfield(tmpeloc, 'plotrad'), 
+if isempty(plotrad) && isfield(tmpeloc, 'plotrad'), 
     plotrad = tmpeloc(1).plotrad; 
     if ischar(plotrad)                        % plotrad shouldn't be a string
         plotrad = str2num(plotrad)           % just checking
     end
-    if plotrad < MINPLOTRAD | plotrad > 1.0
+    if plotrad < MINPLOTRAD || plotrad > 1.0
        fprintf('Bad value (%g) for plotrad.\n',plotrad);
        error(' ');
     end
-    if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
+    if strcmpi(VERBOSE,'on') && ~isempty(plotrad)
        fprintf('Plotting radius plotrad (%g) set from EEG.chanlocs.\n',plotrad);
     end
 end
@@ -794,7 +794,7 @@ else
      plotrad = intrad;
   end
 end                                           % don't interpolate channels with Rd > 1 (below head)
-if ischar(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
+if ischar(plotrad) || plotrad < MINPLOTRAD || plotrad > 1.0
    error('plotrad must be between 0.15 and 1.0');
 end
 
@@ -818,8 +818,8 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'), 
-    if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
+if ~isempty(shrinkfactor) || isfield(tmpeloc, 'shrink'), 
+    if isempty(shrinkfactor) && isfield(tmpeloc, 'shrink'), 
         shrinkfactor = tmpeloc(1).shrink;
         if strcmpi(VERBOSE,'on')
             if ischar(shrinkfactor)
@@ -831,7 +831,7 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
     end
     
     if ischar(shrinkfactor)
-        if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force') | strcmpi(shrinkfactor, 'auto')  
+        if strcmpi(shrinkfactor, 'on') || strcmpi(shrinkfactor, 'force') || strcmpi(shrinkfactor, 'auto')  
             if abs(headrad-rmax) > 1e-2
              fprintf('     NOTE -> the head cartoon will NOT accurately indicate the actual electrode locations\n');
             end
@@ -858,7 +858,7 @@ end; % if shrink
 %%%%%%%%%%%%%%%%% Issue warning if headrad ~= rmax  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 
-if headrad ~= 0.5 & strcmpi(VERBOSE, 'on')
+if headrad ~= 0.5 && strcmpi(VERBOSE, 'on')
    fprintf('     NB: Plotting map using ''plotrad'' %-4.3g,',plotrad);
    fprintf(    ' ''headrad'' %-4.3g\n',headrad);
    fprintf('Warning: The plotting radius of the cartoon head is NOT anatomically correct (0.5).\n')
@@ -884,7 +884,7 @@ ally      = y;
 intchans; % interpolate using only the 'intchans' channels
 pltchans; % plot using only indicated 'plotchans' channels
 
-if length(pltchans) < length(Rd) & strcmpi(VERBOSE, 'on')
+if length(pltchans) < length(Rd) && strcmpi(VERBOSE, 'on')
         fprintf('Interpolating %d and plotting %d of the %d scalp electrodes.\n', ...
                    length(intchans),length(pltchans),length(Rd));    
 end;	
@@ -1039,7 +1039,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     if strcmp(MAPLIMITS,'absmax')
       amax = max(max(abs(Zi)));
       amin = -amax;
-    elseif strcmp(MAPLIMITS,'maxmin') | strcmp(MAPLIMITS,'minmax')
+    elseif strcmp(MAPLIMITS,'maxmin') || strcmp(MAPLIMITS,'minmax')
       amin = min(min(Zi));
       amax = max(max(Zi));
     else
@@ -1062,7 +1062,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   h = gca; % uses current axes
 
                           % instead of default larger AXHEADFAC 
-  if squeezefac<0.92 & plotrad-headrad > 0.05  % (size of head in axes)
+  if squeezefac<0.92 && plotrad-headrad > 0.05  % (size of head in axes)
     AXHEADFAC = 1.05;     % do not leave room for external ears if head cartoon
                           % shrunk enough by the 'skirt' option
   end
@@ -1107,7 +1107,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     %%%%%%%%%%% reset color limits for grid plot %%%%%%%%%%%%%%%%%%%%%%%%%
     %
     if ischar(MAPLIMITS) 
-      if strcmp(MAPLIMITS,'maxmin') | strcmp(MAPLIMITS,'minmax')
+      if strcmp(MAPLIMITS,'maxmin') || strcmp(MAPLIMITS,'minmax')
         amin = min(min(gridvalues(~isnan(gridvalues))));
         amax = max(max(gridvalues(~isnan(gridvalues))));
       elseif strcmp(MAPLIMITS,'absmax')
@@ -1194,7 +1194,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  elseif strcmp(STYLE,'straight') | strcmp(STYLE,'map') % 'straight' was former arg
+  elseif strcmp(STYLE,'straight') || strcmp(STYLE,'map') % 'straight' was former arg
 
       if strcmp(SHADING,'interp') % 'interp' mode is shifted somehow... but how?
          tmph = surface(Xi*unsh,Yi*unsh,zeros(size(Zi)),Zi,'EdgeColor','none',...
@@ -1248,7 +1248,7 @@ else % if STYLE 'blank'
    % pos = get(gca,'position');
    % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
-  if strcmp(ELECTRODES,'labelpoint') |  strcmp(ELECTRODES,'numpoint')
+  if strcmp(ELECTRODES,'labelpoint') ||  strcmp(ELECTRODES,'numpoint')
     text(-0.6,-0.6, ...
     [ int2str(length(Rd)) ' of ' int2str(length(tmpeloc)) ' electrode locations shown']); 
     text(-0.6,-0.7, [ 'Click on electrodes to toggle name/number']);
@@ -1356,7 +1356,7 @@ if headrad > 0                         % if cartoon head to be plotted
 headx = [[rx(:)' rx(1) ]*(hin+hwidth)  [rx(:)' rx(1)]*hin];
 heady = [[ry(:)' ry(1) ]*(hin+hwidth)  [ry(:)' ry(1)]*hin];
 
-if ~ischar(HEADCOLOR) | ~strcmpi(HEADCOLOR,'none')
+if ~ischar(HEADCOLOR) || ~strcmpi(HEADCOLOR,'none')
    %ringh= patch(headx,heady,ones(size(headx)),HEADCOLOR,'edgecolor',HEADCOLOR,'linewidth', HLINEWIDTH); hold on
    headx = [rx(:)' rx(1)]*hin;
    heady = [ry(:)' ry(1)]*hin;
@@ -1390,7 +1390,7 @@ end
   EarY  = [q+.0555 q+.0775 q+.0783 q+.0746 q+.0555 -.0055 -.0932 -.1313 -.1384 -.1199];
   sf    = headrad/plotrad;                                          % squeeze the model ears and nose 
                                                                     % by this factor
-  if ~ischar(HEADCOLOR) | ~strcmpi(HEADCOLOR,'none')
+  if ~ischar(HEADCOLOR) || ~strcmpi(HEADCOLOR,'none')
     plot3([basex;tiphw;0;-tiphw;-basex]*sf,[base;tip-tipr;tip;tip-tipr;base]*sf,...
          2*ones(size([basex;tiphw;0;-tiphw;-basex])),...
          'Color',HEADCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
@@ -1538,7 +1538,7 @@ elseif strcmp(ELECTRODES,'numbers')
 %
 %%%%%%%%%%%%%%%%%%%%%% Mark emarker2 electrodes only  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-elseif strcmp(ELECTRODES,'off') & ~isempty(EMARKER2CHANS)
+elseif strcmp(ELECTRODES,'off') && ~isempty(EMARKER2CHANS)
     hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
         EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
 end

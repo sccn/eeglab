@@ -93,7 +93,7 @@ epocheventout = [];
     
 switch format
 case 'struct'
-   if ~isempty(epoch) & ~isstruct(epoch)
+   if ~isempty(epoch) && ~isstruct(epoch)
 
       fields = getnewfields( fields, size(epoch,2) - length(fields));   
        

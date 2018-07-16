@@ -39,7 +39,7 @@ function varargout = uiputfile2(varargin);
         eeglab_options;
         if option_rememberfolder
             tmp_fld = getenv('TEMP');
-            if isempty(tmp_fld) & isunix
+            if isempty(tmp_fld) && isunix
                 if exist('/tmp') == 7
                     tmp_fld = '/tmp';
                 end

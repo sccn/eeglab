@@ -46,10 +46,10 @@ function latout = eeg_latencyur( events, latin );
 
     boundevents = { events.type };
     latout      = latin;
-    if ~isempty(boundevents) & ischar(boundevents{1})
+    if ~isempty(boundevents) && ischar(boundevents{1})
         indbound = strmatch('boundary', boundevents);
         
-        if isfield(events, 'duration') & ~isempty(indbound)
+        if isfield(events, 'duration') && ~isempty(indbound)
             for index  = indbound'
                 lowerVals = find(latout > events(index).latency);
                 latout(lowerVals) = latout(lowerVals)-events(index).duration;
@@ -61,10 +61,10 @@ function latout = eeg_latencyur( events, latin );
     % build array of 0 and 1 (0 no data)
     boundevents = { events.type };
     latout      = latin;
-    if ~isempty(boundevents) & ischar(boundevents{1})
+    if ~isempty(boundevents) && ischar(boundevents{1})
         indbound = strmatch('boundary', boundevents);
         
-        if isfield(events, 'duration') & ~isempty(indbound)
+        if isfield(events, 'duration') && ~isempty(indbound)
             currentadd = 0;
             points     = ones(1, events(end).latency+sum([events(indbound').duration])); % arrays of 1
             for index  = indbound'

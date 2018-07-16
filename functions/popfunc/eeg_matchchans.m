@@ -45,11 +45,11 @@ if nargin < 2
   return
 end
 no_plot = 0; % yes|no flag
-if nargin > 2 & strcmp(lower(noplot),'noplot')
+if nargin > 2 && strcmp(lower(noplot),'noplot')
   no_plot = 1;
 end
 
-if ~isstruct(bglocs) | ~isstruct(ltlocs)
+if ~isstruct(bglocs) || ~isstruct(ltlocs)
    help eeg_matchchans
 end
 
@@ -68,7 +68,7 @@ bd       = zeros(bgchans,1);
 fprintf('BIG  ltl  Dist\n');
 for c=1:ltchans
    for C=1:bgchans
-      if ~isempty(ltlocs(c).X) & ~isempty(bglocs(C).X)
+      if ~isempty(ltlocs(c).X) && ~isempty(bglocs(C).X)
         bd(C) = sqrt((ltlocs(c).X/ltlocs(c).sph_radius - bglocs(C).X/bglocs(C).sph_radius)^2 + ...
                     (ltlocs(c).Y/ltlocs(c).sph_radius - bglocs(C).Y/bglocs(C).sph_radius)^2 + ...
                     (ltlocs(c).Z/ltlocs(c).sph_radius - bglocs(C).Z/bglocs(C).sph_radius)^2);
@@ -88,7 +88,7 @@ for c=1:ltchans
      return % give up - should not reach here!
    end
    while k<length(ix)
-     if c>1 & sum(ismember(ix(k),selchans(1:c-1)))>0 % avoid chans already chosen 
+     if c>1 && sum(ismember(ix(k),selchans(1:c-1)))>0 % avoid chans already chosen 
         k = k+1;
      else
         break

@@ -83,11 +83,11 @@ if nargin<5
   cycles = DEFAULT_CYCLES;
 end
 
-if nargin < 8 | isempty(titl)
+if nargin < 8 || isempty(titl)
    titl = '';
 end
 
-if nargin < 7 | isempty(titl) | isempty(times)
+if nargin < 7 || isempty(titl) || isempty(times)
   PLOT_IT = 0;
 elseif length(times) ~= frames
   fprintf('phasecoher(): times vector length must be same as frames.\n')
@@ -99,10 +99,10 @@ end
 if nargin < 6
     alpha = nan; % no alpha given
 end
-if nargout > 2 & isnan(alpha) % if still want cohsig
+if nargout > 2 && isnan(alpha) % if still want cohsig
   alpha = DEFAULT_ALPHA; 
 elseif nargout > 2
-  if alpha < 0 | alpha > 0.1
+  if alpha < 0 || alpha > 0.1
     help phasecoher
     fprintf('phasecoher(): alpha out of bounds.\n');
     return
@@ -213,7 +213,7 @@ end
 allamps = sqrt(C.*conj(C)); %compute all amplitudes for all frames, all trials
 allphs = angle(C); %get the phase
 
-if exist('timeStretchRef') & exist('timeStretchMarks') & ...
+if exist('timeStretchRef') && exist('timeStretchMarks') && ...
     length(timeStretchRef) > 0 & length(timeStretchMarks) > 0 %Added -Jean
   for t=1:trials
     M = timewarp(timeStretchMarks(:,t)', timeStretchRef');
@@ -387,7 +387,7 @@ if nargin < 2
   help gauss
   return
 end
-if sds <=0 | frames < 1
+if sds <=0 || frames < 1
   help gauss
   return
 end

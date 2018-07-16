@@ -57,7 +57,7 @@ if nargin < 1
 	return;
 end;	
 
-if (nargin == 3 & (any(pk > 1) | any(pk < 0)))
+if (nargin == 3 && (any(pk > 1) || any(pk < 0)))
     error('qqdiagram(): elements in pk must be between 0 and 1');
 end
 

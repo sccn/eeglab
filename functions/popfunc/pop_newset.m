@@ -146,8 +146,8 @@ elseif ~isempty(g.retrieve) % command line call
     %           retrieving another dataset
     % ***************************************************
     if verbose, disp('Case 4'); end
-    if ~(option_storedisk & strcmpi(EEG.saved, 'no'))
-        if strcmpi(EEG.saved, 'yes') & option_storedisk
+    if ~(option_storedisk && strcmpi(EEG.saved, 'no'))
+        if strcmpi(EEG.saved, 'yes') && option_storedisk
             fprintf('pop_newset(): Dataset %d has not been modified since last save, so did not resave it.\n', OLDSET);
             EEG = update_datafield(EEG);
         
@@ -167,7 +167,7 @@ end
 
 if isempty(EEG)
     args = { 'retrieve', OLDSET }; % cancel    
-elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if several arguments, assign values 
+elseif length(varargin) == 0 && length(EEG) == 1 && strcmpi(g.gui, 'on') % if several arguments, assign values 
     % popup window parameters	
     % -----------------------
     text_new   = 'What do you want to do with the new dataset?';
@@ -198,7 +198,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
     saved = 1;
     filenameold = '';
     filenamenew = '';
-    if ~isempty(ALLEEG) & any(OLDSET ~= 0) & length(OLDSET) == 1
+    if ~isempty(ALLEEG) && any(OLDSET ~= 0) && length(OLDSET) == 1
         if strcmpi(ALLEEG(OLDSET).saved, 'no')
             saved = 0;
             if ~isempty(ALLEEG(OLDSET).filename)
@@ -212,7 +212,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
     % ***************************************************
     % case 5 -> single dataset, has to be saved, one dataset to retreive and study present or several dataset to retrieve
     % ***************************************************
-    if length(g.retrieve) > 1 | ( g.study & ~isempty(g.retrieve)) % selecting several datasets or a study is present
+    if length(g.retrieve) > 1 || ( g.study && ~isempty(g.retrieve)) % selecting several datasets or a study is present
         if verbose, disp('Case 5'); end
         text_new = 'Current dataset has not been saved. Saved it or reload it from disk.';
         text_old = '';
@@ -232,7 +232,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
     % case 6 -> single dataset modified or not, study is present (the old
     %           dataset has to be replaced to preserve study consistency)
     % ***************************************************
-    elseif g.study == 1 & isempty(g.retrieve)
+    elseif g.study == 1 && isempty(g.retrieve)
         if verbose, disp('Case 6'); end
         if saved
             text_old       = 'The old dataset has not been modified since last saved. What do you want to do with it?';
@@ -251,7 +251,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
     % case 7 -> single dataset modified, study is absent, old copy has to
     %           be flush to disk or overwritten 
     % ***************************************************
-    elseif ~saved & option_storedisk
+    elseif ~saved && option_storedisk
         if verbose, disp('Case 7'); end
         text_old = 'Some changes have not been saved. What do you want to do with the old dataset?';
         cb_saveold     = [ 'if ~get(findobj(gcbf, ''tag'', ''cb_owrt''), ''value''),' ...
@@ -322,7 +322,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
     end;        
     % update GUI for selecting multiple datasets
     % ------------------------------------------
-    if length(g.retrieve) > 1 | ( g.study & ~isempty(g.retrieve)) % selecting several datasets or a study is present
+    if length(g.retrieve) > 1 || ( g.study && ~isempty(g.retrieve)) % selecting several datasets or a study is present
         uilist = uilist(1:9);
         geometry = geometry(1:3);
         if ~isempty(EEG.filename)
@@ -346,7 +346,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
     if ~isfield(EEG, 'saved')
         EEG = eeg_checkset(EEG);
     end
-    if strcmpi(EEG.saved, 'justloaded') | ~isempty(g.retrieve)
+    if strcmpi(EEG.saved, 'justloaded') || ~isempty(g.retrieve)
         if overwrite_or_save % only pop-up a window if some action has to be taken
             uilist = uilist(11:end);
             geometry = geometry(5:end);
@@ -355,7 +355,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
             
             % remove data from file for old dataset
             % -------------------------------------
-            if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
+            if option_storedisk && ~isempty(ALLEEG) && OLDSET ~= 0
                 if ~isfield(ALLEEG(OLDSET), 'datfile'), ALLEEG(OLDSET).datfile = ''; end
                 ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
             end
@@ -381,7 +381,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
         try, tags.filenamenew;  catch, tags.filenamenew = ''; end
         cont = 0;
         if ~isempty(result)
-            if overwrite_or_save & tags.cb_saveold % save but not overwrite
+            if overwrite_or_save && tags.cb_saveold % save but not overwrite
                 if isempty(tags.filenameold)
                     warndlg2(strvcat('Error: You must enter a filename for the old dataset!',' ', ...
                            'The old dataset must be saved because, by your', ...
@@ -398,7 +398,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
                 drawnow;
                 return;
             else
-                if isempty(tags.filenamenew) & tags.cb_savenew
+                if isempty(tags.filenamenew) && tags.cb_savenew
                     warndlg2(strvcat('Error: You must enter a filename for the dataset!',' ', ...
                            'It must be saved because, by your current memory option, only one full', ...
                            'dataset or study can be kept in memory. Note that all changes will be', ...
@@ -468,7 +468,7 @@ end
 % assigning values
 % ----------------
 overWflag    = 0;
-if isempty(g.retrieve) & ~isempty(EEG)
+if isempty(g.retrieve) && ~isempty(EEG)
     if strcmpi(EEG.saved, 'justloaded')
         EEG.saved = 'yes';
     else
@@ -504,7 +504,7 @@ end
 
 % remove data from file if necessary
 % ----------------------------------
-if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
+if option_storedisk && ~isempty(ALLEEG) && OLDSET ~= 0
     if ~isfield(ALLEEG, 'datfile'), ALLEEG(OLDSET).datfile = ''; end
     ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
 end

@@ -164,7 +164,7 @@ eegplotoptions = { 'events', EEG.event, 'winlength', 5, 'winrej', ...
 				   'colmodif', { { EEG.reject.rejmanualcol EEG.reject.rejthreshcol EEG.reject.rejconstcol ...
                                    EEG.reject.rejjpcol     EEG.reject.rejkurtcol   EEG.reject.rejfreqcol } } };
 
-if ~isempty(EEG.chanlocs) & icacomp == 1
+if ~isempty(EEG.chanlocs) && icacomp == 1
     if exist('elecrange')
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs(elecrange) };
     else

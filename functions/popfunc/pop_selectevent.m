@@ -140,7 +140,7 @@ if nargin<2
         % create the gui for this field
         % -----------------------------
         textfield = allfields{index};
-        if strcmp(textfield, 'latency') | strcmp(textfield, 'duration')
+        if strcmp(textfield, 'latency') || strcmp(textfield, 'duration')
             if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
             else textfield = [ textfield ' (s)' ];
             end
@@ -222,11 +222,11 @@ if nargin<2
     for index = 1:length(allfields)
         textfield = allfields{index};
         tmpflag = getfield(res, [ 'not' textfield ]);
-        if strcmp(textfield, 'duration') | strcmp(textfield, 'latency') 
+        if strcmp(textfield, 'duration') || strcmp(textfield, 'latency') 
             tmpres = [];
             minlat = getfield(res, [ 'min' textfield ]);
             maxlat = getfield(res, [ 'max' textfield ]);
-            if ~isempty(minlat) & ~isempty(maxlat)
+            if ~isempty(minlat) && ~isempty(maxlat)
                 tmpres = [ minlat '<=' maxlat ];
             end
         else
@@ -284,7 +284,7 @@ if strcmpi(g.select, 'remove'), g.select = 'inverse'; end
 if strcmpi(g.select, 'keep'  ), g.select = 'normal'; end
 if strcmpi(g.deleteepochs, 'yes'  ), g.deleteepochs = 'on'; end
 if strcmpi(g.deleteepochs, 'no'  ),  g.deleteepochs = 'off'; end
-if ~isempty(g.oldtypefield) & isempty(g.renametype)
+if ~isempty(g.oldtypefield) && isempty(g.renametype)
     error('A name for the new type must be defined');
 end
 
@@ -307,14 +307,14 @@ for index = 1:length(allfields)
 				end
 				tmpvar = tmpvartmp;
 			end
-		elseif ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
+		elseif ischar(tmpvar) && isempty( findstr(tmpvar, '<='))
 			if isnumeric(getfield( EEG.event, {1}, allfields{index}))
 				error(['numerical values must be entered for field ''' allfields{index} '''']);
 			end
 		end
 	end
 		
-	if ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
+	if ischar(tmpvar) && isempty( findstr(tmpvar, '<='))
 		tmpvar = { tmpvar };
 	end
 
@@ -380,13 +380,13 @@ for index = 1:length(allfields)
     % scan each field of EEG.event (omit)
     % -----------------------------------
     tmpvar = eval(['g.omit' allfields{index} ]);
-	if eval(['ischar(EEG.event(1).' allfields{index} ')' ]) & isnumeric(tmpvar) & ~isempty(tmpvar)
+	if eval(['ischar(EEG.event(1).' allfields{index} ')' ]) && isnumeric(tmpvar) && ~isempty(tmpvar)
 		for tmpind = 1:length(tmpvar) 
 			tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
 		end
 		tmpvar = tmpvartmp;
 	end
-	if ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
+	if ischar(tmpvar) && isempty( findstr(tmpvar, '<='))
 		tmpvar = { tmpvar };
 	end
     if ~isempty( tmpvar )
@@ -453,7 +453,7 @@ end
 
 % checking if trying to remove boundary events (in continuous data)
 if isfield(EEG.event, 'type')
-    if ischar(EEG.event(1).type) & EEG.trials == 1 
+    if ischar(EEG.event(1).type) && EEG.trials == 1 
         Ieventrem = setdiff_bc([1:length(EEG.event)], Ievent );
         tmpevent  = EEG.event;
         boundaryindex = strmatch('boundary', { tmpevent(Ieventrem).type });
@@ -485,7 +485,7 @@ end
 
 % Events: delete epochs
 % ---------------------
-if strcmp( lower(g.deleteepochs), 'on') & EEG.trials > 1
+if strcmp( lower(g.deleteepochs), 'on') && EEG.trials > 1
 	% ask for confirmation
 	% --------------------
 	Iepoch = ones(1, EEG.trials);

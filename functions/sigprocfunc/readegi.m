@@ -45,12 +45,12 @@
 
 function  [head, TrialData, EventData, SegmentCatIndex] = readegi(filename, dataChunks,forceversion)
 
-if nargin <1 | nargin > 3,
+if nargin <1 || nargin > 3,
     help readegi;
     return;
 end
 
-if nargout < 2 | nargout > 4,
+if nargout < 2 || nargout > 4,
 	error('2 to 4 output args required');
 end
 
@@ -195,7 +195,7 @@ if (head.eventtypes > 0),
 end 
 
 % convert from A/D units to microvolts
-if ( head.bits ~= 0 & head.range ~= 0 )
+if ( head.bits ~= 0 && head.range ~= 0 )
        TrialData = (head.range/(2^head.bits))*TrialData;
 end
 

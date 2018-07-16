@@ -74,16 +74,16 @@ head = [];
 while ~numbegin,
   line =fgets(fid);
   head = [head line];
-  if (length(line)>=8 & line(1:8)=='"NCHAN%"') 
+  if (length(line)>=8 && line(1:8)=='"NCHAN%"') 
       nchans=str2num(line(findstr(line,'=')+1:end-1));
   end
-  if (length(line)>= 12 & line(1:12)=='"NUM.POINTS"') 
+  if (length(line)>= 12 && line(1:12)=='"NUM.POINTS"') 
       nframes=str2num(line(findstr(line,'=')+1:end-1));
   end
-  if (length(line)>= 10 & line(1:10)=='"ACT.FREQ"') 
+  if (length(line)>= 10 && line(1:10)=='"ACT.FREQ"') 
       srate=str2num(line(findstr(line,'=')+1:end-1));
   end
-  if (length(line)>= 4 & line(1:4)=='"TR"') 
+  if (length(line)>= 4 && line(1:4)=='"TR"') 
      head = head(1:length(head)-length(line));
      line =fgets(fid); % get the time and date stamp line
      numbegin=1;

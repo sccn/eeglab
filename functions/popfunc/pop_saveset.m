@@ -183,14 +183,14 @@ if strcmpi(g.savemode, 'resave')
             save_as_dat_file = 1;
         end
     end
-    if ischar(EEG.data) & ~save_as_dat_file % data in .set file
+    if ischar(EEG.data) && ~save_as_dat_file % data in .set file
         TMP = pop_loadset(EEG.filename, EEG.filepath);
         EEG.data = TMP.data;
         data_on_disk = 1;
     end
 else
     if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end
-    if ~strcmpi(EEG.filename, g.filename) | ~strcmpi(EEG.filepath, g.filepath)
+    if ~strcmpi(EEG.filename, g.filename) || ~strcmpi(EEG.filepath, g.filepath)
          EEG.datfile = '';
     end
     EEG.filename    = g.filename;
@@ -250,7 +250,7 @@ try,
     catch
         save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
     end
-    if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
+    if save_as_dat_file && strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
     end
     

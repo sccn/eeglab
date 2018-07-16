@@ -64,7 +64,7 @@ if nargin <4
     help eeg_lat2point;
     return;
 end;    
-if nargin <5 | isempty(timeunit)
+if nargin <5 || isempty(timeunit)
 	timeunit = 1;
 end
 

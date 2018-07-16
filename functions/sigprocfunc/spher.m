@@ -12,7 +12,7 @@
 function sphere = spher(data)
 
 
-if nargin<1 | size(data,1)<1 
+if nargin<1 || size(data,1)<1 
   help spher
   return
 end

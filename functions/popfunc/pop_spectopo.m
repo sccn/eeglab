@@ -156,7 +156,7 @@ if nargin < 3
             disp('  >> figure; chan = 1; spectopo(EEG.data(chan,:,:), EEG.pnts, EEG.srate);');
         end
 		if eval(result{2}) ~= 100, options = [ options ', ''percent'', '  result{2} ]; end
-		if ~isempty(result{3}) & ~isempty(EEG.chanlocs), options = [ options ', ''freq'', ['  result{3} ']' ]; end
+		if ~isempty(result{3}) && ~isempty(EEG.chanlocs), options = [ options ', ''freq'', ['  result{3} ']' ]; end
 		if EEG.trials ~= 1
 			processflag = result{4};
 			if ~isempty(result{5}),    options = [ options ', ''freqrange'',[' result{5} ']' ]; end
@@ -248,7 +248,7 @@ switch processflag,
  otherwise, if nargin <3, close; end; 
   error('Pop_spectopo: processflag must be ''EEG'', ''ERP'' or ''BOTH''');
 end
-if EEG.trials == 1 & ~strcmp(processflag,'EEG')
+if EEG.trials == 1 && ~strcmp(processflag,'EEG')
 	 if nargin <3, close; end
 	 error('pop_spectopo(): must use ''EEG'' mode when processing continuous data');
 end
@@ -269,7 +269,7 @@ end
 % The programming here is a bit redundant but it tries to optimize 
 % memory usage.
 % ----------------------------------------------------------------
-if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
+if timerange(1)/1000~=EEG.xmin || timerange(2)/1000~=EEG.xmax
 	posi = round( (timerange(1)/1000-EEG.xmin)*EEG.srate )+1;
 	posf = min(round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1, EEG.pnts );
 	pointrange = posi:posf;
@@ -286,7 +286,7 @@ end
 
 % add boundaries if continuous data
 % ----------------------------------
-if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & ischar(EEG.event(1).type)
+if EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
 	tmpevent = EEG.event;
     boundaries = strmatch('boundary', {tmpevent.type});
 	if ~isempty(boundaries)
@@ -325,7 +325,7 @@ switch processflag
 				 sbplot(2,1,2); com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''title'', ''EEG'' %s);', outstr, spectopooptions); eval(com)
 end
 
-if nargout < 2 & nargin < 3
+if nargout < 2 && nargin < 3
 	varargout{1} = popcom;
 end
 

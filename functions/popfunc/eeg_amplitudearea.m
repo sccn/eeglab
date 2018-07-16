@@ -82,14 +82,14 @@ for x = 1:size(channels,2)
     for y = 1:(tr -1)
         v1 =  rerp(x,(y))
         v2 =  rerp(x,(y+1))
-        if ((v1 > 0) & (v2 < 0)) | ((v1 < 0) & (v2 > 0))
-            if (y == (tr-1)) & (timr(y+1)> wend)
+        if ((v1 > 0) && (v2 < 0)) || ((v1 < 0) && (v2 > 0))
+            if (y == (tr-1)) && (timr(y+1)> wend)
                 area1 = zero_crossing_truncated(v1, v2, restep, wend, pent)    
             else    
                 area1 = zero_crossing(v1, v2, restep)
             end
         else
-            if( y == (tr-1)) & (timr(y+1)> wend)
+            if( y == (tr-1)) && (timr(y+1)> wend)
                 area1 = rect_tri_truncated(v1, v2, restep,wend,pent)
             else
                 area1 = rect_tri(v1, v2, restep)

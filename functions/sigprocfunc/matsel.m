@@ -72,7 +72,7 @@ end
 
 framesout = length(framelist);
 
-if isempty(chanlist) | chanlist == 0,
+if isempty(chanlist) || chanlist == 0,
   chanlist = [1:chans];
 end
 
@@ -85,7 +85,7 @@ if epochs*frames ~= framestot
     data = data(:,1:epochs*frames);
 end
 
-if isempty(epochlist) | epochlist == 0,
+if isempty(epochlist) || epochlist == 0,
     epochlist = [1:epochs];
 end
 epochsout = length(epochlist);

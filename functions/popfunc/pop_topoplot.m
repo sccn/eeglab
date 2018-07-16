@@ -73,7 +73,7 @@ end;
 if nargin < 2   
    typeplot = 1;
 end
-if typeplot == 0 & isempty(EEG.icasphere)
+if typeplot == 0 && isempty(EEG.icasphere)
    disp('Error: no ICA data for this set, first run ICA'); return;
 end;   
 if isempty(EEG.chanlocs) && ~isfield(EEG, 'chanmatrix')
@@ -154,7 +154,7 @@ if nargin < 3
       catch, end; 
     end
 else
-    if ~isempty(varargin) & isnumeric(varargin{1})
+    if ~isempty(varargin) && isnumeric(varargin{1})
         plotdip = varargin{1};
         varargin = varargin(2:end);
     else
@@ -203,7 +203,7 @@ nbgraph = size(arg2(:),1);
 if ~exist('topotitle')
     topotitle = '';
 end;    
-if ~exist('rowcols') | isempty(rowcols) | rowcols == 0
+if ~exist('rowcols') || isempty(rowcols) || rowcols == 0
     rowcols(2) = ceil(sqrt(nbgraph));
     rowcols(1) = ceil(nbgraph/rowcols(2));
 end;    
@@ -275,8 +275,8 @@ for index = 1:size(arg2(:),1)
     % ------------------------------
     dipoleplotted = 0;
     if plotdip && typeplot == 0
-        if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
-            if length(EEG.dipfit.model) >= index & ~strcmpi(EEG.dipfit.coordformat, 'CTF')
+        if isfield(EEG, 'dipfit') && isfield(EEG.dipfit, 'model')
+            if length(EEG.dipfit.model) >= index && ~strcmpi(EEG.dipfit.coordformat, 'CTF')
                 %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                 curpos = EEG.dipfit.model(arg2(index)).posxyz;
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;

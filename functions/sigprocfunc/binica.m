@@ -84,7 +84,7 @@
  
 function [wts,sph,tmpint] = binica(data,var2,var3,var4,var5,var6,var7,var8,var9,var10,var11,var12,var13,var14,var15,var16,var17,var18,var19,var20,var21,var22,var23,var24,var25)
 
-if nargin < 1 | nargin > 25
+if nargin < 1 || nargin > 25
     more on
     help binica
     more off
@@ -232,7 +232,7 @@ else % data filename given
   end
   nchans = var2;
   nframes = var3;
-  if ischar(nchans) | ischar(nframes)
+  if ischar(nchans) || ischar(nframes)
     fprintf(...
 '\nbinica(): chans, frames args must be given after data file name\n');
     return

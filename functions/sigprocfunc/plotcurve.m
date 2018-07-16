@@ -120,7 +120,7 @@ function plotcurve( times, R, varargin);
   % plotting
   % --------
   if size(R,1) == length(times), R = R'; end
-  if strcmpi(g.plotmean, 'on') | strcmpi(g.plotindiv, 'off')
+  if strcmpi(g.plotmean, 'on') || strcmpi(g.plotindiv, 'off')
       if strcmpi(g.plotindiv, 'on')
           R = [ R; mean(R,1) ];
       else
@@ -128,7 +128,7 @@ function plotcurve( times, R, varargin);
       end
   end
   ax = gca;
-  if ~isempty(g.maskarray) & strcmpi(g.highlightmode, 'bottom')
+  if ~isempty(g.maskarray) && strcmpi(g.highlightmode, 'bottom')
       pos = get(gca, 'position');
       set(gca, 'position', [ pos(1)+pos(3)*0.1 pos(2)+pos(4)*0.1 pos(3)*0.9 pos(4)*0.85 ]);
   end
@@ -153,7 +153,7 @@ function plotcurve( times, R, varargin);
   end
       
   for ind = 1:size(R,1)
-      if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
+      if ind == size(R,1) && strcmpi(g.plotmean, 'on') && size(R,1) > 1
            plot(times,R(ind,:), 'k', 'linewidth', 2);
       elseif ~isempty(g.colors),
            tmp = plot(times,R(ind,:), 'k'); 
@@ -191,7 +191,7 @@ function plotcurve( times, R, varargin);
       ylh2 = ylh + (ylh-yll)/10;
       if ~isnan(yll), g.ylim = [yll2 ylh2]; end
   end
-  if ~isempty(g.ylim) & length(g.ylim) == 2 
+  if ~isempty(g.ylim) && length(g.ylim) == 2 
       if any(g.ylim)
           ylim(g.ylim);
       else
@@ -214,7 +214,7 @@ function plotcurve( times, R, varargin);
       % ---------
       axes(ax);
       for ind = 1:size(R,1)
-          if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
+          if ind == size(R,1) && strcmpi(g.plotmean, 'on') && size(R,1) > 1
                plot(times,R(ind,:), 'k', 'linewidth', 2);
           elseif ~isempty(g.colors),             
               tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind-1, length(g.colors))+1} ); hold on;
@@ -301,11 +301,11 @@ if ~isempty(regions)
     axes(ax);
     in_a_region = 0;
     for index=1:length(regions)
-        if regions(index) & ~in_a_region
+        if regions(index) && ~in_a_region
             tmpreg(1) = times(index);
             in_a_region = 1;
         end
-        if (~regions(index) | index == length(regions)) & in_a_region
+        if (~regions(index) || index == length(regions)) && in_a_region
             tmpreg(2) = times(min(length(times), index));
             in_a_region = 0;
             if strcmpi(highlightmode, 'background')

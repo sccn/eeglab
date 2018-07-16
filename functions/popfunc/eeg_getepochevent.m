@@ -157,20 +157,20 @@ end
 
 % deal with empty types
 % ---------------------
-if ~isempty(opt.type) & ~iscell(opt.type)
+if ~isempty(opt.type) && ~iscell(opt.type)
 	opt.type = { opt.type };
 end
 
 % convert types
 % -------------
 for indextype=1:length(opt.type)
-     if ischar(opt.type{indextype}) & isnumeric(EEG.event(1).type)
+     if ischar(opt.type{indextype}) && isnumeric(EEG.event(1).type)
          if ~isempty(str2num(opt.type{indextype}))   
 			 opt.type{indextype} = str2num(opt.type{indextype}); 
 		 else
 			 error('eeg_getepochevent: string type cannot be found in numeric event type array');
 		 end;		 
-	 elseif isnumeric(opt.type{indextype}) & ischar(EEG.event(1).type)
+	 elseif isnumeric(opt.type{indextype}) && ischar(EEG.event(1).type)
 		  opt.type{indextype} = num2str(opt.type{indextype});
 	 end
 end
@@ -194,7 +194,7 @@ end
 
 % select latencies
 % ----------------
-if isfield(EEG.event, 'latency') & (opt.timewin(1) ~= -Inf | opt.timewin(2) ~= Inf)
+if isfield(EEG.event, 'latency') && (opt.timewin(1) ~= -Inf || opt.timewin(2) ~= Inf)
 	selected = ones(size(Ieventtmp));
 	for index=1:length(Ieventtmp)
         if ~isfield(EEG.event, 'epoch'), epoch = 1;
@@ -202,7 +202,7 @@ if isfield(EEG.event, 'latency') & (opt.timewin(1) ~= -Inf | opt.timewin(2) ~= I
         end
 		reallat = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
 								EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3); 
-		if reallat < opt.timewin(1) | reallat > opt.timewin(2)
+		if reallat < opt.timewin(1) || reallat > opt.timewin(2)
 			selected(index) = 0;
 		end
 	end
@@ -224,7 +224,7 @@ if strcmp(opt.fieldname, 'latency')
 		if length(allepochval{epoch}) == 1
 			epochval{epoch} = allepochval{epoch}{end};
 		else
-            if length(allepochval{epoch}) == 2 & nargout < 2
+            if length(allepochval{epoch}) == 2 && nargout < 2
                 disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ]); 
                 %, ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
             end
@@ -297,11 +297,11 @@ out = 0;
 % go through each character in the string and scale and add it to output
 for val_count = 1:length(ascii_vector)
     ascii_char = ascii_vector(val_count);
-    if ascii_char>=48 & ascii_char<=57            % ['0','9'] to [1, 10]
+    if ascii_char>=48 && ascii_char<=57            % ['0','9'] to [1, 10]
         ascii_adj = ascii_char - 47;
-    elseif ascii_char>=65 & ascii_char<=90        % ['A','Z'] to [11, 36]
+    elseif ascii_char>=65 && ascii_char<=90        % ['A','Z'] to [11, 36]
         ascii_adj = ascii_char - 64;
-    elseif ascii_char>=97 & ascii_char<=122       % ['a','z'] to [11, 36]
+    elseif ascii_char>=97 && ascii_char<=122       % ['a','z'] to [11, 36]
         ascii_adj = ascii_char - 96;
     else ascii_adj = ascii_char;
     end

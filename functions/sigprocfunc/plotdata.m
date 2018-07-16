@@ -178,7 +178,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  if isnumeric(channels) & channels(1)==0,
+  if isnumeric(channels) && channels(1)==0,
     channels = [1:size(data,1)];
   end
   if isnumeric(channels),
@@ -242,7 +242,7 @@ end
      colors = [colors; colors];  % make > 64 available
   end
   for c=1:size(colors,1)   % make white traces black unless axis color is white
-    if colors(c,1)=='w' & axcolor~=[1 1 1]
+    if colors(c,1)=='w' && axcolor~=[1 1 1]
          colors(c,1)='k';
     end
   end
@@ -270,7 +270,7 @@ end
     ymax = limits(4);
   end
 
-  if xmax == 0 & xmin == 0,
+  if xmax == 0 && xmin == 0,
     x = (0:1:frames-1);
     xmin = 0;
     xmax = frames-1;
@@ -283,7 +283,7 @@ end
       return
   end
 
-  if ymax == 0 & ymin == 0,
+  if ymax == 0 && ymin == 0,
       ymax=double(max(max(data)));
       ymin=double(min(min(data)));
       yrange = ymax-ymin;
@@ -296,7 +296,7 @@ end
   end
 
   xlabel = 'Time (ms)';
-  if ymin >= 0 & xmin >= 0,          % For all-positive (spectral) data
+  if ymin >= 0 && xmin >= 0,          % For all-positive (spectral) data
     ISSPEC = 1;
     SIGN = 1;
     fprintf('\nPlotting positive up. Assuming data are spectra.\n');
@@ -400,7 +400,7 @@ end
                     set(hi,'HorizontalAlignment','right','Clipping','off');
                 end
                 
-                if I==chans & limitset,    % draw timescale on lowest right plot
+                if I==chans && limitset,    % draw timescale on lowest right plot
                     ytick = double(-ymax-0.25*ydiff);
                     
                     tick = [int2str(xmin)]; h=text(xmin,ytick,tick); % min time
@@ -486,7 +486,7 @@ end
           
           if ~isempty(channels),                          % print channames
               if ~ISSPEC
-                  if ymin <= 0 & ymax >= 0,
+                  if ymin <= 0 && ymax >= 0,
                   yht = 0;
                   else
                       yht = nan_mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));

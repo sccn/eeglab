@@ -86,7 +86,7 @@ if isfield(dat,'T0')
     EEG.etc.T0 = dat.T0; % added sjo
 end
 
-if isfield(dat, 'Label') & ~isempty(dat.Label)
+if isfield(dat, 'Label') && ~isempty(dat.Label)
     if ischar(dat.Label)
         EEG.chanlocs = struct('labels', cellstr(char(dat.Label(dat.InChanSelect)))); % 5/8/2104 insert (dat.InChanSelect) Ramon
     else

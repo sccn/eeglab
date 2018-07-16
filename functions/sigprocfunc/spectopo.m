@@ -163,7 +163,7 @@ if nargin<3
    help spectopo
    return
 end
-if nargin <= 3 | ischar(varargin{1})
+if nargin <= 3 || ischar(varargin{1})
 	% 'key' 'val' sequence
 	fieldlist = { 'freq'          'real'     []                        [] ;
                   'specdata'      'real'     []                        [] ;
@@ -202,8 +202,8 @@ if nargin <= 3 | ischar(varargin{1})
 	if ischar(g), error(g); end
 	if ~isempty(g.freqrange), g.limits(1:2) = g.freqrange; end
 	if ~isempty(g.weights)
-		if isempty(g.freq) | length(g.freq) > 2
-            if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end
+		if isempty(g.freq) || length(g.freq) > 2
+            if ~isempty(get(0,'currentfigure')) && strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end
          error('spectopo(): for computing component contribution, one must specify a (single) frequency');
 		end
 	end
@@ -211,7 +211,7 @@ else
     if ~isnumeric(data)
        error('spectopo(): Incorrect call format (see >> help spectopo).')
     end
-    if ~isnumeric(frames) | round(frames) ~= frames
+    if ~isnumeric(frames) || round(frames) ~= frames
        error('spectopo(): Incorrect call format (see >> help spectopo).')
     end
     if ~isnumeric(srate)  % 3rd arg must be the sampling rate in Hz
@@ -245,7 +245,7 @@ end
 if g.percent > 1
 	g.percent = g.percent/100; % make it from 0 to 1
 end
-if ~isempty(g.freq) & isempty(g.chanlocs)
+if ~isempty(g.freq) && isempty(g.chanlocs)
 	error('spectopo(): needs channel location information');
 end
 if isempty(g.weights) && ~isempty(g.plotchans)
@@ -269,8 +269,8 @@ end
 %    error('Cannot plot data component at all channels (option not implemented)');
 %end
 
-if ~isempty(g.freq) & min(g.freq)<0
-    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end
+if ~isempty(g.freq) && min(g.freq)<0
+    if ~isempty(get(0,'currentfigure')) && strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end
    fprintf('spectopo(): freqs must be >=0 Hz\n');
    return
 end
@@ -303,7 +303,7 @@ else
     % compute channel spectra using pwelch()
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     epoch_subset = ones(1,epochs);
-    if g.percent ~= 1 & epochs == 1
+    if g.percent ~= 1 && epochs == 1
         fprintf('Selecting the first %2.1f%% of data for analysis...\n', g.percent*100);
         frames = round(size(data,2)*g.percent);
         data = data(:, 1:frames);
@@ -312,7 +312,7 @@ else
             g.boundaries(end+1) = frames;
         end;            
     end
-    if g.percent ~= 1 & epochs > 1
+    if g.percent ~= 1 && epochs > 1
         epoch_subset = zeros(1,epochs);
         nb = ceil( g.percent*epochs);
         while nb>0
@@ -362,7 +362,7 @@ else
         myfprintf(g.verbose, '\n');
     else
         % compute data spectrum
-        if isempty(g.plotchan) | g.plotchan == 0
+        if isempty(g.plotchan) || g.plotchan == 0
             myfprintf(g.verbose, 'Computing spectra')
             [eegspecdB freqs specstd] = spectcomp( data, frames, srate, epoch_subset, g);	
             myfprintf(g.verbose, '\n'); % log below
@@ -407,11 +407,11 @@ else
         % compute component spectra
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
         newweights = g.weights;
-        if strcmp(g.memory, 'high') & strcmp(g.icamode, 'normal')
+        if strcmp(g.memory, 'high') && strcmp(g.icamode, 'normal')
             myfprintf(g.verbose, 'Computing component spectra: ')
             [compeegspecdB freqs] = spectcomp( newweights*data(:,:), frames, srate, epoch_subset, g);
         else % in case out of memory error, multiply conmponent sequencially
-            if strcmp(g.icamode, 'sub') & ~isempty(g.plotchan) & g.plotchan == 0
+            if strcmp(g.icamode, 'sub') && ~isempty(g.plotchan) && g.plotchan == 0
                 % scan all electrodes
                 myfprintf(g.verbose, 'Computing component spectra at each channel: ')
                 for index = 1:size(data,1)
@@ -465,12 +465,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute axis and caxis g.limits
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if length(g.limits)<1 | isnan(g.limits(1))
+if length(g.limits)<1 || isnan(g.limits(1))
    g.limits(1) = LOPLOTHZ;
 end
 
 if ~isempty(g.freq)
-	if length(g.limits)<2 | isnan(g.limits(2))
+	if length(g.limits)<2 || isnan(g.limits(2))
 		maxheadfreq = max(g.freq);
 		if rem(maxheadfreq,5) ~= 0
 			g.limits(2) = 5*ceil(maxheadfreq/5);
@@ -637,7 +637,7 @@ if ~isempty(g.weights)
     
 end
 
-if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
+if ~isempty(g.freq) &&  strcmpi(g.plot, 'on')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% plot vertical lines through channel trace bundle at each headfreq
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -737,7 +737,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		% If 1 channel in g.plotchan
 		%
 
-        if ~isempty(g.plotchan) & g.plotchan ~= 0 
+        if ~isempty(g.plotchan) && g.plotchan ~= 0 
 			% if ~isempty(varargin) % if there are extra topoplot() flags
 			%	topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
 			%			 'style', 'blank', 'emarkersize1chan', 10, varargin{:});
@@ -753,7 +753,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
             
 		else % plot all channels in g.plotchans 
 
-            if isempty(g.mapframes) | g.mapframes == 0
+            if isempty(g.mapframes) || g.mapframes == 0
                 g.mapframes = 1:size(eegspecdB,1); % default to plotting all chans
             end
 			if ~isempty(varargin)
@@ -783,7 +783,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 
 		% make the line with the scalp topoplot thicker than others
 		set(li(realpos(1)), 'linewidth', 2.5); 
-        if isempty(g.mapchans) | g.mapchans == 0
+        if isempty(g.mapchans) || g.mapchans == 0
             g.mapchans = 1:size(g.icawinv,1); % default to plotting all chans
         end
 		for index = 1:length(g.icamaps)
@@ -812,7 +812,7 @@ end
 %%%%%%%%%%%%%%%%
 % Draw title
 %%%%%%%%%%%%%%%%
-if ~isempty(g.title) & strcmpi(g.plot, 'on')
+if ~isempty(g.title) && strcmpi(g.plot, 'on')
     tl = textsc(g.title);
 	set(tl,'fontsize',15)
 end
@@ -820,7 +820,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % return component spectrum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-if ~isempty(g.weights) & nargout >= 3
+if ~isempty(g.weights) && nargout >= 3
     tmp = compeegspecdB;
     compeegspecdB = zeros(ncompsori, size(tmp,2));
     compeegspecdB(g.icacomps,:) = tmp;
@@ -934,7 +934,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
                 end
 				%[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
 				%					  winlength,g.overlap);
-				if c==1 & e==epoch_subset(1)
+				if c==1 && e==epoch_subset(1)
 					eegspec = zeros(nchans,length(freqs));
 					specstd = zeros(nchans,length(freqs));
 				end

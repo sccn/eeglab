@@ -48,7 +48,7 @@ function indices = eeg_chantype(data,chantype)
     % ------------------------------------------------------------
     if isfield(data,'type')
         datatype = {data.type};
-    elseif isfield(data,'chanlocs') & isfield(data.chanlocs,'type')
+    elseif isfield(data,'chanlocs') && isfield(data.chanlocs,'type')
         datatype = {data.chanlocs.type};
     else error('Incorrect ''data'' input. Should be ''EEG'' or ''loc_file'' structure variable in the format associated with EEGLAB.');
     end

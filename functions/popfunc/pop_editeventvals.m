@@ -66,7 +66,7 @@ if nargin < 1
    return;
 end;	
 
-if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
+if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
     
     if ischar(EEG) % GUI
         gui    = 1;
@@ -157,13 +157,13 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
           if isfield(EEG.event, 'type') 
               if strcmpi(EEG.event(valnum).type, 'boundary'), enable = 'off'; end
           end
-          if strcmp( allfields{index}, 'latency') & ~isempty(EEG.event(valnum).latency)
+          if strcmp( allfields{index}, 'latency') && ~isempty(EEG.event(valnum).latency)
               if isfield(EEG.event, 'epoch')
                    value = eeg_point2lat( EEG.event(valnum).latency, EEG.event(valnum).epoch, ...
                                           EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
               else value = (EEG.event(valnum).latency-1)/EEG.srate+EEG.xmin;
               end
-          elseif strcmp( allfields{index}, 'duration') & ~isempty(EEG.event(valnum).duration)
+          elseif strcmp( allfields{index}, 'duration') && ~isempty(EEG.event(valnum).duration)
               if isfield(EEG.event, 'epoch')
                    value = EEG.event(valnum).duration/EEG.srate*1000; % milliseconds
               else value = EEG.event(valnum).duration/EEG.srate;      % seconds
@@ -186,7 +186,7 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
       % update original
       % --------------- 
       tmpobj = findobj('parent', gcf, 'tag', 'original');
-      if isfield(EEG.event, 'urevent') & EEG.event(valnum).urevent ~= valnum
+      if isfield(EEG.event, 'urevent') && EEG.event(valnum).urevent ~= valnum
            set(tmpobj, 'string', [ 'originally ' int2str(EEG.event(valnum).urevent)], ...
                        'horizontalalignment', 'center');
       else set(tmpobj, 'string', ' '); 
@@ -231,7 +231,7 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
       % -------------
       valnum    = valnum   + shift;
       if isfield(EEG.event, 'epoch'), curepoch = EEG.event(valnum).epoch; end
-      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
+      if isfield(EEG, 'urevent') && isfield(EEG.event, 'urevent')
           % find non empty urvalnum
           urvalnum = [];
           count = 0;
@@ -246,7 +246,7 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
       
       % update urevents
       % ---------------
-      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
+      if isfield(EEG, 'urevent') && isfield(EEG.event, 'urevent')
           EEG.urevent(end+3)            = EEG.urevent(end);
           EEG.urevent(urvalnum+1:end-2) = EEG.urevent(urvalnum:end-3);
           EEG.urevent(urvalnum)         = EEG.urevent(end-1);
@@ -261,7 +261,7 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
       EEG.event(valnum)         = EEG.event(end-1);
       EEG.event                 = EEG.event(1:end-2);
       if isfield(EEG.event, 'epoch'), EEG.event(valnum).epoch = curepoch; end;      
-      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
+      if isfield(EEG, 'urevent') && isfield(EEG.event, 'urevent')
           EEG.event(valnum).urevent = urvalnum;
           for index = valnum+1:length(EEG.event)
               EEG.event(index).urevent = EEG.event(index).urevent+1;
@@ -316,14 +316,14 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
           
       % latency and duration case
       % -------------------------
-      if strcmp( field, 'latency') & ~isempty(editval)
+      if strcmp( field, 'latency') && ~isempty(editval)
           if isfield(EEG.event, 'epoch')
                editval = eeg_lat2point( editval, EEG.event(valnum).epoch, ...
                                        EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
           else editval = (editval- EEG.xmin)*EEG.srate+1;
           end
       end
-      if strcmp( field, 'duration') & ~isempty(editval)
+      if strcmp( field, 'duration') && ~isempty(editval)
           if isfield(EEG.event, 'epoch')
                editval = editval/1000*EEG.srate; % milliseconds
           else editval = editval*EEG.srate;      % seconds
@@ -337,12 +337,12 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
       
       % update urevents
       % ---------------
-      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
+      if isfield(EEG, 'urevent') && isfield(EEG.event, 'urevent')
           urvalnum  = EEG.event(valnum).urevent;
           
           % latency case
           % ------------
-          if strcmp( field, 'latency') & ~isempty(editval)
+          if strcmp( field, 'latency') && ~isempty(editval)
               if isfield(EEG.urevent, 'epoch')
                   urepoch = EEG.urevent(urvalnum).epoch;
                   
@@ -378,7 +378,7 @@ if nargin >= 2 | ischar(EEG) % interpreting command from GUI or command line
           
           % duration case
           % ------------
-          if strcmp( field, 'duration') & ~isempty(editval)
+          if strcmp( field, 'duration') && ~isempty(editval)
               if isfield(EEG.event, 'epoch')
                    editval = editval/1000*EEG.srate; % milliseconds -> point
               else editval = editval*EEG.srate;      % seconds -> point
@@ -509,7 +509,7 @@ if nargin<2
         
         % input string
         % ------------
-        if strcmp( allfields{index}, 'latency') | strcmp( allfields{index}, 'duration') 
+        if strcmp( allfields{index}, 'latency') || strcmp( allfields{index}, 'duration') 
             if EEG.trials > 1
                  inputstr =  [ allfields{index} ' (ms)'];
             else inputstr =  [ allfields{index} ' (sec)'];
@@ -652,12 +652,12 @@ function eventtmp = checkconsistency(eventtmp, valnum, field)
     
     otherval = mod(valnum+1, length(eventtmp))+1;
     
-    if ischar(getfield(eventtmp(valnum), field)) & ~ischar(getfield(eventtmp(otherval), field))
+    if ischar(getfield(eventtmp(valnum), field)) && ~ischar(getfield(eventtmp(otherval), field))
         eventtmp(valnum) = setfield(eventtmp(valnum), field, str2num(getfield(eventtmp(valnum), field)));
     end
-    if ~ischar(getfield(eventtmp(valnum), field)) & ischar(getfield(eventtmp(otherval), field))
+    if ~ischar(getfield(eventtmp(valnum), field)) && ischar(getfield(eventtmp(otherval), field))
         eventtmp(valnum) = setfield(eventtmp(valnum), field, num2str(getfield(eventtmp(valnum), field)));
     end
-    if strcmpi(field, 'latency') & isempty(getfield(eventtmp(valnum), field))
+    if strcmpi(field, 'latency') && isempty(getfield(eventtmp(valnum), field))
         eventtmp(valnum).latency = NaN;
     end

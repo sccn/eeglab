@@ -159,7 +159,7 @@ end
     
 EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'));
 
-if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
+if strcmpi(g.rmeventchan, 'on') && strcmpi(dat.TYPE, 'BDF') && isfield(dat, 'BDF')
     if size(EEG.data,1) >= dat.BDF.Status.Channel, 
         disp('Removing event channel...');
         EEG.data(dat.BDF.Status.Channel,:) = []; 

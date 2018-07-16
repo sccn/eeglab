@@ -62,7 +62,7 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
     if size(coords, 1) ~= 3
         error('Number of columns must be 3 for the coordinate input');
     end
-    if length(rotate) > 0 & length(rotate) ~= 3
+    if length(rotate) > 0 && length(rotate) ~= 3
         error('rotate parameter must have 3 values');
     end
     

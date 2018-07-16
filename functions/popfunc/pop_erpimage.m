@@ -463,7 +463,7 @@ if popup
        end
     end
 	sortingwin   = eval( [ '[' res.eventrange ']' ] );
-	if ~isempty(res.field) & ~strcmp(res.renorm, 'no')
+	if ~isempty(res.field) && ~strcmp(res.renorm, 'no')
 		opt.renorm = res.renorm;
 	end
 	if ~isempty(res.align)

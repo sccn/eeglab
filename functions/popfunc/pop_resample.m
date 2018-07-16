@@ -106,7 +106,7 @@ oldpnts  = EEG.pnts;
 
 % resample for multiple channels
 % -------------------------
-if isfield(EEG, 'event') & isfield(EEG.event, 'type') & ischar(EEG.event(1).type)
+if isfield(EEG, 'event') && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
     tmpevent = EEG.event;
     bounds = strmatch('boundary', { tmpevent.type });
     if ~isempty(bounds),
@@ -214,7 +214,7 @@ if isfield(EEG.event, 'latency')
 
         end
 
-        if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
+        if isfield(EEG, 'urevent') && isfield(EEG.urevent, 'latency')
             try
                 for iUrevt = 1:length(EEG.urevent)
                     % Recompute urevent latencies relative to segment onset

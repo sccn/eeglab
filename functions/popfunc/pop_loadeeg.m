@@ -105,16 +105,16 @@ else
 end
 
 if exist('datformat') ~= 1, datformat = 'auto'; end
-if exist('range_chan') ~= 1   | isempty(range_chan)      , range_chan     = 'all'; end
-if exist('range_sweeps') ~= 1 | isempty(range_sweeps)    , range_sweeps     = 'all'; end
-if exist('range_typeeeg') ~= 1 | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end
-if exist('range_response') ~= 1 | isempty(range_response), range_response     = 'all'; end
+if exist('range_chan') ~= 1   || isempty(range_chan)      , range_chan     = 'all'; end
+if exist('range_sweeps') ~= 1 || isempty(range_sweeps)    , range_sweeps     = 'all'; end
+if exist('range_typeeeg') ~= 1 || isempty(range_typeeeg)   , range_typeeeg     = 'all'; end
+if exist('range_response') ~= 1 || isempty(range_response), range_response     = 'all'; end
 
 % load datas
 % ----------
 EEG = eeg_emptyset;
 if ~isempty(filepath)
-    if filepath(end) ~= '/' & filepath(end) ~= '\' & filepath(end) ~= ':'
+    if filepath(end) ~= '/' && filepath(end) ~= '\' && filepath(end) ~= ':'
         error('The file path last character must be a delimiter');
     end
     fullFileName = sprintf('%s%s', filepath, filename);

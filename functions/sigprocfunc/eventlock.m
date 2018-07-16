@@ -139,7 +139,7 @@ end % NB: data is now size((chans*)frames,ntrials)
 aligndata=repmat(nan,frames,ntrials); % begin with matrix of NaN's
 shifts = zeros(1,ntrials);
 
-if ~exist('medval') | isempty(medval) 
+if ~exist('medval') || isempty(medval) 
    medval= median(eventvals);
 end
 [medval medx] = min(abs(medval-xvals)); 

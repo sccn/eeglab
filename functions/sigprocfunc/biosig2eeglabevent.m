@@ -90,7 +90,7 @@ elseif isfield(EVENT,'POS')
     count = 1;
     for index = 1:length(EVENT.POS)
         pos_tmp = EVENT.POS(index) - interval(1) + 1;
-        if pos_tmp > 0 & EVENT.POS(index) <= interval(2)
+        if pos_tmp > 0 && EVENT.POS(index) <= interval(2)
             event(count).latency = pos_tmp;
             if isfield(EVENT, 'TYP')
                 typ = EVENT.TYP(index);

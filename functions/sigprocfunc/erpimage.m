@@ -431,7 +431,7 @@ if nargin < 1
 end
 
 data = squeeze(data);
-if nargin < 3 | isempty(times)
+if nargin < 3 || isempty(times)
     if size(data,1)==1 || size(data,2)==1
         fprintf('\nerpimage(): either input a times vector or make data size = (frames,trials).\n')
         return
@@ -440,7 +440,7 @@ if nargin < 3 | isempty(times)
     NoTimesPassed= 1;
 end
 
-if nargin < 2 | isempty(sortvar)
+if nargin < 2 || isempty(sortvar)
     sortvar = 1:size(data,2);
     NoShowVar = 1; % don't plot the dummy sortvar
 end
@@ -473,7 +473,7 @@ end
 if nargin<3
     times = NO;
 end
-if (length(times) == 1) | (times == NO),  % make default times
+if (length(times) == 1) || (times == NO),  % make default times
     times = 0:frames-1;
     srate = 1000*(length(times)-1)/(times(length(times))-times(1));
     fprintf('Using sampling rate %g Hz.\n',srate);
@@ -625,7 +625,7 @@ if nargin > 6
                 fprintf('\nerpimage(): limits arg must be a vector sized (1,2<->9).\n');
                 return
             end
-            if  ~isnan(Arg(1)) & (Arg(2) <= Arg(1))
+            if  ~isnan(Arg(1)) && (Arg(2) <= Arg(1))
                 help erpimage
                 fprintf('\nerpimage(): time limits out of order or out of range.\n');
                 return
@@ -645,7 +645,7 @@ if nargin > 6
             if length(Arg)> 3
                 maxerp = Arg(4);
             end
-            if ~isnan(maxerp) & maxerp <= minerp
+            if ~isnan(maxerp) && maxerp <= minerp
                 help erpimage
                 fprintf('\nerpimage(): erp limits args out of order.\n');
                 return
@@ -739,13 +739,13 @@ if nargin > 6
                     error('\nerpimage(): Invalid negative argument for keyword ''phasesort''');
                 end
             end
-            if min(phargs(1)) < times(1) | max(phargs(1)) > times(end)
+            if min(phargs(1)) < times(1) || max(phargs(1)) > times(end)
                 error('\nerpimage(): time for phase sorting filter out of bound.');
             end
-            if phargs(2) >= 100 | phargs(2) < -100
+            if phargs(2) >= 100 || phargs(2) < -100
                 error('\nerpimage(): %-argument for keyword ''phasesort'' must be (-100;100)');
             end
-            if length(phargs) >= 4 & phargs(3) > phargs(4)
+            if length(phargs) >= 4 && phargs(3) > phargs(4)
                 error('\nerpimage(): Phase sorting frequency range must be increasing.');
             end
             if length(phargs) == 5
@@ -758,15 +758,15 @@ if nargin > 6
             if n > 2
                 error('\nerpimage(): Too many arguments for keyword ''sortwin''');
             end
-            if min(sortwinarg(1)) < times(1) | max(sortwinarg(1)) > times(end)
+            if min(sortwinarg(1)) < times(1) || max(sortwinarg(1)) > times(end)
                 error('\nerpimage(): start time for value sorting out of bounds.');
             end
             if n > 1
-                if min(sortwinarg(2)) < times(1) | max(sortwinarg(2)) > times(end)
+                if min(sortwinarg(2)) < times(1) || max(sortwinarg(2)) > times(end)
                     error('\nerpimage(): end time for value sorting out of bounds.');
                 end
             end
-            if n > 1 & sortwinarg(1) > sortwinarg(2)
+            if n > 1 && sortwinarg(1) > sortwinarg(2)
                 error('\nerpimage(): Value sorting time range must be increasing.');
             end
             Sortwinflag = NO;
@@ -787,16 +787,16 @@ if nargin > 6
             end
             
             if ~isinf(ampargs(1))
-                if min(ampargs(1)) < times(1) | max(ampargs(1)) > times(end)
+                if min(ampargs(1)) < times(1) || max(ampargs(1)) > times(end)
                     error('\nerpimage(): time for amplitude sorting filter out of bounds.');
                 end
             end
             
-            if ampargs(2) >= 100 | ampargs(2) < -100
+            if ampargs(2) >= 100 || ampargs(2) < -100
                 error('\nerpimage(): percentile argument for keyword ''ampsort'' must be (-100;100)');
             end
             
-            if length(ampargs) == 4 & abs(ampargs(3)) > abs(ampargs(4))
+            if length(ampargs) == 4 && abs(ampargs(3)) > abs(ampargs(4))
                 error('\nerpimage(): Amplitude sorting frequency range must be increasing.');
             end
             Ampflag = NO;
@@ -809,18 +809,18 @@ if nargin > 6
             end
             valargs = Arg;
             
-            if min(valargs(1)) < times(1) | max(valargs(1)) > times(end)
+            if min(valargs(1)) < times(1) || max(valargs(1)) > times(end)
                 error('\nerpimage(): start time for value sorting out of bounds.');
             end
             if n > 1
-                if min(valargs(2)) < times(1) | max(valargs(2)) > times(end)
+                if min(valargs(2)) < times(1) || max(valargs(2)) > times(end)
                     error('\nerpimage(): end time for value sorting out of bounds.');
                 end
             end
-            if n > 1 & valargs(1) > valargs(2)
+            if n > 1 && valargs(1) > valargs(2)
                 error('\nerpimage(): Value sorting time range must be increasing.');
             end
-            if n==3 & (~isnumeric(valargs(3)) | valargs(3)==0)
+            if n==3 && (~isnumeric(valargs(3)) || valargs(3)==0)
                 error('\nerpimage(): Value sorting direction must be +1 or -1.');
             end
             Valflag = NO;
@@ -830,7 +830,7 @@ if nargin > 6
             titl = Arg; titleflag = NO;
         elseif Erpalphaflag == YES
             erpalpha = Arg(1);
-            if erpalpha < MIN_ERPALPHA | erpalpha > MAX_ERPALPHA
+            if erpalpha < MIN_ERPALPHA || erpalpha > MAX_ERPALPHA
                 fprintf('\nerpimage(): erpalpha value is out of bounds [%g, %g]\n',...
                     MIN_ERPALPHA,MAX_ERPALPHA);
                 return
@@ -866,7 +866,7 @@ if nargin > 6
                 elseif strcmpi(Arg, 'off') Showwin = NO;  a = a+1;
                 end
             end
-        elseif strcmp(Arg,'noplot') % elseif strcmp(Arg,'NoShow') % by Luca & Ramon
+        elseif strcmp(Arg,'noplot') % elseif strcmp(Arg,'NoShow') % by Luca && Ramon
             NoShow = YES;
             if a < nargin,
                 Arg = eval(['arg' int2str(a+1-6)]);
@@ -904,10 +904,10 @@ if nargin > 6
                 Arg = eval(['arg' int2str(a+1-6)]);
                 if strcmpi(Arg, 'on'),     Erpflag = YES; erp_ptiles=1; a = a+1;
                 elseif strcmpi(Arg, 'off') Erpflag = NO;  a = a+1;
-                elseif strcmpi(Arg,'1') | (Arg==1) Erplag = YES; erp_ptiles=1; a=a+1;
-                elseif strcmpi(Arg,'2') | (Arg==2) Erplag = YES; erp_ptiles=2; a=a+1;
-                elseif strcmpi(Arg,'3') | (Arg==3) Erplag = YES; erp_ptiles=3; a=a+1;
-                elseif strcmpi(Arg,'4') | (Arg==4) Erplag = YES; erp_ptiles=4; a=a+1;
+                elseif strcmpi(Arg,'1') || (Arg==1) Erplag = YES; erp_ptiles=1; a=a+1;
+                elseif strcmpi(Arg,'2') || (Arg==2) Erplag = YES; erp_ptiles=2; a=a+1;
+                elseif strcmpi(Arg,'3') || (Arg==3) Erplag = YES; erp_ptiles=3; a=a+1;
+                elseif strcmpi(Arg,'4') || (Arg==4) Erplag = YES; erp_ptiles=4; a=a+1;
                 end
             end
         elseif strcmpi(Arg,'rmerp')
@@ -918,7 +918,7 @@ if nargin > 6
                 elseif strcmpi(Arg, 'off') Rmerp = 'no';  a = a+1;
                 end
             end
-        elseif strcmp(Arg,'cbar') | strcmp(Arg,'colorbar')
+        elseif strcmp(Arg,'cbar') || strcmp(Arg,'colorbar')
             Colorbar = YES;
             if a < nargin,
                 Arg = eval(['arg' int2str(a+1-6)]);
@@ -926,7 +926,7 @@ if nargin > 6
                 elseif strcmpi(Arg, 'off') Colorbar = NO;  a = a+1;
                 end
             end
-        elseif (strcmp(Arg,'allamps') | strcmp(Arg,'plotamps'))
+        elseif (strcmp(Arg,'allamps') || strcmp(Arg,'plotamps'))
             Allampsflag = YES;
             if a < nargin,
                 Arg = eval(['arg' int2str(a+1-6)]);
@@ -942,7 +942,7 @@ if nargin > 6
                 elseif strcmpi(Arg, 'off') Erpstdflag = NO;  a = a+1;
                 end
             end
-        elseif strcmp(Arg,'noxlabel') | strcmp(Arg,'noxlabels') | strcmp(Arg,'nox')
+        elseif strcmp(Arg,'noxlabel') || strcmp(Arg,'noxlabels') || strcmp(Arg,'nox')
             NoTimeflag = YES;
             if a < nargin,
                 Arg = eval(['arg' int2str(a+1-6)]);
@@ -964,13 +964,13 @@ if nargin > 6
             titleflag = YES;
         elseif strcmp(Arg,'coher')
             Coherflag = YES;
-        elseif strcmp(Arg,'timestretch') | strcmp(Arg,'timewarp') % Added -JH
+        elseif strcmp(Arg,'timestretch') || strcmp(Arg,'timewarp') % Added -JH
             timestretchflag = YES;
         elseif strcmp(Arg,'allcohers')
             Allcohersflag = YES;
-        elseif strcmp(Arg,'topo') | strcmp(Arg,'topoplot')
+        elseif strcmp(Arg,'topo') || strcmp(Arg,'topoplot')
             Topoflag = YES;
-        elseif strcmp(Arg,'spec') | strcmp(Arg,'spectrum')
+        elseif strcmp(Arg,'spec') || strcmp(Arg,'spectrum')
             Specflag = YES;
         elseif strcmp(Arg,'Specaxis') || strcmp(Arg,'specaxis') || strcmp(Arg,'SpecAxis')
             SpecAxisflag = YES;
@@ -980,7 +980,7 @@ if nargin > 6
             Alignflag = YES;
         elseif strcmp(Arg,'limits')
             Limitflag = YES;
-        elseif (strcmp(Arg,'phase') | strcmp(Arg,'phasesort'))
+        elseif (strcmp(Arg,'phase') || strcmp(Arg,'phasesort'))
             Phaseflag = YES;
         elseif strcmp(Arg,'ampsort')
             Ampflag = YES;
@@ -1095,26 +1095,26 @@ if   Caxflag == YES ...
     fprintf('\nerpimage(): missing option arg.\n')
     return
 end
-if (Allampsflag | exist('data2')) & ( any(isnan(coherfreq)) | ~Cohsigflag )
+if (Allampsflag || exist('data2')) && ( any(isnan(coherfreq)) || ~Cohsigflag )
     fprintf('\nerpimage(): allamps and allcohers flags require coher freq, srate, and cohsig.\n');
     return
 end
-if Allampsflag & exist('data2')
+if Allampsflag && exist('data2')
     fprintf('\nerpimage(): cannot image both allamps and allcohers.\n');
     return
 end
-if ~exist('srate') | srate <= 0
+if ~exist('srate') || srate <= 0
     fprintf('\nerpimage(): Data srate must be specified and > 0.\n');
     return
 end
 if ~isempty(auxvar)
     % whos auxvar
-    if size(auxvar,1) ~= ntrials & size(auxvar,2) ~= ntrials
+    if size(auxvar,1) ~= ntrials && size(auxvar,2) ~= ntrials
         fprintf('\nerpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
             ntrials);
         return
     end
-    if size(auxvar,1) == ntrials & size(auxvar,2) ~= ntrials  % make (N,frames)
+    if size(auxvar,1) == ntrials && size(auxvar,2) ~= ntrials  % make (N,frames)
         auxvar = auxvar';
     end
     if size(auxvar,2) ~= ntrials
@@ -1129,7 +1129,7 @@ if ~isempty(auxvar)
             return
         end
     end
-elseif exist('timeStretchRef') & ~isempty(timeStretchRef)
+elseif exist('timeStretchRef') && ~isempty(timeStretchRef)
     if ~isnan(aligntime)
         fprintf(['\nerpimage(): options "align" and ' ...
             '"timewarp" are not compatiable.\n']);
@@ -1159,7 +1159,7 @@ elseif exist('timeStretchRef') & ~isempty(timeStretchRef)
     verttimesColors = {timeStretchColors{find(auxvarInd)}};
     newauxvars = repmat(newauxvars, [1 ntrials]);
     
-    if isempty(auxvar) % Initialize auxvar & auxcolors
+    if isempty(auxvar) % Initialize auxvar && auxcolors
         %  auxvar = newauxvars;
         auxcolors = {timeStretchColors{find(auxvarInd)}};
     else % Append auxvar & auxcolors
@@ -1192,10 +1192,10 @@ if exist('phargs')
             phargs(3),cycles);
         return
     end
-    if length(phargs)==4 & phargs(4) > srate/2
+    if length(phargs)==4 && phargs(4) > srate/2
         phargs(4) = srate/2;
     end
-    if length(phargs)==5 & (phargs(5)>180 | phargs(5) < -180)
+    if length(phargs)==5 && (phargs(5)>180 || phargs(5) < -180)
         fprintf('\nerpimage(): coher topphase (%g) out of range.\n',topphase);
         return
     end
@@ -1212,17 +1212,17 @@ if exist('ampargs')
             abs(ampargs(3)),cycles);
         return
     end
-    if length(ampargs)==4 & abs(ampargs(4)) > srate/2
+    if length(ampargs)==4 && abs(ampargs(4)) > srate/2
         ampargs(4) = srate/2;
         fprintf('> Reducing max ''ampsort'' frequency to Nyquist rate (%g Hz)\n',srate/2)
     end
 end
 if ~any(isnan(coherfreq))
-    if coherfreq(1) <= 0 | srate <= 0
+    if coherfreq(1) <= 0 || srate <= 0
         fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(1));
         return
     end
-    if coherfreq(end) > srate/2 | srate <= 0
+    if coherfreq(end) > srate/2 || srate <= 0
         fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(end));
         return
     end
@@ -1236,7 +1236,7 @@ end
 if isnan(timelimits)
     timelimits = [min(times) max(times)];
 end
-if ~ischar(aligntime) & ~isnan(aligntime)
+if ~ischar(aligntime) && ~isnan(aligntime)
     if ~isinf(aligntime) ...
             & (aligntime < timelimits(1) | aligntime > timelimits(2))
         help erpimage
@@ -1441,8 +1441,8 @@ end
 %% %%%%%%%%%%%%%%%%% Align data to sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-if ischar(aligntime) | ~isnan(aligntime)
-    if ~ischar(aligntime) & isinf(aligntime)
+if ischar(aligntime) || ~isnan(aligntime)
+    if ~ischar(aligntime) && isinf(aligntime)
         aligntime= median(sortvar);
         fprintf('Aligning data to median sortvar.\n');
         % Alternative below: trimmed median - ignore top/bottom 5%
@@ -1495,7 +1495,7 @@ end
 %% %%%%%%%%%%%%% Sort the data trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if exist('phargs') == 1 % if phase-sort the data trials
-    if length(phargs) >= 4 & phargs(3) ~= phargs(4) % find max frequency
+    if length(phargs) >= 4 && phargs(3) ~= phargs(4) % find max frequency
         % in specified band
         if exist('psd') == 2 % requires Signal Processing Toolbox
             fprintf('Computing data spectrum using psd().\n');
@@ -1863,13 +1863,13 @@ else
 end
 if decfactor > sqrt(ntrials) % if large, output this many trials
     n = 1:ntrials;
-    if exist('phargs') & length(phargs)>1
+    if exist('phargs') && length(phargs)>1
         if phargs(2)>0
             n = n(ceil(phargs(2)*ntrials)+1:end); % trials after rejection
         elseif phargs(2)<0
             n = n(1:floor(phargs(2)*length(n)));  % trials after rejection
         end
-    elseif exist('ampargs') & length(ampargs)>1
+    elseif exist('ampargs') && length(ampargs)>1
         if ampargs(2)>0
             n = n(ceil(ampargs(2)*ntrials)+1:end); % trials after rejection
         elseif ampargs(2)<0
@@ -1889,8 +1889,8 @@ if ~isreal(decfactor), decfactor = imag(decfactor); end
 %
 urdata = data; % save data to compute amp, coher on unsmoothed data
 
-if ~Allampsflag & ~exist('data2') % if imaging potential,
-    if length(timeStretchRef) > 0 & length(timeStretchMarks) > 0
+if ~Allampsflag && ~exist('data2') % if imaging potential,
+    if length(timeStretchRef) > 0 && length(timeStretchMarks) > 0
         %
         % Perform time-stretching here -JH %%%%%%%%%%%%%%%%
         %
@@ -2038,7 +2038,7 @@ end
 %
 %% %%%%%%%%%%% Determine coherence freqeuncy %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if length(coherfreq) == 2 & coherfreq(1) ~= coherfreq(2) & freq <= 0
+if length(coherfreq) == 2 && coherfreq(1) ~= coherfreq(2) && freq <= 0
     % find max frequency in specified band - should use Matlab pwelch()?
     if exist('psd') == 2 % from Signal Processing Toolbox
         [pxx,tmpfreq] = psd(urdata(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
@@ -2061,7 +2061,7 @@ end
 
 
 
-if ~Allampsflag & ~exist('data2') %%%%%%%% Plot ERP image %%%%%%%%%%
+if ~Allampsflag && ~exist('data2') %%%%%%%% Plot ERP image %%%%%%%%%%
     
     %Stretch the data array
     % $$$     keyboard;
@@ -2475,10 +2475,10 @@ end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%% plot vert lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(verttimes)
-    if size(verttimes,1) ~= 1 & size(verttimes,2) == 1 & size(verttimes,1) ~= ntrials
+    if size(verttimes,1) ~= 1 && size(verttimes,2) == 1 && size(verttimes,1) ~= ntrials
         verttimes = verttimes';
     end
-    if size(verttimes,1) ~= 1 & size(verttimes,1) ~= ntrials
+    if size(verttimes,1) ~= 1 && size(verttimes,1) ~= ntrials
         fprintf('\nerpimage(): vert arg matrix must have 1 or %d rows\n',ntrials);
         return
     end
@@ -2494,7 +2494,7 @@ if ~isempty(verttimes)
                 if TIMEX          % overplot vt on image
                     if length(vt)==1
                         mydotstyle = DOTSTYLE;
-                        if exist('auxcolors') & ...
+                        if exist('auxcolors') && ...
                                 length(verttimes) == length(auxcolors)
                             mydotstyle = auxcolors{find(verttimes == vt)};
                         end
@@ -2538,7 +2538,7 @@ end
 %% %%%%%%%%%%%%%%%%%%%%%%%%% plot horizontal ('horz') lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(horzepochs)
-    if size(horzepochs,1) > 1 & size(horzepochs,1) > 1
+    if size(horzepochs,1) > 1 && size(horzepochs,1) > 1
         fprintf('\nerpimage(): horz arg must be a vector\n');
         return
     end
@@ -2585,20 +2585,20 @@ end
 %
 if strcmpi(NoShow, 'no')
     if ~isnan(aligntime) % if trials time-aligned
-        if times(1) <= aligntime & times(frames) >= aligntime
+        if times(1) <= aligntime && times(frames) >= aligntime
             plot([aligntime aligntime],[min(outtrials) max(outtrials)],...
                 'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
             % plot vertical line at aligntime
         end
     else % trials not time-aligned
-        if times(1) <= 0 & times(frames) >= 0
+        if times(1) <= 0 && times(frames) >= 0
             plot([0 0],[min(outtrials) max(outtrials)],...
                 'k','Linewidth',ZEROWIDTH); % plot smoothed sortwvar
         end
     end
 end
 
-if strcmpi(NoShow, 'no') & ( min(outsort) < timelimits(1) ...
+if strcmpi(NoShow, 'no') && ( min(outsort) < timelimits(1) ...
         |max(outsort) > timelimits(2))
     ur_outsort = outsort; % store the pre-adjusted values
     fprintf('Not all sortvar values within time vector limits: \n')
@@ -2635,7 +2635,7 @@ if strcmpi(NoShow, 'no')
             end
         end
     else % if switch x<->y axes
-        if Nosort == YES & NoTimeflag==NO
+        if Nosort == YES && NoTimeflag==NO
             
             l=xlabel(img_ylab);
             if ~isempty(img_ylab) && ~strcmpi(img_ylab,'Trials')
@@ -2671,7 +2671,7 @@ if strcmpi(NoShow, 'no')
     set(gca,'Box','off');
     set(gca,'Fontsize',TICKFONT);
     set(gca,'color',BACKCOLOR);
-    if Erpflag == NO & NoTimeflag == NO
+    if Erpflag == NO && NoTimeflag == NO
         if exist('NoTimesPassed')~=1
             l=xlabel('Time (ms)');
         else
@@ -2832,7 +2832,7 @@ if Erpflag == YES
     end % compute average ERP, ignoring nan's
 end
 
-if Erpflag == YES & strcmpi(NoShow, 'no')
+if Erpflag == YES && strcmpi(NoShow, 'no')
     axes(ax1); % reset current axes to the erpimage
     xtick = get(ax1,'Xtick');               % remember x-axis tick locations
     xticklabel = get(ax1,'Xticklabel');     % remember x-axis tick locations
@@ -2935,7 +2935,7 @@ if Erpflag == YES & strcmpi(NoShow, 'no')
     end
     
     if isnan(coherfreq)            % if no amp and coher plots below . . .
-        if TIMEX & NoTimeflag == NO
+        if TIMEX && NoTimeflag == NO
             if exist('NoTimesPassed')~=1
                 l=xlabel('Time (ms)');
             else
@@ -2965,7 +2965,7 @@ if Erpflag == YES & strcmpi(NoShow, 'no')
             if isnan(aligntime)
                 if TIMEX      % overplot vt on ERP
                     mydotstyle = DOTSTYLE;
-                    if exist('auxcolors') & ...
+                    if exist('auxcolors') && ...
                             length(verttimes) == length(verttimesColors)
                         mydotstyle = verttimesColors{find(verttimes == vt)};
                     end
@@ -3030,7 +3030,7 @@ if ~isnan(coherfreq)
         
         fprintf('Computing and plotting amplitude at %g Hz.\n',coherfreq);
         
-        if ~isnan(signifs) | Cohsigflag==NO % don't compute or plot signif. levels
+        if ~isnan(signifs) || Cohsigflag==NO % don't compute or plot signif. levels
             [amps,cohers] = phasecoher(urdata,size(times,2),srate,coherfreq,cycles);
             if ~isnan(signifs)
                 ampsig = signifs([1 2]);
@@ -3186,7 +3186,7 @@ if ~isnan(coherfreq)
                 if isnan(aligntime)
                     if TIMEX      % overplot vt on amp
                         mydotstyle = DOTSTYLE;
-                        if exist('auxcolors') & ...
+                        if exist('auxcolors') && ...
                                 length(verttimes) == length(verttimesColors)
                             mydotstyle = verttimesColors{find(verttimes == vt)};
                         end
@@ -3303,7 +3303,7 @@ if ~isnan(coherfreq)
                 if isnan(aligntime)
                     if TIMEX      % overplot vt on coher
                         mydotstyle = DOTSTYLE;
-                        if exist('auxcolors') & ...
+                        if exist('auxcolors') && ...
                                 length(verttimes) == length(verttimesColors)
                             mydotstyle = verttimesColors{find(verttimes == vt)};
                         end
@@ -3378,7 +3378,7 @@ end
 %
 %% %%%%%%%%%%%%% Plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if (~isempty(topomap)) & strcmpi(NoShow, 'no')
+if (~isempty(topomap)) && strcmpi(NoShow, 'no')
     h(12)=axes('Position',...
         [gcapos(1)+0.10*gcapos(3) gcapos(2)+0.92*gcapos(4),...
         0.20*gcapos(3) 0.14*gcapos(4)]);
@@ -3525,7 +3525,7 @@ if ~isempty(winlocs)
         hannwin = makehanning(length(winloc));
         hannwin = hannwin./max(hannwin); % make max = 1
         hannwin = hannwin(:)'; % make row vector
-        if ~isempty(axlimits) & sum(isnan(axlimits))==0
+        if ~isempty(axlimits) && sum(isnan(axlimits))==0
             % fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
             fillwiny = [hannwin*axlimits(3) hannwin*axlimits(4)];
         else
@@ -3538,7 +3538,7 @@ if ~isempty(winlocs)
 end
 if ~isempty(signif);% (2,times) array giving upper and lower signif limits
     filltimes = [times times(end:-1:1)];
-    if size(signif,1) ~=2 | size(signif,2) ~= length(times)
+    if size(signif,1) ~=2 || size(signif,2) ~= length(times)
         fprintf('plot1trace(): signif array must be size (2,frames)\n')
         return
     end
@@ -3654,15 +3654,15 @@ amp = abs(resp);
 %
 function prctl = prctle(data,pc); % return percentile of a distribution
 [prows pcols] = size(pc);
-if prows ~= 1 & pcols ~= 1
+if prows ~= 1 && pcols ~= 1
     error('\nerpimage(): pc must be a scalar or a vector.');
 end
-if any(pc > 100) | any(pc < 0)
+if any(pc > 100) || any(pc < 0)
     error('\nerpimage(): pc must be between 0 and 100');
 end
 [i,j] = size(data);
 sortdata = sort(data);
-if i==1 | j==1 % if data is a vector
+if i==1 || j==1 % if data is a vector
     i = max(i,j); j = 1;
     if i == 1,
         fprintf('  prctle() note: input data is a single scalar!\n')

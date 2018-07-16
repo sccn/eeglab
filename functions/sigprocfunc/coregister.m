@@ -163,7 +163,7 @@ end
 % undocumented commands run from GUI
 % ----------------------------------
 if ischar(chanlocs1) 
-    if ~strcmpi(chanlocs1, 'redraw') & ~strcmpi(chanlocs1, 'fiducials') & ~strcmpi(chanlocs1, 'warp')
+    if ~strcmpi(chanlocs1, 'redraw') && ~strcmpi(chanlocs1, 'fiducials') && ~strcmpi(chanlocs1, 'warp')
         chanlocs1 = readlocs(chanlocs1);
     else
         com = chanlocs1;
@@ -468,7 +468,7 @@ if 1
             '''head model. Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
             '''in the EEGLAB menu and select the "No coreg" option.'',' ];
     if ~isstruct(chanlocs2)
-        if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
+        if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) || ...
                 ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
             cb_helpme = [ cb_helpme '''Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
                           '''in the EEGLAB menu and select the "No coreg" option.''), ''Warning'');' ];
@@ -737,7 +737,7 @@ function redrawgui(fid)
     
     % plot mesh
     % ---------
-    if ~isempty(dat.meshpnt) & isempty(findobj(gcf, 'tag', 'mesh'))
+    if ~isempty(dat.meshpnt) && isempty(findobj(gcf, 'tag', 'mesh'))
         if ~isempty(dat.meshtri)
             p1 = plotmesh(dat.meshtri, dat.meshpnt, [], 1);
             set(p1, 'tag', 'mesh');

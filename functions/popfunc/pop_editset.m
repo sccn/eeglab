@@ -325,7 +325,7 @@ for curfield = tmpfields'
         case 'chanlocs', varname = getfield(g, {1}, curfield{1});
                          if isempty(varname)
                              EEGOUT.chanlocs = [];
-                         elseif ischar(varname) & exist( varname ) == 2
+                         elseif ischar(varname) && exist( varname ) == 2
                             fprintf('pop_editset(): channel locations file ''%s'' found\n', varname); 
                             [ EEGOUT.chanlocs lab theta rad ind ] = readlocs(varname);
                          elseif ischar(varname)
@@ -339,7 +339,7 @@ for curfield = tmpfields'
                              EEGOUT.chanlocs = varname;
                          end
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
-                         if ischar(varname) & exist( varname ) == 2
+                         if ischar(varname) && exist( varname ) == 2
                             fprintf('pop_editset(): ICA weight matrix file ''%s'' found\n', varname);
                             if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end;                            
 							try, EEGOUT.icaweights = load(varname, '-ascii');
@@ -363,7 +363,7 @@ for curfield = tmpfields'
 								 EEGOUT.icawinv = [];                                 
 							 end
 						 end
-                         if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
+                         if ~isempty(EEGOUT.icaweights) && isempty(EEGOUT.icasphere)
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
                          end
         case 'icachansind', varname = getfield(g, {1}, curfield{1});
@@ -375,7 +375,7 @@ for curfield = tmpfields'
   								 EEGOUT.icachansind = varname;
 							 end
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
-                         if ischar(varname) & exist( varname ) == 2
+                         if ischar(varname) && exist( varname ) == 2
                             fprintf('pop_editset(): ICA sphere matrix file ''%s'' found\n', varname); 
                             if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end
                             try, EEGOUT.icasphere = load(varname, '-ascii');
@@ -399,20 +399,20 @@ for curfield = tmpfields'
 								 EEGOUT.icawinv = [];                                 
 							 end
                          end
-                         if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
+                         if ~isempty(EEGOUT.icaweights) && isempty(EEGOUT.icasphere)
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
                          end
 	    case 'data'    , varname = getfield(g, {1}, curfield{1});
                          if isnumeric(varname)
                              EEGOUT.data = varname;
-                         elseif exist( varname ) == 2 & ~strcmp(lower(g.dataformat), 'array');
+                         elseif exist( varname ) == 2 && ~strcmp(lower(g.dataformat), 'array');
                             fprintf('pop_editset(): raw data file ''%s'' found\n', varname); 
                             switch lower(g.dataformat)
 							 case 'ascii' , 
 							  try, EEGOUT.data = load(varname, '-ascii');
 							  catch, disp(lasterr); error(['pop_editset() error: cannot read ascii file ''' varname ''' ']); 
 							  end
-							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
+							  if ndims(EEGOUT.data)<3 && size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
 							 case 'matlab', 
 							  try,
 								  x = whos('-file', varname);
@@ -424,7 +424,7 @@ for curfield = tmpfields'
 								  clear tmpdata;
 							  catch, error(['pop_editset() error: cannot read .mat file ''' varname ''' ']); 
 							  end
-							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
+							  if ndims(EEGOUT.data)<3 && size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
 							 case {'float32le' 'float32be'}, 
 							  if EEGOUT.nbchan == 0,
 								  error(['pop_editset() error: to read float32 data you must first specify the number of channels']);
@@ -466,7 +466,7 @@ for curfield = tmpfields'
                              warning on;
                          else 
                              EEGOUT.data = varname;
-                             if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
+                             if ndims(EEGOUT.data)<3 && size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
                          end
          otherwise, error(['pop_editset() error: unrecognized field ''' curfield{1} '''']); 
     end

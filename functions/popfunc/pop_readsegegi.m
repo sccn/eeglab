@@ -75,7 +75,7 @@ end
 
 % add one channel with the event data
 % -----------------------------------
-if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
+if ~isempty(Eventdata) && size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end
 EEG.comments        = [ 'Original files: ' orifilename ' to ' tmpfilename ];

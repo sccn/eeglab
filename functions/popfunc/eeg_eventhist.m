@@ -92,7 +92,7 @@ else
      vals{k} = getfield(Event(k),field);
   end
 end
-if nargout == 1 | exist('IS_STRUCT')
+if nargout == 1 || exist('IS_STRUCT')
   return      % return vals only, no histogram 
 end
 %

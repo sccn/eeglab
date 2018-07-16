@@ -43,7 +43,7 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
     if isempty(basevector)
 		basevector =0;
 	end
-    if length(basevector) == 1 & basevector(1) ~= 0
+    if length(basevector) == 1 && basevector(1) ~= 0
        fprintf('rmbase(): basevector should be a vector of frame indices.\n');
        return
     end

@@ -116,7 +116,7 @@ compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
 
 %fprintf( 'The ICA projection accounts for %2.2f percent of the data\n', 100*varegg);
 	
-if nargin < 2 | plotag ~= 0
+if nargin < 2 || plotag ~= 0
 
     ButtonName = 'continue';
     while ~strcmpi(ButtonName, 'Cancel') & ~strcmpi(ButtonName, 'Accept')

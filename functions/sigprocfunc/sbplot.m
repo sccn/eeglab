@@ -57,7 +57,7 @@ if nargin<3
    error('            requires >=3 arguments');
 end
 
-if nargin>3 & strcmp(varargin{1},'ax')
+if nargin>3 && strcmp(varargin{1},'ax')
    pos = get(varargin{2},'Position'); %  sbplot(3,1,[2 3]) -> 0.4111 0.1100 0.4939 0.815
    varargin = {varargin{3:end}};
 else

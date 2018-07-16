@@ -49,7 +49,7 @@ if nargin<4
     return;
 end
 
-if nargin > 4 & gui
+if nargin > 4 && gui
     error('Chancenter: 4th input'' gui'' is obsolete. Use pop_chancenter instead');
 else 
 	if isempty(center)
@@ -70,7 +70,7 @@ end
 fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
 newcenter = center;
 
-if  wobble/mean(radius) > 0.01 & optim==1
+if  wobble/mean(radius) > 0.01 && optim==1
 	% Find center
 	% ----------------------------------------------
 	fprintf('Optimizing center position...\n');

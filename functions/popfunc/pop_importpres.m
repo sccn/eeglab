@@ -65,7 +65,7 @@ end
 if nargin < 5
     durfield = '';
 end
-if nargin >= 5 & ~ischar(durfield)
+if nargin >= 5 && ~ischar(durfield)
     if nargin >= 6
         varargin = { align varargin{:} };
     end
@@ -151,7 +151,7 @@ for index = 1:length(fields)
     indspace = find(fields{index} == ' ');
     fields{index}(indspace) = '_';
     indparen = find(fields{index} == ')');
-    if ~isempty(indparen) & indparen == length(fields{index})
+    if ~isempty(indparen) && indparen == length(fields{index})
         % remove text for parenthesis
         indparen = find(fields{index} == '(');
         if indparen ~= 1

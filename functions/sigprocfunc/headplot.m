@@ -376,7 +376,7 @@ if ischar(values)
     fprintf('Saving (%dk) file %s\n',round(tmpinfo.bytes/1000), spline_file);
     return
 
-  elseif strcmp(values,'example') | strcmp(values,'demo')
+  elseif strcmp(values,'example') || strcmp(values,'demo')
 %
 %%%%%%%%%%%%%%%%%% Show an example electrode angles file  %%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -520,7 +520,7 @@ else
   if size(g.maplimits) == [1,2]
       amin = g.maplimits(1);
       amax = g.maplimits(2);
-  elseif strcmp(g.maplimits,'maxmin') | strcmp(g.maplimits,'minmax')
+  elseif strcmp(g.maplimits,'maxmin') || strcmp(g.maplimits,'minmax')
       amin = min(min(abs(P)))*1.02; % 2% shrinkage keeps within color bounds
       amax = max(max(abs(P)))*1.02; 
   elseif strcmp(g.maplimits,'absmax')
@@ -543,7 +543,7 @@ else
   colormap(g.colormap)
   p1 = patch('Vertices',POS,'Faces',TRI1,'FaceVertexCdata',W(:),...
       'FaceColor','interp', 'cdatamapping', 'direct', 'tag', 'mesh');    %%%%%%%%% Plot scalp map %%%%%%%%%
-  if exist('NORM') == 1 & ~isempty(NORM)
+  if exist('NORM') == 1 && ~isempty(NORM)
       set(p1, 'vertexnormals', NORM);
   end
   
@@ -633,7 +633,7 @@ else
   else
       if ~ischar(g.view)
           [h,a] = size(g.view);
-          if h~= 1 | a~=2
+          if h~= 1 || a~=2
               close; error('headplot(): View matrix size must be (1,2).')
           end
       end

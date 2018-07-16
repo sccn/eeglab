@@ -91,7 +91,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
     
     % auto center
     % -----------
-    if strcmpi(g.autocenter, 'on') & isempty(g.center)
+    if strcmpi(g.autocenter, 'on') && isempty(g.center)
         disp('Reading template 10-20 file');
         locs1020 = readlocs('eeglab1020.ced');
         
@@ -131,7 +131,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
 
     % auto rotate
     % -----------
-    if strcmpi(g.autorotate, 'on') & isempty(g.rotate)
+    if strcmpi(g.autorotate, 'on') && isempty(g.rotate)
         if exist('locs1020') ~= 1
             disp('Reading template 10-20 file');
             locs1020 = readlocs('eeglab1020.ced');
@@ -156,7 +156,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
 
     % auto scale
     % ----------
-    if strcmpi(g.autoscale, 'on') & isempty(g.hscale) & isempty(g.vscale)
+    if strcmpi(g.autoscale, 'on') && isempty(g.hscale) && isempty(g.vscale)
         if exist('locs1020') ~= 1
             disp('Reading template 10-20 file');
             locs1020 = readlocs('eeglab1020.ced');
@@ -234,7 +234,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
     
     % get X and Y coordinates
     % -----------------------
-    if strcmpi(g.coordinates, 'sph') | strcmpi(g.coordinates, 'pol')
+    if strcmpi(g.coordinates, 'sph') || strcmpi(g.coordinates, 'pol')
         [X Y] = pol2cart( [ chanlocs.theta ]/180*pi, [ chanlocs.radius ]); Z = 1;
         if strcmpi(g.coordinates, 'sph')
             X = X/0.25*46;
@@ -364,7 +364,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
     
     % uniform?
     % --------
-    if strcmpi(g.uniform, 'on') & ( ~isempty(g.vscale) | ~isempty(g.hscale))
+    if strcmpi(g.uniform, 'on') && ( ~isempty(g.vscale) || ~isempty(g.hscale))
         disp('uniform scaling: averaging left-right and rear-front scaling factor');
         hscalefact = mean([hscalefact vscalefact]);
         vscalefact = hscalefact;
@@ -372,7 +372,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
     
     % scaling data
     % ------------
-    if ~isempty(g.vscale) | ~isempty(g.hscale) | ~isempty(g.scale)
+    if ~isempty(g.vscale) || ~isempty(g.hscale) || ~isempty(g.scale)
         Y = Y/hscalefact;
         X = X/vscalefact;
         Z = Z/((hscalefact+vscalefact)/2);
@@ -380,7 +380,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
     
     % updating structure
     % ------------------
-    if strcmpi(g.coordinates, 'sph') |  strcmpi(g.coordinates, 'pol') 
+    if strcmpi(g.coordinates, 'sph') ||  strcmpi(g.coordinates, 'pol') 
         [phi,theta] = cart2pol(Y, X);
         phi = phi/pi*180;
         if strcmpi(g.coordinates, 'pol')

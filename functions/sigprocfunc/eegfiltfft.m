@@ -50,7 +50,7 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
         help eegfiltfft;
     end
     [chans frames] = size(data);
-    if nargin < 5 | epochframes == 0
+    if nargin < 5 || epochframes == 0
         epochframes = frames;
     end
     if nargin < 7

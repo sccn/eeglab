@@ -72,7 +72,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                
         geom = { 1 1 1 1 1 1 1 [1.1 1] };
         [res userdata tmp restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'helpcom', 'pophelp(''pop_interp'')');
-        if isempty(res) | isempty(userdata), return; end
+        if isempty(res) || isempty(userdata), return; end
         
         if restag.method == 1
              method = 'spherical';
@@ -117,7 +117,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
             if ~isempty(tmpanswer),
                 tmpanswernum = round(str2num(tmpanswer{1}));
                 if ~isempty(tmpanswernum),
-                    if tmpanswernum > 0 & tmpanswernum <= length(ALLEEG),
+                    if tmpanswernum > 0 && tmpanswernum <= length(ALLEEG),
                         TMPEEG = ALLEEG(tmpanswernum);
                         
                         tmpchans1 = TMPEEG.chanlocs;

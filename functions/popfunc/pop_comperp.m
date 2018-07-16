@@ -226,7 +226,7 @@ end
 
 % check consistency
 % -----------------
-if length(datsub) > 0 & length(datadd) ~= length(datsub)
+if length(datsub) > 0 && length(datadd) ~= length(datsub)
     error('The number of component to subtract must be the same as the number of components to add');
 end
 
@@ -240,7 +240,7 @@ if length(datsub) == 1 &strcmpi(g.subavg, 'on')
     g.subavg  = 'off';
     g.suball = 'on';
 end
-if length(datsub) == 1 & length(datadd) == 1 &strcmpi(g.diffavg, 'on')
+if length(datsub) == 1 && length(datadd) == 1 &strcmpi(g.diffavg, 'on')
     g.diffavg  = 'off';
     g.diffall = 'on';
 end;      
@@ -260,7 +260,7 @@ for index = unionIndices(:)'
     if ALLEEG(index).nbchan ~= nbchan, error(['Dataset '  int2str(index) ' does not have the same number of channels as others']); end
 end
     
-if ~isempty(g.alpha) & length(datadd) == 1
+if ~isempty(g.alpha) && length(datadd) == 1
     error([ 'T-tests require more than one ''' datadd ''' dataset' ]);
 end
 
@@ -343,7 +343,7 @@ if ~isempty(g.lowpass)
         erptoplot = eegfiltfft(erptoplot, srate, 0, g.lowpass);
     end
 end
-if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end
+if strcmpi(g.geom, 'array') || flag == 0, chanlocs = []; end
 if ~isfield(chanlocs, 'theta'), chanlocs = []; end
 
 % select time range
@@ -378,7 +378,7 @@ else
     erpsub = [];
 end
 
-if nargin < 3 & nargout == 1
+if nargin < 3 && nargout == 1
     erp1 = sprintf('pop_comperp( ALLEEG, %d, %s);', flag, vararg2str({ datadd datsub options{:} }) );
 end
 return;
@@ -523,7 +523,7 @@ end;
 a1 = mean(d1, dim);
 v1 = std(d1, [], dim).^2;
 n1 = size(d1,dim);
-if length(d2) == 1 & d2 == 0
+if length(d2) == 1 && d2 == 0
     a2 = 0;
     n2 = n1;
     df = n1 + n2 - 2;

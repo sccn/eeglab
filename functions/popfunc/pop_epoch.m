@@ -87,7 +87,7 @@ com = '';
 indices = [];
 
 if isempty(EEG.event)
-    if EEG.trials > 1 & EEG.xmin <= 0 & EEG.xmax >=0
+    if EEG.trials > 1 && EEG.xmin <= 0 && EEG.xmax >=0
         disp('No EEG.event structure found: creating events of type ''TLE'' (Time-Locking Event) at time 0');
         EEG.event(EEG.trials).epoch = EEG.trials; 
         for trial = 1:EEG.trials
@@ -316,7 +316,7 @@ fprintf('pop_epoch():%d epochs generated\n', length(indices));
 
 % update other fields
 % -------------------
-if lim(1) ~= tmptime(1) & lim(2)-1/EEG.srate ~= tmptime(2)
+if lim(1) ~= tmptime(1) && lim(2)-1/EEG.srate ~= tmptime(2)
 	fprintf('pop_epoch(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', ...
 		tmptime(1), tmptime(2)+1/EEG.srate);
 end
@@ -364,7 +364,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % check for boundary events
 % -------------------------
 disp('pop_epoch(): checking epochs for data discontinuity');
-if ~isempty(EEG.event) & ischar(EEG.event(1).type)
+if ~isempty(EEG.event) && ischar(EEG.event(1).type)
     tmpevent = EEG.event;
 	boundaryindex = strmatch('boundary', { tmpevent.type });
 	if ~isempty(boundaryindex)

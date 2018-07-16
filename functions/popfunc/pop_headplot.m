@@ -93,7 +93,7 @@ if nargin < 3 % Open GUI input window
     if typeplot == 1 % ********** data plot
         fieldname    = 'splinefile';        
         if isempty(EEG.splinefile) && exist(EEG.splinefile, 'file')          
-            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
+            if length(EEG.icachansind) == EEG.nbchan && ~isempty(EEG.icasplinefile)
                 EEG.splinefile = EEG.icasplinefile;
             else
                 compute_file = 1;
@@ -104,7 +104,7 @@ if nargin < 3 % Open GUI input window
     else % ************* Component plot       
         fieldname    = 'icasplinefile';
         if isempty(EEG.icasplinefile) && exist(EEG.icasplinefile, 'file')
-            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
+            if length(EEG.icachansind) == EEG.nbchan && ~isempty(EEG.splinefile)
                 EEG.icasplinefile = EEG.splinefile;
             else
                 compute_file = 1;
@@ -343,14 +343,14 @@ end
 if typeplot == 1 % ********** data plot
     fieldname    = 'splinefile';        
     if isempty(EEG.splinefile)            
-        if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
+        if length(EEG.icachansind) == EEG.nbchan && ~isempty(EEG.icasplinefile)
             EEG.splinefile = EEG.icasplinefile;
         end
     end
 else % ************* Component plot       
     fieldname    = 'icasplinefile';
     if isempty(EEG.icasplinefile)
-        if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
+        if length(EEG.icachansind) == EEG.nbchan && ~isempty(EEG.splinefile)
             EEG.icasplinefile = EEG.splinefile;
         end
     end
@@ -380,7 +380,7 @@ else
 end;    
 SIZEBOX = 150;
 nbgraph = size(arg2(:),1);
-if ~exist('rowcols') | isempty(rowcols) | rowcols == 0
+if ~exist('rowcols') || isempty(rowcols) || rowcols == 0
     rowcols(2) = ceil(sqrt(nbgraph));
     rowcols(1) = ceil(nbgraph/rowcols(2));
 end;    

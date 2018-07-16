@@ -63,14 +63,14 @@ end
 
 % pop up window
 % -------------
-if (nargin < 3 & typeproc==1)
+if (nargin < 3 && typeproc==1)
 	promptstr    = { 'Channel number:'; 'Trim percentage (each end):' };
 	inistr       = { '1';'5' };
 	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end
 	cnum   	     = eval( [ '[' result{1} ']' ] ); % the brackets allow processing Matlab arrays
 	percent      = eval( [ '[' result{2} ']' ] );
-elseif (nargin < 3 & typeproc==0)
+elseif (nargin < 3 && typeproc==0)
 	promptstr    = { 'Component number:'; 'Trim percentage (each end):' };
 	inistr       = { '1'; '5' };
 	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
@@ -79,11 +79,11 @@ elseif (nargin < 3 & typeproc==0)
     percent      = eval( [ '[' result{2} ']' ] );
 end
 
-if length(cnum) ~= 1 | (cnum-floor(cnum)) ~= 0
+if length(cnum) ~= 1 || (cnum-floor(cnum)) ~= 0
 	error('pop_signalstat(): Channel/component number must be a single integer');
 end
 
-if cnum < 1 | cnum > EEG.nbchan
+if cnum < 1 || cnum > EEG.nbchan
    error('pop_signalstat(): Channel/component number out of range');
 end;   
 

@@ -38,7 +38,7 @@ if isempty(EEG.data)
     error('Pop_averef: cannot process empty data');
 end
 
-if nargin < 2 | confirm == 1
+if nargin < 2 || confirm == 1
     % which set to save
 	% -----------------
 	 ButtonName=questdlg2( strvcat('Convert the data to average reference?', ...

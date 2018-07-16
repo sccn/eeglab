@@ -45,10 +45,10 @@ function latout = eeg_urlatency( events, latin );
     
     boundevents = { events.type };
     latout      = latin;
-    if ~isempty(boundevents) & ischar(boundevents{1})
+    if ~isempty(boundevents) && ischar(boundevents{1})
         indbound = strmatch('boundary', boundevents);
         
-        if isfield(events, 'duration') & ~isempty(indbound)
+        if isfield(events, 'duration') && ~isempty(indbound)
             for index = indbound'
                 tmpInds = find(events(index).latency < latin); % the find handles several input latencies
                 latout(tmpInds) = latout(tmpInds) + events(index).duration;

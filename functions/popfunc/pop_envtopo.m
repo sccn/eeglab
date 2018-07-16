@@ -52,10 +52,10 @@ if nargin < 1
 	help pop_envtopo;
 	return;
 end;	
-if length(EEG) == 1 & isempty( EEG.icasphere )
+if length(EEG) == 1 && isempty( EEG.icasphere )
 	disp('Error: cannot make plot without ICA weights. See "Tools > Run ICA".'); return;
 end
-if length(EEG) == 1 & isempty(EEG.chanlocs)
+if length(EEG) == 1 && isempty(EEG.chanlocs)
 	fprintf('Cannot make plot without channel locations. See "Edit > Dataset info".\n');
 	return;
 end

@@ -62,7 +62,7 @@ if nargin < 2
 	if length(result) == 0 return; end
 	no_rt = eval( result{1} );
 end
-if exist('no_rt') ~= 1 | isempty(no_rt)
+if exist('no_rt') ~= 1 || isempty(no_rt)
 	no_rt = NaN;
 end
 

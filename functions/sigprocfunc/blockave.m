@@ -60,7 +60,7 @@ if max(epochs) > nepochs
    return
 end
 if min(epochs) < 1
-   if size(epochs,1)>1 | size(epochs,2) > 1
+   if size(epochs,1)>1 || size(epochs,2) > 1
      help blockave
      return
    else

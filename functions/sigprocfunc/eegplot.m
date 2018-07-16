@@ -422,7 +422,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
     if g.spacing > 10
       g.spacing = round(g.spacing);
     end
-    if g.spacing  == 0 | isnan(g.spacing)
+    if g.spacing  == 0 || isnan(g.spacing)
         g.spacing = 1; % default
     end
   end
@@ -489,8 +489,8 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
       'XColor',DEFAULT_AXIS_COLOR,...
       'YColor',DEFAULT_AXIS_COLOR);
 
-  if ischar(g.eloc_file) | isstruct(g.eloc_file)  % Read in electrode names
-      if isstruct(g.eloc_file) & length(g.eloc_file) > size(data,1)
+  if ischar(g.eloc_file) || isstruct(g.eloc_file)  % Read in electrode names
+      if isstruct(g.eloc_file) && length(g.eloc_file) > size(data,1)
           g.eloc_file(end) = []; % common reference channel location
       end
       eegplot('setelect', g.eloc_file, ax1);
@@ -868,7 +868,7 @@ u(22) = uicontrol('Parent',figh, ...
 
   % plot durations
   % --------------
-  if g.ploteventdur & isfield(g.events, 'duration')
+  if g.ploteventdur && isfield(g.events, 'duration')
       disp(['Use menu "Display > Hide event duration" to hide colored regions ' ...
            'representing event duration']);
   end
@@ -1103,7 +1103,7 @@ u(22) = uicontrol('Parent',figh, ...
   % prepare event array if any
   % --------------------------
   if ~isempty(g.events)
-      if ~isfield(g.events, 'type') | ~isfield(g.events, 'latency'), g.events = []; end
+      if ~isfield(g.events, 'type') || ~isfield(g.events, 'latency'), g.events = []; end
   end
       
   if ~isempty(g.events)
@@ -1290,7 +1290,7 @@ else
         else tmpcolor = g.color{mod(i-1,length(g.color))+1};
         end
         
-        if isfield(g, 'eloc_file') & ...
+        if isfield(g, 'eloc_file') && ...
                    isfield(g.eloc_file, 'badchan') & ...
                    g.eloc_file(g.chans-i+1).badchan;
             tmpcolor = [ .85 .85 .85 ];
@@ -1309,7 +1309,7 @@ else
         end
         
 %        keyboard;  
-        if (isfield(g, 'eloc_file') & ...
+        if (isfield(g, 'eloc_file') && ...
                    isfield(g.eloc_file, 'badchan') & ...
                    ~g.eloc_file(g.chans-i+1).badchan) | ...
                    (~isfield(g, 'eloc_file')) | ...
@@ -1322,9 +1322,9 @@ else
      
     % draw selected channels
     % ------------------------
-    if ~isempty(g.winrej) & size(g.winrej,2) > 2
+    if ~isempty(g.winrej) && size(g.winrej,2) > 2
     	for tpmi = 1:size(g.winrej,1) % scan rows
-			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
+			if (g.winrej(tpmi,1) >= lowlim && g.winrej(tpmi,1) <= highlim) || ...
 				(g.winrej(tpmi,2) >= lowlim & g.winrej(tpmi,2) <= highlim)
 				abscmin = max(1,round(g.winrej(tpmi,1)-lowlim));	 
 				abscmax = round(g.winrej(tpmi,2)-lowlim);
@@ -1399,7 +1399,7 @@ else
     lowlim = round(g.time*multiplier+1);
    	highlim = round(min((g.time+g.winlength)*multiplier+1));
   	displaymenu = findobj('tag','displaymenu','parent',gcf);
-    if ~isempty(g.winrej) & g.winstatus
+    if ~isempty(g.winrej) && g.winstatus
 		if g.trialstag ~= -1 % epoched data
 			indices = find((g.winrej(:,1)' >= lowlim & g.winrej(:,1)' <= highlim) | ...
 						   (g.winrej(:,2)' >= lowlim & g.winrej(:,2)' <= highlim));
@@ -1507,7 +1507,7 @@ else
             
             % draw duration is not 0
             % ----------------------
-            if g.ploteventdur & ~isempty(g.eventlatencyend) ...
+            if g.ploteventdur && ~isempty(g.eventlatencyend) ...
                     & g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
                 tmplatend = g.eventlatencyend(event2plot(index))-lowlim-1;
                 if tmplatend ~= 0, 
@@ -1565,7 +1565,7 @@ else
         if tagzerooffset < 0, tagzerooffset = 0; end
         
 		for i=1:length(alltag)-1
-			if ~isempty(tagpos) & tagpos(end)-alltag(i)<2*incrementpoint/3
+			if ~isempty(tagpos) && tagpos(end)-alltag(i)<2*incrementpoint/3
 				tagpos  = tagpos(1:end-1);
 			end
 			if ~isempty(g.freqlimits)
@@ -1680,7 +1680,7 @@ else
    if size(result,1) == 0 return; end
    
    g.dispchans = eval(result{1});
-   if g.dispchans<0 | g.dispchans>g.chans
+   if g.dispchans<0 || g.dispchans>g.chans
        g.dispchans =g.chans;
    end
    set(gcf, 'UserData', g);
@@ -2039,7 +2039,7 @@ else
                 lowlim  = round(g.time*g.srate+1);
                 highlim = round(g.winlength*g.srate);
             end
-            if (tmppos(1) >= 0) & (tmppos(1) <= highlim),
+            if (tmppos(1) >= 0) && (tmppos(1) <= highlim),
                 if isempty(g.winrej) Allwin=0;
                 else Allwin = (g.winrej(:,1) < lowlim+tmppos(1)) & (g.winrej(:,2) > lowlim+tmppos(1));
                 end
@@ -2058,7 +2058,7 @@ else
                     if g.trialstag ~= -1 % find nearest trials boundaries if epoched data
                         alltrialtag = [0:g.trialstag:g.frames];
                         I1 = find(alltrialtag < (tmppos(1)+lowlim) ); 
-                        if ~isempty(I1) & I1(end) ~= length(alltrialtag),
+                        if ~isempty(I1) && I1(end) ~= length(alltrialtag),
                             g.winrej = [g.winrej' [alltrialtag(I1(end)) alltrialtag(I1(end)+1) g.wincolor zeros(1,g.chans)]']';
                         end
                     else,

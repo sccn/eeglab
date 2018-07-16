@@ -293,7 +293,7 @@ listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
 % ----------------------------------
 % special mode for getting the info
 % ----------------------------------
-if ischar(filename) & strcmp(filename, 'getinfos')
+if ischar(filename) && strcmp(filename, 'getinfos')
    eloc = chanformat;
    labels = listcolformat;
    return;
@@ -342,7 +342,7 @@ if ischar(filename)
    
    % assign format from filetype
    % ---------------------------
-   if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') ...
+   if ~isempty(g.filetype) && ~strcmpi(g.filetype, 'custom') ...
            & ~strcmpi(g.filetype, 'asc') & ~strcmpi(g.filetype, 'elc') & ~strcmpi(g.filetype, 'dat')
       indexformat = strmatch(lower(g.filetype), { chanformat.type }, 'exact');
       g.format = chanformat(indexformat).importformat;
@@ -357,7 +357,7 @@ if ischar(filename)
    
    % import file
    % -----------
-   if strcmp(g.filetype, 'asc') | strcmp(g.filetype, 'dat')
+   if strcmp(g.filetype, 'asc') || strcmp(g.filetype, 'dat')
        eloc = readneurolocs( filename );
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
@@ -366,7 +366,7 @@ if ischar(filename)
                type = eloc(index).type;
                if type == 69,     eloc(index).type = 'EEG';
                elseif type == 88, eloc(index).type = 'REF';
-               elseif type >= 76 & type <= 82, eloc(index).type = 'FID';
+               elseif type >= 76 && type <= 82, eloc(index).type = 'FID';
                else eloc(index).type = num2str(eloc(index).type);
                end
            end
@@ -379,7 +379,7 @@ if ischar(filename)
        eloc = convertlocs(eloc, 'cart2all');
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
-   elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
+   elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') || ...
            strcmp(g.filetype, 'polhemus')
        try, 
            [eloc labels X Y Z]= readelp( filename );

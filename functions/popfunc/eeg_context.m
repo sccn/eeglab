@@ -84,7 +84,7 @@ if nargin < 1
    return
 end
 
-if nargin< 6 | isempty(alltargs)
+if nargin< 6 || isempty(alltargs)
   alltargs = 0;
 elseif strcmpi(alltargs,'all')
   alltargs = 1;
@@ -105,20 +105,20 @@ if ~isfield(EEG.event,'urevent')
    error('No EEG.event().urevent field found');
 end
       
-if EEG.trials == 1 | ~isfield(EEG.event(1),'epoch')
+if EEG.trials == 1 || ~isfield(EEG.event(1),'epoch')
   fprintf('Data are continuous: Returning info on all targets; no epoch info returned.\n')
   alltargs = 1;
   epochinfo = 0;
 else
   epochinfo = 1;
 end
-if epochinfo & ~isfield(EEG,'epoch')
+if epochinfo && ~isfield(EEG,'epoch')
   error('No EEG.epoch information in this epoched dataset - run eeg_checkset()');
 end
-if epochinfo & ~isfield(EEG.epoch,'eventlatency')
+if epochinfo && ~isfield(EEG.epoch,'eventlatency')
   error('No EEG.epoch.eventlatency information in this epoched dataset');
 end
-if epochinfo & ~isfield(EEG.epoch,'event')
+if epochinfo && ~isfield(EEG.epoch,'event')
   error('No EEG.epoch.event information in this epoched dataset');
 end
 
@@ -130,16 +130,16 @@ end
 %
 %%%%%%%%%%%%%%%%%% Substitute input defaults %%%%%%%%%%%%%%%%%%%%
 %
-if nargin < 5 | isempty(field)
+if nargin < 5 || isempty(field)
   NO_FIELD = 1;        % flag no field variable output
 end
-if nargin  < 4 | isempty(positions)
+if nargin  < 4 || isempty(positions)
   positions = 1;    % default: find next
 end
-if nargin < 3 | isempty(neighbors)
+if nargin < 3 || isempty(neighbors)
   neighbors = {'_ALL'};  % flag neighbors are all neighboring events
 end
-if nargin < 2 | isempty(targets)
+if nargin < 2 || isempty(targets)
   targets = {'_ALL'};  % flag targets are all events
 end
 
@@ -296,7 +296,7 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
  while ~istarget & tidx<=length(targets)           % for each potential target type
     uridxtype = EEG.urevent(uridx).type;
     if ~ischar(uridxtype), uridxtype = num2str(uridxtype); end
-    if strcmpi(uridxtype,targets(tidx)) | strcmp(targets{1},'_ALL')         
+    if strcmpi(uridxtype,targets(tidx)) || strcmp(targets{1},'_ALL')         
                                                    % if is a target type
       istarget=1;                                  % flag event as target
       targetcount = targetcount+1;                 % increment target count
@@ -400,7 +400,7 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
      %%%%%%%%%% cycle through neighbor types %%%%%%%%%%%%%
      %
      while ~isneighbor & nidx<=length(neighbors)     % for each neighbor event type
-       if strcmpi(uidxtype,neighbors(nidx)) | strcmp(neighbors,'_ALL')
+       if strcmpi(uidxtype,neighbors(nidx)) || strcmp(neighbors,'_ALL')
          isneighbor=1;                               % flag 'neighbors' event
          curpos = curpos+1;
          %

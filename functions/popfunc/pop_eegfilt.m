@@ -107,7 +107,7 @@ if nargin < 2
     revfilt = 0;
     if result{4},
         revfilt = 1;
-        if locutoff == 0 | hicutoff == 0,
+        if locutoff == 0 || hicutoff == 0,
             error('Need both lower and higher edge for notch filter');
         end
     end
@@ -120,7 +120,7 @@ if nargin < 2
     else causal = 0;
     end
     plotfreqz = result{7};
-    if locutoff == 0 & hicutoff == 0 return; end
+    if locutoff == 0 && hicutoff == 0 return; end
     if result{8}
         firtype = 'fir1';
     else
@@ -174,7 +174,7 @@ end
 options = {options{:} revfilt firtype causal};
 
 if EEG.trials == 1
-    if ~isempty(EEG.event) & isfield(EEG.event, 'type') & ischar(EEG.event(1).type)
+    if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
         tmpevent = EEG.event;
         boundaries = strmatch('boundary', { tmpevent.type });
         if isempty(boundaries)
@@ -204,7 +204,7 @@ if EEG.trials == 1
                         end
                     catch
                         fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
-                        if locutoff ~= 0 & hicutoff == 0
+                        if locutoff ~= 0 && hicutoff == 0
                             tmprange = [boundaries(n)+1:boundaries(n+1)];
                             EEG.data(:,tmprange) = ...
                                 EEG.data(:,tmprange) - repmat(mean(EEG.data(:,tmprange),2), [1 length(tmprange)]);
@@ -234,7 +234,7 @@ else
 end
 EEG.icaact = [];
 
-if ~usefft & plotfreqz & exist('b') == 1
+if ~usefft && plotfreqz && exist('b') == 1
     freqz(b, 1, [], EEG.srate);
 end
 

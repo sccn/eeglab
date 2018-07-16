@@ -78,7 +78,7 @@ else
 end
 
 if nargin>2
-  if size(minmax,1) ~= 1 | size(minmax,2) ~= 2
+  if size(minmax,1) ~= 1 || size(minmax,2) ~= 2
     help cbar
     fprintf('cbar() : minmax arg must be [min,max]\n');
     return
@@ -103,7 +103,7 @@ end
 % Choose colorbar position
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if (length(colors) == 1) & (colors == 0)
+if (length(colors) == 1) && (colors == 0)
   t = caxis;
 else
   t = [0 1];

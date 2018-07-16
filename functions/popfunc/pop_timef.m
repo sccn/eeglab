@@ -139,7 +139,7 @@ if popup
     % add title
     % ---------
 	if isempty( findstr(  '''title''', result{6}))
-        if ~isempty(EEG.chanlocs) & typeproc
+        if ~isempty(EEG.chanlocs) && typeproc
             chanlabel = EEG.chanlocs(num).labels;
         else
             chanlabel = int2str(num);

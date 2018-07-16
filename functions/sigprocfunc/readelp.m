@@ -83,7 +83,7 @@ while 1
                     
         elseif tmpstr(2) == 'N' % regular channel
             nm = strtok(tmpstr(3:end));
-            if ~(strcmp(nm, 'Name') | strcmp(nm, 'Status'))
+            if ~(strcmp(nm, 'Name') || strcmp(nm, 'Status'))
                 eloc(index).labels = nm;
                 needToReadNumbers = 1;
             end
@@ -94,12 +94,12 @@ while 1
     tmpstr = fgetl(fid);
     while isempty(tmpstr)
         tmpstr = fgetl(fid);
-        if ~ischar(tmpstr) & tmpstr == -1
+        if ~ischar(tmpstr) && tmpstr == -1
             break;
         end; 
     end
     
-    if ~ischar(tmpstr) & tmpstr == -1
+    if ~ischar(tmpstr) && tmpstr == -1
         break;
     end;  
 end;  

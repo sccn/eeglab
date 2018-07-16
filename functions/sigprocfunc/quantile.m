@@ -63,15 +63,15 @@ if nargin < 2
 end;	
 
 [prows pcols] = size(pc);
-if prows ~= 1 & pcols ~= 1
+if prows ~= 1 && pcols ~= 1
     error('pc must be a scalar or a vector.');
 end
-if any(pc > 1) | any(pc < 0)
+if any(pc > 1) || any(pc < 0)
     error('pc must be between 0 and 1');
 end
 [i,j] = size(data);
 sortdata = sort(data);
-if i==1 | j==1 % if data is a vector
+if i==1 || j==1 % if data is a vector
     i = max(i,j); j = 1;
     if i == 1,
         fprintf('  quantile() note: input data is a single scalar!\n')

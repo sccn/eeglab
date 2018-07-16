@@ -289,7 +289,7 @@ for curfield = tmpfields'
        otherwise, % user defined field command
                   % --------------------------
             infofield = findstr(curfield{1}, 'info');
-            if ~isempty(infofield) & infofield == length( curfield{1} )-3
+            if ~isempty(infofield) && infofield == length( curfield{1} )-3
                 % description of a field
                 % ----------------------     
                 fieldname = curfield{1}(1:infofield-1);

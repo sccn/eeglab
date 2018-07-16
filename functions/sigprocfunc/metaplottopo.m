@@ -94,7 +94,7 @@ g = finputcheck(varargin, { 'chanlocs'  ''    []          '';
     'axcopycom' 'string'                []          '';
     'axsize'    'float'                 [0 1]       [nan nan]}, 'metaplottopo' );
 if ischar(g), error(g); end
-if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); end
+if length(g.chans) == 1 && g.chans(1) ~= 0, error('can not plot a single ERP'); end
 
 [chans,framestotal]=size(data);           % data size
 

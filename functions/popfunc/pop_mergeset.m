@@ -53,7 +53,7 @@ end
 if isempty(INEEG1)
     error('needs at least two datasets');
 end
-if nargin < 2 & length(INEEG1) == 1
+if nargin < 2 && length(INEEG1) == 1
     error('needs at least two datasets');
 end
 
@@ -96,7 +96,7 @@ else % INEEG is an EEG struct
     if INEEG1.srate ~= INEEG2.srate
         error('The two datasets must have the same sampling rate');
     end
-    if INEEG1.trials > 1 | INEEG2.trials > 1
+    if INEEG1.trials > 1 || INEEG2.trials > 1
         if INEEG1.pnts ~= INEEG2.pnts
             error('The two epoched datasets must have the same number of points');
         end
@@ -177,7 +177,7 @@ else % INEEG is an EEG struct
     
     % Concatenate data
     % ----------------
-    if INEEG1.trials > 1 | INEEG2.trials > 1
+    if INEEG1.trials > 1 || INEEG2.trials > 1
         INEEG1.data(:,:,end+1:end+size(INEEG2.data,3)) = INEEG2.data(:,:,:);
     else
         INEEG1.data(:,end+1:end+size(INEEG2.data,2)) = INEEG2.data(:,:);
@@ -189,7 +189,7 @@ else % INEEG is an EEG struct
     INEEG1pnts   = INEEG1.pnts;
     INEEG2pnts   = INEEG2.pnts;
 
-    if INEEG1.trials > 1 | INEEG2.trials > 1 % epoched data
+    if INEEG1.trials > 1 || INEEG2.trials > 1 % epoched data
         INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
 
     else % continuous data
@@ -296,7 +296,7 @@ else % INEEG is an EEG struct
 
         % add discontinuity event if continuous
         % -------------------------------------
-        if INEEG1trials  == 1 & INEEG2trials == 1
+        if INEEG1trials  == 1 && INEEG2trials == 1
             disp('Adding boundary event...');
             INEEG1.event(end+1).type    = 'boundary'; 
             INEEG1.event(end  ).latency = INEEG1pnts+0.5; 

@@ -58,7 +58,7 @@ if nargin<2
   return
 end
 
-if ~exist('fform') | isempty(fform)|fform==0
+if ~exist('fform') || isempty(fform)|fform==0
 	fform = 'native';
 end
 
@@ -79,7 +79,7 @@ if fid>0
         error('offset must be a positive integer or a 2-item cell array');
      end
      for k=1:length(datasize)
-       if startpos(k) < 1 | startpos(k) > datasize(k)
+       if startpos(k) < 1 || startpos(k) > datasize(k)
           error('offset must be a positive integer or a 2-item cell array');
        end
      end
@@ -126,7 +126,7 @@ if fid>0
 % -----------------------------
  if ischar('Asize')
    if iscell(offset)
-         if length(datasize) ~= 2 | datasize(1) ~= datasize(2)
+         if length(datasize) ~= 2 || datasize(1) ~= datasize(2)
               error('size ''square'' must refer to a square 2-D matrix');
          end
          Asize = [datsize(1) datasize(2)];

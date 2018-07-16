@@ -52,7 +52,7 @@ else
     rejglobalE = zeros( size(EEG.icaweights,1), EEG.trials);
 end
 
-if typerej == 0 | Rothertype
+if typerej == 0 || Rothertype
 	if Rmanual
 		rejglobal  = rejarray( rejglobal,  EEG.reject.rejmanual); % see bottom for the
 		rejglobalE = rejarray( rejglobalE, EEG.reject.rejmanualE); % function rejarray
@@ -81,7 +81,7 @@ end
 
 % ---------------
 
-if typerej == 1 | Rothertype
+if typerej == 1 || Rothertype
 	if Rmanual
 		rejglobal  = rejarray( rejglobal,  EEG.reject.icarejmanual);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.icarejmanualE);

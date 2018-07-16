@@ -63,7 +63,7 @@ if nargin == 1
 	typecomp = 1;    % defaults
         chanorcomp = 1;
 end
-if typecomp == 0 & isempty(EEG.icaweights)
+if typecomp == 0 && isempty(EEG.icaweights)
    error('No ICA weights recorded for this dataset -- first run ICA on it');
 end;   
 if nargin == 2

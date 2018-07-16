@@ -55,7 +55,7 @@ function chanlocs = readeetraklocs( filename )
             end
         end
     end
-    if isempty(indpos) | isempty(indlabels)
+    if isempty(indpos) || isempty(indlabels)
         error('Could not find ''Labels'' or ''Position'' tag in electrode file');
     end
     

@@ -122,7 +122,7 @@ if nargin < 1
 end
 
 if length(varargin) > 0
-    if length(varargin) == 1 | ~ischar(varargin{1}) | isempty(varargin{1}) | ...
+    if length(varargin) == 1 || ~ischar(varargin{1}) || isempty(varargin{1}) || ...
         (length(varargin)>2 &  ~ischar(varargin{3}))
         options = { 'chanlocs' varargin{1} };
         if nargin > 2, options = { options{:} 'frames' varargin{2} }; end
@@ -133,7 +133,7 @@ if length(varargin) > 0
         if nargin > 8, options = { options{:} 'ydir'   varargin{8} }; end
         if nargin > 9, options = { options{:} 'vert'   varargin{9} }; end
         if nargin > 10,options = { options{:} 'hori'  varargin{10} }; end
-        if nargin > 4 & ~isequal(varargin{4}, 0), options = {options{:} 'title'  varargin{4} }; end
+        if nargin > 4 && ~isequal(varargin{4}, 0), options = {options{:} 'title'  varargin{4} }; end
         %    , chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
     else
         options = varargin;
@@ -174,7 +174,7 @@ if length(g.axsize) < 2
 else 
     axheight = g.axsize(2);
 end
-if isempty(g.chans) | g.chans == 0
+if isempty(g.chans) || g.chans == 0
    g.chans = 1:size(data,1);
 elseif ~ischar(g.chans)
    g.chans = g.chans;
@@ -192,11 +192,11 @@ if isempty(g.chanlocs) % plot in a rectangular grid
 elseif ~isfield(g.chanlocs, 'theta')
     plotgrid = 1;
 end
-if length(g.chans) < 4 & ~plotgrid
+if length(g.chans) < 4 && ~plotgrid
     disp('Not enough channels, does not use channel coordinate to plot axis');
     plotgrid = 1;
 end
-if plotgrid & isempty(g.geom)
+if plotgrid && isempty(g.geom)
   n = ceil(sqrt(length(g.chans)));
   g.geom = [n ceil(length(g.chans)/n)];
 end
@@ -347,7 +347,7 @@ end
         end
         g.colors = cellstr(g.colors);
         for c=1:length(g.colors)   % make white traces black unless axis color is white
-            if g.colors{c}(1)=='w' & axcolor~=[1 1 1]
+            if g.colors{c}(1)=='w' && axcolor~=[1 1 1]
                 g.colors{c}(1)='k';
             end
         end
@@ -378,7 +378,7 @@ end
         ymax = g.limits(4);
     end
 
-    if xmax == 0 & xmin == 0,
+    if xmax == 0 && xmin == 0,
         x = (0:1:g.frames-1);
         xmin = 0;
         xmax = g.frames-1;
@@ -391,7 +391,7 @@ end
         return
     end
 
-    if ymax == 0 & ymin == 0,
+    if ymax == 0 && ymin == 0,
         % for abs max scaling:
         ymax=max(max(abs(data)));
         ymin=ymax*-1;
@@ -561,7 +561,7 @@ end
                 %
                 NAME_OFFSET = -.25;
                 NAME_OFFSETY = .2;
-                if ymin <= 0 & ymax >= 0,
+                if ymin <= 0 && ymax >= 0,
                     yht = 0;
                 else
                     yht = mean(data(c,1+P*g.frames:1+P*g.frames+g.frames-1));
@@ -607,7 +607,7 @@ end
             ymn = min([ymax ymin]);
             ymx = max([ymax ymin]);
             if isempty(g.plotfunc)
-                if ischar(tmpcolor{1}) & length(tmpcolor) > 1
+                if ischar(tmpcolor{1}) && length(tmpcolor) > 1
                     plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), tmpcolor{1}, tmpcolor{2:end});   
                 else
                     plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   
@@ -742,7 +742,7 @@ end
     set(h,'HorizontalAlignment','center',...
           'Clipping','off');  % center text
 
-    if length(g.legend) > 1 & strcmpi(g.showleg, 'on')
+    if length(g.legend) > 1 && strcmpi(g.showleg, 'on')
         tmpleg = vararg2str(g.legend);
         quotes = find(tmpleg == '''');
         for index = length(quotes):-1:1

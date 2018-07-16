@@ -106,7 +106,7 @@ else
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename);
     forceversion = [];
 end
-if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
+if ~isempty(Eventdata) && size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end
 EEG.comments        = [ 'Original file: ' filename ];
@@ -139,13 +139,13 @@ if ~isempty(Eventdata)
             indtim  = strmatch('tim0', lower(alltypes), 'exact');
             
             % if epoc but no tim0 then epoc represent pauses in recording
-            if isempty(indtim) & ~isempty(indepoc)
+            if isempty(indtim) && ~isempty(indepoc)
                 for index = indepoc
                     EEG.event(index).type = 'boundary';
                 end
             end
             % other wise if both non-empty data epochs
-            if ~isempty(indtim) & ~isempty(indepoc)
+            if ~isempty(indtim) && ~isempty(indepoc)
                 if rem(size(EEG.data,2) / (length(indepoc)+1),1) == 0
                     EEG.event(index) = []; % remove epoch events
                     EEG.trials       = length(indepoc)+1;

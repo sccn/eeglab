@@ -82,7 +82,7 @@ channo = input(:,1);
 az = input(:,2);
 horiz = input(:,3);
 
-if exist('method')== 1 & method == 1
+if exist('method')== 1 && method == 1
   radius = abs(az/180)/factor;
   i = find(az>=0);
   angle(i) = 90-horiz(i);

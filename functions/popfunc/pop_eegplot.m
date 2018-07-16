@@ -97,7 +97,7 @@ if icacomp == 0
 	end
 end
 
-if nargin < 3 & EEG.trials > 1
+if nargin < 3 && EEG.trials > 1
 
 	% which set to save
 	% -----------------
@@ -173,7 +173,7 @@ else % case of a single trial (continuous data)
         end
     end; 
     eegplotoptions = { 'events', EEG.event };
-    if ~isempty(EEG.chanlocs) & icacomp
+    if ~isempty(EEG.chanlocs) && icacomp
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
     end
 end

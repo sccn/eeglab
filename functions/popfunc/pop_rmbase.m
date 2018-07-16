@@ -60,7 +60,7 @@ if nargin < 1
 	help pop_rmbase;
 	return;
 end;	
-if nargin < 2 & EEG(1).trials > 1
+if nargin < 2 && EEG(1).trials > 1
 	% popup window parameters
 	% -----------------------
     defaultbase = [num2str(EEG(1).times(1)) ' 0'];

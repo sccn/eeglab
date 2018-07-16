@@ -130,7 +130,7 @@ g = finputcheck(varargin, { 'subjind'     'integer'  []               [];
                             'mri'         { 'struct','string' } [] '';
                             'norm2JointProb' 'string'  { 'on','off' } 'off'});
 if ischar(g), error(g); end
-if ~strcmpi(g.method, 'alldistance') & isempty(g.subjind)
+if ~strcmpi(g.method, 'alldistance') && isempty(g.subjind)
     error('Subject indices are required for this method');
 end
 if ~iscell(g.weight), g.weight = { g.weight }; end
@@ -278,7 +278,7 @@ voxvol = sum((point1(1:3)-point2(1:3)).^2)*g.subsample^3; % in mm
 % compute global subject entropy if necessary
 % -------------------------------------------
 vals   = unique_bc(g.subjind); % the unique subject indices
-if strcmpi(g.method, 'relentropy') | strcmpi(g.method, 'entropy') %%%%% entropy %%%%%%%
+if strcmpi(g.method, 'relentropy') || strcmpi(g.method, 'entropy') %%%%% entropy %%%%%%%
     newind = zeros(size(g.subjind));
     for index = 1:length(vals) % foreach subject in the cluster
         tmpind = find(g.subjind == vals(index)); % dipoles for the subject
@@ -359,7 +359,7 @@ if ~strcmpi(g.method, 'alldistance')
         tmpweights{1}   = g.weight{1}(  indsort);
         tmpweights{end} = g.weight{end}(indsort);
        
-        if strcmpi(g.method, 'relentropy') | strcmpi(g.method, 'entropy') %%%%% entropy %%%%%%%
+        if strcmpi(g.method, 'relentropy') || strcmpi(g.method, 'entropy') %%%%% entropy %%%%%%%
             
             subjs  = g.subjind(indsort(1:g.methodparam)); % get subject indices of closest dipoles
             p      = histc(subjs, edges);

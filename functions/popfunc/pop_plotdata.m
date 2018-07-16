@@ -106,7 +106,7 @@ if exist('singletrials') ~= 1
     singletrials = 0;
 end;    
 
-if EEG.trials > 1 & singletrials == 0
+if EEG.trials > 1 && singletrials == 0
     fprintf('Selecting trials and components...\n');
 	if typeplot == 1
 	   sigtmp = nan_mean(EEG.data(indices,:,trials),3);

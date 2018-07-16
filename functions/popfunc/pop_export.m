@@ -168,7 +168,7 @@ if strcmpi(g.transpose, 'on');
         end
         if strcmpi(g.elec, 'on') 
             if tmpind > 0
-                if ~isempty(EEG.chanlocs) & ~strcmpi(g.ica, 'on')
+                if ~isempty(EEG.chanlocs) && ~strcmpi(g.ica, 'on')
                     fprintf(fid, '%s\t', EEG.chanlocs(tmpind).labels);
                 else fprintf(fid, '%d\t', tmpind);
                 end
@@ -190,7 +190,7 @@ else
         end
         if strcmpi(g.elec, 'on') 
             if tmpind > 0
-                if ~isempty(EEG.chanlocs) & ~strcmpi(g.ica, 'on')
+                if ~isempty(EEG.chanlocs) && ~strcmpi(g.ica, 'on')
                     fprintf(fid,'%s\t', EEG.chanlocs(tmpind).labels);
                 else fprintf(fid,'%d\t', tmpind);
                 end

@@ -42,7 +42,7 @@
 
 function axcopy(fig, command)
 
-if (exist('fig') == 1) & strcmp(fig,'noticks')
+if (exist('fig') == 1) && strcmp(fig,'noticks')
    noticks = 1;
    if nargin> 1
      shift
@@ -50,7 +50,7 @@ if (exist('fig') == 1) & strcmp(fig,'noticks')
      fig = [];
    end
 end
-if ~(exist('fig') ==1) | isempty(fig) | fig == 0 
+if ~(exist('fig') ==1) || isempty(fig) || fig == 0 
    fig = gcf;
 end
 

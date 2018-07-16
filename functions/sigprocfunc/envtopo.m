@@ -185,7 +185,7 @@ if nargin < 2
    return
 end
 
-if nargin <= 2 | ischar(varargin{1})
+if nargin <= 2 || ischar(varargin{1})
 	% 'key' 'val' sequences
 	fieldlist = { 'chanlocs'      ''         []                       [] ;
 				  'title'         'string'   []                       '';
@@ -279,10 +279,10 @@ if ~isempty(g.pvaf)
 	g.sortvar = g.pvaf; % leave deprecated g.pvaf behind. 
 end
 
-if strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'pvaf') | strcmpi(g.sortvar,'mv')
+if strcmpi(g.sortvar,'on') || strcmpi(g.sortvar,'pvaf') || strcmpi(g.sortvar,'mv')
    g.sortvar = 'mp'; % update deprecated flags
 end
-if strcmpi(g.sortvar,'off') | strcmp(g.sortvar,'rv') 
+if strcmpi(g.sortvar,'off') || strcmp(g.sortvar,'rv') 
    g.sortvar = 'rp';
 end
 
@@ -352,18 +352,18 @@ g.limcontrib = g.limcontrib/1000; % the time range in which to select largest co
 %
 %%%%%%%%%%%% Collect time range information %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if length(g.limits) == 3 | length(g.limits) > 4 % if g.limits wrong length
+if length(g.limits) == 3 || length(g.limits) > 4 % if g.limits wrong length
    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
 end
 
 xunitframes = 0; % flag plotting if xmin & xmax are in frames instead of sec
 if ~isempty(g.timerange)   % if 'timerange' given
-    if g.limits(1)==0 & g.limits(2)==0
+    if g.limits(1)==0 && g.limits(2)==0
          g.limits(1) = min(g.timerange); % if no time 'limits
          g.limits(2) = max(g.timerange); % plot whole data epoch
     end
 else % if no 'timerange' given
-    if g.limits(1)==0 & g.limits(2)==0 % if no time limits as well, 
+    if g.limits(1)==0 && g.limits(2)==0 % if no time limits as well, 
          fprintf('\nNOTE: No time limits given: using 0 to %d frames\n',frames-1);
          g.limits(1) = 0;
          g.limits(2) = frames-1;
@@ -467,13 +467,13 @@ if wtcomps ~= chans
    fprintf('  - component scalp maps and time courses may not be correct.\n');
 end
 
-if isempty(g.voffsets) | ( size(g.voffsets) == [1,1] & g.voffsets(1) == 0 )
+if isempty(g.voffsets) || ( size(g.voffsets) == [1,1] && g.voffsets(1) == 0 )
     g.voffsets = zeros(1,MAXTOPOS); 
 end
-if isempty(g.plotchans) | g.plotchans(1)==0
+if isempty(g.plotchans) || g.plotchans(1)==0
     g.plotchans = 1:chans;
 end
-if max(g.plotchans) > chans | min(g.plotchans) < 1
+if max(g.plotchans) > chans || min(g.plotchans) < 1
     error('invalid ''plotchan'' index');
 end
 
@@ -485,7 +485,7 @@ if g.compnums < 0 % legacy syntax
    g.compsplot = abs(g.compnums);
    g.compnums = [];
 end
-if isempty(g.compnums) | g.compnums(1) == 0
+if isempty(g.compnums) || g.compnums(1) == 0
     g.compnums = 1:wtcomps; % by default, select from all components
 end
 
@@ -496,7 +496,7 @@ else
     MAXTOPOS = g.compsplot;
 end
 
-if max(g.compnums) > wtcomps | min(g.compnums)< 1
+if max(g.compnums) > wtcomps || min(g.compnums)< 1
     error('Keyword ''compnums'' out of range (1 to %d)', wtcomps);
 end
 
@@ -576,7 +576,7 @@ if ntopos > MAXTOPOS
       ntopos = MAXTOPOS; % limit the number of topoplots to display
 end
 
-if max(g.compnums) > wtcomps | min(g.compnums)< 1
+if max(g.compnums) > wtcomps || min(g.compnums)< 1
       fprintf(...
        'envtopo(): one or more compnums out of range (1,%d).\n',wtcomps);
       return
@@ -824,7 +824,7 @@ end
 % Edited and moved here from 'Collect Y-axis information' section below -Jean
 %
 if length(g.limits) == 4 
-     if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
+     if g.limits(3)~=0 || g.limits(4)~=0 % collect plotting limits from 'limits'
 	 ymin = g.limits(3);
 	 ymax = g.limits(4);
          ylimset = 1;
@@ -869,10 +869,10 @@ else
   mapcolors = [1 maporder+1];
 end
 
-if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill') %%%%%%%% if 'sunvenv' %%%%%%%%%
+if strcmpi(g.sumenv,'on')  || strcmpi(g.sumenv,'fill') %%%%%%%% if 'sunvenv' %%%%%%%%%
  sumenv = envelope(sumproj(:,:), g.envmode);
- if ~ylimset & max(sumenv) > ymax, ymax = max(sumenv(1,:)); end
- if ~ylimset & min(sumenv) < ymin, ymin = min(sumenv(2,:)); end
+ if ~ylimset && max(sumenv) > ymax, ymax = max(sumenv(1,:)); end
+ if ~ylimset && min(sumenv) < ymin, ymin = min(sumenv(2,:)); end
  if strcmpi(g.sumenv,'fill')  
     %
     % Plot the summed projection filled 
@@ -929,7 +929,7 @@ set(t,'fontsize',FONTSIZESMALL,'fontweight','bold','Tag','text_inaxes')
     envx = [1;compx+1];
     for c = 1:ntopos+1   
         curenv = matsel(envdata,frames,0,1,envx(c));
-        if ~ylimset & max(curenv) > ymax, ymax = max(curenv); end
+        if ~ylimset && max(curenv) > ymax, ymax = max(curenv); end
         p=plot(times,curenv,colors(mapcolors(c),1),'Tag',['line_envelope_' num2str(c)]);% plot the max
         set(gca,'FontSize',FONTSIZESMALL,'FontWeight','Bold')
         if c==1                                % Note: use colors in original
@@ -953,7 +953,7 @@ set(t,'fontsize',FONTSIZESMALL,'fontweight','bold','Tag','text_inaxes')
         end
         hold on
         curenv = matsel(envdata,frames,0,2,envx(c));
-        if ~ylimset & min(curenv) < ymin, ymin = min(curenv); end
+        if ~ylimset && min(curenv) < ymin, ymin = min(curenv); end
         p=plot(times,curenv,colors(mapcolors(c),1),'Tag',['line_envelope_' num2str(c)]);% plot the min
 
         if c==1
@@ -975,10 +975,10 @@ set(t,'fontsize',FONTSIZESMALL,'fontweight','bold','Tag','text_inaxes')
                 set(l1,'LineWidth',2);  % embolden dotted env lines
             end
         end
-        if c==1 & ~isempty(g.vert)
+        if c==1 && ~isempty(g.vert)
             for v=1:length(g.vert)
                 vl=plot([g.vert(v) g.vert(v)], [-1e10 1e10],'k--','Tag','line_vertline'); % plot specified vertical lines
-                if any(g.limcontrib ~= 0) & v>= length(g.vert)-1;
+                if any(g.limcontrib ~= 0) && v>= length(g.vert)-1;
                     set(vl,'linewidth',g.limcontribweight);
                     set(vl,'linestyle',':');
                 else
@@ -987,7 +987,7 @@ set(t,'fontsize',FONTSIZESMALL,'fontweight','bold','Tag','text_inaxes')
                 end
             end
         end
-        if g.limits(1) <= 0 & g.limits(2) >= 0    % plot vertical line at time zero
+        if g.limits(1) <= 0 && g.limits(2) >= 0    % plot vertical line at time zero
                 vl=plot([0 0], [-1e10 1e10],'k');
                     set(vl,'linewidth',2,'Tag','line_vertatzero');
         end
@@ -995,7 +995,7 @@ set(t,'fontsize',FONTSIZESMALL,'fontweight','bold','Tag','text_inaxes')
         %
         % plot the n-th component filled 
         %
-        if g.fillcomp(1)>0 & find(g.fillcomp==c-1) 
+        if g.fillcomp(1)>0 && find(g.fillcomp==c-1) 
             fprintf('filling the envelope of component %d\n',c-1);
             mins = matsel(envdata,frames,0,2,envx(c));
             p=fill([times times(frames:-1:1)],...

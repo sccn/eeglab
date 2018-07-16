@@ -181,7 +181,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
             else df = [];
             end
             
-        elseif size(data,2) == 2 & strcmpi(g.paired, 'off')
+        elseif size(data,2) == 2 && strcmpi(g.paired, 'off')
             
             % paired t-test (very fast)
             % -------------

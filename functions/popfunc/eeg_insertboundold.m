@@ -51,7 +51,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
         help eeg_insertbound;
         return;
     end
-    if size(regions,2) ~= 1 & exist('lengths') ~= 1
+    if size(regions,2) ~= 1 && exist('lengths') ~= 1
         lengths = regions(:,2)-regions(:,1)+1;
         regions = regions(:,1);
     end
@@ -80,12 +80,12 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     allnest     = [];
     countrm     = 0;
 	for tmpindex = 1:length(boundevents) % sorted in decreasing order
-        if boundevents(tmpindex) >= 0.5 & boundevents(tmpindex) <= pnts
+        if boundevents(tmpindex) >= 0.5 && boundevents(tmpindex) <= pnts
                             
             % find event succeding boundary to insert event 
             % at the correct location in the event structure
             % ----------------------------------------------
-            if ~isempty(eventout) & isfield(eventout, 'latency')
+            if ~isempty(eventout) && isfield(eventout, 'latency')
                 alllats   = [ eventout.latency ] - boundevents(tmpindex);
                 tmpind    = find( alllats >= 0 );
                 [tmp tmpind2 ] = min(alllats(tmpind));

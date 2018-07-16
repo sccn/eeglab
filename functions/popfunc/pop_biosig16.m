@@ -150,7 +150,7 @@ else
     EEG.trials   = dat.NRec;
     EEG.pnts     = size(EEG.data,2)/dat.NRec;
 end
-if isfield(dat, 'Label') & ~isempty(dat.Label)
+if isfield(dat, 'Label') && ~isempty(dat.Label)
     EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
 end
 EEG = eeg_checkset(EEG);

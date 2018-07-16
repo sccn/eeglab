@@ -77,7 +77,7 @@ end
 [nbchan pnts sweeps] = size(signal);
 jp  = zeros(nbchan,sweeps);
 
-if exist('oldjp') & ~isempty( oldjp ) % speed up the computation
+if exist('oldjp') && ~isempty( oldjp ) % speed up the computation
 	jp = oldjp;
 else
 	for rc = 1:nbchan

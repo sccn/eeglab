@@ -401,7 +401,7 @@ end
 
 % recompute latency and epoch number for events
 % ---------------------------------------------
-if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
+if length(g.trial) ~= EEG.trials && ~isempty(EEG.event)
     if ~isfield(EEG.event, 'epoch')
         disp('Pop_epoch warning: bad event format with epoch dataset, removing events');
         EEG.event = [];
@@ -461,7 +461,7 @@ end
 
 % performing removal
 % ------------------
-if ~isempty(g.time) | ~isempty(g.notime)
+if ~isempty(g.time) || ~isempty(g.notime)
     if EEG.trials > 1
         % select new time window
         % ----------------------    
@@ -474,7 +474,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
         [EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, ...
                                                      [g.time(1) g.time(2)]*EEG.srate, 'allevents', tmpeventlatency);
         tmptime = tmptime/EEG.srate;
-        if g.time(1) ~= tmptime(1) & g.time(2)-1/EEG.srate ~= tmptime(2)
+        if g.time(1) ~= tmptime(1) && g.time(2)-1/EEG.srate ~= tmptime(2)
             fprintf('pop_select(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', tmptime(1), tmptime(2)+1/EEG.srate);
         end
         EEG.xmin = tmptime(1);
@@ -521,7 +521,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
             end
             
             for index = 1:length(g.notime)
-                if g.notime(index) ~= 0  & g.notime(index) ~= EEG.xmax
+                if g.notime(index) ~= 0  && g.notime(index) ~= EEG.xmax
                     if mod(index,2), g.notime(index) = g.notime(index) + 1/EEG.srate;
                     else             g.notime(index) = g.notime(index) - 1/EEG.srate;
                     end

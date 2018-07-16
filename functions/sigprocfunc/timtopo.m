@@ -147,7 +147,7 @@ end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % defaults: limits == 0 or [0 0 0 0]
-  if ( length(g.limits) == 1 & g.limits==0) | (length(g.limits)==4 & ~any(g.limits))  
+  if ( length(g.limits) == 1 && g.limits==0) || (length(g.limits)==4 && ~any(g.limits))  
     xmin=0;
     xmax=frames-1;
     ymin=min(min(data));
@@ -172,7 +172,7 @@ end
     return
   end
 
-  if xmax == 0 & xmin == 0,
+  if xmax == 0 && xmin == 0,
     x = (0:1:frames-1);
     xmin = 0;
     xmax = frames-1;
@@ -185,7 +185,7 @@ end
       return
   end
 
-  if ymax == 0 & ymin == 0,
+  if ymax == 0 && ymin == 0,
       ymax=max(max(data));
       ymin=min(min(data));
   end
@@ -203,7 +203,7 @@ x = xmin:sampint:xmax;   % make vector of x-values
 if plottimes_set == 0
   [mx plotframes] = max(sum(data.*data)); 
                   % default plotting frame has max variance
-  if nargin< 4 | isempty(g.plottimes)
+  if nargin< 4 || isempty(g.plottimes)
 	  g.plottimes = x(plotframes);
   else
 	  g.plottimes(find(isnan(g.plottimes))) = x(plotframes);
@@ -219,7 +219,7 @@ if plottimes_set == 1
     ntopos = MAX_TOPOS;
   end
 
-  if max(g.plottimes) > xmax | min(g.plottimes)< xmin
+  if max(g.plottimes) > xmax || min(g.plottimes)< xmin
     fprintf(...
 'timtopo(): at least one plottimes value outside of epoch latency range - cannot plot.\n');
     return
@@ -283,7 +283,7 @@ else % even number of topos
 end
 topoleft = topoleft - 0.01; % adjust left a bit for colorbar
 
-if max(plotframes) > frames |  min(plotframes) < 1
+if max(plotframes) > frames ||  min(plotframes) < 1
     fprintf('Requested map frame %d is outside data range (1-%d)\n',max(plotframes),frames);
     return
 end
@@ -342,7 +342,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot zero time line %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-if xmin<0 & xmax>0
+if xmin<0 && xmax>0
    plot([0 0],[ymin ymax],'k:','linewidth',1.5);
 else
   fprintf('xmin %g and xmax %g do not cross time 0.\n',xmin,xmax)
@@ -355,7 +355,7 @@ height = ymax-ymin;
 lwidth = 1.5;  % increment line thickness
 
 for t=1:ntopos % dfraw vertical lines through the data at topoplot frames
- if length(g.plotchans)>1 | g.voffsets(t)
+ if length(g.plotchans)>1 || g.voffsets(t)
   l1 = plot([g.plottimes(t) g.plottimes(t)],...
        [min(data(g.plotchans,plotframes(t))) ...
        g.voffsets(t) + max(data(g.plotchans,plotframes(t)))],'w'); % white underline behind

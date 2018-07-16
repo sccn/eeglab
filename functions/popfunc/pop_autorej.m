@@ -197,7 +197,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                 fprintf('Re-adjusting probability limits and running again...*********\n');
             end
         else
-            if opt.startprob > 5 & maxiter < 8 % don't decrease and startover more than 8 times
+            if opt.startprob > 5 && maxiter < 8 % don't decrease and startover more than 8 times
                 fprintf('Decreasing probability limits for final pruning...######\n');
                 opt.startprob = opt.startprob - 0.5; numrej = 1; maxiter = maxiter+1; % repeat process back to 5 stds
             else

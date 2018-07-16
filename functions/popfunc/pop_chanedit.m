@@ -407,7 +407,7 @@ else
                 args{ curfield+1 } =  flag_replurchan;
             case 'return'
                 [tmpchans] = eeg_checkchanlocs(chans);
-                if nchansori ~= 0 & nchansori ~= length(tmpchans)
+                if nchansori ~= 0 && nchansori ~= length(tmpchans)
                     if ~popask(strvcat(['The number of data channels (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
                             ['correspond to the initial number of channels (' int2str(nchansori) '), so for consistency purposes'], ...
                             'new channel information will be ignored if this function was called from EEGLAB', ...
@@ -464,7 +464,7 @@ else
                     method=args{curfield+1};
                     extraargs = {''};
                 end
-                if ~isempty(fig) & ~strcmp(method, 'chancenter')
+                if ~isempty(fig) && ~strcmp(method, 'chancenter')
                     tmpButtonName=questdlg2( strvcat('This will modify fields in the channel structure', ...
                         'Are you sure you want to apply this function ?'), 'Confirmation', 'Cancel', 'Yes','Yes');
                     if ~strcmpi(tmpButtonName, 'Yes'), return; end
@@ -493,13 +493,13 @@ else
                                              'Set channel type', 1, { '' '' }, 'pop_chanedit');
                 end
                 try, tmpchans = args{curfield+1}{1}; tmptype = args{curfield+1}{2};catch, return; end
-                if isempty(tmpchans) & isempty(tmptype), return; end
+                if isempty(tmpchans) && isempty(tmptype), return; end
                 if ischar(tmpchans)
                     tmpchans = eval( [ '[' tmpchans ']' ], 'settype: error in channel indices');
                 end
                 if ~ischar(tmptype), tmptype = num2str(tmptype); end
                 for index = 1:length(tmpchans)
-                    if tmpchans(index) > 0 & tmpchans(index) <= length(chans)
+                    if tmpchans(index) > 0 && tmpchans(index) <= length(chans)
                         chans( tmpchans(index) ).type = tmptype;
                     end
                 end
@@ -511,13 +511,13 @@ else
                                                  'Set channel reference', 1, { '' '' }, 'pop_chanedit');
                 end
                 try, tmpchans = args{curfield+1}{1}; tmpref = args{curfield+1}{2};catch, return; end
-                if isempty(tmpchans) & isempty(tmpref), return; end
+                if isempty(tmpchans) && isempty(tmpref), return; end
                 if ischar(tmpchans)
                     tmpchans = eval( [ '[' tmpchans ']' ], 'settype: error in channel indices');
                 end
                 if ~ischar(tmpref), tmpref = num2str(tmpref); end
                 for index = 1:length(tmpchans)
-                    if tmpchans(index) > 0 & tmpchans(index) <= length(chans)
+                    if tmpchans(index) > 0 && tmpchans(index) <= length(chans)
                         chans( tmpchans(index) ).ref = tmpref;
                     end
                 end
@@ -785,7 +785,7 @@ else
                         if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end
                     end
                     [tmp1 ind1 ind2] = intersect_bc( lower(standardchans), {chans.labels});
-                    if ~isempty(tmp1) | isfield(chans, 'theta')
+                    if ~isempty(tmp1) || isfield(chans, 'theta')
 
                         % finding template location files
                         % -------------------------------
@@ -889,7 +889,7 @@ else
                     end
                     if ~isfield(chans, 'type'), chans(1).type = []; end
                 end
-                if ~isempty(findstr(args{ curfield+1 }, 'standard_10')) & ...
+                if ~isempty(findstr(args{ curfield+1 }, 'standard_10')) && ...
                         ~isempty(findstr(args{ curfield+1 }, '.elc'))
                     chaninfo.nosedir = '+Y';
                 else
@@ -965,7 +965,7 @@ return;
 % format the output field
 % -----------------------
 function strval = reformat( val )
-if isnumeric(val) & isempty(val), val = '[]'; end
+if isnumeric(val) && isempty(val), val = '[]'; end
 if ischar(val), strval = [ '''' val '''' ];
 else           strval = num2str(val);
 end

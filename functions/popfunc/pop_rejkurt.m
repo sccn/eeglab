@@ -262,7 +262,7 @@ nrej = sum(rej);
 
 com = [ com sprintf('EEG = pop_rejkurt(EEG,%s);',...
 		vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject,vistype, [], plotflag})) ];
-if nargin < 3 & nargout == 2
+if nargin < 3 && nargout == 2
 	locthresh = com;
 end
 

@@ -69,17 +69,17 @@ end
 if nargin<5
   chansout = [];
 end
-if isempty(chansout) | chansout(1) == 0
+if isempty(chansout) || chansout(1) == 0
   chansout = 1:chans;
 end
-if min(chansout)<1 | max(chansout)> chans
+if min(chansout)<1 || max(chansout)> chans
   fprintf('icaproj(): chansout variable out of 1:chans range.\n')
   return
 end
 
 [mchans,epochs] = size(datamean);
 frames = floor(framestot/epochs);
-if epochs*frames ~= framestot | frames < 1,
+if epochs*frames ~= framestot || frames < 1,
     fprintf(...
         'icaproj(): frames (%d) does not divide data length (%d)\n.',...
                 frames,framestot);
@@ -109,7 +109,7 @@ for a=1:ncomps-1
   end
 end
 for a=1:ncomps
-    if compindex(a)>chans | compindex(a)<1
+    if compindex(a)>chans || compindex(a)<1
       fprintf('icaproj(): component index %d out of range!\n',compindex(a));
       return
       break

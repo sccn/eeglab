@@ -60,7 +60,7 @@ end
 %end
 
 [chans frames] = size(data);
-if chans > 1 & frames == 1,
+if chans > 1 && frames == 1,
     help eegfilt
     error('input data should be a row vector.');
 end
@@ -72,10 +72,10 @@ minfac         = 3;    % this many (lo)cutoff-freq cycles in filter
 min_filtorder  = 15;   % minimum filter length
 trans          = 0.15; % fractional width of transition zones
 
-if locutoff>0 & hicutoff > 0 & locutoff > hicutoff,
+if locutoff>0 && hicutoff > 0 && locutoff > hicutoff,
     error('locutoff > hicutoff ???\n');
 end
-if locutoff < 0 | hicutoff < 0,
+if locutoff < 0 || hicutoff < 0,
     error('locutoff | hicutoff < 0 ???\n');
 end
 
@@ -104,7 +104,7 @@ if strcmp(firtype, 'firls')
     warning('Using firls to estimate filter coefficients. We recommend that you use fir1 instead, which yields larger attenuation. In future, fir1 will be used by default!');
 end
 
-if isempty(filtorder) | filtorder==0,
+if isempty(filtorder) || filtorder==0,
     if locutoff>0,
         filtorder = minfac*fix(srate/locutoff);
     elseif hicutoff>0,
@@ -135,7 +135,7 @@ if (1+trans)*hicutoff/nyq > 1
     error('high cutoff frequency too close to Nyquist frequency');
 end
 
-if locutoff > 0 & hicutoff > 0,    % bandpass filter
+if locutoff > 0 && hicutoff > 0,    % bandpass filter
     if revfilt
         fprintf('eegfilt() - performing %d-point notch filtering.\n',filtorder);
     else

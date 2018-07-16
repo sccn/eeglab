@@ -178,7 +178,7 @@ if nargin < 2
     if ~isempty( result{7}), options = { options{:} 'headerlines' eval(result{7}) }; end; 
     if ~result{8}, options = { options{:} 'clearevents' 'off'}; end; 
 else 
-    if ~isempty(varargin) & ~ischar(varargin{1})
+    if ~isempty(varargin) && ~ischar(varargin{1})
         % old call compatibility
         options = { 'latencyfields' varargin{1} };
         if nargin > 4
@@ -222,7 +222,7 @@ fprintf('Pop_importepoch: Loading file or array...\n');
 if ischar(filename)
 	% check filename
 	% --------------
-	if exist(filename) == 2 & evalin('base', ['exist(''' filename ''')']) == 1
+	if exist(filename) == 2 && evalin('base', ['exist(''' filename ''')']) == 1
 		disp('Pop_importepoch WARNING: FILE AND ARRAY WITH THE SAME NAME, LOADING FILE');
 	end
     %values = load_file_or_array( filename, g.headerlines );
@@ -337,7 +337,7 @@ for index = 1:length(g.latencyfields)
         EEG.event(end+1).epoch  = trials; 
         EEG.event(end).type     = g.latencyfields{index};
         EEG.event(end).latency  = (getfield(EEG.epoch(trials), g.latencyfields{index})*g.timeunit-EEG.xmin)*EEG.srate+1+(trials-1)*EEG.pnts;
-        if g.durationfields{index} ~= 0 & g.durationfields{index} ~= '0'
+        if g.durationfields{index} ~= 0 && g.durationfields{index} ~= '0'
             EEG.event(end).duration = getfield(EEG.epoch(trials), g.durationfields{index})*g.timeunit*EEG.srate;
         else
             EEG.event(end).duration = 0;
@@ -362,7 +362,7 @@ end
 
 % adding desciption to the fields
 % -------------------------------
-if ~isfield(EEG, 'eventdescription' ) | isempty( EEG.eventdescription )
+if ~isfield(EEG, 'eventdescription' ) || isempty( EEG.eventdescription )
 	allfields = fieldnames(EEG.event);
     EEG.eventdescription{strmatch('epoch', allfields, 'exact')} = 'Epoch number';
 	if ~isempty(strmatch('type', allfields)), EEG.eventdescription{strmatch('type', allfields)} = 'Event type'; end
@@ -378,7 +378,7 @@ EEG = eeg_checkset(EEG, 'makeur');
 
 % generate the output command
 % ---------------------------
-if isempty(filename) & nargout == 2
+if isempty(filename) && nargout == 2
     disp('Pop_importepoch: cannot generate command string'); return;
 else 
 	com = sprintf('EEG = pop_importepoch( EEG, ''%s'', %s);',filename, vararg2str( { fieldlist options{:} }));

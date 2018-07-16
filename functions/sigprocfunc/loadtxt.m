@@ -88,7 +88,7 @@ if fid<0, error( ['file ' filename ' found but error while opening file'] ); end
 index = 0;
 while index < abs(g.skipline)
     tmpline = fgetl(fid); 
-    if g.skipline > 0 | ~isempty(tmpline)
+    if g.skipline > 0 || ~isempty(tmpline)
         index = index + 1;
     end;    
 end; % skip lines ---------
@@ -136,7 +136,7 @@ while isempty(inputline) | inputline~=-1
      if linenb > g.nlines
          inputline = -1;
      end
-     if ~mod(linenb,10) & strcmp(g.verbose, 'on'), fprintf('%d ', linenb); end
+     if ~mod(linenb,10) && strcmp(g.verbose, 'on'), fprintf('%d ', linenb); end
 end;        
 if strcmp(g.verbose, 'on'),  fprintf('%d\n', linenb-1); end
 if strcmp(g.convert, 'force'), array = [ array{:} ]; end

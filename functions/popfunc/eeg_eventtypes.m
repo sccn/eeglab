@@ -80,7 +80,7 @@ UREVENTS = 0; % flag returning infor for urevents instead of events
 typelist = [];
 if nargin>1
    if ischar(arg2)
-       if strcmp(arg2,'urevent') | strcmp(arg2,'urevents')
+       if strcmp(arg2,'urevent') || strcmp(arg2,'urevents')
             UREVENTS = 1; % change flag
        else
             error('second argument string not understood')

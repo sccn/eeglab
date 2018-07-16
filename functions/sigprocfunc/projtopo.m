@@ -58,7 +58,7 @@ DEFAULT_TITLE = '';
 %
 if nargin < 7,
     colors = 'white1st.col';
-elseif colors==0 | isempty(colors)
+elseif colors==0 || isempty(colors)
     colors = 'white1st.col';
 end
 
@@ -72,7 +72,7 @@ if titl==0,
     titl = DEFAULT_TITLE;
 end
 
-if nargin < 4 | nargin > 8
+if nargin < 4 || nargin > 8
     help projtopo
     fprintf('projtopo(): requires 4-8 arguments.\n\n');
     return
@@ -81,7 +81,7 @@ end
 % Test data size
 %
 [chans,framestot] = size(data);
-if ~exist('plotchans') | isempty(plotchans) | plotchans==0
+if ~exist('plotchans') || isempty(plotchans) || plotchans==0
    plotchans = 1:chans; % default
 end
 frames = framestot; % assume one epoch

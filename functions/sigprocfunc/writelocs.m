@@ -151,7 +151,7 @@ if ~isempty(g.customheader)
         fprintf(fid, '%s\n', allstrs{index});
     end
 end
-if  strcmpi(g.header, 'on') | g.skipline == 2
+if  strcmpi(g.header, 'on') || g.skipline == 2
    for index=1:length(g.format)
       fprintf(fid, '%8s\t', g.format{index});
    end

@@ -105,7 +105,7 @@ end
     ymax = limits(4);
   end
 
-  if xmax == 0 & xmin == 0,
+  if xmax == 0 && xmin == 0,
     x = (0:1:frames-1);
     xmin = 0;
     xmax = frames-1;
@@ -118,7 +118,7 @@ end
       return
   end
 
-  if ymax == 0 & ymin == 0,
+  if ymax == 0 && ymin == 0,
       ymax=max(max(data));
       ymin=min(min(data));
   end

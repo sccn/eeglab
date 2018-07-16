@@ -49,12 +49,12 @@ mindata = min(data);
 % -------------------------------------
 if nargin > 2
         timelimits = timelimits(:)';  % make row vector
-        if size(timelimits,2)~=2 | size(timelimits,2)~=2
+        if size(timelimits,2)~=2 || size(timelimits,2)~=2
            error('timelimits array must be a [start_time, end_time] vector')
         end
 	X = linspace(timelimits(1),timelimits(2),length(maxdata));   % x-axis description (row vector)
 	Y = ones(1,size(X,2));
-        if size(timearray,1)>1 & size(timearray,2)>1
+        if size(timearray,1)>1 && size(timearray,2)>1
            error('timearray must be a vector')
         end
 	Xi = timearray(:)';   % make a row vector

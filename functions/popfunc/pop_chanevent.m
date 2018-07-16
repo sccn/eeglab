@@ -180,7 +180,7 @@ if ischar(g), error(g); end
 
 % check inut consistency
 % ----------------------
-if strcmpi(g.duration, 'on') & ~strcmpi(g.edge, 'leading')
+if strcmpi(g.duration, 'on') && ~strcmpi(g.edge, 'leading')
     error('Must detect leading edge to extract event duration');
 end
 
@@ -231,7 +231,7 @@ for ci = chan
         tmpevent    = tmpevent2+1;
         tmpeventval = tmpevent2;
     end
-    if exist('tmpevent1') & exist('tmpevent2')
+    if exist('tmpevent1') && exist('tmpevent2')
         tmpevent    = sort([ tmpevent1+1 tmpevent2+1]);
         tmpeventval = sort([ tmpevent1+2 tmpevent2]);
     end
@@ -281,7 +281,7 @@ else
 	for index = 1:length(events)
 		EEG.event(end+1).type  = events(index).type;
 		EEG.event(end).latency = events(index).latency;
-        if EEG.trials > 1 | isfield(EEG.event, 'epoch');
+        if EEG.trials > 1 || isfield(EEG.event, 'epoch');
             EEG.event(end).epoch = 1+floor((EEG.event(end).latency-1) / EEG.pnts);
         end
 	end
