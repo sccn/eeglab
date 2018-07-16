@@ -58,32 +58,32 @@ command = '';
 if nargin < 1 
     help pop_importpres;
     return
-end;
+end
 
 % decode input (and backward compatibility)
 % -----------------------------------------
 if nargin < 5
     durfield = '';
-end;
+end
 if nargin >= 5 & ~ischar(durfield)
     if nargin >= 6
         varargin = { align varargin{:} };
-    end;
+    end
     align = durfield;
     durfield = '';
 else
     if nargin < 6
         align = 0;
-    end;
-end;
+    end
+end
 
 if nargin < 2 
 	% ask user
 	[filename, filepath] = uigetfile('*.log;*.LOG', 'Choose a Presentation file -- pop_importpres()'); 
     drawnow;
-	if filename == 0 return; end;
+	if filename == 0 return; end
 	filename = [filepath filename];
-end;
+end
 
 fields = loadtxt(filename, 'delim', 9, 'skipline', -2, 'nlines', 1, 'verbose', 'off');
 
@@ -93,13 +93,13 @@ if nargin > 1
     if nargin < 3
         typefield = 'code'; % backward compatibility
         latfield  = 'time';
-    end;
+    end
     indtype  = strmatch(lower(typefield), lower(fields));
     indlat   = strmatch(lower(latfield) , lower(fields));
     if ~isempty(durfield)
          inddur   = strmatch(lower(durfield) , lower(fields));
     else inddur = 0;
-    end;
+    end
 else
     indtype1   = strmatch('event type', lower(fields));
     indtype2   = strmatch('code', lower(fields));
@@ -116,7 +116,7 @@ else
     uigeom = { [2 1] [2 1] [2 1] 1 1 };
     result = inputgui(uigeom, uilist, 'pophelp(''pop_importpres'')', 'Import presentation file - pop_importpres()', ...
                       [], 'normal', [2 2 2 1 1]);
-    if isempty(result), return; end;
+    if isempty(result), return; end
     
     indtype = result{1};
     indlat  = result{2};
@@ -126,14 +126,14 @@ else
     if inddur ~= 0
          durfield  = fields{inddur};
     else durfield  = '';
-    end;
-end;
+    end
+end
 if isempty(indtype)
     error(['Could not detect field ''' typefield ''', try importing the file as ASCII (use delimiter=9 (tab))']);
-end;
+end
 if isempty(indlat)
     error(['Could not detect field ''' latfield ''', try importing the file as ASCII (use delimiter=9 (tab))']);
-end;
+end
 disp(['Replacing field ''' typefield ''' by ''type'' for EEGLAB compatibility']);
 disp(['Replacing field ''' latfield  ''' by ''latency'' for EEGLAB compatibility']);
 fields{indtype} = 'type';
@@ -159,13 +159,13 @@ for index = 1:length(fields)
             fields{index} = fields{index}(1:indparen-1);
         else
             fields{index}(indspace) = '_';
-        end;
+        end
     else
         fields{index}(indspace) = '_';
         indparen = find(fields{index} == '(');
         fields{index}(indspace) = '_';
-    end;
-end;
+    end
+end
 
 % find if uncertainty is duplicated
 % ---------------------------------
@@ -173,11 +173,11 @@ induncert  = strmatch('uncertainty', lower(fields), 'exact');
 if length(induncert) > 1
     fields{induncert(2)}= 'Uncertainty2';
     disp('Renaming second ''Uncertainty'' field');
-end;
+end
 
 % import file
 % -----------
-if isempty(EEG.event), align = NaN; end;
+if isempty(EEG.event), align = NaN; end
 
 %EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
 %                           'delim', 9, 'align', align, 'fields', fields, varargin{:});

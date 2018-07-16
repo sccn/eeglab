@@ -44,7 +44,7 @@ function [H,S,D]=acsobiro(X,n,p),
 if nargin<1 || nargin > 3
     help acsobiro
     return;
-end;
+end
 
 [m,N,ntrials]=size(X);
 if nargin==1,
@@ -55,7 +55,7 @@ if nargin==1,
 elseif nargin==2,
     DEFAULT_LAGS = 100;
     p=min(DEFAULT_LAGS,ceil(N/3)); % number of correlation matrices to be diagonalized
-end;
+end
 
 X(:,:)=X(:,:)-(mean(X(:,:),2)*ones(1,N*ntrials));        % Remove data means 
 
@@ -68,8 +68,8 @@ for t = 1:ntrials
         Rxx=Rxx+(X(:,1:N-1,t)*X(:,2:N,t)')/(N-1)/ntrials; % Estimate the sample covariance matrix 
                                           % for the time delay p=1, to reduce influence 
                                           % of white noise.
-    end;
-end;
+    end
+end
 
 [Ux,Dx,Vx]=svd(Rxx);
         Dx=diag(Dx);
@@ -83,7 +83,7 @@ else    % under assumption of no additive noise and when the
    n=max(find(Dx>1e-99)); % detect the number of sources
    fprintf('acsobiro(): Estimated number of sources is %d\n',n);
    Q= diag(real(sqrt(1./Dx(1:n))))*Ux(:,1:n)';
-end;
+end
 Xb = zeros(size(X));
 Xb(:,:)=Q*X(:,:); % prewhitened data
 
@@ -97,8 +97,8 @@ Xb(:,:)=Q*X(:,:); % prewhitened data
            Rxp=Xb(:,k:N,t)*Xb(:,1:N-k+1,t)'/(N-k+1)/ntrials;
        else
            Rxp=Rxp+Xb(:,k:N,t)*Xb(:,1:N-k+1,t)'/(N-k+1)/ntrials;
-       end;
-   end;
+       end
+   end
    M(:,u:u+m-1)=norm(Rxp,'fro')*Rxp;  % Frobenius norm =
  end;                                  % sqrt(sum(diag(Rxp'*Rxp)))
 

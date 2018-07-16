@@ -51,13 +51,13 @@ function [STUDY, ALLEEG] = std_interp(STUDY, ALLEEG, chans, method);
 if nargin < 2
     help std_interp;
     return;
-end;
+end
 if nargin < 3
     chans = [];
-end;
+end
 if nargin < 4
     method = 'spherical';
-end;
+end
 
 % union of all channel structures
 % -------------------------------
@@ -71,9 +71,9 @@ if iscell(chans)
         tmpind = strmatch(lower(chans{index}), alllabs, 'exact');
         if isempty(tmpind)
             error( sprintf('Channel named ''%s'' not found in any dataset', chans{index}));
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % read all STUDY datasets and interpolate electrodes
 % ---------------------------------------------------
@@ -91,7 +91,7 @@ for index = 1:length(STUDY.datasetinfo)
        interplocs = alllocs(union(id1, id2));
    else
        interplocs = chans;
-   end;
+   end
    
    if length(interplocs) ~= length(tmplocs)
        
@@ -101,8 +101,8 @@ for index = 1:length(STUDY.datasetinfo)
        if isfield(ALLEEG(tmpind).chaninfo, 'nodatchans')
             if isfield(ALLEEG(tmpind).chaninfo.nodatchans, 'labels')
                 extrachans = ALLEEG(tmpind).chaninfo.nodatchans;
-            end;
-       end;
+            end
+       end
        tmplabels = { tmplocs.labels };
        for i=1:length(interplocs)
            ind = strmatch( interplocs(i).labels, tmplabels, 'exact');
@@ -113,9 +113,9 @@ for index = 1:length(STUDY.datasetinfo)
                if ~isempty(ind)
                     fprintf('Found position of %s in chaninfo structure\n', interplocs(i).labels);
                     interplocs(i) = extrachans(ind);
-               end;
-           end;
-       end;
+               end
+           end
+       end
        
         % perform interpolation
         % ---------------------
@@ -136,11 +136,11 @@ for index = 1:length(STUDY.datasetinfo)
         else
             [ ALLEEG EEG ] = eeg_store(ALLEEG, EEG, tmpind);
             ALLEEG(tmpind).saved = 'yes';
-        end;
+        end
     else
         fprintf('No need for interpolation for dataset %d\n', tmpind);
-    end;
-end;
+    end
+end
            
        
 function checkchans(STUDY, ALLEEG)
@@ -164,13 +164,13 @@ function checkchans(STUDY, ALLEEG)
                        if alllocs(id2(ind)).theta == tmplocs2(tmpmatch).theta
                            datind = ind2;
                            break;
-                       end;
-                   end;
-               end;
+                       end
+                   end
+               end
 
                error(sprintf( [ 'Dataset %d and %d do not have the same channel location\n' ...
                    'for electrode ''%s''' ], datind, tmpind, tmplocs(id1(ind)).labels));
-           end;
-       end;
-    end;
+           end
+       end
+    end
 

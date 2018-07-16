@@ -31,7 +31,7 @@ function STUDY = std_reset(STUDY)
 if nargin < 1
     help std_reset;
     return;
-end;
+end
 
 fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
            'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
@@ -39,10 +39,10 @@ fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
 for ind = 1:length(fields)
     if isfield(STUDY.cluster, fields{ind})
         STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
-    end;
+    end
     if isfield(STUDY, 'changrp')
         if isfield(STUDY.changrp, fields{ind})
             STUDY.changrp = rmfield(STUDY.changrp, fields{ind});
-        end;
-    end;
-end;
+        end
+    end
+end

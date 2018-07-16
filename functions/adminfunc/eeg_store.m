@@ -57,8 +57,8 @@ function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, va
 if nargin >= 3
     if length(EEG) ~= length(storeSetIndex) & storeSetIndex(1) ~= 0
         error('Length of input dataset structure must equal the length of the index array');
-    end;
-end;
+    end
+end
 
 % considering multiple datasets
 % -----------------------------
@@ -68,7 +68,7 @@ if length(EEG) > 1
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             tmpsaved      = EEG.saved;
-            if strcmpi(tmpsaved, 'justloaded'), tmpsaved = 'yes'; end;
+            if strcmpi(tmpsaved, 'justloaded'), tmpsaved = 'yes'; end
             [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
             ALLEEG(storeSetIndex(index)).saved = tmpsaved;
             TMPEEG(index).saved                = tmpsaved;
@@ -77,15 +77,15 @@ if length(EEG) > 1
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             tmpsaved      = EEG.saved;
-            if strcmpi(tmpsaved, 'justloaded'), tmpsaved = 'yes'; end;
+            if strcmpi(tmpsaved, 'justloaded'), tmpsaved = 'yes'; end
             [ALLEEG, EEG, storeSetIndex(index)] = eeg_store(ALLEEG, EEG);
             ALLEEG(storeSetIndex(index)).saved = tmpsaved;
             TMPEEG(index).saved                = tmpsaved;
-        end;
-    end;
+        end
+    end
     EEG = TMPEEG;
 	return;
-end;
+end
 
 if nargin < 3
     % creating new dataset
@@ -94,24 +94,24 @@ if nargin < 3
     EEG.filename = '';
     EEG.filepath = '';
     EEG.datfile  = '';
-end;
+end
 
 if isempty(varargin) % no text output and no check (study loading)
     [ EEG com ]  = eeg_checkset(EEG);
 else
     com = '';
-end;
+end
 if nargin > 2, 
     if storeSetIndex == 0 || strcmpi(EEG.saved, 'justloaded')
         EEG.saved = 'yes'; % just loaded
     else 
         EEG.saved = 'no';
-    end;
+    end
 elseif strcmpi(EEG.saved, 'justloaded')
     EEG.saved = 'yes';        
 else
     EEG.saved = 'no';        
-end;
+end
 EEG = eeg_hist(EEG, com);
 
 % find first free index
@@ -119,7 +119,7 @@ EEG = eeg_hist(EEG, com);
 findindex = 0;
 if nargin < 3,             findindex = 1;
 elseif storeSetIndex == 0, findindex = 1; 
-end;
+end
 
 if findindex
 	i = 1;
@@ -127,20 +127,20 @@ if findindex
 		try
 			if isempty(ALLEEG(i).data);
 				storeSetIndex = i; i = 2000;
-			end;
+			end
 			i = i+1;	
 		catch
 			storeSetIndex = i; i = 2000;
-		end;
-   end;
+		end
+   end
    if isempty(varargin) % no text output and no check
        fprintf('Creating a new ALLEEG dataset %d\n', storeSetIndex);
-   end;
+   end
 else
 	if isempty(storeSetIndex) | storeSetIndex == 0
 		storeSetIndex = 1;
-	end;
-end;
+	end
+end
 
 if ~isempty( ALLEEG )
 	try
@@ -152,8 +152,8 @@ if ~isempty( ALLEEG )
 		end;	
         if ~isfield(EEG, 'datfile') && isfield(ALLEEG, 'datfile')
             ALLEEG(storeSetIndex).datfile = '';
-        end;
-	end;
+        end
+	end
 else	
 	ALLEEG = EEG;
 	if storeSetIndex ~= 1

@@ -77,7 +77,7 @@ function makehtml( directorylist, outputdir, varargin );
 if nargin < 2
     help makehtml;
     return;
-end;
+end
     
 if outputdir(end) ~= '/', outputdir(end+1) = '/'; end; 
     
@@ -85,41 +85,41 @@ if ~isempty( varargin )
     g = struct( varargin{:} );
 else
     g = [];
-end;
+end
     
-try, g.mainonly;    catch, g.mainonly = 'off'; end;
-try, g.mainheader;  catch, g.mainheader = ''; end;
-try, g.outputfile;  catch, g.outputfile = 'index.html'; end;
-try, g.fontindex;   catch, g.fontindex = 'Helvetica'; end;
-try, g.backindex;   catch, g.backindex =  '<body bgcolor="#fcffff">'; end;
-try, g.header;      catch, g.header = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10 'self.window.location = fnc;' 10 '}' 10  '//--></script>' ]; end;
-try, g.background;  catch, g.background = '<body bgcolor="#fcffff">'; end;
-%try, g.background;  catch, g.background = '<body BACKGROUND="cream_stucco.jpg" bgproperties="fixed" bgcolor="#ffffe5">'; end;
-try, g.refcall;     catch, g.refcall = 'javascript:openhelp(''%s.html'')'; end;
-try, g.font;        catch, g.font = 'Helvetica'; end;
-try, g.footer;      catch, g.footer = '<A HREF ="index.html">Back to functions</A>';  end;
-try, g.outputlink;  catch, g.outputlink = [ '<tr><td VALIGN=TOP ALIGN=RIGHT NOSAVE><A HREF="javascript:openhelp(''%s.html'')">%s</A></td><td>%s</td></tr>' ];  end;
+try, g.mainonly;    catch, g.mainonly = 'off'; end
+try, g.mainheader;  catch, g.mainheader = ''; end
+try, g.outputfile;  catch, g.outputfile = 'index.html'; end
+try, g.fontindex;   catch, g.fontindex = 'Helvetica'; end
+try, g.backindex;   catch, g.backindex =  '<body bgcolor="#fcffff">'; end
+try, g.header;      catch, g.header = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10 'self.window.location = fnc;' 10 '}' 10  '//--></script>' ]; end
+try, g.background;  catch, g.background = '<body bgcolor="#fcffff">'; end
+%try, g.background;  catch, g.background = '<body BACKGROUND="cream_stucco.jpg" bgproperties="fixed" bgcolor="#ffffe5">'; end
+try, g.refcall;     catch, g.refcall = 'javascript:openhelp(''%s.html'')'; end
+try, g.font;        catch, g.font = 'Helvetica'; end
+try, g.footer;      catch, g.footer = '<A HREF ="index.html">Back to functions</A>';  end
+try, g.outputlink;  catch, g.outputlink = [ '<tr><td VALIGN=TOP ALIGN=RIGHT NOSAVE><A HREF="javascript:openhelp(''%s.html'')">%s</A></td><td>%s</td></tr>' ];  end
 
 % read header text file
 % ---------------------
 if ~isempty(g.mainheader)
     doc = [];
     fid = fopen(g.mainheader , 'r');
-    if (fid == -1), error(['Can not open file ''' g.mainheader '''' ]); end;
+    if (fid == -1), error(['Can not open file ''' g.mainheader '''' ]); end
     str = fgets( fid );
     while ~feof(fid)
         str = deblank(str(1:end-1));
         doc = [ doc str(1:end) ];
         str = fgets( fid );
-    end;
+    end
     g.backindex = [ g.backindex doc ];
-end;
+end
 
 options = { 'footer', g.footer, 'background', g.background, ...
 		  'refcall', g.refcall, 'font', g.font, 'header', g.header, 'outputlink', g.outputlink};
 if strcmpi( g.mainonly, 'on')
     options = { options{:}, 'outputonly', g.mainonly };
-end;
+end
 
 % ------------------------------------------- 
 % scrips which generate a web page for eeglab
@@ -153,7 +153,7 @@ rmpath('.');
 % write .html file
 % ----------------
 fo = fopen([ outputdir g.outputfile], 'w');
-if fo == -1, error(['cannot open file ''' [ outputdir g.outputfile] '''']); end;
+if fo == -1, error(['cannot open file ''' [ outputdir g.outputfile] '''']); end
 
 fprintf(fo, '<HTML><HEAD>%s</HEAD>%s<FONT FACE="%s">\n', OPENWIN, g.backindex, g.fontindex);
 
@@ -162,14 +162,14 @@ if strcmp(mode, 'files')
 else % direcotry
 	for index = 1:length( directorylist )
 		makehelphtml( direct{ index }, fo, directorylist{index}{2}, STYLEHEADER, outputdir, mode, options, g.mainonly );
-	end;
+	end
 end;	
 fprintf( fo, '</FONT></BODY></HTML>');
 fclose( fo );
 if isunix
     chmodcom = sprintf('!chmod 777 %s*', outputdir);
     eval(chmodcom);
-end;
+end
 
 % ------------------------------
 % Generate help files for EEGLAB
@@ -179,8 +179,8 @@ if strcmp(mode, 'dir')
 		if length(directorylist{index}) > 2
 			makehelpmatlab( directorylist{index}{3}, direct{ index },directorylist{index}{2}); 
 		end;    
-	end;
-end;
+	end
+end
 addpath('.');	
 
 
@@ -196,13 +196,13 @@ function filelist = scandir( dirlist )
             filelist  = { filelist{:} tmplist{:} };
         end;    
     else
-        if dirlist(end) ~= '/', dirlist(end+1) = '/'; end;
+        if dirlist(end) ~= '/', dirlist(end+1) = '/'; end
         if exist(dirlist) ~= 7
             error([ dirlist ' is not a directory']);
         end;    
         tmpdir  =  dir([dirlist '*.m']); 
         filelist = { tmpdir(:).name }; 
-    end;
+    end
     filelist = sort( filelist );      
 return;
 
@@ -222,35 +222,35 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
 			else
 				filename = files{index};
 			    filelink = '';
-			end;
+			end
 			fprintf('Processing (mode file) %s:%s\n', filename, filelink );
 			if ~isempty(filename)
                 if ~exist(fullfile(DEST, [ filename(1:end-1) 'html' ]))
                     cd(DEST); 
                     try, delete([ DEST filename ]);
-                    catch, end;
+                    catch, end
                     help2html2( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
                     
                     if strcmp(mainonly,'off')
                         inputfile = which( filename);
                         try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
-                        catch, fprintf('Cannot copy file %s\n', inputfile); end;
-                    end;
+                        catch, fprintf('Cannot copy file %s\n', inputfile); end
+                    end
                     
                     indexdot = find(filename == '.');
-                end;
+                end
                 if ~isempty(filelink)
                     com = [ space2html(filelink)  ' -- ' space2html([ filename(1:indexdot(end)-1) '()'], ...
                                                                     [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
                 else
                     com = [ space2html([ filename(1:indexdot(end)-1) '()'], ...
                                        [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
-                end;
+                end
 			else 
 				com = space2html(filelink, '<B>', '</B><BR>');
-			end;
+			end
 			fprintf( fo, '%s', com);
-		end;
+		end
 		fprintf(fo, '</UL>' );
 	else 
 		fprintf(fo, STYLEHEADER, title, title );
@@ -264,8 +264,8 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
                 if strcmp(mainonly,'off')
                     inputfile = which( files{index});
                     try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
-                    catch, fprintf('Cannot copy file %s\n', inputfile); end;
-                end;
+                    catch, fprintf('Cannot copy file %s\n', inputfile); end
+                end
             else
                 fprintf('Skipping %s\n', files{index});
                 cd(DEST); 
@@ -274,7 +274,7 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
                 fprintf( fo, '%s', com);
                 cd(tmpdir);
             end
-		end;
+		end
 		fprintf(fo, '</table>' );
 	end;	
 return;
@@ -311,10 +311,10 @@ function strout = space2html(strin, linkb, linke)
 	while strin(index) == ' '
 		strout = [ strout '&nbsp; '];
 		index = index+1;
-	end;
+	end
 	if nargin == 3
 		strout = [strout linkb strin(index:end) linke];
 	else
 		strout = [strout strin(index:end)];
-	end;
+	end
 				   

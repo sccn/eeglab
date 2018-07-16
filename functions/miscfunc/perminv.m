@@ -40,7 +40,7 @@ end
 invvec = zeros(size(vector));
 for i=1:length(vector)
   invvec(vector(i)) = i;
-end;
+end
 
 if transpose==1,
 	invvec = invvec';

@@ -139,7 +139,7 @@ if nargin < 4
         
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'geomvert', geomvert, ...
                                             'title', 'LInear MOdeling of EEG data -- pop_limo()', 'helpcom', 'pophelp(''pop_limo'');');
-    if isempty(res), return; end;
+    if isempty(res), return; end
     opttmp  = eval( [ '{ ' res.options ' }' ]);
     if length(opttmp) > 0 && isnumeric(opttmp{1})
         error([ 'Wrong options. Options must be in the format' 10 '''key'', val. For example ''timelim'', [-100 600]' ]);

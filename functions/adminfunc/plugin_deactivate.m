@@ -5,7 +5,7 @@ function plugin_deactivate(foldername);
     fullpluginfolder = fullfile(fileparts(which('eeglab.m')), 'plugins', foldername);
     if ~exist(fullpluginfolder)
         error([ 'Could not find folder ' foldername 'in extension folder' ]);
-    end;
+    end
 
     disp('Removing extension from path');
     allPaths = path;
@@ -15,14 +15,14 @@ function plugin_deactivate(foldername);
         if ~isempty(strfind(tmpPath, fullpluginfolder))
             rmpath(tmpPath);
             fprintf('Removing path %s\n', tmpPath);
-        end;
-    end;
+        end
+    end
 
     disp([ 'Moving extension ' foldername ' to deactivatedplugins folder' ]);
     fulldeactivatedpluginfolder = fullfile(fileparts(which('eeglab.m')), 'deactivatedplugins');
-    if ~exist(fulldeactivatedpluginfolder), mkdir(fulldeactivatedpluginfolder); end;
+    if ~exist(fulldeactivatedpluginfolder), mkdir(fulldeactivatedpluginfolder); end
     try
         movefile(fullpluginfolder, fulldeactivatedpluginfolder);
     catch
         eeglab_error;
-    end;
+    end

@@ -32,10 +32,10 @@ function icaact = eeg_getica(EEG, comp)
   if nargin < 1
     help eeg_getica;
     return;
-  end;
+  end
   if nargin < 2
     comp = 1:size(EEG.icaweights,1);
-  end;
+  end
   
   if ~isempty(EEG.icaact)
     icaact = EEG.icaact(comp,:,:);
@@ -47,4 +47,4 @@ function icaact = eeg_getica(EEG, comp)
     end
     icaact = (EEG.icaweights(comp,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
     icaact = reshape( icaact, size(icaact,1), EEG.pnts, EEG.trials);
-  end;
+  end

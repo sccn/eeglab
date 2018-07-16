@@ -72,14 +72,14 @@ eventConditions = [];
 inputKeyValuesFields = fieldnames(inputKeyValues);
 for i=1:length(inputKeyValuesFields)
     eval([inputKeyValuesFields{i} '= inputKeyValues.' inputKeyValuesFields{i} ';']);
-end;
+end
 
 
 if length(eventConditions) < length(eventSequence)
     for i = (length(eventConditions)+1):length(eventSequence)
         eventConditions{i} = '';
-    end;
-end;
+    end
+end
 
 epochsIsAcceptable = ones(1, length(EEG.epoch));
 for epochNumber = 1:length(EEG.epoch)
@@ -95,13 +95,13 @@ for epochNumber = 1:length(EEG.epoch)
             timeWarp{epochNumber} = [timeWarp{epochNumber}; firstLatency];
             minimumLatency = firstLatency;
             eventNameID = eventNameID + 1;
-        end;
-    end;
+        end
+    end
 
     if length(timeWarp{epochNumber}) < length(eventSequence)
         epochsIsAcceptable(epochNumber) = false;
-    end;
-end;
+    end
+end
 
 
 acceptableEpochs = find(epochsIsAcceptable);
@@ -115,14 +115,14 @@ else
     timeWarp(:,rejectedEpochesBasedOnLateny) = [];
     acceptableEpochs(rejectedEpochesBasedOnLateny) = [];
     
-end;
+end
 
 % since latencies and accepted epochs always have to be together, we put them in one structure
 timeWarpStructure.latencies = timeWarp'; % make it suitable for newtimef()
 
 if isempty(timeWarpStructure.latencies) % when empty, it becomes a {} instead of [], so we change it to []
     timeWarpStructure.latencies = [];
-end;
+end
 
 timeWarpStructure.epochs = acceptableEpochs;
 timeWarpStructure.eventSequence = eventSequence;
@@ -134,7 +134,7 @@ timeWarpStructure.eventSequence = eventSequence;
         rejectedBasedOnLateny = [];
         for eventNumber = 1:size(timeWarpDiff, 1)
             rejectedBasedOnLateny = [rejectedBasedOnLateny find(abs(timeWarpDiff(eventNumber, :)-  mean(timeWarpDiff(eventNumber, :))) > maxSTDForRelative * std(timeWarpDiff(eventNumber, :)))];
-        end;
+        end
         rejectedEpochesBasedOnLateny = unique_bc(rejectedBasedOnLateny);
     end
 
@@ -144,7 +144,7 @@ timeWarpStructure.eventSequence = eventSequence;
         rejectedBasedOnLateny = [];
         for eventNumber = 1:size(timeWarp, 1)
             rejectedBasedOnLateny = [rejectedBasedOnLateny find(abs(timeWarp(eventNumber, :)-  mean(timeWarp(eventNumber, :))) >  maxSTDForAbsolute* std(timeWarp(eventNumber, :)))];
-        end;
+        end
         rejectedEpochesBasedOnLateny = unique_bc(rejectedBasedOnLateny);
     end
 
@@ -158,9 +158,9 @@ timeWarpStructure.eventSequence = eventSequence;
 
                 if isempty(firstLatency)
                     firstLatency = epoch.eventlatency{eventNumber};
-                end;
-            end;
-        end;
+                end
+            end
+        end
     end
 
     function result = eventMeetsCondition(epoch, eventNumber, condition)
@@ -173,10 +173,10 @@ timeWarpStructure.eventSequence = eventSequence;
             for i=1:length(epochField)
                 epochField{i} = strrep(epochField{i},'event',''); % remove event from the beginning of field names
                 condition = strrep(condition, epochField{i}, ['cell2mat(epoch.event' epochField{i} '(' num2str(eventNumber) '))' ]);
-            end;
+            end
 
             result = eval(condition);
-        end;
+        end
 
     end
 
@@ -185,15 +185,15 @@ timeWarpStructure.eventSequence = eventSequence;
         if ischar(types)
             if iscell(eventStr) && isnumeric(cell2mat(eventStr))
                 eventStr = num2str(cell2mat(eventStr));
-            end;
+            end
             
             result = strcmp(eventStr, types);
         else % it must be a cell of strs
             result = false;
             for i=1:length(types)
                 result = result ||  strcmp(eventStr, types{i});                
-            end;
-        end;
+            end
+        end
     end
         
 end

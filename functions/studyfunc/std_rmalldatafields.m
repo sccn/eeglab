@@ -37,10 +37,10 @@ function STUDY = std_rmalldatafields(STUDY, chanorcomp);
 if nargin < 1
     help std_rmalldatafields;
     return;
-end;
+end
 if nargin < 2
     chanorcomp = 'both';
-end;
+end
 
 fields = { 'erpdata'  'erptimes'  'erpdatatrials'  'erptrialinfo' ...
                'specdata' 'specfreqs' 'specdatatrials' 'spectrialinfo' ...
@@ -53,11 +53,11 @@ for ff = 1:length(fields)
     if strcmpi(chanorcomp, 'data') || strcmpi(chanorcomp, 'both')
         if isfield(STUDY.changrp, fields{ff})
             STUDY.changrp = rmfield(STUDY.changrp, fields{ff} );
-        end;
-    end;
+        end
+    end
     if strcmpi(chanorcomp, 'clust') || strcmpi(chanorcomp, 'both')
         if isfield(STUDY.cluster, fields{ff})
             STUDY.cluster = rmfield(STUDY.cluster, fields{ff} );
-        end;
-    end;
-end;
+        end
+    end
+end

@@ -350,7 +350,7 @@ if exist('loc_file')
         if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
            fprintf('Plotting radius plotrad (%g) set from EEG.chanlocs.\n',plotrad);
         end
-	end;
+	end
 	if isempty(plotrad) 
       plotrad = min(1.0,max(Rd)*1.02);            % default: just outside the outermost electrode location
       plotrad = max(plotrad,0.5);                 % default: plot out to the 0.5 head boundary
@@ -532,7 +532,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
           if strcmpi(MASKSURF, 'on')
               set(tmph, 'visible', 'off');
               handle = tmph;
-          end;
+          end
           [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
           for h=chs, set(h,'color',CCOLOR); end
       %
@@ -549,7 +549,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
           if strcmpi(MASKSURF, 'on')
               set(tmph, 'visible', 'off');
               handle = tmph;
-          end;
+          end
       %
       %%%%%%%%%%%%%%%%%% Else fill contours with uniform colors  %%%%%%%%%%%%%%%%%%
       %
@@ -589,7 +589,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   
 if exist('handle') ~= 1
     handle = gca;
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%% Plot filled ring to mask jagged grid boundary %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -773,19 +773,19 @@ if ~isempty(DIPOLE)
         DIPOLE(:,2) =  tmp(:,1);
         DIPOLE(:,3) = -tmp(:,4);
         DIPOLE(:,4) =  tmp(:,3);
-    end;
+    end
     for index = 1:size(DIPOLE,1)
         if ~any(DIPOLE(index,:))
              DIPOLE(index,:) = [];
         end
-    end;
+    end
     DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax*(rmax/plotrad); % scale radius from 1 -> rmax (0.5)
     DIPOLE(:,3:end) = (DIPOLE(:,3:end))*rmax/100000*(rmax/plotrad); 
     if strcmpi(DIPNORM, 'on')
         for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
-        end;
-    end;
+        end
+    end
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
 
     PLOT_DIPOLE=1;
@@ -808,9 +808,9 @@ if ~isempty(DIPOLE)
         hh = line( [DIPOLE(index, 1) DIPOLE(index, 1)+DIPOLE(index, 3)]', ...
                    [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]');
         set(hh, 'color', DIPCOLOR, 'linewidth', DIPSCALE*30/7);
-      end;
-    end;
-end;
+      end
+    end
+end
 
 %
 %%%%%%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%

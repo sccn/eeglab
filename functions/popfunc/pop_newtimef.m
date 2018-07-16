@@ -139,8 +139,8 @@ else
 	popup = ischar(num) | isempty(num);
 	if ischar(num)
 		lastcom = num;
-	end;
-end;
+	end
+end
 
 % pop up window
 % -------------
@@ -206,10 +206,10 @@ if popup
 	[ tmp1 tmp2 strhalt result ] = inputgui( geometry, uilist, 'pophelp(''pop_newtimef'');', ...
 					   fastif(typeproc, 'Plot channel time frequency -- pop_newtimef()', ...
 							  'Plot component time frequency -- pop_newtimef()'));
-	if length( tmp1 ) == 0 return; end;
+	if length( tmp1 ) == 0 return; end
 
-	if result.fft,      result.cycle = '0'; end;
-	if result.nobase,   result.baseline = 'NaN'; end;
+	if result.fft,      result.cycle = '0'; end
+	if result.nobase,   result.baseline = 'NaN'; end
     
 	num	     = eval( [ '[' result.chan    ']' ] ); 
 	tlimits	 = eval( [ '[' result.tlimits ']' ] ); 
@@ -221,42 +221,42 @@ if popup
     % ------------
     options = [];
     if isfield(EEG.chanlocs, 'theta') && ~isempty(EEG.chanlocs(num).theta)
-        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
+        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end
         if typeproc == 1
-            if isempty(EEG.chanlocs), caption = [ 'Channel ' int2str(num) ]; else caption = EEG.chanlocs(num).labels; end;
+            if isempty(EEG.chanlocs), caption = [ 'Channel ' int2str(num) ]; else caption = EEG.chanlocs(num).labels; end
             options = [options ', ''topovec'', ' int2str(num) ...
                         ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', ''' caption '''' ];
         else
             options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
                        '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', [''IC ' num2str(num) ''']' ];
-      end;
-    end;
+      end
+    end
     
-	if ~isempty( result.baseline ),  options = [ options ', ''baseline'',[' result.baseline ']' ]; end;
-    if ~isempty( result.alpha ),     options = [ options ', ''alpha'',' result.alpha ];   end;
-	if ~isempty( result.options ),   options = [ options ',' result.options ];            end;
-	if ~isempty( result.freqs ),     options = [ options ', ''freqs'', [' result.freqs ']'   ]; end;
-	if ~isempty( result.erspmax ),   options = [ options ', ''erspmax'', [' result.erspmax ']' ]; end;
-	if ~isempty( result.itcmax ),    options = [ options ', ''itcmax'','  result.itcmax ];      end;
-	if ~result.plotersp,             options = [ options ', ''plotersp'', ''off''' ];     end;
-	if ~result.plotitc,              options = [ options ', ''plotitc'' , ''off''' ];     end;
-	if result.plotcurve,             options = [ options ', ''plottype'', ''curve''' ];   end;
-	if result.fdr,                   options = [ options ', ''mcorrect'', ''fdr''' ];     end;
-	if result.freqscale,             options = [ options ', ''freqscale'', ''log''' ];    end;
-	if ~result.plotphase,            options = [ options ', ''plotphase'', ''off''' ];    end;
-	if ~result.scale,                options = [ options ', ''scale'', ''abs''' ];        end;
-    if result.ntimesout == 1,        options = [ options ', ''ntimesout'', 50' ];         end;
-    if result.ntimesout == 2,        options = [ options ', ''ntimesout'', 100' ];        end;
-    if result.ntimesout == 3,        options = [ options ', ''ntimesout'', 150' ];        end;
-    if result.ntimesout == 5,        options = [ options ', ''ntimesout'', 300' ];        end;
-    if result.ntimesout == 6,        options = [ options ', ''ntimesout'', 400' ];        end;
+	if ~isempty( result.baseline ),  options = [ options ', ''baseline'',[' result.baseline ']' ]; end
+    if ~isempty( result.alpha ),     options = [ options ', ''alpha'',' result.alpha ];   end
+	if ~isempty( result.options ),   options = [ options ',' result.options ];            end
+	if ~isempty( result.freqs ),     options = [ options ', ''freqs'', [' result.freqs ']'   ]; end
+	if ~isempty( result.erspmax ),   options = [ options ', ''erspmax'', [' result.erspmax ']' ]; end
+	if ~isempty( result.itcmax ),    options = [ options ', ''itcmax'','  result.itcmax ];      end
+	if ~result.plotersp,             options = [ options ', ''plotersp'', ''off''' ];     end
+	if ~result.plotitc,              options = [ options ', ''plotitc'' , ''off''' ];     end
+	if result.plotcurve,             options = [ options ', ''plottype'', ''curve''' ];   end
+	if result.fdr,                   options = [ options ', ''mcorrect'', ''fdr''' ];     end
+	if result.freqscale,             options = [ options ', ''freqscale'', ''log''' ];    end
+	if ~result.plotphase,            options = [ options ', ''plotphase'', ''off''' ];    end
+	if ~result.scale,                options = [ options ', ''scale'', ''abs''' ];        end
+    if result.ntimesout == 1,        options = [ options ', ''ntimesout'', 50' ];         end
+    if result.ntimesout == 2,        options = [ options ', ''ntimesout'', 100' ];        end
+    if result.ntimesout == 3,        options = [ options ', ''ntimesout'', 150' ];        end
+    if result.ntimesout == 5,        options = [ options ', ''ntimesout'', 300' ];        end
+    if result.ntimesout == 6,        options = [ options ', ''ntimesout'', 400' ];        end
     if result.nfreqs == 1,           options = [ options ', ''padratio'', 1' ];           end;    
     if result.nfreqs == 2,           options = [ options ', ''padratio'', 2' ];           end;    
-    if result.nfreqs == 3,           options = [ options ', ''padratio'', 4' ];           end;
-    if result.nfreqs == 4,           options = [ options ', ''nfreqs'', ' int2str(length(freqs)) ]; end;
-    if result.basenorm == 2,         options = [ options ', ''basenorm'', ''on''' ];      end;
-    if result.basenorm == 4,         options = [ options ', ''basenorm'', ''on''' ];      end;
-    if result.basenorm >= 3,         options = [ options ', ''trialbase'', ''full''' ];      end;
+    if result.nfreqs == 3,           options = [ options ', ''padratio'', 4' ];           end
+    if result.nfreqs == 4,           options = [ options ', ''nfreqs'', ' int2str(length(freqs)) ]; end
+    if result.basenorm == 2,         options = [ options ', ''basenorm'', ''on''' ];      end
+    if result.basenorm == 4,         options = [ options ', ''basenorm'', ''on''' ];      end
+    if result.basenorm >= 3,         options = [ options ', ''trialbase'', ''full''' ];      end
 
     % add title
     % ---------
@@ -265,20 +265,20 @@ if popup
             chanlabel = EEG.chanlocs(num).labels;
         else
             chanlabel = int2str(num);
-        end;
-	end;
+        end
+	end
     
     % compute default winsize
     % -----------------------
     if EEG.xmin < 0 && isempty(findstr( '''winsize''', result.options)) && isempty( result.freqs )
         fprintf('Computing window size in pop_newtimef based on half of the length of the baseline period');
         options = [ options ', ''winsize'', ' int2str(-EEG.xmin*EEG.srate) ];
-    end;
+    end
     
-	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 else
     options = [ ',' vararg2str(varargin) ];
-end;
+end
 
 % compute epoch limits
 % --------------------
@@ -299,7 +299,7 @@ else
     		tmpsig = EEG.icaact(num,pointrange,:);
  	    else
             tmpsig = (EEG.icaweights(num,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
-        end;
+        end
 	else
 		error('You must run ICA first');
 	end;	
@@ -310,19 +310,19 @@ tmpsig = reshape( tmpsig, length(num), size(tmpsig,2)*size(tmpsig,3));
 % -------
 outstr = '';
 if ~popup
-    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
-    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
-end;
+    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end
+    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end
+end
 
 % plot the datas and generate output command
 % --------------------------------------------
 if length( options ) < 2
     options = '';
-end;
+end
 if nargin < 4
     varargout{1} = sprintf('figure; pop_newtimef( EEG, %d, %d, [%s], [%s] %s);', typeproc, num, ...
 			int2str(tlimits), num2str(cycles), options);
-end;
+end
 com = sprintf('%s newtimef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)	    
 
@@ -337,4 +337,4 @@ function txt = context(var, allvars, alltext);
 	else
 		disp([ 'warning: variable ''' var ''' not found']);
 		txt = '';
-	end;
+	end

@@ -99,7 +99,7 @@ outheight = 0;
 if nargin < 2
 	help supergui;
 	return;
-end;
+end
 
 % get version and
 % set additional parameters
@@ -110,7 +110,7 @@ versnum = str2num(v(1:indDot(2)-1));
 if versnum >= 7.14
      addParamFont = { 'fontsize' 12 };
 else addParamFont = { };
-end;
+end
 
 warning off MATLAB:hg:uicontrol:ParameterValuesMustBeValid
 
@@ -142,20 +142,20 @@ if ~isempty(g.geomhoriz)
     maxcount = sum(cellfun('length', g.geomhoriz));
     if maxcount ~= length(g.uilist)
         warning('Wrong size for ''geomhoriz'' input');
-    end;
+    end
     if ~isempty(g.geomvert)
         if length(g.geomvert) ~= length(g.geomhoriz)
             warning('Wrong size for ''geomvert'' input');
-        end;
-    end;
+        end
+    end
     g.insetv = g.insetv/length(g.geomhoriz);
-end;
+end
 if ~isempty(g.geom)
     if length(g.geom) ~= length(g.uilist)
         warning('Wrong size for ''geom'' input');
-    end;
+    end
     maxcount = length(g.geom);
-end;
+end
 
 % create new figure
 % -----------------
@@ -170,7 +170,7 @@ if ~isempty(g.geomhoriz) & ~iscell( g.geomhoriz )
 	g.geomhoriz = {};
 	for row = 1:length(oldgeom)
 		g.geomhoriz = { g.geomhoriz{:} ones(1, oldgeom(row)) };
-	end;
+	end
 end
 if isempty(g.geomvert)
 	g.geomvert = ones(1, length(g.geomhoriz));
@@ -191,14 +191,14 @@ if isempty(g.geom)
             g.geom{count} = { length(g.geomhoriz{row}) sumvert [incx incy] [g.geomhoriz{row}(column)*ratio g.geomvert(row)] };
             incx = incx+g.geomhoriz{row}(column)*ratio;
             count = count+1;
-        end;
+        end
         incy = incy+g.geomvert(row);
-    end;
+    end
     g.borders(1:2) = g.borders(1:2)/maxhoriz*5;
     g.borders(3:4) = g.borders(3:4)/sumvert*10;
     g.spacing(1)   = g.spacing(1)/maxhoriz*5;
     g.spacing(2)   = g.spacing(2)/sumvert*10;
-end;
+end
 
 % disp new geometry
 % -----------------
@@ -207,9 +207,9 @@ if 0
     for index = 1:length(g.geom)
         fprintf('{ %g %g [%g %g] [%g %g] } ...\n', g.geom{index}{1}, g.geom{index}{2}, ...
             g.geom{index}{3}(1), g.geom{index}{3}(2), g.geom{index}{4}(1), g.geom{index}{3}(2));
-    end;
+    end
     fprintf('};\n');
-end;
+end
 
 % get axis coordinates
 % --------------------
@@ -263,31 +263,31 @@ for counter = 1:maxcount
                  curwidth = currentelem{2};
                  currentelem(1:2) = [];
             else curwidth = 0;
-            end;
+            end
             if strcmpi(currentelem{1}, 'align'),
                  align = currentelem{2};
                  currentelem(1:2) = [];
             else align = 'right';
-            end;
+            end
             if strcmpi(currentelem{1}, 'stickto'),
                  stickto = currentelem{2};
                  currentelem(1:2) = [];
             else stickto = 'none';
-            end;
+            end
             if strcmpi(currentelem{1}, 'vertshift'), currentelem(1) = []; addvert = -height/2; 
             else                                                          addvert = 0;   
-            end;
+            end
             if strcmpi(currentelem{1}, 'vertexpand'), heightfactor = currentelem{2}; addvert = -(heightfactor-1)*height; currentelem(1:2) = []; 
             else                                      heightfactor = 1;   
-            end;
+            end
             
             % position adjustment depending on GUI type
             if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'popupmenu')
                 posy = posy-height/5;
-            end;
+            end
             if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'text')
                 posy = posy+height/5;
-            end;
+            end
                 
             if strcmpi(currentelem{1}, 'function'),
                 % property grid argument
@@ -316,28 +316,28 @@ for counter = 1:maxcount
                         curpos(1) = curpos(1)+curpos(3)-curwidth;
                     elseif strcmpi(align, 'center')
                         curpos(1) = curpos(1)+curpos(3)/2-curwidth/2;
-                    end;
+                    end
                     set(allhandlers{counter}, 'position', [ curpos(1) curpos(2) curwidth curpos(4) ]);
                     if strcmpi(stickto, 'on')
                         set( allhandlers{counter-1}, 'units', 'pixels');
                         curpos2 = get(allhandlers{counter-1}, 'position');
                         set(allhandlers{counter-1}, 'position', [ curpos(1)-curpos2(3)-10 curpos2(2) curpos2(3) curpos2(4) ]);
                         set( allhandlers{counter-1}, 'units', 'normalized');
-                    end;
+                    end
                     curext(3) = curwidth;
-                end;
+                end
                 set( allhandlers{counter}, 'units', 'normalized');			
-            end;
+            end
 
             if ~strcmp(style, 'edit') && (~strcmp(style, 'pushbutton') || strcmpi(g.adjustbuttonwidth, 'on'))
                 %tmp = curext(3)/curpos(3);
-                %if tmp > 3*factmultx && factmultx > 0, adsfasd; end;
+                %if tmp > 3*factmultx && factmultx > 0, adsfasd; end
                 factmultx = max(factmultx, curext(3)/curpos(3));
-                if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end;
-            end;
+                if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
+            end
             if  ~strcmp(style, 'listbox')
                 factmulty = max(factmulty, curext(4)/curpos(4));
-            end;
+            end
 
             % Uniformize button text aspect (first letter must be upercase)
             % -----------------------------
@@ -346,23 +346,23 @@ for counter = 1:maxcount
                 if length(tmptext) > 1
                     if upper(tmptext(1)) ~= tmptext(1) || lower(tmptext(2)) ~= tmptext(2) && ~strcmpi(tmptext, 'STATS')
                         tmptext = lower(tmptext);
-                        try, tmptext(1) = upper(tmptext(1)); catch, end;
-                    end;
-                end;
+                        try, tmptext(1) = upper(tmptext(1)); catch, end
+                    end
+                end
                 set(allhandlers{counter}, 'string', tmptext);
-            end;
-        end;
+            end
+        end
     else 
         allhandlers{counter} = 0;
-    end;
-end;
+    end
+end
 
 % adjustments
 % -----------
 factmultx = factmultx*1.02;% because some text was still hidden
 if factmultx < 0.1
 	factmultx = 0.1;
-end;
+end
 
 % for MAC (magnify figures that have edit fields)
 % -------
@@ -373,8 +373,8 @@ try,
         factmulty = factmulty*1.5;
 	elseif ~isunix % windows
         factmulty = factmulty*1.08;
-    end;
-catch, end;
+    end
+catch, end
 factmulty = factmulty*0.9; % global shinking
 warning on;	
 
@@ -383,7 +383,7 @@ warning on;
 pos = get(g.fig, 'position');
 if factmulty > 1
 	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
-end;
+end
 pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
 pos(3) = max(pos(3)*factmultx, g.minwidth);
 pos(4) = pos(4)*factmulty;
@@ -399,9 +399,9 @@ for index = 1:length(allhandlers)
 			curext = get(allhandlers{index}, 'extent');
 			set(allhandlers{index}, 'position', [curpos(1) curpos(2)-4 curpos(3) curext(4)]);
             set(allhandlers{index}, 'unit', 'normalized');
-		end;
-	end;
-end;
+		end
+	end
+end
 
 % setting defaults colors
 %------------------------
@@ -410,7 +410,7 @@ catch,
 	GUIBACKCOLOR        =  [.8 .8 .8];     
 	GUIPOPBUTTONCOLOR   = [.8 .8 .8];    
 	GUITEXTCOLOR        = [0 0 0];
-end;
+end
 
 numobjects = cellfun(@ishandle, allhandlers); % (isnumeric by ishanlde was changed here)
 allhandlersnum = [ allhandlers{numobjects} ];
@@ -432,7 +432,7 @@ comp = computer;
 if length(comp) < 3 || ~strcmpi(comp(1:3), 'MAC') % this puts the wrong background on macs
     set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
     set(hh, 'foregroundcolor', GUITEXTCOLOR);
-end;
+end
 hh =findobj(allhandlersnum, 'parent', g.fig, 'style', 'popupmenu');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
@@ -458,13 +458,13 @@ if ~isempty(g.screenpos)
         pos(1) = (screenSize(3)-pos(3))/2;
         pos(2) = (screenSize(4)-pos(4))/2+pos(4);
         set(g.fig, 'position', pos);
-    end;
+    end
 end;    
 
 % set userdata and title
 % ----------------------
-if ~isempty(g.userdata), set(g.fig, 'userdata', g.userdata); end;
-if ~isempty(g.title   ), set(g.fig, 'name',     g.title   ); end;
+if ~isempty(g.userdata), set(g.fig, 'userdata', g.userdata); end
+if ~isempty(g.title   ), set(g.fig, 'name',     g.title   ); end
 
 return;
 

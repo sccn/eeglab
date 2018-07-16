@@ -25,31 +25,31 @@
 %             Matlab v5 function.
 
 function [value,freq,index] = uniquef(grp,sortflag)
-  if (nargin < 2) sortflag = []; end;
+  if (nargin < 2) sortflag = []; end
 
   get_index = 0;
   if (nargout > 2)
     get_index = 1;
-  end;
+  end
 
   if (isempty(sortflag))
     sortflag = 0;
-  end;
+  end
 
   tol = eps * 10.^4;
   grp = grp(:);                           % Convert input matrix to vector
 
   if (get_index)                          % Create vector of indices
     ind = [1:length(grp)]';
-  end;
+  end
 
   if (any([~isfinite(grp)]))                % Remove NaN's and infinite values
     i = find(~isfinite(grp));               %   from input vector and index vector
     grp(i) = [];
     if (get_index)                     
       ind(i) = [];
-    end;
-  end;
+    end
+  end
 
   value = [];
   freq = [];
@@ -61,13 +61,13 @@ function [value,freq,index] = uniquef(grp,sortflag)
     else                                  % If not,
       value = [value; grp(i)];            %   add to value list
       freq =  [freq; 1];                  %   and initialize frequency counter
-    end;
-  end;
+    end
+  end
 
   if (sortflag)
     [value,i] = sort(value);
     freq = freq(i);
-  end;
+  end
 
   if (get_index)
     nval = length(value);                 % Number of unique values
@@ -75,8 +75,8 @@ function [value,freq,index] = uniquef(grp,sortflag)
     for v = 1:nval                        % For each unique value,
       i = find(grp == value(v));          %   Find observations having value
       index(v) = ind(i(1));               %   Save first
-    end;
-  end;
+    end
+  end
 
   return;
 

@@ -60,10 +60,10 @@ if exist('color') == 1
    		if isempty(I)
       		fprintf('Warning: color [%d %d %d] not found\n', ...
       			color(index,1), color(index,2), color(index,3));
-   		end;
+   		end
    		TMPREJ = TMPREJ(I,:);   
    	end;	
-end;
+end
 
 % remove other specific colors
 % ----------------------------
@@ -74,12 +74,12 @@ if exist('colorout') == 1
    		I = find( tmpcol1 ~= tmpcol2);   
    		TMPREJ = TMPREJ(I,:);   
    	end;	
-end;
+end
 
 events = [];
 if ~isempty(TMPREJ)
    events = TMPREJ(:,1:5);
    events = [ type*ones(size(events,1), 1) ones(size(events,1), 1) round(events(:,1:2)) events(:,3:5)]; 
-end;
+end
 
 return;

@@ -431,7 +431,7 @@ hold on
 plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',LINEWIDTH)
 for i=1:length(verts)
   plot([verts(i) verts(i)],[0 freqs(max(dispf))],'--m','LineWidth',LINEWIDTH);
-end;
+end
 hold off
 set(h(6),'YTickLabel',[],'YTick',[])
 set(h(6),'XTickLabel',[],'XTick',[])
@@ -452,7 +452,7 @@ plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
 plot([0 0],[-500 500],'--m','LineWidth',LINEWIDTH);
 for i=1:length(verts)
   plot([verts(i) verts(i)],[-500 500],'--m','LineWidth',LINEWIDTH);
-end;
+end
 axis([min(times) max(times) 0 max(Emax)*1.2])
 tick = get(h(10),'YTick');
 set(h(10),'YTick',[tick(1) ; tick(length(tick))])
@@ -516,7 +516,7 @@ if nargout>5
    plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',LINEWIDTH); % zero-time line
    for i=1:length(verts)
      plot([verts(i) verts(i)],[0 freqs(max(dispf))],'--m','LineWidth',LINEWIDTH);
-   end;
+   end
 
    pos13 = get(h(13),'Position');
    set(h(13),'Position',[pos13(1) pos13(2) midpos(3) pos13(4)]);

@@ -57,7 +57,7 @@ pvals = 1-(mx-0.5)/len;
 if strcmpi(tail, 'both')
     pvals = min(pvals, 1-pvals);
     pvals = 2*pvals;
-end;
+end
 
 
 % get the number of dimensions in a matrix
@@ -71,5 +71,5 @@ else
         val = 1;
     else
         val = 2;
-    end;
-end;
+    end
+end

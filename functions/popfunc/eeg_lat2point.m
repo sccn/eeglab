@@ -51,10 +51,10 @@ try
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
-    else g= []; end;
+    else g= []; end
 catch
     error('std_checkdatasession() error: calling convention {''key'', value, ... } error');
-end;
+end
  try, g.outrange; catch, g.outrange = 1; end; %
  
  flag = 0;
@@ -66,21 +66,21 @@ if nargin <4
 end;    
 if nargin <5 | isempty(timeunit)
 	timeunit = 1;
-end;
+end
 
 if length(lat_array) ~= length(epoch_array)
 	if length(epoch_array)~= 1
 		disp('eeg_lat2point: latency and epochs must have the same length'); return;
 	else
 		epoch_array = ones(1,length(lat_array))*epoch_array;
-	end;
-end;
+	end
+end
 if length(timewin) ~= 2
     disp('eeg_lat2point: timelimits must have length 2'); return;
-end;
+end
 if iscell(epoch_array)
 	epoch_array = [ epoch_array{:} ];
-end;
+end
 if iscell(lat_array)
 	lat_array = [ lat_array{:} ];
 end

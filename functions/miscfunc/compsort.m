@@ -75,7 +75,7 @@ end
 if framestot==0,
     fprintf('Gcompsort(): cannot process an empty data array.\n');
     return
-end;
+end
 [srows,scols] = size(sphere);
 [wrows,wcols] = size(weights);
 
@@ -98,13 +98,13 @@ if size(chanlist,1)>1
 end
 if nargin<6,
     nlargest=0;
-end;
+end
 if nargin<5,
     frames = 0;
-end;
+end
 if nargin<4,
    datamean = 1;
-end;
+end
 if frames ==0,
     frames = framestot;
 end

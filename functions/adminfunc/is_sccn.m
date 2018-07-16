@@ -10,5 +10,5 @@ function bool = is_sccn;
                'end;' ...
                'bool = strcmpi(domname(1:end-1), ''ucsd.edu'');' ], '');
     catch,
-    end;
+    end
     

@@ -35,7 +35,7 @@ if ~isempty(varargin)
 	imagesc(a, varargin{:});
 else
 	imagesc(a);
-end;
+end
 c = caxis;
 
 cm = colormap;
@@ -45,10 +45,10 @@ intervals = linspace(c(1), c(2), size(cm,1));
 for wi = 1:size(a,2)
 	for hi = 1:size(a,1)
 		aa(hi,wi,1:3) = cm(dest(hi+(wi-1)*size(a,1)),1:3);
-	end;
-end;
+	end
+end
 if ~isempty(varargin)
 	imagesc(aa, varargin{:});
 else
 	imagesc(aa);
-end;
+end

@@ -57,10 +57,10 @@ for index = 2:length(ALLEEG)
                 cluster{c}(end+1) = index;
                 found = 1;
                 break;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     if ~found
         cluster{end+1} = index;
-    end;
-end;
+    end
+end

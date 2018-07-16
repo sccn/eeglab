@@ -39,7 +39,7 @@ if nargin < 1
 end;	
 if nargin < 3
     delimiter = [];
-end;
+end
 
 % first format input string
 % -------------------------
@@ -48,11 +48,11 @@ if ~isempty(find(strinori == 10))
     strinori = [ ' ' strinori ' ' ];
     for ind = 2:length(tmpinds)
         allstrs{ind} = strinori(tmpinds(ind-1)+1:tmpinds(ind)-1);
-        if isempty(allstrs{ind}), allstrs{ind} = ' '; end;
-    end;
+        if isempty(allstrs{ind}), allstrs{ind} = ' '; end
+    end
     strinori = strvcat(allstrs{:});
-end;
-if size(strinori,2) < maxlen, strout = strinori; return; end;
+end
+if size(strinori,2) < maxlen, strout = strinori; return; end
 
 strout = [];
 for index = 1:size(strinori,1) % scan lines
@@ -67,12 +67,12 @@ for index = 1:size(strinori,1) % scan lines
             lines{count} = curline;
             curline      = '';
             count = count + 1;
-        end;
+        end
         if isempty(curline) curline = tok;
         else                curline = [ curline ' ' tok ];
-        end;
-    end;
-    if ~isempty(curline), lines{count} = curline; end;
+        end
+    end
+    if ~isempty(curline), lines{count} = curline; end
     
     % type of delimiter
     % -----------------
@@ -80,21 +80,21 @@ for index = 1:size(strinori,1) % scan lines
         if ~isempty(lines)
              strouttmp = strvcat(lines{:});
         else strouttmp = '';
-        end;
+        end
         if isempty(strouttmp)
             strouttmp = ones(1,maxlen)*' ';
         elseif size(strouttmp, 2) < maxlen
             strouttmp(:,end+1:maxlen) = ' ';
-        end;
+        end
         strout = strvcat(strout, strouttmp);
     else
         strouttmp = lines{1};
         for index = 2:length(lines)
             strouttmp = [ strouttmp 10 lines{index} ];
-        end;
+        end
         if index == 1, strout = strouttmp;
         else strout = [ strout 10 strouttmp ];
-        end;
-    end;
-end;
+        end
+    end
+end
 	 

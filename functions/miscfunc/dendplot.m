@@ -17,14 +17,14 @@
 function dendplot(topology,labels,fontsize)
   if (nargin<2)
     labels = [];
-  end;
+  end
   if (nargin < 3)
     fontsize = [];
-  end;
+  end
 
   if (isempty(fontsize))              % Default font size for labels
     fontsize = 10;
-  end;
+  end
 
   r = size(topology,1);
   n = r+1;                            % Number of taxa
@@ -36,7 +36,7 @@ function dendplot(topology,labels,fontsize)
   y(otus) = 0.5:(n-0.5);
   for i = 1:(n-1)
     y(topology(i,3)) = mean([y(topology(i,1)),y(topology(i,2))]);
-  end;
+  end
 
   clf;                                % Begin plot
   hold on;
@@ -47,14 +47,14 @@ function dendplot(topology,labels,fontsize)
     X = [links(i,3) links(i,4)];
     Y = [y(desc) y(desc)];
     plot(X,Y,'k');
-  end;
+  end
 
   for i = (n+1):(2*n-1)               % Vertical lines
     indx = find(links(:,2)==i);
     X = [links(indx,4)];
     Y = [y(links(indx(1),1)) y(links(indx(2),1))];
     plot(X,Y,'k');
-  end;
+  end
 
   maxdist = max(links(:,4));
   for i = 1:n                         % OTU labels
@@ -65,8 +65,8 @@ function dendplot(topology,labels,fontsize)
       h = text(-.02*maxdist,y(i),num2str(i));  % For OTUs on right
       set(h,'fontsize',fontsize);
 %     text(-.06*maxdist,y(i),num2str(i)); % For UTOs on left
-    end;
-  end;
+    end
+  end
 
   axis([0 maxdist+0.03*maxdist 0 n]); % Axes
   axis('square');

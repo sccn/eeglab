@@ -92,16 +92,16 @@ frames = framestot; % assume one epoch
 %
 if compnums == 0,
     compnums = [1:wr];
-end;
+end
 if size(compnums,1)>1,        % handle column of compnums !
     compnums = compnums';
-end;
+end
 if length(compnums) > MAXPLOTDATACHANS,
     fprintf(...
   'projtopo(): cannot plot more than %d channels of data at once.\n',...
          MAXPLOTDATACHANS);
     return
-end;
+end
 
 if max(compnums)>wr,
    fprintf(...
@@ -121,7 +121,7 @@ for s=compnums,            % for each component
    fprintf('%d ',s);
    proj = icaproj(data,weights,s); % let offsets distribute 
    projdata = [projdata proj];  % append projected data onto projdata
-end;
+end
 fprintf('\n');
 %
 % Make the plot

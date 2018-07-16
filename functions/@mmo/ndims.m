@@ -22,4 +22,4 @@ function res = ndims(obj)
 
     if length(obj.dimensions) <= 2 || all(obj.dimensions(3:end) == 1), res = 2;
     else                                                               res = length(obj.dimensions);
-    end;
+    end

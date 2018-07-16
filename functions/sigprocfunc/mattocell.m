@@ -29,14 +29,14 @@ function C = mattocell( M, varargin );
 if nargin < 1
 	help mattocell;
 	return;
-end;
+end
 if isempty(M)
 	C = [];
 	return;
-end;
+end
 C = cell(size(M));
 for i=1:size(M,1)
     for j=1:size(M,2)
         C{i,j} = M(i,j);
-    end;
+    end
 end;   

@@ -99,11 +99,11 @@ function [accarrayout, Rbootout, Rbootout2] = bootstat(oriargs, formula, varargi
 if nargin < 2
 	help bootstat;
 	return;
-end;
+end
 
 if ~ischar(formula)
 	error('The second argument must be a string formula');
-end;
+end
 
 g = finputcheck(varargin, ...
                 { 'dims'          'integer'  []                       []; ...
@@ -123,7 +123,7 @@ g = finputcheck(varargin, ...
 				  'rboot'         'real'     []                       NaN	});
 if ischar(g)
 	error(g);
-end;
+end
 if isempty(g.shuffledim) & strcmpi(g.boottype, 'rand')
     g.shuffledim = []; 
 elseif isempty(g.shuffledim)
@@ -134,11 +134,11 @@ if 2/g.alpha > g.naccu
     if strcmpi(g.distfit, 'off') | ~((size(oriarg1,1) == 1 | size(oriarg1,2) == 1) & size(oriarg1,3) == 1)
         g.naccu = 2/g.alpha; 
         fprintf('Adjusting naccu to compute alpha value');
-    end;
-end;
+    end
+end
 if isempty(g.rboot)
 	g.rboot = NaN;
-end;
+end
 
 % function for bootstrap computation
 % ----------------------------------
@@ -148,9 +148,9 @@ if ~iscell(oriargs) | length(oriargs) == 1,
 else 
     oriarg1 = oriargs{1};
     oriarg2 = oriargs{2};
-end;
+end
 [nb_points times trials] = size(oriarg1);
-if times == 1, disp('Warning 1 value only for shuffling dimension'); end;
+if times == 1, disp('Warning 1 value only for shuffling dimension'); end
 
 % only consider baseline
 % ----------------------
@@ -159,11 +159,11 @@ if ~isempty(g.basevect)
     arg1 = oriarg1(:,g.basevect,:);
     if ~isempty(oriarg2)
         arg2 = oriarg2(:,g.basevect,:);
-    end;
+    end
 else
     arg1 = oriarg1;
     arg2 = oriarg2;
-end;
+end
 
 % formula for accumulation array
 % ------------------------------
@@ -206,11 +206,11 @@ elseif strcmpi(g.boottype, 'rand') & strcmpi(g.randmode, 'inverse')
     totlen    = prod(size(arg1));
     if isreal(arg1), 
         multarray(1:round(totlen/2)) = 0;
-    end;
+    end
     for shuff = 1:ndims(multarray)
          multarray = supershuffle(multarray,shuff); % initial shuffling
-    end;
-    if isempty(g.shuffledim), g.shuffledim = 1:ndims(multarray); end;
+    end
+    if isempty(g.shuffledim), g.shuffledim = 1:ndims(multarray); end
     invarg1 = 1./arg1;
     
     % accumulate
@@ -220,7 +220,7 @@ elseif strcmpi(g.boottype, 'rand') & strcmpi(g.randmode, 'inverse')
     while index <= g.naccu
         for shuff = g.shuffledim
             multarray = supershuffle(multarray,shuff);
-        end;
+        end
         tmpinds = find(reshape(multarray, 1, prod(size(multarray))));
         arg1 = oriarg1;
         arg1(tmpinds) = invarg1(tmpinds);
@@ -240,11 +240,11 @@ elseif strcmpi(g.boottype, 'rand') % opposite
     else
         tmparray            = exp(j*linspace(0,2*pi,totlen+1));
         multarray(1:totlen) = tmparray(1:end-1);
-    end;
+    end
     for shuff = 1:ndims(multarray)
          multarray = supershuffle(multarray,shuff); % initial shuffling
-    end;
-    if isempty(g.shuffledim), g.shuffledim = 1:ndims(multarray); end;
+    end
+    if isempty(g.shuffledim), g.shuffledim = 1:ndims(multarray); end
     
     % accumulate
     % ----------
@@ -253,7 +253,7 @@ elseif strcmpi(g.boottype, 'rand') % opposite
     while index <= g.naccu
         for shuff = g.shuffledim
             multarray = supershuffle(multarray,shuff);
-        end;
+        end
         arg1 = arg1.*multarray;
         eval([ formula ';' ]);
         eval( g.formulapost ); % also contains index = index+1
@@ -284,7 +284,7 @@ else
         while index <= g.naccu
             for shuff = g.shuffledim
                 arg1 = supershuffle(arg1,shuff);
-            end;
+            end
             eval([ formula ';' ]);
             eval( g.formulapost );
         end
@@ -296,12 +296,12 @@ else
         while index <= g.naccu
             for shuff = g.shuffledim
                 arg1 = shuffleonedim(arg1,shuff);
-            end;
+            end
             eval([ formula ';' ]);
             eval( g.formulapost );
         end
-    end;
-end;
+    end
+end
 Rbootout(count:end,:,:,:) = [];
 
 % **********************
@@ -313,15 +313,15 @@ Rbootout(count:end,:,:,:) = [];
 accarray = Rbootout;
 if ~isreal(accarray)
     accarray = sqrt(accarray .* conj(accarray)); % faster than abs()
-end;
+end
 % reshape the output if necessary
 % -------------------------------
 if ~isempty(g.dimaccu)
     if g.dimaccu+1 == 3
         accarray = permute( accarray, [1 3 2]);
-    end;
+    end
     accarray = reshape( accarray, size(accarray,1)*size(accarray,2), size(accarray,3) );
-end;
+end
 if size(accarray,1) == 1, accarray = accarray'; end; % first dim contains g.naccu
 
 % ******************************************************
@@ -339,7 +339,7 @@ if strcmpi(g.distfit, 'off')
     if abs(accarray(1,1,1) - accarray(end,1,1)) < abs(accarray(1,1,1))*1e-15
         accarray1(:) = NaN;
         accarray2(:) = NaN;
-    end;
+    end
 
 else
     % *******************
@@ -352,8 +352,8 @@ else
     if ~isempty(g.vals{index})
         if ~all(size(g.vals{index}) == sizerboot(2:end) )
             error('For fitting, vals must have the same dimension as the output array (try transposing)');
-        end;
-    end;
+        end
+    end
     
     % fitting with Ramberg-Schmeiser distribution
     % -------------------------------------------
@@ -365,18 +365,18 @@ else
                     accarray1(index1,index2) = correctfit(accarray1, 'gamparams', [g.correctp 0]); % no correction for p=0
                 else
                     accarray1(index1,index2) = correctfit(accarray1, 'gamparams', g.correctp);
-                end;
-            end;
-        end;
+                end
+            end
+        end
     else % compute value for significance
         for index1 = 1:size(accarrayout,1)
             for index2 = 1:size(accarrayout,2)
                 [p c l chi2] = rsfit(Rbootout(:),0);
                 pval = g.alpha;   accarray1(index1,index2) = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);
                 pval = 1-g.alpha; accarray2(index1,index2) = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);        
-            end;
-        end;
-    end;
+            end
+        end
+    end
 
     % plot results 
     % -------------------------------------
@@ -387,7 +387,7 @@ else
     % normy = normpdf(valcomp, mu, sigma);
     % plot(valcomp, normy/max(normy)*tmpax(4), 'r');
     % return;
-end;
+end
 
 % set output array: backward compatible
 % -------------------------------------
@@ -399,10 +399,10 @@ else
         accarrayout(:,:,2) = accarray1;
     else
         accarrayout = [ accarray2(:) accarray1(:) ];
-    end;
-end;
+    end
+end
 accarrayout = squeeze(accarrayout);
-if size(accarrayout,1) == 1 & size(accarrayout,3) == 1, accarrayout = accarrayout'; end;
+if size(accarrayout,1) == 1 & size(accarrayout,3) == 1, accarrayout = accarrayout'; end
 
 % better but not backward compatible
 % ----------------------------------
@@ -432,9 +432,9 @@ return;
         tmpsort = sort(Rbootout);
         i = round(g.alpha*g.naccu);
         sigval = [mean(tmpsort(1:i)) mean(tmpsort(g.naccu-i+1:g.naccu))];
-        if strcmpi(g.bootside, 'upper'), sigval = sigval(2); end;
+        if strcmpi(g.bootside, 'upper'), sigval = sigval(2); end
         accarrayout = sigval;
-    end;
+    end
 
 % this shuffling preserve the number of -1 and 1
 % for cloumns and rows (assuming matrix size is multiple of 2
@@ -443,8 +443,8 @@ function array = supershuffle(array, dim)
     if size(array, 1) == 1 | size(array,2) == 1
         array = shuffle(array);
         return;
-    end;
-    if size(array, dim) == 1, return; end;
+    end
+    if size(array, dim) == 1, return; end
 
     if dim == 1
         indrows = shuffle(1:size(array,1));
@@ -452,22 +452,22 @@ function array = supershuffle(array, dim)
             tmparray                    = array(indrows(index),:,:);
             array(indrows(index),:,:)   = array(indrows(index+1),:,:);
             array(indrows(index+1),:,:) = tmparray;
-        end;
+        end
     elseif dim == 2
         indcols = shuffle(1:size(array,2));
         for index = 1:2:length(indcols)-rem(length(indcols),2) % shuffle colums
             tmparray                    = array(:,indcols(index),:);
             array(:,indcols(index),:)   = array(:,indcols(index+1),:);
             array(:,indcols(index+1),:) = tmparray;
-        end;
+        end
     else
         ind3d = shuffle(1:size(array,3));
         for index = 1:2:length(ind3d)-rem(length(ind3d),2) % shuffle colums
             tmparray                  = array(:,:,ind3d(index));
             array(:,:,ind3d(index))   = array(:,:,ind3d(index+1));
             array(:,:,ind3d(index+1)) = tmparray;
-        end;
-    end;
+        end
+    end
 
 % shuffle one dimension, one row/colums at a time
 % -----------------------------------------------
@@ -479,19 +479,19 @@ function array = shuffleonedim(array, dim)
             for index1 = 1:size(array,3)
                 for index2 = 1:size(array,2)
                     array(:,index2,index1) = shuffle(array(:,index2,index1));
-                end;
-            end;
+                end
+            end
         elseif dim == 2
             for index1 = 1:size(array,3)
                 for index2 = 1:size(array,1)
                     array(index2,:,index1) = shuffle(array(index2,:,index1));
-                end;
-            end;
+                end
+            end
         else
             for index1 = 1:size(array,1)
                 for index2 = 1:size(array,2)
                     array(index1,index2,:) = shuffle(array(index1,index2,:));
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end

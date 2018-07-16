@@ -50,20 +50,20 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     if nargin < 3
         help eeg_insertbound;
         return;
-    end;
+    end
     if size(regions,2) ~= 1 & exist('lengths') ~= 1
         lengths = regions(:,2)-regions(:,1)+1;
         regions = regions(:,1);
-    end;
+    end
     if exist('lengths') ~= 1
         lengths = zeros(size(regions));
-    end;
+    end
     
     if length(regions)
         fprintf('eeg_insertbound(): %d boundary (break) events added.\n', size(regions, 1));
     else 
         return;
-    end;
+    end
 
     % recompute latencies of boundevents (in new dataset)
     % ---------------------------------------------------
@@ -92,7 +92,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
                 tmpind2        = tmpind(tmpind2);
             else
                 tmpind2 = [];
-            end;
+            end
             
             % insert event at tmpind2
             % -----------------------
@@ -105,7 +105,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
             else
                 tmpind2 = length(eventout)+1;
                 eventout(tmpind2).type     = 'boundary';
-            end;
+            end
             eventout(tmpind2).latency  = boundevents(tmpindex);
             eventout(tmpind2).duration = lengths(tmpindex); % just to create field
             
@@ -117,19 +117,19 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
             countrm           = countrm+length(tmpnest);
             for latind = tmpind2+1:length(eventout)
                 eventout(latind).latency = eventout(latind).latency-lengths(tmpindex);
-            end;
+            end
             
             % add lengths of previous events (must be done after above)
             % ---------------------------------------------------------
             eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
-            if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
+            if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end
         
         end; 
-	end;
+	end
 
     if countrm > 0
         fprintf('eeg_insertbound(): event latencies recomputed and %d events removed.\n', countrm);
-    end;
+    end
 
     
 % look for nested events
@@ -147,11 +147,11 @@ function [ indnested, addlen ] = findnested(event, ind);
             if ~isempty( event(tmpind).duration )
                 addlen    = addlen + event(tmpind).duration;
                 % otherwise old event duration or merge data discontinuity
-            end;
-        end;
+            end
+        end
         indnested = [ indnested tmpind ];
         tmpind = tmpind+1;
-    end;
+    end
     
 % remove urevent and recompute indices
 % THIS FUNCTION IS DEPRECATED
@@ -163,7 +163,7 @@ function [event, urevent] = removenested(event, urevent, nestind);
         nestind = sort(nestind);
         urind = [ event.urevent ]; % this must not be done in the loop
                                              % since the indices are dyanmically updated
-    end;
+    end
     
     for ind = 1:length(nestind)
         % find event urindices higher than the urevent to suppress
@@ -172,7 +172,7 @@ function [event, urevent] = removenested(event, urevent, nestind);
         for indevent = tmpind
             event(indevent).urevent = event(indevent).urevent-1;
         end;    
-    end;
+    end
     
     urevent(nestind) = [];
     

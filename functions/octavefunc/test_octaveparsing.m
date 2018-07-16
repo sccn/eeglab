@@ -15,6 +15,6 @@ for index = 1:length(a)
             tmp = lasterr;
             inds = find(tmp == 10);
             fprintf('*************\n%s\n*************\n', tmp(1:inds(1)-1));
-        end;
-    end;
-end;
+        end
+    end
+end

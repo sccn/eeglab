@@ -55,16 +55,16 @@ if nargin < 2
 	% ask user
 	[filename, filepath] = uigetfile('*.DAT', 'Choose a DAT file -- pop_loaddat'); 
     drawnow;
-	if filename == 0 return; end;
+	if filename == 0 return; end
 	result       = inputdlg2( { strvcat('Code signifying no event in a trial ([]=none)', ...
 									 '(none=all latencies are imported)')}, ...
 									 'Load Neuroscan DATA file -- pop_loaddat()', 1,  {'1000'}, 'pop_loaddat');
-	if length(result) == 0 return; end;
+	if length(result) == 0 return; end
 	no_rt = eval( result{1} );
-end;
+end
 if exist('no_rt') ~= 1 | isempty(no_rt)
 	no_rt = NaN;
-end;
+end
 
 % load datas
 % ----------
@@ -83,7 +83,7 @@ end;
 for index = 1:length(EEG.event)
 	EEG.event(index).eegtype  = typeeeg (EEG.event(index).epoch);
 	EEG.event(index).response = response(EEG.event(index).epoch);
-end;
+end
 
 for index = 1:n
 	if rt(index) ~= no_rt
@@ -93,7 +93,7 @@ for index = 1:n
 		EEG.event(end).eegtype  = typeeeg(index);
 		EEG.event(end).response = response(index);
 	end
-end;
+end
 tmpevent = EEG.event;
 tmp = [ tmpevent.latency ];
 [tmp indexsort] = sort(tmp);

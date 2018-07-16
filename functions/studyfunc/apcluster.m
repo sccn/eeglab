@@ -69,7 +69,7 @@ if nargin==0, % display demo
 	fprintf('end;\n');
 	fprintf('axis equal tight;\n\n');
 	return;
-end;
+end
 start = clock;
 % Handle arguments to function
 if nargin<2 error('Too few input arguments');
@@ -90,58 +90,58 @@ else
         elseif strcmp(varargin{i},'maxits')
             maxits=varargin{i+1};
             i=i+2;
-            if maxits<=0 error('maxits must be a positive integer'); end;
+            if maxits<=0 error('maxits must be a positive integer'); end
         elseif strcmp(varargin{i},'convits')
             convits=varargin{i+1};
             i=i+2;
-            if convits<=0 error('convits must be a positive integer'); end;
+            if convits<=0 error('convits must be a positive integer'); end
         elseif strcmp(varargin{i},'dampfact')
             lam=varargin{i+1};
             i=i+2;
             if (lam<0.5)||(lam>=1)
                 error('dampfact must be >= 0.5 and < 1');
-            end;
+            end
         else i=i+1;
-        end;
-    end;
-end;
+        end
+    end
+end
 if lam>0.9
     fprintf('\n*** Warning: Large damping factor in use. Turn on plotting\n');
     fprintf('    to monitor the net similarity. The algorithm will\n');
     fprintf('    change decisions slowly, so consider using a larger value\n');
     fprintf('    of convits.\n\n');
-end;
+end
 
 % Check that standard arguments are consistent in size
 if length(size(s))~=2 error('s should be a 2D matrix');
 elseif length(size(p))>2 error('p should be a vector or a scalar');
 elseif size(s,2)==3
     tmp=max(max(s(:,1)),max(s(:,2)));
-    if length(p)==1 N=tmp; else N=length(p); end;
+    if length(p)==1 N=tmp; else N=length(p); end
     if tmp>N
         error('data point index exceeds number of data points');
     elseif min(min(s(:,1)),min(s(:,2)))<=0
         error('data point indices must be >= 1');
-    end;
+    end
 elseif size(s,1)==size(s,2)
     N=size(s,1);
     if (length(p)~=N)&&(length(p)~=1)
         error('p should be scalar or a vector of size N');
-    end;
-else error('s must have 3 columns or be square'); end;
+    end
+else error('s must have 3 columns or be square'); end
 
 % Construct similarity matrix
 if N>3000
     fprintf('\n*** Warning: Large memory request. Consider activating\n');
     fprintf('    the sparse version of APCLUSTER.\n\n');
-end;
+end
 if size(s,2)==3 && size(s,1)~=3,
     S=-Inf*ones(N,N,class(s)); 
-    for j=1:size(s,1), S(s(j,1),s(j,2))=s(j,3); end;
+    for j=1:size(s,1), S(s(j,1),s(j,2))=s(j,3); end
 else S=s;
-end;
+end
 
-if S==S', symmetric=true; else symmetric=false; end;
+if S==S', symmetric=true; else symmetric=false; end
 realmin_=realmin(class(s)); realmax_=realmax(class(s));
 
 % In case user did not remove degeneracies from the input similarities,
@@ -151,27 +151,27 @@ if ~nonoise
     rns=randn('state'); randn('state',0);
     S=S+(eps*S+realmin_*100).*rand(N,N);
     randn('state',rns);
-end;
+end
 
 % Place preferences on the diagonal of S
-if length(p)==1 for i=1:N S(i,i)=p; end;
-else for i=1:N S(i,i)=p(i); end;
-end;
+if length(p)==1 for i=1:N S(i,i)=p; end
+else for i=1:N S(i,i)=p(i); end
+end
 
 % Numerical stability -- replace -INF with -realmax
 n=find(S<-realmax_); if ~isempty(n), warning('-INF similarities detected; changing to -REALMAX to ensure numerical stability'); S(n)=-realmax_; end; clear('n');
-if ~isempty(find(S>realmax_,1)), error('+INF similarities detected; change to a large positive value (but smaller than +REALMAX)'); end;
+if ~isempty(find(S>realmax_,1)), error('+INF similarities detected; change to a large positive value (but smaller than +REALMAX)'); end
 
 
 % Allocate space for messages, etc
 dS=diag(S); A=zeros(N,N,class(s)); R=zeros(N,N,class(s)); t=1;
-if plt, netsim=zeros(1,maxits+1); end;
+if plt, netsim=zeros(1,maxits+1); end
 if details
     idx=zeros(N,maxits+1);
     netsim=zeros(1,maxits+1); 
     dpsim=zeros(1,maxits+1); 
     expref=zeros(1,maxits+1); 
-end;
+end
 
 % Execute parallel affinity propagation updates
 e=zeros(N,convits); dn=0; i=0;
@@ -189,7 +189,7 @@ while ~dn
 		R(I,ii)=ST(I,ii)-Y2;
 		R(:,ii)=(1-lam)*R(:,ii)+lam*old; % Damping
         R(R(:,ii)>realmax_,ii)=realmax_;
-	end;
+	end
 	A=A'; R=R';
 
     % Compute availabilities
@@ -199,15 +199,15 @@ while ~dn
 		A(:,jj) = sum(Rp)-Rp;
 		dA = A(jj,jj); A(:,jj) = min(A(:,jj),0); A(jj,jj) = dA;
 		A(:,jj) = (1-lam)*A(:,jj) + lam*old; % Damping
-	end;
+	end
 	
     % Check for convergence
     E=((diag(A)+diag(R))>0); e(:,mod(i-1,convits)+1)=E; K=sum(E);
     if i>=convits || i>=maxits,
         se=sum(e,2);
         unconverged=(sum((se==convits)+(se==0))~=N);
-        if (~unconverged&&(K>0))||(i==maxits) dn=1; end;
-    end;
+        if (~unconverged&&(K>0))||(i==maxits) dn=1; end
+    end
 
     % Handle plotting and storage of details, if requested
     if plt||details
@@ -218,12 +218,12 @@ while ~dn
             tmpdpsim=sum(S(sub2ind([N N],notI,tmpidx(notI))));
             tmpexpref=sum(dS(I));
             tmpnetsim=tmpdpsim+tmpexpref;
-        end;
-    end;
+        end
+    end
     if details
         netsim(i)=tmpnetsim; dpsim(i)=tmpdpsim; expref(i)=tmpexpref;
         idx(:,i)=tmpidx;
-    end;
+    end
     if plt,
         netsim(i)=tmpnetsim;
 		figure(234);
@@ -231,7 +231,7 @@ while ~dn
         xlabel('# Iterations');
         ylabel('Fitness (net similarity) of quantized intermediate solution');
 %         drawnow; 
-    end;
+    end
 end; % iterations
 I=find((diag(A)+diag(R))>0); K=length(I); % Identify exemplars
 if K>0
@@ -244,7 +244,7 @@ if K>0
 	tmpnetsim=tmpdpsim+tmpexpref;
 else
     tmpidx=nan*ones(N,1); tmpnetsim=nan; tmpexpref=nan;
-end;
+end
 if details
     netsim(i+1)=tmpnetsim; netsim=netsim(1:i+1);
     dpsim(i+1)=tmpdpsim; dpsim=dpsim(1:i+1);
@@ -252,7 +252,7 @@ if details
     idx(:,i+1)=tmpidx; idx=idx(:,1:i+1);
 else
     netsim=tmpnetsim; dpsim=tmpdpsim; expref=tmpexpref; idx=tmpidx;
-end;
+end
 % if plt||details
     fprintf('\nNumber of exemplars identified: %d  (for %d data points)\n',K,N);
     fprintf('Net similarity: %g\n',tmpnetsim);
@@ -260,10 +260,10 @@ end;
     fprintf('  Preferences of selected exemplars: %g\n',tmpexpref);
     fprintf('Number of iterations: %d\n\n',i);
 	fprintf('Elapsed time: %g sec\n',etime(clock,start));
-% end;
+% end
 if unconverged
 	fprintf('\n*** Warning: Algorithm did not converge. Activate plotting\n');
 	fprintf('    so that you can monitor the net similarity. Consider\n');
 	fprintf('    increasing maxits and convits, and, if oscillations occur\n');
 	fprintf('    also increasing dampfact.\n\n');
-end;
+end

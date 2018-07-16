@@ -512,7 +512,7 @@ if weights ~= 0,                    % initialize weights
             return;
         end
     end
-end;
+end
 %
 %%%%%%%%%%%%%%%%%%%%% Check keyword values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -531,7 +531,7 @@ elseif floor(epochs) ~= epochs,
 elseif nsub > ncomps
     fprintf('runica(): there can be at most %d sub-Gaussian components!\n',ncomps);
     return
-end;
+end
 
 %
 % adjust nochange if necessary
@@ -543,10 +543,10 @@ if isnan(nochange)
     else
         nochangeupdated = 1; % for fprinting purposes
         nochange = DEFAULT_STOP;
-    end;
+    end
 else
     nochangeupdated = 0;
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process the data %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -587,7 +587,7 @@ if verbose,
 
     if nochangeupdated
         fprintf('More than 32 channels: default stopping weight change 1E-7\n');
-    end;
+    end
     fprintf('Training will end when wchange < %g or after %d steps.\n', ...
         nochange,maxsteps);
     if biasflag,
@@ -634,7 +634,7 @@ if exist('Specgramflag') == 1
     if isempty(fs)
         fprintf('runica(): specified frequency range too narrow!\n');
         return
-    end;
+    end
 
     specdata = reshape(tmp(fs,:),1,length(fs)*size(tmp,2));
     specdata = [real(specdata) imag(specdata)];
@@ -786,7 +786,7 @@ while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         pause(0);
         if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
             close; error('USER ABORT');
-        end;
+        end
         if biasflag
             u=weights*data(:,permute(t:t+block-1)) + bias*onesrow;
         else
@@ -1010,7 +1010,7 @@ end; % end training %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~laststep
     laststep = step;
-end;
+end
 lrates = lrates(1,1:laststep);           % truncate lrate history vector
 %
 %%%%%%%%%%%%%% Orient components towards max positive activation %%%%%%

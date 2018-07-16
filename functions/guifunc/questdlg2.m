@@ -32,15 +32,15 @@ result = '';
 if nargin < 2
    help questdlg2;
    return;
-end;
+end
 if isempty(varargin)
     varargin = { 'Yes' 'No' 'Cancel' 'Yes' };
-end;
+end
 result = varargin{end};
-if Prompt(end) == 10, Prompt(end) = []; end;
-if Prompt(end) == 10, Prompt(end) = []; end;
-if Prompt(end) == 10, Prompt(end) = []; end;
-if Prompt(end) == 10, Prompt(end) = []; end;
+if Prompt(end) == 10, Prompt(end) = []; end
+if Prompt(end) == 10, Prompt(end) = []; end
+if Prompt(end) == 10, Prompt(end) = []; end
+if Prompt(end) == 10, Prompt(end) = []; end
 
 fig = figure('visible', 'off');
 set(gcf, 'name', Title);
@@ -49,18 +49,18 @@ listui = {};
 geometry = {};
 if ~isempty(find(Prompt == 10))
     indlines = find(Prompt == 10);
-    if indlines(1) ~= 1, indlines = [ 0 indlines ]; end;
-    if indlines(end) ~= length(Prompt), indlines = [ indlines length(Prompt)+1 ]; end;
+    if indlines(1) ~= 1, indlines = [ 0 indlines ]; end
+    if indlines(end) ~= length(Prompt), indlines = [ indlines length(Prompt)+1 ]; end
     for index = 1:length(indlines)-1
         geometry{index} = [1];
         listui{index} = { 'Style', 'text', 'string' Prompt(indlines(index)+1:indlines(index+1)-1) };
-    end;
+    end
 else
     for index = 1:size(Prompt,1)
         geometry{index} = [1];
         listui{index} = { 'Style', 'text', 'string' Prompt(index,:) };
-    end;
-end;
+    end
+end
 listui{end+1} = {};
 
 geometry = { geometry{:} 1 ones(1,length(varargin)-1) };
@@ -69,16 +69,16 @@ for index = 1:length(varargin)-1 % ignoring default val
 	if strcmp(varargin{index}, varargin{end})
 		listui{end}{end+1} = 'fontweight';
 		listui{end}{end+1} = 'bold';
-	end;
-end;
+	end
+end
 
 %cr = length(find(Prompt == char(10)))+1;
 %if cr == 1
 %	cr = size(Prompt,1);
-%end;
+%end
 %cr = cr^(7/);
-%if cr >= 8, cr = cr-1; end;
-%if cr >= 4, cr = cr-1; end;
+%if cr >= 8, cr = cr-1; end
+%if cr >= 4, cr = cr-1; end
 %[tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'geomvert', [cr 1 1], 'uilist', listui, ...
 [tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
     'borders', [0.02 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'on' );
@@ -88,4 +88,4 @@ try,
 	result = get(fig, 'userdata');
 	close(fig);
     drawnow;
-end;
+end

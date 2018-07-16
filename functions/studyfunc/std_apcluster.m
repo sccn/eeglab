@@ -77,10 +77,10 @@ try
             opts.(options{i}) = options{i+1};
         end
     else opts= [];
-    end;
+    end
 catch
     disp('std_infocluster() error: calling convention {''key'', value, ... } error'); return;
-end;
+end
 
 try opts.maxits;           catch, opts.maxits       = 200;          end; % Maximun number of iterations
 try opts.convits;          catch, opts.convits      = 100;          end; %

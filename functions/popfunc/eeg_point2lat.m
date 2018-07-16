@@ -52,30 +52,30 @@ function newlat = eeg_point2lat( lat_array, epoch_array, srate, timewin, timeuni
 if nargin <3
     help eeg_point2lat;
     return;
-end;
+end
 if isempty( epoch_array )
     epoch_array = ones( size(lat_array) );
-end;
+end
 if nargin <4
     timewin = 0;
-end;
+end
 if nargin <5
 	timeunit = 1;
-end;
+end
 
 if length(lat_array) ~= length(epoch_array)
 	if length(epoch_array)~= 1
 		disp('eeg_point2lat: latency and epoch arrays must have the same length'); return;
 	else
 		epoch_array = ones(1,length(lat_array))*epoch_array;
-	end;
-end;
+	end
+end
 if length(timewin) ~= 2
     disp('eeg_point2lat: timelimits array must have length 2'); return;
-end;
+end
 if iscell(epoch_array)
 	epoch_array = [ epoch_array{:} ];
-end;
+end
 if iscell(lat_array)
 	lat_array = [ lat_array{:} ];
 end
@@ -86,6 +86,6 @@ if length(timewin) == 2
     pnts = (timewin(2)-timewin(1))*srate+1;
 else
     pnts = 0;
-end;
+end
 newlat  = ((lat_array - (epoch_array-1)*pnts-1)/srate+timewin(1))/timeunit;
 newlat = round(newlat*1E9)*1E-9;

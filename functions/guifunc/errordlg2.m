@@ -37,9 +37,9 @@ if exist('beep') == 5
 	beep;
 else
 	disp(char(7));
-end;
+end
 if nargin <2
 	Title = 'Error';
-end;
-if ~ismatlab, error(Prompt); end;
+end
+if ~ismatlab, error(Prompt); end
 questdlg2(Prompt, Title, 'OK', 'OK');

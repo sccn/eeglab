@@ -66,17 +66,17 @@ command = '';
 if nargin < 2
     help pop_clust;
     return;
-end;
+end
 
 if isempty(STUDY.etc)
     error('No pre-clustering information, pre-cluster first!');
-end;
+end
 if ~isfield(STUDY.etc, 'preclust')
     error('No pre-clustering information, pre-cluster first!');
-end;
+end
 if isempty(STUDY.etc.preclust)
     error('No pre-clustering information, pre-cluster first!');
-end;
+end
 
 % Check that path to the stats toolbox comes first (conflict with Fieldtrip)
 flagstats = strcmp(regexp(which('kmeans'), '(?<=[\\/]toolbox[\\/])[^\\/]+', 'match', 'once'),'stats');
@@ -84,7 +84,7 @@ if ~flagstats
     kmeansPath = fileparts(which('kmeans'));
     rmpath(kmeansPath);
     addpath(kmeansPath);
-end;
+end
         
 if isempty(varargin) %GUI call
     
@@ -99,14 +99,14 @@ if isempty(varargin) %GUI call
         for index = 2:length(STUDY.cluster)
             if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
                 rmindex = [ rmindex index ];
-            end;
+            end
         end;        
-    end;
+    end
     
     if length(STUDY.cluster) > 2 & ~isempty(rmindex)
         resp = questdlg2('Clustering again will delete the last clustering results', 'Warning', 'Cancel', 'Ok', 'Ok');
-        if strcmpi(resp, 'cancel'), return; end;
-    end;
+        if strcmpi(resp, 'cancel'), return; end
+    end
     
 	alg_options = {'Kmeans (stat. toolbox)' 'Neural Network (stat. toolbox)' 'Kmeanscluster (no toolbox)' 'Affinity Propagation' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
@@ -119,22 +119,22 @@ if isempty(varargin) %GUI call
     saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
-    if ~exist('kmeans'), valalg = 3; else valalg = 1; end;
+    if ~exist('kmeans'), valalg = 3; else valalg = 1; end
                   
     strclust = '';
     if STUDY.etc.preclust.clustlevel > length(STUDY.cluster)
         STUDY.etc.preclust.clustlevel = 1;
-    end;
+    end
     if STUDY.etc.preclust.clustlevel == 1
         strclust = [ 'Performing clustering on cluster ''' STUDY.cluster(STUDY.etc.preclust.clustlevel).name '''' ];
     else
         strclust = [ 'Performing sub-clustering on cluster ''' STUDY.cluster(STUDY.etc.preclust.clustlevel).name '''' ];
-    end;
+    end
     
     numClust = ceil(mean(cellfun(@length, { STUDY.datasetinfo.comps })));
     if numClust > 2, numClustStr = num2str(numClust);
     else             numClustStr = '10';
-    end;
+    end
     
 	clust_param = inputgui( { [1] [1] [1 1] [1 0.5 0.5 ] [ 1 0.5 0.5 ] }, ...
 	{ {'style' 'text'       'string' strclust 'fontweight' 'bold'  } {} ...
@@ -156,8 +156,8 @@ if isempty(varargin) %GUI call
             STUDY.cluster(clustlevel).child = [];
             if clustlevel == 1 & length(STUDY.cluster) > 1
                 STUDY.cluster(1).child = { STUDY.cluster(2).name }; % "Notclust" cluster
-            end;
-        end;
+            end
+        end
         
         clus_alg = alg_options{clust_param{1}};
         clus_num = str2num(clust_param{2});
@@ -169,12 +169,12 @@ if isempty(varargin) %GUI call
             clustdata = STUDY.etc.preclust.preclustdata;
         catch
             error('Error accesing preclustering data. Perform pre-clustering.');
-        end;
+        end
         command = '[STUDY] = pop_clust(STUDY, ALLEEG,';
         
-        if ~isempty(findstr(clus_alg, 'Kmeanscluster')), clus_alg = 'kmeanscluster'; end;
-        if ~isempty(findstr(clus_alg, 'Kmeans ')), clus_alg = 'kmeans'; end;
-        if ~isempty(findstr(clus_alg, 'Neural ')), clus_alg = 'neural network'; end;
+        if ~isempty(findstr(clus_alg, 'Kmeanscluster')), clus_alg = 'kmeanscluster'; end
+        if ~isempty(findstr(clus_alg, 'Kmeans ')), clus_alg = 'kmeans'; end
+        if ~isempty(findstr(clus_alg, 'Neural ')), clus_alg = 'neural network'; end
         
         % Cleaning cache
         STUDY.cache = [];
@@ -194,7 +194,7 @@ if isempty(varargin) %GUI call
                     else
                         %[IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
                         [C,IDX,sumd] =kmeans_st(real(clustdata),clus_num,150);
-                    end;
+                    end
                     [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Kmeans', clus_num});
                 end    
          case 'Hierarchical tree'
@@ -250,17 +250,17 @@ else %command line call
         for index = 2:length(STUDY.cluster)
             if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
                 rmindex = [ rmindex index ];
-            end;
+            end
         end;        
-    end;
+    end
     if ~isempty(rmindex)
         fprintf('Removing child clusters of ''%s''...\n', nameclustbase);
         STUDY.cluster(rmindex)          = [];
         STUDY.cluster(clustlevel).child = [];
         if clustlevel == 1 & length(STUDY.cluster) > 1
             STUDY.cluster(1).child = { STUDY.cluster(2).name }; % "Notclust" cluster
-        end;
-    end;
+        end
+    end
 
     %default values
     algorithm = 'kmeans';
@@ -305,7 +305,7 @@ else %command line call
                     [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
                 else
                     [IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
-                end;
+                end
                 [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Kmeans', clus_num});
             else
                 [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,outliers,5, algorithm);

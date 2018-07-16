@@ -16,7 +16,7 @@
 %	Ver 2.30 	 5.Nov.1998
 %
 %	For use under Octave define the following function
-% function s=upper(s); s=toupper(s); end;
+% function s=upper(s); s=toupper(s); end
 
 % V2.12    Warning for missing Header information  
 % V2.20    EDF.AS.* changed
@@ -45,13 +45,13 @@ SLASH='/';		% defines Seperator for Subdirectories
 BSLASH=setstr(92);
 
 cname=computer;
-if cname(1:2)=='PC' SLASH=BSLASH; end;
+if cname(1:2)=='PC' SLASH=BSLASH; end
 
 fid=fopen(FILENAME,'r','ieee-le');          
 if fid<0 
 	fprintf(2,['Error LOADEDF: File ' FILENAME ' not found\n']);  
 	return;
-end;
+end
 
 EDF.FILE.FID=fid;
 EDF.FILE.OPEN = 1;
@@ -65,12 +65,12 @@ if SPos==0
 	EDF.FILE.Path = pwd;
 else
 	EDF.FILE.Path = FILENAME(1:SPos-1);
-end;
+end
 EDF.FileName = [EDF.FILE.Path SLASH EDF.FILE.Name '.' EDF.FILE.Ext];
 
 H1=setstr(fread(EDF.FILE.FID,256,'char')');     %
 EDF.VERSION=H1(1:8);                     % 8 Byte  Versionsnummer 
-%if 0 fprintf(2,'LOADEDF: WARNING  Version EDF Format %i',ver); end;
+%if 0 fprintf(2,'LOADEDF: WARNING  Version EDF Format %i',ver); end
 EDF.PID = deblank(H1(9:88));                  % 80 Byte local patient identification
 EDF.RID = deblank(H1(89:168));                % 80 Byte local recording identification
 %EDF.H.StartDate = H1(169:176);         % 8 Byte		
@@ -83,10 +83,10 @@ if EDF.VERSION(1)=='0'
                 EDF.T0(1)=2000+EDF.T0(1);
         else
                 EDF.T0(1)=1900+EDF.T0(1);
-        end;
+        end
 else ;
         % in a future version, this is hopefully not needed   
-end;
+end
 
 EDF.HeadLen = str2num(H1(185:192));  % 8 Byte  Length of Header
 % reserved = H1(193:236);	         % 44 Byte		
@@ -174,8 +174,8 @@ for k=1:EDF.NS
 	    EDF.ChanTyp(k)='O';
 	elseif findstr(upper(EDF.Label(k,:)),'EMG')
 	    EDF.ChanTyp(k)='M';
-	end;
-end;
+	end
+end
 
 EDF.AS.spb = sum(EDF.SPR);	% Samples per Block
 bi=[0;cumsum(EDF.SPR)]; 
@@ -183,10 +183,10 @@ bi=[0;cumsum(EDF.SPR)];
 idx=[];idx2=[];
 for k=1:EDF.NS, 
 	idx2=[idx2, (k-1)*max(EDF.SPR)+(1:EDF.SPR(k))];
-end;
+end
 maxspr=max(EDF.SPR);
 idx3=zeros(EDF.NS*maxspr,1);
-for k=1:EDF.NS, idx3(maxspr*(k-1)+(1:maxspr))=bi(k)+ceil((1:maxspr)'/maxspr*EDF.SPR(k));end;
+for k=1:EDF.NS, idx3(maxspr*(k-1)+(1:maxspr))=bi(k)+ceil((1:maxspr)'/maxspr*EDF.SPR(k));end
 
 %EDF.AS.bi=bi;
 EDF.AS.IDX2=idx2;

@@ -35,7 +35,7 @@ function helpforexe( funct, fold );
 if nargin <1
 	help histforexe;
 	return;
-end;
+end
 nonmatlab = 0;
 
 % write all files
@@ -47,11 +47,11 @@ for index = 1:length(funct)
     for ind2 = 1:length(doc1)
         if isempty(doc1{ind2}) fprintf(fid, [ 'disp('' '');\n' ]);
         else                   fprintf(fid, [ 'disp(' vararg2str({ doc1{ind2} }) ');\n' ]);
-        end;
-    end;
+        end
+    end
     fclose(fid);
     %fprintf(fid, 'for tmpind = 1:length(tmptxt), if isempty(tmptxt{tmpind}), disp('' ''); else disp(tmptxt{tmpind}); end; end; clear tmpind tmptxt;\n' );
-end;
+end
 
 % try all functions
 % -----------------
@@ -59,7 +59,7 @@ tmppath = pwd;
 cd(fold);
 for index = 1:length(funct)
     evalc([ 'help_' funct{index}(1:end-2) ]);
-end;
+end
 cd(tmppath);
 return;
 
@@ -74,17 +74,17 @@ else
 		fid = fopen( funct, 'r');
 	else
 		fid = fopen( [funct '.m'], 'r');
-	end;
-end;
+	end
+end
 
 if fid == -1
 	error('File not found');
-end;
+end
 
 sub = 1;
 try, 
-    if ~isunix, sub = 0; end;
-catch, end;
+    if ~isunix, sub = 0; end
+catch, end
 
 if nonmatlab
 	str = fgets( fid );
@@ -92,13 +92,13 @@ if nonmatlab
 		str = deblank(str(1:end-sub));
         doc = { doc{:} str(1:end) };    
         str = fgets( fid );
-	end;
+	end
 else
 	str = fgets( fid );
 	while (str(1) == '%')
 		str = deblank(str(1:end-sub));
         doc = { doc{:} str(2:end) };    
 		str = fgets( fid );
-	end;
-end;
+	end
+end
 fclose(fid);

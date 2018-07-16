@@ -24,5 +24,5 @@ function warndlg2(Prompt, Title);
 
 if nargin <2
 	Title = 'Warning';
-end;
+end
 questdlg2(Prompt, Title, 'OK', 'OK');

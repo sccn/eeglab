@@ -90,7 +90,7 @@ for  ci = 1:length(comps)
         disp('(this is because the component moved had no pre-clustering data associated to it)');
     elseif ~strncmpi('Notclust',STUDY.cluster(new_clus).name,8)
         STUDY.cluster(new_clus).preclust.preclustdata(indcomp,:) = STUDY.cluster(old_clus).preclust.preclustdata(comps(ci),:); %with preclustdata
-    end;
+    end
 
     % sort by sets
     % ------------
@@ -115,8 +115,8 @@ if ~isempty(STUDY.cluster(old_clus).preclust.preclustdata)
     try,
         STUDY.cluster(old_clus).preclust.preclustdata = STUDY.cluster(old_clus).preclust.preclustdata(left_comps,:);
     catch, % this generates an unknown error but I was not able to reproduce it - AD Sept. 26, 2009        
-    end;
-end;
+    end
+end
 
 % update the component indices
 % ----------------------------
@@ -132,5 +132,5 @@ function STUDY = rm_centroid(STUDY, clsindex)
     for index = 1:length(allfields)
         if isempty(strmatch(allfields{index}, keepfields))
             STUDY.cluster = setfield( STUDY.cluster, { clsindex }, allfields{index}, []);
-        end;
-    end;
+        end
+    end

@@ -100,7 +100,7 @@ if nargin<1
 end
 if nargin < 2
     ref = [];
-end;
+end
 
 % check inputs
 % ------------
@@ -115,25 +115,25 @@ g = finputcheck(varargin, { 'icaweight'   'real'    []          [];
                             'refloc'     { 'cell','struct' }  { [] [] }   {};
                             'keepref'    'string'  {'on','off' }             'off';
                             'elocs'      {'integer','struct'}  []            [] });
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 if ~isempty(g.icaweight)
     g.icaweights = g.icaweight;
-end;
+end
 if ~isempty(g.icaweights)
     if isempty(g.icachansind), 
         g.icachansind = [1:size(g.icaweights,2)]; 
         disp('Warning: reref() output has changed slightly since EEGLAB 5.02');
         disp('         the 4th output argument is the indices of channels used for ICA instead');
         disp('         of the mean reference value (which is now output argument 5)');
-    end;
-end;
-if ischar(ref), ref = { ref }; end;
-if iscell(ref), ref = eeg_chaninds(g.elocs, ref); end;
+    end
+end
+if ischar(ref), ref = { ref }; end
+if iscell(ref), ref = eeg_chaninds(g.elocs, ref); end
 if ~isempty(ref)
     if ref > size(data,1)
         error('reference channel index out of range');
-    end;
-end;
+    end
+end
 
 [dim1 dim2 dim3] = size(data);
 data = reshape(data, dim1, dim2*dim3);
@@ -155,12 +155,12 @@ if ~isempty(g.refloc) == 1
                 fieldloc = fieldnames(g.elocs);
                 for ind = 1:length(fieldloc)
                     g.elocs(end) = setfield(g.elocs(end), fieldloc{ind}, getfield(g.refloc(iLocs), fieldloc{ind}));
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end
     [dim1 dim2 dim3] = size(data);
-end;
+end
 
 % exclude some channels
 % ---------------------
@@ -171,7 +171,7 @@ nchansin  = length(chansin);
 % ----------------
 if nargout > 4
     meandata = sum(data(chansin,2))/nchansin;
-end;
+end
 
 % generate rereferencing matrix
 % -----------------------------
@@ -187,16 +187,16 @@ else
         tmpref = ref;
         for index = length(g.exclude):-1:1
             tmpref(find(g.exclude(index) < tmpref)) = tmpref(find(g.exclude(index) < tmpref))-1;
-        end;
+        end
         for index = 1:length(tmpref)
             refmatrix(:,tmpref(index)) = refmatrix(:,tmpref(index))-1/length(tmpref);
-        end;
+        end
     else % compute average reference
         refmatrix = eye(nchansin)-ones(nchansin)*1/nchansin;
-    end;
+    end
     chansout = chansin;
     data(chansout,:) = refmatrix*data(chansin,:);
-end;
+end
 
 % change reference in elocs structure
 % -----------------------------------
@@ -204,19 +204,19 @@ if ~isempty(g.elocs)
     if isempty(ref)
         for ind = chansin
             g.elocs(ind).ref = 'average';
-        end;
+        end
     else
         reftxt = { g.elocs(ref).labels };
         if length(reftxt) == 1, reftxt = reftxt{1}; 
         else
             reftxt = cellfun(@(x)([x ' ']), reftxt, 'uniformoutput', false);
             reftxt = [ reftxt{:} ];
-        end;
+        end
         for ind = chansin
             g.elocs(ind).ref = reftxt;
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % remove reference
 % ----------------
@@ -226,8 +226,8 @@ if strcmpi(g.keepref, 'off')
     if ~isempty(g.elocs)
         morechans = g.elocs(ref);
         g.elocs(ref) = [];
-    end;
-end;
+    end
+end
 
 data = reshape(data, size(data,1), dim2, dim3);
 
@@ -236,5 +236,5 @@ data = reshape(data, size(data,1), dim2, dim3);
 W = []; S = []; icachansind = [];
 if ~isempty(g.icaweights) 
     disp('Warning: This function does not process ICA array anymore, use the pop_reref function instead');
-end;
+end
 Elocs = g.elocs;

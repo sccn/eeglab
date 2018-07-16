@@ -48,10 +48,10 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
     if nargin < 2
         help rsfit;
         return;
-    end;
+    end
     if nargin < 3
         plotflag  = 0;
-    end;
+    end
     
     % moments
     % -------
@@ -70,20 +70,20 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
         disp('rsfit error: Can not fit negative kurtosis');
         save('/home/arno/temp/dattmp.mat', '-mat', 'x');
         disp('data saved to disk in /home/arno/temp/dattmp.mat');        
-    end;
+    end
     
     % find fit
     % --------
     try, 
         [sol tmp exitcode] = fminsearch('rspdfsolv', [0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 100000000), abs(xskew), xkurt);    
     catch, exitcode = 0; % did not converge
-    end;
+    end
     if ~exitcode
         try, [sol tmp exitcode] = fminsearch('rspdfsolv', -[0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 100000000), abs(xskew), xkurt);
-        catch, exitcode = 0; end;
-    end;
-    if ~exitcode,           error('No convergence'); end;
-    if sol(2)*sol(1) == -1, error('Wrong sign for convergence'); end;
+        catch, exitcode = 0; end
+    end
+    if ~exitcode,           error('No convergence'); end
+    if sol(2)*sol(1) == -1, error('Wrong sign for convergence'); end
     %fprintf('          l-val:%f\n', sol);
     
     res = rspdfsolv(sol, abs(xskew), xkurt);
@@ -120,8 +120,8 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
             if N(index) < 5
                 N(index+1) = N(index+1) + N(index);
                 indices2rm = [ indices2rm index];
-            end;
-        end;
+            end
+        end
         N(indices2rm)   = [];
         X(indices2rm+1) = [];
         indices2rm = [];
@@ -129,8 +129,8 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
             if N(index) < 5
                 N(index-1) = N(index-1) + N(index);
                 indices2rm = [ indices2rm index];
-            end;
-        end;
+            end
+        end
         N(indices2rm)   = [];
         X(indices2rm)   = [];
         
@@ -140,7 +140,7 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
             p1 = rsget( l, X(index+1));
             p2 = rsget( l, X(index  ));
             expect(index) = length(x)*(p1-p2); 
-        end;
+        end
         
         % value of X2
         % -----------
@@ -149,7 +149,7 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
         % plot fit
         % --------
         if plotflag
-            if plotflag ~= 2, figure('paperpositionmode', 'auto'); end;
+            if plotflag ~= 2, figure('paperpositionmode', 'auto'); end
             hist(x, 10);
             
             % plot fit
@@ -163,7 +163,7 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
                 p2 = rsget( l, abscisia(index  ));
                 expectplot(index-1) = length(x)*(p2-p1); 
                 % have to do this subtraction since this a cumulate density distribution
-            end;
+            end
             abscisia = (abscisia(2:end)+abscisia(1:end-1))/2;
             hold on; plot(abscisia, expectplot, 'r');
         
@@ -180,6 +180,6 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
             xlabel('Bins');
             ylabel('# of data point per bin');            
             title (sprintf('Fit of distribution using Ramberg-Schmeiser distribution (Chi2 = %2.4g)', res));            
-        end;
-    end;
+        end
+    end
     return

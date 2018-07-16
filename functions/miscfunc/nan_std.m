@@ -25,7 +25,7 @@ function out = nan_std(in)
     if nargin < 1
       help nan_std;
       return;
-    end;
+    end
     
     nans = find(isnan(in));
     in(nans) = 0;

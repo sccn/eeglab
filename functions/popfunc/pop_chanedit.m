@@ -153,14 +153,14 @@ com ='';
 if nargin < 1
     help pop_chanedit;
     return;
-end;
+end
 chansout = chans;
 chaninfo   = [];
 fig      = [];
 
 if nargin < 2
     orichaninfo = [];
-end;
+end
 
 if isempty(chans) || all(~ishandle(chans))
     % in case an EEG structure was given as input
@@ -173,15 +173,15 @@ if isempty(chans) || all(~ishandle(chans))
         if isfield(EEG, 'chaninfo')
             chaninfo = EEG(1).chaninfo;
         else chaninfo = [];
-        end;
+        end
         if isfield(EEG, 'urchanlocs')
             urchans = EEG(1).urchanlocs;
-        end;
+        end
     else
         nchansori     = 0;
         dataset_input = 0;
         chaninfo      = orichaninfo;
-    end;
+    end
 
     % dealing with additional parameters
     % ----------------------------------
@@ -190,15 +190,15 @@ if isempty(chans) || all(~ishandle(chans))
             if ~ischar(varargin{1})
                 urchans  = varargin{1};
                 varargin = varargin(2:end);
-            end;
-        end;
+            end
+        end
     elseif nargin > 1 && ~isempty(orichaninfo) && ischar(orichaninfo)
         varargin = { orichaninfo varargin{:} };
         if isequal(orichaninfo, chaninfo)
             chaninfo    = [];
-        end;
+        end
         orichaninfo = [];
-    end;
+    end
     
     % insert "no data channels" in channel structure
     % ----------------------------------------------
@@ -212,11 +212,11 @@ if isempty(chans) || all(~ishandle(chans))
                 'A new option (more anatomically correct) is to plot channels' 10 ...
                 'outside head limits so the shrink option has been disabled.' 10 ...
                 '(Edit the icadefs file to disable this message)' ], 'Shrink factor warning');
-        end;
-    end;
+        end
+    end
 
     oldchaninfo = chaninfo;
-end;
+end
 
 % Checking for flag to replace 'urchanloc' field
 indx_tmp = find(strcmp(varargin,'rplurchanloc'));
@@ -235,12 +235,12 @@ if nargin < 3
         for index = 1:length(chans)
             chans(index).ref       = '';
             chans(index).datachan  = 1;
-        end;
+        end
         if ~isempty(com)
             totaluserdat = com;
             %[chans chaninfo urchans com] = pop_chanedit(chans, chaninfo, com{:});
-        end;
-    end;
+        end
+    end
 
     commentfields = { 'Channel label ("label")', ...
                       'Polar angle ("theta")', 'Polar radius ("radius")', ...
@@ -287,7 +287,7 @@ if nargin < 3
             { 'Style', 'edit', 'tag', [ 'chanedit' allfields{index} ], 'string', ...
             num2str(getfield(chans,{1}, allfields{index})), 'horizontalalignment', 'center', 'callback', cbfield } ...
               { } uiconvert{index} };
-    end;
+    end
 
     % special checkbox for chandata field
     % -----------------------------------
@@ -330,7 +330,7 @@ if nargin < 3
                      'pop_chanedit(gcbf, [], ''rplurchanloc'', valnumtmp);' ...
                      'clear valnumtmp;' ];
     noseparam = strmatch(upper(chaninfo.nosedir), { '+X' '-X' '+Y' '-Y' });
-    if isempty(noseparam), error('Wrong value for nose direction'); end;
+    if isempty(noseparam), error('Wrong value for nose direction'); end
     geometry = { geometry{:} [1] [0.9 1.3 0.6 1.1 0.9] [1] [1 1 1 1 1] [1]};
     uilist   = { uilist{:},...
         { } ...
@@ -369,7 +369,7 @@ if nargin < 3
         com = ''; 
         if dataset_input, chansout = EEG; end; 
         return; 
-    end;
+    end
 
     % transfer events back from global workspace
     chans      = userdata.chans;
@@ -377,7 +377,7 @@ if nargin < 3
     urchans    = userdata.urchans; 
     if ~isempty(userdata.commands)
         com = sprintf('%s=pop_chanedit(%s, %s);', inputname(1), inputname(1), vararg2str(userdata.commands));
-    end;
+    end
     % Updating flag
     flag_replurchan = results{15};
 else
@@ -393,7 +393,7 @@ else
         chaninfo    = userdata.chaninfo;
         urchans     = userdata.urchans;
         currentpos  = str2num(get(findobj(fig, 'tag', 'chaneditnumval'), 'string'));
-    end;
+    end
     
     args = varargin;
     % no interactive inputs
@@ -402,7 +402,7 @@ else
     for curfield = 1:2:length(args)
         switch lower(args{curfield})
             case 'rplurchanloc'
-                if flag_replurchan, urchans = eeg_checkchanlocs(chans, chaninfo); end;
+                if flag_replurchan, urchans = eeg_checkchanlocs(chans, chaninfo); end
                 args{curfield}     = 'rplurchanloc';
                 args{ curfield+1 } =  flag_replurchan;
             case 'return'
@@ -414,17 +414,17 @@ else
                             'If you have added a reference channel manually, check the "Data channel" checkbox is off'))
                     else
                         set(findobj(fig, 'tag', 'ok'), 'userdata', 'stop');
-                    end;
+                    end
                 else
                     set(findobj(fig, 'tag', 'ok'), 'userdata', 'stop');
-                end;
+                end
                 args = {};
             case 'plot3d', % GUI only
                 tmpind = find(~cellfun('isempty', { chans.X }));
                 if ~isempty(tmpind),
                     plotchans3d([ [ chans(tmpind).X ]' [ chans(tmpind).Y ]' [ chans(tmpind).Z ]'], { chans(tmpind).labels }); 
                 else disp('cannot plot: no XYZ coordinates');
-                end;
+                end
                 args = {};
             case 'plot2d', % GUI only
                 plotrad = str2num(get(findobj(fig, 'tag', 'plotrad'), 'string'));
@@ -437,25 +437,25 @@ else
             case 'plotrad',
                 if isempty( args{curfield+1} )
                      args{curfield+1} = str2num(get(findobj(fig, 'tag', 'plotrad'), 'string'));
-                end;
+                end
                 chaninfo.plotrad = args{curfield+1};
             case 'forcelocs',
                 if ~isempty(fig) % GUI BASED
                     [ comtmp tmpforce ] = forcelocs(chans); 
                     if ~isempty(tmpforce), 
                         args{curfield+1} = tmpforce{1};
-                    end;
-                end;
+                    end
+                end
                 if ~isempty(args{curfield+1})
                     chans = forcelocs(chans,args{curfield+1});
                     disp('Convert XYZ coordinates to spherical and polar');
-                end;
+                end
             case 'chancenter',
                 if ~isempty(fig)
                     [chans newcenter tmpcom] = pop_chancenter(chans);
                     args{curfield  } = 'eval';
                     args{curfield+1} = tmpcom;
-                end;
+                end
             case 'convert',
                 if iscell(args{curfield+1})
                     method=args{curfield+1}{1};
@@ -463,72 +463,72 @@ else
                 else
                     method=args{curfield+1};
                     extraargs = {''};
-                end;
+                end
                 if ~isempty(fig) & ~strcmp(method, 'chancenter')
                     tmpButtonName=questdlg2( strvcat('This will modify fields in the channel structure', ...
                         'Are you sure you want to apply this function ?'), 'Confirmation', 'Cancel', 'Yes','Yes');
-                    if ~strcmpi(tmpButtonName, 'Yes'), return; end;
-                end;
+                    if ~strcmpi(tmpButtonName, 'Yes'), return; end
+                end
                 switch method
                     case 'chancenter',
                         if isempty(extraargs)
                             [X Y Z]=chancenter( [chans.X ]', [ chans.Y ]', [ chans.Z ]',[]);
                         else
                             [X Y Z]=chancenter( [chans.X ]', [ chans.Y ]', [ chans.Z ]', extraargs{:});
-                        end;
-                        if isempty(X), return; end;
+                        end
+                        if isempty(X), return; end
                         for index = 1:length(chans)
                             chans(index).X  = X(index);
                             chans(index).Y  = Y(index);
                             chans(index).Z  = Z(index);
-                        end;
+                        end
                         disp('Note: automatically convert XYZ coordinates to spherical and polar');
                         chans = convertlocs(chans, 'cart2all');
                     otherwise
                         chans = convertlocs(chans, method, 'verbose', 'on');
-                end;
+                end
             case 'settype'                
                 if ~isempty(fig)
                     args{curfield+1} = inputdlg2({'Channel indices' 'Type (e.g. EEG)' }, ...
                                              'Set channel type', 1, { '' '' }, 'pop_chanedit');
-                end;
-                try, tmpchans = args{curfield+1}{1}; tmptype = args{curfield+1}{2};catch, return; end;
-                if isempty(tmpchans) & isempty(tmptype), return; end;
+                end
+                try, tmpchans = args{curfield+1}{1}; tmptype = args{curfield+1}{2};catch, return; end
+                if isempty(tmpchans) & isempty(tmptype), return; end
                 if ischar(tmpchans)
                     tmpchans = eval( [ '[' tmpchans ']' ], 'settype: error in channel indices');
-                end;
-                if ~ischar(tmptype), tmptype = num2str(tmptype); end;
+                end
+                if ~ischar(tmptype), tmptype = num2str(tmptype); end
                 for index = 1:length(tmpchans)
                     if tmpchans(index) > 0 & tmpchans(index) <= length(chans)
                         chans( tmpchans(index) ).type = tmptype;
-                    end;
-                end;
+                    end
+                end
             case 'setref'
                 if ~isempty(fig)
                     disp('Note that setting the reference only changes the reference labels');
                     disp('Use the re-referencing menu to change the reference');
                     args{curfield+1} = inputdlg2({'Channel indices' 'Reference (e.g. Cz)' }, ...
                                                  'Set channel reference', 1, { '' '' }, 'pop_chanedit');
-                end;
-                try, tmpchans = args{curfield+1}{1}; tmpref = args{curfield+1}{2};catch, return; end;
-                if isempty(tmpchans) & isempty(tmpref), return; end;
+                end
+                try, tmpchans = args{curfield+1}{1}; tmpref = args{curfield+1}{2};catch, return; end
+                if isempty(tmpchans) & isempty(tmpref), return; end
                 if ischar(tmpchans)
                     tmpchans = eval( [ '[' tmpchans ']' ], 'settype: error in channel indices');
-                end;
-                if ~ischar(tmpref), tmpref = num2str(tmpref); end;
+                end
+                if ~ischar(tmpref), tmpref = num2str(tmpref); end
                 for index = 1:length(tmpchans)
                     if tmpchans(index) > 0 & tmpchans(index) <= length(chans)
                         chans( tmpchans(index) ).ref = tmpref;
-                    end;
-                end;
+                    end
+                end
             case 'transform'
                 if ~isempty(fig)
                     args{curfield+1} = inputdlg2({'Enter transform: (Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2), etc.' }, ...
                                                   'Transform', 1, { '' }, 'pop_chanedit');
-                end;
-                try, tmpoper = args{curfield+1}; catch, return; end;
-                if isempty(deblank(tmpoper)), return; end;
-                if iscell(tmpoper), tmpoper = tmpoper{1}; end;
+                end
+                try, tmpoper = args{curfield+1}; catch, return; end
+                if isempty(deblank(tmpoper)), return; end
+                if iscell(tmpoper), tmpoper = tmpoper{1}; end
                 tmpoper = [ tmpoper ';' ];
                 [eloc, labels, theta, radius, indices] = readlocs(chans);
                 if isempty(findstr(tmpoper, 'chans'))
@@ -550,20 +550,20 @@ else
                             chans(indices(ind)).sph_theta  = sph_theta(min(length(sph_theta),ind));
                             chans(indices(ind)).sph_phi    = sph_phi(min(length(sph_phi),ind));
                             chans(indices(ind)).sph_radius = sph_radius(min(length(sph_radius),ind));
-                        end;
+                        end
                         
-                        if     ~isempty(findstr(tmpoper, 'X')),          chans = convertlocs(chans, 'cart2all'); end;
-                        if     ~isempty(findstr(tmpoper, 'Y')),          chans = convertlocs(chans, 'cart2all'); end;
-                        if     ~isempty(findstr(tmpoper, 'Z')),          chans = convertlocs(chans, 'cart2all'); end;
+                        if     ~isempty(findstr(tmpoper, 'X')),          chans = convertlocs(chans, 'cart2all'); end
+                        if     ~isempty(findstr(tmpoper, 'Y')),          chans = convertlocs(chans, 'cart2all'); end
+                        if     ~isempty(findstr(tmpoper, 'Z')),          chans = convertlocs(chans, 'cart2all'); end
                         if     ~isempty(findstr(tmpoper, 'sph_theta')),  chans = convertlocs(chans, 'sph2all');
-                        elseif ~isempty(findstr(tmpoper, 'theta')),      chans = convertlocs(chans, 'topo2all'); end;
-                        if     ~isempty(findstr(tmpoper, 'sph_phi')),    chans = convertlocs(chans, 'sph2all');  end;
+                        elseif ~isempty(findstr(tmpoper, 'theta')),      chans = convertlocs(chans, 'topo2all'); end
+                        if     ~isempty(findstr(tmpoper, 'sph_phi')),    chans = convertlocs(chans, 'sph2all');  end
                         if     ~isempty(findstr(tmpoper, 'sph_radius')), chans = convertlocs(chans, 'sph2all');
-                        elseif ~isempty(findstr(tmpoper, 'radius')),     chans = convertlocs(chans, 'topo2all'); end;
-                    catch, disp('Unknown error when applying transform'); end;
+                        elseif ~isempty(findstr(tmpoper, 'radius')),     chans = convertlocs(chans, 'topo2all'); end
+                    catch, disp('Unknown error when applying transform'); end
                 else
                     eval(tmpoper);
-                end;
+                end
                 
             case 'headrad'
                 if ~isempty(fig) % GUI
@@ -572,8 +572,8 @@ else
                      if ~isempty(tmpres),
                           args{ curfield+1 } = str2num(tmpres{1});
                      else return;
-                     end;
-                end;
+                     end
+                end
                 if ~isempty( args{ curfield+1 } )
                     allrad = [ chans.sph_radius ];
                     if length(unique(allrad)) == 1 % already spherical
@@ -583,9 +583,9 @@ else
                         chans = pop_chanedit(chans, 'transform', [ 'sph_radius = sph_radius*' num2str( factor ) ';' ]);
                         disp('Warning: electrodes do not lie on a sphere. Sphere model fitting for');
                         disp('         dipole localization will work but generate many warnings');
-                    end;
+                    end
                     chans = convertlocs(chans, 'sph2all');
-                end;
+                end
                 
             case 'shrink'
                 chans(1).shrink = args{ curfield+1 };
@@ -605,10 +605,10 @@ else
                 tmpargs = args{ curfield+1 };
                 if length( tmpargs ) < 3
                     error('pop_chanedit: not enough arguments to change field value');
-                end;
+                end
                 if ~isempty(strmatch( tmpargs{2}, { 'X' 'Y' 'Z' 'theta' 'radius' 'sph_theta' 'sph_phi' 'sph_radius'}))
-                     if ~isnumeric(tmpargs{3}), tmpargs{3} = str2num(tmpargs{3}); end;
-                end;
+                     if ~isnumeric(tmpargs{3}), tmpargs{3} = str2num(tmpargs{3}); end
+                end
                 for paramChan = 2:2:length(tmpargs)
                     eval([ 'chans(' int2str(tmpargs{1}) ').'  tmpargs{paramChan} '=' reformat(tmpargs{paramChan+1} ) ';' ]);
                 end
@@ -619,33 +619,33 @@ else
                     tmpargs2    = cell(1, length(allfields)+1);
                     tmpargs2{1} = tmpargs;
                     tmpargs     = tmpargs2;
-                    if strcmpi(allfields{end}, 'datachan'), tmpargs{end} = 0; end;
-                end;
+                    if strcmpi(allfields{end}, 'datachan'), tmpargs{end} = 0; end
+                end
                 if length( tmpargs ) < length(allfields)+1
                     error('pop_chanedit: not enough arguments to change all field values');
-                end;
+                end
                 num = tmpargs{1};
-                if strcmpi(lower(args{curfield}), 'append'), num=num+1; currentpos = currentpos+1; end;
+                if strcmpi(lower(args{curfield}), 'append'), num=num+1; currentpos = currentpos+1; end
                 chans(end+1) = chans(end);
                 chans(num+1:end) = chans(num:end-1);
                 for index = 1:length( allfields )
                     chans = setfield(chans, {num}, allfields{index}, tmpargs{index+1});
-                end;
+                end
                 if isfield(chans, 'datachan')
                     if isempty(chans(num).datachan)
                         chans(num).datachan = 0;
-                    end;
-                end;
+                    end
+                end
             case 'changechan'
                 tmpargs = args{ curfield+1 };
                 num = tmpargs{1};
                 allfields = fieldnames(chans);
                 if length( tmpargs ) < length(allfields)+1
                     error('pop_chanedit: not enough arguments to change all field values');
-                end;
+                end
                 for index = 1:length( allfields )
                     eval([ 'chans(' int2str(num) ').' allfields{index} '=' reformat(tmpargs{index+1}) ';' ]);
-                end;
+                end
                 
             case 'load'
                 if ~isempty(fig) % GUI
@@ -672,10 +672,10 @@ else
                         if isempty(tmpfmt), 
                              args{ curfield+1 } = [];
                         else args{ curfield+1 } = { fullfile(tmpp, tmpf) 'filetype' tmpformattype{tmpfmt{1}} };
-                        end;
+                        end
                     else args{ curfield+1 } = [];
-                	end;
-                end;
+                	end
+                end
                 
                 tmpargs = args{ curfield+1 };
                 if ~isempty(tmpargs),
@@ -689,7 +689,7 @@ else
                         [tmp tmp2 chans]  = eeg_checkchanlocs(chans);
                         chaninfo          = [];
                         chaninfo.filename = tmpargs{1};
-                    end;
+                    end
                     
                     % backup file content etc...
                     % --------------------------
@@ -701,16 +701,16 @@ else
                     urchans = chans;
                     for index = 1:length(chans)
                         chans(index).urchan = index;
-                    end;
-                end;
+                    end
+                end
                 if ~isfield(chans, 'datachan')
                     chans(1).datachan = [];
-                end;
+                end
                 for index = 1:length(chans)
                     if isempty(chans(index).datachan)
                         chans(index).datachan = 1;
-                    end;
-                end;
+                    end
+                end
                 
             case 'eval'
                 tmpargs = args{ curfield+1 };
@@ -726,22 +726,22 @@ else
                      [tmpf tmpp] = uiputfile('*.ced', 'Save channel locs in EEGLAB .ced format');
                      drawnow;
                      args{ curfield+1 } = fullfile(tmpp, tmpf);
-                end;
+                end
                 tmpargs = args{ curfield+1 };
-                if isempty(tmpargs), return; end;
+                if isempty(tmpargs), return; end
                 fid = fopen(tmpargs, 'w');
-                if fid ==-1, error('Cannot open file'); end;
+                if fid ==-1, error('Cannot open file'); end
                 
                 allfields = fieldnames(chans);
                 fields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' };
                 tmpdiff = setdiff(fields, allfields);
-                if ~isempty(tmpdiff), error(sprintf('Field "%s" missing in channel location structure', tmpdiff{1})); end;
+                if ~isempty(tmpdiff), error(sprintf('Field "%s" missing in channel location structure', tmpdiff{1})); end
                 [tmp,ia,tmp] = intersect(allfields,fields,'stable');  %Getting the original order from file
                 origfield = allfields(ia);
                 fprintf(fid, 'Number\t');
                 for field = 1:length(fields)
                     fprintf(fid, '%s\t', origfield{field});
-                end;
+                end
                 fprintf(fid, '\n');
                 for index=1:length(chans)
                     fprintf(fid, '%d\t',  index);
@@ -751,11 +751,11 @@ else
                             fprintf(fid, '%s\t',  tmpval);
                         else
                             fprintf(fid, '%3.3g\t',  tmpval);
-                        end;
-                    end;
+                        end
+                    end
                     fprintf(fid, '\n');
-                end;
-                if isempty(tmpargs), chantmp = readlocs(tmpargs); end;
+                end
+                if isempty(tmpargs), chantmp = readlocs(tmpargs); end
                 
             case 'nosedir'
                 nosevals = { '+X' '-X' '+Y' '-Y' };
@@ -767,11 +767,11 @@ else
                                 'be +X. If your electrodes are currently aligned with a specific' 10 ...
                                 'head model, you will have to rotate them in the model coregistration' 10 ... 
                                 'interface to realign them with the model.'], 'My Warn Dialog');
-                end;
+                end
                 chaninfo.nosedir = args{ curfield+1 };
                 if isempty(strmatch(chaninfo.nosedir, nosevals))
                     error('Wrong value for nose direction');
-                end;
+                end
                 
             case { 'lookup' 'lookupgui' }
                 if strcmpi(lower(args{curfield}), 'lookupgui')
@@ -782,8 +782,8 @@ else
                         'P3' 'P1' 'Pz' 'P2' 'P4' 'P6' 'P8' 'P10' 'PO9' 'PO7' 'PO3' 'POz' 'PO4' 'PO8' 'PO10' ...
                         'O1' 'Oz' 'O2' 'O9' 'O10' 'CB1' 'CB2' 'Iz' };
                     for indexchan = 1:length(chans)
-                        if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end;
-                    end;
+                        if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end
+                    end
                     [tmp1 ind1 ind2] = intersect_bc( lower(standardchans), {chans.labels});
                     if ~isempty(tmp1) | isfield(chans, 'theta')
 
@@ -799,7 +799,7 @@ else
                             userdatatmp = { template_models(1).chanfile template_models(2).chanfile 'Standard-10-5-Cap385_witheog.elp' }; % last file in the path (see eeglab.m)
                             clear EEG;
                         catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385_witheog.elp' }; % files are in the path (see eeglab.m)
-                        end;
+                        end
 
                         % other commands for help/load
                         % ----------------------------
@@ -814,7 +814,7 @@ else
                         if ~isfield(chans, 'theta'),                    message =1;
                         elseif all(cellfun('isempty', {chans.theta })), message =1;
                         else                                            message =2;
-                        end;
+                        end
                         if message == 1
                             textcomment = strvcat('Only channel labels are present currently, but some of these labels have known', ...
                                 'positions. Do you want to look up coordinates for these channels using the electrode', ...
@@ -824,7 +824,7 @@ else
                             textcomment = strvcat('Some channel labels may have known locations.', ...
                                 'Do you want to look up coordinates for these channels using the electrode', ...
                                 'file below? If you do not know, press OK.');
-                        end;
+                        end
                         uilist = { { 'style' 'text' 'string' textcomment } ...
                             { 'style' 'popupmenu'  'string' [ 'use BESA file for 4-shell dipfit spherical model' ...
                             '|use MNI coordinate file for BEM dipfit model|Use spherical file with eye channels' ] ...
@@ -846,22 +846,22 @@ else
                             com = args;
                         else
                             return;
-                        end;
-                    end;
+                        end
+                    end
                 else    
                     chaninfo.filename = args{ curfield+1 };
-                end;
+                end
                 if strcmpi(chaninfo.filename, 'standard-10-5-cap385.elp')
                     dipfitdefs;
                     chaninfo.filename = template_models(1).chanfile;
                 elseif strcmpi(chaninfo.filename, 'standard_1005.elc')
                     dipfitdefs;
                     chaninfo.filename = template_models(2).chanfile;
-                end;
+                end
                 tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );                
                 for indexchan = 1:length(chans)
-                    if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end;
-                end;
+                    if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end
+                end
                 [tmp ind1 ind2] = intersect_bc(lower({ tmplocs.labels }), lower({ chans.labels }));
                 if ~isempty(tmp)
                     chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan }, 'type', { chans.type });
@@ -877,33 +877,33 @@ else
                         chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
                         chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
                         chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
-                    end;
+                    end
                     tmpdiff = setdiff_bc([1:length(chans)], ind2);
                     if ~isempty(tmpdiff)
                         fprintf('Channel lookup: no location for ');
                         for index = 1:(length(tmpdiff)-1)
                             fprintf('%s,', chans(tmpdiff(index)).labels);
-                        end;
+                        end
                         fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu\n', ...
                             chans(tmpdiff(end)).labels);
-                    end;
-                    if ~isfield(chans, 'type'), chans(1).type = []; end;
-                end;
+                    end
+                    if ~isfield(chans, 'type'), chans(1).type = []; end
+                end
                 if ~isempty(findstr(args{ curfield+1 }, 'standard_10')) & ...
                         ~isempty(findstr(args{ curfield+1 }, '.elc'))
                     chaninfo.nosedir = '+Y';
                 else
                     chaninfo.nosedir = '+X';
-                end;
-                if flag_replurchan, urchans = eeg_checkchanlocs(chans, chaninfo); end;
+                end
+                if flag_replurchan, urchans = eeg_checkchanlocs(chans, chaninfo); end
                 for index = 1:length(chans)
                     chans(index).urchan    = index;
                     chans(index).ref       = '';
-                end;
-        end;
-    end;
+                end
+        end
+    end
     
-end;
+end
 
 % call from a figure
 % ------------------
@@ -926,10 +926,10 @@ if ~isempty(fig)
                 set(obj, 'value', getfield(chans(currentpos), allfields{index}));
             else
                 tmpval = getfield(chans(currentpos), allfields{index});
-                if ischar(tmpval) && strcmpi(tmpval, '[]'), tmpval = ''; end;
+                if ischar(tmpval) && strcmpi(tmpval, '[]'), tmpval = ''; end
                 set(obj, 'string', num2str(tmpval));
-            end;
-        end;
+            end
+        end
     else
         for index = 1:length(allfields)
             obj = findobj(fig, 'tag', [ 'chanedit' allfields{index}]);
@@ -937,9 +937,9 @@ if ~isempty(fig)
                 set(obj, 'value', 0);
             else
                 set(obj, 'string', '');
-            end;
-        end;
-    end;
+            end
+        end
+    end
 else
     [chans chaninfo] = eeg_checkchanlocs(chans, chaninfo);
     if dataset_input,
@@ -947,28 +947,28 @@ else
              for index = 1:length(EEG)
                  EEG(index).chanlocs = chans;
                  EEG(index).chaninfo = chaninfo;
-             end;
+             end
              % Updating urchanlocs            
-             if flag_replurchan && ~isempty(urchans), EEG.urchanlocs = urchans; end;
+             if flag_replurchan && ~isempty(urchans), EEG.urchanlocs = urchans; end
              EEG = eeg_checkset(EEG); % for channel orientation
          else
              disp('Channel structure size not consistent with the data so changes will be ignored');
              disp('Use the function pop_select(EEG, ''nochannel'', [x]); if you wish the remove data channels');
-         end;
-         try chansout = EEG; catch, end;
+         end
+         try chansout = EEG; catch, end
     else chansout = chans;
-    end;
-end;
+    end
+end
 
 return;
 
 % format the output field
 % -----------------------
 function strval = reformat( val )
-if isnumeric(val) & isempty(val), val = '[]'; end;
+if isnumeric(val) & isempty(val), val = '[]'; end
 if ischar(val), strval = [ '''' val '''' ];
 else           strval = num2str(val);
-end;
+end
 
 % extract text using tokens (not used)
 % ------------------------------------
@@ -976,7 +976,7 @@ function txt = inserttxt( txt, tokins, tokfind);
 locfind = findstr(txt, tokfind);
 for index = length(locfind):-1:1
     txt = [txt(1:locfind(index)-1) tokins txt(locfind(index):end)];
-end;
+end
 
 % ask for confirmation
 % --------------------
@@ -986,4 +986,4 @@ ButtonName=questdlg2( text, ...
 switch lower(ButtonName),
     case 'cancel', num = 0;
     case 'yes',    num = 1;
-end;
+end

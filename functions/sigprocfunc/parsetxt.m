@@ -35,19 +35,19 @@ end;
 
 if nargin < 2
     delims = [' ' ',' 9 '"' '''' ];
-end;
+end
     
 cellarray = {};
 tmptxt = '';
 for index =1:length(txt)
     if ~isempty(findstr(txt(index), delims))
-        if ~isempty(tmptxt), cellarray = { cellarray{:}, tmptxt }; end;
+        if ~isempty(tmptxt), cellarray = { cellarray{:}, tmptxt }; end
         tmptxt = '';
     else
         tmptxt = [ tmptxt txt(index) ];
-    end;
+    end
 end;        
 if ~isempty(tmptxt)
     cellarray = { cellarray{:}, tmptxt };
-end;
+end
 return;

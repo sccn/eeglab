@@ -35,11 +35,11 @@ function STUDY = std_selectdesign(STUDY, ALLEEG, designind);
 if nargin < 3
     help std_selectdesign;
     return;
-end;
+end
 
 if designind < 1 || designind > length(STUDY.design) || isempty(STUDY.design(designind).name)
     disp('Cannot select an empty STUDY.design');
     return;
-end;
+end
 STUDY.currentdesign = designind;
 STUDY = std_rmalldatafields( STUDY );

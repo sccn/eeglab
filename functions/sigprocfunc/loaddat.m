@@ -36,7 +36,7 @@ if nargin<1
 	fprintf('Not enought arguments\n'); 
 	help loaddat 
 	return;
-end;
+end
 
 BOOL='int16';
 ULONG='int32'; 
@@ -46,11 +46,11 @@ fid=fopen(FILENAME,'r','ieee-le');
 if fid<0
 	fprintf(2,['Error LOADEEG: File ' FILENAME ' not found\n']);  
 	return;
-end;
+end
 
 % skip the first 20 lines
 % -----------------------
-for index=1:20	fgetl(fid); end;
+for index=1:20	fgetl(fid); end
 
 % read the matrix
 % ---------------

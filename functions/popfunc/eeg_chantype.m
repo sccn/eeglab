@@ -37,7 +37,7 @@ function indices = eeg_chantype(data,chantype)
 
     if nargin < 1
         help eeg_chantype;
-    end;
+    end
    
     if ischar(chantype), chantype = cellstr(chantype); end
     if ~iscell(chantype), 
@@ -62,7 +62,7 @@ function indices = eeg_chantype(data,chantype)
             if strcmpi(chantype{i},char(datatype{j}))
                 plotchans(k) = j;
                 k = k + 1;
-            end;
+            end
         end
     end
     indices = sort(plotchans);

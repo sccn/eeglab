@@ -50,7 +50,7 @@ end;
            tmpsaved = { ALLEEG.saved };
            tmpsaved = tmpsaved(CURRENTSET);
     catch, tmpsaved = 'no';
-    end;
+    end
 
     if length(CURRENTSET) > 1 & option_storedisk
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
@@ -58,7 +58,7 @@ end;
             [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
         else
             ALLEEG = EEG;
-        end;
+        end
     else
         if CURRENTSET ~= 0
             [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
@@ -66,20 +66,20 @@ end;
         else
             EEG = eeg_emptyset; % empty dataset
             return;
-        end;
-    end;
+        end
+    end
     
     % retain saved field
     % ------------------
     for index = 1:length(CURRENTSET)
         ALLEEG(CURRENTSET(index)).saved = tmpsaved{index};
         EEG(index).saved                = tmpsaved{index};
-    end;
+    end
     
 %catch
 %	fprintf('Warning: cannot retrieve dataset with index %d\n', CURRENTSET); 
 %	return;
-%end;
+%end
 
 return;
 

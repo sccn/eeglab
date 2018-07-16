@@ -69,14 +69,14 @@ if ~isstruct(ALLEEG) % old calling format
     filename   = fullfile(EEG.filepath, EEG.filename(1:end-4));
     comporchan = varargin{1};
     options = {'measure', 'spec'};
-    if length(varargin) > 1, options = { options{:} 'freqlimits', varargin{2} }; end;
+    if length(varargin) > 1, options = { options{:} 'freqlimits', varargin{2} }; end
     if comporchan(1) > 0
         [datavals tmp xvals] = std_readfile(filename, 'components',comporchan, options{:});
     else
        [datavals tmp xvals] = std_readfile(filename, 'channels', comporchan, options{:});
-    end;
+    end
     STUDY    = datavals';
     specdata = xvals;
-end;
+end
 
 [STUDY, specdata, allfreqs] = std_readerp(STUDY, ALLEEG, 'datatype', 'spec', varargin{:});

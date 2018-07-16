@@ -236,7 +236,7 @@ if itcC | erspC | specC | erpC | scalpC
         end
         if ~scalpC
             fprintf('\n');
-        end;
+        end
 	end
 end
 

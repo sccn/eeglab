@@ -53,10 +53,10 @@ com = '';
 
 if isempty(EEG.event)
     error( [ 'No event. This function removes data' 10 'based on event latencies' ]);
-end;
+end
 if isempty(EEG.trials)
     error( [ 'This function only works with continuous data' ]);
-end;
+end
 if ~isfield(EEG.event, 'latency'),
     error( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
 end;    
@@ -94,22 +94,22 @@ if nargin < 3
               { 'style' 'popupmenu'  'string' 'Keep selected|Remove selected' } };
               
    result = inputgui( geometry, uilist, 'pophelp(''pop_rmdat'')', 'Remove data portions around events - pop_rmdat()');
-   if length(result) == 0 return; end;
+   if length(result) == 0 return; end
    
-   if strcmpi(result{1}, '[]'), result{1} = ''; end;
+   if strcmpi(result{1}, '[]'), result{1} = ''; end
    if ~isempty(result{1})
        if strcmpi(result{1}(1),'''')   % If event type appears to be in single-quotes, use comma
                                        % and single-quote as delimiter between event types. toby 2.24.2006
                                        % fixed Arnaud May 2006
             events = eval( [ '{' result{1} '}' ] );
        else events = parsetxt( result{1});
-       end;
+       end
    else events = {};
    end
    timelims = eval( [ '[' result{2} ']' ] );
    invertsel = result{3}-1;
  
-end;
+end
 
 tmpevent = EEG.event;
 
@@ -130,12 +130,12 @@ allinds = [];
 for index = 1:length(events)
     inds = strmatch(events{index},{ tmpevent.type }, 'exact');
     allinds = [allinds(:); inds(:) ]';
-end;
+end
 allinds = sort(allinds);
 if isempty(allinds)
     disp('No event found');
     return;
-end;
+end
 
 % compute time limits
 % -------------------
@@ -152,25 +152,25 @@ for bind = 1:length(allinds)
         diffbound = bndlattmp-evtlat;
         allneginds = find(diffbound < 0);
         allposinds = find(diffbound > 0);
-        if ~isempty(allneginds), evtbeg = bndlattmp(allneginds(1)); end;
+        if ~isempty(allneginds), evtbeg = bndlattmp(allneginds(1)); end
         if ~isempty(allposinds), evtend = bndlattmp(allposinds(1)); end;       
         fprintf('Boundary found: time limits for event %d reduced from %3.2f to %3.2f\n', allinds(bind), ...
             (evtbeg-evtlat)/EEG.srate, (evtend-evtlat)/EEG.srate);
     end
     if ~isempty(array) && evtbeg < array(end)
-        array(end) = evtend;
+        array(end) = evtend
     else
         array = [ array; evtbeg  evtend];
-    end;
-end;
+    end
+end
 array
 
-if ~isempty(array) && array(1) < 1, array(1) = 1; end;
-if ~isempty(array) && array(end) > EEG.pnts, array(end) = EEG.pnts; end;
+if ~isempty(array) && array(1) < 1, array(1) = 1; end
+if ~isempty(array) && array(end) > EEG.pnts, array(end) = EEG.pnts; end
 if isempty(array)
     disp('No event found');
     return;
-end;
+end
 
 if invertsel
     EEG = pop_select(EEG, 'notime', (array-1)/EEG.srate);

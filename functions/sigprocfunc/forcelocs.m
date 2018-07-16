@@ -64,7 +64,7 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
     if nargin < 1
         help forcelocs;
         return;
-    end;
+    end
     if nargin < 2
         geom = { [0.4 1 1 0.3] };
         uilist = { { 'style' 'text' 'string' 'X/Y value' 'tag' 'valstr' } ...
@@ -86,10 +86,10 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
                                        '[tmp1 tmp2] = pop_chansel({tmp3.labels}, ''selectionmode'', ''single'');' ...
                                        'if ~isempty(tmp1) set(findobj(gcbf, ''tag'', ''' tag '''), ''string'', tmp2); end;' ...
                                        'clear tmp1 tmp2;' ] } };
-        end;
+        end
         
         results = inputgui( geom, uilist, 'pophelp(''forcelocs'');', 'Force electrode location -- forcelocs()', chanlocs );
-        if length(results) == 0, return; end;
+        if length(results) == 0, return; end
         
         options = {};
         for index = 1:NENTRY
@@ -97,11 +97,11 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
             if ~isempty(results{tmpi})
                 tmpchans = parsetxt(results{tmpi+2});
                 options = { options{:},{ str2num(results{tmpi}) FIELDS{results{tmpi+1}} tmpchans{:} }};
-            end;
+            end
         end;    
     else 
         options = varargin;
-    end;
+    end
 
     % scan all locations
     % ------------------
@@ -122,9 +122,9 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
             
             for chanind = 1:length(chanlocs)
                 [chanlocs(chanind).X chanlocs(chanind).Z]= rotation(chanlocs(chanind).X, chanlocs(chanind).Z, rotangle);
-            end;
+            end
             chanlocs = convertlocs(chanlocs, 'cart2all');
-        end;
+        end
         
         % rotate Y-Z plane 
         % ----------------
@@ -136,11 +136,11 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
             
             for chanind = 1:length(chanlocs)
                 [chanlocs(chanind).Y chanlocs(chanind).Z]= rotation(chanlocs(chanind).Y, chanlocs(chanind).Z, rotangle);
-            end;
+            end
             chanlocs = convertlocs(chanlocs, 'cart2all');
-        end;
+        end
     
-    end;
+    end
         
 
 % get channel indices
@@ -150,7 +150,7 @@ function chanlist = getchans(chanliststr, channelnames);
     for index = 1:length(chanliststr)
         i = strmatch (lower(chanliststr{index}), channelnames, 'exact');
         chanlist  = [chanlist i];
-    end;
+    end
 
 % function rotate coordinates
 % ---------------------------

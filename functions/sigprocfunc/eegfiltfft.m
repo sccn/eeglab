@@ -48,19 +48,19 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
     
     if nargin < 4
         help eegfiltfft;
-    end;
+    end
     [chans frames] = size(data);
     if nargin < 5 | epochframes == 0
         epochframes = frames;
     end
     if nargin < 7
         revfilt = 0;
-    end;
+    end
     
     epochs = frames/epochframes;
     if epochs ~= round(epochs)
         error('Epochframes does not divide the total number of frames');
-    end;
+    end
     fv=reshape([0:epochframes-1]*fs/epochframes,epochframes,1); % Frequency vector for plotting    
     
     %figure;
@@ -74,12 +74,12 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
         [tmp idxl]=min(abs(fv-lowcut));  % Find the entry in fv closest to 5 kHz
     else
         idxl = 0;
-    end;
+    end
     if highcut ~= 0        
         [tmp idxh]=min(abs(fv-highcut));  % Find the entry in fv closest to 5 kHz    
     else 
         idxh = ceil(length(fv)/2);
-    end;
+    end
     
     % filter the data
     % ---------------
@@ -93,7 +93,7 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
                     X(end/2:end)=0;
                 else
                     X((end+1)/2:end)=0;
-                end;
+                end
             else
                 X(1:idxl)=complex(0);
                 X(end-idxl:end)=complex(0);

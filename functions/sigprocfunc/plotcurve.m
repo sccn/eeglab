@@ -57,7 +57,7 @@ function plotcurve( times, R, varargin);
 	if nargin < 2
         help plotcurve;
         return;
-	end;
+	end
 	g = finputcheck( varargin, { 'maskarray' ''        []       [];
                              'val2mask'      'real'    []           R;
                              'highlightmode' 'string'  { 'background','bottom' } 'background';
@@ -78,18 +78,18 @@ function plotcurve( times, R, varargin);
                              'plottopo'      'real'    []                        [];
                              'linewidth'     'real'    []                        2;
                              'marktimes'     'real'    []                        [] });
-   if ischar(g), error(g); end;
+   if ischar(g), error(g); end
   % keyboard;
    if isempty(g.colors), g.colors = { 'r' 'g' 'b' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
-                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' }; end;
-   if strcmpi(g.plotindiv, 'off'), g.plotmean = 'on'; end;
+                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' }; end
+   if strcmpi(g.plotindiv, 'off'), g.plotmean = 'on'; end
    
    if ~any(length(times) == size(R))
        try,
            R = reshape(R, length(times), length(R)/length(times))';
        catch, error('Size of time input and array input does not match');
-       end;
-   end;
+       end
+   end
 
    % regions of significance
    % -----------------------
@@ -108,30 +108,30 @@ function plotcurve( times, R, varargin);
                        else
                            Rregions(find((g.val2mask > repmat(g.maskarray(:,1),[1 length(times)])) ...
                              & (g.val2mask < repmat(g.maskarray(:,2),[1 length(times)])))) = 0;
-                       end;
+                       end
                case 1, Rregions  (find(g.val2mask < repmat(g.maskarray(:),[1 size(g.val2mask,2)]))) = 0;
            end; 
            Rregions = sum(Rregions,1);
-       end;
+       end
    else 
        Rregions = [];
    end
 
   % plotting
   % --------
-  if size(R,1) == length(times), R = R'; end;
+  if size(R,1) == length(times), R = R'; end
   if strcmpi(g.plotmean, 'on') | strcmpi(g.plotindiv, 'off')
       if strcmpi(g.plotindiv, 'on')
           R = [ R; mean(R,1) ];
       else
           R = mean(R,1);
-      end;
-  end;
+      end
+  end
   ax = gca;
   if ~isempty(g.maskarray) & strcmpi(g.highlightmode, 'bottom')
       pos = get(gca, 'position');
       set(gca, 'position', [ pos(1)+pos(3)*0.1 pos(2)+pos(4)*0.1 pos(3)*0.9 pos(4)*0.85 ]);
-  end;
+  end
   
   % plot topographies
   % -----------------
@@ -146,11 +146,11 @@ function plotcurve( times, R, varargin);
           topoplot(g.plottopo(index,:), g.chanlocs);
           if ~isempty(g.plottopotitle)
               title(g.plottopotitle{index}, 'interpreter', 'none');
-          end;
-      end;
+          end
+      end
       
       axes(tmpax);
-  end;
+  end
       
   for ind = 1:size(R,1)
       if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
@@ -158,7 +158,7 @@ function plotcurve( times, R, varargin);
       elseif ~isempty(g.colors),
            tmp = plot(times,R(ind,:), 'k'); 
            tmpcol = g.colors{mod(ind-1, length(g.colors))+1};
-           if length(tmpcol) > 1, tmpstyle = tmpcol(2:end); tmpcol = tmpcol(1); else tmpstyle = '-'; end;
+           if length(tmpcol) > 1, tmpstyle = tmpcol(2:end); tmpcol = tmpcol(1); else tmpstyle = '-'; end
            set(tmp, 'color', tmpcol, 'linestyle', tmpstyle); 
            
            if ~isempty(g.traceinfo)
@@ -169,9 +169,9 @@ function plotcurve( times, R, varargin);
                        set(tmp, 'ButtonDownFcn', g.traceinfo{ind});
                    catch,
                        error('Trace info cell array does not contain the same number of element as trace in the graph')
-                   end;
-               end;
-           end;
+                   end
+               end
+           end
            
            % change the line style when number of plots exceed number of colors in g.colors
            %lineStyles = {'-', '--',':','-.'};
@@ -179,8 +179,8 @@ function plotcurve( times, R, varargin);
           
            hold on;
       else plot(times,R(ind,:));
-      end;
-  end;
+      end
+  end
   
   % ordinate limits
   % ---------------
@@ -189,8 +189,8 @@ function plotcurve( times, R, varargin);
       ylh = max(reshape(R, [1 prod(size(R))]));
       yll2 = yll - (ylh-yll)/10;
       ylh2 = ylh + (ylh-yll)/10;
-      if ~isnan(yll), g.ylim = [yll2 ylh2]; end;
-  end;
+      if ~isnan(yll), g.ylim = [yll2 ylh2]; end
+  end
   if ~isempty(g.ylim) & length(g.ylim) == 2 
       if any(g.ylim)
           ylim(g.ylim);
@@ -198,7 +198,7 @@ function plotcurve( times, R, varargin);
           ylim([0 1]);
           axis off;
           box off;
-      end;
+      end
   elseif ~isempty(g.ylim)
       yl = ylim;
       ylim([g.ylim yl(2)]);
@@ -219,16 +219,16 @@ function plotcurve( times, R, varargin);
           elseif ~isempty(g.colors),             
               tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind-1, length(g.colors))+1} ); hold on;
           else plot(times,R(ind,:));
-          end;
-      end;
-      if strcmpi(g.highlightmode, 'bottom'), xlabel(''); set(ax, 'xtick', []); end;
-  end;
+          end
+      end
+      if strcmpi(g.highlightmode, 'bottom'), xlabel(''); set(ax, 'xtick', []); end
+  end
   box on;
   
   ylim(yl);
   if strcmpi(g.logpval, 'on')
       set(gca, 'ytickmode', 'manual', 'yticklabel', round(10.^-get(gca, 'ytick')*1000)/1000, 'ydir', 'reverse');
-  end;
+  end
   
   % vertical lines
   % --------------
@@ -243,8 +243,8 @@ function plotcurve( times, R, varargin);
   if ~isempty(g.vert)
       for index = 1:length(g.vert)
           line([g.vert(index), g.vert(index)], [yl(1) yl(2)], 'linewidth', 1, 'color', 'm');
-      end;
-  end;
+      end
+  end
   xlim([times(1) times(end)]);
 
   % title and legend
@@ -264,12 +264,12 @@ function plotcurve( times, R, varargin);
       if ~isempty(g.legend)
           hh = legend(g.legend(:), 'location', 'southeast');
           set(hh, 'unit', 'pixels', 'interpreter', 'none')
-      end;
+      end
       if isempty(g.maskarray)
           xlabel(g.xlabel);
-      end;
+      end
       ylabel(g.ylabel)
-  end;
+  end
   
 % -----------------
 % highlight regions
@@ -295,7 +295,7 @@ if ~strcmpi(highlightmode, 'background')
 else
     axsignif = [];
     xlabel(myxlabel);
-end;
+end
 
 if ~isempty(regions)
     axes(ax);
@@ -304,7 +304,7 @@ if ~isempty(regions)
         if regions(index) & ~in_a_region
             tmpreg(1) = times(index);
             in_a_region = 1;
-        end;
+        end
         if (~regions(index) | index == length(regions)) & in_a_region
             tmpreg(2) = times(min(length(times), index));
             in_a_region = 0;
@@ -319,11 +319,11 @@ if ~isempty(regions)
                     [yl2(1) yl2(1) yl2(2) yl2(2)], color2); hold on;
                 set(tmph, 'edgecolor', color2);
                 axes(oldax);
-            end;
-        end;
-    end;
+            end
+        end
+    end
     ylim(yl);
-end;
+end
   
 
   function res = dims(array)

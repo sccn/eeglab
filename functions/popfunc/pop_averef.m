@@ -36,7 +36,7 @@ if nargin < 1
 end;   
 if isempty(EEG.data)
     error('Pop_averef: cannot process empty data');
-end;
+end
 
 if nargin < 2 | confirm == 1
     % which set to save
@@ -46,9 +46,9 @@ if nargin < 2 | confirm == 1
 	        'Average reference confirmation -- pop_averef()', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', return;
-	 end;
+	 end
 	 confirm = 0;
-end;
+end
 
 EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
 if ~isempty(EEG.icaweights)
@@ -57,10 +57,10 @@ if ~isempty(EEG.icaweights)
 	EEG.icawinv = [];
 	if size(EEG.icaweights,1) > EEG.nbchan
 		disp('Warning: one or more channels may have been removed; component weight re-referencing may be inaccurate'); 
-	end;
+	end
 	if size(EEG.icasphere,1) <  EEG.nbchan
 		disp('Warning: one or more components may have been removed; component weight re-referencing could be inaccurate'); 
-	end;
+	end
 else
 	EEG.data = averef(EEG.data);
 end;	

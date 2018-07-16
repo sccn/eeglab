@@ -49,7 +49,7 @@ if ~isempty(cache)
     allHashCodes = { cache.hashcode };
     maxlen       = max(max(cellfun(@length, allHashCodes)), length(hashcode));
     ind = find(strncmp(hashcode, allHashCodes, maxlen));
-end;
+end
     
 if isempty(ind)
     if nargin > 2
@@ -59,10 +59,10 @@ if isempty(ind)
         % make sure the cache is not too large
         while getfield(whos('cache'), 'bytes') > option_cachesize*1000000
             cache(1) = [];
-        end;
+        end
     else
         data = [];
-    end;
+    end
 else
     data = cache(ind).data;
-end;
+end

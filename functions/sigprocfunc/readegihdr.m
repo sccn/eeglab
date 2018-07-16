@@ -52,7 +52,7 @@ function head = readegihdr(fid,forceversion)
 if nargin < 1
     help readegihdr;
     return;
-end;
+end
     
 head.version = fread(fid,1,'integer*4');
 if exist('forceversion')
@@ -61,7 +61,7 @@ end
 
 if ~( head.version >= 2 & head.version <= 7 ),
         error('EGI Simple Binary Versions 2-7 supported only.');
-end;
+end
 
 year = fread(fid,1,'integer*2');
 month = fread(fid,1,'integer*2');

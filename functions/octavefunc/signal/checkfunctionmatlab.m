@@ -18,5 +18,5 @@ if ismatlab
     else
         addpath(genpath(octavefolder));
         warning([ toolbox ' toolbox is absent or not in the path, using replacement functions' ]);
-    end;
-end;
+    end
+end

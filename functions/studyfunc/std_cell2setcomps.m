@@ -33,7 +33,7 @@ else
     tmpstruct  = [];
     sets       = setinds;
     inds       = allinds;
-end;
+end
 
 % initialize flag array
 % ---------------------
@@ -41,8 +41,8 @@ flag = cell(size(inds));
 for i = 1:size(inds,1)
     for j = 1:size(inds,2)
         flag{i,j} = zeros(size(inds{i,j}));
-    end;
-end;
+    end
+end
 
 % find datasets with common ICA decompositions
 clusters = std_findsameica(ALLEEG);
@@ -57,7 +57,7 @@ for i = 1:size(inds,1)
                 
                 % found one good component
                 complist(count) = inds{i,j}(ind);
-                %if complist(count) == 12, dfds; end;
+                %if complist(count) == 12, dfds; end
                 
                 % search for the same component in other datasets
                 for c = 1:length(clusters)
@@ -71,18 +71,18 @@ for i = 1:size(inds,1)
                                 for ind2 = 1:length(sets{i2,j2})
                                     if any(sets{i2,j2}(ind2) == clusters{c}) && complist(count) == inds{i2, j2}(ind2)
                                         flag{i2,j2}(ind2) = 1;
-                                    end;
-                                end;
-                            end;
-                        end;
-                    end;
-                end;
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
                 
                 count = count+1;
                 
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 tmpstruct.sets  = setlist;
 tmpstruct.comps = complist;

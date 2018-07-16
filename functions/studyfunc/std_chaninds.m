@@ -42,16 +42,16 @@ function finalinds = std_chaninds(instruct, channames);
         tmpallchans = lower({ instruct.changrp.name });
     else
         tmpallchans = instruct;
-    end;
-    if ~iscell(channames), channames = { channames }; end;
+    end
+    if ~iscell(channames), channames = { channames }; end
     
-    if isempty(channames), finalinds = [1:length(tmpallchans)]; return; end;
+    if isempty(channames), finalinds = [1:length(tmpallchans)]; return; end
     for c = 1:length(channames)
         if isnumeric(channames)
             chanind = channames(c);
         else
             chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
-            if isempty(chanind), warning(sprintf([ 'Channel "%s" and maybe others was not' 10 'found in pre-computed data file' ], channames{c})); end;
-        end;
+            if isempty(chanind), warning(sprintf([ 'Channel "%s" and maybe others was not' 10 'found in pre-computed data file' ], channames{c})); end
+        end
         finalinds   = [ finalinds chanind ];
-    end;
+    end

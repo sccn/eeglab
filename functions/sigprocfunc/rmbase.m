@@ -39,10 +39,10 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 
 	if nargin<3,
 		basevector =0;
-	end;
+	end
     if isempty(basevector)
 		basevector =0;
-	end;
+	end
     if length(basevector) == 1 & basevector(1) ~= 0
        fprintf('rmbase(): basevector should be a vector of frame indices.\n');
        return
@@ -55,10 +55,10 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 
 	if nargin < 2,
 		frames = 0;
-	end;
+	end
     if isempty(frames)
 		frames =0;
-	end;
+	end
 	if nargin<1,
 		help rmbase;
 		fprintf('rmbase(): needs at least one argument.\n\n');
@@ -78,14 +78,14 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 	[chans framestot]= size(data);
 	if frames ==0,
 		frames = framestot;
-	end;
+	end
     epochs = fix(framestot/frames);
 
 	if length(basevector)>framestot,
 		fprintf('rmbase(): length(basevector) > frames per epoch.\n\n');
 		help rmbase;
 		return
-	end;
+	end
 
     datamean = zeros(chans,epochs);
     % fprintf('removing epoch means for %d epochs\n',epochs);
@@ -100,11 +100,11 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
                    %if e==1
                    %    fprintf('rmbase(): whole-data channel means removed. \n\n');
                    %end
-            end;
+            end
             datamean(c,e) = rmeans;
             dataout(c,(e-1)*frames+1:e*frames) = data(c,(e-1)*frames+1:e*frames) - rmeans;
-        end;
-    end;
+        end
+    end
 
     dataout = reshape(dataout, oridims);
     

@@ -66,7 +66,7 @@ g = finputcheck(varargin, { 'artcomps'   'integer'    []         [];
                             'chans'      'integer'    []         [];
                             'fraction'   'real'       []         1;
                             'plot'       'string'     { 'on';'off';'def' } 'def' }, 'eeg_pvaf');
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 numcomps = size(EEG.icaact,1);
 if round(g.fraction*EEG.pnts*EEG.trials)<1
@@ -76,14 +76,14 @@ end
 if strcmpi(g.plot, 'def')
     if nargout > 0, g.plot = 'on';
     else            g.plot = 'off';
-    end;
+    end
 end 
 
 numchans = EEG.nbchan;
 chans = 1:numchans;
 if ~isempty(g.chans)
     g.omitchans = setdiff_bc([1:EEG.nbchan], g.chans);
-end;
+end
 if ~isempty(g.omitchans)
  if max(g.omitchans)>numchans
   help eeg_pvaf
@@ -222,7 +222,7 @@ elseif strcmpi(g.plot, 'on')
    end
    if length(chanlocs) > 1
        topoplot(pvafs',chanlocs);  % plot pvaf here
-   end;
+   end
    
    if length(comps)>5        % add text legend
      if length(g.artcomps)>3
@@ -262,7 +262,7 @@ elseif strcmpi(g.plot, 'on')
       maxc=max(pvafs)
    else 
       maxc=100; 
-   end;
+   end
 
    pvstr=sprintf('Total pvaf: %3.1f%%',pvaf);
    tx=text(-0.9,-0.6,pvstr);

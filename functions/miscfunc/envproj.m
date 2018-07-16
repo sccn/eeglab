@@ -119,20 +119,20 @@ end
 %
 if chanlist == 0,
     chanlist = [1:chans];
-end;
+end
 if compnums == 0,
     compnums = [1:wr];
-end;
+end
 if size(compnums,1)>1,        % handle column of compnums !
     compnums = compnums';
-end;
+end
 numcomps = length(compnums);
 if numcomps > MAXENVPLOTCHANS,
     fprintf(...
 'envproj(): cannot plot more than %d channels of data at once.\n',...
                   MAXENVPLOTCHANS);
     return
-end;
+end
 
 if max(compnums)>wr
  fprintf('\nenvproj(): Component index %d out of bounds (1:%d).\n',...
@@ -163,22 +163,22 @@ end
         fprintf( ...
  'envproj(): limits should be 0 or an array [xmin xmax ymin ymax].\n');
         return
-      end;
+      end
         if limits(1,1) == 0 & limits(1,2) ==0,
             xmin=0;
             xmax=0;
         else
             xmin = limits(1,1);
             xmax = limits(1,2);
-        end;
+        end
          if limits(1,3) == 0 & limits(1,4) ==0,
             ymin=0;
             ymax=0;
         else
             ymin = limits(1,3);
             ymax = limits(1,4);
-        end;
-  end;
+        end
+  end
 
   if xmax == 0 & xmin == 0,
     x = (0:1:frames-1);
@@ -187,7 +187,7 @@ end
   else
     dx = (xmax-xmin)/(frames-1);
     x=xmin*ones(1,frames)+dx*(0:frames-1); % construct x-values
-  end;
+  end
 
   if ymax == 0 & ymin == 0,
     ymax=max(max(data(chanlist,:)));
@@ -213,10 +213,10 @@ end
             for j=1:c
                 if colors(i,j)=='.',
                     colors(i,j)=' ';
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end
 [rr cc] = size(colors);
 
 %
@@ -241,7 +241,7 @@ for c=compnums,            % for each component
                  % append envelope of projected data sets onto envdata
   % Note: size(envdata) = [length(chanlist)  frames*(numcomps+1)]
   n = n+1;
-end;
+end
 fprintf('\n');
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

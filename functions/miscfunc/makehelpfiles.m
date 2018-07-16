@@ -41,20 +41,20 @@ function makehelpfiles( varargin );
 if nargin < 1
     help makehelpfiles;
     return;
-end;
+end
     
 opt = finputcheck( varargin,  { 'folder'     'string'   { }  '';
                                 'outputfile' 'string'   { }  '';
                                 'title'      'string'   { }  '' }, 'makehelpfiles');
-if ischar(opt), error(opt); end;
-if isempty(opt.folder),     error('You need to specify a folder'); end;
-if isempty(opt.outputfile), error('You need to specify an output file'); end;
+if ischar(opt), error(opt); end
+if isempty(opt.folder),     error('You need to specify a folder'); end
+if isempty(opt.outputfile), error('You need to specify an output file'); end
 
 fo = fopen( opt.outputfile, 'w');
 if ~isempty(opt.title)
      fprintf(fo, '%%%s (%s folder):\n', opt.title, opt.folder);
 else fprintf(fo, '%% *Content of %s folder:*\n', opt.folder);
-end;
+end
 dirContent = dir(fullfile(opt.folder, '*.m'));
 dirContent = { dirContent.name };
 for iFile = 1:length(dirContent)
@@ -65,7 +65,7 @@ for iFile = 1:length(dirContent)
     % get help from the first line
     if isempty(firstLine) || firstLine(1) ~= '%'
         firstLine = fgetl(fidTmp);
-    end;
+    end
     fclose(fidTmp);
         
     if isempty(firstLine) || firstLine(1) ~= '%'
@@ -75,16 +75,16 @@ for iFile = 1:length(dirContent)
         if ~isempty(indexMinus)
              firstLineText = deblank(firstLine(indexMinus(1)+1:end));
         else firstLineText = deblank(firstLine(2:end));
-        end;
-        if isempty(firstLineText), firstLineText = 'No help information'; end;
-        if firstLineText(1) == ' ', firstLineText(1) = []; end;
-        if firstLineText(1) == ' ', firstLineText(1) = []; end;
-        if firstLineText(1) == ' ', firstLineText(1) = []; end;
+        end
+        if isempty(firstLineText), firstLineText = 'No help information'; end
+        if firstLineText(1) == ' ', firstLineText(1) = []; end
+        if firstLineText(1) == ' ', firstLineText(1) = []; end
+        if firstLineText(1) == ' ', firstLineText(1) = []; end
         firstLineText(1) = upper(firstLineText(1));
-        if firstLineText(end) ~= '.', firstLineText = [ firstLineText '...' ]; end;
-    end;
+        if firstLineText(end) ~= '.', firstLineText = [ firstLineText '...' ]; end
+    end
     
     refFunction = sprintf('<a href="matlab:helpwin %s">%s</a>', fileName(1:end-2), fileName(1:end-2));
     fprintf(fo, '%%  %-*s - %s\n', 50+length(fileName(1:end-2)), refFunction, firstLineText);
-end;
+end
 fclose( fo );

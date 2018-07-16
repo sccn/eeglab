@@ -45,7 +45,7 @@ if nargin < 1
    %filename = 'chan32.locs';
    %filepath = 'c:\eeglab\eeglab4.0\';
    drawnow;
-   if filename == 0 return; end;
+   if filename == 0 return; end
    filename = [filepath filename];
    tmpfile = loadtxt(filename);
    nbcols = cellfun('isempty', tmpfile(end,:));
@@ -63,7 +63,7 @@ if nargin < 1
 		 case 'elp', filetype = 'polhemus';
 		 case 'eps', filetype = 'besa';
 		 otherwise, filetype =  ''; 
-   end;
+   end
    indexfiletype = strmatch(filetype, listtype, 'exact'); 
    
    % convert format info
@@ -77,15 +77,15 @@ if nargin < 1
            for index2 = 1:length(formatinfo{index})
                indexformat = strmatch(formatinfo{index}{index2}, listcolformat, 'exact');
                indexlist(count, index2) = indexformat;
-           end;
+           end
            if isempty(formatskipcell{index}), formatskip(count) = 0; 
            else                               formatskip(count) = formatskipcell{index}; 
-           end;
+           end
            count = count+1;
        else
            rmindex = [ rmindex index ];
-       end;
-   end;
+       end
+   end
    listtype(rmindex) = [];
    listtype  (end+1) = { 'custom' };
    formatskip(end+1) = 0;
@@ -134,15 +134,15 @@ if nargin < 1
    % --------------
    for index = 1:length(nbcols)
       listui{end+1} = { 'style' 'text' 'string' [ 'column ' int2str(index) ] };
-   end;
+   end
    for index = 1:length(nbcols)
       listui{end+1} = { 'style' 'listbox' 'tag' [ 'col' int2str(index) ] 'string' ...
             strvcat(listcolformat{:}) };
-   end;
+   end
    for index = 1:length(nbcols)
       listui{end+1} = { 'style' 'text' 'string' formatstr(tmpfile(1:min(10, size(tmpfile,1)),index)) ...
             'tag' ['text' int2str(index) ] 'userdata' formatstr(tmpfile(:,index)) };      
-   end;
+   end
    listui = { listui{:} ...
          {} ...
          { 'style' 'pushbutton' 'string' 'Cancel', 'callback', 'close gcbf;' } ...
@@ -161,7 +161,7 @@ if nargin < 1
    cont = 1;
    while cont
       waitfor( findobj('parent', fig, 'tag', 'Import'), 'userdata');
-      if isempty( findobj('parent', fig, 'tag', 'Import') ), return; end;
+      if isempty( findobj('parent', fig, 'tag', 'Import') ), return; end
       
    	% decode inputs
    	% -------------
@@ -173,7 +173,7 @@ if nargin < 1
       	tmpobj = findobj(fig, 'tag', [ 'col' int2str(tmpindex) ]);
       	tmpcolstr{tmpindex} = get(tmpobj, 'string');
       	tmpcolstr{tmpindex} = deblank(tmpcolstr{tmpindex}(get(tmpobj,'value'),:));
-   	end;
+   	end
    
    	% take appropriate measures
    	% -------------------------
@@ -186,11 +186,11 @@ if nargin < 1
          	figure; topoplot([],tmplocs, 'style', 'blank', 'electrodes', 'labelpoint');
          catch,
             errordlg2(strvcat('Error while importing locations:', lasterr), 'Error');
-         end;
+         end
       else 
       	cont = 0;   
-      end;
-   end;
+      end
+   end
    close(fig);
    
    % importing files
@@ -200,7 +200,7 @@ if nargin < 1
    
 else 
 	tmplocs = readlocs( filename, varargin{:});	   
-end;
+end
 
 command = sprintf('EEG.chanlocs = pop_readlocs(''%s'', %s);', filename, vararg2str(varargin)); 
 return;
@@ -212,7 +212,7 @@ for index1 = 1:size(celltxt,1)
    alltxt{index1} = '';
    for index2 = 1:size(celltxt,2)
       alltxt{index1} = sprintf('%s\t%s', alltxt{index1}, num2str(celltxt{index1,index2}));
-   end;
+   end
    alltxt{index1} = sprintf(alltxt{index1}, '%s\n', alltxt{index1});
-end;
+end
 alltxt = strvcat( alltxt{:});

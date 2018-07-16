@@ -32,21 +32,21 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
     if nargin < 2
         help fillcurves;
         return;
-    end;
+    end
     
     if nargin < 3
         Y2 = Y1;
         Y1 = X;
         X = [1:length(Y1)];
-    end;
+    end
     if nargin < 4 || isempty(color)
         color = { 'r' 'b' 'g' 'c' };
     elseif ~iscell(color)
         color = { color };
-    end;
+    end
     if nargin < 5
         transparent = 0.5;
-    end;
+    end
     X1 = X(:)';
     X2 = X(:)';
     
@@ -62,7 +62,7 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
         tmp2 = find(~Y2);
         Y1(tmp1) = []; X1(tmp1) = [];
         Y2(tmp2) = []; X2(tmp2) = [];
-    end;
+    end
     
     % multiple curve plot
     % -------------------
@@ -70,7 +70,7 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
         for index = 1:size(Y1,2)
             fillcurves(X, Y1(:,index)', Y2(:,index)', color{index}, transparent);
             hold on;
-        end;
+        end
         yl = ylim;
         xl = xlim;
         line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
@@ -86,11 +86,11 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
                 if isfield(fields, 'FaceAlpha');
                     numfaces = size(get(hh(index), 'Vertices'),1);
                     set(hh(index), 'FaceVertexCData', repmat([1 1 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', transparent, 'edgecolor', 'none');
-                end;
-            end;
-        end;
+                end
+            end
+        end
         return;
-    end;
+    end
     
     % plot
     % ----
@@ -102,7 +102,7 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
     if transparent
         numfaces = size(get(h, 'Vertices'),1);
         set(h, 'FaceVertexCData', repmat([1 1 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', transparent, 'edgecolor', 'none');
-    end;
+    end
 
     % replot lines at boundaries
     % --------------------------
@@ -112,4 +112,4 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
         xl = xlim;
         line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
         line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
-    end;
+    end

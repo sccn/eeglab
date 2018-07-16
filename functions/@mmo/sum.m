@@ -22,7 +22,7 @@ function sumval = sum(obj,dim)
     
     if nargin < 2
         dim = 1;
-    end;
+    end
     
     s1  = size(obj);
     ss.type = '()';
@@ -32,5 +32,5 @@ function sumval = sum(obj,dim)
         if index == 1
              sumval = subsref(obj, ss);
         else sumval = sumval + subsref(obj, ss);
-        end;
-    end;
+        end
+    end

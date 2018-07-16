@@ -42,29 +42,29 @@ function EEG = biosig2eeglab(dat, DAT, interval, channels, importevent);
 if nargin < 2
     help biosig2eeglab;
     return;
-end;
+end
 if nargin < 3
     interval = [];
-end;
+end
 if nargin < 4
     channels = [];
-end;
+end
 if nargin < 5
     importevent = 0;
-end;
+end
 
 % import data
 % -----------
 if abs(dat.NS - size(DAT,1)) > 1
     DAT = DAT';
-end;
+end
 EEG = eeg_emptyset;
 
 % convert to seconds for sread
 % ----------------------------
 if max(dat.InChanSelect) > size(DAT,1)
     dat.InChanSelect = [1:size(DAT,1)];
-end;
+end
 EEG.nbchan          = length(dat.InChanSelect); %= size(DAT,1);
 EEG.srate           = dat.SampleRate(1);
 EEG.data            = DAT(dat.InChanSelect,:);  %DAT
@@ -92,8 +92,8 @@ if isfield(dat, 'Label') & ~isempty(dat.Label)
     else
         % EEG.chanlocs = struct('labels', dat.Label(1:min(length(dat.Label), size(EEG.data,1))));
         EEG.chanlocs = struct('labels', dat.Label(dat.InChanSelect)); % sjo added 120907 to avoid error below % 5/8/2104 insert (dat.InChanSelect) Ramon
-    end;
-    if length(EEG.chanlocs) > EEG.nbchan, EEG.chanlocs = EEG.chanlocs(1:EEG.nbchan); end;
+    end
+    if length(EEG.chanlocs) > EEG.nbchan, EEG.chanlocs = EEG.chanlocs(1:EEG.nbchan); end
 end
 EEG = eeg_checkset(EEG);
 
@@ -107,8 +107,8 @@ EEG.event = [];
 %     if EEG.data(end,p) > EEG.data(end,p-1) & EEG.data(end,p) >= EEG.data(end,p+1)
 %         EEG.event(end+1).latency =  p;
 %         EEG.event(end).type = bitand(double(EEG.data(end,p)-startval),255);
-%     end;
-% end;
+%     end
+% end
 
 % lastout = mod(EEG.data(end,1),256);newevs = []; % andrey's code 8 bits
 % codeout = mod(EEG.data(end,2),256);
@@ -118,10 +118,10 @@ EEG.event = [];
 %         newevs = [newevs codeout];
 %         EEG.event(end+1).latency =  p;
 %         EEG.event(end).type = codeout;
-%     end;
+%     end
 %     lastout = codeout;
 %     codeout = nextcode;
-% end;
+% end
 
 %lastout = mod(EEG.data(end,1),256*256);newevs = []; % andrey's code 16 bits
 %codeout = mod(EEG.data(end,2),256*256);
@@ -131,10 +131,10 @@ EEG.event = [];
 %        newevs = [newevs codeout];
 %        EEG.event(end+1).latency =  p;
 %        EEG.event(end).type = codeout;
-%    end;
+%    end
 %    lastout = codeout;
 %    codeout = nextcode;
-%end;
+%end
 
 % if strcmp(dat.TYPE,'EDF') % sjo added 120907
 %     disp('filetype EDF does not support events');
@@ -145,11 +145,11 @@ if importevent
     if isfield(dat, 'BDF')
         if dat.BDF.Status.Channel <= size(EEG.data,1)
             EEG.data(dat.BDF.Status.Channel,:) = [];
-        end;
+        end
         EEG.nbchan = size(EEG.data,1);
         if ~isempty(EEG.chanlocs) && dat.BDF.Status.Channel <= length(EEG.chanlocs)
             EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
-        end;
+        end
     elseif isempty(dat.EVENT.POS)
         disp('Extracting events from last EEG channel...');
         %Modifieded by Andrey (Aug.5,2008) to detect all non-zero codes: 
@@ -165,27 +165,27 @@ if importevent
                 if (thiscode ~= 0) && (thiscode~=prevcode) 
                     EEG.event(end+1).latency =  p;
                     EEG.event(end).type = thiscode;
-                end;
-            end;
+                end
+            end
             EEG.data(end,:) = [];
             EEG.chanlocs(end) = [];
-        end;
+        end
         % recreate the epoch field if necessary
         % -------------------------------------
         if EEG.trials > 1
             for i = 1:length(EEG.event)
                 EEG.event(i).epoch = ceil(EEG.event(i).latency/EEG.pnts);
-            end;
-        end;
+            end
+        end
         EEG = eeg_checkset(EEG, 'eventconsistency');
-    end;
+    end
 
     if ~isempty(dat.EVENT.POS)    
         if isfield(dat, 'out') % Alois fix for event interval does not work
             if isfield(dat.out, 'EVENT')
                 dat.EVENT = dat.out.EVENT;
-            end;
-        end;
+            end
+        end
         EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
 
         % recreate the epoch field if necessary
@@ -193,15 +193,15 @@ if importevent
         if EEG.trials > 1
             for i = 1:length(EEG.event)
                 EEG.event(i).epoch = ceil(EEG.event(i).latency/EEG.pnts);
-            end;
-        end;
+            end
+        end
 
         EEG = eeg_checkset(EEG, 'eventconsistency');
     elseif isempty(EEG.event) 
         disp('Warning: no event found. Events might be embeded in a data channel.');
         disp('         To extract events, use menu File > Import Event Info > From data channel');
-    end;
-end;
+    end
+end
 
 % convert data to single if necessary
 % -----------------------------------

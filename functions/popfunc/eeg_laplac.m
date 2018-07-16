@@ -19,7 +19,7 @@
 %
 % Author: Juan Sebastian Gonzalez, DFI / Universidad de Chile
 % 
-% Message from Jürgen Kayser, one of the main author of the CSD (Current
+% Message from Jrgen Kayser, one of the main author of the CSD (Current
 % Source Density) toolbox: "I do not find any differences between his Laplacian 
 % solution and our CSD transform (i.e., apart from the lack of a smoothing
 % constant, the choice of the m constant, and the specific spherical locations 
@@ -51,7 +51,7 @@ function [laplac, time] = eeg_laplac(EEG, paso)
 if nargin < 2
    help eeg_laplac;
    return;
-end;
+end
 
 tic
 n = length(EEG.data(:,1));

@@ -46,10 +46,10 @@ function [X, t, f] = std_readspecgram(ALLEEG, abset, comp, timerange, freqrange,
 
 if nargin < 4
     timerange = [];
-end;
+end
 if nargin < 5
     freqrange = [];
-end;
+end
     
 X = [];
 
@@ -65,8 +65,8 @@ if iscell(comp)
             error([ 'Channel ''' comp{index} ''' not found in dataset ' int2str(abset)]);
         else    
             chanind = [ chanind tmp ];
-        end;
-    end;
+        end
+    end
     filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'datspecgram']);
     prefix = 'chan';
     inds   = chanind;
@@ -78,7 +78,7 @@ else
     filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspecgram']);
     prefix = 'comp';
     inds   = comp;
-end;
+end
 
 for k=1:length(inds)
     try,
@@ -87,16 +87,16 @@ for k=1:length(inds)
         warning backtrace on;
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
-    end;
+    end
 
     tmpdat    = getfield(erpstruct, [ prefix int2str(inds(k)) ]);
     if k == 1
         X = zeros([size(tmpdat) length(comp)]);
-    end;
+    end
     X(:,:,k) = tmpdat;
     f        = getfield(erpstruct, 'freqs');
     t        = getfield(erpstruct, 'times');
-end;
+end
 
 % select frequency range of interest
 % ----------------------------------

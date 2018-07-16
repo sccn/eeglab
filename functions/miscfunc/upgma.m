@@ -28,25 +28,25 @@
 %   3/14/04 - changed 'suppress' flag to 'doplot'.
 
 function [topology,support] = upgma(dist,labels,doplot,fontsize)
-  if (nargin < 2) labels = []; end;
-  if (nargin < 3) doplot = []; end;
-  if (nargin < 4) fontsize = []; end;
+  if (nargin < 2) labels = []; end
+  if (nargin < 3) doplot = []; end
+  if (nargin < 4) fontsize = []; end
 
   suprt = 0;
-  if (nargout > 1) suprt = 1; end;
-  if (isempty(doplot)) doplot = 1; end;
+  if (nargout > 1) suprt = 1; end
+  if (isempty(doplot)) doplot = 1; end
 
   [n,p] = size(dist);
   if (n~=p | any(diag(dist)>eps))
     dist
     error('  UPGMA: input matrix is not a distance matrix.');
-  end;
+  end
 
   if (~isempty(labels))
     if (size(labels,1)~=n)
       error('  UPGMA: numbers of taxa and taxon labels do not match.');
-    end;
-  end;
+    end
+  end
 
   clstsize = ones(1,n);               % Number of elements in clusters/otus
   id = 1:n;                           % Cluster IDs
@@ -61,15 +61,15 @@ function [topology,support] = upgma(dist,labels,doplot,fontsize)
     k = 1;                              % Use first identified minimum
     while  (ii(k)>jj(k))                 %   for which i<j
       k = k+1;
-      if k > length(ii) ,keyboard;end;
-    end;
+      if k > length(ii) ,keyboard;end
+    end
     i = ii(k);
     j = jj(k);
     if (id(i)<id(j))
       topology(step,:) = [id(i) id(j) n+step min_dist];
     else
       topology(step,:) = [id(j) id(i) n+step min_dist];
-    end;
+    end
     id(i) = n+step;
     dist(i,j) = plug;
     dist(j,i) = plug;
@@ -85,16 +85,16 @@ function [topology,support] = upgma(dist,labels,doplot,fontsize)
         dist(i,k) = alpha_i * dist(i,k) + alpha_j * dist(j,k);
         dist(k,j) = plug;
         dist(j,k) = plug;
-      end;
-    end;
+      end
+    end
   end; % for step
 
   if (doplot)                         % Plot dendrogram
     dendplot(topology,labels,fontsize);
-  end;
+  end
 
   if (suprt)                          % Specify group membership at nodes
     support = clstsupt(topology);
-  end;
+  end
 
   return;

@@ -8,12 +8,12 @@ plugin = plugin_getweb('process', plugin);
 for iRow = 1:length(plugin)
     plugin(iRow).remove       = 0;
     plugin(iRow).reactivate   = 0;
-end;
+end
 
 if isempty(strmatch('deactivated', { plugin.status }, 'exact'))
     warndlg2('There are no deactivated plugins');
     return;
-end;
+end
 
 maxchar = 60;
 uilist =  { {} { 'style' 'text' 'string' '             List of deactivated plugins                                 ' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
@@ -33,7 +33,7 @@ for iRow = 1:length(plugin)
         description = plugin(iRow).description;
         if length(description) > maxchar+2
              description = [ description(1:min(maxchar,length(description))) '...' ];
-        end;
+        end
 
         cb = [ 'tmptag = get(gcbo, ''tag'');' ...
                'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
@@ -50,8 +50,8 @@ for iRow = 1:length(plugin)
         geom = { geom{:}, lineGeom };
         geomvert = [ geomvert 1];
         pluginIndices = [ pluginIndices iRow ];
-    end;
-end;
+    end
+end
 
 evalStr = [ 'uisettxt(gcf, ''reactivate''     , ''Reactivate'' , ''rotation'', 90, ''fontsize'', 14);' ...
             'uisettxt(gcf, ''remove1''        , ''Remove''     , ''rotation'', 90, ''fontsize'', 14);' ...
@@ -62,14 +62,14 @@ evalStr = [ 'uisettxt(gcf, ''reactivate''     , ''Reactivate'' , ''rotation'', 9
             'clear tmppos tmpobj;'];
 
 res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr);
-if isempty(res), return; end;
+if isempty(res), return; end
 
 % decode inputs
 % -------------
 for iRow = 1:length(pluginIndices)
     plugin(pluginIndices(iRow)).reactivate  = res{(iRow-1)*2+1};
     plugin(pluginIndices(iRow)).remove      = res{(iRow-1)*2+2};
-end;
+end
 
 % install plugins
 % ---------------
@@ -85,5 +85,5 @@ for iRow = 1:length(plugin)
         restartEeglabFlag = true;
         fprintf('Reactivating plugin %s\n', plugin(iRow).name);
         plugin_reactivate(plugin(iRow).foldername);
-    end;
-end;
+    end
+end

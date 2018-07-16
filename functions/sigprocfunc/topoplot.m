@@ -294,12 +294,12 @@ end
 % calling topoplot from Fieldtrip
 % -------------------------------
 fieldtrip = 0;
-if nargin < 2, loc_file = []; end;
-if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end;
-if ischar(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end;
+if nargin < 2, loc_file = []; end
+if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end
+if ischar(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end
 if fieldtrip
     error('Wrong calling format, are you trying to use the topoplot Fieldtrip function?');
-end;
+end
 
 nargs = nargin;
 if nargs == 1
@@ -397,12 +397,12 @@ if nargs > 2
                 NOSEDIR = Value;
                 if isempty(strmatch(lower(NOSEDIR), { '+x', '-x', '+y', '-y' }))
                     error('Invalid nose direction');
-                end;
+                end
             case 'chaninfo'
                 CHANINFO = Value;
-                if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end;
-                if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end;
-                if isfield(CHANINFO, 'plotrad') & isempty(plotrad), plotrad = CHANINFO.plotrad; end;
+                if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end
+                if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end
+                if isfield(CHANINFO, 'plotrad') & isempty(plotrad), plotrad = CHANINFO.plotrad; end
                 if isfield(CHANINFO, 'chantype')
                     chantype = CHANINFO.chantype;
                     if ischar(chantype), chantype = cellstr(chantype); end
@@ -562,7 +562,7 @@ if nargs > 2
                 if strcmpi(SHADING,'interp') && isempty(warningInterp)
                     warning('Using interpolated shading in scalp topographies prevent to export them as vectorized figures');
                     warningInterp = 1;
-                end;
+                end
             case 'noplot'
                 noplot = Value;
                 if ~ischar(noplot)
@@ -598,7 +598,7 @@ end
 
 if strcmpi(whitebk, 'on')
     BACKCOLOR = [ 1 1 1 ];
-end;
+end
 
 if isempty(find(strcmp(varargin,'colormap')))
     cmap = colormap(DEFAULT_COLORMAP);
@@ -613,8 +613,8 @@ if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
         ContourVals = zeros(1,length(loc_file));
         ContourVals(Values) = 1;
         Values = ContourVals;
-    end;
-end;
+    end
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
@@ -687,7 +687,7 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 %
 if ~isempty(plotchans)
     plotchans = intersect_bc(plotchans, indices);
-end;
+end
 if ~isempty(Values) & ~strcmpi( STYLE, 'blank') & isempty(plotchans)
     plotchans = indices;
 end
@@ -725,8 +725,8 @@ if isfield(CHANINFO, 'icachansind') & ~isempty(Values) & length(Values) ~= lengt
         tmpvals(CHANINFO.icachansind) = ContourVals;
         ContourVals = tmpvals;
         
-    end;
-end;
+    end
+end
 
 %
 %%%%%%%%%%%%%%%%%%% last channel is reference? %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -735,9 +735,9 @@ if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary
                                          % (common reference channel)
     if plotchans(end) == length(tmpeloc)
         plotchans(end) = [];
-    end;
+    end
 
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%% remove infinite and NaN values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -745,7 +745,7 @@ end;
 if length(Values) > 1
     inds          = union_bc(find(isnan(Values)), find(isinf(Values))); % NaN and Inf values
     plotchans     = setdiff_bc(plotchans, inds);
-end;
+end
 if strcmp(plotgrid,'on')
     plotchans = setxor(plotchans,gchans);   % remove grid chans from head plotchans   
 end
@@ -762,7 +762,7 @@ labels    = strvcat(labels); % make a label string matrix
 if ~isempty(Values) & length(Values) > 1
     Values      = Values(plotchans);
     ContourVals = ContourVals(plotchans);
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -779,7 +779,7 @@ if isempty(plotrad) & isfield(tmpeloc, 'plotrad'),
     if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
        fprintf('Plotting radius plotrad (%g) set from EEG.chanlocs.\n',plotrad);
     end
-end;
+end
 if isempty(plotrad) 
   plotrad = min(1.0,max(Rd)*1.02);            % default: just outside the outermost electrode location
   plotrad = max(plotrad,0.5);                 % default: plot out to the 0.5 head boundary
@@ -826,9 +826,9 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
                 fprintf('Automatically shrinking coordinates to lie above the head perimter.\n');
             else                
                 fprintf('Automatically shrinking coordinates by %3.2f\n', shrinkfactor);
-            end;
+            end
         end
-    end;
+    end
     
     if ischar(shrinkfactor)
         if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force') | strcmpi(shrinkfactor, 'auto')  
@@ -951,7 +951,7 @@ else
     elseif strcmpi(lower(NOSEDIR), '-x')
         rotate = pi;
     else rotate = pi/2;
-    end;
+    end
     allcoords = (inty + intx*sqrt(-1))*exp(sqrt(-1)*rotate);
     intx = imag(allcoords);
     inty = real(allcoords);
@@ -961,7 +961,7 @@ else
     allcoords = (y + x*sqrt(-1))*exp(sqrt(-1)*rotate);
     x = imag(allcoords);
     y = real(allcoords);
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -996,7 +996,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   catch,
       [Xi,Yi,Zi] = griddata(inty,intx,intValues',yi,xi'); % interpolate data (Octave)
       [Xi,Yi,ZiC] = griddata(inty,intx,intContourVals',yi,xi'); % interpolate data
-  end;
+  end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%%%%%
   %
@@ -1174,7 +1174,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
         handle = tmph;
-    end;
+    end
     
     warning off;
     if ~PMASKFLAG
@@ -1186,8 +1186,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         for indsubh = 1:length(subh)
             numfaces = size(get(subh(indsubh), 'XData'),1); 
             set(subh(indsubh), 'FaceVertexCData', ones(numfaces,3), 'Cdatamapping', 'direct', 'facealpha', 0.5, 'linewidth', 2);
-        end;
-    end;
+        end
+    end
     handle = tmph;                                   % surface handle
     for h=chs, set(h,'color',CCOLOR); end
     warning on;
@@ -1206,7 +1206,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
         handle = tmph;
-    end;
+    end
     handle = tmph;                                   % surface handle
   %
   %%%%%%%%%%%%%%%%%% Else fill contours with uniform colors  %%%%%%%%%%%%%%%%%%
@@ -1254,12 +1254,12 @@ else % if STYLE 'blank'
     text(-0.6,-0.7, [ 'Click on electrodes to toggle name/number']);
     tl = title('Channel locations');
     set(tl, 'fontweight', 'bold');
-  end;
+  end
 end % STYLE 'blank'
 
 if exist('handle') ~= 1
     handle = gca;
-end;
+end
 
 if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 
@@ -1282,7 +1282,7 @@ end
 if strcmp(CONVHULL,'on') %%%%%%%%% mask outside the convex hull of the electrodes %%%%%%%%%
   cnv = convhull(allx,ally);
   cnvfac = round(CIRCGRID/length(cnv)); % spline interpolate the convex hull
-  if cnvfac < 1, cnvfac=1; end;
+  if cnvfac < 1, cnvfac=1; end
   CIRCGRID = cnvfac*length(cnv);
 
   startangle = atan2(allx(cnv(1)),ally(cnv(1)));
@@ -1557,16 +1557,16 @@ try,
                     hp2 = disk(y(kk),x(kk),radius, [1 0 0], 0 , angleRatio, 16);
                     if angleRatio ~= 360
                         hp2 = disk(y(kk),x(kk),radius, [0 0 1], angleRatio, 360, 16);
-                    end;
+                    end
                 else
                     tmpcolor = COLORARRAY{max(1,min(Values(kk), length(COLORARRAY)))};
                     hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', tmpcolor, 'markersize', EMARKERSIZE1CHAN);
                     hp2 = disk(y(kk),x(kk),0.04, tmpcolor, 0, 360, 10);
-                end;
-            end;
+                end
+            end
         end
     end
-catch, end;
+catch, end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot dipole(s) on the scalp map  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1588,18 +1588,18 @@ if ~isempty(DIPOLE)
         DIPOLE(:,2) =  tmp(:,1);
         DIPOLE(:,3) = -tmp(:,4);
         DIPOLE(:,4) =  tmp(:,3);
-    end;
+    end
     for index = 1:size(DIPOLE,1)
         if ~any(DIPOLE(index,:))
              DIPOLE(index,:) = [];
         end
-    end;
+    end
     DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax*(rmax/plotrad); % scale radius from 1 -> rmax (0.5)
     DIPOLE(:,3:end) = (DIPOLE(:,3:end))*rmax/100000*(rmax/plotrad); 
     if strcmpi(DIPNORM, 'on')
         for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
-        end;
+        end
     elseif strcmpi(DIPNORMMAX, 'on')     
         for inorm =  1: size(DIPOLE,1)
             normtmp(inorm) = norm(DIPOLE(inorm,3:5)); % Max norm of projection on XY
@@ -1608,7 +1608,7 @@ if ~isempty(DIPOLE)
         for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:4))*0.2*normtmp(index)/normtmp(maxnormindx);
         end; 
-    end;
+    end
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
 
     PLOT_DIPOLE=1;
@@ -1631,9 +1631,9 @@ if ~isempty(DIPOLE)
         hh = line( [DIPOLE(index, 1) DIPOLE(index, 1)+DIPOLE(index, 3)]', ...
                    [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]',[10 10]);
         set(hh, 'color', DIPCOLOR, 'linewidth', DIPSCALE*30/7);
-      end;
-    end;
-end;
+      end
+    end
+end
 
 end % if ~ 'gridplot'
 
@@ -1653,13 +1653,13 @@ if strcmpi(DRAWAXIS, 'on')
     if round(real(coordend2))<0
          text( 5+round(real(coordend2))*1.2, 5+round(imag(coordend2))*1.2-2, '+Y');
     else text( 5+round(real(coordend2))*1.2, 5+round(imag(coordend2))*1.2, '+Y');
-    end;
+    end
     if round(real(coordend1))<0
          text( 5+round(real(coordend1))*1.2, 5+round(imag(coordend1))*1.2+1.5, '+X');
     else text( 5+round(real(coordend1))*1.2, 5+round(imag(coordend1))*1.2, '+X');
-    end;
+    end
     set(gca, 'xlim', [0 10], 'ylim', [0 10]);
-end;
+end
 
 %
 %%%%%%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%
@@ -1683,6 +1683,6 @@ function h2 = disk(X, Y, radius, colorfill, oriangle, endangle, segments)
          h2 = patch( [X   + cos(A)*radius(1)], [Y   + sin(A)*radius(end)], zeros(1,segments)+3, colorfill);
     else A  = linspace(oriangle/180*pi, endangle/180*pi, segments-1);
          h2 = patch( [X X + cos(A)*radius(1)], [Y Y + sin(A)*radius(end)], zeros(1,segments)+3, colorfill);
-    end;
+    end
     set(h2, 'FaceColor', colorfill);
 	set(h2, 'EdgeColor', 'none'); 

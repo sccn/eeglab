@@ -54,7 +54,7 @@ function [power, freqs] = spec(X, nfft, fs, win, overlap);
 if nargin < 1
     help spec;
     return;
-end;
+end
 
 % default parameters
 % ------------------
@@ -62,31 +62,31 @@ if nargin < 2
     nfft = 256;
 else 
     nfft = pow2(nextpow2(nfft));
-end;
+end
 nfft = min(length(X), nfft);
 if nargin < 3
     fs = 2;
-end;
+end
 if nargin < 4
     win = nfft;
 else 
     win = pow2(nextpow2(win));
-end;
+end
 if win > length(X)
     win = length(X);
-end;
+end
 if log2(win) ~= round(log2(win))
     win = pow2(floor(log2(win)));
-end;
+end
 if nargin < 5
     overlap = 0;
-end;
+end
 
 % compute corresponding parameters for timef
 % ------------------------------------------
 padratio = pow2(nextpow2(nfft/win));
 timesout = floor(length(X)/(win-overlap));
-if timesout <= 1, timesout = 2; end;
+if timesout <= 1, timesout = 2; end
 
 [ersp itc mbase times freqs] = timef(X(:)', length(X), [0 length(X)]/fs*1000, fs, ...
                                         0, 'padratio', padratio, 'timesout', timesout, 'winsize', win, 'maxfreq', fs/2, ...
@@ -100,7 +100,7 @@ if nargout < 1
     hold on;
     h = plot(freqs,  10*log10(power));
     set(h, 'linewidth', 2);
-end;
+end
 return;
 
 figure;

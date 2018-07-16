@@ -28,19 +28,19 @@ function [s s2 s3] = size(a,dim)
             if length(s) == 2, s = s([2 1]);
             elseif length(s) == 3
                 s = [s(3) s(1) s(2)];
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     if nargin > 1
         s = [s 1];
         s = s(dim);
-    end;
+    end
     
     if nargout > 2
         s3 = s(3);
-    end;
+    end
     if nargout > 1
         s2 = s(2);
         s  = s(1);
-    end;
+    end

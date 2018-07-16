@@ -148,14 +148,14 @@ function [tmpall, freqs, timesout, itcvals] = timefreq(data, srate, varargin)
 if nargin < 2
     help timefreq;
     return;
-end;
+end
 
 [chan frame trials]= size(data);
 if trials == 1 && chan ~= 1
     trials = frame;
     frame  = chan;
     chan   = 1;
-end;
+end
 g = finputcheck(varargin, ...
     { 'ntimesout'     'integer'  []                     []; ...
     'timesout'      'real'     []                       []; ...
@@ -176,12 +176,12 @@ g = finputcheck(varargin, ...
     'timestretch'   'cell'     []                       {}; ...
     'wletmethod'    'string'   {'dftfilt2','dftfilt3'}    'dftfilt3'; ...
     });
-if ischar(g), error(g); end;
-if isempty(g.freqscale), g.freqscale = 'linear'; end;
-if isempty(g.winsize),   g.winsize   = max(pow2(nextpow2(frame)-3),4); end;
-if isempty(g.ntimesout), g.ntimesout = 200; end;
-if isempty(g.freqs),     g.freqs     = [0 srate/2]; end;
-if isempty(g.tlimits),   g.tlimits   = [0 frame/srate*1000]; end;
+if ischar(g), error(g); end
+if isempty(g.freqscale), g.freqscale = 'linear'; end
+if isempty(g.winsize),   g.winsize   = max(pow2(nextpow2(frame)-3),4); end
+if isempty(g.ntimesout), g.ntimesout = 200; end
+if isempty(g.freqs),     g.freqs     = [0 srate/2]; end
+if isempty(g.tlimits),   g.tlimits   = [0 frame/srate*1000]; end
 
 % checkin parameters
 % ------------------
@@ -200,7 +200,7 @@ end
 
 % finding frequency limits
 % ------------------------
-if g.cycles(1) ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles(1)/g.winsize; end;
+if g.cycles(1) ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles(1)/g.winsize; end
 
 % finding frequencies
 % -------------------
@@ -210,7 +210,7 @@ if length(g.freqs) == 2
     % -----------
     if g.freqs(1) == 0 & g.cycles(1) ~= 0
         g.freqs(1) = srate*g.cycles(1)/g.winsize;
-    end;
+    end
 
     % default number of freqs using padratio
     % --------------------------------------
@@ -226,19 +226,19 @@ if length(g.freqs) == 2
                 [tmp minind] = min(abs(tmpfreqs-g.freqs(1)));
                 g.freqs(1)   = tmpfreqs(minind);
                 verboseprintf(g.verbose, 'Adjust min freq. to %3.2f Hz to match FFT output frequencies\n', g.freqs(1));
-            end;
+            end
             if ~any(tmpfreqs == g.freqs(2))
                 [tmp minind] = min(abs(tmpfreqs-g.freqs(2)));
                 g.freqs(2)   = tmpfreqs(minind);
                 verboseprintf(g.verbose, 'Adjust max freq. to %3.2f Hz to match FFT output frequencies\n', g.freqs(2));
-            end;
-        end;
+            end
+        end
 
         % find number of frequencies
         % --------------------------
         g.nfreqs = length(tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2)))));
-        if g.freqs(1)==g.freqs(2), g.nfreqs = 1; end;
-    end;
+        if g.freqs(1)==g.freqs(2), g.nfreqs = 1; end
+    end
 
     % find closest freqs for FFT
     % --------------------------
@@ -248,8 +248,8 @@ if length(g.freqs) == 2
     else
         g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs); % this should be OK for FFT
         % because of the limit adjustment
-    end;
-end;
+    end
+end
 g.nfreqs = length(g.freqs);
 
 % function for time freq initialisation
@@ -264,7 +264,7 @@ if (g.cycles(1) == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%
         case 'hamming',        g.win   = hamming(g.winsize);
         case 'blackmanharris', g.win   = blackmanharris(g.winsize);
         case 'none',           g.win   = ones(g.winsize,1);
-    end;
+    end
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %freqs = srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
     %g.win = dftfilt(g.winsize,g.freqs(2)/srate,g.cycles,g.padratio,g.cyclesfact);
@@ -289,8 +289,8 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     g.winsize = 0;
     for index = 1:length(g.win)
         g.winsize = max(g.winsize,length(g.win{index}));
-    end;
-end;
+    end
+end
 
 % compute time vector
 % -------------------
@@ -332,7 +332,7 @@ if g.cycles(1) == 0
             %tmpall = tmpX(2:g.padratio*g.winsize/2+1,:,:);
             tmpX = fft(tmpX,g.padratio*g.winsize);
             tmpall = tmpX(2:g.padratio*g.winsize/2+1,:,:);
-        end;
+        end
     else % old iterative computation
         tmpall = repmat(nan,[length(freqs) length(g.timesout) trials]);
         verboseprintf(g.verbose, 'Processing trial (of %d):',trials);
@@ -344,20 +344,20 @@ if g.cycles(1) == 0
                     tmpX = data([-g.winsize/2+1:g.winsize/2]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
                 else
                     tmpX = data([-g.winsize+1:0]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
-                end;
+                end
 
                 tmpX = tmpX - mean(tmpX);
                 if strcmpi(g.detrend, 'on'),
                     tmpX = detrend(tmpX);
-                end;
+                end
 
                 tmpX = g.win .* tmpX(:);
                 tmpX = fft(tmpX,g.padratio*g.winsize);
                 tmpX = tmpX(2:g.padratio*g.winsize/2+1);
                 tmpall(:,index, trial) = tmpX(:);
-            end;
-        end;
-    end;
+            end
+        end
+    end
 else % wavelet
     if chan > 1
         % wavelets are processed in groups of the same size
@@ -379,7 +379,7 @@ else % wavelet
             tmpX    = bsxfun(@minus, tmpX, mean( tmpX, 2)); % avoids repmat - faster than tmpX = tmpX - repmat(mean(tmpX), [size(tmpX,1) 1 1]);
             wavarray = reshape(wavarray, [1 size(wavarray,1) size(wavarray,2)]);
             tmpall(:,wt(ind):wt(ind+1)-1,:,:,:) = reshape(sum(bsxfun(@times, tmpX, wavarray),2), [szfreqdata(1) szfreqdata(3:end)]);
-        end;
+        end
         verboseprintf(g.verbose, '\n');
         %tmpall = squeeze(tmpall(1,:,:,:));
     elseif 0
@@ -399,7 +399,7 @@ else % wavelet
             tmpX    = data(indices);
             tmpX    = bsxfun(@minus, tmpX, mean( tmpX, 1)); % avoids repmat - faster than tmpX = tmpX - repmat(mean(tmpX), [size(tmpX,1) 1 1]);
             tmpall(wt(ind):wt(ind+1)-1,:,:)  = squeeze(sum(bsxfun(@times, tmpX, wavarray),1));
-        end;
+        end
     elseif 0
         % wavelets are processed one by one but all windows simultaneously
         % -> not faster than the regular iterative method
@@ -418,13 +418,13 @@ else % wavelet
             tmpX = bsxfun(@minus, tmpX, mean( tmpX, 1)); % avoids repmat - faster than tmpX = tmpX - repmat(mean(tmpX), [size(tmpX,1) 1 1]);
             tmpX = sum(bsxfun(@times, tmpX, g.win{freqind}'),1);
             tmpall(freqind,:,:) = tmpX;
-        end;
+        end
     else
         % prepare wavelet filters
         % -----------------------
         for index = 1:length(g.win)
             g.win{index} = transpose(repmat(g.win{index}, [trials 1]));
-        end;
+        end
 
         % apply filters
         % -------------
@@ -441,21 +441,21 @@ else % wavelet
                     tmpX = data([-sizewav/2:sizewav/2]+g.indexout(index),:);
                 else
                     tmpX = data([-sizewav:0]+g.indexout(index),:);
-                end;
+                end
 
                 tmpX = tmpX - ones(size(tmpX,1),1)*mean(tmpX);
                 if strcmpi(g.detrend, 'on'),
                     for trial = 1:trials
                         tmpX(:,trial) = detrend(tmpX(:,trial));
-                    end;
-                end;
+                    end
+                end
 
                 tmpX = sum(wav .* tmpX);
                 tmpall( freqind, index, :) = tmpX;
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 verboseprintf(g.verbose, '\n');
 
 % time-warp code begins -Jean
@@ -490,7 +490,7 @@ if ~isempty(g.timestretch) && length(g.timestretch{1}) > 0
         
 %         if ~isempty(outOfTimeRangeTimeWarpMarkers)
 %             verboseprintf(g.verbose, 'Timefreq warning: time-warp latencies in epoch %d are out of time range defined for calculation of ERSP.\n', t);
-%         end;
+%         end
         
         [dummy marksPos] = min(transpose( ...
             abs( ...
@@ -534,20 +534,20 @@ if any(reshape(zerovals, 1, prod(size(zerovals))))
     tmpall(zerovals) = Inf;
     minval = min(tmpall(:)); % remove bug
     tmpall(zerovals) = minval;
-end;
+end
 
 % compute and subtract ITC
 % ------------------------
 if nargout > 3 || strcmpi(g.subitc, 'on')
     itcvals = newtimefitc(tmpall, g.itctype);
-end;
+end
 if strcmpi(g.subitc, 'on')
     %a = gcf; figure; imagesc(abs(itcvals)); cbar; figure(a);
     if ndims(tmpall) <= 3
          tmpall = (tmpall - abs(tmpall) .* repmat(itcvals, [1 1 trials])) ./ abs(tmpall);
     else tmpall = (tmpall - abs(tmpall) .* repmat(itcvals, [1 1 1 trials])) ./ abs(tmpall);
-    end;
-end;
+    end
+end
 
 % find closest output frequencies
 % -------------------------------
@@ -556,20 +556,20 @@ if length(g.freqs) ~= length(freqs) || any(g.freqs ~= freqs)
     for index = 1:length(g.freqs)
         [dum ind] = min(abs(freqs-g.freqs(index)));
         allindices(index) = ind;
-    end;
+    end
     verboseprintf(g.verbose, 'finding closest frequencies: %d freqs removed\n', length(freqs)-length(allindices));
     freqs = freqs(allindices);
     if ndims(tmpall) <= 3
          tmpall = tmpall(allindices,:,:);
     else tmpall = tmpall(:,allindices,:,:);
-    end;
+    end
     if nargout > 3 | strcmpi(g.subitc, 'on')
         if ndims(tmpall) <= 3
              itcvals = itcvals(allindices,:,:);
         else itcvals = itcvals(:,allindices,:,:);
-        end;
-    end;
-end;
+        end
+    end
+end
 
 timesout = g.timesout;
 
@@ -599,7 +599,7 @@ if isempty(timevar) % no pre-defined time points
             ntimevar = frames-winsize;
             if ntimevar < 0
                 error('Not enough data points, reduce the window size or lowest frequency');
-            end;
+            end
             verboseprintf(verbose, ['Value of ''timesout'' must be <= frame-winsize, ''timesout'' adjusted to ' int2str(ntimevar) '\n']);
         end
         npoints = ntimevar(1);
@@ -607,7 +607,7 @@ if isempty(timevar) % no pre-defined time points
         if strcmpi(causal, 'on')
              timevals = linspace(tlimits(1)+2*wintime, tlimits(2), npoints);
         else timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
-        end;
+        end
         verboseprintf(verbose, 'Generating %d time points (%1.1f to %1.1f ms)\n', npoints, min(timevals), max(timevals));
     else
         % subsample data
@@ -616,10 +616,10 @@ if isempty(timevar) % no pre-defined time points
         if strcmpi(causal, 'on')
              timeindices = [ceil(winsize+nsub):nsub:length(timevect)];
         else timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
-        end;
+        end
         timevals    = timevect( timeindices ); % the conversion at line 741 leaves timeindices unchanged
         verboseprintf(verbose, 'Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
-    end;
+    end
 else
     timevals = timevar;
     % check boundaries
@@ -628,18 +628,18 @@ else
     if strcmpi(causal, 'on')
          tmpind  = find( (timevals >= tlimits(1)+2*wintime-0.0001) & (timevals <= tlimits(2)) ); 
     else tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) ); 
-    end;
+    end
     % 0.0001 account for numerical innacuracies on opteron computers
     if isempty(tmpind)
         error('No time points. Reduce time window or minimum frequency.');
-    end;
+    end
     if  length(timevals) ~= length(tmpind)
         verboseprintf(verbose, 'Warning: %d out of %d time values were removed (now %3.2f to %3.2f ms) so the lowest\n', ...
             length(timevals)-length(tmpind), length(timevals), timevals(tmpind(1)), timevals(tmpind(end)));
         verboseprintf(verbose, '         frequency could be computed with the requested accuracy\n');
-    end;
+    end
     timevals = timevals(tmpind);
-end;
+end
 
 % find closet points in data
 % --------------------------
@@ -647,13 +647,13 @@ timeindices = round(eeg_lat2point(timevals, 1, srate, tlimits, 1E-3));
 if length(timeindices) < length(unique(timeindices))
     timeindices = unique_bc(timeindices)
     verboseprintf(verbose, 'Warning: duplicate times, reduce the number of output times\n');
-end;
+end
 if length(unique(timeindices(2:end)-timeindices(1:end-1))) > 1
     verboseprintf(verbose, 'Finding closest points for time variable\n');
     verboseprintf(verbose, 'Time values for time/freq decomposition is not perfectly uniformly distributed\n');
 else
     verboseprintf(verbose, 'Distribution of data point for time/freq decomposition is perfectly uniform\n');
-end;
+end
 timevals    = timevect(timeindices);
 
 % DEPRECATED, FOR C INTERFACE
@@ -693,5 +693,5 @@ Boot.Rsignif = [];
 function verboseprintf(verbose, varargin)
 if strcmpi(verbose, 'on')
     fprintf(varargin{:});
-end;
+end
 

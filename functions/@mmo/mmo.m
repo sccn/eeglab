@@ -42,38 +42,38 @@ classdef mmo
         function dataout = mmo(dataFileIn, datadims, writableVal, transposedVal, debugVal)
             if nargin < 3
                 writableVal = true;
-            end;
+            end
             if nargin < 4
                 transposedVal = false;
-            end;
+            end
             if nargin < 5
                 debugVal = false;
-            end;
+            end
             
             % check that the file is not empty
             % --------------------------------
             if ~isempty(dataFileIn)
                 if ~ischar(dataFileIn)
                     error('First input must be a file name');
-                end;
+                end
 
                 dirContent = dir(dataFileIn);
                 if isempty(dirContent)
                     error([ 'Data file ''' dataFileIn '''not found' ]);
                 elseif dirContent(1).bytes == 0
                     error([ 'Empty data file ''' dataFileIn '''' ]);
-                end;
+                end
             else
                 dataFileIn = mmo.getnewfilename;
                 fid = fopen(dataFileIn, 'w');
-                if fid == -1, error('Cannot open new file'); end;
-                if length(datadims) == 1, datadims(2) = 1; end;
+                if fid == -1, error('Cannot open new file'); end
+                if length(datadims) == 1, datadims(2) = 1; end
                 tmpdata = zeros(1, prod(datadims(2:end)), 'single');
                 for index = 1:datadims(1)
                     fwrite(fid, tmpdata, 'float');
-                end;
+                end
                 fclose(fid);
-            end;
+            end
                 
             % test memory map but discards it
             % -------------------------------
@@ -84,12 +84,12 @@ classdef mmo
             % ----------
             while datadims(end) == 1 && length(datadims) > 1
                 datadims(end) = [];
-            end;
+            end
             if transposedVal
                 if length(datadims) == 1, datadims = [1 datadims];
                 else                      datadims = [datadims(2:end) datadims(1)];
-                end;
-            end;
+                end
+            end
             
             dataout.dataFile   = dataFileIn;
             dataout.dimensions = datadims;
@@ -129,13 +129,13 @@ classdef mmo
                     elseif strcmpi(s(index).class, 'mmo')
                         if s(index).persistent || s(index).global
                             disp('Warning: mmo objects should not be made persistent or global. Behavior is unpredictable.');
-                        end;
+                        end
                         tmpVar = evalin('caller', s(index).name);
-                        if isequal(tmpVar, obj), ncopies = ncopies + 1; end;
-                        if ncopies > 1, break; end;
-                    end;
-                end;
-            end;
+                        if isequal(tmpVar, obj), ncopies = ncopies + 1; end
+                        if ncopies > 1, break; end
+                    end
+                end
+            end
         end
         
         % numerical implementations of basic functions
@@ -149,6 +149,6 @@ classdef mmo
     end
     
     methods (Static)
-        function str  = getnewfilename; str = fullfile(gettempfolder(true), sprintf('memapdata_%.9d%.9d.fdt', round(rand(1)*10^9), round(rand(1)*10^9))); end;
+        function str  = getnewfilename; str = fullfile(gettempfolder(true), sprintf('memapdata_%.9d%.9d.fdt', round(rand(1)*10^9), round(rand(1)*10^9))); end
     end
 end

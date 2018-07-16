@@ -78,7 +78,7 @@ if ncomps < 1 | frames*(ncomps+1) ~= framestot,
   'chanproj(): data length (%d) not a multiple of ncomps (%d).\n',...
                                    framestot,ncomps);
     return
-end;
+end
  
 if chan> chans,
     fprintf(...
@@ -88,7 +88,7 @@ if chan> chans,
 else
     chandata = projdata(chan,:);
     epochs = fix(length(chandata)/frames);
-end;
+end
 if epochs > MAXPLOTDATACHANS
   fprintf(...
  'chanproj(): maximum number of traces to plot is %d\n',...
@@ -110,12 +110,12 @@ else
       fprintf( ...
 'chanproj():^G limits should be 0 or an array [xmin xmax ymin ymax].\n');
       return
-  end;
+  end
   xmin = limits(1);
   xmax = limits(2);
   ymin = limits(3);
   ymax = limits(4);
-end;
+end
 
 if xmin == 0 & xmax == 0,
   x = [0:frames-1];
@@ -124,7 +124,7 @@ if xmin == 0 & xmax == 0,
 else
   dx = (xmax-xmin)/(frames-1);
   x=xmin*ones(1,frames)+dx*(0:frames-1);          % construct x-values
-end;
+end
 
 if ymax == 0 & ymin == 0,
   ymax=max(max(projdata(chan,:)));
@@ -167,7 +167,7 @@ if colorfile ~=0,
     if cid <3,
         fprintf('chanproj(): cannot open file %s.\n',colorfile);
         return
-    end;
+    end
     colors = fscanf(cid,'%s',[3 MAXPLOTDATACHANS]);
     colors = colors';
     [r c] = size(colors);
@@ -175,12 +175,12 @@ if colorfile ~=0,
         for j=1:c
             if colors(i,j)=='.',
                 colors(i,j)=' ';
-            end;
-        end;
-    end;
+            end
+        end
+    end
 else    % default color order - no yellow
     colors =['w  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  '];
-end;
+end
 %
 % Make vector of x-values
 %
@@ -215,7 +215,7 @@ for e=1:epochs,
       plot(x,chandata(e,:),colors(e),'LineWidth',1);  % plot it!
     end
     hold on;
-end;
+end
 fprintf('\n');
 %
 %%%%%%%%%%%%%%%%%%%% Fix axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

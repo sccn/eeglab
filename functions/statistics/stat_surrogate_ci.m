@@ -47,10 +47,10 @@ end
 % reshape matrix
 % --------------
 nd = size(distribution);
-if length(nd) == 2 && nd(2) == 1, nd(2) = []; end;
+if length(nd) == 2 && nd(2) == 1, nd(2) = []; end
 ndori = nd;
 nd = nd(1:end-1);
-if isempty(nd), nd = 1; end;
+if isempty(nd), nd = 1; end
 distribution = reshape(distribution, [prod(nd) size(distribution,myndims(distribution))]);
 
 % append observed to last dimension of surrogate distribution
@@ -62,7 +62,7 @@ N = size(distribution, numDims);
 % sort along last dimension (replications)
 [tmpsort idx] = sort( distribution, numDims,'ascend');
 
-if strcmpi(tail, 'both'), alpha = alpha/2; end;
+if strcmpi(tail, 'both'), alpha = alpha/2; end
 
 low  = round(alpha*N);
 high = N-low;
@@ -95,5 +95,5 @@ else
         val = 1;
     else
         val = 2;
-    end;
-end;
+    end
+end

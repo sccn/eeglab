@@ -35,13 +35,13 @@
 %     The function rejects data epochs containing data values outside a 
 %     given standard deviation (s.d.) threshold entered by the user (e.g., 
 %     3 s.d.'s). In each iteration, if the number of epochs that are
-%     thus marked for rejection are fewer than 'maxrej' (by default, 5%), it  
-%     then rejects the beyond-threshold data epochs and iterates. If the number 
-%     of epochs marked  for rejection is more than 5% of the total number 
-%     of data epochs, it does not reject them, but instead  increases the 
-%     s.d. threshold by 0.5 s.d. and iterates. When no more data epochs are 
-%     found to exceed the current s.d. threshold, it lowers the threshold 
-%     by 0.5 s.d. and continues to iterate until either no more epochs are 
+%     thus marked for rejection arefewer than 'maxrej' (by default, 5%), it  
+%     then rejects thebeyond-threshold dataepochsand iterates. If the number 
+%     of epochs marked for rejection is more than 5% ofthe totalnumber 
+%     of data epochs, it does not reject them, but instead increases the 
+%     s.d.threshold by 0.5 s.d.and iterates. When no more data epochs are 
+%     found toexceed the currents.d. threshold, it lowersthe threshold 
+%     by 0.5 s.d. and continues to iterate until either nomore epochs are 
 %     rejected or until 8 iterations have been performed.
 %
 % Authors: Julie Onton and Arnaud Delorme, SCCN/INC/UCSD, 2007-
@@ -70,13 +70,13 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
     if nargin < 1
         help pop_autorej;
         return;
-    end;
+    end
     rmep = [];
     com = '';
     
     if EEG.trials == 1
         error('This function requires data epochs');
-    end;
+    end
     
     opt = finputcheck(varargin, { 'startprob'    'real'    []     DEFAULT_STARTPROB; ...
                                   'electrodes'   'real'    []     [1:EEG.nbchan]; ...
@@ -85,7 +85,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                                   'eegplot'      'string'  { 'on';'off' }    'off'; ...
                                   'nogui'        'string'  { 'on';'off' }    'off'; ...
                                   'threshold'    'real'    []     DEFAULT_THRESH }, 'pop_autorej');
-    if isstr(opt), error(opt); end;
+    if isstr(opt), error(opt); end
     
     % pop-up GUI for rejecting artifacts
     % ----------------------------------
@@ -111,19 +111,19 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
         result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
                                  'helpcom', 'pophelp(''pop_autorej'')', ...
                                  'title', 'Automatic artifact rejection -- pop_autorej()');
-        if isempty(result), return; end;
+        if isempty(result), return; end
         
         options = { 'nogui' 'on' };
-        if ~strcmpi(result{1}, '1000'), options = { options{:} 'threshold' str2num(result{1}) }; end;
-        if ~isempty(result{2}),         options = { options{:} 'electrodes' setdiff([1:EEG.nbchan], str2num(result{2})) }; end;
-        if ~isempty(result{3}),         options = { options{:} 'icacomps'   str2num(result{3}) }; end;
-        if ~strcmpi(result{4}, '5'),    options = { options{:} 'startprob' str2num(result{4}) }; end;
-        if ~strcmpi(result{5}, '5'),    options = { options{:} 'maxrej'    str2num(result{5}) }; end;
-        if result{6}, options = { options{:} 'eegplot' 'on' }; end;
+        if ~strcmpi(result{1}, '1000'), options = { options{:} 'threshold' str2num(result{1}) }; end
+        if ~isempty(result{2}),         options = { options{:} 'electrodes' setdiff([1:EEG.nbchan], str2num(result{2})) }; end
+        if ~isempty(result{3}),         options = { options{:} 'icacomps'   str2num(result{3}) }; end
+        if ~strcmpi(result{4}, '5'),    options = { options{:} 'startprob' str2num(result{4}) }; end
+        if ~strcmpi(result{5}, '5'),    options = { options{:} 'maxrej'    str2num(result{5}) }; end
+        if result{6}, options = { options{:} 'eegplot' 'on' }; end
     
         [ EEG rmep com ] = pop_autorej(EEG, options{:});
         return;
-    end;
+    end
   
     EEGIN = EEG; % backup EEG structure
     if ~isempty(opt.icacomps), 
@@ -132,7 +132,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
     else
         processdat = 1;
         complist   = opt.electrodes;
-    end;
+    end
     
     % rejection of extremelly large fluctuations
     % ------------------------------------------
@@ -147,7 +147,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
 %         EEG = pop_rejepoch( EEG,EEG.reject.rejthresh,0); % actually reject high prob epochs
 %         fprintf('\nRe-baselining after large amplitude artifact removed (does not affect the data)...\n');
 %         EEG = pop_rmbase( EEG, [EEG.xmin*1000 EEG.xmax*1000]);
-%     end;
+%     end
     
     %--------------------------------------------
 
@@ -157,7 +157,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
         
     else% if rejection based on ICs
         numrej = length(find(EEG.reject.icarejjp));  % count number of epochs marked
-    end;
+    end
     if (numrej/EEG.trials) < opt.maxrej/100
         if processdat
             rmep(1,end+1:end+length(find(EEG.reject.rejjp))) = alleps(EEG.reject.rejjp);
@@ -167,11 +167,11 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
             rmep(1,end+1:end+length(find(EEG.reject.icarejjp))) = alleps(EEG.reject.icarejjp);
             alleps(EEG.reject.icarejjp) = [];
             EEG = pop_rejepoch( EEG,EEG.reject.icarejjp,0); % actually reject high prob epochs
-        end;
+        end
     else
         fprintf('Re-adjusting probability limits and running again...*********\n');
         opt.startprob = opt.startprob + .5;
-    end;
+    end
     repeat = 1; maxiter = 0;
     while repeat == 1 % keep running probability until there are no epochs above threshold
         if numrej > 0
@@ -181,7 +181,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                 
             else% if rejection based on ICs
                 numrej = length(find(EEG.reject.icarejjp));  % count number of epochs marked
-            end;
+            end
             if (numrej/EEG.trials) < opt.maxrej/100
                 if processdat
                     rmep(1,end+1:end+length(find(EEG.reject.rejjp))) = alleps(EEG.reject.rejjp);
@@ -191,11 +191,11 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                     rmep(1,end+1:end+length(find(EEG.reject.icarejjp))) = alleps(EEG.reject.icarejjp);
                     alleps(EEG.reject.icarejjp) = [];
                     EEG = pop_rejepoch( EEG,EEG.reject.icarejjp,0);
-                end;
+                end
             else
                 opt.startprob = opt.startprob + 0.5; EEG.reject.icarejjp = [];EEG.reject.rejjpE = [];
                 fprintf('Re-adjusting probability limits and running again...*********\n');
-            end;
+            end
         else
             if opt.startprob > 5 & maxiter < 8 % don't decrease and startover more than 8 times
                 fprintf('Decreasing probability limits for final pruning...######\n');
@@ -205,10 +205,10 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                     opt.maxrej = 15; % go through last round with a high threshold
                 else
                     repeat = 0;
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end
     
     % run kurtosis check
     % ------------------
@@ -219,7 +219,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
         rmep(1,end+1:end+length(find(EEG.reject.icarejkurt))) = alleps(EEG.reject.icarejkurt);
         alleps(EEG.reject.icarejjp) = [];
         EEG = pop_rejepoch( EEG,EEG.reject.icarejkurt,0);
-    end;
+    end
     
     %--------------------------------------------
     
@@ -245,7 +245,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
         eegplot( EEG.data(elecrange,:,:), 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
     else
         EEG = pop_rejepoch( EEG, rmep, 0); % actually reject high prob epochs        
-    end;
+    end
     
     com = sprintf('EEG = pop_autorej(EEG, %s);', vararg2str( varargin ));
     

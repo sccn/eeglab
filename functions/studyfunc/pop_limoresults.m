@@ -52,7 +52,7 @@ classdef pop_limoresults < handle
                 set(obj.gui_h.listbox_elect2plot,'String',electoplot_list);
                 set(obj.gui_h.listbox_elect2plot,'Value',electoplot_indx);
             catch
-            end;
+            end
             
             % Creating Name of Regressors
             %--------------------------------------------------------------
@@ -128,7 +128,7 @@ classdef pop_limoresults < handle
                  %---------------------------------------------------------
                 if ~isempty(cont_indx) && (Nreg ~= length(tmpregnames))
                     display('Split regressor detected. Giving generic names to continuos regressors ...' );
-                    if ~isempty(cat_indx), inintcont = length(cat_indx)+1; else inintcont = 1 ; end;
+                    if ~isempty(cat_indx), inintcont = length(cat_indx)+1; else inintcont = 1 ; end
                     
                     for i = inintcont:(Nreg-1)
                         tmpregnames{i} = ['Cont_' num2str(i - (inintcont - 1))];
@@ -884,7 +884,7 @@ limoindx = [];
 var2plot.guiname{1}  = 'No Variables Computed';
 measure_list         = {'erp','spec'};
 datorica_list        = {'dat', 'ica'};
-if ~exist('checknewfile_flag','var'), checknewfile_flag = 0; end;
+if ~exist('checknewfile_flag','var'), checknewfile_flag = 0; end
 
 requested_datatype = [datorica_list{datoricaindx} measure_list{measureindx}];
 measures_computed  = {STUDY.design(STUDY.currentdesign).limo.datatype};

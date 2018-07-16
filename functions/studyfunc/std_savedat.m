@@ -25,7 +25,7 @@ function std_savedat( tmpfile, structure)
     delims = find( tmpfile == '.');
     if ~isfield(structure, 'datafile') && ~isfield(structure, 'datafiles') 
         structure.datafile = [ tmpfile(1:delims(end)-1) '.set' ];
-    end;
+    end
     
     % fix reading problem (bug 764)
     tmpfile2  = which(tmpfile);
@@ -40,9 +40,9 @@ function std_savedat( tmpfile, structure)
             fields = fieldnames(structure);
             for i=1:length(fields)
                 eval([ fields{i} '=structure.'  fields{i} ';']);
-            end;
+            end
             save('-mat', tmpfile, fields{:});
-        end;
+        end
     else
         save('-v7.3' , tmpfile, '-struct', 'structure');
-    end;
+    end

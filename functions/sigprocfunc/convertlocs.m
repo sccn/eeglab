@@ -48,16 +48,16 @@ function chans = convertlocs(chans, command, varargin);
 if nargin < 1
    help convertlocs;
    return;
-end;
+end
 
 if nargin < 2
    command = 'auto';
-end;
+end
 if nargin == 4 && strcmpi(varargin{2}, 'on')
     verbose = 1;
 else
     verbose = 0; % off
-end;
+end
 
 % test if value exists for default
 % --------------------------------
@@ -66,28 +66,28 @@ if strcmp(command, 'auto')
         command = 'cart2all';
         if verbose
             disp('Make all coordinate frames uniform using Cartesian coords');
-        end;
+        end
     else
         if isfield(chans, 'sph_theta') && ~isempty(chans(1).sph_theta)
             command = 'sph2all';
             if verbose
                 disp('Make all coordinate frames uniform using spherical coords');
-            end;
+            end
         else
             if isfield(chans, 'sph_theta_besa') && ~isempty(chans(1).sph_theta_besa)
                 command = 'sphbesa2all';
                 if verbose
                     disp('Make all coordinate frames uniform using BESA spherical coords');
-                end;
+                end
             else
                 command = 'topo2all';
                 if verbose
                     disp('Make all coordinate frames uniform using polar coords');
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end
 
 % convert
 % -------         
@@ -99,17 +99,17 @@ switch command
    [sph_phi sph_theta] = topo2sph( [ [ theta{indices} ]' [ radius{indices}]' ] );
    if verbose
        disp('Warning: electrodes forced to lie on a sphere for polar to 3-D conversion');
-   end;
+   end
    for index = 1:length(indices)
       chans(indices(index)).sph_theta  = sph_theta(index);
       chans(indices(index)).sph_phi    = sph_phi  (index);
-   end;
+   end
    if isfield(chans, 'sph_radius'),
        meanrad = mean([ chans(indices).sph_radius ]);
-       if isempty(meanrad), meanrad = 1; end;
+       if isempty(meanrad), meanrad = 1; end
    else
        meanrad = 1;
-   end;
+   end
    sph_radius(1:length(indices)) = {meanrad};
 case 'topo2sphbesa',
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
@@ -118,7 +118,7 @@ case 'topo2cart'
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
    if verbose
        disp('Warning: spherical coordinates automatically updated');
-   end;
+   end
    chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords
 case 'topo2all',
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
@@ -130,22 +130,22 @@ case 'sph2cart',
    indices = find(~cellfun('isempty', sph_theta));
    if ~isfield(chans, 'sph_radius'), sph_radius(1:length(indices)) = {1};
    else                              sph_radius = {chans.sph_radius};
-   end;
+   end
    inde = find(cellfun('isempty', sph_radius));
    if ~isempty(inde)
        meanrad = mean( [ sph_radius{:} ]);
        sph_radius(inde) = { meanrad };
-   end;
+   end
    [x y z] = sph2cart([ sph_theta{indices} ]'/180*pi, [ sph_phi{indices} ]'/180*pi, [ sph_radius{indices} ]');
    for index = 1:length(indices)
       chans(indices(index)).X = x(index);
       chans(indices(index)).Y = y(index);
       chans(indices(index)).Z = z(index);
-   end;
+   end
 case 'sph2topo',
  if verbose
      % disp('Warning: all radii constrained to one for spherical to topo transformation');
- end;
+ end
  sph_theta  = {chans.sph_theta};
  sph_phi    = {chans.sph_phi};
  indices = find(~cellfun('isempty', sph_theta));
@@ -155,8 +155,8 @@ case 'sph2topo',
      chans(indices(index)).radius = radius(index);
      if ~isfield(chans, 'sph_radius') || isempty(chans(indices(index)).sph_radius)
          chans(indices(index)).sph_radius = 1;
-     end;
- end;
+     end
+ end
 case 'sph2sphbesa',
    % using polar coordinates
    sph_theta  = {chans.sph_theta};
@@ -189,7 +189,7 @@ case 'sphbesa2sph',
    for index = 1:length(indices)
       chans(indices(index)).sph_theta  = sph_theta(index);
       chans(indices(index)).sph_phi    = sph_phi  (index);      
-   end;
+   end
 case 'sphbesa2topo',
    chans = convertlocs(chans, 'sphbesa2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2topo', varargin{:}); % search for spherical coords
@@ -208,7 +208,7 @@ case 'cart2sphbesa',
 case 'cart2sph',
     if verbose
         disp('WARNING: If XYZ center has not been optimized, optimize it using Edit > Channel Locations');
-	end;
+	end
     X  = {chans.X};
     Y  = {chans.Y};
     Z  = {chans.Z};
@@ -218,8 +218,8 @@ case 'cart2sph',
 		 chans(indices(index)).sph_theta     = th(index)/pi*180;
 		 chans(indices(index)).sph_phi       = phi(index)/pi*180;
 		 chans(indices(index)).sph_radius    = radius(index);
-	end;
+	end
 case 'cart2all',
    chans = convertlocs(chans, 'cart2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2all', varargin{:}); % search for spherical coords
-end;
+end

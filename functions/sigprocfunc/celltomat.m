@@ -29,11 +29,11 @@ function M = celltomat( C, varargin );
 if nargin < 1
 	help celltomat;
 	return;
-end;
+end
 
 M = zeros(size(C));
 for i=1:size(C,1)
     for j=1:size(C,2)
         M(i,j) = C{i,j};
-    end;
+    end
 end;   

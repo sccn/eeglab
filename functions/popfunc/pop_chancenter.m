@@ -43,13 +43,13 @@ optim = 0;
 if nargin<1
     help pop_chancenter
     return;
-end;
+end
 
 com = '';
 newcenter = [];
 if nargin < 3
     omitchans = [];
-end;
+end
 if nargin < 2
     cb_browse = [ 'tmpchans = get(gcbf, ''userdata'');' ...
                   'set(findobj(gcbf, ''tag'', ''chans''), ''string'', ' ...
@@ -71,16 +71,16 @@ if nargin < 2
     
     results = inputgui( geometry, uilist, 'pophelp(''pop_chancenter'');', ...
                         'Convert channel locations -- pop_chancenter()', chanlocs );
-	if isempty(results), return; end;
+	if isempty(results), return; end
 	if results{1}
         center = [];
     else
         center  = eval( [ '[' results{2} ']' ] );
-    end;
+    end
     if ~isempty(results{3})
         omitchans =  eval( [ '[' results{3} ']' ] );
-    end;
-end;
+    end
+end
 
 % remove channels
 % ---------------
@@ -93,12 +93,12 @@ for index = 1:length(c)
     chanlocs(c(index)).X  = X(index);
     chanlocs(c(index)).Y  = Y(index);
     chanlocs(c(index)).Z  = Z(index);
-end;
+end
 disp('Note: automatically convert XYZ coordinates to spherical and polar');
 chanlocs = convertlocs(chanlocs, 'cart2all');
 if ~isempty(omitchans)
     disp('Important warning: the location of omitted channels has not been modified');
-end;
+end
 if nargout > 2
     com = sprintf('%s = pop_chancenter( %s, %s);', inputname(1), inputname(1), vararg2str({ center omitchans }));
 end

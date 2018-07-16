@@ -50,21 +50,21 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     if nargin < 3
         help eeg_insertbound;
         return;
-    end;
+    end
     regions = round(regions);
     regions(regions < 1) = 1;
     regions(regions > pnts) = pnts;
     for i=2:size(regions,1)
         if regions(i-1,2) >= regions(i,1)
             regions(i,1) = regions(i-1,2)+1;
-        end;
-    end;
+        end
+    end
 
     if ~isempty(regions)
         fprintf('eeg_insertbound(): %d boundary (break) events added.\n', size(regions, 1));
     else 
         return;
-    end;
+    end
 
     % recompute latencies of boundevents (in new dataset)
     % ---------------------------------------------------
@@ -75,7 +75,7 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     if ~isempty(eventin)
          eventLatencies = [ eventin.latency ]; 
     else eventLatencies = [];
-    end;
+    end
     newEventLatencies = eventLatencies;
     oriLen            = length(eventin);
     rmEvent           = [];
@@ -95,14 +95,14 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
             eventin(end+1).type   = 'boundary';
             eventin(end).latency  = regions(iRegion,1)-sum(lengths(1:iRegion-1))-0.5;
             eventin(end).duration = lengths(iRegion,1)+addlength;
-        end;
+        end
     end
 
     % copy latencies
     % --------------
     for iEvent = 1:oriLen
         eventin(iEvent).latency = newEventLatencies(iEvent);
-    end;
+    end
     eventin(rmEvent) = [];
     
     % resort events
@@ -113,11 +113,11 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
         [tmp, sortind] = sort(alllatencies);
         eventin = eventin(sortind);
         newind = sortind(oriLen+1:end);
-    end;
+    end
     
     if ~isempty(rmEvent)
         fprintf('eeg_insertbound(): event latencies recomputed and %d events removed.\n', length(rmEvent));
-    end;
+    end
 
     
 % look for nested events
@@ -132,5 +132,5 @@ function [ indEvents, addlen ] = findnested(event, eventlat, region)
         addlen      = sum( [ event(indEvents(boundaryInd)).duration ] );
     else
         addlen = 0;
-    end;
+    end
     

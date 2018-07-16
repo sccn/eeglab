@@ -59,20 +59,20 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     if nargin < 2
         help std_filecheck;
         return;
-    end;
+    end
     if nargin < 3
         guiflag = 'guion';
-    end;
+    end
     if nargin < 4
         ignorefields = {};
-    end;
+    end
     
-    if ~exist( filename ), res = guiflag; return; end;
+    if ~exist( filename ), res = guiflag; return; end
         
     params1 = load('-mat', filename, 'parameters');
     params1 = finputcheck( params1.parameters, { 'tmp' 'real' [] NaN}, '', 'ignore'); % allow to tackle duplicate fields
     params1 = rmfield(params1, 'tmp');
-    if iscell(params2), params2 = struct(params2{:}); end;
+    if iscell(params2), params2 = struct(params2{:}); end
     
     % test if the fields are different
     % --------------------------------
@@ -87,29 +87,29 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     res = 'same';
     if ~isequal( fields1, fields2 ),
         for ind = 1:length(allfields)
-            if strcmpi(allfields{ind}, 'plotitc'), adsfads; end;
+            if strcmpi(allfields{ind}, 'plotitc'), adsfads; end
             if ~isfield( params1, allfields{ind})
                 if ischar(getfield(params2, allfields{ind}))
                      params1 = setfield(params1, allfields{ind}, '');
                 else params1 = setfield(params1, allfields{ind}, []);
-                end;
+                end
                 res = 'different';
-            end;
+            end
             if ~isfield( params2, allfields{ind})
                 if ischar(getfield(params1, allfields{ind}))
                      params2 = setfield(params2, allfields{ind}, '');
                 else params2 = setfield(params2, allfields{ind}, []);
-                end;
+                end
                 res = 'different';
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     % data type
     % ---------
     if ~isempty(strmatch('cycles', allfields)), strcom = 'ERSP';
     else                                        strcom = 'SPECTRAL';
-    end;
+    end
     
     % compare fields
     % --------------
@@ -146,7 +146,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
             strvcat(txt{:})
             error([ 'Two ' strcom ' files had different parameters and the ' strcom ' function' 10 ...
                           'cannot handle that. We suggest that you delete all files. See command line details' ]);
-        end;
+        end
     elseif strcmpi(guiflag, 'recompute'), 
         res     = 'recompute';
         disp(['Deleting and recomputing file: ' filename ]);
@@ -154,7 +154,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     elseif strcmpi(res, 'same') & ( strcmpi(guiflag, 'guion') | strcmpi(guiflag, 'same') )
         disp(['Using file on disk: ' filename ]);
         return;
-    end;
+    end
     
     set_yes = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_no''), ''value'', 0);'];
     set_no  = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_yes''), ''value'', 0);' ];
@@ -176,7 +176,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     ersp_ans = inputgui('geometry', {[1] [1] [1] [1] [0.5 1] }, 'geomvert', [2 max(length(txt),1)*0.7 1 1 1 1], 'uilist', uilist, ...
                         'helpcom', '', 'title', ['Recalculate ' upper(strcom) ' parameters -- part of std_ersp()']); 
                         
-    if isempty(ersp_ans), res = 'cancel'; return; end;
+    if isempty(ersp_ans), res = 'cancel'; return; end
     if find(celltomat(ersp_ans))  == 2 % use existing ERSP info from this dataset
         disp(['Using file on disk: ' filename ]);
         params2 = params1;

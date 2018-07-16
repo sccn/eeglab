@@ -41,14 +41,14 @@ function [alltext, allvars] = gethelpvar( filename, varlist )
 if nargin < 1
 	help gethelpvar;
 	return;
-end;
+end
 
 % input file
 % ---------- 
 fid = fopen( filename, 'r');
 if fid == -1
 	error('File not found');
-end;
+end
 
 cont = 1;
 % scan file
@@ -86,9 +86,9 @@ while (str(1) == '%')
 	  	 switch lower(str(1:i2d))
 	  		case { 'usage:' 'authors:' 'author:' 'notes:' 'note:' 'input:' ...
 	  		'inputs:' 'outputs:' 'output' 'example:' 'examples:' 'see also:' }, newtitle = 1;
-		 end;
+		 end
 		 if (i2d == length(str)) & (str(1) ~= '%'), newtitle = 1; end;	
-   	  end;
+   	  end
       if newtitle
   			tilehtml = str(1:i2d); 
   			newtitle = 1;
@@ -135,10 +135,10 @@ while (str(1) == '%')
                     	vartext = [ vartext 10 str];    % CR otherwise
                     end;	
                end;		
-            end;
+            end
          end;	 
          newtitle = 0;		
-      end;
+      end
 	  % --- END OF DECODING 	
       
    	  str = fgets( fid );
@@ -156,7 +156,7 @@ while (str(1) == '%')
        	 	else
        			if ~isempty(oldvartext)
            			%fprintf( fo, [ g.normcol2 g.tabtext '</td></tr>\n' ], oldvartext);	
-       			end;
+       			end
          	end;	 	
          	newvar = 1;
          	oldvarname = varname;
@@ -181,7 +181,7 @@ while (str(1) == '%')
 					%fprintf(fo, [ g.normrow g.doublecol ...
 					%			'<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
 					%			' height=150 width=200></A></CENTER></td></tr>' ]);
-		       %end;
+		       %end
             end;             
    		elseif ~isempty(oldvarname)
 			allvars{indexout} = oldvarname;
@@ -192,7 +192,7 @@ while (str(1) == '%')
    	 	else
    			if ~isempty(oldvartext)
        			%fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], oldvartext);	
-   			end;
+   			end
          end;      
       end;	
       
@@ -205,21 +205,21 @@ while (str(1) == '%')
          end;		
          oldvarname = [];
          oldvartext = [];
-      end;
+      end
    else
       str = fgets( fid );
-   end;
-end;
+   end
+end
 fclose( fid );
 
 % remove quotes of variables
 % --------------------------
 for index = 1:length(allvars)
-	if allvars{index}(1) == '''', allvars{index} = eval( allvars{index} ); end;
-end;
+	if allvars{index}(1) == '''', allvars{index} = eval( allvars{index} ); end
+end
 
 if exist('varlist') == 1
-	if ~iscell(varlist), varlist = { varlist }; end;
+	if ~iscell(varlist), varlist = { varlist }; end
         newtxt = mat2cell(zeros(length(varlist), 1), length(varlist), 1); % preallocation
 	for index = 1:length(varlist)
 		loc = strmatch( varlist{index}, allvars);
@@ -228,10 +228,10 @@ if exist('varlist') == 1
 		else
 			disp([ 'warning: variable ''' varlist{index} ''' not found']);
 			newtxt{index} = '';
-		end;
-	end;
+		end
+	end
 	alltext = newtxt;
-end;
+end
 	
 return;
 
@@ -254,21 +254,21 @@ function strout = formatstr( str, refcall );
 				strout = [strout ' ' tokout ]; 	
 			end;	
 			[tok1 strrm] = strtok( strrm );
-		end;
+		end
 return;	
  
 function tokout = functionformat( tokin, refcall );
 	tokout = tokin;	% default
 	[test, realtokin, tail] = testfunc1( tokin );
-	if ~test,  [test, realtokin, tail] = testfunc2( tokin ); end;
+	if ~test,  [test, realtokin, tail] = testfunc2( tokin ); end
 	if test
 		i1 = findstr( refcall, '%s');
 		i2 = findstr( refcall(i1(1):end), '''');
-		if isempty(i2) i2 = length( refcall(i1(1):end) )+1; end;
+		if isempty(i2) i2 = length( refcall(i1(1):end) )+1; end
 		filename  = [ realtokin refcall(i1+2:i1+i2-2)];
 		if exist( filename ) % do not make link if the file does not exist 
 			tokout =  sprintf( [ '<A HREF="' refcall '">%s</A>' tail ' ' ], realtokin, realtokin );
-		end;
+		end
 	end;		
 return;
 
@@ -276,9 +276,9 @@ function [test, realtokin, tail] = testfunc1( tokin ) % test if is string is 'fu
 	test = 0; realtokin = ''; tail = '';
 	if ~isempty( findstr( tokin, '()' ) )
 		realtokin = tokin( 1:findstr( tokin, '()' )-1);
-		if length(realtokin) < (length(tokin)-2) tail = tokin(end); else tail = []; end;
+		if length(realtokin) < (length(tokin)-2) tail = tokin(end); else tail = []; end
 		test = 1;
-	end;
+	end
 return;
 
 function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FUNCTION[,]'  
@@ -289,7 +289,7 @@ function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FU
 			tail = ',';
 		else
 			realtokin = tokin;
-		end;
+		end
 		testokin = realtokin;
 		testokin(findstr(testokin, '_')) = 'A';
 		testokin(findstr(testokin, '2')) = 'A';
@@ -297,5 +297,5 @@ function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FU
 			test = 1;
 		end;				
 		realtokin = lower(realtokin);
-	end;
+	end
 return;	

@@ -22,7 +22,7 @@ function b = subsref(a,s)
     
     if s(1).type == '.'
         b = builtin('subsref', struct(a), s); return;
-    end;
+    end
         
     subs = s(1).subs;
     finaldim = cellfun('length', subs);
@@ -33,53 +33,53 @@ function b = subsref(a,s)
         if ischar(subs{1})
             subs{1} = [1:size(a,1)];
             subs{2} = [1:size(a,2)];
-            if ndims(a) == 3, subs{3} = [1:size(a,3)]; end;
+            if ndims(a) == 3, subs{3} = [1:size(a,3)]; end
             finaldim = prod(size(a));
-        end;
+        end
         
     % two dimension input
     % -------------------
     elseif length(s(1).subs) == 2 
-        if ischar(subs{1}), subs{1} = [1:size(a,1)]; end;
+        if ischar(subs{1}), subs{1} = [1:size(a,1)]; end
         
         if ischar(subs{2}),
             subs{2} = [1:size(a,2)];
-            if ndims(a) == 3, subs{3} = [1:size(a,3)]; end;
-        end;
+            if ndims(a) == 3, subs{3} = [1:size(a,3)]; end
+        end
         if length(subs) == 3
              finaldim = [ length(subs{1}) length(subs{2})*length(subs{3}) ];
         else finaldim = [ length(subs{1}) length(subs{2}) ];
-        end;
+        end
             
     % three dimension input
     % ---------------------
     elseif length(s(1).subs) == 3
         
-        if ischar(subs{1}), subs{1} = [1:size(a,1)]; end;
-        if ischar(subs{2}), subs{2} = [1:size(a,2)]; end;
+        if ischar(subs{1}), subs{1} = [1:size(a,1)]; end
+        if ischar(subs{2}), subs{2} = [1:size(a,2)]; end
         if ndims(a) == 2, 
             subs(3) = []; 
         else
-            if ischar(subs{3}), subs{3} = [1:size(a,3)]; end;
-        end;
+            if ischar(subs{3}), subs{3} = [1:size(a,3)]; end
+        end
         finaldim = cellfun('length', subs);
      
-    end;
+    end
 
     % non-transposed data
     % -------------------
     if ~strcmpi(a.fileformat, 'transposed')
-        if length(subs) == 1, b = a.data.data.x(subs{1}); end;
-        if length(subs) == 2, b = a.data.data.x(subs{1}, subs{2}); end;
-        if length(subs) == 3, b = a.data.data.x(subs{1}, subs{2}, subs{3}); end;
+        if length(subs) == 1, b = a.data.data.x(subs{1}); end
+        if length(subs) == 2, b = a.data.data.x(subs{1}, subs{2}); end
+        if length(subs) == 3, b = a.data.data.x(subs{1}, subs{2}, subs{3}); end
     else
         if ndims(a) == 2
-            %if length(s) ==         0, b = transpose(a.data.data.x); return; end;
-            if length(s(1).subs) == 1, b = a.data.data.x(s(1).subs{1})'; end;
-            if length(s(1).subs) == 2, b = a.data.data.x(s(1).subs{2}, s(1).subs{1})'; end;
-            if length(s(1).subs) == 3, b = a.data.data.x(s(1).subs{2}, s(1).subs{1})'; end;
+            %if length(s) ==         0, b = transpose(a.data.data.x); return; end
+            if length(s(1).subs) == 1, b = a.data.data.x(s(1).subs{1})'; end
+            if length(s(1).subs) == 2, b = a.data.data.x(s(1).subs{2}, s(1).subs{1})'; end
+            if length(s(1).subs) == 3, b = a.data.data.x(s(1).subs{2}, s(1).subs{1})'; end
         else
-            %if length(s) ==         0, b = permute(a.data.data.x, [3 1 2]); return; end;
+            %if length(s) ==         0, b = permute(a.data.data.x, [3 1 2]); return; end
             if length(subs) == 1,
                 inds1 = mod(subs{1}-1, size(a,1))+1;
                 inds2 = mod((subs{1}-inds1)/size(a,1), size(a,2))+1;
@@ -87,7 +87,7 @@ function b = subsref(a,s)
                 inds  = (inds1-1)*size(a,2)*size(a,3) + (inds3-1)*size(a,2) + inds2;
                 b = a.data.data.x(inds);
             else
-                if length(subs) < 2, subs{3} = 1; end;
+                if length(subs) < 2, subs{3} = 1; end
                 
                 % repmat if several indices in different dimensions
                 % -------------------------------------------------
@@ -99,11 +99,11 @@ function b = subsref(a,s)
                 inds = (subs{1}-1)*a.data.Format{2}(1)*a.data.Format{2}(2) + (subs{3}-1)*a.data.Format{2}(1) + subs{2};
                 inds = reshape(inds, [1 prod(size(inds))]);
                 b = a.data.data.x(inds);
-            end;
-        end;
-    end;
+            end
+        end
+    end
  
-    if length(finaldim) == 1, finaldim(2) = 1; end;
+    if length(finaldim) == 1, finaldim(2) = 1; end
     b = reshape(b, finaldim);
 
 % 2 dims

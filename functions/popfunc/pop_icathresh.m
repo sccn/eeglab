@@ -86,31 +86,31 @@ rej = EEG.reject.gcompreject;
 if nargin < 1
 	help pop_icathresh;
 	return;	
-end;
+end
 
 if nargin < 2
 	threshval = [];
-end;
+end
 if nargin < 3
 	rejmethod = 'current';
-end;
+end
 if nargin < 4
 	rejvalue = 25;
-end;
+end
 if nargin < 5
 	interact = 1;
-end;
+end
 if ~isempty(threshval)
 	EEG.reject.threshentropy = threshval(1);
 	EEG.reject.threshkurtact = threshval(2);
 	EEG.reject.threshkurtdist = threshval(3);
-end;
+end
 
 tagmenu = 'pop_icathresh';
 
 if ~isempty( findobj('tag', tagmenu))
 	error('cannot open two identical windows, close the first one first');
-end;
+end
 
 % the current rejection will be stored in userdata of the figure
 % --------------------------------------------------------------
@@ -205,7 +205,7 @@ if interact
 	cb_calrej = [ 'ButtonName=questdlg2( ''This will erase previous projections'', ''Confirmation'', ''CANCEL'', ''OK'', ''OK'');' ]
 else
 	cb_calrej = [ 'ButtonName= ''OK''' ];	
-end;
+end
 cb_calrej = [ cb_calrej ...
     		  'switch ButtonName,' ...
        	 	  '   case ''OK'',' ... 
@@ -223,7 +223,7 @@ rejvalpercent = '25';
 switch rejmethod
 	case 'percent', rejvalpercent = num2str( rejvalue);
 	case 'dataset', rejvalother = num2str( rejvalue); 
-end;
+end
     				
 % -----------------------------------------------------
 allh = supergui(gcf, { 	[1] ...
@@ -280,7 +280,7 @@ switch rejmethod
 	case 'dataset', eval([ 'gcbf = [];' cb_other]);
 	case 'current', eval([ 'gcbf = [];' cb_current]);
 	otherwise, eval([ 'gcbf = [];' cb_percent]);
-end;
+end
 
 	
 return;	 

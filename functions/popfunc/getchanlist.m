@@ -39,16 +39,16 @@ function chanlist = getchanlist(chanlocs, type)
     if nargin < 1
         help getchanlist;
         return;
-    end;
+    end
     
     if nargin < 2 || ~isfield(chanlocs, 'type')
         chanlist = [1:length(chanlocs)];
         return;
-    end;
+    end
     
     % search channel types
     % --------------------
-    if ischar(type), type = { type }; end;
+    if ischar(type), type = { type }; end
     type = lower(type);
     chanlist = [];
     alltypes = lower({ chanlocs.type });
@@ -56,9 +56,9 @@ function chanlist = getchanlist(chanlocs, type)
         tmplist = strmatch(type{index}, alltypes, 'exact');
         if isempty(tmplist)
             fprintf('Warning: no channel of type ''%s'' found\n', type{index});
-        end;
+        end
         chanlist = [ chanlist tmplist' ];
-    end;
+    end
     chanlist = sort(chanlist);
     
     

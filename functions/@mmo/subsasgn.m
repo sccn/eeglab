@@ -23,8 +23,8 @@ function obj = subsasgn(obj,ss,val)
 % check empty assignement
 % -----------------------
 for index = 1:length(ss(1).subs)
-    if isempty(ss(1).subs{index}), return; end;
-end;
+    if isempty(ss(1).subs{index}), return; end
+end
 
 % remove useless ":"
 % ------------------
@@ -33,12 +33,12 @@ while length(obj.dimensions) < length(ss(1).subs)
         ss(1).subs(end) = [];
     else
         break;
-    end;
-end;
+    end
+end
 
 % deal with transposed data
 % -------------------------
-if obj.transposed, ss = transposeindices(obj, ss); end;
+if obj.transposed, ss = transposeindices(obj, ss); end
 
 % check stack and local variables
 % ---------------------
@@ -52,13 +52,13 @@ if ncopies < 2
         elseif strcmpi(s(index).class, 'mmo')
             if s(index).persistent || s(index).global
                 disp('Warning: mmo objects should not be made persistent or global. Behavior is unpredictable.');
-            end;
+            end
             tmpVar = evalin('caller', s(index).name);
-            if isequal(tmpVar, obj), ncopies = ncopies + 1; end;
-            if ncopies > 1, break; end;
-        end;
-    end;
-end;
+            if isequal(tmpVar, obj), ncopies = ncopies + 1; end
+            if ncopies > 1, break; end
+        end
+    end
+end
 
 % removing some entries
 % ---------------------
@@ -80,10 +80,10 @@ if isempty(val)
             nonSingleton(end+1) = index;
             if islogical( ss(1).subs{index}),  ss(1).subs{index} = find( ss(1).subs{index}); end
             ss2(1).subs{index} = setdiff_bc([1:newdim1(index)], ss(1).subs{index}); % invert selection
-        end;
-    end;
-    if length(nonSingleton) > 1, error('A null assignment can have only one non-colon index'); end;
-    if isempty(nonSingleton), obj = []; return; end;
+        end
+    end
+    if length(nonSingleton) > 1, error('A null assignment can have only one non-colon index'); end
+    if isempty(nonSingleton), obj = []; return; end
     
     % compute new final dimension and copy data
     % -----------------------------------------
@@ -91,11 +91,11 @@ if isempty(val)
         fid = fopen(newFileName, 'w');
         newdim2 = [ prod(newdim2)-length(ss(1).subs{1}) ];
         if ~(newdim1(1) > 1 && all(newdim1(2:end) == 1)), newdim2 = [1 newdim2]; 
-        else                                              newdim2 = [newdim2 1]; end;
+        else                                              newdim2 = [newdim2 1]; end
         newindices = setdiff_bc([1:prod(newdim1)], ss(1).subs{1});
         for index = newindices
             fwrite(fid, tmpMMO.Data.x(index), 'float');
-        end;
+        end
         fclose(fid);
         fprintf('Warning: memory mapped object writing might not be up to date in cache on network drive');
     else
@@ -104,12 +104,12 @@ if isempty(val)
             newdim2(length(ss(1).subs)+1:end) = [];
             if nonSingleton == length(ss(1).subs)
                 ss2(1).subs{end} = setdiff_bc([1:newdim2(end)], ss(1).subs{end});
-            end;
-        end;
+            end
+        end
         newdim2(nonSingleton) = newdim2(nonSingleton)-length(ss(1).subs{nonSingleton});
         if ischar(ss2.subs{end})
             ss2.subs{end} = [1:prod(newdim1(length(ss2.subs):end))];
-        end;
+        end
         ss3 = ss2;
         fid = fopen(newFileName, 'w');
         
@@ -120,17 +120,17 @@ if isempty(val)
             ss3.subs{end} = ss2.subs{end}(index:min(index+inc, length(ss2.subs{end})));
             tmpdata = subsref(tmpMMO.Data.x, ss3);
             fwrite(fid, tmpdata, 'float');
-        end;
+        end
         fclose(fid);
         fprintf('Warning: memory mapped object writing might not be up to date in cache on network drive');
-    end;
+    end
     
     % delete file if necessary
     if ncopies == 1 && obj.writable
         delete(obj.dataFile);
-    end;
+    end
     
-    if obj.debug, disp('new copy created, old deleted (length 1)'); end;
+    if obj.debug, disp('new copy created, old deleted (length 1)'); end
     obj.dimensions = newdim2;
     obj.dataFile = newFileName;
     obj.writable = true;
@@ -147,32 +147,32 @@ else
         if ~ischar(ss(1).subs{1}) && max(ss(1).subs{1}) > prod(newdim1)
             if length(newdim1) > 2
                 error('Attempt to grow array along ambiguous dimension.');
-            end;
-        end;
+            end
+        end
         if max(ss(1).subs{1}) > prod(newdim2)
             notOneDim = find(newdim2 > 1);
             if length(notOneDim) == 1
                 newdim2(notOneDim) = max(ss(1).subs{1});
-            end;
-        end;
+            end
+        end
     else
-        if length(newdim1) == 3 && newdim1(3) == 1, newdim1(end) = []; end;
+        if length(newdim1) == 3 && newdim1(3) == 1, newdim1(end) = []; end
         if length(ss(1).subs) == 2 && length(newdim1) == 3
             if ~ischar(ss(1).subs{2}) && max(ss(1).subs{2}) > prod(newdim1(2:end))
                 error('Attempt to grow array along ambiguous dimension.');
-            end;
-            if isnumeric(ss(1).subs{1}), newdim2(1) = max(max(ss(1).subs{1}), newdim2(1)); end;
+            end
+            if isnumeric(ss(1).subs{1}), newdim2(1) = max(max(ss(1).subs{1}), newdim2(1)); end
         else
             for index = 1:length(ss(1).subs)
                 if isnumeric(ss(1).subs{index})
                     if index > length(newdim2)
                         newdim2(index) = max(ss(1).subs{index});
                     else newdim2(index) = max(max(ss(1).subs{index}), newdim2(index));
-                    end;
-                end;
-            end;
-        end;
-    end;
+                    end
+                end
+            end
+        end
+    end
     
     % create new array of new size if necessary
     % -----------------------------------------
@@ -201,13 +201,13 @@ else
                     else
                         for index1 = 1:dim1(1)
                             fwrite(fid, tmpMMO.Data.x(index1,index2,index3), 'float');
-                        end;
-                    end;
+                        end
+                    end
                     fwrite(fid, tmpdata1, 'float');
-                end;
-            end;
+                end
+            end
             fwrite(fid, tmpdata2, 'float');
-        end;
+        end
         fwrite(fid, tmpdata3, 'float');
         fclose(fid);
         fprintf('Warning: memory mapped object writing might not be up to date in cache on network drive');
@@ -215,9 +215,9 @@ else
         % delete file if necessary
         if ncopies == 1 && obj.writable
             delete(obj.dataFile);
-        end;
+        end
         
-        if obj.debug, disp('new copy created, old deleted'); end;
+        if obj.debug, disp('new copy created, old deleted'); end
         obj.dimensions = newdim2;
         obj.dataFile = newFileName;
         obj.writable = true;
@@ -230,10 +230,10 @@ else
         copyfile(obj.dataFile, newFileName);
         obj.dataFile = newFileName;
         obj.writable = true;
-        if obj.debug, disp('new copy created'); end;
+        if obj.debug, disp('new copy created'); end
     else
-        if obj.debug, disp('using same copy'); end;
-    end;
+        if obj.debug, disp('using same copy'); end
+    end
     
     % copy new data
     tmpMMO = memmapfile(obj.dataFile, 'writable', obj.writable, 'format', { 'single' obj.dimensions 'x' });
@@ -255,13 +255,13 @@ else
                 ss2(1).subs{1} = index1;
                 if ischar(ss(1).subs{1}) ss3(1).subs{1} = index1;
                 else                    ss3(1).subs{1} = ss(1).subs{1}(index1);
-                end;
+                end
                 tmpMMO.Data.x = builtin('subsasgn', tmpMMO.Data.x, ss3, subsref(val,ss2));
-            end;
-        end;
-    end;
+            end
+        end
+    end
         
     obj = updateWorkspace(obj);
     
-end;
+end
 

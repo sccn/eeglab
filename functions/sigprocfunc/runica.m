@@ -565,14 +565,14 @@ elseif floor(epochs) ~= epochs,
 elseif nsub > ncomps
     fprintf('runica(): there can be at most %d sub-Gaussian components!\n',ncomps);
     return
-end;
+end
 
 if ~isempty(logfile)
     fid = fopen(logfile, 'w');
-    if fid == -1, error('Cannot open logfile for writing'); end;
+    if fid == -1, error('Cannot open logfile for writing'); end
 else
     fid = [];
-end;
+end
 verb = verbose;
 
 if weights ~= 0,                    % initialize weights
@@ -598,10 +598,10 @@ if isnan(nochange)
     else
         nochangeupdated = 1; % for fprinting purposes
         nochange = DEFAULT_STOP;
-    end;
+    end
 else 
     nochangeupdated = 0;
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process the data %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -637,7 +637,7 @@ icaprintf(verb,fid,'Learning rate will be multiplied by %g whenever angledelta >
 
 if nochangeupdated 
     icaprintf(verb,fid,'More than 32 channels: default stopping weight change 1E-7\n');
-end;
+end
 icaprintf(verb,fid,'Training will end when wchange < %g or after %d steps.\n', nochange,maxsteps);
 if biasflag,
     icaprintf(verb,fid,'Online bias adjustment will be used.\n');
@@ -847,8 +847,8 @@ if strcmpi(interrupt, 'on')
     
     if strcmpi(interrupt, 'on')
         drawnow;
-    end;
-end;
+    end
+end
 
 
 %% Compute ICA Weights
@@ -861,10 +861,10 @@ if biasflag & extended
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
-                    if ~isempty(fid), fclose(fid); end;
+                    if ~isempty(fid), fclose(fid); end
                     close; error('USER ABORT');
-                end;
-            end;
+                end
+            end
             
             %% promote data block (only) to double to keep u and weights double
             u=weights*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
@@ -1033,10 +1033,10 @@ if biasflag & ~extended
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
-                    if ~isempty(fid), fclose(fid); end;
+                    if ~isempty(fid), fclose(fid); end
                     close; error('USER ABORT');
-                end;
-            end;
+                end
+            end
             
             u=weights*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
             y=1./(1+exp(-u));                                                
@@ -1153,10 +1153,10 @@ if ~biasflag & extended
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
-                    if ~isempty(fid), fclose(fid); end;
+                    if ~isempty(fid), fclose(fid); end
                     close; error('USER ABORT');
-                end;
-            end;
+                end
+            end
             
             u=weights*double(data(:,timeperm(t:t+block-1))); % promote block to dbl
             y=tanh(u);                                                       %
@@ -1320,10 +1320,10 @@ if ~biasflag & ~extended
                 drawnow;
                 flag = getappdata(fig, 'run');
                 if ~flag,
-                    if ~isempty(fid), fclose(fid); end;
+                    if ~isempty(fid), fclose(fid); end
                     close; error('USER ABORT');
-                end;
-            end;
+                end
+            end
             u=weights*double(data(:,timeperm(t:t+block-1)));
             y=1./(1+exp(-u));                                                %
             weights = weights + lrate*(BI+(1-2*y)*u')*weights;
@@ -1437,12 +1437,12 @@ end
   
 if strcmpi(interrupt, 'on')
     close(fig);
-end;
+end
 
 
   if ~laststep
     laststep = step;
-  end;
+  end
   lrates = lrates(1,1:laststep);           % truncate lrate history vector
 
   %
@@ -1463,7 +1463,7 @@ end;
               data(r,:) = data(r,:)+ser(r); % add back row means 
           end
           data = weights*data; % OK in single
-      end;
+      end
   end
   %
   % NOTE: Now 'data' are the component activations = weights*sphere*raw_data
@@ -1557,4 +1557,4 @@ function icaprintf(verb,fid, varargin);
             fprintf(fid, varargin{:});
         end;        
         fprintf(varargin{:});
-    end;
+    end

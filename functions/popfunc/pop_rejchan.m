@@ -89,13 +89,13 @@ if nargin < 2
     geom = { [2 1.3] [2 1.3] [2 0.4 0.9] [2 1.3] [2 1.3] };
     result = inputgui( 'uilist', uilist, 'geometry', geom, 'title', 'Reject channel -- pop_rejchan()', ...
         'helpcom', 'pophelp(''pop_rejchan'')');
-    if isempty(result), return; end;
+    if isempty(result), return; end
     
     options = { 'elec' eval( [ '[' result{1} ']' ] ) 'threshold' str2num(result{4}) };
     if result{3}, 
          options = { options{:} 'norm', 'on' }; 
     else options = { options{:} 'norm', 'off' }; 
-    end;
+    end
     
     if result{2} == 1
         options = { options{:} 'measure', 'prob' };
@@ -104,11 +104,11 @@ if nargin < 2
     else
         options = { options{:} 'measure', 'spec' };
         options = { options{:} 'freqrange', str2num(result{5})};
-    end;
+    end
 
 else
     options = varargin;
-end;
+end
 
 opt = finputcheck( options, { 'norm'      'string'    { 'on';'off' }       'off';
                               'measure'   'string'    { 'prob';'kurt';'spec' }    'kurt';
@@ -116,7 +116,7 @@ opt = finputcheck( options, { 'norm'      'string'    { 'on';'off' }       'off'
                               'freqrange' 'real'      []                   [1 EEG.srate/2];
                               'elec'      'integer'   []                   [1:EEG.nbchan];
                               'threshold' 'real'   []                      400 }, 'pop_rejchan');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 % compute the joint probability
 % -----------------------------
@@ -124,7 +124,7 @@ if strcmpi(opt.norm, 'on')
     normval = 2;
 else
     normval = 0;
-end;
+end
 if strcmpi(opt.measure, 'prob')
     fprintf('Computing probability for channels...\n');
     [ measure indelec ] = jointprob( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, opt.precomp, normval);
@@ -142,17 +142,17 @@ else
         [tmp fBeg] = min(abs(freq-opt.freqrange(1)));
         [tmp fEnd] = min(abs(freq-opt.freqrange(2)));
         measure = measure(:, fBeg:fEnd);
-    end;
+    end
     
     % consider that data below 20 db has been filtered and remove it
     indFiltered = find(mean(measure) < -20);
-    if ~isempty(indFiltered) && indFiltered(1) > 11, measure = measure(:,1:indFiltered(1)-10); disp('Removing spectrum data below -20dB (most likelly filtered out)'); end;
+    if ~isempty(indFiltered) && indFiltered(1) > 11, measure = measure(:,1:indFiltered(1)-10); disp('Removing spectrum data below -20dB (most likelly filtered out)'); end
     meanSpec = mean(measure);
     stdSpec  = std( measure);
     
 %     for indChan = 1:size(measure,1)
-%         if any(measure(indChan,:) > meanSpec+stdSpec*opt.threshold), indelec(indChan) = 1; end;
-%     end;
+%         if any(measure(indChan,:) > meanSpec+stdSpec*opt.threshold), indelec(indChan) = 1; end
+%     end
     if strcmpi(opt.norm, 'on')
         measure1  = max(bsxfun(@rdivide, bsxfun(@minus, measure, meanSpec), stdSpec),[],2);
         if length(opt.threshold) > 1
@@ -162,7 +162,7 @@ else
         else
             indelec = measure1 > opt.threshold(1);
             disp('Selecting maximum normalized power over the frequency range');
-        end;
+        end
     else
         measure1 = max(measure,[],2);
         if length(opt.threshold) > 1
@@ -172,10 +172,10 @@ else
         else
             indelec = measure > opt.threshold(1);
             disp('Selecting maximum power over the frequency range');
-        end;
-    end;
+        end
+    end
     measure = measure1;
-end;
+end
 colors = cell(1,length(opt.elec)); colors(:) = { 'k' };
 colors(find(indelec)) = { 'r' }; colors = colors(end:-1:1);
 fprintf('%d electrodes labeled for rejection\n', length(find(indelec)));
@@ -185,14 +185,14 @@ indelec = find(indelec)';
 tmpchanlocs = EEG.chanlocs;
 if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { tmpchanlocs(opt.elec).labels }';
 else                       tmplocs = []; tmpelec = mattocell([opt.elec]'); % tmpelec = mattocell([1:EEG.nbchan]');%Ramon on 8/7/2014
-end;
+end
 if exist('measure2', 'var')
      fprintf('#\tElec.\t[min]\t[max]\n');
      tmpelec(:,3) = mattocell(measure2);
      tmpelec(:,4) = mattocell(measure);
 else fprintf('#\tElec.\tMeasure\n');
      tmpelec(:,3) = mattocell(measure);
-end;
+end
 tmpelec(:,2) = tmpelec(:,1);
 tmpelec(:,1) = mattocell([1:length(measure)]');
 for index = 1:size(tmpelec,1)
@@ -202,12 +202,12 @@ for index = 1:size(tmpelec,1)
         fprintf('%d\t%s\t%3.2f'       , tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3});
     else % Ramon on 8/7/2014
         fprintf('%d\t%d\t%3.2f'       , tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3});
-    end;
+    end
     if any(indelec == index), fprintf('\t*Bad*\n');
     else                      fprintf('\n');
-    end;
-end;
-if isempty(indelec), return; end;
+    end
+end
+if isempty(indelec), return; end
 
 com = sprintf('EEG = pop_rejchan(EEG, %s);', vararg2str(options));
 if nargin < 2
@@ -224,6 +224,6 @@ if nargin < 2
 			 'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors(end:-1:1), 'eloc_file', tmplocs, 'command', tmpcom);
 else
     EEG = pop_select(EEG, 'nochannel', opt.elec(indelec));
-end;
+end
 
 return;

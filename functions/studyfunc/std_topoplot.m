@@ -86,7 +86,7 @@ for k = 3:2:nargin
         case 'comps'
             if ischar( varargin{k-1} ), mode = 'apart'; 
             else STUDY = std_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1}); return;
-            end;
+            end
         case 'mode' % Plotting mode 'together' / 'apart'
             mode = varargin{k-1};
         case 'figure'
@@ -110,15 +110,15 @@ if isempty(cls)
         end
     end
     cls = tmp;
-end;
+end
 
 % Plot all the components in the cluster
 disp('Drawing components of cluster (all at once)...');
-if ~isfield(STUDY.cluster,'topo'), STUDY.cluster(1).topo = []; end;
+if ~isfield(STUDY.cluster,'topo'), STUDY.cluster(1).topo = []; end
 for clus = 1: length(cls) % For each cluster requested
     if isempty(STUDY.cluster(cls(clus)).topo)
         STUDY = std_readtopoclust(STUDY,ALLEEG, cls(clus));
-    end;
+    end
 end
 if strcmpi(mode, 'apart')         
     for clus = 1: length(cls) % For each cluster requested

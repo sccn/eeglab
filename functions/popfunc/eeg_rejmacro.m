@@ -41,7 +41,7 @@ if ~exist('elecrange')
 	error('Error: eeg_rejmacro cannot be called from the command line');
 end;	
 
-if ~exist('nbpnts') nbpnts = EEG.pnts; end;
+if ~exist('nbpnts') nbpnts = EEG.pnts; end
 
 % mix all type of rejections
 % --------------------------
@@ -82,7 +82,7 @@ else
              '  if ~isempty(tmprej) eval([ ''if ~isempty('' tmpstr ''),'' tmpstr ''='' tmpstr ''| tmprej; else, '' tmpstr ''=tmprej; end;'' ]); end;' ...
              '  if ~isempty(tmprejE2) eval([ ''if ~isempty('' tmpstr ''E),'' tmpstr ''E='' tmpstr ''E| tmprejE2; else, '' tmpstr ''E=tmprejE2; end;'' ]); end;' ];
 %             '  size(tmprejE2), eval([''disp(size('' tmpstr ''E))'']),' ...
-end;
+end
 % text commented below to fix BUG 478
 %             '  [tmprej tmprejE] = eegplot2trial(TMPREJ,' int2str(nbpnts) ', EEG.trials, [' num2str(EEG.reject.rejmanualcol) '], []);' ...
 %             '  if ~isempty(tmprejE),' ...
@@ -110,7 +110,7 @@ else
 end; 
 if ~exist('topcommand')
 	topcommand = [];
-end;
+end
 
 % the first part is used to convert the eegplot output
 command = [  com2 topcommand 'clear indextmp colortmp icaprefix tmpcom tmprej tmprejE tmprejE2 TMPREJ;' ];
@@ -121,15 +121,15 @@ if all(colrej == EEG.reject.rejmanualcol)
 else
 	oldrej  = eval(macrorej);
 	oldrejE = eval(macrorejE);
-end;
+end
 
 switch superpose
  case 0, rejeegplot = trial2eegplot(  rej, rejE, nbpnts, colrej);
  case 1, rejeegplottmp = trial2eegplot(  oldrej, oldrejE, nbpnts, min(colrej+0.15, [1 1 1]));
          if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplottmp ]; 
-		 else rejeegplot = []; end;
+		 else rejeegplot = []; end
          rejeegplottmp = trial2eegplot(  rej, rejE, nbpnts, colrej);
-         if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
+         if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end
  case 2, 
   rejeegplot = [];
   for index = 1:length(EEG.reject.disprej)
@@ -140,25 +140,25 @@ switch superpose
 				  currentname = [ 'EEG.reject.icarej' EEG.reject.disprej{index} ];
 			  else
 				  currentname = [ 'EEG.reject.rej' EEG.reject.disprej{index} ];
-			  end;
+			  end
 			  currentcolor =  [ 'EEG.reject.rej' EEG.reject.disprej{index} 'col' ];
 			  %if strcmp(EEG.reject.disprej{index}, 'manual')
 			  %	  currentcolor = [ 'min(' currentcolor '+0.15, [1 1 1])' ];
 			  %end; % using this test, manual rejections won't be added to current rej
 			  eval( [ 'rejeegplottmp = trial2eegplot( ' currentname ',' currentname ...
 					  'E, nbpnts,' currentcolor ');' ]);
-			  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
-		  end;
-	  end;
-  end;
+			  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end
+		  end
+	  end
+  end
   rejeegplottmp = trial2eegplot(  rej, rejE, nbpnts, colrej);
-  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
-end;
+  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end
+end
 if ~isempty(rejeegplot)
 	rejeegplot = rejeegplot(:,[1:5,elecrange+5]);
 else
 	rejeegplot = [];
-end;
+end
 eegplotoptions = { 'events', EEG.event, 'winlength', 5, 'winrej', ...
 				   rejeegplot, 'xgrid', 'off', 'wincolor', EEG.reject.rejmanualcol, ...
 				   'colmodif', { { EEG.reject.rejmanualcol EEG.reject.rejthreshcol EEG.reject.rejconstcol ...
@@ -169,15 +169,15 @@ if ~isempty(EEG.chanlocs) & icacomp == 1
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs(elecrange) };
     else
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
-    end;
+    end
 else 
     if exist('elecrange')
         for index = 1:length(elecrange)
             tmpstruct(index).labels = int2str(elecrange(index));
-        end;
+        end
         eegplotoptions = { eegplotoptions{:}  'eloc_file' tmpstruct };
-    end;
-end;
+    end
+end
 if ~reject
 	eegplotoptions = { eegplotoptions{:}  'butlabel', 'UPDATE MARKS' };
-end;
+end

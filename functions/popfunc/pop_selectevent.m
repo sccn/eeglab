@@ -83,7 +83,7 @@ function [EEG, Ievent, com] = pop_selectevent(EEG, varargin);
 if nargin < 1
    help pop_selectevent;
    return;
-end;
+end
 Ievent = [];
 com ='';
 event_indices = [];
@@ -102,7 +102,7 @@ allfields = fieldnames(EEG.event);
 indexmatch = strmatch('urevent', allfields);
 if ~isempty(indexmatch)
     allfields = { allfields{1:indexmatch-1} allfields{indexmatch+1:end} };
-end;
+end
 
 if nargin<2
     geometry = { [0.6 2.1 1.2 0.8 ] };
@@ -128,11 +128,11 @@ if nargin<2
 			 if ~isempty(tmptext)
 				 if size(tmptext,1) > 15,    stringtext = [ tmptext(1,1:15) '...' ]; 
 				 else                        stringtext = tmptext(1,:); 
-				 end;
+				 end
 			 else stringtext = 'no description'; tmptext = 'no description (use menu Edit > Event Field)';
-			 end;
+			 end
         else stringtext = 'no description'; tmptext = 'no description (use menu Edit > Event Field)';
-        end;
+        end
 
 		descrip = { 'string', stringtext, 'callback', ['questdlg2(' vararg2str(tmptext) ...
 					',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ] };
@@ -143,7 +143,7 @@ if nargin<2
         if strcmp(textfield, 'latency') | strcmp(textfield, 'duration')
             if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
             else textfield = [ textfield ' (s)' ];
-            end;
+            end
             middletxt  = { { 'Style', 'text', 'string', 'min' } { 'Style', 'edit', 'string', '' 'tag' [ 'min' allfields{index} ] } ...
                            { 'Style', 'text', 'string', 'max' } { 'Style', 'edit', 'string', '' 'tag' [ 'max' allfields{index} ] } };
             middlegeom = [ 0.3 0.35 0.3 0.35 ];
@@ -167,14 +167,14 @@ if nargin<2
         else
             middletxt  = { { 'Style', 'edit', 'string', '' 'tag' textfield } };
             middlegeom = 1.3;
-        end;
+        end
         geometry = { geometry{:} [0.55 0.65 middlegeom 0.1 0.22 0.1] };
         uilist   = { uilist{:}, ...
          { 'Style', 'text', 'string', textfield }, ...
          { 'Style', 'pushbutton', descrip{:}, 'horizontalalignment', 'left' }, ...
          middletxt{:}, ...
          { }, { 'Style', 'checkbox', 'string', '    ' 'tag' [ 'not' allfields{index} ] },{ } };
-    end;
+    end
     
     % event indices
     % -------------
@@ -208,17 +208,17 @@ if nargin<2
                        'value', 1  'tag' 'rmepochs' } { } { } ...
                      { } { 'Style', 'checkbox', 'string','Invert epoch selection', ...
                        'value', 0 'tag' 'invertepoch' } { } { } };
-    end;
+    end
     
 	[results tmp2 tmp3 res] = inputgui( geometry, uilist, 'pophelp(''pop_selectevent'')', 'Select events -- pop_selectevent()');
-    if length(results) == 0, return; end;
+    if length(results) == 0, return; end
    
     % decode inputs
     % -------------
     args = {};
     if ~res.notindices, args = { args{:},     'event', eval( [ '[' res.indices ']' ]) };
     else                args = { args{:}, 'omitevent', eval( [ '[' res.indices ']' ]) }; 
-    end;
+    end
     for index = 1:length(allfields)
         textfield = allfields{index};
         tmpflag = getfield(res, [ 'not' textfield ]);
@@ -228,7 +228,7 @@ if nargin<2
             maxlat = getfield(res, [ 'max' textfield ]);
             if ~isempty(minlat) & ~isempty(maxlat)
                 tmpres = [ minlat '<=' maxlat ];
-            end;
+            end
         else
             tmpres  = getfield(res, textfield);
             try, tmpres2 = eval( [ '[' tmpres ']' ] );
@@ -237,29 +237,29 @@ if nargin<2
                         tmpres = eval( [ '{' tmpres '}' ] );
                     else
                         tmpres = parsetxt( tmpres ); 
-                    end;
+                    end
                 else
                     tmpres = tmpres2;
-                end;
-            catch, tmpres = parsetxt( tmpres ); end;
+                end
+            catch, tmpres = parsetxt( tmpres ); end
         end
         if ~isempty(tmpres)
             if ~tmpflag, args = { args{:}, textfield, tmpres };
             else         args = { args{:}, [ 'omit' textfield], tmpres }; 
-            end;
-        end;
-    end;
-    if res.invertevent,  args = { args{:}, 'select', 'inverse' }; end;
-    if ~isempty(res.rename),       args = { args{:}, 'renametype', res.rename }; end;
-    if ~isempty(res.retainfield),  args = { args{:}, 'oldtypefield', res.retainfield }; end;
+            end
+        end
+    end
+    if res.invertevent,  args = { args{:}, 'select', 'inverse' }; end
+    if ~isempty(res.rename),       args = { args{:}, 'renametype', res.rename }; end
+    if ~isempty(res.retainfield),  args = { args{:}, 'oldtypefield', res.retainfield }; end
     args = { args{:}, 'deleteevents', fastif(res.rmevents,     'on', 'off') };
     if EEG.trials > 1
         args = { args{:}, 'deleteepochs', fastif(res.rmepochs    , 'on', 'off') };        
         args = { args{:}, 'invertepochs', fastif(res.invertepoch , 'on', 'off') };
-    end;
+    end
 else % no interactive inputs
     args = varargin;
-end;
+end
 
 % setting default for the structure
 % ---------------------------------
@@ -276,17 +276,17 @@ for index = 1:length(allfields)
 	fieldlist{end  , 2} = '';
 	fieldlist{end+1, 1} = [ 'omit' allfields{index} ];
 	fieldlist{end  , 2} = '';
-end;
+end
 g = finputcheck( args, fieldlist, 'pop_selectevent');
-if ischar(g), error(g); end;
-if isempty(g.event), g.event = [1:length(EEG.event)]; end;
-if strcmpi(g.select, 'remove'), g.select = 'inverse'; end;
-if strcmpi(g.select, 'keep'  ), g.select = 'normal'; end;
-if strcmpi(g.deleteepochs, 'yes'  ), g.deleteepochs = 'on'; end;
-if strcmpi(g.deleteepochs, 'no'  ),  g.deleteepochs = 'off'; end;
+if ischar(g), error(g); end
+if isempty(g.event), g.event = [1:length(EEG.event)]; end
+if strcmpi(g.select, 'remove'), g.select = 'inverse'; end
+if strcmpi(g.select, 'keep'  ), g.select = 'normal'; end
+if strcmpi(g.deleteepochs, 'yes'  ), g.deleteepochs = 'on'; end
+if strcmpi(g.deleteepochs, 'no'  ),  g.deleteepochs = 'off'; end
 if ~isempty(g.oldtypefield) & isempty(g.renametype)
     error('A name for the new type must be defined');
-end;
+end
 
 % select the events to keep
 % -------------------------
@@ -304,19 +304,19 @@ for index = 1:length(allfields)
 			if ischar(getfield( EEG.event, {1}, allfields{index}))
 				for tmpind = 1:length(tmpvar)
 					tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
-				end;
+				end
 				tmpvar = tmpvartmp;
-			end;
+			end
 		elseif ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
 			if isnumeric(getfield( EEG.event, {1}, allfields{index}))
 				error(['numerical values must be entered for field ''' allfields{index} '''']);
-			end;
-		end;
-	end;
+			end
+		end
+	end
 		
 	if ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
 		tmpvar = { tmpvar };
-	end;
+	end
 
     % scan each field of EEG.event
     % ----------------------------
@@ -330,9 +330,9 @@ for index = 1:length(allfields)
                 
                 if isempty( tmpindex ),
                     fprintf('Warning: ''%s'' field value ''%s'' not found\n', allfields{index}, tmpvar{index2});
-                end;
+                end
                 Ieventtmp = unique_bc( [ Ieventtmp; tmpindex ]);
-            end;
+            end
             Ievent = intersect_bc( Ievent, Ieventtmp );
         elseif ischar( tmpvar ) % real range
             tmpevent = EEG.event;
@@ -350,13 +350,13 @@ for index = 1:length(allfields)
 				else
 					tmpvarvalue = eeg_point2lat(tmpvarvalue, ones(1,length(EEG.event)), EEG.srate, ...
 											[EEG.xmin EEG.xmax], 1);
-				end;
-			end;
+				end
+			end
 			if strcmp(allfields{index}, 'duration')
 				if EEG.trials > 1, tmpvarvalue = tmpvarvalue/EEG.srate*1000;
                 else               tmpvarvalue = tmpvarvalue/EEG.srate;
-                end;
-            end;
+                end
+            end
 			Ieventlow  = find( tmpvarvalue >= min);
 			Ieventhigh = find( tmpvarvalue <= max);
 			Ievent = intersect_bc( Ievent, intersect( Ieventlow, Ieventhigh ) );
@@ -364,7 +364,7 @@ for index = 1:length(allfields)
 			if strcmp(allfields{index}, 'latency')
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
 						 'so you may use the ''a<=b'' notation to select these values\n']);
-			end;
+			end
             % ======== JRI BUGFIX 3/6/14
             %eval( [ 'tmpevent = EEG.event; tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
             tmpvarvalue = safeConcatenate(EEG.event, allfields{index});            
@@ -372,10 +372,10 @@ for index = 1:length(allfields)
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique_bc( [ Ieventtmp find(tmpvarvalue == tmpvar(index2)) ] );
-            end;
+            end
 			Ievent = intersect_bc( Ievent, Ieventtmp );
-        end;
-     end;
+        end
+     end
         
     % scan each field of EEG.event (omit)
     % -----------------------------------
@@ -383,12 +383,12 @@ for index = 1:length(allfields)
 	if eval(['ischar(EEG.event(1).' allfields{index} ')' ]) & isnumeric(tmpvar) & ~isempty(tmpvar)
 		for tmpind = 1:length(tmpvar) 
 			tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
-		end;
+		end
 		tmpvar = tmpvartmp;
-	end;
+	end
 	if ischar(tmpvar) & isempty( findstr(tmpvar, '<='))
 		tmpvar = { tmpvar };
-	end;
+	end
     if ~isempty( tmpvar )
         if  iscell( tmpvar )
             eval( [ 'tmpevent = EEG.event; tmpvarvalue = {tmpevent(:).' allfields{index} '};'] );
@@ -397,9 +397,9 @@ for index = 1:length(allfields)
                 tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
                 if isempty( tmpindex ),
                     fprintf('Warning: ''%s'' field value ''%s'' not found\n', allfields{index}, tmpvar{index2});
-                end;
+                end
                 Ieventtmp = unique_bc( [ Ieventtmp; tmpindex ]);
-            end;
+            end
             Ieventrem = union_bc( Ieventrem, Ieventtmp );
          elseif ischar( tmpvar )
             tmpevent = EEG.event;
@@ -417,13 +417,13 @@ for index = 1:length(allfields)
 				else
 					tmpvarvalue = eeg_point2lat(tmpvarvalue, ones(1,length(EEG.event)), EEG.srate, ...
 											[EEG.xmin EEG.xmax], 1);
-				end;
-			end;
+				end
+			end
 			if strcmp(allfields{index}, 'duration')
 				if EEG.trials > 1, tmpvarvalue = tmpvarvalue/EEG.srate*1000;
                 else               tmpvarvalue = tmpvarvalue/EEG.srate;
-                end;
-            end;
+                end
+            end
             Ieventlow  = find( tmpvarvalue > min);
             Ieventhigh = find( tmpvarvalue < max);
             Ieventrem = union_bc( Ieventrem, intersect( Ieventlow, Ieventhigh ) );
@@ -431,7 +431,7 @@ for index = 1:length(allfields)
 			if strcmp(allfields{index}, 'latency')
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
 						 'so you may use the ''a<=b'' notation to select these values\n']);
-			end;
+			end
             tmpevent = EEG.event;
             % ======== JRI BUGFIX 3/6/14
             %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
@@ -440,16 +440,16 @@ for index = 1:length(allfields)
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique_bc( [ Ieventtmp find( tmpvarvalue ==tmpvar(index2)) ] );
-            end;
+            end
             Ieventrem = union_bc( Ieventrem, Ieventtmp );
-        end;
-	end;
-end;
+        end
+	end
+end
 
 Ievent = setdiff_bc( Ievent, Ieventrem);
 if strcmp(g.select, 'inverse')
 	Ievent = setdiff_bc( [1:length(EEG.event)], Ievent );
-end;
+end
 
 % checking if trying to remove boundary events (in continuous data)
 if isfield(EEG.event, 'type')
@@ -460,12 +460,12 @@ if isfield(EEG.event, 'type')
         if ~isempty(boundaryindex)
             boundaryindex = Ieventrem(boundaryindex);
             Ievent = [ Ievent boundaryindex ];
-        end;
+        end
         Ievent = sort(Ievent);
     else boundaryindex = [];
-    end;
+    end
 else boundaryindex = [];
-end;
+end
 
 % rename events if necessary
 % --------------------------
@@ -475,13 +475,13 @@ if ~isempty(g.renametype)
         for index = setdiff_bc(Ievent, boundaryindex)
             eval([ 'EEG.event(index).' g.oldtypefield '= EEG.event(index).type;']);
             EEG.event(index).type = g.renametype;
-        end;
+        end
     else
         for index = setdiff_bc(Ievent, boundaryindex)
             EEG.event(index).type = g.renametype;
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % Events: delete epochs
 % ---------------------
@@ -491,27 +491,27 @@ if strcmp( lower(g.deleteepochs), 'on') & EEG.trials > 1
 	Iepoch = ones(1, EEG.trials);
 	for index = 1:length(Ievent)
 		Iepoch(EEG.event(Ievent(index)).epoch) = 0;
-	end;
+	end
     if strcmpi(g.invertepochs, 'on')
         Iepoch = ~Iepoch;
-    end;
+    end
 	Iepoch = find(Iepoch == 0);
 	if length(Iepoch) == 0,
 		error('Empty dataset: all epochs have been removed');
-	end;
+	end
 	if nargin < 2 
 		ButtonName=questdlg2(strvcat([ 'Warning: delete ' num2str(EEG.trials-length(Iepoch)) ...
                             ' (out of ' int2str(EEG.trials) ') un-referenced epochs ?' ]), ...
 							'Confirmation', ...
 							 'Cancel', 'Ok','Ok');
-	else ButtonName = 'ok'; end;
+	else ButtonName = 'ok'; end
 	
 	switch lower(ButtonName),
 	 case 'cancel', return; 
 	 case 'ok',
 	  if strcmpi(g.deleteevents, 'on')
           EEG.event = EEG.event(Ievent);
-      end;
+      end
       EEG = pop_select(EEG, 'trial', Iepoch);
 	end % switch
 else 
@@ -519,8 +519,8 @@ else
     % --------------------------
     if strcmpi(g.deleteevents, 'on')
         EEG.event = EEG.event(Ievent);
-    end;
-end;
+    end
+end
 
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
@@ -530,8 +530,8 @@ argsout = {};
 for index =1:2:length(args)
 	if ~isempty(args{index+1})
 		argsout = { argsout{:} args{index}  args{index+1}};
-	end;
-end;
+	end
+end
 com = sprintf('EEG = pop_selectevent( EEG, %s);', vararg2str(argsout));
 
 % chop the text so that it fits into the description window

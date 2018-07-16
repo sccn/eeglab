@@ -41,7 +41,7 @@ function latout = eeg_urlatency( events, latin );
     if nargin < 2
         help eeg_urlatency;
         return;
-    end;
+    end
     
     boundevents = { events.type };
     latout      = latin;
@@ -52,9 +52,9 @@ function latout = eeg_urlatency( events, latin );
             for index = indbound'
                 tmpInds = find(events(index).latency < latin); % the find handles several input latencies
                 latout(tmpInds) = latout(tmpInds) + events(index).duration;
-            end;
+            end
         elseif ~isempty(indbound) % boundaries but with no associated duration
             latout = NaN;
-        end;
-    end;
+        end
+    end
     

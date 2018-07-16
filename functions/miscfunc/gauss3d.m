@@ -48,28 +48,28 @@ function mat = gauss3d( sizeX, sizeY, sizeZ, sigmaX, sigmaY, sigmaZ, meanX, mean
 if nargin < 2
 	help gauss2d
 	return; 
-end;
+end
 if nargin < 4
 	sigmaX = sizeX/5;
-end;
+end
 if nargin < 5
 	sigmaY = sizeY/5;
-end;
+end
 if nargin < 6
 	sigmaZ = sizeZ/5;
-end;
+end
 if nargin < 7
 	meanX = (sizeX+1)/2;
-end;
+end
 if nargin < 8
 	meanY = (sizeY+1)/2;
-end;
+end
 if nargin < 9
 	meanZ = (sizeZ+1)/2;
-end;
+end
 if nargin < 10
 	cut = 0;
-end;
+end
 
 [X,Y,Z] = ndgrid(1:sizeX,1:sizeY,1:sizeZ);
 
@@ -82,7 +82,7 @@ if cut > 0
 	maximun = max(mat(:))*cut;
 	I = find(mat < maximun);
 	mat(I) = 0;
-end;
+end
 
 return;
 

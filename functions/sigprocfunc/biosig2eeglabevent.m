@@ -36,10 +36,10 @@ function event = biosig2eeglabevent(EVENT, interval, mode)
 
 if nargin < 2
     interval = [];
-end;
+end
 if (nargin < 3) || isempty(mode)
     mode = 0;
-end;
+end
 
 event = [];
 disp('Importing data events...');

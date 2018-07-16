@@ -83,7 +83,7 @@ STUDY = pop_erspparams(STUDY, 'default');
     'component'     'integer' []             [];
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 dtype = opt.datatype;
 
@@ -92,15 +92,15 @@ dtype = opt.datatype;
 tmpDataType = opt.datatype;
 if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc'), 
     tmpDataType = 'timef'; 
-    if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end;
-    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.specparams.freqrange; end;
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.specparams.freqrange; end
 else
-    if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end;
-    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.erspparams.freqrange; end;
-end;
+    if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.erspparams.freqrange; end
+end
 if ~isempty(opt.channels), fileExt = [ '.dat' tmpDataType ];
 else                       fileExt = [ '.ica' tmpDataType ];
-end;
+end
 
 % first subject data file
 % -----------------------
@@ -111,18 +111,18 @@ testSubjectFile = fullfile(ALLEEG(1).filepath, [ ALLEEG(1).subject fileExt ]);
 allSubjects = { STUDY.datasetinfo.subject };
 uniqueSubjects = unique(allSubjects);
 STUDY.subject = uniqueSubjects;
-if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
+if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end
 if isempty(subjectList)
     if isnan(opt.design), subjectList = STUDY.subject;
     else subjectList = STUDY.design(opt.design).cases.value; 
-    end;
-end;
+    end
+end
 
 % options
 % -------
 if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
 else                      opts = { 'freqlimits', opt.freqrange };
-end;
+end
 opts = { opts{:} 'singletrials' opt.singletrials };
 
 for iSubj = 1:length(subjectList)
@@ -131,7 +131,7 @@ for iSubj = 1:length(subjectList)
     bigstruct = [];
     if ~isempty(opt.channels), bigstruct.channel = opt.channels;
     else                       bigstruct.cluster = opt.clusters; % there can only be one cluster
-    end;
+    end
     bigstruct.datatype     = opt.datatype;
     bigstruct.singletrials = opt.singletrials;
     bigstruct.subject      = subjectList{iSubj};
@@ -141,7 +141,7 @@ for iSubj = 1:length(subjectList)
     if isnan(opt.design)
          bigstruct.design.variable = struct([]);
     else bigstruct.design.variable = STUDY.design(opt.design).variable;
-    end;
+    end
 
     % find component indices
     % ----------------------
@@ -151,8 +151,8 @@ for iSubj = 1:length(subjectList)
         for iDat = datasetInds(:)'
             indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject
             compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
-        end;
-    end;
+        end
+    end
     
     % read all channels/components at once
     hashcode = gethashcode(std_serialize(bigstruct));
@@ -170,36 +170,36 @@ for iSubj = 1:length(subjectList)
         if ~isempty(opt.channels)
              [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels);
         else [dataTmp{iSubj} params xvals yvals eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'components', compList);
-        end;
+        end
 
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') % ERP or spectrum
             if strcmpi(opt.singletrials, 'off')
                 dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
-            end;
+            end
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
-        end;
+        end
         if ~isempty(eventsTmp{iSubj}{1}) && strcmpi(opt.singletrials, 'off')
             eventsTmp{iSubj} = cellfun(@(x)squeeze(mean(x)), eventsTmp{iSubj}, 'uniformoutput', false);
-        end;
+        end
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params });
-    end;
-end;
+    end
+end
 
 % if single trials put channels in 2nd dim and trials in last dim
 if strcmpi(opt.singletrials, 'on') && length(opt.channels) > 1
     for iCase = 1:length(dataTmp)
         for iItem = 1:length(dataTmp{1}(:))
             dataTmp{iCase}{iItem} = permute(dataTmp{iCase}{iItem}, [1 3 2]);
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % store data for all subjects
 if strcmpi(opt.datatype, 'erp') || strcmpi(opt.datatype, 'spec')
-     if length(opt.channels) > 1, dim = 3; else dim = 2; end;
-else if length(opt.channels) > 1, dim = 4; else dim = 3; end;
-end;
+     if length(opt.channels) > 1, dim = 3; else dim = 2; end
+else if length(opt.channels) > 1, dim = 4; else dim = 3; end
+end
 datavals = reorganizedata(dataTmp, dim);
 events   = reorganizedata(eventsTmp, 1);
 
@@ -212,11 +212,11 @@ if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && st
     componentPol = STUDY.cluster(opt.clusters).topopol;
     if isempty(componentPol)
         disp('Cluster topographies absent - cannot adjust single component ERP polarities');
-    end;
+    end
     for iItem = 1:length(datavals)
         datavals{iItem} = bsxfun(@times, datavals{iItem}, componentPol);
-    end;
-end;
+    end
+end
 
 % compute mean spectrum
 % ---------------------
@@ -230,22 +230,22 @@ function meanpowbase = computemeanspectrum(spectrum, singletrials)
                 if strcmpi(singletrials, 'on')
                     if count == 0, meanpowbase = mean(spectrum{index},2);
                     else           meanpowbase = meanpowbase + mean(spectrum{index},2);
-                    end;
+                    end
                 else
                     if count == 0, meanpowbase = spectrum{index};
                     else           meanpowbase = meanpowbase + spectrum{index};
-                    end;
-                end;
+                    end
+                end
                 count = count+1;
-            end;
-        end;
+            end
+        end
         meanpowbase = meanpowbase/count;
     catch,
         error([ 'Problem while subtracting mean spectrum.' 10 ...
                 'Common spectrum subtraction is performed based on' 10 ...
                 'pairing settings in your design. Most likelly, one' 10 ...
                 'independent variable should not have its data paired.' ]);
-    end;
+    end
         
 % remove mean spectrum 
 % --------------------
@@ -256,11 +256,11 @@ function spectrum = removemeanspectrum(spectrum, meanpowbase)
                 if size(spectrum{c,g},2) ~= size(meanpowbase, 2)
                      tmpmeanpowbase = repmat(meanpowbase, [1 size(spectrum{c,g},2)]);
                 else tmpmeanpowbase = meanpowbase;
-                end;
+                end
                 spectrum{c,g} = spectrum{c,g} - tmpmeanpowbase;
-            end;
-        end;
-    end;
+            end
+        end
+    end
 
 % reorganize data
 % ---------------
@@ -272,8 +272,8 @@ function datavals = reorganizedata(dataTmp, dim)
             case 2, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) numItems], 'single'); 
             case 3, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) numItems], 'single'); 
             case 4, datavals{iItem} = zeros([ size(dataTmp{1}{iItem},1) size(dataTmp{1}{iItem},2) size(dataTmp{1}{iItem},3) numItems], 'single'); 
-        end;
-    end;
+        end
+    end
     for iItem=1:length(dataTmp{1}(:)')
         count = 1;
         for iCase = 1:length(dataTmp)
@@ -283,11 +283,11 @@ function datavals = reorganizedata(dataTmp, dim)
                     case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 4, datavals{iItem}(:,:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
-                end;
+                end
                 count = count+numItems;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
 % call newtimef (duplicate function in std_erspplot)
 % --------------
@@ -300,12 +300,12 @@ function dataout = processtf(dataSubject, xvals, datatype, singletrials, g)
         if strcmpi(singletrials, 'off')
             if ndims(dataout) == 4,     dataout = mean(dataout, 4);
             elseif ndims(dataout) == 3, dataout = mean(dataout, 3);
-            end;
-        end;
+            end
+        end
     else
         if strcmpi(singletrials, 'off')
-            if ~isfield(params, 'itctype'), params.itctype = 'phasecoher'; end;
+            if ~isfield(params, 'itctype'), params.itctype = 'phasecoher'; end
             dataout = newtimefitc(dataSubject, g.itctype);
-        end;
-    end;
+        end
+    end
     

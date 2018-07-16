@@ -43,17 +43,17 @@ for iField = 1:length(fields)
         iSubj = strmatch( STUDY.datasetinfo(iDat).subject, subjects);
         if ~isempty(STUDY.datasetinfo(iDat).(fields{iField}))
             subjVals{iSubj}{end+1} = STUDY.datasetinfo(iDat).(fields{iField});
-        end;
-    end;
+        end
+    end
     
     for iSubj = 1:length(subjVals)
         if ~isempty(subjVals{iSubj})
             if ischar(subjVals{iSubj}{1}) subjVals{iSubj} = unique(subjVals{iSubj});
             else                         subjVals{iSubj} = mattocell(unique([subjVals{iSubj}{:}]));
-            end;
-        end;
-    end;
+            end
+        end
+    end
     if all( cellfun(@length, subjVals) == 1 )
         groupvar{end+1} = fields{iField};
-    end;
-end;
+    end
+end

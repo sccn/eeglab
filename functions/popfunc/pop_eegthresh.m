@@ -88,11 +88,11 @@ end;
 if icacomp == 0
 	if isempty( EEG.icasphere )
 		disp('Error: you must run ICA first'); return;
-	end;
-end;
+	end
+end
 if exist('reject') ~= 1
     reject = 1;
-end;
+end
 
 if nargin < 3
     
@@ -130,7 +130,7 @@ if nargin < 3
     result = inputgui( geometry,uilist,'pophelp(''pop_eegthresh'');', figname);
     
     size_result  = size( result );
-    if size_result(1) == 0 return; end;
+    if size_result(1) == 0 return; end
     elecrange    = result{1};
     negthresh    = result{2};
     posthresh    = result{3};
@@ -138,7 +138,7 @@ if nargin < 3
     endtime      = result{5};
     superpose    = result{6};
     reject       = result{7};
-end;
+end
 
 if ischar(elecrange) % convert arguments if they are in text format
     calldisp = 1;
@@ -147,22 +147,22 @@ if ischar(elecrange) % convert arguments if they are in text format
     posthresh = eval( [ '[' posthresh ']' ]  );
     if ischar(starttime)
         starttime = eval( [ '[' starttime ']' ]  );
-    end;
+    end
     if ischar(endtime)
         endtime   = eval( [ '[' endtime ']' ]  );
-    end;
+    end
 else
     calldisp = 0;
-end;
+end
 
 if any(starttime < EEG.xmin) 
  fprintf('Warning : starttime inferior to minimum time, adjusted\n'); 
 	starttime(find(starttime < EEG.xmin)) = EEG.xmin; 
-end;
+end
 if any(endtime   > EEG.xmax) 
 	fprintf('Warning : endtime superior to maximum time, adjusted\n'); 
 	endtime(find(endtime > EEG.xmax)) = EEG.xmax;
-end;
+end
 
 if icacomp == 1
 	[Itmp Irej NS Erejtmp] = eegthresh( EEG.data, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
@@ -173,7 +173,7 @@ else
 	[Itmp Irej NS Erejtmp] = eegthresh( icaacttmp, EEG.pnts, 1:length(elecrange), negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
     tmpelecIout = zeros(size(EEG.icaweights,1), EEG.trials);
     tmpelecIout(elecrange,Irej) = Erejtmp;
-end;
+end
 
 fprintf('%d channel selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trials marked for rejection\n', length(Irej), EEG.trials);
@@ -187,7 +187,7 @@ if calldisp
         			macrorejE = 'EEG.reject.rejthreshE';
     else			macrorej  = 'EEG.reject.icarejthresh';
         			macrorejE = 'EEG.reject.icarejthreshE';
-    end;
+    end
 	
 	colrej = EEG.reject.rejthreshcol;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
@@ -196,12 +196,12 @@ if calldisp
         eegplot( EEG.data(elecrange,:,:), 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
     else
         eegplot( icaacttmp, 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
-    end;
+    end
 else 
     if reject == 1
         EEG = pop_rejepoch(EEG, rej, 0);
-    end;
-end;
+    end
+end
 if ~isempty(rej)
     if icacomp	== 1
         EEG.reject.rejthresh  = rej;
@@ -209,8 +209,8 @@ if ~isempty(rej)
     else
         EEG.reject.icarejthresh  = rej;
         EEG.reject.icarejthreshE = rejE;
-    end;
-end;
+    end
+end
 
 %com = sprintf('Indexes = pop_eegthresh( %s, %d, [%s], [%s], [%s], [%s], [%s], %d, %d);', ...
 %   inputname(1), icacomp, num2str(elecrange),  num2str(negthresh), ...
@@ -219,7 +219,7 @@ com = [ com sprintf('EEG = pop_eegthresh(EEG,%s);', ...
 		vararg2str({icacomp,elecrange,negthresh,posthresh,starttime,endtime,superpose,reject})) ]; 
 if nargin < 3
 	Irej = com;
-end;
+end
 
 return;
 
@@ -239,5 +239,5 @@ function [Irej, Erej] = thresh( data, elecrange, timerange, negthresh, posthresh
 						timerange, starttime, endtime);
  	   Irej = union_bc(Irej, Itmprej);
  	   Erej(elecrange(index),Itmprej) = Etmprej;
-	end;
+	end
 

@@ -52,7 +52,7 @@ com ='';
 if nargin < 1
     help pop_rmbase;
     return;
-end;
+end
 if isempty(EEG(1).data)
     disp('pop_rmbase(): cannot remove baseline of an empty dataset'); return;
 end;    
@@ -66,7 +66,7 @@ if nargin < 2 & EEG(1).trials > 1
     defaultbase = [num2str(EEG(1).times(1)) ' 0'];
     if EEG(1).times(1) >= 0
         defaultbase = '[ ]';
-    end;
+    end
     uilist = { { 'style' 'text' 'string' 'Baseline latency range ([min max] in ms) ([ ] = whole epoch):' } ...
                { 'style' 'edit' 'string'  defaultbase } ...
                { 'style' 'text' 'string' 'Or remove baseline points vector (ex:1:56):' } ...
@@ -75,8 +75,8 @@ if nargin < 2 & EEG(1).trials > 1
                };
     uigeom = { [3 1] [3 1] [1] };
     [result usrdat] = inputgui( 'uilist', uilist, 'geometry', uigeom, 'title', 'Baseline removal - pop_rmbase()', 'helpcom', 'pophelp(''pop_rmbase'');'); 
-    if isempty(result), return; end;
-    if ~isempty(usrdat) && isnan(usrdat), return; end;
+    if isempty(result), return; end
+    if ~isempty(usrdat) && isnan(usrdat), return; end
 
 	% decode parameters
 	% -----------------
@@ -93,10 +93,10 @@ elseif nargin < 2 && EEG(1).trials == 1
 	% popup window parameters
 	% -----------------------
     resp = questdlg2(strvcat('Remove mean of each data channel'), 'pop_rmbase', 'Cancel', 'Ok', 'Ok');
-    if strcmpi(resp, 'Cancel'), return; end;
+    if strcmpi(resp, 'Cancel'), return; end
     timerange = [];
     pointrange = [1:EEG(1).pnts];
-end;
+end
 
 % process multiple datasets
 % -------------------------
@@ -104,21 +104,21 @@ if length(EEG) > 1
     [ EEG com ] = eeg_eval( 'pop_rmbase', EEG, 'warning', 'on', 'params', ...
                             { timerange pointrange } );
     return;
-end;
+end
 
 flag_timerange = 1; % provide timerange as input (so use in history)
 if ~isempty(timerange)
     if timerange(1) < EEG.times(1) || timerange(end) > EEG.times(end)
         error('pop_rmbase(): Bad time range');
-    end;
+    end
     pointrange = find( EEG.times >= timerange(1) & EEG.times <= timerange(2));
 elseif ~isempty(pointrange)
     flag_timerange = 0;
-    if pointrange(1) < 1, pointrange(1) = 1; end;
-    if pointrange(end) > EEG.pnts, pointrange(end) = EEG.pnts; end;
+    if pointrange(1) < 1, pointrange(1) = 1; end
+    if pointrange(end) > EEG.pnts, pointrange(end) = EEG.pnts; end
 else
     pointrange = [1:EEG.pnts];
-end;
+end
 
 %
 % Respect excised data boundaries if continuous data
@@ -142,8 +142,8 @@ if EEG.trials == 1 && ~isempty(EEG.event) ...
                                                    [1:length(tmprange)]);
             elseif length(tmprange) == 1
                 EEG.data(:,tmprange) = 0;
-            end;
-        end;
+            end
+        end
     else
         EEG.data = rmbase( EEG.data, EEG.pnts, pointrange );    
     end;		
@@ -151,9 +151,9 @@ else
     for indc = 1:EEG.nbchan
         tmpmean  = mean(double(EEG.data(indc,pointrange,:)),2);
         EEG.data(indc,:,:) = EEG.data(indc,:,:) - repmat(tmpmean, [1 EEG.pnts 1]);
-    end;
+    end
 %    EEG.data = rmbase( reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials), EEG.pnts, pointrange );
-end;
+end
 
 EEG.data = reshape( EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 EEG.icaact = [];

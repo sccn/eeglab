@@ -67,19 +67,19 @@ function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
       imagesc(times,newfreqs,data,clim);
   else 
       imagesc(times,newfreqs,data);
-  end;
+  end
   set(gca, 'yscale', 'log');
   
   % puting ticks
   % ------------
-  if nargin >= 5, set(gca, 'xtick', xticks); end;
+  if nargin >= 5, set(gca, 'xtick', xticks); end
   if nargin >= 6
       divs = yticks;
   else 
       divs = linspace(log(freqs(1)), log(freqs(end)), 10);
       divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
                                                % out-of border label with within border ticks
-  end;
+  end
   set(gca, 'ytickmode', 'manual');
   set(gca, 'ytick', divs);
   
@@ -88,5 +88,5 @@ function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
   set(gca, 'yminortick', 'off', 'xaxislocation', 'bottom', 'box', 'off', 'ticklength', [0.03 0], 'tickdir','out', 'color', 'none');  
   if ~isempty(varargin)
       set(gca, varargin{:});
-  end;
+  end
   

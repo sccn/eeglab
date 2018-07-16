@@ -37,7 +37,7 @@ function [data, subject, comp_names] = std_selcomp(STUDY, data, clust, setinds, 
 if nargin < 2
     help std_selcomp;
     return;
-end;
+end
 
 optndims = ndims(data{1});
 comp_names = {};
@@ -45,12 +45,12 @@ subject    = '';
 
 % find and select group
 % ---------------------
-if isempty(compsel), return; end;
+if isempty(compsel), return; end
 sets   = STUDY.cluster(clust).sets(:,compsel);
 comps  = STUDY.cluster(clust).comps(compsel);
 %grp    = STUDY.datasetinfo(sets(1)).group;
 %grpind = strmatch( grp, STUDY.group );
-%if isempty(grpind), grpind = 1; end;
+%if isempty(grpind), grpind = 1; end
 %data = data(:,grpind);
 
 % find component
@@ -62,8 +62,8 @@ for c = 1:length(data(:))
         setindex = STUDY.design(STUDY.currentdesign).cell(setinds{c}(ind)).dataset;
         if compinds{c}(ind) == comps && any(setindex == sets)
             rminds(ind) = [];
-        end;
-    end;
+        end
+    end
         
     if optndims == 2
         data{c}(:,rminds) = []; %2-D
@@ -71,18 +71,18 @@ for c = 1:length(data(:))
         data{c}(:,:,rminds) = []; %3-D
     else
         data{c}(:,:,:,rminds) = []; %3-D
-    end;
+    end
     comp_names{c,1} = comps;
-end;
+end
 % for c = 1:size(data,1)
 %     for ind = 1:length(compinds{1,grpind})
 %         if compinds{1,grpind}(ind) == comps & any(setinds{1,grpind}(ind) == sets)
 %             if optndims == 2
 %                  data{c} = data{c}(:,ind);
 %             else data{c} = data{c}(:,:,ind);
-%             end;
+%             end
 %             comp_names{c,1} = comps;
-%         end;
-%     end;
-% end;
+%         end
+%     end
+% end
 subject = STUDY.datasetinfo(sets(1)).subject;

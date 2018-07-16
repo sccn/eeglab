@@ -56,7 +56,7 @@ global ALLCOM;
 %    fprintf('2: %s\n', command);
 %elseif nargin == 1
 %    fprintf('1: %s\n', command);
-%end;
+%end
 
 if nargin < 1
 	if isempty(ALLCOM)
@@ -71,17 +71,17 @@ if nargin < 1
 			else
 				fprintf('%s\n', txt );
 			end;				
-		end;
+		end
 	end;	
     if nargout > 0
         str = strvcat(ALLCOM);
-    end;
+    end
 elseif nargin == 1
 	if isempty( command )
 		return;
-	end;
+	end
 	if ischar( command )
-        if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end;
+        if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end
 		if isempty(ALLCOM)
 			ALLCOM = { command };
 		else	
@@ -103,7 +103,7 @@ elseif nargin == 1
 				end;				
 				evalin( 'base', ALLCOM{command} ); % execute element
 				eegh( ALLCOM{command} );    % add to history
-			end;
+			end
 		end;	
 	end;		
 else % nargin == 2
@@ -113,13 +113,13 @@ else % nargin == 2
                 if ~isempty(findstr(ALLCOM{index}, str))
                     str = ALLCOM{index};  
                     return;
-                end;
-            end;
+                end
+            end
             str = [];
-        end;
+        end
     else
         % warning also some code present in eeg_store and pop_newset
-        if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end;
+        if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end
         eegh(command); % add to history
         if ~isempty(command)
             if length(str) == 1
@@ -127,10 +127,10 @@ else % nargin == 2
             else
                 for i = 1:length(str)
                     str(i) = eeg_hist(str(i), [ '% multiple datasets command: ' command ]);
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end
 
 

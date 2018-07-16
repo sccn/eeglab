@@ -74,9 +74,9 @@ if ~isempty(varargin)  % Are there optional parameters available?
             k = k + 2;
         else  % Ignore unknown parameters
             k = k + 2;
-        end;
-    end;
-end;
+        end
+    end
+end
 
 fields = fieldnames(EEG.event);  % Get all event fields
 nFields = length(fields);  % Number of event fields

@@ -57,13 +57,13 @@ com = '';
 if nargin < 1
    help pop_plotdata;
    return;
-end;
+end
 if nargin < 2
 	typeplot = 1; % 1=signal; 0=component
-end;
+end
 if exist('plottitle') ~= 1
 	plottitle = '';
-end;
+end
 
 if nargin <3
 	if typeplot % plot signal channels
@@ -83,7 +83,7 @@ if nargin <3
                                    {   ['1:' int2str(size(EEG.icawinv,2))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] ['0 0'] }, ...
                                    'pop_plotdata' );
 	end;		
-	if length(result) == 0 return; end;
+	if length(result) == 0 return; end
 
 	indices   	 = eval( [ '[' result{1} ']' ] );
 
@@ -117,7 +117,7 @@ if EEG.trials > 1 & singletrials == 0
        tmpdata = eeg_getdatact(EEG, 'component', indices, 'trialindices', trials);
 	   fprintf('Averaging...\n');
 	   sigtmp = nan_mean(tmpdata,3);
-	end;
+	end
 else
 	if typeplot == 1
 	   sigtmp = EEG.data(indices,:,trials);
@@ -126,10 +126,10 @@ else
 	      error('no ICA data for this set, first run ICA');
 	   end;  
        sigtmp = eeg_getdatact(EEG, 'component', indices, 'trialindices', trials);
-	end;
-end;
+	end
+end
 figure;
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 if exist('YDIR') ~= 1
      ydir = 1;
 else
@@ -156,7 +156,7 @@ if ~isempty(EEG.chanlocs) && typeplot == 1
     chanlabels = strvcat({ tmpchanlocs(indices).labels });
 else
     chanlabels = num2str(indices(:));
-end;
+end
 plottopo( sigtmp, 'frames', EEG.pnts, 'limits', [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], 'title', plottitle, 'chans', 1:size(sigtmp,1), 'ydir', ydir, 'channames', chanlabels);
 %plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], plottitle, indices,0,0,ydir);
 
@@ -167,7 +167,7 @@ if typeplot == 1
 	set(gcf, 'name', 'Plot > Channel ERPs > In rect. array -- plotdata()');
 else
 	set(gcf, 'name', 'Plot > Component ERPs > In rect. array -- plotdata()');
-end;
+end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%% set y-axis direction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -188,7 +188,7 @@ end
 switch nargin
 	case {0, 1, 2, 3}, com = sprintf('pop_plotdata(EEG, %d, %s, [1:%d], ''%s'', %d, %d, [%g %g]);', typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials,ydir,ymin,ymax);
 	case 4, com = sprintf('pop_plotdata(EEG, %d, %s, %s, ''%s'', %d, %d, [%g %g]);', typeplot, vararg2str(indices), vararg2str(trials), plottitle, singletrials,ydir,ymin,ymax);
-end;
+end
 
 fprintf([com '\n']);
 return;

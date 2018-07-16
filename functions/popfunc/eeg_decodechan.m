@@ -68,23 +68,23 @@ if ischar(chanstr)
             if isnan(str2double(chanlocs(1).(field))) % channel labels are not numerical
                 if ~isnan(str2double(c))
                     chanlistnum(end+1) = str2double(c);
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end
     if length(chanlistnum) == length(chanlist)
         chanlist = chanlistnum;
-    end;
+    end
 else
     chanlist = chanstr;
-end;
+end
 
 % convert to values
 % -----------------
 chanval = 0;
 if isnumeric(chanlist)
     chanval = chanlist;
-end;
+end
 % chanval  = [];
 % if iscell(chanlist)
 %     for ind = 1:length(chanlist)
@@ -93,11 +93,11 @@ end;
 %         if ~isnan(valtmp)
 %              chanval(end+1) = valtmp;
 %         else chanval(end+1) = 0;
-%         end;
-%     end;
+%         end
+%     end
 % else
 %     chanval = chanlist;
-% end;
+% end
 
 % convert to numerical
 % --------------------
@@ -113,23 +113,23 @@ else
         if ~isempty(indmatch)
             for tmpi = 1:length(indmatch)
                 chaninds(end+1) = indmatch(tmpi);
-            end;
+            end
         else
             try,
                 eval([ 'chaninds = ' chanlist{ind} ';' ]);
                 if isempty(chaninds)
                      error([ 'Channel ''' chanlist{ind} ''' not found' ]);
                 else 
-                end;
+                end
             catch
                 error([ 'Channel ''' chanlist{ind} ''' not found' ]);
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 chaninds = sort(chaninds);
 if ~isempty(chanlocs)
     chanlist = { chanlocs(chaninds).(field) };
 else
     chanlist = {};
-end;
+end

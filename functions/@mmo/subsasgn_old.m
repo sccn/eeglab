@@ -52,14 +52,14 @@ if ~isempty(stack)
                 % we are in a script.
                 while ~isempty(stack) && ~isequal(stack, obj.workspace)
                     stack(1) = [];
-                end;
+                end
                 if ~isequal(stack, obj.workspace)
                     ncopies = 2;
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end
 
 % check local variables
 % ---------------------
@@ -72,13 +72,13 @@ if ncopies < 2
         elseif strcmpi(s(index).class, 'mmo')
             if s(index).persistent || s(index).global
                 disp('Warning: mmo objects should not be made persistent or global. Behavior is unpredictable.');
-            end;
+            end
             tmpVar = evalin('caller', s(index).name);
-            if isequal(tmpVar, obj), ncopies = ncopies + 1; end;
-            if ncopies > 1, break; end;
-        end;
-    end;
-end;
+            if isequal(tmpVar, obj), ncopies = ncopies + 1; end
+            if ncopies > 1, break; end
+        end
+    end
+end
 
 % removing some entries
 % ---------------------
@@ -98,10 +98,10 @@ if isempty(val)
         if ~ischar(subs{index}) % can only be ":"
             nonSingleton(end+1) = index;
             subs2 = setdiff_bc([1:newdim1(index)], subs{index}); % invert selection
-        end;
-    end;
-    if length(nonSingleton) > 1, error('A null assignment can have only one non-colon index'); end;
-    if isempty(nonSingleton), obj = []; return; end;
+        end
+    end
+    if length(nonSingleton) > 1, error('A null assignment can have only one non-colon index'); end
+    if isempty(nonSingleton), obj = []; return; end
     
     % compute new final dimension
     % ---------------------------
@@ -111,7 +111,7 @@ if isempty(val)
         newindices = setdiff_bc([1:prod(newdim1)], ss(1).subs{1});
         for index = newindices
             fwrite(fid, tmpMMO.Data.x(index), 'float');
-        end;
+        end
         fclose(fid);
     else
         newdim2(nonSingleton) = newdim2(nonSingleton)-length(subs{index});
@@ -119,14 +119,14 @@ if isempty(val)
         fid = fopen(newFileName, 'w');
         fwrite(fid, tmpMMO.Data.x(index), 'float');
         fclose(fid);
-    end;
+    end
     
     % delete file if necessary
     if ncopies == 1 && obj.writable
         delete(obj.dataFile);
-    end;
+    end
     
-    if obj.debug, disp('new copy created, old deleted (length 1)'); end;
+    if obj.debug, disp('new copy created, old deleted (length 1)'); end
     obj.dimensions = [1 newdim2];
     obj.dataFile = newFileName;
     obj.writable = true;
@@ -139,8 +139,8 @@ elseif ncopies == 1 && obj.writable
         if index > length(newdim2)
             newdim2(index) = max(ss(1).subs{index});
         else newdim2(index) = max(max(ss(1).subs{index}), newdim2(index));
-        end;
-    end;
+        end
+    end
     
     % create new array of new size
     % -----------------------------------------
@@ -154,21 +154,21 @@ elseif ncopies == 1 && obj.writable
     for index = 1:prod(newdim1(2:end))
         fwrite(fid, tmpMMO.Data.x(:,index), 'float');
         fwrite(fid, tmpdata, 'float');
-    end;
+    end
     if prod(newadim1(2:end)) ~= prod(newdim2(2:end))
         tmpdata = zeros(newdim2(1), 1, 'single');
         for index = prod(newdim1(2:end))+1:prod(newdim2(2:end))
             fwrite(fid, tmpdata, 'float');
-        end;
-    end;
+        end
+    end
     fclose(fid);
     
     % delete file if necessary
     if ncopies == 1 && obj.writable
         delete(obj.dataFile);
-    end;
+    end
     
-    if obj.debug, disp('new copy created, old deleted'); end;
+    if obj.debug, disp('new copy created, old deleted'); end
     obj.dimensions = newdim2;
     obj.dataFile = newFileName;
     obj.writable = true;
@@ -184,16 +184,16 @@ else
             notOneDim = find(newdim2 > 1);
             if length(notOneDim) == 1
                 newdim2(notOneDim) = max(ss(1).subs{1});
-            end;
-        end;
+            end
+        end
     else
         for index = 1:length(ss(1).subs)
             if index > length(newdim2)
                 newdim2(index) = max(ss(1).subs{index});
             else newdim2(index) = max(max(ss(1).subs{index}), newdim2(index));
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     % create new array of new size if necessary
     % -----------------------------------------
@@ -208,21 +208,21 @@ else
         for index = 1:prod(newdim1(2:end))
             fwrite(fid, tmpMMO.Data.x(:,index), 'float');
             fwrite(fid, tmpdata, 'float');
-        end;
+        end
         if prod(newdim1(2:end)) ~= prod(newdim2(2:end))
             tmpdata = zeros(newdim2(1), 1, 'single');
             for index = prod(newdim1(2:end))+1:prod(newdim2(2:end))
                 fwrite(fid, tmpdata, 'float');
-            end;
-        end;
+            end
+        end
         fclose(fid);
         
         % delete file if necessary
         if ncopies == 1 && obj.writable
             delete(obj.dataFile);
-        end;
+        end
         
-        if obj.debug, disp('new copy created, old deleted'); end;
+        if obj.debug, disp('new copy created, old deleted'); end
         obj.dimensions = newdim2;
         obj.dataFile = newFileName;
         obj.writable = true;
@@ -235,15 +235,15 @@ else
         copyfile(obj.dataFile, newFileName);
         obj.dataFile = newFileName;
         obj.writable = true;
-        if obj.debug, disp('new copy created'); end;
+        if obj.debug, disp('new copy created'); end
     else
-        if obj.debug, disp('using same copy'); end;
-    end;
+        if obj.debug, disp('using same copy'); end
+    end
     
     tmpMMO = memmapfile(obj.dataFile, 'writable', obj.writable, 'format', { 'single' obj.dimensions 'x' });
     tmpMMO.Data.x = builtin('subsasgn', tmpMMO.Data.x, ss, val);
     
-end;
+end
 
 return;
 
@@ -260,16 +260,16 @@ if isstruct(arg)
     for ilen = 1:length(arg)
         for index = fieldnames(arg)'
             ncopies = ncopies + checkcopies_local(obj, arg(ilen).(index{1}));
-            if ncopies > 1, return; end;
-        end;
-    end;
+            if ncopies > 1, return; end
+        end
+    end
 elseif iscell(arg)
     for index = 1:length(arg(:))
         ncopies = ncopies + checkcopies_local(obj, arg{index});
-        if ncopies > 1, return; end;
-    end;
+        if ncopies > 1, return; end
+    end
 elseif isa(arg, 'mmo') && isequal(obj, arg)
     ncopies = 1;
 else
     ncopies = 0;
-end;
+end

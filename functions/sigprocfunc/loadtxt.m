@@ -60,10 +60,10 @@ if nargin < 1
 end;	
 if ~isempty(varargin)
    try, g = struct(varargin{:});
-   catch, disp('Wrong syntax in function arguments'); return; end;
+   catch, disp('Wrong syntax in function arguments'); return; end
 else
     g = [];
-end;
+end
 
 g = finputcheck( varargin, { 'convert'   'string'   { 'on';'off';'force' }   'on';
                              'skipline'  'integer'  [0 Inf]          0;
@@ -73,8 +73,8 @@ g = finputcheck( varargin, { 'convert'   'string'   { 'on';'off';'force' }   'on
                              'convertmethod' 'string'   { 'str2double';'str2num' }   'str2double';
                              'delim'     { 'integer';'string' } []               [9 32];
                              'nlines'    'integer'  []               Inf });
-if ischar(g), error(g); end;
-if strcmpi(g.blankcell, 'off'), g.uniformdelim = 'on'; end;
+if ischar(g), error(g); end
+if strcmpi(g.blankcell, 'off'), g.uniformdelim = 'on'; end
 g.convert = lower(g.convert);
 g.verbose = lower(g.verbose);
 g.delim = char(g.delim);
@@ -95,7 +95,7 @@ end; % skip lines ---------
 
 inputline = fgetl(fid);
 linenb = 1;
-if strcmp(g.verbose, 'on'), fprintf('Reading file (lines): '); end;
+if strcmp(g.verbose, 'on'), fprintf('Reading file (lines): '); end
 while isempty(inputline) | inputline~=-1
      colnb = 1;
      if ~isempty(inputline)
@@ -105,12 +105,12 @@ while isempty(inputline) | inputline~=-1
          if strcmpi(g.uniformdelim, 'on')
              for index = 2:length(g.delim)
                  inputline(find(inputline == g.delim(index))) = g.delim(1);
-             end;
-         end;
+             end
+         end
          
          while ~isempty(deblank(inputline))
-             if strcmpi(g.blankcell,'off'), inputline = strtrim(inputline); end;
-             if tabFirstpos && length(inputline) > 1 && all(inputline(1) ~= g.delim), tabFirstpos = 0; end;
+             if strcmpi(g.blankcell,'off'), inputline = strtrim(inputline); end
+             if tabFirstpos && length(inputline) > 1 && all(inputline(1) ~= g.delim), tabFirstpos = 0; end
              [tmp inputline tabFirstpos] = mystrtok(inputline, g.delim, tabFirstpos);
              switch g.convert
                 case 'off', array{linenb, colnb} = tmp;
@@ -119,27 +119,27 @@ while isempty(inputline) | inputline~=-1
                          tmp2 = str2double(tmp);
                          if isnan( tmp2 )  , array{linenb, colnb} = tmp;
                          else                array{linenb, colnb} = tmp2;
-                         end;
+                         end
                      else
                          tmp2 = str2num(tmp);
                          if isempty( tmp2 )  , array{linenb, colnb} = tmp;
                          else                  array{linenb, colnb} = tmp2;
-                         end;
-                     end;
+                         end
+                     end
                 case 'force', array{linenb, colnb} = str2double(tmp);
-             end;
+             end
              colnb = colnb+1;
-         end;
+         end
 	     linenb = linenb +1;
-     end;
+     end
      inputline = fgetl(fid);
      if linenb > g.nlines
          inputline = -1;
-     end;
-     if ~mod(linenb,10) & strcmp(g.verbose, 'on'), fprintf('%d ', linenb); end;
+     end
+     if ~mod(linenb,10) & strcmp(g.verbose, 'on'), fprintf('%d ', linenb); end
 end;        
-if strcmp(g.verbose, 'on'),  fprintf('%d\n', linenb-1); end;
-if strcmp(g.convert, 'force'), array = [ array{:} ]; end;
+if strcmp(g.verbose, 'on'),  fprintf('%d\n', linenb-1); end
+if strcmp(g.convert, 'force'), array = [ array{:} ]; end
 fclose(fid); 
 
 % problem strtok do not consider tabulation
@@ -148,7 +148,7 @@ function [str, strout, tabFirstpos] = mystrtok(strin, delim, tabFirstpos);
     % remove extra spaces at the beginning
     while any(strin(1) == delim) && strin(1) ~= 9 && strin(1) ~= ','
          strin = strin(2:end);
-    end;
+    end
     % for tab and coma, consider empty cells
     if length(strin) > 1 && any(strin(1) == delim)
         if tabFirstpos || any(strin(2) == delim)
@@ -157,10 +157,10 @@ function [str, strout, tabFirstpos] = mystrtok(strin, delim, tabFirstpos);
             if strin(2) ~= 9 && strin(2) ~= ','
                 tabFirstpos = 0;
                 strout = strtrim(strout);
-            end;
+            end
         else
             [str, strout] = strtok(strin, delim);
-        end;
+        end
     else
         [str, strout] = strtok(strin, delim);
-    end;
+    end

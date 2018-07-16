@@ -51,7 +51,7 @@ function res = rspdfsolv( l, a3, a4);
     res = (estim_a3 - a3)^2 + (estim_a4 - a4)^2;
     
     % the last term try to ensures that l(1) and l(2) are of the same sign
-    if sign(l(1)*l(2)) == -1, res = 2*res; end;
+    if sign(l(1)*l(2)) == -1, res = 2*res; end
     return;
     
 %         original equations

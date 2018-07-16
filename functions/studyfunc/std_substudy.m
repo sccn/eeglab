@@ -55,7 +55,7 @@ opt = finputcheck(varargin, { 'condition' 'cell' {}      {};
                               'group'     'cell' {}      {};
                               'rmdat'     'string' { 'on','off' }      'on';
                               'subject'   'cell' {}      {} }, 'std_substudy');
-if ischar(opt), return; end;
+if ischar(opt), return; end
 
 % find datasets to remove
 % -----------------------
@@ -64,26 +64,26 @@ if ~isempty(opt.subject)
     for index = 1:length(STUDY.datasetinfo)
         if ~strmatch(STUDY.datasetinfo.subject, opt.subject, 'exact')
             tagdel = [ tagdel index ];
-        end;
-    end;
-end;
+        end
+    end
+end
 if ~isempty(opt.condition)
     for index = 1:length(STUDY.datasetinfo)
         if ~strmatch(STUDY.datasetinfo.condition, opt.condition, 'exact')
             tagdel = [ tagdel index ];
-        end;
-    end;
-end;
+        end
+    end
+end
 if ~isempty(opt.group)
     for index = 1:length(STUDY.datasetinfo)
         if ~strmatch(STUDY.datasetinfo.group, opt.group, 'exact')
             tagdel = [ tagdel index ];
-        end;
-    end;
-end;
+        end
+    end
+end
 if ~isempty(opt.dataset)
     tagdel = [ tagdel setdiff([1:length(ALLEEG)], opt.dataset) ];
-end;
+end
 tagdel = unique_bc(tagdel);
 
 % find new dataset indices
@@ -93,22 +93,22 @@ if strcmpi(opt.rmdat, 'on')
     alldats(tagdel) = [];
     for index = 1:length(ALLEEG)
         tmp = find(alldats == index);
-        if isempty(tmp), tmp = NaN; end;
+        if isempty(tmp), tmp = NaN; end
         datcoresp(index) = tmp;
-    end;
+    end
     ALLEEG(tagdel) = [];
     STUDY.datasetinfo(tagdel) = [];
     for index = 1:length(STUDY.datasetinfo)
         STUDY.datasetinfo(index).index = index;
-    end;
+    end
 else
     alldats(tagdel) = [];
     for index = 1:length(ALLEEG)
         tmp = find(alldats == index);
-        if isempty(tmp), tmp = NaN; else tmp = index; end;
+        if isempty(tmp), tmp = NaN; else tmp = index; end
         datcoresp(index) = tmp;
-    end;
-end;
+    end
+end
 
 % check channel consistency
 % -------------------------
@@ -119,9 +119,9 @@ for i = 1:length(STUDY.changrp)
            nonnans = find(~isnan(newinds));
            STUDY.changrp(i).setinds{c,g} = newinds(nonnans);
            STUDY.changrp(i).allinds{c,g} = STUDY.changrp(i).allinds{c,g}(nonnans);
-       end;
-    end;
-end;
+       end
+    end
+end
 
 % check cluster consistency
 % -------------------------
@@ -131,10 +131,10 @@ for index = 1:length(STUDY.cluster)
         if all(isnan(STUDY.cluster(index).sets(:,i)))
             STUDY.cluster(index).sets(:,i) = [];
             STUDY.cluster(index).comps(:,i) = [];
-        end;
-    end;
+        end
+    end
     [tmp STUDY.cluster(index).setinds STUDY.cluster(index).allinds] = std_setcomps2cell(STUDY, STUDY.cluster(index).sets, STUDY.cluster(index).comps);
-end;
+end
 
 STUDY = std_reset(STUDY);
 STUDY = std_checkset(STUDY, ALLEEG);

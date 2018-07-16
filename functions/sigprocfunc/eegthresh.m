@@ -55,7 +55,7 @@ function [Iin, Iout, newsignal, elec] = eegthresh( signal, pnts, electrodes, neg
 if nargin < 7
 	help eegthresh;
 	return;
-end;
+end
 
 if starttime < timerange(1)
 	disp('eegthresh: starting point out of range, adjusted');
@@ -73,7 +73,7 @@ if size(posthresh,2) < size(electrodes,2)
 end;	
 if size(negthresh,2) < size(electrodes,2)
 	negthresh = [ negthresh negthresh(end)*ones(1,size(electrodes,2)-size(negthresh,2))];
-end;
+end
 	
 % complete timeselect values if necessary
 %----------------------------------------
@@ -102,12 +102,12 @@ for indexe = 1:size(electrodes(:),1)
 	% remove outliers
 	% ---------------
 	sigtmp = squeeze(signal(indexe,framelowlimit:framehighlimit,:));
-    if size(signal,3) == 1, sigtmp = sigtmp'; end;
+    if size(signal,3) == 1, sigtmp = sigtmp'; end
 	sigmax = max(sigtmp, [], 1);
 	sigmin = min(sigtmp, [], 1);
 	elec(indexe,:) = ( sigmin < negthresh(indexe) ) | ( sigmax > posthresh(indexe) );
 	allelec = allelec | elec(indexe,:);
-end;
+end
 Iout = find( allelec == 1 );
 Iin  = find( allelec == 0 );
 elec = elec(:,Iout);
@@ -119,8 +119,8 @@ if ~isempty(Iin)
 	newsignal = newsignal(:,:,Iin);
 	if ndims(signal) == 2
 		newsignal = newsignal(:,:);
-	end;
+	end
 else
 	newsignal = [];
-end;
+end
 return;

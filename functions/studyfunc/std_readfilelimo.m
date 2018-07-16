@@ -60,10 +60,10 @@ try
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
-    else g = []; end;
+    else g = []; end
 catch
     error('std_readfilelimo() error: calling convention {''key'', value, ... } error');
-end;
+end
 
 try, g.channels;                catch, g.channels          = [];        end; %
 try, g.components;              catch, g.components        = [];        end; %
@@ -158,7 +158,7 @@ if all([~isempty(g.timelimits),isfield(limostruct.data,'sampling_rate')])
     if any([g.timelimits(1) < limostruct.data.start, g.timelimits(2) > limostruct.data.end])
         error('std_readfilelimo(): Time indices provided are out of bonds');
     else
-        TimeVec = limostruct.data.start: 1000/limostruct.data.sampling_rate:limostruct.data.end;
+        TimeVec = limostruct.data.start: 1000/limostruct.data.sampling_rate:limostruct.data.end
         [tmp,TimeIndx(1)] = min(abs(TimeVec - g.timelimits(1)));
         [tmp,TimeIndx(2)] = min(abs(TimeVec - g.timelimits(2)));
         TimeIndxVec = TimeIndx(1):TimeIndx(2);
@@ -244,7 +244,7 @@ end
 % Retreiving data
 %..........................................................................
 if isfield(limostruct.data,'sampling_rate')
-    TimeVec = limostruct.data.start: 1000/limostruct.data.sampling_rate:limostruct.data.end;
+    TimeVec = limostruct.data.start: 1000/limostruct.data.sampling_rate:limostruct.data.end
 end
 
 switch g.measure

@@ -42,22 +42,22 @@ function mat = gauss2d( sizeX, sizeY, sigmaX, sigmaY, meanX, meanY, cut);
 if nargin < 2
 	help gauss2d
 	return; 
-end;
+end
 if nargin < 3
 	sigmaX = sizeX/5;
-end;
+end
 if nargin < 4
 	sigmaY = sizeY/5;
-end;
+end
 if nargin < 5
 	meanX = (sizeX+1)/2;
-end;
+end
 if nargin < 6
 	meanY = (sizeY+1)/2;
-end;
+end
 if nargin < 7
 	cut = 0;
-end;
+end
 
 X = linspace(1, sizeX, sizeX)'* ones(1,sizeY);
 Y = ones(1,sizeX)'   		  * linspace(1, sizeY, sizeY);
@@ -72,7 +72,7 @@ if cut > 0
 	maximun = max(max(mat))*cut;
 	I = find(mat < maximun);
 	mat(I) = 0;
-end;
+end
 
 return;
 

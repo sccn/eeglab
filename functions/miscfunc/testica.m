@@ -65,7 +65,7 @@ default_frames = 10000;
 default_exppow = -0.05;
 default_shape = 1.2;
 plotflag = 1;
-try, plotflag = ismatlab; catch, end;
+try, plotflag = ismatlab; catch, end
 
 if nargin<2
   help testica
@@ -230,7 +230,7 @@ if nargout == 0
    fprintf('\nView the results:\n');
    fprintf('Use mouse to rotate the image.\n');
 end
-if ~plotflag, return; end;
+if ~plotflag, return; end
 figure('Position',pos+2*off);
 set(gcf,'Color',BACKCOLOR);
 surf(testresult);  % plot the resulting ~identity matrix

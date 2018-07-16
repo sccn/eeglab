@@ -49,31 +49,31 @@ meanY, dephase, cut);
 if nargin < 2
 	help gabor2d
 	return; 
-end;
+end
 if nargin < 3
 	freq = 360/sizeX;
-end;
+end
 if nargin < 4
 	angle = 0;
-end;
+end
 if nargin < 5
 	sigmaX = sizeX/5;
-end;
+end
 if nargin < 6
 	sigmaY = sizeY/5;
-end;
+end
 if nargin < 7
 	meanX = (sizeX+1)/2;
-end;
+end
 if nargin < 8
 	meanY = (sizeY+1)/2;
-end;
+end
 if nargin < 9
 	dephase = 0;
-end;
+end
 if nargin < 10
 	cut = 0;
-end;
+end
 freq = freq/180*pi;
 
 X = linspace(1, sizeX, sizeX)'* ones(1,sizeY);
@@ -90,7 +90,7 @@ if cut > 0
 	maximun = max(max(mat))*cut;
 	I = find(mat < maximun);
 	mat(I) = 0;
-end;
+end
 
 return;
 
@@ -103,7 +103,7 @@ for X = 1:sizeX
             .*exp(-0.5*(  ((X-meanX)/sigmaX).*((X-meanX)/sigmaX)...
                           +((Y-meanY)/sigmaY).*((Y-meanY)/sigmaY)))... 
             			/((sigmaX*sigmaY)^(0.5)*pi); 
-    end;
-end;
+    end
+end
 
 return;

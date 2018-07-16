@@ -38,7 +38,7 @@ function [lgfreqs,datout, h, yt, yl] = logimagesc(times,freqs,data,varargin)
   if nargin < 1
       help logimagesc;
       return
-  end;
+  end
   if size(data,1) ~= length(freqs)
       fprintf('logfreq(): data matrix must have %d rows!\n',length(freqs));
       datout = data;
@@ -78,7 +78,7 @@ function [lgfreqs,datout, h, yt, yl] = logimagesc(times,freqs,data,varargin)
   
   if strcmp(plot, 'on')
       imagesc(times,freqs,data);
-      try colormap(DEFAULT_COLORMAP); catch, end;
+      try colormap(DEFAULT_COLORMAP); catch, end
       nt = ceil(min(freqs)); % new tick - round up min y to int
       ht = floor(max(freqs)); % high freq - round down
 

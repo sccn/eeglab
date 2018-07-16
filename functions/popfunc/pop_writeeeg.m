@@ -35,7 +35,7 @@ function [command] = pop_writeeeg(EEG, filename, varargin)
 command = '';
 
 % enforce use the str2double of Biosig
-if ~plugin_askinstall('Biosig', 'sopen'), return; end;
+if ~plugin_askinstall('Biosig', 'sopen'), return; end
 biosigpathfirst
 
 if nargin < 2
@@ -43,12 +43,12 @@ if nargin < 2
         res = questdlg2( [ 'This dataset contains data epochs.' 10 'Do you want to export the concatenated' 10 'data epochs?' ], '', 'No', 'Yes', 'Yes');
         if strcmpi(res, 'No')
             return;
-        end;
-    end;
+        end
+    end
     
 	% ask user
 	[filename, filepath] = uiputfile('*.*', 'Enter a file name -- pop_writeeeg()'); 
-	if filename == 0 return; end;
+	if filename == 0 return; end
 	filename = fullfile(filepath,filename);
     
     % file format
@@ -59,12 +59,12 @@ if nargin < 2
     geom = [1 1];
     result = inputgui( 'geometry', geom, 'uilist', uilist, 'helpcom', 'pophelp(''pop_writeeeg'')', ...
                      'title', 'Write data using BIOSIG -- pop_writeeeg()', 'geomvert', [1 2.5]);
-    if length(result) == 0 return; end;
+    if length(result) == 0 return; end
 
     options = { 'TYPE' fileformats{result{1}} };
 else
     options = varargin;
-end;
+end
 
 warning('off', 'MATLAB:intConvertNonIntVal');
 if ~isempty(EEG.chanlocs)
@@ -72,7 +72,7 @@ if ~isempty(EEG.chanlocs)
     writeeeg(filename, EEG.data(:,:), EEG.srate, 'label', { tmpchanlocs.labels }, 'EVENT', EEG.event, options{:});
 else
     writeeeg(filename, EEG.data(:,:), EEG.srate, 'EVENT', EEG.event, options{:});
-end;
+end
 warning('on', 'MATLAB:intConvertNonIntVal');
 
 command = sprintf('pop_writeeeg(EEG, ''%s'', %s);', filename, vararg2str(options)); 

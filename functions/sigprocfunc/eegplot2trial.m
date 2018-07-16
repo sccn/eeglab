@@ -60,7 +60,7 @@ if exist('color') == 1 && ~isempty(color)
    		%if isempty(I)
       	%	fprintf('Warning: color [%d %d %d] not found\n', ...
       	%		color(index,1), color(index,2), color(index,3));
-   		%end;
+   		%end
    		TMPREJ = [ TMPREJ; TMPREJINIT(I,:)];
    	end;	
 else 
@@ -75,8 +75,8 @@ else
 			I = find( tmpcol1 == tmpcol2);   
 			TMPREJ(I,:) = [];   
 		end;	
-	end;
-end;
+	end
+end
 
 % perform the conversion
 % ----------------------
@@ -94,6 +94,6 @@ if ~isempty(TMPREJ)
     I = find(tmpsig);
 	tmprejelec   = zeros( nbchan, sweeps);
 	tmprejelec(:,I) = TMPREJ(:,6:nbchan+5)';
-end;
+end
 
 return;

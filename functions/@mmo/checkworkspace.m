@@ -22,12 +22,12 @@ if ~isempty(stack)
                             subFlag = false;
                         elseif ~isequal(obj.workspace(index+index2), stack(index2+1))
                             subFlag = false;
-                        end;
-                    end;
-                end;
-                if subFlag, return; end;
-            end;
-        end;
+                        end
+                    end
+                end
+                if subFlag, return; end
+            end
+        end
                         
         % if subfunction, must be a copie
         if ~isempty(obj.workspace) && strcmpi(stack(end).file, obj.workspace(end).file) && ...
@@ -51,11 +51,11 @@ if ~isempty(stack)
                 % we are in a script.
                 while ~isempty(stack) && ~isequal(stack, obj.workspace)
                     stack(1) = [];
-                end;
+                end
                 if ~isequal(stack, obj.workspace)
                     ncopies = 2;
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end

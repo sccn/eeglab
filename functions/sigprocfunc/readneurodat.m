@@ -40,7 +40,7 @@ function [chanlocs, labels, theta, phi] = readneurodat(filename);
     if nargin < 1
         help readneurodat;
         return;
-    end;
+    end
     
     % enter file name here
     % --------------------
@@ -67,7 +67,7 @@ function [chanlocs, labels, theta, phi] = readneurodat(filename);
     chanlocs = convertlocs( chanlocs, 'sphbesa2all');
     for index = 1:length(chanlocs)
         chanlocs(index).labels = num2str(chanlocs(index).labels);
-    end;
+    end
     theta = theta/pi*180;
     fprintf('Note: .dat file contain polar 2-D coordinates. EEGLAB will use these coordinates\n');
     fprintf('      to recreated 3-D coordinates.\n');

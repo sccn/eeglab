@@ -37,7 +37,7 @@ command = '';
 if nargin < 1
 	help pop_delset;
 	return;
-end;
+end
 if isempty( ALLSET )
 	error('Cannot delete dataset. Restart eeglab to clear all dataset information');
     return;
@@ -51,12 +51,12 @@ if nargin < 2 | set_in < 0
 		inistr       = { int2str(-set_in) };
 	else
 		inistr       = { '1' };
-	end;
+	end
 	result       = inputdlg2( promptstr, 'Delete dataset -- pop_delset()', 1,  inistr, 'pop_delset');
 	size_result  = size( result );
-	if size_result(1) == 0 return; end;
+	if size_result(1) == 0 return; end
 	set_in   	 = eval( [ '[' result{1} ']' ] );
-end;
+end
 
 if isempty(set_in)
 	return;
@@ -72,8 +72,8 @@ for i = set_in
 	catch
 		error('Error: no such dataset');
 		return;
-	end;
-end;
+	end
+end
     
 % command = sprintf('%s = pop_delset( %s, [%s] );', inputname(1), inputname(1), int2str(set_in));
 command = sprintf('EEG = pop_delset( EEG, [%s] );', int2str(set_in));

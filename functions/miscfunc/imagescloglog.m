@@ -81,10 +81,10 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
       imagesc(newtimes,newfreqs,data,clim);
   else 
       imagesc(newtimes,newfreqs,data);
-  end;
+  end
   
   set(gca, 'yscale', 'log', 'xscale', 'log');
-  try colormap(DEFAULT_COLORMAP); catch, end;
+  try colormap(DEFAULT_COLORMAP); catch, end
   
   % puting ticks
   % ------------
@@ -94,7 +94,7 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
       divs = linspace(log(times(1)), log(times(end)), 10);
       divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
                                                % out-of border label with within border ticks
-  end;
+  end
   set(gca, 'xtickmode', 'manual');
   set(gca, 'xtick', divs);
   if nargin >= 6
@@ -103,7 +103,7 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
       divs = linspace(log(freqs(1)), log(freqs(end)), 10);
       divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
                                                % out-of border label with within border ticks
-  end;
+  end
   set(gca, 'ytickmode', 'manual');
   set(gca, 'ytick', divs);
   
@@ -112,5 +112,5 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
   set(gca, 'yminortick', 'off', 'xaxislocation', 'bottom', 'box', 'off', 'ticklength', [0.03 0], 'tickdir','out', 'color', 'none');  
   if ~isempty(varargin)
       set(gca, varargin{:});
-  end;
+  end
   

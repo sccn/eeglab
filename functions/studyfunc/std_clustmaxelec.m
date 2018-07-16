@@ -36,7 +36,7 @@ function std_clustmaxelec(STUDY, ALLEEG, clusterind);
 if nargin < 1
     help findicmaxelec;
     return;
-end;
+end
 
 fprintf('Finding electrodes with max weight for cluster %d\n', clusterind);
 fprintf('-------------------------------------------------\n');
@@ -51,13 +51,13 @@ for index = 1:length(STUDY.cluster(clusterind).comps)
     allelec = unique_bc(maxallelec);
 
     fprintf('The electrode with the max weight for component %d of dataset %d is "%s"\n', comp, set, maxallelec{index});
-end;
+end
     
  
 for indelec=1:length(allelec)  
     nbelec{indelec} = length(find(strcmp(allelec{indelec}, maxallelec) == 1));
     
     fprintf('Number of occurrence of electrode %s: %d\n', allelec{indelec}, nbelec{indelec});  
-end;
+end
      
 

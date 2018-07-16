@@ -45,12 +45,12 @@ function cellval = hlp_argstruct2linearcell(cfg);
                         cellval = { cellval{:} ff{iField} vararg2str(val) };
                     else
                         cellval = { cellval{:} ff{iField} val };
-                    end;
-                end;
-            end;
+                    end
+                end
+            end
         end
     else
         cellval = cfg;
-    end;
+    end
     
             

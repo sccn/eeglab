@@ -42,13 +42,13 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     if nargin < 2
         help eeg_eval;
         return;
-    end;
+    end
     
     % check input parameters
     % ----------------------
     g = finputcheck( varargin, { 'params'   'cell'    {}               {};
                                  'warning'  'string'  { 'on','off' }   'on' }, 'eeg_eval');
-    if ischar(g), error(g); end;
+    if ischar(g), error(g); end
     
     % warning pop up
     % --------------
@@ -64,12 +64,12 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
             res = questdlg2( [ 'Data files on disk will be automatically overwritten.' 10 ...
                                 'Are you sure you want to proceed with this operation?' ], ...
                             'Confirmation', 'Cancel', 'Proceed', 'Proceed');
-        end;
+        end
         switch lower(res),
          case 'cancel', return;
          case 'proceed',;
-        end;
-    end;
+        end
+    end
  
     % execute function
     % ----------------
@@ -78,7 +78,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         command = [ 'TMPEEG = ' funcname '( TMPEEG, ' vararg2str(g.params) ');' ];
     else
         eval( [ 'func = @' funcname ';' ] );
-    end;
+    end
         
     NEWEEG = [];
     for i = 1:length(EEG)
@@ -86,31 +86,31 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         TMPEEG    = eeg_retrieve(EEG, i);
         if v(1) == '5', eval(command);                      % Matlab 5
         else            TMPEEG = feval(func, TMPEEG, g.params{:}); % Matlab 6 and higher
-        end;
+        end
         TMPEEG = eeg_checkset(TMPEEG);
         TMPEEG.saved = 'no';
         if option_storedisk
             TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
             TMPEEG = update_datafield(TMPEEG);
-        end;
+        end
         NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
         if option_storedisk
             NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
-        end;
-    end;
+        end
+    end
     EEG = NEWEEG;
     
     % history
     % -------
     if nargout > 1
         com = sprintf('%s = %s( %s,%s);', funcname, inputname(2), funcname, inputname(2), vararg2str(g.params));
-    end;
+    end
 
 function EEG = update_datafield(EEG);
-    if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end;
+    if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end
     if ~isempty(EEG.datfile)
         EEG.data = EEG.datfile;
     else 
         EEG.data = 'in set file';
-    end;
+    end
     EEG.icaact = [];

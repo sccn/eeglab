@@ -5,7 +5,7 @@ function plugin_reactivate(foldername);
     fullpluginfolder = fullfile(fileparts(which('eeglab.m')), 'deactivatedplugins', foldername);
     if ~exist(fullpluginfolder)
         error([ 'Could not find folder ' foldername 'in deactivatedplugins folder' ]);
-    end;
+    end
 
     disp([ 'Moving plugin ' foldername ' to plugins folder' ]);
     fulldeactivatedpluginfolder = fullfile(fileparts(which('eeglab.m')), 'plugins');
@@ -13,4 +13,4 @@ function plugin_reactivate(foldername);
         movefile(fullpluginfolder, fulldeactivatedpluginfolder);
     catch
         eeglab_error;
-    end;
+    end

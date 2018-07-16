@@ -70,18 +70,18 @@ function [ncorrect, pval] = correct_mc( EEG, cycles, freqrange, timesout);
     if nargin < 1
         help correct_mc;
         return;
-    end;
+    end
     if nargin < 2
         cycles  = [3 0.5];
-    end;
+    end
     if nargin < 3
         freqrange = [2 50];
-    end;
+    end
     if nargin < 4
         % possible number of time outputs
         % -------------------------------
         timesout = [5 6 7 8 9 10 12 14 16 18 20 24 28 32 36 40];
-    end;
+    end
     nfreqs = ceil(log2(freqrange(2)));
         
     % scan times
@@ -102,17 +102,17 @@ function [ncorrect, pval] = correct_mc( EEG, cycles, freqrange, timesout);
             for fi = 1:length(freqs)
                 tmp      = corrcoef(ersp(fi,1:end-1), ersp(fi,2:end));
                 tmpf(index,fi) = tmp(2,1);
-            end;
+            end
             
-        end;
+        end
         
         % fit curve and determine if the result is significant
         % ----------------------------------------------------
         for fi = 1:length(freqs)
             pval(fi, ti) = rsfit(tmpf(:,fi)', 0);
-            if pval(fi,ti) > 0.9999, pval(fi,ti) = NaN; end;
-        end;
-    end;
+            if pval(fi,ti) > 0.9999, pval(fi,ti) = NaN; end
+        end
+    end
 
     % find minimum number of points for each frequency
     % ------------------------------------------------
@@ -124,7 +124,7 @@ function [ncorrect, pval] = correct_mc( EEG, cycles, freqrange, timesout);
             if pval(fi,ti) < threshold
                 ncorrect = ncorrect +  timesout(ti);
                 ti = size(pval,2)+1;
-            end;
+            end
             ti = ti+1;
-        end;
-    end;
+        end
+    end

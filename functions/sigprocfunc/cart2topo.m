@@ -65,14 +65,14 @@ function [th,r,xx,yy,zz] = cart2topo(x,varargin)
 if nargin<1
     help cart2topo
     return;
-end;
+end
 if nargin >= 2
 	if ~ischar(varargin{1})
 		y = varargin{1};
 		z = varargin{2};
 		varargin = varargin(3:end);
-	end;
-end;
+	end
+end
 if exist('y') ~= 1 
 	if size(x,2)==3 % separate 3-column data
 		z = x(:,3);
@@ -81,18 +81,18 @@ if exist('y') ~= 1
 	else
 		error('Insufficient data in first argument');
 	end
-end;
+end
 
 g = [];
 if ~isempty(varargin)
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
-end;
+end
 
-try, g.optim;      catch, g.optim = 0; end;
-try, g.squeeze;    catch, g.squeeze = 0; end;
-try, g.center;     catch, g.center = [0 0 0]; end;
-try, g.gui;        catch, g.gui = 'off'; end;
+try, g.optim;      catch, g.optim = 0; end
+try, g.squeeze;    catch, g.squeeze = 0; end
+try, g.center;     catch, g.center = [0 0 0]; end
+try, g.gui;        catch, g.gui = 'off'; end
 
 if g.squeeze>1
   fprintf('Warning: Squeeze must be less than 1.\n');
@@ -112,7 +112,7 @@ z = z(:);
 if any(z < 0)
     disp('WARNING: some electrodes lie below the z=0 plane, result may be inaccurate')
     disp('         Instead use cart2sph() then sph2topo().')
-end;
+end
 if strcmp(g.gui, 'on')
 	[x y z newcenter] = chancenter(x, y, z, [], 1);
 else 
@@ -120,8 +120,8 @@ else
 		[x y z newcenter] = chancenter(x, y, z, []);
 	else
 		[x y z newcenter] = chancenter(x, y, z, g.center);
-	end;
-end;
+	end
+end
 radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
 xx=-x; yy=-y; zz=z;
 x = x./radius; % make radius 1
@@ -142,7 +142,7 @@ r = r/pi;        % scale r to max 0.500
 if g.squeeze < 0
     g.squeeze = 1 - 0.5/max(r); %(2*max(r)-1)/(2*rmax);
     fprintf('Electrodes will be squeezed together by %2.3g to show all\n', g.squeeze);
-end;
+end
 r = r-g.squeeze*r; % squeeze electrodes in squeeze*100% to have all inside
 
 for n=1:size(x,1)

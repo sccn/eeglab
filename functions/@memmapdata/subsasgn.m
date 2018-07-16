@@ -35,7 +35,7 @@ switch index.type
    case 2, a.data(index.subs{1}, index.subs{2}) = val;
    case 3, a.data(index.subs{1}, index.subs{2}, index.subs{3}) = val;
    case 4, a.data(index.subs{1}, index.subs{2}, index.subs{3}, index.subs{4}) = val;
-  end;
+  end
  case '.'
   switch index.subs
    case 'srate'

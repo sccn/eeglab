@@ -183,7 +183,7 @@ varargout{1} = '';
 if nargin < 1
    help pop_erpimage;
    return;
-end;
+end
 
 if typeplot == 0 && isempty(EEG.icasphere)
    error('no ICA data for this set, first run ICA');
@@ -194,7 +194,7 @@ end;
 
 if nargin < 2	
 	typeplot = 1; %1=signal; 0=component
-end;
+end
 lastcom = [];
 if nargin < 3
 	popup = 1;
@@ -202,8 +202,8 @@ else
 	popup = ischar(channel) | isempty(channel);
 	if ischar(channel)
 		lastcom = channel;
-	end;
-end;
+	end
+end
 
 if popup
 	% get contextual help
@@ -239,7 +239,7 @@ if popup
     opt.limits       = [ opt.limits NaN NaN NaN NaN NaN NaN NaN NaN NaN ]; opt.limits = opt.limits(1:9);
     opt.coher        = [ opt.coher NaN NaN NaN NaN NaN NaN NaN NaN NaN ];  opt.coher  = opt.coher(1:3);
     opt.phasesort    = [ opt.phasesort NaN NaN NaN NaN NaN NaN NaN NaN NaN ]; opt.phasesort = opt.phasesort(1:4);
-    if isnan(opt.limits(1)), opt.limits(1:2) = 1000*[EEG.xmin EEG.xmax]; end;
+    if isnan(opt.limits(1)), opt.limits(1:2) = 1000*[EEG.xmin EEG.xmax]; end
     
 	commandphase = [ 'if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''phase''),''string'')),' ...
 					 '   if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''coher''),''string'')), ' ...
@@ -364,10 +364,10 @@ if popup
 		uilist{6} = { 'Style', 'text', 'string', 'Project to channel #', 'fontweight', 'bold','tooltipstring', ['Project component(s) to data channel' 10 ...
 												  'This allows plotting projected component activity at one channel in microvolts'] };
 		uilist{7} = { 'Style', 'edit', 'string', getkeyval(lastcom, 4), 'tag', 'projchan' };
-	end;
+	end
     [oldres a b res] = inputgui( geometry, uilist, 'pophelp(''pop_erpimage'');', ...
 							 fastif( typeplot, 'Channel ERP image -- pop_erpimage()', 'Component ERP image -- pop_erpimage()'));
-	if isempty(oldres), return; end;
+	if isempty(oldres), return; end
 
 	% first rows
 	% ---------
@@ -378,169 +378,169 @@ if popup
             if strcmpi(res.projchan(1),'''')
                  projchan = eval( [ '{' res.projchan '}' ]);
             else projchan = parsetxt( res.projchan);
-            end;
+            end
             if ~isempty(projchan) && ~isempty(str2num(projchan{1}))
                 projchan = cellfun(@str2num, projchan);
-            end;
+            end
         else
             projchan = []; 
-        end;
+        end
     else, 
         projchan = []; 
-    end;
+    end
     opt = [];
 	if ~isempty(res.others)
         try,
             tmpcell = eval( [ '{' res.others '}' ] );
             opt = struct( tmpcell{:} );
         catch, error('Additional options ("More options") requires ''key'', ''val'' arguments');
-        end;
-	end;
+        end
+	end
 	if ~typeplot && isempty(projchan)
         opt.yerplabel = '';
     else
         opt.yerplabel = '\muV' ;
-	end;
+	end
 	smooth       = eval(res.smooth);
     if res.plotmap
 		if isfield(EEG.chanlocs, 'theta')
-            if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
+            if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end
 			if typeplot == 0
 				     opt.topo = [ ' { mean(EEG.icawinv(:,[' int2str(channel) ']),2) EEG.chanlocs EEG.chaninfo } '];
 			else     opt.topo = [ ' { [' int2str(channel) '] EEG.chanlocs EEG.chaninfo } '];
 			end;	
-		end;
-	end;
+		end
+	end
 	
 	decimate     = eval( res.decimate );
 	if res.erp
 		opt.erp = 'on';
-	end;
+	end
 	
 	% finding limits
 	% --------------
 	limits(1:8)  = NaN;
 	if ~isempty(res.limerp)
 		limits(3:4) = eval( [ '[' res.limerp ']' ]); 
-	end;
+	end
 	if ~isempty(res.limtime) % time limits
 		if ~strcmp(res.limtime, num2str(1000*[EEG.xmin EEG.xmax]))
 			limits(1:2) = eval( [ '[' res.limtime ']' ]);
-		end;
-	end;
+		end
+	end
 	if ~isempty(res.limamp)
 		limits(5:6) = eval( [ '[' res.limamp ']' ]);
-	end;
+	end
 	if ~isempty(res.limcoher)
 		limits(7:8) = eval( [ '[' res.limcoher ']' ]);
-	end;
+	end
 	if ~isempty(res.limbaseamp)
 		limits(9) = eval( res.limbaseamp ); %bamp
-	end;
+	end
 	if ~all(isnan(limits))
         opt.limits = limits;
-	end;
+	end
 	
 	% color limits
 	% --------------
 	if res.cbar
 		opt.cbar = 'on';
-	end;
+	end
 	if res.caxis
 		opt.caxis = str2num(res.caxis);
-	end;
+	end
 	
 	% event rows
 	% ----------
 	if res.nosort
 		opt.nosort = 'on';
-	end;
-	try, sortingeventfield = eval( res.field ); catch, sortingeventfield = res.field; end;
+	end
+	try, sortingeventfield = eval( res.field ); catch, sortingeventfield = res.field; end
     if ~isempty(res.type)
        if strcmpi(res.type(1),'''')
             sortingtype = eval( [ '{' res.type '}' ] );
        else sortingtype = parsetxt( res.type );
-       end;
+       end
     end
 	sortingwin   = eval( [ '[' res.eventrange ']' ] );
 	if ~isempty(res.field) & ~strcmp(res.renorm, 'no')
 		opt.renorm = res.renorm;
-	end;
+	end
 	if ~isempty(res.align)
 		opt.align = str2num(res.align);
-	end;
+	end
 	if res.noplot
 		opt.noplot = 'on';
-	end;
+	end
 
 	% phase rows
 	% ----------
 	tmpphase = [];
 	if ~isempty(res.phase)
 		tmpphase = eval( [ '[ 0 0 ' res.phase ']' ]);
-	end;
+	end
 	if ~isempty(res.phase2)
 		tmpphase(2) = eval( res.phase2 );
-	end;
+	end
 	if ~isempty(res.phase3)
 		tmpphase(1) = eval( res.phase3 );
-	end;
+	end
 	if ~isempty(tmpphase)
 		opt.phasesort = tmpphase;
-	end;
+	end
 	
 	% coher row
 	% ----------
 	tmpcoher = [];
 	if res.plotamps
 		opt.plotamps = 'on';
-	end;
+	end
 	if ~isempty(res.coher)
 		tmpcoher = eval( [ '[' res.coher ']' ]);
-	end;
+	end
 	if ~isempty(res.coher2)
 		if length(tmpcoher) == 1
 			tmpcoher(2) = tmpcoher(1);
-		end;
+		end
 		tmpcoher(3) = eval( res.coher2 );
-	end;
+	end
 	if ~isempty(tmpcoher)
 		opt.coher = tmpcoher;
-	end;
+	end
 
 	% options row
 	% ------------
 	if ~isempty(res.spec)
 		opt.spec = eval( [ '[' res.spec ']' ]);
-	end;
+	end
 	if ~isempty(res.vert)
 		opt.vert = eval( [ '[' res.vert ']' ]);
-	end;
+	end
 	figure;
     options = '';
 else
 	options = '';
 	if nargin < 4
 		projchan = [];
-	end;
+	end
 	if nargin < 5
 		titleplot = ' ';
-	end;
+	end
 	if nargin < 6
 		smooth = 5;
-	end;
+	end
 	if nargin < 7
 		decimate = 0;
-	end;
+	end
 	if nargin < 8
 		sortingtype = [];
-	end;
+	end
 	if nargin < 9
 		sortingwin = [];
-	end;
+	end
 	if nargin < 10
 		sortingeventfield = [];
-	end;
+	end
     %options = vararg2str(varargin); % NO BECAUSE OF THE CHANNEL LOCATION
     %                                  PROBLEM BELOW
 	for i=1:length( varargin )
@@ -563,16 +563,16 @@ else
         end
           options = [ options ', { [' num2str(varargin{ i }{1}') ']'' optchanlocs optchaninfo }' ]; 
 		  end;    
-		end;
+		end
 	end;	
-end;
-try, icadefs; set(gcf, 'color', BACKCOLOR,'Name',' erpimage()'); catch, end;
+end
+try, icadefs; set(gcf, 'color', BACKCOLOR,'Name',' erpimage()'); catch, end
 
 % testing inputs
 % --------------
 if typeplot == 0 && length(channel) > 1 && isempty(projchan)
 	error('A channel must be selected to plot (the sum of) several component projections');
-end;
+end
 
 % find sorting latencies
 % ---------------------
@@ -588,7 +588,7 @@ if ~isempty(sortingeventfield)
             typetxt = [typetxt ' ''' sortingtype{index} '''' ];
         else
             typetxt = [typetxt ' ' num2str(sortingtype{index}) ];
-        end;
+        end
     end;    
 % $$$ 	% renormalize latencies if necessary
 % $$$ 	% ----------------------------------
@@ -600,9 +600,9 @@ if ~isempty(sortingeventfield)
 % $$$ 	    case 'no',;
 % $$$ 	    otherwise,
 % $$$ 	        locx = findstr('x', lower(renorm))
-% $$$ 	        if length(locx) ~= 1, error('Pop_erpimage error: unrecognize renormalazing formula'); end;
+% $$$ 	        if length(locx) ~= 1, error('Pop_erpimage error: unrecognize renormalazing formula'); end
 % $$$ 	        eval( [ 'events =' renorm(1:locx-1) 'events' renorm(locx+1:end) ';'] );
-% $$$ 	end;
+% $$$ 	end
 else
 	events = 'ones(1, EEG.trials)*EEG.xmax*1000';
     %events = ones(1, EEG.trials)*EEG.xmax*1000;
@@ -611,12 +611,12 @@ end;
 
 if ischar(projchan)
     projchan = { projchan };
-end;
+end
 if iscell(projchan) 
     projchannum = std_chaninds(EEG, projchan);
 else
     projchannum = projchan;
-end;
+end
 
 if typeplot == 1
 	tmpsig = ['mean(EEG.data([' int2str(channel) '], :),1)'];
@@ -624,15 +624,15 @@ else
     % test if ICA was computed or if one has to compute on line
     % ---------------------------------------------------------
     tmpsig = [ 'eeg_getdatact(EEG, ''component'', [' int2str(channel) '], ''projchan'', [' int2str(projchannum) '])' ];
-end;
+end
 
 % outputs
 % -------
 outstr = '';
 if ~popup
-    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
-    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
-end;
+    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end
+    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end
+end
 
 % plot title
 % ----------
@@ -648,9 +648,9 @@ if isempty(titleplot)
             tmpstr = vararg2str({projchan});
             tmpstr(find(tmpstr == '''')) = '"';
             titleplot = [ titleplot ' -> Chan. ' tmpstr ];
-        end;
+        end
     end
-end;
+end
     
 % plot the data and generate output command
 % --------------------------------------------
@@ -660,14 +660,14 @@ if isempty( options )
         opt = rmfield(opt, 'topo');
     else
         tmptopo = '';
-    end;
+    end
     fields = fieldnames(opt);
     values = struct2cell(opt);
     params = { fields{:}; values{:} };
     options = [ ',' vararg2str( { params{:} } ) ];
     tmpind = find( options == '\' ); options(tmpind(1:2:end)) = [];
-    if ~isempty(tmptopo), options = [ options ',''topo'',' tmptopo ]; end;
-end;
+    if ~isempty(tmptopo), options = [ options ',''topo'',' tmptopo ]; end
+end
 
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
 popcom = sprintf('figure; pop_erpimage(EEG,%d, [%s],[%s],''%s'',%d,%d,{%s},[%s],''%s'' %s);', typeplot, int2str(channel), vararg2str({projchan}), titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
@@ -679,7 +679,7 @@ eval(com)
 
 if popup
 	varargout{1} = popcom; % [10 '% Call: ' com];
-end;
+end
 
 return;
 
@@ -692,5 +692,5 @@ function txt = context(var, allvars, alltext);
 	else
 		disp([ 'warning: variable ''' var ''' not found']);
 		txt = '';
-	end;
+	end
 

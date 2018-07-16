@@ -26,14 +26,14 @@ function obj = reshape(obj,d1,d2,d3)
         d1 = [ d1 d2 d3 ];
     elseif nargin > 2
         d1 = [ d1 d2 ];
-    end;
+    end
     
     if prod(size(obj)) ~= prod(d1)
         error('Wrong dimensions for reshaping');
-    end;
+    end
     
     if obj.transposed
         d1 = [d1(2:end) d1(1)];
-    end;
+    end
 
     obj.dimensions = d1;

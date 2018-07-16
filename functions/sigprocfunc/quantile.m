@@ -55,7 +55,7 @@ if ~isempty(path2)
     return;
 else
     pc = varargin{1};
-end;
+end
 
 if nargin < 2
 	help quantile;

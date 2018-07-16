@@ -87,26 +87,26 @@ function [ Irej, Irejdetails, n, threshold, thresholdg] = rejstatepoch( signal, 
 if nargin < 1
 	help rejstatepoch;
 	return;
-end;
+end
 
 if ~ischar( signal )
 
 	if nargin < 2
 		help rejstatepoch;
 		return;
-	end;
+	end
 
 	if ~isempty( varargin ), g=struct(varargin{:}); 
-	else g= []; end;
-	try, g.plot; 			catch, g.plot='on'; end;
-	try, g.threshold; 		catch, g.threshold=5; end;
-	try, g.thresholdg; 		catch, g.thresholdg=5; end;
-	try, g.global; 			catch, g.global='on'; end;
-	try, g.rejglob; 		catch, g.rejglob=[]; end;
-	try, g.normalize; 		catch, g.normalize='on'; end;
-	try, g.plotcom; 		catch, g.plotcom=''; end;
-	try, g.title;	 		catch, g.title=''; end;
-	try, g.labels;	 		catch, g.labels=''; end;
+	else g= []; end
+	try, g.plot; 			catch, g.plot='on'; end
+	try, g.threshold; 		catch, g.threshold=5; end
+	try, g.thresholdg; 		catch, g.thresholdg=5; end
+	try, g.global; 			catch, g.global='on'; end
+	try, g.rejglob; 		catch, g.rejglob=[]; end
+	try, g.normalize; 		catch, g.normalize='on'; end
+	try, g.plotcom; 		catch, g.plotcom=''; end
+	try, g.title;	 		catch, g.title=''; end
+	try, g.labels;	 		catch, g.labels=''; end
 
 	g.rej = rej;
 	clear rej
@@ -143,28 +143,28 @@ if ~ischar( signal )
 	if ~isempty(g.rejglob)
 		if length(g.rejglob) ~= size(g.rej,2)
 			disp('Error: Rejglob must be have the same length as rej columns'); return;
-		end;
+		end
 	else
-		switch lower(g.global), case 'on', g.rejglob = sum(g.rej,1); end;
+		switch lower(g.global), case 'on', g.rejglob = sum(g.rej,1); end
 	end;		
 	if size(signal,3) ~= size(g.rej,2)
 		disp('Error: Signal must be have the same number of element in 3rd dimension as rej have columns'); return;
-	end;
+	end
 	if isempty(g.labels)
 		for index = 1:size(g.rej,1)
 			g.labels(index,:) = sprintf('%3d', index);
-		end;
+		end
 		if ~isempty(g.rejglob)
 			g.labels(index+2,:) = 'g. ';
-		end;
+		end
 	end;		
 			
 	switch lower(g.normalize),  
 		case 'on', 
 			g.rej = (g.rej-mean(g.rej,2)*ones(1, size(g.rej,2)))./ (std(g.rej, 0, 2)*ones(1, size(g.rej,2)));
-			switch lower(g.global), case 'on', g.rejglob = (g.rejglob(:)-mean(g.rejglob(:)))./ std(g.rejglob(:)); end;
+			switch lower(g.global), case 'on', g.rejglob = (g.rejglob(:)-mean(g.rejglob(:)))./ std(g.rejglob(:)); end
 	end;	
-	switch lower(g.global), case 'off',g.rejglob = []; end;
+	switch lower(g.global), case 'off',g.rejglob = []; end
 
 	% plot the buttons
 	% ----------------
@@ -282,7 +282,7 @@ if ~ischar( signal )
 	rejstatepoch('draw');
 	switch g.plot,
 		case 'on', waitfor( haccept, 'userdata'); drawnow;
-	end;
+	end
 
 	threshold  = g.threshold;
 	thresholdg = g.thresholdg;
@@ -300,7 +300,7 @@ if ~ischar( signal )
 		threshold = TMPEEG{3};
 		thresholdg = TMPEEG{4};
 		close(gcf);
-	catch, end;
+	catch, end
 else %if signal is a string draw everything
 
 	% retreive data
@@ -329,7 +329,7 @@ else %if signal is a string draw everything
 		rej2 = abs(g.rejg) > g.thresholdg;
 		n2 = sum(rej2(:));
 		rej = rej | rej2(:)';
-	end;
+	end
 	fprintf('%d trials rejected (single:%d, all:%d)\n', sum(rej(:)), n1, n2);
 	gcfdata {3} = rej;
 	gcfdata {4} = rejelec;
@@ -339,7 +339,7 @@ else %if signal is a string draw everything
 	% -----------------------------
 	plotstat( 'Plotwin');
 
-end;
+end
 return;
 
 function plotstat( id );
@@ -386,10 +386,10 @@ function plotstat( id );
 	else
 		pp = patch([size(g.rej(:),1) size(g.rej(:),1) size(g.rej(:),1)+2*sweeps size(g.rej(:),1)+2*sweeps], [yl(1)-1 yl(2)+1 yl(2)+1 yl(1)-1], get(gcf, 'color'), 'clipping', 'off');
 		set(pp, 'EdgeColor',  get(gcf, 'color'));
-	end;
+	end
 	for index = 0:sweeps:size(g.rej(:),1); 
 		plot([index index], yl, 'k');
-	end;
+	end
 
 	% restore properties
 	title(oldtitle);

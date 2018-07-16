@@ -181,8 +181,8 @@ if nargin < 2                 % if several arguments, assign values
             curref = [ int2str(abs(EEGOUT.ref)) ];
         else
             curref = [ int2str(abs(EEGOUT.ref)) ];
-        end;
-    end;
+        end
+    end
                         
     uilist = { ...
          { 'Style', 'text', 'string', 'Dataset name', 'horizontalalignment', 'right', ...
@@ -235,30 +235,30 @@ if nargin < 2                 % if several arguments, assign values
 
     [ results newcomments ] = inputgui( geometry, uilist, 'pophelp(''pop_editset'');', 'Edit dataset information - pop_editset()', ...
                                          EEG.comments);
-    if length(results) == 0, return; end;
+    if length(results) == 0, return; end
 	args = {};
 
     i = 1;
 	if ~strcmp( results{i  },         EEG.setname   ) , args = { args{:}, 'setname',           results{i  }  }; end;    
-	if ~strcmp( results{i+1}, num2str(EEG.srate)    ) , args = { args{:}, 'srate',     str2num(results{i+1}) }; end;
-	if ~strcmp( results{i+2},         EEG.subject   ) , args = { args{:}, 'subject',           results{i+2}  }; end;
-	if ~strcmp( results{i+3}, num2str(EEG.pnts)     ) , args = { args{:}, 'pnts',      str2num(results{i+3}) }; end;
-	if ~strcmp( results{i+4},         EEG.condition ) , args = { args{:}, 'condition',         results{i+4}  }; end;
-    if ~strcmp( results{i+5}, num2str(EEG.xmin)     ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end;
-    if ~strcmp( results{i+6}, num2str(EEG.session)  ) , args = { args{:}, 'session',   str2num(results{i+6}) }; end;
-	if ~strcmp( results{i+7}, num2str(EEG.nbchan)   ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end;
-    if ~strcmp( results{i+8},        EEG.group      ) , args = { args{:}, 'group',             results{i+8}  }; end;
-    if ~strcmp( results{i+9}, num2str(EEG.ref)      ) , args = { args{:}, 'ref',               results{i+9}  }; end;
-    if ~strcmp(EEG.comments, newcomments)             , args = { args{:}, 'comments' , newcomments }; end;
+	if ~strcmp( results{i+1}, num2str(EEG.srate)    ) , args = { args{:}, 'srate',     str2num(results{i+1}) }; end
+	if ~strcmp( results{i+2},         EEG.subject   ) , args = { args{:}, 'subject',           results{i+2}  }; end
+	if ~strcmp( results{i+3}, num2str(EEG.pnts)     ) , args = { args{:}, 'pnts',      str2num(results{i+3}) }; end
+	if ~strcmp( results{i+4},         EEG.condition ) , args = { args{:}, 'condition',         results{i+4}  }; end
+    if ~strcmp( results{i+5}, num2str(EEG.xmin)     ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end
+    if ~strcmp( results{i+6}, num2str(EEG.session)  ) , args = { args{:}, 'session',   str2num(results{i+6}) }; end
+	if ~strcmp( results{i+7}, num2str(EEG.nbchan)   ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end
+    if ~strcmp( results{i+8},        EEG.group      ) , args = { args{:}, 'group',             results{i+8}  }; end
+    if ~strcmp( results{i+9}, num2str(EEG.ref)      ) , args = { args{:}, 'ref',               results{i+9}  }; end
+    if ~strcmp(EEG.comments, newcomments)             , args = { args{:}, 'comments' , newcomments }; end
     
     if abs(str2num(results{i+5})) > 10,
         fprintf('WARNING: are you sure the epoch start time (%3.2f) is in seconds\n', str2num(results{i+5}));
-    end;
+    end
     
-	if ~isempty( results{i+12} ) , args = { args{:}, 'icachansind',  results{i+13} }; end;
-	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end;
-	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end;
-	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end;
+	if ~isempty( results{i+12} ) , args = { args{:}, 'icachansind',  results{i+13} }; end
+	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end
+	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end
+	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end
     
 else % no interactive inputs
     args = varargin;
@@ -267,22 +267,22 @@ else % no interactive inputs
     %for index=1:2:length(args)
     %    if ~isempty(inputname(index+2)) & ~ischar(args{index+1}) & length(args{index+1})>1, 
 	%		args{index+1} = inputname(index+1); 
-	%	end;
+	%	end
     %end;                
-end;
+end
 
 % create structure
 % ----------------
 if ~isempty(args)
    try, g = struct(args{:});
-   catch, disp('Setevent: wrong syntax in function arguments'); return; end;
+   catch, disp('Setevent: wrong syntax in function arguments'); return; end
 else
     g = [];
-end;
+end
 
 % test the presence of variables
 % ------------------------------
-try, g.dataformat;	 	  catch, g.dataformat = 'ascii'; end;
+try, g.dataformat;	 	  catch, g.dataformat = 'ascii'; end
 
 % assigning values
 % ----------------
@@ -300,11 +300,11 @@ for curfield = tmpfields'
         case 'pnts'      , EEGOUT.pnts      = getfield(g, {1}, curfield{1});
         case 'comments'  , EEGOUT.comments  = getfield(g, {1}, curfield{1});
         case 'nbchan'    , tmp              = getfield(g, {1}, curfield{1});
-                           if tmp ~=0, EEGOUT.nbchan = tmp; end;
+                           if tmp ~=0, EEGOUT.nbchan = tmp; end
 	    case 'averef'    , disp('The ''averef'' argument is obsolete; use function pop_reref() instead');
         case 'ref'       , EEGOUT.ref       = getfield(g, {1}, curfield{1});
                            disp('WARNING: CHANGING REFERENCE DOES NOT RE-REFERENCE THE DATA, use menu Tools > Rereference instead');
-                           if ~isempty(str2num( EEGOUT.ref )), EEG,ref = str2num(EEG.ref); end;
+                           if ~isempty(str2num( EEGOUT.ref )), EEG,ref = str2num(EEG.ref); end
         case 'xmin'    , oldxmin = EEG.xmin;
                          EEGOUT.xmin = getfield(g, {1}, curfield{1});
                          if oldxmin ~= EEGOUT.xmin
@@ -312,15 +312,15 @@ for curfield = tmpfields'
                                  if nargin < 2
                                      if ~popask( ['Warning: changing the starting point of epochs will' 10 'lead to recomputing epoch event latencies, Continue?'] )
                                          com = ''; warndlg2('pop_editset(): transformation cancelled by user'); return; 
-                                     end;
-                                 end;
+                                     end
+                                 end
                                  if isfield(EEG.event, 'latency')
                                      for index = 1:length(EEG.event)
                                          EEG.event(index).latency = EEG.event(index).latency - (EEG.xmin-oldxmin)*EEG.srate;
-                                     end;
+                                     end
                                  end;       
                              end;    
-                         end;
+                         end
         case 'srate'   , EEGOUT.srate = getfield(g, {1}, curfield{1});
         case 'chanlocs', varname = getfield(g, {1}, curfield{1});
                          if isempty(varname)
@@ -331,13 +331,13 @@ for curfield = tmpfields'
                          elseif ischar(varname)
                             EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
                             if iscell(EEGOUT.chanlocs)
-                                if length(EEGOUT.chanlocs) > 1, EEGOUT.chaninfo   = EEGOUT.chanlocs{2}; end;
-                                if length(EEGOUT.chanlocs) > 2, EEGOUT.urchanlocs = EEGOUT.chanlocs{3}; end;
+                                if length(EEGOUT.chanlocs) > 1, EEGOUT.chaninfo   = EEGOUT.chanlocs{2}; end
+                                if length(EEGOUT.chanlocs) > 2, EEGOUT.urchanlocs = EEGOUT.chanlocs{3}; end
                                 EEGOUT.chanlocs = EEGOUT.chanlocs{1};
-                            end;
+                            end
                          else
                              EEGOUT.chanlocs = varname;
-                         end;
+                         end
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
                          if ischar(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): ICA weight matrix file ''%s'' found\n', varname);
@@ -350,8 +350,8 @@ for curfield = tmpfields'
                                     EEGOUT.icaweights = reshape( EEGOUT.icaweights, [length(EEGOUT.icaweights)/nbcol nbcol]);
                                 catch
                                     fprintf('pop_editset() warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
-                                end;
-                            end;
+                                end
+                            end
                          else
 							 if isempty(varname) 
 								 EEGOUT.icaweights = [];
@@ -361,11 +361,11 @@ for curfield = tmpfields'
                              else
 								 EEGOUT.icaweights = varname;
 								 EEGOUT.icawinv = [];                                 
-							 end;
-						 end;
+							 end
+						 end
                          if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
-                         end;
+                         end
         case 'icachansind', varname = getfield(g, {1}, curfield{1});
 							 if isempty(varname) 
 								 EEGOUT.icachansind = [];
@@ -373,11 +373,11 @@ for curfield = tmpfields'
 								 EEGOUT.icachansind = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
                              else
   								 EEGOUT.icachansind = varname;
-							 end;
+							 end
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
                          if ischar(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): ICA sphere matrix file ''%s'' found\n', varname); 
-                            if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end;
+                            if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end
                             try, EEGOUT.icasphere = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
                             catch,
@@ -386,8 +386,8 @@ for curfield = tmpfields'
                                     EEGOUT.icasphere = reshape( EEGOUT.icasphere, [length(EEGOUT.icasphere)/nbcol nbcol]);
                                 catch
                                     fprintf('pop_editset() warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
-                                end;
-                            end;
+                                end
+                            end
                          else
 							 if isempty(varname) 
 								 EEGOUT.icasphere = [];
@@ -397,11 +397,11 @@ for curfield = tmpfields'
                              else
   								 EEGOUT.icasphere = varname;
 								 EEGOUT.icawinv = [];                                 
-							 end;
-                         end;
+							 end
+                         end
                          if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
-                         end;
+                         end
 	    case 'data'    , varname = getfield(g, {1}, curfield{1});
                          if isnumeric(varname)
                              EEGOUT.data = varname;
@@ -411,20 +411,20 @@ for curfield = tmpfields'
 							 case 'ascii' , 
 							  try, EEGOUT.data = load(varname, '-ascii');
 							  catch, disp(lasterr); error(['pop_editset() error: cannot read ascii file ''' varname ''' ']); 
-							  end;
-							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+							  end
+							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
 							 case 'matlab', 
 							  try,
 								  x = whos('-file', varname);
 								  if length(x) > 1, 
 									  error('pop_editset() error: .mat file must contain a single variable'); 
-								  end;
+								  end
 								  tmpdata = load(varname, '-mat');									  
 								  EEGOUT.data = getfield(tmpdata,{1},x(1).name);
 								  clear tmpdata;
 							  catch, error(['pop_editset() error: cannot read .mat file ''' varname ''' ']); 
-							  end;
-							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+							  end
+							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
 							 case {'float32le' 'float32be'}, 
 							  if EEGOUT.nbchan == 0,
 								  error(['pop_editset() error: to read float32 data you must first specify the number of channels']);
@@ -432,9 +432,9 @@ for curfield = tmpfields'
 							  try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf], ...
 														   fastif(strcmpi(g.dataformat, 'float32le'), 'ieee-le', 'ieee-be'));
 							  catch, error(['pop_editset() error: cannot read float32 data file ''' varname ''' ']); 
-							  end;
+							  end
 							 otherwise, error('pop_editset() error: unrecognized file format');
-                            end;
+                            end
                          elseif ischar(varname)
                              % restoration command
                              %--------------------
@@ -442,14 +442,14 @@ for curfield = tmpfields'
                                  res = evalin('base', ['exist(''' varname ''') == 1']);
                              catch
                                  disp('pop_editset() warning: cannot find specified variable in global workspace!');
-                             end;
+                             end
                              if ~res, 
                                  error('pop_editset(): cannot find specified variable.'); 
-                             end;
+                             end
                              warning off;
                              try,
                                  testval = evalin('base', ['isglobal(' varname ')']);
-                             catch, testval = 0; end;
+                             catch, testval = 0; end
                              if ~testval
                                  commandrestore = [ ' tmpp = '  varname '; clear global ' varname ';'   varname '=tmpp;clear tmpp;' ]; 
                              else
@@ -462,15 +462,15 @@ for curfield = tmpfields'
                              evalin('base', comglobal);
                              eval(comglobal);
                              eval( ['EEGOUT.data = ' varname ';' ]);
-                             try, evalin('base', commandrestore); catch, end;
+                             try, evalin('base', commandrestore); catch, end
                              warning on;
                          else 
                              EEGOUT.data = varname;
-                             if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
-                         end;
+                             if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end
+                         end
          otherwise, error(['pop_editset() error: unrecognized field ''' curfield{1} '''']); 
-    end;
-end;
+    end
+end
 
 EEGOUT = eeg_checkset(EEGOUT);
 
@@ -482,13 +482,13 @@ if nargout > 1
         if ~isempty( args{i+1} )
             if ischar( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );
             else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-            end;
+            end
         else
             com = sprintf('%s, ''%s'', []', com, args{i} );
-        end;
-    end;
+        end
+    end
     com = [com ');'];
-end;
+end
 return;
 
 function num = popask( text )
@@ -497,4 +497,4 @@ function num = popask( text )
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
-	 end;
+	 end

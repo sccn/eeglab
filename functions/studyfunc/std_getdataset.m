@@ -69,7 +69,7 @@ function [EEGOUT listcomp rmlistcomp] = std_getdataset(STUDY, ALLEEG, varargin);
 if nargin < 2
     help std_getdataset;
     return;
-end;
+end
 
 opt = finputcheck( varargin, { 'design'  'integer'   []    STUDY.currentdesign;
                                'interp'  'struct'    { }   struct([]);
@@ -82,7 +82,7 @@ opt = finputcheck( varargin, { 'design'  'integer'   []    STUDY.currentdesign;
                                'checkonly' 'string'   {'on' 'off'}    'off';
                                'cell'    'integer'   []    1                    }, 'std_getdataset');
 %                               'mode'   'string'   { 'channels' 'components' }  'channels';
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 if length(opt.cell) > 1
     % recursive call if more than one dataset
@@ -91,14 +91,14 @@ if length(opt.cell) > 1
     for index = 1:length(opt.cell)
         varargin{2*indcell} = index;
         EEGOUT(index) = std_getdataset(STUDY, ALLEEG, varargin{:});
-    end;
+    end
 else
     if ~isempty(opt.dataset)
         mycell.dataset = opt.dataset;
         mycell.trials  = { [1:ALLEEG(opt.dataset).trials] };
     else
         mycell = STUDY.design(opt.design).cell(opt.cell);
-    end;
+    end
     
     % find components in non-artifactual cluster
     if ~isempty(opt.cluster)
@@ -110,10 +110,10 @@ else
             [indrow indcomp] = find(clsset == mycell.dataset(1));
             if length(indcomp) ~= 1 && strcmpi(opt.onecomppercluster, 'on')
                 error(sprintf('Dataset %d must have exactly 1 components in cluster %d', mycell.dataset(1), opt.cluster(index)));
-            end;
+            end
             listcomp = [listcomp clscomp(indcomp')];
-        end;
-    end;
+        end
+    end
     
     % find components in artifactual clusters
     if ~isempty(opt.rmclust)
@@ -123,14 +123,14 @@ else
             clscomp = STUDY.cluster(opt.rmclust(index)).comps;
             [indrow indcomp] = find(clsset == mycell.dataset(1));
             rmlistcomp = [rmlistcomp clscomp(indcomp')];
-        end;
+        end
         if ~isempty(opt.rmcomps)
             disp('Both ''rmclust'' and ''rmcomps'' are being set. Artifact components will be merged');
-        end;
+        end
         opt.rmcomps = [ opt.rmcomps rmlistcomp ];
     end;  
     rmlistcomp  = opt.rmcomps;
-    if strcmpi(opt.checkonly, 'on'), EEGOUT = 0; return; end;
+    if strcmpi(opt.checkonly, 'on'), EEGOUT = 0; return; end
     
     % get data
     EEG = ALLEEG(mycell.dataset);
@@ -140,7 +140,7 @@ else
     EEGOUT.nbchan   = size(EEGOUT.data,1);
     if ~isempty(opt.interp)
         EEGOUT.chanlocs = opt.interp;
-    end;
+    end
     EEGOUT.event  = [];
     EEGOUT.epoch  = [];
     if isfield(mycell, 'filebase')
@@ -148,7 +148,7 @@ else
         EEGOUT.condition = mycell.value{1};
         EEGOUT.group     = mycell.value{2};
         EEGOUT.subject   = mycell.case;
-    end;
+    end
     if ~isempty(opt.cluster)
         if ~isempty(opt.interp) && strcmpi(opt.interpcomponent, 'on')
             TMPEEG = EEGOUT;
@@ -161,12 +161,12 @@ else
             EEGOUT.icawinv = TMPEEG.data(:, listcomp);
         else
             EEGOUT.icawinv = EEGOUT.icawinv(:, listcomp);
-        end;
+        end
         EEGOUT.icaact         = eeg_getdatact(EEG, 'component', listcomp, 'trialindices', mycell.trials );
         EEGOUT.icaweights     = EEGOUT.icaweights(listcomp,:);
         EEGOUT.etc.clustid    = { STUDY.cluster(opt.cluster).name };  % name of each cluster
         EEGOUT.etc.clustcmpid = listcomp;                             % index of each component in original ICA matrix
     else
         EEGOUT = eeg_checkset(EEGOUT);
-    end;
-end;
+    end
+end

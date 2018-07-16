@@ -48,10 +48,10 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
 
     if nargin < 3
         error('3 arguments required');
-    end;
+    end
     if nargin < 5
         type = 'morlet';
-    end;
+    end
 
     % compute number of cycles at each frequency
     % ------------------------------------------
@@ -63,8 +63,8 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
             cycles = exp(cycles);
         else
             cycles = linspace(cycles(1), cycles(2), length(freqs));
-        end;
-    end;
+        end
+    end
     
     % compute wavelet
     for index = 1:length(freqs)
@@ -90,7 +90,7 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
             wavelet{index} = exp(j*t*p)/sqrt(2*pi) .* ...
                 (exp(-t.^2/(2*s^2))-sqrt(2)*exp(-t.^2/(s^2)-p^2*s^2/4));
         end;    
-    end;
+    end
     
     
     return;
@@ -127,13 +127,13 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
     winsize = 0;
     for index = 1:length(win)
         winsize = max(winsize,length(win{index}));
-    end;
+    end
     allwav = zeros(winsize, length(win));
     for index = 1:length(win)
         wav1 = win{index};
         abs1 = linspace(-(length(wav1)-1)/2,(length(wav1)-1)/2, length(wav1));
         allwav(abs1+(winsize+1)/2,index) = wav1(:);
-    end;
+    end
     figure; imagesc(imag(allwav));
 
 

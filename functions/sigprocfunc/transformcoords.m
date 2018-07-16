@@ -43,28 +43,28 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
     if nargin < 2
         help transformcoords;
         return;
-    end;
+    end
     if nargin < 3
         scale =1;
-    end;
+    end
     if nargin < 4
         center = [0 0 0];
-    end;
+    end
     if nargin < 5
         reverse = 0;
-    end;
+    end
     if size(coords, 1) ~= 3
         coords = coords';
         trp    = 1;
     else
         trp = 0;
-    end;
+    end
     if size(coords, 1) ~= 3
         error('Number of columns must be 3 for the coordinate input');
-    end;
+    end
     if length(rotate) > 0 & length(rotate) ~= 3
         error('rotate parameter must have 3 values');
-    end;
+    end
     
     % decode parameters
     % -----------------
@@ -73,13 +73,13 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
     centz = -center(3);
     if length(scale) == 1
         scale = [scale scale scale];
-    end;
+    end
     scalex = scale(1);
     scaley = scale(2);
     scalez = scale(3);
     if length(rotate) < 3
         rotate = [0 0 0]
-    end;
+    end
     pitch = rotate(1);
     roll  = rotate(2);
     yaw   = rotate(3);
@@ -119,8 +119,8 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
                   -sy*cp            cy*cp               sp     ;
                   sy*sp*cr-cy*sr    -cy*sp*cr-sy*sr     cp*cr  ];
         coords = rot3d*coords;
-    end;
+    end
     
     if trp
         coords = coords';
-    end;
+    end

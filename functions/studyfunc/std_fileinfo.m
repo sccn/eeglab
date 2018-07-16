@@ -44,7 +44,7 @@ function [tmpstructout compinds filepresent] = std_fileinfo( ALLEEG, filetype );
             %fprintf('Files of type "%s" detected, checking...',  filetype);
         elseif firstpass == 1
             notequal = 1;
-        end;
+        end
         firstpass = 0;
         filepresent(dat) = thisfilepresent;
         
@@ -57,13 +57,13 @@ function [tmpstructout compinds filepresent] = std_fileinfo( ALLEEG, filetype );
                 passall = 0;
                 fprintf(' Error\n');
                 break;
-            end;
+            end
             
             % rename chanlabels and store structure
             if isfield(tmptmpstruct, 'chanlabels')
                 tmptmpstruct.labels = tmptmpstruct.chanlabels;
                 tmptmpstruct = rmfield(tmptmpstruct, 'chanlabels');
-            end;
+            end
             
             if filetype(1) ~= 'd' % ICA components
                 allvars = whos('-file', filename);
@@ -71,23 +71,23 @@ function [tmpstructout compinds filepresent] = std_fileinfo( ALLEEG, filetype );
                 for cind = 1:length(allvars)
                     str = allvars(cind).name(5:end);
                     ind_ = find(str == '_');
-                    if ~isempty(ind_), str(ind_:end) = []; end;
+                    if ~isempty(ind_), str(ind_:end) = []; end
                     tmpinds = [ tmpinds str2num(str) ];
-                end;
+                end
                 compinds(dat) = { unique(tmpinds) };
             elseif ~isfield(tmptmpstruct, 'labels')
                 allvars = whos('-file', filename);
                 allvarnames = { allvars.name };
                 tmptmpstruct.labels = allvarnames(strmatch('chan', allvarnames));
-            end;
+            end
             try,
                 tmpstruct(dat) = tmptmpstruct;
             catch,
                 passall = 0;
                 break;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     if exist('tmpstruct') == 1
         tmpstructout = tmpstruct;
-    end;
+    end

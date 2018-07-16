@@ -54,7 +54,7 @@ if v >= 8.1
     disp('Note: for some unknown reason, this function does not return')
     disp('      NaN for a singular matrix under Matlab 2013a and later versions.')
     disp('      Promax on other matrices seems to as in previous revisions though.');
-end;
+end
     
 DEFAULT_POWER     = 4;
 DEFAULT_TOLERANCE = 1e-5;

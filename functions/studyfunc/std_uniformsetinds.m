@@ -33,5 +33,5 @@ for c = 1:length(STUDY.changrp(1).setinds(:))
     tmpind = cellfun(@(x)(length(x{c})), { STUDY.changrp(:).setinds });   
     if length(unique(tmpind)) ~= 1
         uniformchannels = 0;
-    end;
-end;
+    end
+end

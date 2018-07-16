@@ -28,9 +28,9 @@
 %   10/15/02 - corrected documentation.
 
 function [M,stderr,V,grpids] = means(X,grps)
-  if nargin == 0, help means; return; end;
+  if nargin == 0, help means; return; end
 
-  if (nargin < 2) grps = []; end;
+  if (nargin < 2) grps = []; end
 
   [n,p] = size(X);
 
@@ -42,7 +42,7 @@ function [M,stderr,V,grpids] = means(X,grps)
   else
     [ug,fg] = uniquef(grps,1);  
     k = length(ug);
-  end;
+  end
 
   grpids = ug;
   M = zeros(k,p);
@@ -61,8 +61,8 @@ function [M,stderr,V,grpids] = means(X,grps)
         s = std(x(ic));
         stderr(ik,c) = s./sqrt(fg(ik));
         V(ik,c) = s.^2;
-      end;
-    end;
-  end;
+      end
+    end
+  end
 
   return;

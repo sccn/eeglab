@@ -45,14 +45,14 @@ com = '';
 if nargin < 1
    help pop_rejepoch;
    return;
-end;
+end
 if nargin < 2
     tmprej =  find(EEG.reject.rejglobal);
-end;
+end
 if nargin < 3
    confirm = 1;
-end;
-if islogical(tmprej), tmprej = tmprej+0; end;
+end
+if islogical(tmprej), tmprej = tmprej+0; end
 
 uniquerej = double(sort(unique(tmprej)));
 if length(tmprej) > 0 && length(uniquerej) <= 2 && ...
@@ -62,7 +62,7 @@ if length(tmprej) > 0 && length(uniquerej) <= 2 && ...
 else 
     format0_1 = 0;
     fprintf('%d/%d trials rejected\n', length(tmprej), EEG.trials);
-end;
+end
 
 if confirm ~= 0
     ButtonName=questdlg2('Are you sure, you want to reject the labeled trials ?', ...
@@ -75,13 +75,13 @@ if confirm ~= 0
        		disp('Compute new dataset');
     end % switch
 
-end;
+end
 
 % create a new set if set_out is non nul 
 % --------------------------------------
 if format0_1
     tmprej = find(tmprej > 0);
-end;
+end
 EEG = pop_select( EEG, 'notrial', tmprej);
 
 com = sprintf( 'EEG = pop_rejepoch( EEG, %s);', vararg2str({ tmprej 0 }));		

@@ -40,10 +40,10 @@ function [datind, dattrialselect] = std_selectdataset(STUDY, ALLEEG, indvar, ind
 if nargin < 3
     help std_selectdataset;
     return;
-end;
+end
 if nargin < 5
     verboseFlag = 'verbose';
-end;
+end
 
 % check for multiple condition selection
 if ~iscell(indvarvals), 
@@ -54,41 +54,41 @@ if ~iscell(indvarvals),
         pos(end+1) = length(tmpindvar)+1;
         for ind = 1:length(pos)-1
             indvarvals{end+1} = tmpindvar(pos(ind)+3:pos(ind+1)-1);
-        end;
+        end
     else
         indvarvals = { indvarvals }; 
-    end;
-end;
+    end
+end
 
 % default dattrialselect = all trials
 % -----------------------------------
 if isfield(STUDY.datasetinfo, 'trialinfo')
      dattrialselect = cellfun(@(x)([1:length(x)]), { STUDY.datasetinfo.trialinfo }, 'uniformoutput', false);
-else for i=1:length(ALLEEG), dattrialselect{i} = [1:ALLEEG(i).trials]; end;
-end;
+else for i=1:length(ALLEEG), dattrialselect{i} = [1:ALLEEG(i).trials]; end
+end
     
 if isempty(indvar)
     datind = [1:length(STUDY.datasetinfo)];
 elseif isfield(STUDY.datasetinfo, indvar) && ~isempty(getfield(STUDY.datasetinfo(1), indvar))
     % regular selection of dataset in datasetinfo
     % -------------------------------------------
-    if strcmpi(verboseFlag, 'verbose'), fprintf('   Selecting datasets with field ''%s'' equal to %s\n', indvar, vararg2str(indvarvals)); end;
+    if strcmpi(verboseFlag, 'verbose'), fprintf('   Selecting datasets with field ''%s'' equal to %s\n', indvar, vararg2str(indvarvals)); end
     eval( [ 'myfieldvals = { STUDY.datasetinfo.' indvar '};' ] );
     datind = [];
     for dat = 1:length(indvarvals)
         datind = union_bc(datind, std_indvarmatch(indvarvals{dat}, myfieldvals));
-    end;
+    end
 else
     % selection of trials within datasets
     % -----------------------------------
-    if strcmpi(verboseFlag, 'verbose'), fprintf('   Selecting trials with field ''%s'' equal to %s\n', indvar, vararg2str(indvarvals)); end;
+    if strcmpi(verboseFlag, 'verbose'), fprintf('   Selecting trials with field ''%s'' equal to %s\n', indvar, vararg2str(indvarvals)); end
     dattrials      = cellfun(@(x)(eval(['{ x.' indvar '}'])),  { STUDY.datasetinfo.trialinfo }, 'uniformoutput', false);
     dattrials      = cellfun(@(x)(eval(['{ x.' indvar '}'])),  { STUDY.datasetinfo.trialinfo }, 'uniformoutput', false); % do not remove duplicate line (or Matlab crashes)
     dattrialselect = cell(1,length(STUDY.datasetinfo));
     for dat = 1:length(indvarvals)
         for tmpi = 1:length(dattrials)
             dattrialselect{tmpi} = union_bc(dattrialselect{tmpi}, std_indvarmatch(indvarvals{dat}, dattrials{tmpi}));
-        end;
-    end;
+        end
+    end
     datind = find(~cellfun(@isempty, dattrialselect));
-end;
+end

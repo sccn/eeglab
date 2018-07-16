@@ -40,19 +40,19 @@ else
     rvThreshold = rvThreshold/100; % change from percent to value
     if rvThreshold>1
         error('Error: residual variance threshold should be less than 1.\n');
-    end;
+    end
 end
 
 
 if nargin<4
     depthThreshold = 1;
-end;
+end
 
 % find components with low residual variance
 
 for ic = 1:length(EEG.dipfit.model)
     residualvariance(1,ic) =EEG.dipfit.model(ic).rv;
-end;
+end
 compLowResidualvariance = find(residualvariance <rvThreshold);
 
 if isempty(compLowResidualvariance) || ( (nargin>=3) && strcmp(selectionType, 'rv')) % if only rv is requested (not in-brain)
@@ -67,15 +67,15 @@ else
         warning(tmpWarning);
         brainComponents = compLowResidualvariance;
         return;
-    end;
+    end
     load(EEG.dipfit.hdmfile);
     
     posxyz = [];
     for c = compLowResidualvariance
         posxyz = cat(1,posxyz,EEG.dipfit.model(c).posxyz(1,:));
-    end;
+    end
     
     depth = ft_sourcedepth(posxyz, vol);
     
     brainComponents = compLowResidualvariance(find(depth<=depthThreshold));
-end;
+end

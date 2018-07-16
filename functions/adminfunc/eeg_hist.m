@@ -31,16 +31,16 @@ function EEG = eeg_hist( EEG, command );
 
 if nargin < 2
     help eeg_hist;
-end;
+end
 
 if ~isfield(EEG, 'history')
     EEG.history = '';
-end;
+end
 
 if ~isempty(command)
     try
         EEG.history = [ EEG.history 10 command ];
     catch
         EEG.history = strvcat(EEG.history, command);
-    end;
-end;
+    end
+end

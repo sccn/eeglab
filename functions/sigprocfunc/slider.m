@@ -44,19 +44,19 @@ function slider( handler, horiz, vert, horizmag, vertmag, allowsup);
 if nargin < 2 
 	help slider;
 	return;
-end;
+end
 if nargin < 3
 	vert = 0;
-end;
+end
 if nargin < 4
 	horizmag = 1;
-end;
+end
 if nargin < 5
 	vertmag = 1;
-end;
+end
 if nargin < 6
 	allowsup = 1;
-end;
+end
 
 pos   = get(gcf, 'position');
 width  = 5/pos(3)*400;
@@ -82,7 +82,7 @@ if vert
 	 '   set( h(i), ''position'', [ curpos(1) curpos(2)+' num2str(vertmag-1) '*shift curpos(3:end)]);' ...
 	 'end;' ...
 	 'clear h2 h shift i curpos fig curobj;'] );
-end;
+end
 
 if horiz
 	hz = uicontrol('Parent',handler, ...
@@ -101,7 +101,7 @@ if horiz
 	 '   set( h(i), ''position'', [ curpos(1)+' num2str(horizmag-1) '*shift curpos(2:end)]);' ...
 	 'end;' ...
 	 'clear h2 h shift i curpos fig curobj;'] );
-end;
+end
 
 % button to remove the slider
 % ---------------------------
@@ -122,7 +122,7 @@ but = uicontrol( 'style', 'pushbutton', 'Units','Normalized', ...
 
 if ~allowsup
 	set(but, 'enable', 'off');
-end;
+end
 	
 % magnify object in the window
 % ----------------------------
@@ -133,13 +133,13 @@ h = setdiff_bc( h, h2);
 for i = 1:length(h)
 	curpos = get( h(i), 'position');
 	set( h(i), 'position', [curpos(1)*horizmag-(horizmag-1)  curpos(2)*vertmag-(vertmag-1) curpos(3)*horizmag curpos(4)*vertmag]);
-end;
+end
 
 if horiz
 	% set the horizontal axis to 0	
 	% ----------------------------
 	set(hz, 'value', 0);
 	eval(get(hz, 'callback'));
-end;
+end
 return;
 

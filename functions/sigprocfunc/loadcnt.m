@@ -67,7 +67,7 @@ function [f,lab,ev2p] = loadcnt(filename,varargin)
 if ~isempty(varargin)
          r=struct(varargin{:});
 else r = []; 
-end;
+end
 
 try, r.t1;         catch, r.t1=0; end
 try, r.sample1;    catch, r.sample1=[]; end
@@ -549,7 +549,7 @@ if type == 'cnt'
 %                     r.ldnsamples = size(dat,2);
 %                 else
 %                     dat=single(dat(:,1:r.ldnsamples));
-%                 end;
+%                 end
           else           
               warning('CWB has not tested this section of code, so use with caution'); 
               h.channeloffset = h.channeloffset/2;
@@ -713,7 +713,7 @@ if ~isempty(ev2)
         end     
     end
     f.event = ev2p;
-end;
+end
 
 frewind(fid);
 fclose(fid);

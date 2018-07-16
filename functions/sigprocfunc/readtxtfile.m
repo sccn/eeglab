@@ -40,7 +40,7 @@ function com = readtxtfile(filename)
             while ~feof(fid)
                 a = fgetl(fid);
                 com = [ com 10 a ];
-            end;
+            end
             fclose(fid);
-        end;
-    end;
+        end
+    end

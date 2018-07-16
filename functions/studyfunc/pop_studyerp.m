@@ -54,7 +54,7 @@ optiongui = { 'geometry', guigeom, 'uilist'  , guispec, ...
 STUDY  = [];
 ALLEEG = [];
 com = '';
-if isempty(result), return; end;
+if isempty(result), return; end
 
 nSubjects = str2num(outstruct.subjects);
 nConds    = str2num(outstruct.cond);
@@ -74,10 +74,10 @@ guigeom{end+1} = [];
 for icond = 1:nConds
     if icond == 1, guigeom{end} = [ guigeom{end} 1 0.2];
     else           guigeom{end} = [ guigeom{end} 0.1 1 0.2];
-    end;
-    if icond > 1, guispec{end+1} = {}; end;
+    end
+    if icond > 1, guispec{end+1} = {}; end
     guispec = { guispec{:}, {'style' 'text' 'string' [ 'Condition ' num2str(icond) ' name'] } {} };
-end;
+end
 
 % edit boxes for conditions
 % -------------------------
@@ -85,10 +85,10 @@ guigeom{end+1} = [];
 for icond = 1:nConds
     if icond == 1, guigeom{end} = [ guigeom{end} 1 0.2];
     else           guigeom{end} = [ guigeom{end} 0.1 1 0.2];
-    end;
-    if icond > 1, guispec{end+1} = {}; end;
+    end
+    if icond > 1, guispec{end+1} = {}; end
     guispec = { guispec{:}, {'style' 'edit' 'string' '' 'tag' [ 'cond' num2str(icond) ] } {} };
-end;
+end
 guispec{end+1} = {};
 guigeom{end+1} = [1];
 
@@ -98,10 +98,10 @@ guigeom{end+1} = [];
 for icond = 1:nConds
     if icond == 1, guigeom{end} = [ guigeom{end} 1 0.2];
     else           guigeom{end} = [ guigeom{end} 0.1 1 0.2];
-    end;
-    if icond > 1, guispec{end+1} = {}; end;
+    end
+    if icond > 1, guispec{end+1} = {}; end
     guispec = { guispec{:}, {'style' 'text' 'string' ['Condition ' num2str(icond) ' datasets' ] } {} };
-end;
+end
 
 % create edit boxes
 % -----------------
@@ -110,18 +110,18 @@ for index = 1:nSubjects
     for icond = 1:nConds
         if icond == 1, guigeom{end} = [ guigeom{end} 1 0.2];
         else           guigeom{end} = [ guigeom{end} 0.1 1 0.2];
-        end;
+        end
         select_com = ['[inputname, inputpath] = uigetfile2(''*.set;*.SET'', ''Choose dataset to add to STUDY -- pop_study()'');'...
                       'if inputname ~= 0,' ...
                       '   guiind = findobj(''parent'', gcbf, ''tag'', ''set' int2str(icond) '_' int2str(index) ''');' ...
                       '   set( guiind,''string'', fullfile(inputpath, inputname));' ...
                       'end; clear inputname inputpath;'];
-        if icond > 1, guispec{end+1} = {}; end;
+        if icond > 1, guispec{end+1} = {}; end
         guispec = { guispec{:}, ...
                 {'style' 'edit'       'string' ''    'tag' [ 'set' int2str(icond) '_' int2str(index) ] }, ...
                 {'style' 'pushbutton' 'string' '...' 'Callback' select_com } };
-    end;
-end;
+    end
+end
 
 % last text
 % ---------
@@ -134,7 +134,7 @@ optiongui = { 'geometry', guigeom, ...
               'helpcom' , 'pophelp(''pop_studyerp'')', ...
               'title'   , 'Create a new STUDY set -- pop_studyerp()' };
 [result, userdat2, strhalt, outstruct] = inputgui(optiongui{:});    
-if isempty(result), return; end;
+if isempty(result), return; end
 
 % decode outstruct and build call to std_editset
 % ----------------------------------------------
@@ -146,7 +146,7 @@ for icond = 1:nConds
     tagCond = ['cond' int2str(icond) ];
     if isempty(outstruct.(tagCond))
         outstruct.(tagCond) = [ 'condition ' int2str(icond) ];
-    end;
+    end
     
     for index = 1:nSubjects
         tagSet  = [ 'set' int2str(icond) '_' int2str(index) ];
@@ -154,9 +154,9 @@ for icond = 1:nConds
 
         if ~isempty(outstruct.(tagSet))
             commands = { commands{:}, {'index' nConds*index+icond-1 'load' outstruct.(tagSet)  'subject' subject 'condition' outstruct.(tagCond) } };
-        end;
-    end;
-end;
+        end
+    end
+end
 options = { options{:}, 'commands', commands };
 
 % call std_editset to create the STUDY

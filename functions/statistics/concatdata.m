@@ -50,50 +50,50 @@ function [ datac, alllen, dims ] = concatdata(data);
             for i = 1:prod(dims)
                 alllen(i+1) = alllen(i+1) + alllen(i);
                 datac(alllen(i)+1:alllen(i+1)) = data{i};
-            end;
+            end
         case 2,
             datac = zeros(size(data{1},1), sum(alllen), 'single');
             
             for i = 1:prod(dims)
                 alllen(i+1) = alllen(i+1) + alllen(i);
                 datac(:,alllen(i)+1:alllen(i+1)) = data{i};
-            end;
+            end
         case 3,
             datac = zeros(size(data{1},1), size(data{1},2), sum(alllen), 'single');
             
             for i = 1:prod(dims)
                 alllen(i+1) = alllen(i+1) + alllen(i);
                 datac(:,:,alllen(i)+1:alllen(i+1)) = data{i};
-            end;
+            end
         case 4,
             datac = zeros(size(data{1},1), size(data{1},2), size(data{1},3), sum(alllen), 'single');
             
             for i = 1:prod(dims)
                 alllen(i+1) = alllen(i+1) + alllen(i);
                 datac(:,:,:,alllen(i)+1:alllen(i+1)) = data{i};
-            end;
+            end
         case 5,
             datac = zeros(size(data{1},1), size(data{1},2), size(data{1},3), size(data{1},4), sum(alllen), 'single');
             
             for i = 1:prod(dims)
                 alllen(i+1) = alllen(i+1) + alllen(i);
                 datac(:,:,:,:,alllen(i)+1:alllen(i+1)) = data{i};
-            end;
+            end
         case 6,
             datac = zeros(size(data{1},1), size(data{1},2), size(data{1},3), size(data{1},4),size(data{1},5), sum(alllen), 'single');
             
             for i = 1:prod(dims)
                 alllen(i+1) = alllen(i+1) + alllen(i);
                 datac(:,:,:,:,:,alllen(i)+1:alllen(i+1)) = data{i};
-            end;
+            end
         case 7,
             datac = zeros(size(data{1},1), size(data{1},2), size(data{1},3), size(data{1},4), size(data{1},5), size(data{1},6), sum(alllen), 'single');
             
             for i = 1:prod(dims)
                 alllen(i+1) = alllen(i+1) + alllen(i);
                 datac(:,:,:,:,:,:,alllen(i)+1:alllen(i+1)) = data{i};
-            end;
-    end;
+            end
+    end
 
     
 function val = myndims(a)
@@ -106,6 +106,6 @@ function val = myndims(a)
             val = 1;
         else
             val = 2;
-        end;
+        end
     end; 
             

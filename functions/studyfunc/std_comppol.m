@@ -35,13 +35,13 @@ function [compin, pol] = std_comppol(compin);
 if nargin < 1
     help std_comppol;
     return;
-end;
+end
 
 % remove the NaN
 % --------------
 for index = 1:size(compin,2)
     compin(isnan(compin(:,index)),:) =[];
-end;
+end
 
 % run several iterations
 % ----------------------
@@ -55,13 +55,13 @@ for repeat=1:3
         if ~all(compin(:,index) == 0)
              r = corrcoef(compave, compin(:,index) );
         else r = zeros(2,2);
-        end;
+        end
         
         % invert component polarities
         % ---------------------------
         if r(2) < 0
             compin(:,index) = -compin(:,index);
             pol(index)      = -pol(index);
-        end;
-    end;
-end;
+        end
+    end
+end

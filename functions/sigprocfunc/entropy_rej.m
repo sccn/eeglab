@@ -69,7 +69,7 @@ end;
 
 if size(signal,2) == 1 % transpose if necessary
 	signal = signal';
-end;
+end
 
 [nbchan pnts sweeps] = size(signal);
 ent  = zeros(nbchan,sweeps);
@@ -88,8 +88,8 @@ else
 		for index=1:sweeps
 			datatmp = dataProba((index-1)*pnts+1:index*pnts);
 			ent(rc, index) = - sum( datatmp .* log( datatmp ) ); 
-		end;
-	end;
+		end
+	end
 
 	% normalize the last dimension
 	% ----------------------------	
@@ -98,8 +98,8 @@ else
 	    	case 2,	ent = (ent-mean(ent)) / std(ent);
 	    	case 3,	ent = (ent-mean(ent,2)*ones(1,size(ent,2)))./ ...
 				        (std(ent,0,2)*ones(1,size(ent,2)));
-		end;
-	end;
+		end
+	end
 end	
 
 % reject

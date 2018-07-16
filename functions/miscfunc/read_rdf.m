@@ -26,7 +26,7 @@ function [eeg,ev,header] = read_rdf(filename)
     if nargin < 1
         help read_rdf;
         return;
-    end;
+    end
       
   eeg = [];
   ev = [];

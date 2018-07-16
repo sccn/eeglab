@@ -86,7 +86,7 @@ if nargin>2
 end
 if nargin < 4
     grad = 5;
-end;
+end
 
 %obj = findobj('tag','cbar','parent',gcf);
 %if ~isempty(obj) & ~isempty(arg)
@@ -157,7 +157,7 @@ if length(colors) == 1
           image([0 1],[0 t(2)],[ceil(n/2):n-colors]');
       else
           image([0 1],t,[1:n-colors]');
-      end;
+      end
       set(ax,'xticklabelmode','manual')
       set(ax,'xticklabel',[],'YAxisLocation','right')
       
@@ -194,7 +194,7 @@ if nargin > 2
       Cax = get(ax,'Ylim');
   else
       Cax = get(ax,'Xlim');
-  end;
+  end
   CBTicks = [Cax(1):(Cax(2)-Cax(1))/(grad-1):Cax(2)]; % caxis tick positions
   CBLabels = [minmax(1):(minmax(2)-minmax(1))/(grad-1):minmax(2)]; % tick labels
   

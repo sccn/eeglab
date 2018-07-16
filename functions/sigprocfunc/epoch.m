@@ -79,16 +79,16 @@ alleventout = {};
 % ----------------
 if ~isempty(varargin)
    try, g = struct(varargin{:});
-   catch, error('Epoch: wrong syntax in function arguments'); end;
+   catch, error('Epoch: wrong syntax in function arguments'); end
 else
     g = [];
-end;
+end
 
-try, g.srate; 	 	     catch, g.srate = 1; end;
-try, g.valuelim; 	     catch, g.valuelim =  [-Inf Inf]; end;
-try, g.verbose; 	     catch, g.verbose = 'on'; end;
-try, g.allevents; 	     catch, g.allevents = []; end;
-try, g.alleventrange; 	 catch, g.alleventrange = lim; end;
+try, g.srate; 	 	     catch, g.srate = 1; end
+try, g.valuelim; 	     catch, g.valuelim =  [-Inf Inf]; end
+try, g.verbose; 	     catch, g.verbose = 'on'; end
+try, g.allevents; 	     catch, g.allevents = []; end
+try, g.alleventrange; 	 catch, g.alleventrange = lim; end
 
 % computing point limits
 % ----------------------
@@ -104,7 +104,7 @@ eeglab_options;
 if option_memmapdata == 1
      epochdat = mmo([], [size(data,1), newdatalength, length(events)]);
 else epochdat = zeros( size(data,1), newdatalength, length(events) );
-end;
+end
 g.allevents =  g.allevents(:)';
 datawidth  = size(data,2)*size(data,3);
 dataframes = size(data,2);
@@ -125,14 +125,14 @@ for index = 1:length(events)
           if (tmpmin > g.valuelim(1)) && (tmpmax < g.valuelim(2))
               indexes(index) = 1;
           else
-              switch g.verbose, case 'on', fprintf('Warning: event %d out of value limits\n', index); end;
+              switch g.verbose, case 'on', fprintf('Warning: event %d out of value limits\n', index); end
           end;   
       else 
           indexes(index) = 1;
-      end;
+      end
    else
-      switch g.verbose, case 'on', fprintf('Warning: event %d out of data boundary\n', index); end;
-   end;
+      switch g.verbose, case 'on', fprintf('Warning: event %d out of data boundary\n', index); end
+   end
 
    % rereference events
    % ------------------
@@ -142,7 +142,7 @@ for index = 1:length(events)
         eventtrial = intersect_bc( find(g.allevents*g.srate >= posinit),  find(g.allevents*g.srate <= posend) );
         alleventout{index} = eventtrial;
         alllatencyout{index} = g.allevents(eventtrial)*g.srate-pos0; 
-   end;
+   end
 end;   
 newtime(1) = reallim(1)/g.srate;
 newtime(2) = reallim(2)/g.srate;
@@ -153,7 +153,7 @@ indexes = find(indexes == 1);
 if ~isempty(alleventout)
     alleventout = alleventout(indexes);
     alllatencyout= alllatencyout(indexes);
-end;
+end
 reallim = reallim*g.srate;
 return;
 
@@ -166,7 +166,7 @@ return;
 %    alleventout = alleventout(indexes,:) - 1000000;
 %   alllatencyout( find( alllatencyout == 0) ) = nan;
 %   alllatencyout = alllatencyout(indexes,:) - 1000000;
-%end;
+%end
 
 function res = lat2point( lat, srate, pnts);
 

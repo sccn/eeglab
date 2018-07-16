@@ -43,7 +43,7 @@ ALLEEG = [];
 com = '';
 if isempty(varargin)
     [filename, filepath] = uigetfile2('*.study', 'Load a STUDY -- pop_loadstudy()'); 
-    if filename(1) == 0, return; end;
+    if filename(1) == 0, return; end
     if ~strncmp(filename(end-5:end), '.study',6)
         if isempty(strfind(filename,'.'))
             filename = [filename '.study'];
@@ -55,7 +55,7 @@ else
     filepath = '';
     if nargin == 1
         varargin = { 'filename' varargin{:} };
-    end;
+    end
     for k = 1:2:length(varargin)
         switch varargin{k}
             case 'filename'
@@ -128,18 +128,18 @@ if ~isempty(STUDY.design)
     end
 end                      
 
-if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; end;
+if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; end
 if isempty(varargin)
      [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG, 'popup');
 else [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
-end;
+end
 
 if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
     if std_uniformfiles(STUDY, ALLEEG) == 0
          STUDY = std_changroup(STUDY, ALLEEG);
     else STUDY = std_changroup(STUDY, ALLEEG, [], 'interp');
-    end;
-end;
+    end
+end
 
 % Update the design path
 if isfield(STUDY.design, 'cell')
@@ -158,8 +158,8 @@ if isfield(STUDY.design, 'cell')
             elseif ~isempty(tmpinds2)
                 STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
             else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
-            end;
-        end;
+            end
+        end
     end
 end
 
@@ -176,9 +176,9 @@ if isfield(STUDY.design, 'cell')
             elseif ~isempty(tmpinds2)
                 STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
             else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
-            end;
-        end;
-    end;
+            end
+        end
+    end
 end
 
 % check for corrupted ERSP ICA data files
@@ -206,25 +206,25 @@ try
                                     warningshown = 1;
                                     warndlg2( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
                                                  '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'nonmodal');
-                                end;
-                            end;
+                                end
+                            end
                             if warningshown == 0 && exist( [ STUDY.design(des).cell(iCell).filebase '.icaitc' ] )
                                 tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
                                 if ~isfield(tmp, 'trialindices')
                                     warningshown = 1;
                                     warndlg2( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
                                                  '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'modal');
-                                end;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
 catch, 
     disp('Warning: failed to test STUDY file version');
-end;
+end
 
 TMP = STUDY.datasetinfo;
 STUDYTMP = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
@@ -232,11 +232,11 @@ if ~isfield(STUDYTMP.datasetinfo, 'trialinfo')
     sameTrialInfo = false;
 else
     sameTrialInfo = isequal( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
-end;
+end
 clear STUDYTMP;
 if ~sameTrialInfo
     disp('STUDY Warning: the trial information collected from datasets has changed; use STUDY menu to reconcile if necessary');
-end;
+end
 std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 STUDY = std_selectdesign(STUDY, ALLEEG, STUDY.currentdesign);

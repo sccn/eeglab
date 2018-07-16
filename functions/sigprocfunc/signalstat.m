@@ -18,7 +18,7 @@
 %
 % Optional inputs:
 %   plotlab     - 1: default->plot  |  0: ->no plot
-%   dlabel      - A label for the data ([]: default->'Potential [µV]')
+%   dlabel      - A label for the data ([]: default->'Potential [V]')
 %   percent     - percentage of data to exclude for trimmed mean & SD ([]:default->5)
 %                 Excluded is 'percent'/2 high % and 'percent'/2 low %
 %   dlabel2     - A title label for the statistics table
@@ -110,7 +110,7 @@ if nargin < 4
 end
 
 if (nargin < 3 | isempty(dlabel))
-	dlabel='Potential [µV]';
+	dlabel='Potential [V]';
 end
 		
 if nargin < 2
@@ -119,11 +119,11 @@ end;
 	
 if ~isnumeric(plotlab)
 	error('signalstat(): plotlab must be numeric');
-end;
+end
 
 if plotlab ~= 0 & plotlab ~= 1
 		error('signalstat(): plotlab must be 0 or 1');
-end;
+end
 if nargin < 1
 	help signalstat;
 	return;
@@ -232,7 +232,7 @@ end
 
 if plotlab
   figure
-  try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+  try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
   COLOR = [0.56 .66 .9];
   set(gcf,'NumberTitle','off','Name','Signal statistics -- signalstat()')
   fwidth=800;  % figure size in pixels
@@ -284,12 +284,12 @@ if plotlab
   
   if istats
 	  set(gca,'XTick',[])	  
-  elseif ~istats & strcmp(dlabel,'Potential [µV]')
+  elseif ~istats & strcmp(dlabel,'Potential [V]')
 	  set(gca,'XTick',[-125, -75, -25, 0, 25, 75,  125],...
 			  'XTickLabel',['-125' ; ' -75' ; ' -25' ; '  0 ' ; ' 25 ' ; ' 75 ' ; ' 125'])
   end
   
-  if strcmp(dlabel,'Potential [µV]')
+  if strcmp(dlabel,'Potential [V]')
 	  set(gca,'XLim',[-125 125])
   end
 
@@ -316,7 +316,7 @@ if plotlab
 	  set(gca,'FontSize',14,'XMinorTick','on') 
       set(gca,'XLim',xlim)
 	  
-      if strcmp(dlabel,'Potential [µV]')
+      if strcmp(dlabel,'Potential [V]')
 		  set(gca,'XTick',[-125 -75 -25 0 25 75  125],...
 				  'XTickLabel',['-125' ; ' -75' ; ' -25' ; '  0 ' ; ' 25 ' ; ' 75 ' ; ' 125'],...
 				  'XLim',[-125 125])
@@ -344,10 +344,10 @@ if plotlab
   %plot([0 0],ymin,'k--')
   set(gca,'FontSize',14)
   xlabel('Standard Normal Quantiles [Std.Dev.]')
-  if strcmp(dlabel,'Potential [µV]')
-	  ylabel('Ordered Observations [µV]')
+  if strcmp(dlabel,'Potential [V]')
+	  ylabel('Ordered Observations [V]')
   elseif strcmp(dlabel,'Component Activity')
-	  ylabel('Ordered Observations [rel. µV]')
+	  ylabel('Ordered Observations [rel. V]')
   else
 	  ylabel('Ordered Observations')
   end
@@ -367,7 +367,7 @@ if plotlab
 				   'style', 'blank', 'emarkersize1chan', 10);
 	  else
 		  topoplot(map,chan_locs,'electrodes','off');
-	  end;
+	  end
 	  axis('square')
   end 
 
@@ -435,12 +435,12 @@ if length(mymean) < length(myvals)
 	tmpmean = mymean;
 	mymean = zeros(size(myvals));
 	mymean(:) = tmpmean;
-end;
+end
 if length(mystd) < length(myvals)
 	tmpmean = mystd;
 	mystd = zeros(size(myvals));
 	mystd(:) = tmpmean;
-end;
+end
 mymean(1:10);
 mystd(1:10);
 

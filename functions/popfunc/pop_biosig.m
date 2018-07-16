@@ -64,7 +64,7 @@ function [EEG, command, dat] = pop_biosig(filename, varargin);
 EEG = [];
 command = '';
 
-if ~plugin_askinstall('Biosig', 'sopen'), return; end;
+if ~plugin_askinstall('Biosig', 'sopen'), return; end
 biosigpathfirst;
     
 if nargin < 1
@@ -72,14 +72,14 @@ if nargin < 1
 	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
-	if filename == 0 return; end;
+	if filename == 0 return; end
 	filename = [filepath filename];
     
     % look if MEG
     % -----------
     if length(filepath)>4
-        if strcmpi(filepath(end-3:end-1), '.ds'), filename = filepath(1:end-1); end;
-    end;
+        if strcmpi(filepath(end-3:end-1), '.ds'), filename = filepath(1:end-1); end
+    end
     
     % open file to get infos
     % ----------------------
@@ -87,7 +87,7 @@ if nargin < 1
     dat = sopen(filename, 'r', [], 'OVERFLOWDETECTION:OFF');
     if ~isfield(dat, 'NRec')
         error('Unsuported data format');
-    end;
+    end
     
     % special BIOSEMI
     % ---------------
@@ -96,7 +96,7 @@ if nargin < 1
         disp(upper('We highly recommend that you choose a reference channel IF these are Biosemi data'));
         disp(upper('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!'));
         disp('For more information, see <a href="http://www.biosemi.com/faq/cms&drl.htm">http://www.biosemi.com/faq/cms&drl.htm</a>');
-    end;
+    end
     uilist = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
                  { 'style' 'edit' 'string' '' } ...
                  { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
@@ -114,26 +114,26 @@ if nargin < 1
 
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
-    if length(result) == 0 return; end;
+    if length(result) == 0 return; end
     
     % decode GUI params
     % -----------------
     options = {};
-    if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end;
-    if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end;
+    if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end
+    if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end
     if length(result) > 2
-        if ~result{3},          options = { options{:} 'importevent'  'off'  }; end;
-        if ~result{4},          options = { options{:} 'importannot'  'off'  }; end;
-        if  result{5},          options = { options{:} 'blockepoch'   'off' }; end;
-        if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end;
-        if  result{7},          options = { options{:} 'memorymapped' 'on' }; end;
-    end;
+        if ~result{3},          options = { options{:} 'importevent'  'off'  }; end
+        if ~result{4},          options = { options{:} 'importannot'  'off'  }; end
+        if  result{5},          options = { options{:} 'blockepoch'   'off' }; end
+        if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end
+        if  result{7},          options = { options{:} 'memorymapped' 'on' }; end
+    end
     if length(eval( [ '[' result{6} ']' ] )) > 1
         options = { options{:} 'refoptions' { 'keepref' 'off' } };
-    end;
+    end
 else
     options = varargin;
-end;
+end
 
 % decode imput parameters
 % -----------------------
@@ -146,7 +146,7 @@ g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'importannot'  'string'  { 'on';'off' } 'on';
                             'memorymapped' 'string'  { 'on';'off' } 'off';
                             'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % import data
 % -----------
@@ -155,7 +155,7 @@ EEG = eeg_emptyset;
 
 if strcmpi(g.blockepoch, 'off')
     dat.NRec = 1;
-end;
+end
     
 EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'));
 
@@ -165,10 +165,10 @@ if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
         EEG.data(dat.BDF.Status.Channel,:) = []; 
         if ~isempty(EEG.chanlocs) && length(EEG.chanlocs) >= dat.BDF.Status.Channel
             EEG.chanlocs(dat.BDF.Status.Channel) = [];
-        end;
-    end;
+        end
+    end
     EEG.nbchan = size(EEG.data,1);
-end;
+end
 
 % rerefencing
 % -----------
@@ -178,13 +178,13 @@ if ~isempty(g.ref)
 %     EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
 %     if length(g.ref) == size(EEG.data,1)
 %         EEG.ref  = 'averef';
-%     end;
+%     end
 %     if length(g.ref) == 1
 %         disp([ 'Warning: channel ' int2str(g.ref) ' is now zeroed (but still present in the data)' ]);
 %     else
 %         disp([ 'Warning: data matrix rank has decreased through re-referencing' ]);
-%     end;
-end;
+%     end
+end
 
 % test if annotation channel is present
 % -------------------------------------
@@ -197,10 +197,10 @@ if isfield(dat, 'EDFplus') && strcmpi(g.importannot, 'on')
             EEG.nbchan        = EEG.nbchan+1;
             if ~isempty(EEG.chanlocs)
                 EEG.chanlocs(end+1).labels = tmpfields{ind};
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 
 % convert data to single if necessary
 % -----------------------------------
@@ -223,7 +223,7 @@ biosigpathlast;
 % ---------
 function [dat DAT interval] = readfile(filename, channels, blockrange, memmapdata);
 
-if isempty(channels), channels = 0; end;
+if isempty(channels), channels = 0; end
 dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');
 
 if strcmpi(memmapdata, 'off')
@@ -242,7 +242,7 @@ else
     fprintf('Reading data in %s format (file will be mapped to memory so this may take a while)...\n', dat.TYPE);
     inc = ceil(250000/(dat.NS*dat.SPR)); % 1Mb block
     
-    if isempty(blockrange), blockrange = [0 dat.NRec]; end;
+    if isempty(blockrange), blockrange = [0 dat.NRec]; end
     blockrange(2) = min(blockrange(2), dat.NRec);
     allblocks = [blockrange(1):inc:blockrange(end)];
     count = 1;
@@ -250,12 +250,12 @@ else
         TMPDAT=sread(dat, (allblocks(bind+1)-allblocks(bind))*dat.Dur, allblocks(bind)*dat.Dur);
         if bind == 1
             DAT = mmo([], [size(TMPDAT,2) (allblocks(end)-allblocks(1))*dat.SPR]);
-        end;
+        end
         DAT(:,count:count+length(TMPDAT)-1) = TMPDAT';
         count = count+length(TMPDAT);
-    end;
+    end
     sclose(dat);
-end;
+end
 
 if ~isempty(blockrange)
      interval(1) = blockrange(1) * dat.SampleRate(1) + 1;

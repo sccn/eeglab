@@ -75,7 +75,7 @@ function [F, df] = anova1_cell(data)
             n( i) = length(data{i});
             m( i) = mymean(  data{i});
             sd(i) = mystd(   data{i});
-        end;
+        end
         nt = sum(n);
         n   = n';
         m   = m';
@@ -87,7 +87,7 @@ function [F, df] = anova1_cell(data)
             n( :,i) = ones(size(data{i},1) * size(data{i},2), 'single');
             m( :,i) = mymean(  data{i},2);
             sd(:,i) = mystd(   data{i},[],2);
-        end;
+        end
         nt = sum(n(1,:));
     
     elseif nd == 3        
@@ -96,7 +96,7 @@ function [F, df] = anova1_cell(data)
             n( :,:,i) = ones(size(data{i},1),size(data{i},2) * size(data{i},3), 'single');
             m( :,:,i) = mymean(  data{i},3);
             sd(:,:,i) = mystd(   data{i},[],3);
-        end;
+        end
         nt = sum(n(1,1,:));
         
     elseif nd == 4
@@ -105,10 +105,10 @@ function [F, df] = anova1_cell(data)
             n( :,:,:,i) = ones(size(data{i},1),size(data{i},2), size(data{i},3) * size(data{i},4), 'single');
             m( :,:,:,i) = mymean(  data{i},4);
             sd(:,:,:,i) = mystd(   data{i},[],4);
-        end;
+        end
         nt = sum(n(1,1,1,:));
         
-    end;
+    end
     
     mt = mean(m,nd);
     ng = length(data); % number of conditions
@@ -128,14 +128,14 @@ function val = myndims(a)
             val = 1;
         else
             val = 2;
-        end;
-    end;
+        end
+    end
 
 function res = mymean( data, varargin) % deal with complex numbers
     res = mean( data, varargin{:});
     if ~isreal(data)
         res = abs( res );
-    end;
+    end
 
 function res = mystd( data, varargin) % deal with complex numbers
     res = std( abs(data), varargin{:});

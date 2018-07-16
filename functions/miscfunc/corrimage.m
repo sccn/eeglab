@@ -110,9 +110,9 @@ function [time, freq, alpha, sigout, limits, tf, sortvar] = corrimage(data, sort
 if nargin < 3
     help corrimage;
     return;
-end;
+end
     
-if isempty(timevect), timevect = [1 2]; end;
+if isempty(timevect), timevect = [1 2]; end
 
 % check inputs
 % ------------
@@ -134,7 +134,7 @@ g = finputcheck(varargin, { 'freqs'    'real'   [0 Inf]    [2.5 50 50];
                             'erpout'   'real'   []             [];
                             'tfopt'    'cell'   []             {};
                             'erpimopt' 'cell'   []             {} });
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 fprintf('Generating %d frequencies in log scale (ignore message on linear scale)\n', g.freqs(2));
 g.freqs = logscale(g.freqs(1), g.freqs(3), g.freqs(2));
@@ -142,7 +142,7 @@ g.freqs = logscale(g.freqs(1), g.freqs(3), g.freqs(2));
 frames = length(timevect);
 if size(data,1) == 1
     data = reshape(data, frames, size(data,2)*size(data,3)/frames);
-end;
+end
 
 % trim sortvar values
 % -------------------
@@ -156,7 +156,7 @@ data    = data(:, lowindex:highindex);
 if lowindex ~=1 | highindex ~= length(sortorder)
     fprintf('Actual percentiles %1.2f-%1.2f (indices 1-%d -> %d-%d): event vals min %3.2f; max %3.2f\n', ...
              100*(lowindex-1)/len, 100*highindex/len, len, lowindex, highindex, min(sortvar), max(sortvar));
-end;
+end
 
 % assign subject number for each trial
 % ------------------------------------
@@ -164,10 +164,10 @@ if ~isempty(g.triallimit)
     alltrials = zeros(1,len);
     for index = 1:length(g.triallimit)-1
         alltrials([g.triallimit(index):g.triallimit(index+1)-1]) = index; 
-    end;
+    end
     alltrials = alltrials(sortorder);
     alltrials = alltrials(lowindex:highindex);
-end;
+end
 
 %figure; hist(sortvar)
 
@@ -189,13 +189,13 @@ if ~isempty(g.align)
         % compute shifts
         % --------------
         shifts = round((g.align-sortvar)*srate/1000); % shifts can be positive or negative
-    end;
+    end
     
     %figure; hist(shifts)
     minshift = min(shifts); % negative
     maxshift = max(shifts); % positive
-    if minshift > 0, error('minshift has to be negative'); end;
-    if maxshift < 0, error('maxshift has to be positive'); end;
+    if minshift > 0, error('minshift has to be negative'); end
+    if maxshift < 0, error('maxshift has to be positive'); end
     
     % realign data for all trials
     % ---------------------------
@@ -211,7 +211,7 @@ if ~isempty(g.align)
         end 
     end % end trial    
     data = aligndata(maxshift+1:frames+minshift,:);
-    if any(any(isnan(data))), error('NaNs remaining after data alignment'); end;
+    if any(any(isnan(data))), error('NaNs remaining after data alignment'); end
     timevect = timevect(maxshift+1:frames+minshift);
     
     % take the time vector subset
@@ -220,7 +220,7 @@ if ~isempty(g.align)
     else fprintf('Time vector truncated for data alignment between %1.0f and %1.0f\n', ...
                  min(timevect), max(timevect)); 
     end;        
-end;
+end
 
 % regress out the ERP from the data (4 times to have residual ERP close to 0)
 % ---------------------------------------------------------------------------
@@ -243,8 +243,8 @@ if ~isempty(g.erpout)
             fprintf([ '***********************************************\n' ...
                       'Ratio in ERP after regression (compare to before) is %3.2f\n' ...
                       '***********************************************\n' ], mean(erpend./erpstart));
-        end;
-    end;
+        end
+    end
     erpend = mean(data,2);
     fprintf([ '***********************************************\n' ...
               'Ratio in grand ERP after regression (compare to before) is %3.2f\n' ...
@@ -273,7 +273,7 @@ if ~isempty(g.erpout)
         subplot(3,5,index);
         trials = find(alltrials == index); 
         erpimage(data(:,trials), sortvar(trials), timevect, '', 50, 100, 'erp');
-    end;
+    end
     
     disp('Regressing out ERP');
     if ~isempty(g.triallimit)
@@ -295,12 +295,12 @@ if ~isempty(g.erpout)
             %data(:,trials) = erpregout(data(:,trials), [timevect(1) timevect(end)], g.erpout);
             %data(:,trials) = erpregout(data(:,trials), [timevect(1) timevect(end)], g.erpout);
             %data(:,trials) = erpregout(data(:,trials), [timevect(1) timevect(end)], g.erpout);
-        end;
+        end
     else
         %data = erpregout(data, [timevect(1) timevect(end)], g.erpout);
-    end;
-    end;
-end;
+    end
+    end
+end
 
 % generate time points
 % --------------------
@@ -314,7 +314,7 @@ if strcmpi(g.method, 'timefreq') & isempty(g.plotvals)
     [tf, g.freqs, g.times] = timefreq(data, srate, 'freqs', g.freqs, 'timesout', g.times, ...
                                       'tlimits', [min(timevect) max(timevect)], 'wavelet', 3);
     outvar   = sortvar;
-end;
+end
 
 % compute correlation
 % -------------------
@@ -328,7 +328,7 @@ if strcmpi(g.mode, 'phase') & isempty(g.plotvals)
                         '', 0,0,g.erpimopt{:}, 'phasesort', [g.times(time) 0 g.freqs(freq)], 'noshow', 'yes');
             else
                 phsangls = angle( squeeze(tf(freq, time, :))' );
-            end;
+            end
             
             % computing ITCs
             [ ITC(freq, time) alpha(freq, time) ] = ...
@@ -340,8 +340,8 @@ if strcmpi(g.mode, 'phase') & isempty(g.plotvals)
             %ITC(freq, time) = mean(cmplx);
             %alpha(freq,time) = bootstat(outvar/mean(outvar), exp(j*phsangls), 'res = mean(arg1 .* arg2)', ...
             %                         'naccu', 100, 'vals', abs(ITC(freq, time)), 'distfit', 'norm');
-        end;
-    end;
+        end
+    end
     sigout = ITC;
 elseif isempty(g.plotvals)
     for freq = 1:length(g.freqs)
@@ -353,11 +353,11 @@ elseif isempty(g.plotvals)
                              '', 0,0,g.erpimopt{:}, 'ampsort', [g.times(time) 0 g.freqs(freq)], 'noshow', 'yes');
             else
                 phsamp = abs(squeeze(tf(freq, time, :)))';
-            end;
+            end
         
             % computing ITCs
             [ypred alpha(freq, time) Rsq slope(freq, time)] = myregress(outvar, 20*log10(phsamp));
-        end;
+        end
     end;    
     sigout = slope;
 else 
@@ -365,7 +365,7 @@ else
     g.freqs = g.plotvals{2};
     alpha   = g.plotvals{3};
     sigout  = g.plotvals{4};
-end;
+end
 
 % plot correlation
 % ----------------
@@ -375,15 +375,15 @@ if ~strcmp('plot', 'no')
             sigoutplot = angle(sigout);
         else
             sigoutplot = abs(sigout);
-        end;
+        end
     else sigoutplot = sigout; 
-    end;
+    end
     sigouttmp = sigoutplot;
     if strcmpi(g.smooth, 'on')
         tmpfilt = gauss2d(3,3,.3,.3);
         tmpfilt = tmpfilt/sum(sum(tmpfilt));
         alpha = conv2(alpha, tmpfilt, 'same');
-    end;
+    end
     
     % mask signal out
     if g.pmask > 0.5
@@ -398,17 +398,17 @@ if ~strcmp('plot', 'no')
         sigouttmp = sigoutplot;
         indices = find( alpha(:) > g.pmask);
         sigouttmp(indices) = 0;
-    end;
+    end
     
-    if strcmpi(g.nofig, 'off'), figure; end;
+    if strcmpi(g.nofig, 'off'), figure; end
     switch g.plot
      case 'alpha',   limits = plotfig(g.times, g.freqs, -log10(alpha), g);
      case 'sigout',  limits = plotfigsim(g.times, g.freqs, sigoutplot, g);
      case { 'sigoutm' 'sigoutp' }, limits = plotfigsim(g.times, g.freqs, sigouttmp, g);
      case 'sigoutm2', limits = subplot(1,2,1); plotfigsim(g.times, g.freqs, sigoutplot, g);
                       limits = subplot(1,2,2); plotfigsim(g.times, g.freqs, sigouttmp, g);
-    end;
-end;
+    end
+end
 
 time = g.times;
 freq = g.freqs;
@@ -433,7 +433,7 @@ function val = gettimes(timevect, timevar);
             trim    = timevar(2);
             if length(timevect)-2*round(trim/100*length(timevect)) < npoints
                 npoints = length(timevect)-round(trim/100*length(timevect));
-            end;
+            end
             fprintf('Generating %d times points trimmed by %1.1f percent\n', npoints, trim);
             timer = max(timevect) - min(timevect);
             maxt = max(timevect)-timer*trim/100;
@@ -448,7 +448,7 @@ function val = gettimes(timevect, timevar);
             trimtimevect = timevect(round(trim/100*len)+1:len-round(trim/100*len));
             fprintf('Subsampling by %d and triming data by %1.1f percent (%d points)\n', nsub, trim, round(trim/100*len));
             val = trimtimevect(1:nsub:end);
-        end;
+        end
     else
         val = timevar;
     end;        
@@ -458,10 +458,10 @@ function val = gettimes(timevect, timevar);
     for index = 1:length(val)
         [dum ind] = min(abs(timevect-val(index)));
         val(index) = timevect(ind);
-    end;
+    end
     if length(val) < length(unique(val))
         disp('Warning: duplicate times, reduce the number of output times');
-    end;
+    end
     if all(oldval == val)
         disp('Debug msg: Time value unchanged by finding closest in data');
     end;    
@@ -486,16 +486,16 @@ function limits = plotfig(times, freqs, vals, g)
     set(gca, 'yticklabel', num2str(freqs(1:4:end)', 3))
 
     xlabel('Time (ms)'); ylabel('Freq (Hz)');
-    if ~isempty(g.limits), caxis(g.limits); end;
+    if ~isempty(g.limits), caxis(g.limits); end
     limits = caxis;
     if ~isempty(g.vert)
         for vert = g.vert(:)'
             hold on; plot([vert vert], [0.001 500], 'k', 'linewidth', 2);
-        end;
-    end;
+        end
+    end
     if strcmpi(g.cbar,'on')
         cbar;
-    end;
+    end
 
 % plot figure with symetrical phase
 % ---------------------------------
@@ -516,16 +516,16 @@ function limits = plotfigsim(times, freqs, vals, g)
         clim = max(abs(caxis));
         limits = [-clim clim];
         caxis(limits);
-    end;
+    end
     xlabel('Time (ms)'); ylabel('Freq (Hz)');
     if ~isempty(g.vert)
         for vert = g.vert(:)'
             hold on; plot([vert vert], [0.01 500], 'k', 'linewidth', 2);
-        end;
-    end;
+        end
+    end
     if strcmpi(g.cbar,'on')
         cbar;
-    end;
+    end
     return;
 
 
@@ -561,7 +561,7 @@ text(-1300,-1400,sprintf('ITC value: amplitude %3.4f, angle %3.1f\n', abs(ITCval
 % accumulate 200 values
 % ---------------------
 alpha = 0.05;
-if exist('accarray') ~= 1, accarray = NaN; end;
+if exist('accarray') ~= 1, accarray = NaN; end
 [sigval accarray] = bootstat(outvar/mean(outvar), phsangls, 'res = mean(arg1 .* exp(arg2*complex(0,1)))', ...
                       'accarray', accarray, 'bootside', 'upper', 'alpha', alpha);
 text(-1300,-1600,sprintf('Threshold for significance at %d percent(naccu=200): %3.4f\n', alpha*100, sigval));

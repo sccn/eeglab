@@ -59,10 +59,10 @@ end;
 popup=0;
 if nargin < 2
 	popup = 1;
-end;
+end
 if nargin < 3
 	percent=5;
-end;
+end
 
 % pop up window
 % -------------
@@ -75,30 +75,30 @@ if nargin < 2
 					'Percent for trimmed statistics:' };
 	inistr       = { 'latency' '' '' '5' };
 	result       = inputdlg2( promptstr, 'Plot event statistics -- pop_eventstat()', 1,  inistr, 'signalstat');
-	if length( result ) == 0 return; end;
+	if length( result ) == 0 return; end
 	eventfield   = deblank(result{1}); % the brackets allow to process matlab arrays
     if ~isempty(result{2})
         if strcmpi(result{2}(1),'''')
              type = eval( [ '{' result{2} '}' ] );
         else type = parsetxt( result{2});
-        end;
+        end
     else
         disp('WARNING: you should select an event type');
         type = {};
-    end;
+    end
 	latrange     = eval( [ '[' result{3} ']' ] );
 	percent      = eval( [ '[' result{4} ']' ] );
 else
     if nargin < 3
         type = [];
-    end;
+    end
     if nargin < 4
         latrange = [];
-    end;
+    end
     if nargin < 5
         percent = 5;
-    end;
-end;
+    end
+end
 
 % call function signalstat() either on raw data or ICA data
 % ---------------------------------------------------------
@@ -111,7 +111,7 @@ for index = 1:length(alltypevals)
 end;   
 if isempty(typevals)
     error('No such events found. See Edit > Event values to confirm event type.');
-end;
+end
 dlabel='Event values';
 if isempty(type)
     dlabel2=['All event statistics for ''' eventfield ''' info'];
@@ -123,9 +123,9 @@ end;
 % -------
 outstr = '';
 if ~popup
-    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
-    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
-end;
+    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end
+    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end
+end
 
 % return the string command
 % -------------------------
@@ -134,6 +134,6 @@ varargout{1} = sprintf('pop_eventstat( EEG, %s );', vararg2str({eventfield type 
 com          = sprintf('%s signalstat( typevals, 1, dlabel, percent, dlabel2 ); %s', outstr);
 
 eval(com)	
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 
 return;

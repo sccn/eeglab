@@ -6,4 +6,4 @@ for iRow = 1:length(pluginOri)
     plugin(iRow).status         = pluginOri(iRow).status;
     plugin(iRow).name           = pluginOri(iRow).plugin;
     plugin(iRow).installed      = 1;
-end;
+end

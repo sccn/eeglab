@@ -12,7 +12,7 @@ while cont && ~feof(fid)
             bool = false; return;
         else
             bool = true; return;
-        end;
-    end;
-end;
+        end
+    end
+end
 bool = true; return;

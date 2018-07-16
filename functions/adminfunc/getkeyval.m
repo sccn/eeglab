@@ -45,23 +45,23 @@ function txt = getkeyval(lastcom, var, mode, default)
 	if nargin < 1
         help getkeyval;
         return;
-    end;
+    end
     if nargin < 4
 		default = '';
-	end;
+	end
 	if isempty(lastcom)
 		txt = default; return;
-	end;
+	end
 	if nargin < 3
 		mode = '';
-	end;
+	end
 	if ischar(mode) & strcmp(mode, 'present')
 		if ~isempty(findstr(var, lastcom))
 			txt = 1; return;
 		else
 			txt = 0; return;
-		end;
-	end;
+		end
+	end
 	if isnumeric(var)
 		comas = findstr(lastcom, ',');
 		if length(comas) >= var
@@ -69,26 +69,26 @@ function txt = getkeyval(lastcom, var, mode, default)
             tmpval = eval( txt );
             if isempty(tmpval), txt = '';
             else txt = vararg2str( tmpval );
-            end;
+            end
             return;
             
 % 			txt = deblank(txt(end:-1:1));
 % 			txt = deblank(txt(end:-1:1));
 %             
-% 			if ~isempty(txt) & txt(end) == '}', txt = txt(2:end-1); end;
+% 			if ~isempty(txt) & txt(end) == '}', txt = txt(2:end-1); end
 % 			if ~isempty(txt)
 % 				txt = deblank(txt(end:-1:1));
 % 				txt = deblank(txt(end:-1:1));
-% 			end;
-% 			if ~isempty(txt) & txt(end) == ']', txt = txt(2:end-1); end;
+% 			end
+% 			if ~isempty(txt) & txt(end) == ']', txt = txt(2:end-1); end
 % 			if ~isempty(txt)
 % 				txt = deblank(txt(end:-1:1));
 % 				txt = deblank(txt(end:-1:1));
-% 			end;
-% 			if ~isempty(txt) & txt(end) == '''', txt = txt(2:end-1); end;
+% 			end
+% 			if ~isempty(txt) & txt(end) == '''', txt = txt(2:end-1); end
 		else
 			txt = default;
-		end;
+		end
 		%fprintf('%s:%s\n', var, txt);		
 		return;
 	else
@@ -106,7 +106,7 @@ function txt = getkeyval(lastcom, var, mode, default)
 				if ~isempty(parent)
 					comas = comas(find(comas >parent(1)));
 					txt = lastcom(comas(1)+1:comas(2)-1);
-				end;
+				end
 				txt = [ '''' var ''', ' txt ];	
 			elseif isnumeric(mode)
 				txt = str2num(txt);
@@ -118,18 +118,18 @@ function txt = getkeyval(lastcom, var, mode, default)
 					elseif length(txt) >= mode(1)
 						if all(isnan(txt(mode(1)))), txt = '';
 						else txt = num2str(txt(mode(1)));
-						end;
+						end
 					else 
 						txt = default;
-					end;
+					end
 				else
                     txt = num2str(txt);
-				end;
+				end
             elseif txt(1) == ''''
                 txt = txt(2:end-1); % remove quotes for text
-			end;
+			end
 		else
 			txt = default;
-		end;
-	end;
+		end
+	end
 	%fprintf('%s:%s\n', var, txt);		

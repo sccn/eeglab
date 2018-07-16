@@ -45,11 +45,11 @@ if nargin < 4
 end;	
 if nargin < 5
 	funcname = '';
-end;
+end
 	
 if length(Prompt) ~= length(DefAns)
 	error('inputdlg2: prompt and default answer cell array must have the smae size');
-end;
+end
 
 geometry = {};
 listgui = {};
@@ -59,19 +59,19 @@ listgui = {};
 geomvert = [];
 for index = 1:length(Prompt)
 	geomvert = [geomvert size(Prompt{index},1) 1];  % default is vertical geometry
-end;
+end
 if all(geomvert == 1) & length(Prompt) > 1
 	geomvert = []; % horizontal
-end;
+end
 
 for index = 1:length(Prompt)
 	if ~isempty(geomvert) % vertical
 		geometry = { geometry{:} [ 1] [1 ]};
 	else
 		geometry = { geometry{:} [ 1 0.6 ]};
-	end;
+	end
 	listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
 				{ 'Style', 'edit', 'string', DefAns{index} } };
-end;
+end
 
 result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title, [], 'normal', geomvert);

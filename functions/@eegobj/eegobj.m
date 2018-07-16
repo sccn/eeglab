@@ -4,11 +4,11 @@ function this = eegobj(EEG);
         if isa(EEG, 'eegobj')
             this = EEG;
             return;
-        end;
+        end
         for index = 1:length(EEG)
             TMP(index).EEG = EEG(index);
-        end;
+        end
     else
         TMP.EEG = eeg_emptyset;
-    end;
+    end
     this = class(TMP, 'eegobj');

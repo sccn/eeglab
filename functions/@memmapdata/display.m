@@ -33,4 +33,4 @@ function b = display(a)
         a.data.data.x;
     else
         permute(a, [3 1 2]);
-    end;
+    end

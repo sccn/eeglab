@@ -42,12 +42,12 @@ function  plotchans3d(elpfile, arg2, arg3)
 if nargin<1
     help plotchans3d;
     return;
-end;
+end
 zs = [];
 if ischar(elpfile)
     if nargin > 1
         zs = arg2;
-    end;
+    end
     [elocstruct, elocname, X, Y, Z ] =readelp([elpfile]);
 else
     X = elpfile(:,1)';
@@ -57,15 +57,15 @@ else
         elocname = arg2;
     else 
         elocname = [];
-    end;
+    end
     if nargin > 2
         zs = arg3;
-    end;
-end;
+    end
+end
 
 if isempty(zs)
    zs = [1:length(elocname)];
-end;
+end
 
 %zs =[3 7 15 26 36 46 56 64 69 71 72];
 
@@ -77,7 +77,7 @@ hold on
 
 if ~isempty(elocname)
     plot3(X(zs),Y(zs),Z(zs),'b*')
-end;
+end
 
 plot3([0.08 0.12],[0 0],[0 0],'r','LineWidth',4) % nose
 plot3([0 lim],[0 0],[0 0],'b--')                 % axis
@@ -100,7 +100,7 @@ if ~isempty(elocname)
              'VerticalAlignment','middle','Color',[0 0 0],...
              'FontSize',10)
     end
-end;
+end
 %axis(repmat([-lim lim],1,3))
 axis([-lim lim -lim lim -lim*0.5 lim])
 axis equal;

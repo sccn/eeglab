@@ -32,14 +32,14 @@
 %   11/11/03 - initialize dists to NaN for error return.
 
 function dists = eucl(crds1,crds2)
-  if nargin == 0, help eucl; return; end;
+  if nargin == 0, help eucl; return; end
   dists = NaN;
 
   if (nargin < 2)                     % If only crds1 provided,
     [N,P] = size(crds1);
     if (N<2)
       error('  EUCL: need at least two points');
-    end;
+    end
 
     crds1 = crds1';                     % Transpose crds
     dists = zeros(N,N);                 % Calculate pairwise distances
@@ -50,13 +50,13 @@ function dists = eucl(crds1,crds2)
         d = sqrt(sum((c1-crds1(:,(i+1:N))).^2));
       else
         d = abs(c1-crds1(:,(i+1:N)));
-      end;
+      end
       dists(i,(i+1:N)) = d;
       dists((i+1:N),i) = d';
-    end;
+    end
     if (N==2)                            % Single distance for two points
       dists = dists(1,2);
-    end;
+    end
 
   else                                % If crds1 & crds2 provided,
     [N1,P1] = size(crds1);
@@ -65,7 +65,7 @@ function dists = eucl(crds1,crds2)
       error('  EUCL: sets of coordinates must be of same dimension');
     else
       P = P1;
-    end;
+    end
 
     crds1 = crds1';                     % Transpose crds
     crds2 = crds2';
@@ -78,14 +78,14 @@ function dists = eucl(crds1,crds2)
           d = sqrt(sum((c1-crds2).^2));
         else
           d = abs(c1-crds2);
-        end;
+        end
         dists(i,:) = d;
-      end;
-    end;
+      end
+    end
 
     if (N1==1 & N2==1)                  % If two vectors provided,
       dists = sqrt(sum((crds1-crds2).^2));  % Calc scalar
-    end;
+    end
 
     if (N1>1 & N2==1)                   % If matrix & reference point provided,
       crds1 = crds1 - (ones(N1,1)*crds2')'; % Center points on reference point
@@ -93,7 +93,7 @@ function dists = eucl(crds1,crds2)
          dists = sqrt(sum(crds1.^2))';
       else
          dists = abs(crds1)';
-      end;
+      end
     end;                                    % Return column vector
 
     if (N1==1 & N2>1)                   % If reference point & matrix provided,
@@ -102,9 +102,9 @@ function dists = eucl(crds1,crds2)
         dists = sqrt(sum(crds2.^2));
       else
         dists = abs(crds2);
-      end;
+      end
     end;                                    % Return row vector
-  end;
+  end
 
   return;
 

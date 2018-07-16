@@ -44,6 +44,6 @@ function [STUDY, allitc, alltimes, allfreqs, pgroup, pcond, pinter] = std_itcplo
 if nargin < 2
     help std_itcplot;
     return;
-end;
+end
 
 [STUDY allitc alltimes allfreqs pgroup pcond pinter ] = std_erspplot(STUDY, ALLEEG, 'datatype', 'itc', varargin{:});

@@ -39,14 +39,14 @@ function [eloc, names, x, y, z] = readelp( filename );
 if nargin < 1
 	help readelp;
 	return;
-end;
+end
 
 % open file
 % ---------
 fid = fopen(filename, 'r');
 if fid == -1
   disp('Cannot open file'); return;
-end;
+end
 
 index = 1;
 countfid  = 1;
@@ -67,7 +67,7 @@ while 1
             
             index = index + 1;
             needToReadNumbers = 0;
-        end;
+        end
     elseif tmpstr(1) == '%'
         if tmpstr(2) == 'F' % fiducial
             tmp = sscanf(tmpstr(3:end), '%f');
@@ -86,9 +86,9 @@ while 1
             if ~(strcmp(nm, 'Name') | strcmp(nm, 'Status'))
                 eloc(index).labels = nm;
                 needToReadNumbers = 1;
-            end;
-        end;
-    end;
+            end
+        end
+    end
 
     % Get the next line
     tmpstr = fgetl(fid);
@@ -97,7 +97,7 @@ while 1
         if ~ischar(tmpstr) & tmpstr == -1
             break;
         end; 
-    end;
+    end
     
     if ~ischar(tmpstr) & tmpstr == -1
         break;

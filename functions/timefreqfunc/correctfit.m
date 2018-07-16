@@ -48,12 +48,12 @@ function [pval, PHAT, PCI, zerofreq] = correctfit(pval, varargin)
         help correctfit;
         disp('You need to specify one optional input');
         return;
-    end;
+    end
     
     g = finputcheck( varargin, { 'allpval'    'real'    [0 1]          [];
                                  'zeromode'   'string'  {'on','off'}   'on';
                                  'gamparams'  'real'    []             []}, 'correctfit');
-    if ischar(g), error(g); end;
+    if ischar(g), error(g); end
     
     if ~isempty(g.gamparams)
         PHAT     = g.gamparams(1);
@@ -66,16 +66,16 @@ function [pval, PHAT, PCI, zerofreq] = correctfit(pval, varargin)
         [PHAT, PCI] = gamfit( tmpdat );
         PHAT = PHAT(1);
         PCI  = PCI(2);
-    end;
+    end
     
     if pval == 0
         if strcmpi(g.zeromode, 'on')
             pval = zerofreq;
-        end;
+        end
     else
         tmppval = -log10( pval ) + 1E-10;
         pval    = 1-gamcdf( tmppval, PHAT, PCI);
-    end;
+    end
     
     if 1 % plotting
         if exist('tmpdat') == 1
@@ -84,5 +84,5 @@ function [pval, PHAT, PCI, zerofreq] = correctfit(pval, varargin)
             tmpdat = linspace(0.00001,10, 300);
             normy = gampdf( tmpdat, PHAT, PCI);
             plot( tmpdat, normy/max(normy)*mult(2)*3, 'r');
-        end;
-    end;
+        end
+    end

@@ -36,10 +36,10 @@ function [txt, nb, labels] = getallmenuseeglab( handler, level )
 	if nargin < 1
 		help getallmenuseeglab;
 		return;
-	end;
+	end
 	if nargin < 2
 		level = 0;
-	end;
+	end
 	    
 	txt = '';
 	nb = 0;
@@ -53,8 +53,8 @@ function [txt, nb, labels] = getallmenuseeglab( handler, level )
 			txt = [ txtmp txt ];
 			labels = { tmplab labels{:} };
 			nb = nb+nbtmp;
-		end;
-	end;
+		end
+	end
 	try
         lab = get(handler, 'Label');
         cb  = get(handler, 'Callback');
@@ -62,11 +62,11 @@ function [txt, nb, labels] = getallmenuseeglab( handler, level )
         if ~isempty(cb)
     		 newtxt = [ lab ' - <a href="matlab:helpwin ' cb '">' cb '</a>'];
         else newtxt = [ lab ];
-        end;
+        end
         txt = [ newtxt 10  txt ];
 		%txt = [ get(handler, 'Label') 10 txt ];
 		nb = nb+1;
-	catch, end;
+	catch, end
 	if isempty(labels)
 		labels = { nb };
 	end;	
@@ -76,7 +76,7 @@ function [txt, nb, labels] = getallmenuseeglab( handler, level )
         fclose(fid);
         disp(' ');
         disp('Results saved in tmpfile.m');
-    end;
+    end
 
 % transform into array of text
 % ----------------------------
@@ -87,9 +87,9 @@ if nargin < 2
 	lines = find( txt == 10 );
 	for index = 1:length(lines)-1
 		tmptext = txt(lines(index)+1:lines(index+1)-1); 	
-		if maxlength < length( tmptext ), maxlength = length( tmptext ); end;
+		if maxlength < length( tmptext ), maxlength = length( tmptext ); end
 		newtext(index, 1:length(tmptext)) = tmptext;
-	end;
+	end
 	txt = char( newtext(1:index+1, 1:maxlength) );
 end;		
 
@@ -103,19 +103,19 @@ for iList = 1:3
     if ~isempty(indList), 
         if strcmpi(cbin(indList(1):indList(1)+length('pop_stdwarn')-1), 'pop_stdwarn')
             indList = findstr(funcList{iList}, cbin(indList(1)+1:end))+indList(1);
-        end;
+        end
         break; 
-    end;
-end;
+    end
+end
 if ~isempty(indList)
     indEndList = find( cbin(indList(1):end) == '(' );
     if isempty(indEndList) || indEndList(1) > 25
         indEndList = find( cbin(indList(1):end) == ';' );
         if cbin(indList(1)+indEndList(1)-2) == ')'
             indEndList = indEndList-2;
-        end;
-    end;
+        end
+    end
     cbout = cbin(indList(1):indList(1)+indEndList(1)-2);
 else
     cbout = '';
-end;
+end

@@ -44,7 +44,7 @@ function [PP, baseln, mbase] = newtimefbaseln(PPori, timesout, varargin)
 if nargin < 3
     help newtimefbaseln;
     return;
-end;
+end
 
 [ g timefreqopts ] = finputcheck(varargin, ...
     {'powbase'       'real'      []          NaN;
@@ -56,8 +56,8 @@ end;
     'trialbase'     'string'    {'on','off','full'} 'off'; % 'on' skip the baseline
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimefbaseln', 'ignore');
-if ischar(g) error(g); return; end;
-PP = PPori; if ~iscell(PP), PP = { PP }; end;
+if ischar(g) error(g); return; end
+PP = PPori; if ~iscell(PP), PP = { PP }; end
 
 % ---------------
 % baseline length
@@ -67,7 +67,7 @@ if size(g.baseline,2) == 2
     for index = 1:size(g.baseline,1)
         tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
         baseln = union_bc(baseln, tmptime);
-    end;
+    end
     if length(baseln)==0
         error( [ 'There are no sample points found in the default baseline.' 10 ...
             'This may happen even though data time limits overlap with' 10 ...
@@ -79,7 +79,7 @@ else
          baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
     else baseln = 1:length(timesout); % use all times as baseline
     end
-end;
+end
 
 allMbase = cell(size(PP));
 allPmean = cell(size(PP));
@@ -95,10 +95,10 @@ for ind = 1:length(PP(:))
         if strcmpi(g.singletrials, 'on') && strcmpi(g.trialbase, 'off')
             if ndims(P) == 4, Pmean  = mean(P, 4); % average power over trials (channels x freq x time x trials)
             else              Pmean  = mean(P, 3); % average power over trials (freq x time x trials)
-            end;
+            end
         else
             Pmean = P;
-        end;
+        end
         mbase = mean(Pmean(:,baseln,:,:),2);
         mstd  = std(Pmean(:,baseln,:,:),[],2);
     else
@@ -107,14 +107,14 @@ for ind = 1:length(PP(:))
         mstd     = [];
         if size(mbase,1) == 1 % if input was a row vector, flip to be a column
             mbase = mbase';
-        end;
+        end
     end
     
     PP{ind}       = P;
     baselength    = length(baseln);
     allMbase{ind} = mbase;
     allMstd{ind}  = mstd;
-end;
+end
 
 % ------------------------
 % compute average baseline
@@ -125,12 +125,12 @@ if strcmpi(g.commonbase, 'on')
     for ind = 2:length(PP(:))
         meanBaseln = meanBaseln + allMbase{ind}/length(PP(:));
         meanStd    = meanBaseln + allMstd{ ind}/length(PP(:));
-    end;
+    end
     for ind = 1:length(PP(:))
         allMbase{ind} = meanBaseln;
         allMstd{ind}  = meanBaseln;
-    end;
-end;
+    end
+end
 
 % -------------------------
 % remove baseline (average)
@@ -143,9 +143,9 @@ if ~strcmpi(g.trialbase, 'on') % full or off
             % ERSP baseline normalized
         elseif ~isnan( g.baseline(1) ) && ~isnan( allMbase{ind}(1) ) && strcmpi(g.basenorm, 'on')
             PP{ind} = bsxfun(@rdivide, bsxfun(@minus, PP{ind}, allMbase{ind}), allMstd{ind});
-        end;
-    end;
-end;
+        end
+    end
+end
 for ind = 1:length(allMbase(:))
     if ndims(allMbase{ind}) > 2
         % The baseline is only used for plotting purposes
@@ -157,8 +157,8 @@ mbase = allMbase;
 if ~iscell(PPori)
     PP = PP{1}; 
     mbase = allMbase{1};
-end;
+end
 
 % print
 function verboseprintf(verbose, varargin)
-if strcmpi(verbose, 'on') fprintf(varargin{:}); end;
+if strcmpi(verbose, 'on') fprintf(varargin{:}); end

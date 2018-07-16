@@ -48,7 +48,7 @@ end;
 
 if iscell(act) && length(act) == 1
     act = act{1};
-end;
+end
 
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
 act  = reshape(act , size(act ,1), size(act ,2)*size( act,3));
@@ -58,7 +58,7 @@ if iscell(act)
     sphere = act{1};
     weight = act{2};
     act = (weight*sphere)*data;
-end;
+end
 
 compproj   = winv(:,compnums)*act(compnums,:)-data; % difference between data and back-projection
 squarecomp = sum(sum(compproj.^2));                 % the summed-square difference

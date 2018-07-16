@@ -5,14 +5,14 @@ function obj2 = unitaryopp(f, obj1, varargin);
     newFileName = mmo.getnewfilename;
     data = memmapfile(obj1.dataFile, 'writable', obj1.writable, 'format', { 'single' obj1.dimensions 'x' });
     fid = fopen(newFileName, 'w');
-    if obj1.dimensions(end) == 1, obj1.dimensions(end) = []; end;
+    if obj1.dimensions(end) == 1, obj1.dimensions(end) = []; end
     ss.type = '()';
     ss.subs(1:length(obj1.dimensions)-1) = { ':' };
     for index = 1:obj1.dimensions(end)
         ss.subs{length(obj1.dimensions)} = index;
         tmpdata = f(subsref(data.Data.x, ss), varargin{:});
         fwrite(fid, tmpdata, 'float');
-    end;
+    end
     fclose(fid);    
     
     % copy the data

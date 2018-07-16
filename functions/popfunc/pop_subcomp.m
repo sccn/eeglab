@@ -62,11 +62,11 @@ com='';
 if nargin < 1
    help pop_subcomp;
    return;
-end;
+end
 if nargin < 3
 	plotag = 0;
-end;
-if nargin == 4 && ismember(keepcomp,[1 0]); keep_flag = keepcomp; if isempty(plotag) plotag = 0; end;  else keep_flag = 0; end;
+end
+if nargin == 4 && ismember(keepcomp,[1 0]); keep_flag = keepcomp; if isempty(plotag) plotag = 0; end;  else keep_flag = 0; end
 if nargin < 2
 	% popup window parameters
 	% -----------------------
@@ -78,7 +78,7 @@ if nargin < 2
     else
         components = [];
         promptstr    = { ['Component(s) to remove from data:'] };
-    end;
+    end
     uilist    = { { 'style' 'text' 'string' ['Component(s) to remove from data:'] } ...
                   { 'style' 'edit' 'string' int2str(components) } ...
                   { 'style' 'text' 'string' 'Component(s) to retain (overwrites "Component(s) to remove")' } ...
@@ -87,13 +87,13 @@ if nargin < 2
     geom = { [2 0.7] [2 0.7] };
 	result       = inputgui( 'uilist', uilist, 'geometry', geom, 'helpcom', 'pophelp(''pop_subcomp'')', ...
                                      'title', 'Remove components from data -- pop_subcomp()');
-	if length(result) == 0 return; end;
+	if length(result) == 0 return; end
 	components   = eval( [ '[' result{1} ']' ] );
     if ~isempty(result{2}), 
         components   = eval( [ '[' result{2} ']' ] );
         keep_flag = 1; %components  = setdiff_bc([1:size(EEG.icaweights,1)], components); 
-    end;
-end;
+    end
+end
  
 if isempty(components)
 	if ~isempty(EEG.reject.gcompreject)
@@ -101,13 +101,13 @@ if isempty(components)
    	else
         	fprintf('Warning: no components specified, no rejection performed\n');
          	return;
-   	end;
+   	end
 else
     if keep_flag == 1; components  = setdiff_bc([1:size(EEG.icaweights,1)], components); end
     if (max(components) > size(EEG.icaweights,1)) || min(components) < 1
         error('Component index out of range');
-    end;
-end;
+    end
+end
 
 fprintf('Computing projection ....\n');
 component_keep = setdiff_bc(1:size(EEG.icaweights,1), components);
@@ -130,11 +130,11 @@ if nargin < 2 | plotag ~= 0
                     'Trial ERPs (red) with and (blue) without these components');
             else
                 warndlg2('Cannot plot ERPs for continuous data');
-            end;
+            end
         elseif strcmpi(ButtonName, 'Plot single trials')  
         	eegplot( EEG.data(EEG.icachansind,:,:), 'srate', EEG.srate, 'title', 'Black = channel before rejection; red = after rejection -- eegplot()', ...
             	 'limits', [EEG.xmin EEG.xmax]*1000, 'data2', compproj); 
-        end;
+        end
     end;    
     switch ButtonName,
         case 'Cancel', 
@@ -143,7 +143,7 @@ if nargin < 2 | plotag ~= 0
         case 'Accept',
        		disp('Components removed');
     end % switch
-end;
+end
 EEG.data(EEG.icachansind,:,:) = compproj;
 EEG.setname = [ EEG.setname ' pruned with ICA'];
 EEG.icaact  = [];
@@ -156,7 +156,7 @@ EEG.reject      = [];
 
 try,
     EEG.dipfit.model = EEG.dipfit.model(goodinds);
-catch, end;
+catch, end
 
 com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(components), plotag);
 return;

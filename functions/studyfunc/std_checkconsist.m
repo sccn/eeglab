@@ -33,7 +33,7 @@ function [boolval npersubj] = std_checkconsist(STUDY, varargin);
 if nargin < 3
     help std_checkconsist;
     return;
-end;
+end
 
 opt = struct(varargin{:});
 
@@ -47,20 +47,20 @@ elseif strcmpi(opt.uniform, 'session')
     allvals = { STUDY.datasetinfo.session };
     allvals = cellfun(@num2str, allvals, 'uniformoutput', false);
     vallist = STUDY.session;
-    if isempty(vallist), boolval = 1; return; end;
+    if isempty(vallist), boolval = 1; return; end
     vallist = cellfun(@num2str, mattocell(vallist), 'uniformoutput', false);
 else
     error('unknown option');
-end;
+end
 
-if isempty(vallist), boolval = 1; return; end;
+if isempty(vallist), boolval = 1; return; end
 
 for index = 1:length(vallist)
     tmplist = strmatch( vallist{index}, allvals, 'exact');
     vallen(index) = length(unique( { STUDY.datasetinfo(tmplist).subject } ));
-end;
+end
 if length(unique(vallen)) == 1
      boolval = 1;
 else boolval = 0;
-end;
+end
 

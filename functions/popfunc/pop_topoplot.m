@@ -72,7 +72,7 @@ if nargin < 1
 end;   
 if nargin < 2   
    typeplot = 1;
-end;
+end
 if typeplot == 0 & isempty(EEG.icasphere)
    disp('Error: no ICA data for this set, first run ICA'); return;
 end;   
@@ -97,7 +97,7 @@ if nargin < 3
             elecdef = ['''electrodes'', ''off''']; 
         else, 
             elecdef = ['''electrodes'', ''on''']; 
-        end;
+        end
     uilist = { { 'style'   'text'     'string'    txtwhat2plot1 } ...
                { 'style'   'edit'     'string'    editwhat2plot } ...
                { 'style'   'text'     'string'    txtwhat2plot2 } ...
@@ -116,12 +116,12 @@ if nargin < 3
     if typeplot
         uilist(9:11) = [];
         uigeom(6) = [];
-    end;
+    end
     guititle = fastif( typeplot, 'Plot ERP scalp maps in 2-D -- pop_topoplot()', ...
                        'Plot component scalp maps in 2-D -- pop_topoplot()');
     
     result = inputgui( uigeom, uilist, 'pophelp(''pop_topoplot'')', guititle, [], 'normal');
-	if length(result) == 0 return; end;
+	if length(result) == 0 return; end
 	
     % reading first param
     % -------------------
@@ -130,9 +130,9 @@ if nargin < 3
 		tmpbut = questdlg2(...
                   ['This involves drawing ' int2str(length(arg2)) ' plots. Continue ?'], ...
                          '', 'Cancel', 'Yes', 'Yes');
-		if strcmp(tmpbut, 'Cancel'), return; end;
-	end;
-    if isempty(arg2), error('Nothing to plot; enter parameter in first edit box'); end;
+		if strcmp(tmpbut, 'Cancel'), return; end
+	end
+    if isempty(arg2), error('Nothing to plot; enter parameter in first edit box'); end
     
     % reading other params
     % --------------------
@@ -141,27 +141,27 @@ if nargin < 3
     if typeplot
         plotdip = 0;
         try, options      = eval( [ '{ ' result{4} ' }' ]);
-        catch, error('Invalid scalp map options'); end;
+        catch, error('Invalid scalp map options'); end
     else
         plotdip     = result{4};
         try, options      = eval( [ '{ ' result{5} ' }' ]);
-        catch, error('Invalid scalp map options'); end;
+        catch, error('Invalid scalp map options'); end
     end;        
     if length(arg2) == 1, 
       figure('paperpositionmode', 'auto'); curfig=gcf; 
       try, icadefs; 
          set(curfig, 'color', BACKCOLOR); 
       catch, end; 
-    end;
+    end
 else
     if ~isempty(varargin) & isnumeric(varargin{1})
         plotdip = varargin{1};
         varargin = varargin(2:end);
     else
         plotdip = 0;
-    end;
+    end
     options = varargin;
-end;
+end
 
 % additional options
 % ------------------
@@ -195,9 +195,9 @@ for i=1:2:length(options)
             maplimits = options{i+1};
             options(i:i+1) = [];
             break;
-        end;
-    end;
-end;
+        end
+    end
+end
 
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')
@@ -235,18 +235,18 @@ if typeplot
         maxlim = max(SIGTMPAVG(:));
         minlim = min(SIGTMPAVG(:));
         maplimits = [ -max(maxlim, -minlim) max(maxlim, -minlim)];
-    end;
+    end
 else
     if isempty(maplimits)
         maplimits = 'absmax';
-    end;
-end;
+    end
+end
 
 if plotdip
     if strcmpi(EEG.dipfit.coordformat, 'CTF')
         disp('Cannot plot dipole on scalp map for CTF MEG data');
-    end;
-end;
+    end
+end
 
 % plot the graphs
 % ---------------
@@ -259,17 +259,17 @@ if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; e
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
-            if index> 1, figure(curfig); a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
+            if index> 1, figure(curfig); a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end
         	curfig = figure('paperpositionmode', 'auto');
 			pos = get(curfig,'Position');
 			posx = max(0, pos(1)+(pos(3)-SIZEBOX*rowcols(2))/2);
 			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
 			set(curfig,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
-			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end;
+			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end
         end;    
 		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1,'Parent',curfig);
         set(curax, 'visible', 'off')
-    end;
+    end
 
 	% add dipole location if present
     % ------------------------------
@@ -283,15 +283,15 @@ for index = 1:size(arg2(:),1)
                 try,
                     select = EEG.dipfit.model(arg2(index)).select;
                 catch select = 0;
-                end;
+                end
                 if ~isempty(curpos)
                     if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
                         transform = pinv( sph2spm );
                         tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
                         tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
-                        try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end;
-                        try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end;
-                    end;
+                        try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end
+                        try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end
+                    end
                     curpos = curpos / 85;
                     if size(curpos,1) > 1 && length(select) == 2
                         dipole_index = find(strcmpi('dipole',options),1);
@@ -332,42 +332,42 @@ for index = 1:size(arg2(:),1)
         addopt = { 'verbose', 'on' };
     else 
         addopt = { 'verbose', 'off' };
-    end;
+    end
     %fprintf('Printing to figure %d.\n',curfig);
     options = {  'maplimits' maplimits options{:} addopt{:} };
     if ~isnan(arg2(index))
 		if typeplot
-            if nbgraph > 1, axes(curax); end;
+            if nbgraph > 1, axes(curax); end
             tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, options{:});
 			if nbgraph == 1, 
-                 figure(curfig); if nbgraph > 1, axes(curax); end;
+                 figure(curfig); if nbgraph > 1, axes(curax); end
                  title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle]);
 			else 
                  figure(curfig); if nbgraph > 1, axes(curax); end; 
                  title([int2str(arg2(index)) ' ms'] );
-			end;
+			end
 		else
             if arg2(index) < 0
-                 figure(curfig);  if nbgraph > 1, axes(curax); end;
+                 figure(curfig);  if nbgraph > 1, axes(curax); end
                  tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, options{:} );
             else
-                 figure(curfig);  if nbgraph > 1, axes(curax); end;
+                 figure(curfig);  if nbgraph > 1, axes(curax); end
                  tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, options{:} );
             end;    			
 			if nbgraph == 1, texttitle = ['IC ' int2str(arg2(index)) ' from ' topotitle];
 			else             texttitle = ['IC ' int2str(arg2(index))];
-			end;
-            if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end;
+			end
+            if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end
             figure(curfig);  if nbgraph > 1, axes(curax); end; htmp = title(texttitle);
             try, icadefs; set(htmp,'FontSize',AXES_FONTSIZE_L); catch, end; clear htmp;
-		end;
+		end
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
         countobj = countobj+length(tmpobj);
 		drawnow;
 		axis square;
     else
     axis off
-    end;
+    end
 end
 
 % Draw colorbar
@@ -377,7 +377,7 @@ if colorbar_switch
             ColorbarHandle = cbar(0,0,[maplimits(1) maplimits(2)]);
         else
             ColorbarHandle = cbar(0,0,get(gca, 'clim'));
-        end;
+        end
         pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
         set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
     elseif ~ischar(maplimits)
@@ -387,17 +387,17 @@ if colorbar_switch
     if ~typeplot    % Draw '+' and '-' instead of numbers for colorbar tick labels
         tmp = get(gca, 'ytick');
         set(gca, 'ytickmode', 'manual', 'yticklabelmode', 'manual', 'ytick', [tmp(1) 0 tmp(end)], 'yticklabel', { '-' '0' '+' });
-        try, icadefs; set(gca,'FontSize',AXES_FONTSIZE_L+2); catch, end;
+        try, icadefs; set(gca,'FontSize',AXES_FONTSIZE_L+2); catch, end
     end
 end
 
 if nbgraph> 1, 
    figure(curfig); a = textsc(0.5, 0.05, topotitle); 
    set(a, 'fontweight', 'bold'); 
-end;
+end
 if nbgraph== 1, 
    com = 'figure;'; 
-end;
+end
 set(allobj(1:countobj-1), 'visible', 'on');
 
 figure(curfig);

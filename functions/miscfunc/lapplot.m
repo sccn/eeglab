@@ -41,7 +41,7 @@ function [laplac] = lapplot(map,filename,draw)
 if nargin < 2
 	help lapplot;
 	return;
-end;
+end
 
 MAXCHANS = size(map,1);
 GRID_SCALE = 2*MAXCHANS+5;
@@ -74,7 +74,7 @@ yi = linspace(-0.5,0.5,GRID_SCALE);   % y-axis description (row vector)
 for i=1:MAXCHANS
    [useless_var horizidx(i)] = min(abs(y(i) - xi));    % find pointers to electrode
    [useless_var vertidx(i)] = min(abs(x(i) - yi));     % positions in Zi
-end;
+end
    
 % -----------------
 % Compute laplacian
@@ -131,7 +131,7 @@ plot(1+width/2-EarX*width,...
 hold off
 axis off
 
-	end;
+	end
 end;                   
 
 return;

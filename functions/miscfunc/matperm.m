@@ -48,7 +48,7 @@ errcode=0;
 if  ix ~= iy | p ~= iy,
  fprintf('matperm: indx and indy must be column vectors, same height as y.\n');
  errcode=1
-end;
+end
 
 if n~=q,
    fprintf('matperm(): two matrices must be same number of columns.\n');
@@ -60,8 +60,8 @@ else
   elseif p<m,
   		y = [y;zeros(m-p,n)];	% add rows to y to match height of x
   		m=p;
-  end;
-end;
+  end
+end
 if errcode==0,
 %
 % Return the row permutation of matrix x most correlated with matrix y:
@@ -78,7 +78,7 @@ if errcode==0,
   permx = permx(1:oldm,:);		 % throw out bottom rows if 
 								 % they were added to match y
   indperm = indperm(1:oldm,:);
-end;
+end
 
 return
 

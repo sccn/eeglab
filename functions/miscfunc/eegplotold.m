@@ -956,7 +956,7 @@ else
     end
     if spacing == 0
         spacing = 1;
-    end;
+    end
     if Fs == 0
       Fs = DEFAULT_SAMPLE_RATE;
     end

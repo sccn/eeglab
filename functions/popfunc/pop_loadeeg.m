@@ -70,7 +70,7 @@ if nargin < 1
 
 	% ask user
 	[filename, filepath] = uigetfile('*.eeg;*.EEG', 'Choose an EEG file -- pop_loadeeg()'); 
-	if filename == 0 return; end;
+	if filename == 0 return; end
 
 	% popup window parameters
 	% -----------------------
@@ -82,7 +82,7 @@ if nargin < 1
 	inistr       = { 'Auto' '' '' '' '' };
 	pop_title    = sprintf('Load an EEG dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadeeg');
-	if size( result,1 ) == 0 return; end;
+	if size( result,1 ) == 0 return; end
 
 	% decode parameters
 	% -----------------
@@ -93,7 +93,7 @@ if nargin < 1
         datformat = 'int32';
     elseif (strcmpi(precision, '0') || strcmpi(precision, 'auto'))
         datformat = 'auto'
-    end;
+    end
 	range_sweeps    = eval( [ '[' result{2} ']' ] );
 	range_typeeeg   = eval( [ '[' result{3}  ']' ] );
 	range_chan      = eval( [ '[' result{4}  ']' ] );
@@ -101,14 +101,14 @@ if nargin < 1
 else
     if exist('filepath') ~= 1
         filepath = '';
-    end;
-end;
+    end
+end
 
-if exist('datformat') ~= 1, datformat = 'auto'; end;
-if exist('range_chan') ~= 1   | isempty(range_chan)      , range_chan     = 'all'; end;
-if exist('range_sweeps') ~= 1 | isempty(range_sweeps)    , range_sweeps     = 'all'; end;
-if exist('range_typeeeg') ~= 1 | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end;
-if exist('range_response') ~= 1 | isempty(range_response), range_response     = 'all'; end;
+if exist('datformat') ~= 1, datformat = 'auto'; end
+if exist('range_chan') ~= 1   | isempty(range_chan)      , range_chan     = 'all'; end
+if exist('range_sweeps') ~= 1 | isempty(range_sweeps)    , range_sweeps     = 'all'; end
+if exist('range_typeeeg') ~= 1 | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end
+if exist('range_response') ~= 1 | isempty(range_response), range_response     = 'all'; end
 
 % load datas
 % ----------
@@ -116,7 +116,7 @@ EEG = eeg_emptyset;
 if ~isempty(filepath)
     if filepath(end) ~= '/' & filepath(end) ~= '\' & filepath(end) ~= ':'
         error('The file path last character must be a delimiter');
-    end;
+    end
     fullFileName = sprintf('%s%s', filepath, filename);
 else
     fullFileName = filename;
@@ -129,7 +129,7 @@ EEG.setname 		= 'Neuroscan EEG data';
 EEG.nbchan          = size(EEG.data,1);
 for index = 1:size(namechan,1)
     EEG.chanlocs(index).labels = deblank(char(namechan(index,:)));
-end;
+end
 EEG = eeg_checkset(EEG);
 if any(rt)
     EEG = pop_importepoch( EEG, [rt(:)*1000 eegtype(:) accept(:) eegresp(:)], { 'RT' 'type' 'accept' 'response'}, {'RT'}, 1E-3, 0, 1);

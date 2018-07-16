@@ -74,7 +74,7 @@ if ~isfield(EEG,'event')
 end
 if nargin > 1
     error('Multiple input arguments are currently disabled');
-end;
+end
 
 UREVENTS = 0; % flag returning infor for urevents instead of events
 typelist = [];

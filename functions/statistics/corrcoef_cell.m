@@ -49,12 +49,12 @@ function c = corrcoef_cell(a,b);
 if nargin < 1
     help corrcoef_cell;
     return;
-end;
+end
 
 if nargin < 2
     b = a{2};
     a = a{1};
-end;
+end
 
 nd = myndims(a);
 if nd == 1
@@ -95,7 +95,7 @@ elseif nd == 4
     cvb = sum(bb.*bb,4);
 
     c = cv./sqrt(cva.*cvb);
-end;
+end
 
 function val = myndims(a)
     if ndims(a) > 2
@@ -107,5 +107,5 @@ function val = myndims(a)
             val = 1;
         else
             val = 2;
-        end;
+        end
     end; 

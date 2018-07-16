@@ -33,11 +33,11 @@ allcom = '';
 if nargin < 2
     help pop_studydesign;
     return;
-end;
+end
 
 if ~ischar(STUDY) && isfield(STUDY, 'currentdesign') && STUDY.currentdesign > length(STUDY.design)
     STUDY.currentdesign = length(STUDY.design);
-end;
+end
 
 if nargin < 3 && ~ischar(STUDY)
     
@@ -55,17 +55,17 @@ if nargin < 3 && ~ischar(STUDY)
         for iVar = length(usrdat.design(ind).variable):-1:1
             if isempty(usrdat.design(ind).variable(iVar).label)
                 usrdat.design(ind).variable(iVar) = [];
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     % check numerical variables
     for ind1 = 1:length(usrdat.factors)
         if all(cellfun(@isnumeric, usrdat.factorvals{ind1}))
              usrdat.numerical(ind1) = 1;
         else usrdat.numerical(ind1) = 0;
-        end;
-    end;
+        end
+    end
         
     cb_selectsubj   = 'pop_studydesign(''selectsubj'', gcbf);';
     cb_setsubj      = 'pop_studydesign(''setsubj'', gcbf);';
@@ -141,7 +141,7 @@ if nargin < 3 && ~ischar(STUDY)
     for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;            
     streval = [ 'pop_studydesign(''selectdesign'', gcf);' ];    
     [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'title', 'Edit STUDY design -- pop_studydesign()', 'helpbut', 'Web help', 'helpcom',  'web(''http://sccn.ucsd.edu/wiki/Chapter_03:_Working_with_STUDY_designs'', ''-browser'')', 'geom', geometry, 'userdata', usrdat, 'eval', streval);
-    if isempty(tmp), return; end;
+    if isempty(tmp), return; end
     
     % call std_makedesign
     % -------------------
@@ -152,8 +152,8 @@ if nargin < 3 && ~ischar(STUDY)
             fprintf('Deleting STUDY design %d\n', index);
             com    = 'STUDY.design(index) = [];'; eval(com);
             allcom = [ allcom 10 com ];
-        end;
-    end;
+        end
+    end
     for index = 1:length(des)
         tmpdes  = des(index);
         if ~isfield(tmpdes.variable, 'vartype'), tmpdes.variable(1).vartype = []; end; 
@@ -164,27 +164,27 @@ if nargin < 3 && ~ischar(STUDY)
                 for iVar = 1:length(tmpdes.variable)
                     if isempty(tmpdes.variable(iVar).vartype)
                         tmpdes.variable(iVar).vartype = 'categorical';
-                    end;
-                end;
-            end;
+                    end
+                end
+            end
             
             [STUDY com] = std_makedesign(STUDY, ALLEEG, index, tmpdes);
             allcom = [ allcom 10 com ];
         else
             fprintf('STUDY design %d not modified\n', index);
-        end;
-    end;
+        end
+    end
     if result.listboxdesign ~= STUDY.currentdesign
         fprintf('Selecting STUDY design %d\n', result.listboxdesign);
         com = sprintf('STUDY = std_selectdesign(STUDY, ALLEEG, %d);', result.listboxdesign); eval(com);
         allcom = [ allcom 10 com ];
-    end;
+    end
     if result.chk_save == 1
         fprintf('Resaving STUDY\n');
         [STUDY ALLEEG com] = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
         allcom = [ allcom 10 com ];
-    end;
-    if ~isempty(allcom), allcom(1) = []; end;
+    end
+    if ~isempty(allcom), allcom(1) = []; end
     
 elseif ischar(STUDY)
     com = STUDY;
@@ -251,7 +251,7 @@ elseif ischar(STUDY)
             if val == 1
                 warndlg2('The first STUDY design cannot be removed, only modified');
                 return;
-            end;
+            end
             des(val) = [];
             
         case 'rename', % Rename study design
@@ -259,7 +259,7 @@ elseif ischar(STUDY)
             strs       = get(findobj(fig, 'tag', 'listboxdesign'), 'string');
             result     = inputdlg2( { 'Study design name:                                                                    ' }, ...
                                       'Rename Study Design', 1,  { strs{val} }, 'pop_studydesign');
-            if isempty(result), return; end;
+            if isempty(result), return; end
             des(val).name  = result{1};
                       
         case 'updategui', % update the study information (whenever the user click on a button)
@@ -281,19 +281,19 @@ elseif ischar(STUDY)
                     valStrCell = encodevals(des(val).variable(iVar).value);
                     for iVal = 1:length(valStrCell)
                         valStr = [ valStr sprintf('%s - ', valStrCell{iVal}) ];
-                    end;
+                    end
                     valStr(end-2:end) = [];
                     strCond = sprintf('Categorical variable: %s - Values (%s)', des(val).variable(iVar).label, valStr);
                 else
                     strCond = sprintf('Continuous variable: %s', des(val).variable(iVar).label);
-                end;
+                end
                 curVal{end+1} = strCond;
 
-            end;
+            end
             curValLbfact = get(findobj(fig, 'tag', 'lbfact0'), 'value');
             valVar = min(curValLbfact, length(des(val).variable(iVar)));
-            if isequal(valVar, 0), valVar = []; end;
-            if isempty(valVar) && ~isempty(curVal), valVar = 1; end;
+            if isequal(valVar, 0), valVar = []; end
+            if isempty(valVar) && ~isempty(curVal), valVar = 1; end
             set(findobj(fig, 'tag', 'lbfact0'), 'string', curVal, 'value', valVar);
             return;
             
@@ -322,7 +322,7 @@ elseif ischar(STUDY)
                 set(findobj(fig, 'tag', 'lbval2'), 'value', valfact, 'string', encodevals(usrdat.factorvals{val1}));
             else
                 set(findobj(fig, 'tag', 'lbval2'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact);
-            end;
+            end
             return;
 
         case 'selectdatatrialsadd', % Add button in the GUI above
@@ -338,14 +338,14 @@ elseif ischar(STUDY)
                 des(val).include = eval( get(findobj(fig, 'tag', 'lbfact2'), 'string') );
             catch,
                 warndlg2('Syntax error');
-            end;
+            end
             
         case 'selectfolder',
             res = uigetdir;
             if ~isempty(findstr(filepath, res)) && findstr(filepath, res) == 1 && ~isequal(filepath, res)
                 res = res(length(filepath)+2:end);
-            end;
-            if res(1) == 0, return; end;
+            end
+            if res(1) == 0, return; end
             des(val).filepath = res;
             
         case 'list'
@@ -364,8 +364,8 @@ elseif ischar(STUDY)
             if ~isempty(tmpVar) && ~strcmp(tmpVar,'None')
                 des(val).variable(end+1).label = tmpVar;
                 des(val).variable(end  ).value = tmpVarList; % empty for cont var
-                if cat, des(val).variable(end).vartype = 'categorical'; else des(val).variable(end).vartype = 'continuous'; end;
-            end;
+                if cat, des(val).variable(end).vartype = 'categorical'; else des(val).variable(end).vartype = 'continuous'; end
+            end
             % update var list
             [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);
             usrdat.factors     = { 'None' usrdat.factors{:} };
@@ -376,13 +376,13 @@ elseif ischar(STUDY)
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
             tmpval = des(val).variable(val2).value;
-            if strcmpi(des(val).variable(val2).vartype, 'continuous'), tmpval = []; end;
+            if strcmpi(des(val).variable(val2).vartype, 'continuous'), tmpval = []; end
             [tmpVar tmpVarList cat] = pop_addindepvar(usrdat, [], des(val).variable(val2).label, tmpval);
             if ~isempty(tmpVar) && ~strcmp(tmpVar,'None')
                 des(val).variable(val2).label = tmpVar;
                 des(val).variable(val2).value = tmpVarList; % empty for cont var
-                if cat, des(val).variable(val2).vartype = 'categorical'; else des(val).variable(val2).vartype = 'continuous'; end;
-            end;
+                if cat, des(val).variable(val2).vartype = 'categorical'; else des(val).variable(val2).vartype = 'continuous'; end
+            end
             % update var list
             [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(struct('design', des, 'datasetinfo', datinfo), 'both', 1);
             usrdat.factors     = { 'None' usrdat.factors{:} };
@@ -397,7 +397,7 @@ elseif ischar(STUDY)
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             usrdat = pop_importgroupvar(usrdat,val);
             
-    end;
+    end
 
     usrdat.design = des;
     set(fig, 'userdata', usrdat);
@@ -405,8 +405,8 @@ elseif ischar(STUDY)
     
     if strcmpi(com, 'newvar')
         set(findobj(fig, 'tag', 'lbfact0'), 'value', length(des(val).variable));
-    end;
-end;
+    end
+end
 
 function res = str2cell(strSubj)
     res = textscan(strSubj, '%s');
@@ -417,12 +417,12 @@ function res = str2cell(strSubj)
     res = res';
 
 function res = strmatchmult(a, b);
-    if isempty(b), res = []; return; end;
+    if isempty(b), res = []; return; end
     res = zeros(1,length(a));
     for index = 1:length(a)
         tmpi = std_indvarmatch(a{index}, b);
         res(index) = tmpi(1); % in case there is a duplicate
-    end;
+    end
     %[tmp ind] = mysetdiff(b, a);
     %res = setdiff_bc([1:length(b)], ind);
 
@@ -431,14 +431,14 @@ function cellarray = mysort(cellarray)
             % also there is no reason the order should be different
     if ~isempty(cellarray) && ischar(cellarray{1})
         cellarray = sort(cellarray);
-    end;
+    end
 
 function [cellout inds ] = mysetdiff(cell1, cell2);
     if (~isempty(cell1) && ischar(cell1{1})) || (~isempty(cell2) && ischar(cell2{1}))
          [ cellout inds ] = setdiff_bc(cell1, cell2);
     else [ cellout inds ] = setdiff_bc([ cell1{:} ], [ cell2{:} ]);
          cellout = mattocell(cellout);
-    end;
+    end
 
 % encode string an numerical values for list boxes
 function cellout = encodevals(cellin)
@@ -454,9 +454,9 @@ function cellout = encodevals(cellin)
                 cellout{index} =  cellin{index}{1};
                 for indcell = 2:length(cellin{index})
                     cellout{index} = [ cellout{index} ' & ' cellin{index}{indcell} ];
-                end;
-            end;
-        end;
+                end
+            end
+        end
     else
         for index = 1:length(cellin)
             if length(cellin{index}) == 1
@@ -465,7 +465,7 @@ function cellout = encodevals(cellin)
                 cellout{index} =  num2str(cellin{index}(1));
                 for indcell = 2:length(cellin{index})
                     cellout{index} = [ cellout{index} ' & ' num2str(cellin{index}(indcell)) ];
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end

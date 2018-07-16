@@ -42,9 +42,9 @@ if nargin < 2
 	% ask user
 	[filename, filepath] = uigetfile('*.*', 'Choose a EV2 file -- pop_importev2'); 
     drawnow;
-	if filename == 0 return; end;
+	if filename == 0 return; end
     filename = fullfile(filepath, filename);
-end;
+end
 
 % find out if there is a line to skip or not
 % ------------------------------------------
@@ -52,23 +52,23 @@ fid = fopen(filename, 'r');
 tmpl = fgetl(fid);
 if isempty(findstr('ype', tmpl)), skipline = 0;
 else                              skipline = 1;
-end;
+end
 fclose(fid);
 
 % load datas
 % ----------
 tmpevent = EEG.event;
-try, oldeventlats = [ tmpevent.latency ]; catch, end;
+try, oldeventlats = [ tmpevent.latency ]; catch, end
 EEG = pop_importevent(EEG, 'fields', { 'num' 'type' 'response' 'acc' 'RT' 'latency'}, ...
                       'skipline', skipline, 'timeunit', 1E-3, 'align', NaN, 'append', 'no', 'event', filename );
 
 tmpevent = EEG.event;
 neweventlats = [ tmpevent.latency ];
-if ~exist('oldeventlats'), oldeventlats = neweventlats; end;
+if ~exist('oldeventlats'), oldeventlats = neweventlats; end
 len = min(min(length(oldeventlats), length(neweventlats)), 10);
 if mean(oldeventlats(1:len) - neweventlats(1:len)) > 1
     error('Wrong alignment of ev2 file with data');
-end;
+end
 
 command = sprintf('EEG = pop_importev2(EEG, %s);', filename); 
 

@@ -98,7 +98,7 @@ function [erspinterp t f ] = eeg_specgram(EEG, varargin);
 if nargin < 1
     help std_specgram;
     return;
-end;
+end
 
 [opt moreopts] = finputcheck(varargin, { 'components' 'integer' []             [];
                                          'channels'   { 'cell','integer' }  { [] [] }     {}
@@ -112,7 +112,7 @@ end;
                                          'timerange'  'real'    []             [];
                                          'filter'     'real'    []             []}, ...    % 11 points
                                          'eeg_specgram', 'ignore');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 if isfield(EEG,'icaweights')
    numc = size(EEG.icaweights,1);
 else
@@ -134,17 +134,17 @@ if ~isempty(opt.channels)
         tmpchanlocs = EEG(1).chanlocs;
         for index = 1:length(opt.channels)
             chanind = strmatch( lower(opt.channels{index}), lower({ tmpchanlocs.labels }), 'exact');
-            if isempty(chanind), error('Channel group not found'); end;
+            if isempty(chanind), error('Channel group not found'); end
             chaninds(index) = chanind;
-        end;
+        end
         opt.indices  = chaninds;
         opt.channels = chaninds;
-    end;
+    end
 else    
     filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'icaspecgram']);
     prefix = 'comp';
     opt.indices = opt.components;
-end;
+end
 
 % SPEC information found in datasets
 % ----------------------------------
@@ -154,7 +154,7 @@ if exist(filename) & strcmpi(opt.recompute, 'off')
         [erspinterp, t, f] = std_readspecgram(EEG, 1, opt.components, opt.freqrange);
     else
         [erspinterp, t, f] = std_readspecgram(EEG, 1, -opt.channels, opt.freqrange);
-    end;
+    end
     return;
     
 end
@@ -166,12 +166,12 @@ if strcmpi(prefix, 'comp')
     X = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
 else
     EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', opt.rmcomps);
-    if ~isempty(opt.rmcomps), options = { options{:} 'rmcomps' opt.rmcomps }; end;
+    if ~isempty(opt.rmcomps), options = { options{:} 'rmcomps' opt.rmcomps }; end
     if ~isempty(opt.interp), 
         EEG = eeg_interp(EEG, opt.interp, 'spherical'); 
-    end;
+    end
     X = EEG.data;
-end;
+end
 
 % get the array of original point latency
 % ---------------------------------------
@@ -186,11 +186,11 @@ if EEG.trials == 1
         if ~all(urarray(win))
             wintag(i) = 0;
             %fprintf('Missing data window: %3.1f-%3.1f s\n', (win(1)-1)/EEG.srate, (win(end)-1)/EEG.srate); 
-        end;
-    end;
+        end
+    end
 else
     error('eeg_specgram can only be run on continuous data');
-end;
+end
 
 % compute spectrum 2 solutions
 % 1- use newtimef, have to set the exact times and window
@@ -208,7 +208,7 @@ options   = { 0 'winsize', opt.winsize, 'baseline', [0 Inf], 'timesout', wincent
 %              'freqs' freqs 'cycles' cycles 'plotersp', 'off', 'plotitc', 'off' };
 for ic = 1:length(opt.indices)
     [ersp(:,:,ic) itc powebase t f] = newtimef(X(opt.indices(ic), :), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, options{:}, moreopts{:});
-end;
+end
 
 % interpolate and smooth in time
 % ------------------------------
@@ -226,9 +226,9 @@ for s = 1:size(ersp,3)
             erspinterp(:,wininterp(i),s) = erspinterp(:,wininterp(i)-1+first1right(1),s);
         else
             erspinterp(:,wininterp(i),s) =(erspinterp(:,wininterp(i)-1+first1right(1),s) + erspinterp(:,wininterp(i)+1-first1left(1),s))/2;
-        end;
-    end;
-end;
+        end
+    end
+end
 
 %erspinterp = vectdata(ersp, urwincenter(find(wintag))/EEG.srate, 'timesout', urwincenter/EEG.srate);
 
@@ -243,7 +243,7 @@ if ~isempty(opt.filter)
     erspinterp = convn(erspinterp, filter/sum(filter), 'same');
     %erspinterp = conv2(erspinterp, filter/sum(filter)); 
     %erspinterp(:, [1:(filterlen-1)/2 end-(filterlen-1)/2+1:end]) = [];        
-end;
+end
 
 % plot result
 % -----------
@@ -263,7 +263,7 @@ if strcmpi(opt.plot, 'on')
     xlabel('Time (h)');
     ylabel('Frequency (Hz)');
     set(gca, 'ydir', 'normal');
-end;
+end
 
 % Save SPECs in file (all components or channels)
 % ----------------------------------
@@ -275,7 +275,7 @@ else
     tmpchanlocs = EEG(1).chanlocs;
     savetofile( filename, t, f, erspinterp, 'chan', opt.indices, options, { tmpchanlocs.labels }, opt.interp);
     [erspinterp, t, f] = std_readspecgram(EEG, 1, -opt.channels, opt.timerange, opt.freqrange);
-end;
+end
 return;
 
 % recompute the original data length in points
@@ -285,7 +285,7 @@ function urlat = eeg_makeurarray(EEG, urpnts);
     if isempty(EEG.event) | ~isfield(EEG.event, 'duration')
         urlat = 1:EEG.pnts;
         return;
-    end;
+    end
     
     % get boundary events latency and duration
     % ----------------------------------------
@@ -297,13 +297,13 @@ function urlat = eeg_makeurarray(EEG, urpnts);
         if alldurs(1) <= 1
             alllats(1) = [];
             alldurs(1) = [];
-        end;
-    end;
+        end
+    end
     
     if isempty(alllats)
         urlat = 1:EEG.pnts;
         return;
-    end;
+    end
     
     % build the ur boolean array
     % --------------------------
@@ -311,7 +311,7 @@ function urlat = eeg_makeurarray(EEG, urpnts);
     for i=1:length(alllats)
         urlat(round(alllats(i)+0.5):round(alllats(i)+0.5+alldurs(i)-1)) = 0;
         alllats(i+1:end) = alllats(i+1:end)+alldurs(i);
-    end;
+    end
     urlat(find(urlat)) = 1:EEG.pnts;
 
 % -------------------------------------
@@ -323,10 +323,10 @@ function savetofile(filename, t, f, X, prefix, comps, params, labels, interp);
     allspec = [];
     for k = 1:length(comps)
         allspec = setfield( allspec, [ prefix int2str(comps(k)) ], X(:,:,k));
-    end;
+    end
     if ~isempty(labels)
         allspec.labels = labels;
-    end;
+    end
     allspec.freqs      = f;
     allspec.times      = t;
     allspec.parameters = params;
@@ -342,28 +342,28 @@ function pntslat = eeg_urpnts(EEG);
     if isempty(EEG.event) | ~isfield(EEG.event, 'duration')
         pntslat = EEG.pnts;
         return;
-    end;
+    end
     tmpevent = EEG.event;
     bounds = strmatch('boundary', { tmpevent.type });
     alldurs = [ tmpevent(bounds).duration ];
     if length(alldurs) > 0
         if alldurs(1) <= 1, alldurs(1) = [];
-        end;
-    end;
+        end
+    end
     pntslat = EEG.pnts + sum(alldurs);
 
 % recompute the original latency
 % ------------------------------
 function pntslat = eeg_urlatency(EEG, pntslat);
 
-    if isempty(EEG.event), return; end;
-    if ~ischar(EEG.event(1).type), return; end;
+    if isempty(EEG.event), return; end
+    if ~ischar(EEG.event(1).type), return; end
     
     tmpevent = EEG.event;
     bounds = strmatch('boundary', { tmpevent.type })
     for i=1:length(bounds)
         if EEG.event(bounds(i)).duration > 1
             pntslat = pntslat + EEG.event(bounds(i)).duration;
-        end;
-    end;
+        end
+    end
     

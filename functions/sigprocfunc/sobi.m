@@ -96,7 +96,7 @@ X(:,:)=Q*X(:,:);
 % else    % assumes no noise
 %    IBL=sqrtm(Rx);
 %    Q=inv(IBL);
-% end;
+% end
 % X=Q*X;
 
 %
@@ -111,8 +111,8 @@ X(:,:)=Q*X(:,:);
            Rxp=X(:,k:N,t)*X(:,1:N-k+1,t)'/(N-k+1)/ntrials;
        else
            Rxp=Rxp+X(:,k:N,t)*X(:,1:N-k+1,t)'/(N-k+1)/ntrials;
-       end;
-   end;
+       end
+   end
    M(:,u:u+m-1)=norm(Rxp,'fro')*Rxp;  % Frobenius norm =
  end;                                  % sqrt(sum(diag(Rxp'*Rxp)))
 

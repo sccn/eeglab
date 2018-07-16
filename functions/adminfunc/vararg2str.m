@@ -41,11 +41,11 @@ function strout = vararg2str(allargs, inputnam, inputnum, int2str );
 if nargin < 1
 	help vararg2str;
 	return;
-end;
+end
 if isempty(allargs)
     strout = '';
     return;
-end;
+end
 
 % default arguments
 % -----------------
@@ -54,25 +54,25 @@ if nargin < 2
 else
 	if length(inputnam) < length(allargs)
 		inputnam(end+1:length(allargs)) = {''};	
-	end;
-end;
+	end
+end
 if nargin < 3
 	inputnum(1:length(allargs)) = NaN;
 else
 	if length(inputnum) < length(allargs)
 		inputnum(end+1:length(allargs)) = NaN;	
-	end;
-end;
+	end
+end
 if nargin < 4
 	int2str(1:length(allargs)) = 0;
 else
 	if length(int2str) < length(allargs)
 		int2str(end+1:length(allargs)) = 0;	
-	end;
-end;
+	end
+end
 if ~iscell( allargs )
 	allargs = { allargs };
-end;
+end
 
 % actual conversion
 % -----------------
@@ -87,7 +87,7 @@ for index = 1:length(allargs)
 				strout = [ strout ',' tmpvar ];
 			else
 				strout = [ strout ',' str2str( tmpvar ) ];
-			end;
+			end
 		elseif isnumeric( tmpvar ) | islogical( tmpvar )
 			strout = [ strout ',' array2str( tmpvar ) ];
 		elseif iscell( tmpvar )
@@ -99,18 +99,18 @@ for index = 1:length(allargs)
 			strout = [ strout ',' struct2str( tmpvar ) ];		
 		else
 			error('Unrecognized input');
-		end;
-	end;
+		end
+	end
 	
-end;
+end
 if ~isempty(strout)
 	strout = strout(2:end);
-end;
+end
 
 % convert string to string
 % ------------------------
 function str = str2str( array )
-	if isempty( array), str = ''''''; return; end;
+	if isempty( array), str = ''''''; return; end
 	str = '';
 	for index = 1:size(array,1)
         tmparray = deblank(array(index,:));
@@ -118,8 +118,8 @@ function str = str2str( array )
             str = [ str ','' ''' ];
         else    
             str = [ str ',''' doublequotes(tmparray) '''' ];
-        end;
-	end;
+        end
+	end
 	if size(array,1) > 1
 		str = [ 'strvcat(' str(2:end) ')'];
 	else
@@ -130,14 +130,14 @@ return;
 % convert array to string
 % -----------------------
 function str = array2str( array )
-    if isempty( array), str = '[]'; return; end;
-	if prod(size(array)) == 1, str = num2str(array); return; end;
-	if size(array,1) == 1, str = [ '[' contarray(array) '] ' ]; return; end;
-	if size(array,2) == 1, str = [ '[' contarray(array') ']'' ' ]; return; end;
+    if isempty( array), str = '[]'; return; end
+	if prod(size(array)) == 1, str = num2str(array); return; end
+	if size(array,1) == 1, str = [ '[' contarray(array) '] ' ]; return; end
+	if size(array,2) == 1, str = [ '[' contarray(array') ']'' ' ]; return; end
 	str = '';
 	for index = 1:size(array,1)
 		str = [ str ';' contarray(array(index,:)) ];
-	end;
+	end
 	str = [ '[' str(2:end) ']' ];
 return;
 
@@ -146,14 +146,14 @@ return;
 function str = struct2str( structure )
 	if isempty( structure )
 		str = 'struct([])'; return;
-	end;
+	end
 	str = '';
 	allfields = fieldnames( structure );
 	for index = 1:length( allfields )
 		strtmp = '';
 		eval( [ 'allcontent = { structure.' allfields{index} ' };' ] ); % getfield generates a bug
 		str = [ str, '''' allfields{index} ''',{' vararg2str( allcontent ) '},' ];
-	end;
+	end
 	str = [ 'struct(' str(1:end-1) ')' ];
 return;
 
@@ -164,8 +164,8 @@ function str = doublequotes( str )
 	if ~isempty(quoteloc)
 		for index = length(quoteloc):-1:1
 			str = [ str(1:quoteloc(index)) str(quoteloc(index):end) ];
-		end;
-	end;
+		end
+	end
 return;
 	
 % test continuous arrays
@@ -176,11 +176,11 @@ function str = contarray( array )
     if prod(size(array)) == 1
         str =  num2str(array);
         return;
-    end;
+    end
     if size(array,1) == 1 & size(array,2) == 2
         str =  [num2str(array(1)) ' ' num2str(array(2))];
         return;
-    end;
+    end
     if isempty(tmpind) | all(isnan(array(tmpind)))
 		str = num2str(array(1));
 		skip = 0;
@@ -192,20 +192,20 @@ function str = contarray( array )
                         str = [str ' ' num2str(array(index))];
                     else
                         str = [str ' ' num2str(array(index-1)) ' ' num2str(array(index))];
-                    end;
+                    end
 				else
                     if indent == 1
                         str = [str ':' num2str(array(index-1)) ' ' num2str(array(index))];
                     else
                         str = [str ':' num2str(indent) ':' num2str(array(index-1)) ' ' num2str(array(index))];
-                    end;
-				end;
+                    end
+				end
 				skip = 0;
                 indent = array(index) - array(index-1);
 			else
 				skip = skip + 1;
-			end;
-		end;
+			end
+		end
 		if array(index) == array(index-1)+indent
             if skip ~= 0      
                 if indent == 1
@@ -214,17 +214,17 @@ function str = contarray( array )
                     str = [str ' ' num2str(array(index)) ];
                 else
                     str = [str ':' num2str(indent) ':' num2str(array(index)) ];
-                end;
-            end;
-		end;
+                end
+            end
+		end
 	else
         if length(array) < 10
             str = num2str(array(1));
             for index = 2:length(array)
                 str = [str ' ' num2str(array(index)) ];
-            end;
+            end
         else        
             str = num2str(double(array));
-        end;
-	end;
+        end
+	end
 	

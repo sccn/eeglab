@@ -56,29 +56,29 @@ com = '';
 if nargin < 1
 	help pop_saveset;
 	return;
-end;
-if isempty(EEG)  , error('Cannot save empty datasets'); end;
+end
+if isempty(EEG)  , error('Cannot save empty datasets'); end
 
 % empty filename (resave file)
 emptyfilename = 0;
 if nargin > 1
-    if isempty(varargin{1}) && isempty(EEG.filename), emptyfilename = 1; end;
+    if isempty(varargin{1}) && isempty(EEG.filename), emptyfilename = 1; end
     if strcmpi(varargin{1},'savemode') 
         if length(EEG) == 1
-            if isempty(EEG(1).filename), varargin{2} = ''; emptyfilename = 1; end;
+            if isempty(EEG(1).filename), varargin{2} = ''; emptyfilename = 1; end
         else
             if any(cellfun(@isempty, { EEG.filename }))
                 error('Cannot resave files who have not been saved previously');
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 
 if nargin < 2 || emptyfilename
-    if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
+    if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end
     % pop up window to ask for file
     [filename, filepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
-    if ~ischar(filename), return; end;
+    if ~ischar(filename), return; end
     drawnow;
     options = { 'filename' filename 'filepath' filepath };
 else
@@ -88,11 +88,11 @@ else
         options = { 'filename' varargin{1} };
         if nargin > 2
             options = { options{:} 'filepath' varargin{2} };
-        end;
+        end
     else
         options = varargin;
-    end;
-end;
+    end
+end
 
 % decode input parameters
 % -----------------------
@@ -103,11 +103,11 @@ g = finputcheck(options,  { 'filename'   'string'   []     '';
                             'version'    'string'   { '6','7.3' } defaultSave;
                             'check'      'string'   { 'on','off' }     'off';
                             'savemode'   'string'   { 'resave','onefile','twofiles','' } '' });
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % current filename without the .set
 % ---------------------------------
-if emptyfilename == 1, g.savemode = ''; end;
+if emptyfilename == 1, g.savemode = ''; end
 [g.filepath filenamenoext ext] = fileparts( fullfile(g.filepath, g.filename) ); ext = '.set';
 g.filename = [ filenamenoext ext ];
 
@@ -136,7 +136,7 @@ if length(EEG) == 1
 % $$$             case 'Cancel', return;
 % $$$             case 'No, save as before', % nothing
 % $$$             case 'Yes, do it', g.savemode = 'onefile';
-% $$$         end;
+% $$$         end
 % $$$         g.filename = EEG.filename;
 % $$$         g.filepath = EEG.filepath;
     elseif strcmpi(g.savemode, 'resave') && ~isfield(EEG, 'datfile') && option_savetwofiles
@@ -151,11 +151,11 @@ if length(EEG) == 1
 % $$$             case 'Cancel', return;
 % $$$             case 'No, save as before', % nothing
 % $$$             case 'Yes, do it', g.savemode = 'twofiles';
-% $$$         end;
+% $$$         end
 % $$$         g.filename = EEG.filename;
 % $$$         g.filepath = EEG.filepath;
-    end;
-end;
+    end
+end
 
 % default saving otion
 % --------------------
@@ -168,43 +168,43 @@ if strcmpi(g.savemode, 'resave')
         for index = 1:length(EEG)
             pop_saveset(EEG(index), 'savemode', 'resave');
             EEG(index).saved = 'yes';
-        end;
+        end
         if nargout > 1
             com = sprintf('EEG = pop_saveset( EEG, %s);', vararg2str(options));
         end
         return;
-    end;
+    end
     
-    if strcmpi( EEG.saved, 'yes'), disp('Dataset has not been modified; No need to resave it.'); return; end;
+    if strcmpi( EEG.saved, 'yes'), disp('Dataset has not been modified; No need to resave it.'); return; end
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
     if isfield(EEG, 'datfile')
         if ~isempty(EEG.datfile)
             save_as_dat_file = 1;
-        end;
-    end;
+        end
+    end
     if ischar(EEG.data) & ~save_as_dat_file % data in .set file
         TMP = pop_loadset(EEG.filename, EEG.filepath);
         EEG.data = TMP.data;
         data_on_disk = 1;
-    end;
+    end
 else
-    if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
+    if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end
     if ~strcmpi(EEG.filename, g.filename) | ~strcmpi(EEG.filepath, g.filepath)
          EEG.datfile = '';
-    end;
+    end
     EEG.filename    = g.filename;
     EEG.filepath    = g.filepath;
     if isempty(g.savemode)
         if option_savematlab, g.savemode = 'onefile';
         else                  g.savemode = 'twofiles';
-        end;
-    end;
+        end
+    end
     if strcmpi(g.savemode, 'twofiles')
         save_as_dat_file = 1;
         EEG.datfile = [ filenamenoext '.fdt' ];
-    end;
-end;
+    end
+end
 
 % Saving data as float and Matlab
 % -------------------------------
@@ -215,11 +215,11 @@ if ~ischar(EEG.data)
         tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
     else 
         tmpdata = EEG.data;
-    end;
+    end
     no_resave_dat = 'no';
 else 
     no_resave_dat = 'yes';
-end;
+end
 v = version;
 try, 
     fprintf('Saving dataset...\n');
@@ -228,7 +228,7 @@ try,
         if ~ischar(EEG.data)
             EEG.data = EEG.datfile;
             tmpdata = floatwrite( tmpdata, fullfile(EEG.filepath, EEG.data), 'ieee-le');
-        end;
+        end
     else
         if isfield(EEG, 'datfile')
             if ~isempty(EEG.datfile)
@@ -236,23 +236,23 @@ try,
                     try, 
                         delete(fullfile(EEG.filepath, EEG.datfile));
                         disp('Deleting .dat/.fdt file on disk (all data is within the Matlab file)');
-                    catch, end;
-                end;
-            end;
+                    catch, end
+                end
+            end
             EEG.datfile = [];
-        end;
-    end;
+        end
+    end
 
     try
         if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', 'EEG');
         else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', 'EEG');
-        end;
+        end
     catch
         save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
-    end;
+    end
     if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
-    end;
+    end
     
     % save ICA activities
     % -------------------
@@ -260,28 +260,28 @@ try,
 %     if isempty(EEG.icaweights) & exist(icafile)
 %         disp('ICA activation file found on disk, but no more ICA activities. Deleting file.');
 %         delete(icafile);
-%     end;
+%     end
 %     if ~option_saveica & exist(icafile)
 %         disp('Options indicate not to save ICA activations. Deleting ICA activation file.');
 %         delete(icafile);
-%     end;
+%     end
 %     if option_saveica & ~isempty(EEG.icaweights)
 %         if ~exist('tmpdata')
 %             TMP = eeg_checkset(EEG, 'loaddata');
 %             tmpdata = TMP.data;
-%         end;
+%         end
 %         if isempty(tmpica)
 %              tmpica2 = (EEG.icaweights*EEG.icasphere)*tmpdata(EEG.icachansind,:);
 %         else tmpica2 = tmpica;
-%         end;
+%         end
 %         tmpica2 = reshape(tmpica2, size(tmpica2,1), size(tmpica2,2)*size(tmpica2,3));
 %         floatwrite( tmpica2, icafile, 'ieee-le');
 %         clear tmpica2;
-%     end;
+%     end
     
 catch,
     rethrow(lasterror);
-end;
+end
 
 % try to delete old .fdt or .dat files
 % ------------------------------------
@@ -292,8 +292,8 @@ if exist(tmpfilename) == 2
         delete(tmpfilename);
         disp('Delete sucessfull.');
     catch, disp('Error while attempting to remove file'); 
-    end;
-end;
+    end
+end
 if save_as_dat_file == 0
     tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
     if exist(tmpfilename) == 2
@@ -302,19 +302,19 @@ if save_as_dat_file == 0
             delete(tmpfilename);
             disp('Delete sucessfull.');
         catch, disp('Error while attempting to remove file'); 
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % recovering variables
 % --------------------
 EEG.icaact = tmpica;
 if data_on_disk
     EEG.data = 'in set file';
-end;
+end
 if isnumeric(EEG.data) && v(1) < 7
     EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
-end;
+end
 EEG.saved = 'justloaded';
 if nargout > 1
     com = sprintf('EEG = pop_saveset( EEG, %s);', vararg2str(options));
@@ -327,6 +327,6 @@ function num = popask( text )
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
-	 end;
+	 end
 
 

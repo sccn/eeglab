@@ -56,28 +56,28 @@ if typerej == 0 | Rothertype
 	if Rmanual
 		rejglobal  = rejarray( rejglobal,  EEG.reject.rejmanual); % see bottom for the
 		rejglobalE = rejarray( rejglobalE, EEG.reject.rejmanualE); % function rejarray
-	end;
+	end
 	if Rthres
 		rejglobal  = rejarray( rejglobal,  EEG.reject.rejthresh);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.rejthreshE);
-	end;
+	end
 	if Rfreq
 		rejglobal  = rejarray( rejglobal,  EEG.reject.rejfreq);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.rejfreqE);
-	end;
+	end
 	if Rconst
 		rejglobal  = rejarray( rejglobal,  EEG.reject.rejconst);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.rejconstE);
-	end;
+	end
 	if Rent
 		rejglobal  = rejarray( rejglobal,  EEG.reject.rejjp);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.rejjpE);
-	end;
+	end
 	if Rkurt
 		rejglobal  = rejarray( rejglobal,  EEG.reject.rejkurt);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.rejkurtE);
-	end;
-end;
+	end
+end
 
 % ---------------
 
@@ -85,28 +85,28 @@ if typerej == 1 | Rothertype
 	if Rmanual
 		rejglobal  = rejarray( rejglobal,  EEG.reject.icarejmanual);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.icarejmanualE);
-	end;
+	end
 	if Rthres
 		rejglobal  = rejarray( rejglobal,  EEG.reject.icarejthresh);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.icarejthreshE);
-	end;
+	end
 	if Rfreq
 		rejglobal  = rejarray( rejglobal,  EEG.reject.icarejfreq);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.icarejfreqE);
-	end;
+	end
 	if Rconst
 		rejglobal  = rejarray( rejglobal,  EEG.reject.icarejconst);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.icarejconstE);
-	end;
+	end
 	if Rent
 		rejglobal  = rejarray( rejglobal,  EEG.reject.icarejjp);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.icarejjpE);
-	end;
+	end
 	if Rkurt
 		rejglobal  = rejarray( rejglobal,  EEG.reject.icarejkurt);
 		rejglobalE = rejarray( rejglobalE, EEG.reject.icarejkurtE);
-	end;
-end;
+	end
+end
 
 EEG.reject.rejglobal = rejglobal;
 EEG.reject.rejglobalE = rejglobalE;
@@ -122,5 +122,5 @@ function dest = rejarray( dest, ori)
         dest = ori;
     elseif ~isempty(ori)
 		dest = dest | ori;
-	end;
+	end
 return;

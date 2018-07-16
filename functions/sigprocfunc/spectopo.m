@@ -199,14 +199,14 @@ if nargin <= 3 | ischar(varargin{1})
                   'mapframes'     'integer'  [1:size(data,2)]         []};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
-	if ischar(g), error(g); end;
-	if ~isempty(g.freqrange), g.limits(1:2) = g.freqrange; end;
+	if ischar(g), error(g); end
+	if ~isempty(g.freqrange), g.limits(1:2) = g.freqrange; end
 	if ~isempty(g.weights)
 		if isempty(g.freq) | length(g.freq) > 2
-            if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
+            if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end
          error('spectopo(): for computing component contribution, one must specify a (single) frequency');
-		end;
-	end;
+		end
+	end
 else
     if ~isnumeric(data)
        error('spectopo(): Incorrect call format (see >> help spectopo).')
@@ -220,40 +220,40 @@ else
 
 	if nargin > 3,    g.freq = varargin{1};
 	else              g.freq = [];
-	end;
+	end
 	if nargin > 4,	  g.chanlocs = varargin{2};
 	else              g.chanlocs = [];
-	end;
+	end
 	if nargin > 5,    g.limits = varargin{3};
 	else              g.limits = [nan nan nan nan nan nan];
-	end;
+	end
 	if nargin > 6,    g.title = varargin{4};
 	else              g.title = '';
-	end;
+	end
 	if nargin > 7,    g.freqfac = varargin{5};
 	else              g.freqfac = FREQFAC;
-	end;
+	end
 	if nargin > 8,    g.percent = varargin{6};
 	else              g.percent = 100;
-	end;
+	end
 	if nargin > 10,    g.reref = 'averef';
 	else               g.reref = 'off';
-	end;
+	end
 	g.weights = [];
 	g.icamaps = [];
-end;
+end
 if g.percent > 1
 	g.percent = g.percent/100; % make it from 0 to 1
-end;
+end
 if ~isempty(g.freq) & isempty(g.chanlocs)
 	error('spectopo(): needs channel location information');
-end;
+end
 if isempty(g.weights) && ~isempty(g.plotchans)
     data = data(g.plotchans,:);
     if ~isempty(g.chanlocs)
         g.chanlocs = g.chanlocs(g.plotchans);
-    end;
-end;
+    end
+end
 
 if strcmpi(g.rmdc, 'on')
     data = data - repmat(mean(data,2), [ 1 size(data,2) 1]);
@@ -265,12 +265,12 @@ if frames == 0
 end
 
 %if ~isempty(g.plotchan) & g.plotchan == 0 & strcmpi(g.icamode, 'sub')
-%    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
+%    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end
 %    error('Cannot plot data component at all channels (option not implemented)');
-%end;
+%end
 
 if ~isempty(g.freq) & min(g.freq)<0
-    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
+    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end
    fprintf('spectopo(): freqs must be >=0 Hz\n');
    return
 end
@@ -288,14 +288,14 @@ else
         ncompsori = size(g.weights,1);
         if isempty(g.icawinv)
             g.icawinv = pinv(g.weights); % maps
-        end;
+        end
         if ~isempty(g.icacomps)
             g.weights = g.weights(g.icacomps, :);
             g.icawinv = g.icawinv(:,g.icacomps);
         else 
             g.icacomps = [1:size(g.weights,1)];
-        end;
-    end;
+        end
+    end
     compeegspecdB = [];
     resvar = NaN;
 
@@ -311,7 +311,7 @@ else
         if ~isempty(g.boundaries)
             g.boundaries(end+1) = frames;
         end;            
-    end;
+    end
     if g.percent ~= 1 & epochs > 1
         epoch_subset = zeros(1,epochs);
         nb = ceil( g.percent*epochs);
@@ -320,13 +320,13 @@ else
             if ~epoch_subset(index)
                 epoch_subset(index) = 1;
                 nb = nb-1;
-            end;
+            end
         end;        
         epoch_subset = find(epoch_subset == 1);
         fprintf('Randomly selecting %d of %d data epochs for analysis...\n', length(epoch_subset),epochs);
     else
         epoch_subset = find(epoch_subset == 1);
-    end;
+    end
     if isempty(g.weights)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
         % compute data spectra
@@ -340,14 +340,14 @@ else
             % spec = sqrt( power(g.mapnorm(1)*compact).^2 + power(g.mapnorm(2)*compact).^2 + ...)
             % spec = sqrt( g.mapnorm(1)^4*power(compact).^2 + g.mapnorm(1)^4*power(compact).^2 + ...)
             % spec = sqrt( g.mapnorm(1)^4 + g.mapnorm(1)^4 + ... )*power(compact)
-        end;
+        end
 
         tmpc = find(eegspecdB(:,1)); 			     % > 0 power chans
         tmpindices = find(eegspecdB(:,1) == 0);
         if ~isempty(tmpindices)
              zchans = int2str(tmpindices); % 0-power chans
         else zchans = [];
-        end;
+        end
         if length(tmpc) ~= size(eegspecdB,1)
             myfprintf(g.verbose, '\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
                        zchans);
@@ -356,7 +356,7 @@ else
             if ~isempty(g.chanlocs)
                 g.chanlocs2 = g.chanlocs(tmpc);
             end
-        end;
+        end
         eegspecdB = 10*log10(eegspecdB);
         specstd   = 10*log10(specstd);
         myfprintf(g.verbose, '\n');
@@ -371,7 +371,7 @@ else
             g.reref = 'off';
             [eegspecdB freqs specstd] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
             myfprintf(g.verbose, '\n'); % log below
-        end;
+        end
         g.reref = 'off';
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -387,7 +387,7 @@ else
             eegspecdBtoplot = sqrt(mean(eegspecdB.^2,1)); % RMS before log as for components
         else 
             eegspecdBtoplot = eegspecdB;
-        end;
+        end
         tmpc = find(eegspecdB(:,1)); 			% > 0 power chans
         zchans = int2str(find(eegspecdB(:,1) == 0)); 	% 0-power chans
         if length(tmpc) ~= size(eegspecdB,1)
@@ -398,7 +398,7 @@ else
             if ~isempty(g.chanlocs)
                 g.chanlocs2 = g.chanlocs(tmpc);
             end
-        end;
+        end
         specstd   = 10*log10(specstd);
         eegspecdB = 10*log10(eegspecdB);
         eegspecdBtoplot = 10*log10(eegspecdBtoplot);
@@ -417,13 +417,13 @@ else
                 for index = 1:size(data,1)
                     g.plotchan = index;
                     [compeegspecdB(:,:,index) freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
-                end;
+                end
                 g.plotchan = 0;
             else
                 myfprintf(g.verbose, 'Computing component spectra: ')
                 [compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
-            end;
-        end;
+            end
+        end
         myfprintf(g.verbose, '\n');
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -437,11 +437,11 @@ else
                     compeegspecdB(index,:) = 10*log10( sqrt(mean(g.icawinv(:,index).^4)) * compeegspecdB(index,:) );
                 else 
                     compeegspecdB(index,:) = 10*log10( g.icawinv(g.plotchan,index)^2 * compeegspecdB(index,:) );
-                end;
-            end;
+                end
+            end
         else % already spectrum of data-components
             compeegspecdB = 10*log10( compeegspecdB );
-        end;
+        end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
         % select components to plot
@@ -453,14 +453,14 @@ else
             if strcmp(g.icamode, 'normal')
                 g.icamaps = g.icamaps(end:-1:1);
                 g.icafreqsval = g.icafreqsval(end:-1:1);
-            end;
-            if g.nicamaps < length(g.icamaps), g.icamaps = g.icamaps(1:g.nicamaps); end;
+            end
+            if g.nicamaps < length(g.icamaps), g.icamaps = g.icamaps(1:g.nicamaps); end
         else 
             [tmp indexfreq] = min(abs(g.freq-freqs));
             g.icafreqsval   = compeegspecdB(g.icamaps, indexfreq);
-        end;
-    end;
-end;
+        end
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute axis and caxis g.limits
@@ -490,8 +490,8 @@ else % no freq specified
 
     if isnan(g.limits(2))
         g.limits(2) = srate/2;
-    end;
-end;
+    end
+end
 
 [tmp maxfreqidx] = min(abs(g.limits(2)-freqs)); % adjust max frequency
 [tmp minfreqidx] = min(abs(g.limits(1)-freqs)); % adjust min frequency
@@ -529,32 +529,32 @@ if strcmpi(g.plot, 'on')
     mainfig = gca; axis off;
     if ~isempty(g.freq)
         specaxes = sbplot(3,4,[5 12], 'ax', mainfig); 
-    end;
+    end
     
     if isempty(g.weights)
         %pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)'); % old command
         if strcmpi(g.plotmean, 'on'), specdata = mean(eegspecdB,1); % average channels
         else                          specdata = eegspecdB;
-        end;
+        end
         for index = 1:size(specdata,1) % scan channels
             tmpcol  = allcolors{mod(index, length(allcolors))+1};
             command = [ 'disp(''Channel ' int2str(index) ''')' ];
             pl(index)=plot(freqs(1:maxfreqidx),specdata(index,1:maxfreqidx)', ...
                            'color', tmpcol, 'ButtonDownFcn', command); hold on;
-        end;
+        end
     else 
         for index = 1:size(eegspecdBtoplot,1)
             tmpcol  = allcolors{mod(index, length(allcolors))+1};
             command = [ 'disp(''Channel ' int2str(g.plotchan(index)) ''')' ];
             pl(index)=plot(freqs(1:maxfreqidx),eegspecdBtoplot(index,1:maxfreqidx)', ...
                            'color', tmpcol, 'ButtonDownFcn', command); hold on;
-        end;
-    end;
+        end
+    end
     set(pl,'LineWidth',2);
     set(gca,'TickLength',[0.02 0.02]);
     try, 
         axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
-    catch, disp('Could not adjust axis'); end;
+    catch, disp('Could not adjust axis'); end
     xl=xlabel('Frequency (Hz)');
     set(xl,'fontsize',AXES_FONTSIZE_L);
     % yl=ylabel('Rel. Power (dB)');
@@ -562,7 +562,7 @@ if strcmpi(g.plot, 'on')
     set(yl,'fontsize',AXES_FONTSIZE_L);
     set(gca,'fontsize',AXES_FONTSIZE_L)
     box off;
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   plot component contribution   %
@@ -574,7 +574,7 @@ if ~isempty(g.weights)
             set(pl,'LineWidth',5, 'color', 'k');
         else 
             set(pl, 'linewidth', 2, 'color', 'k');
-        end;
+        end
         
         hold on;
         for f=1:length(g.icamaps)
@@ -590,15 +590,15 @@ if ~isempty(g.weights)
                 command = [ 'disp(''Component ' int2str(othercomps(index)) ''')' ];
                 pl(index)=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps(index),1:maxfreqidx)', ...
                                'color', tmpcol, 'ButtonDownFcn', command); hold on;
-            end;
-        end;
+            end
+        end
         if length(g.limits)<3|isnan(g.limits(3))
             newaxis = axis;
             newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
             newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
             axis(newaxis);
-        end;
-	end;
+        end
+	end
     
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% indicate component contribution %
@@ -615,7 +615,7 @@ if ~isempty(g.weights)
                 resvartmp = [];
                 for chan = 1:size(eegspecdB,1) % scan channels
                     resvartmp(chan)  = 100 - 100*exp(-(eegspecdB(chan,freqidx(1))-compeegspecdB(index, indexfreq, chan))/10*log(10));
-                end;
+                end
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
                 myfprintf(g.verbose, 'Component %d percent variance accounted for:%6.2f ± %3.2f\n', ...
@@ -623,9 +623,9 @@ if ~isempty(g.weights)
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
                 myfprintf(g.verbose, 'Component %d percent variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     % for icamode=sub and plotchan == 0 -> take the RMS power of all channels
     % -----------------------------------------------------------------------
@@ -633,9 +633,9 @@ if ~isempty(g.weights)
         compeegspecdB = exp( compeegspecdB/10*log(10) );
         compeegspecdB = sqrt(mean(compeegspecdB.^2,3)); % RMS before log (dim1=comps, dim2=freqs, dim3=chans)
         compeegspecdB = 10*log10( compeegspecdB );
-    end;
+    end
     
-end;
+end
 
 if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -647,7 +647,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 			plot([freqs(freqidx(f)) freqs(freqidx(f))], ...
 				 [min(eegspecdB(:,freqidx(f))) max(eegspecdB(:,freqidx(f)))],...
 				 'k','LineWidth',2.5);
-		end;
+		end
 	else
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		% plot vertical line at comp analysis freq
@@ -681,7 +681,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		freqnormpos = tmpmainpos(1) + tmpmainpos(3)*(freqs(freqidx(1))-g.limits(1))/(g.limits(2)-g.limits(1));
 		for index = 1:length(g.icamaps)+1
 			[realpos(index) allaxuse] = closestplot( freqnormpos, allaxcoords, allaxuse );
-		end;
+		end
 	
 		% put the channel plot a liitle bit higher
 		tmppos = get(headax(realpos(1)), 'position');
@@ -689,7 +689,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		set(headax(realpos(1)), 'position', tmppos);
 	else 
 		realpos = 1:length(g.freq); % indices giving order of plotting positions
-	end;
+	end
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% plot connecting lines using changeunits()
@@ -701,10 +701,10 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 				%g.icafreqsval contains the sorted frequency values at the specified frequency
 			else 
 				from = changeunits([freqs(freqidx(f)),maxcompdB],specaxes,large);
-			end;
+			end
 		else
 			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
-		end;
+		end
 		pos = get(headax(realpos(f)),'position');
 		to = changeunits([0,0],headax(realpos(f)),large)+[0 -min(pos(3:4))/2.5];
 		hold on;
@@ -716,7 +716,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],colr,'LineWidth',PLOT_LINEWIDTH_S);
 		axis([0 1 0 1]);
 		axis off;
-	end;
+	end
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% plot selected channel head using topoplot()
@@ -731,7 +731,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 			maplimits = 'absmax';
 		else                       
 			maplimits = [g.limits(5) g.limits(6)];
-		end;
+		end
         
 		%
 		% If 1 channel in g.plotchan
@@ -749,7 +749,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 				tl=title(g.chanlocs(g.plotchan).labels);
 			else
 				tl=title([ 'c' int2str(g.plotchan)]);
-			end;
+			end
             
 		else % plot all channels in g.plotchans 
 
@@ -766,12 +766,12 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 			else
 				tl=title([num2str(freqs(freqidx(f)), '%3.1f') ' Hz']);
 			end
-		end;
+		end
 		set(tl,'fontsize',AXES_FONTSIZE_L);
 		axis square;
 		drawnow
 		myfprintf(g.verbose, '.');
-	end;
+	end
 	myfprintf(g.verbose, '\n');
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -779,7 +779,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if ~isempty(g.weights)
 		% use headaxe from 2 to end (reserved earlier)
-		if realpos(1) == max(realpos), plotcolbar(g); end;
+		if realpos(1) == max(realpos), plotcolbar(g); end
 
 		% make the line with the scalp topoplot thicker than others
 		set(li(realpos(1)), 'linewidth', 2.5); 
@@ -800,14 +800,14 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
                     set(gca, 'userdata', ['text(-0.6, -0.6, ''Rel. Var.: ' sprintf('%6.2f', resvar(g.icacomps(compnum))) ''');'] );
                 else
                     set(gca, 'userdata', ['text(-0.6, -0.6, ''PVAF: ' sprintf('%6.2f', resvar(g.icacomps(compnum))) ''');'] );
-                end;
-            catch, end;
-			if realpos(index+1) == max(realpos), plotcolbar(g); end;
-		end;
+                end
+            catch, end
+			if realpos(index+1) == max(realpos), plotcolbar(g); end
+		end
 	else 
 		plotcolbar(g);
-	end;
-end;
+	end
+end
 
 %%%%%%%%%%%%%%%%
 % Draw title
@@ -824,7 +824,7 @@ if ~isempty(g.weights) & nargout >= 3
     tmp = compeegspecdB;
     compeegspecdB = zeros(ncompsori, size(tmp,2));
     compeegspecdB(g.icacomps,:) = tmp;
-end;
+end
     
 %%%%%%%%%%%%%%%%
 % Turn on axcopy (disabled to allow to click on curves)
@@ -833,7 +833,7 @@ if strcmpi(g.plot, 'on')
     disp('Click on each trace for channel/component index');
     axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata'''')); end;');
     % will not erase the commands for the curves
-end;
+end
 
 %%%%%%%%%%%%%%%%
 % Plot color bar
@@ -874,7 +874,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 		nchans = size(newweights,1);
 	else 
 		nchans = size(data,1);		
-	end;
+	end
 	%fftlength = 2^round(log(srate)/log(2))*g.freqfac;
 	if isempty(g.winsize)
 %         winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
@@ -883,7 +883,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
         winlength = min(srate, frames);
     else
         winlength = g.winsize;
-    end;
+    end
     
     if strcmpi(g.wintype,'blackmanharris')
          if usepwelch
@@ -902,12 +902,12 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
         fftlength = g.nfft;
     elseif strcmp(g.wintype,'blackmanharris')
         fftlength = 2^(nextpow2(length(winlength)))*g.freqfac;
-    end;
+    end
     
     if ~usepwelch, 
         myfprintf(g.verbose, '\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
         myfprintf(g.verbose, 'function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
-    end;
+    end
     myfprintf(g.verbose,' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
         
 	for c=1:nchans % scan channels or components
@@ -916,13 +916,13 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 				tmpdata = newweights(c,:)*data; % component activity
 			else % data - component contribution
                 tmpdata = data(g.plotchan,:) - (g.icawinv(g.plotchan,c)*newweights(c,:))*data;
-			end;
+			end
 		else
 			tmpdata = data(c,:); % channel activity
-		end;
+		end
 		if strcmp(g.reref, 'averef')
 			tmpdata = averef(tmpdata);
-		end;
+		end
 		for e=epoch_subset
 			if isempty(g.boundaries)
                 if usepwelch
@@ -931,7 +931,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
                 else
                     [tmpspec,freqs] = spec(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
                                            winlength,g.overlap);
-                end;
+                end
 				%[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
 				%					  winlength,g.overlap);
 				if c==1 & e==epoch_subset(1)
@@ -950,7 +950,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
                         else
                             [tmpspec,freqs] =  spec(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
                                                     fftlength,srate,winlength,g.overlap);
-                        end;
+                        end
                         if exist('eegspec') ~= 1
                             eegspec = zeros(nchans,length(freqs));
                             specstd = zeros(nchans,length(freqs));
@@ -959,9 +959,9 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
                             ((g.boundaries(n+1)-g.boundaries(n)+1)/g.boundaries(end));
                         specstd(c,:) = eegspec(c,:) + tmpspec'.^2 * ...
                             ((g.boundaries(n+1)-g.boundaries(n)+1)/g.boundaries(end));
-                    end;
+                    end
 				end
-			end;
+			end
 		end
 		myfprintf(g.verbose,'.');
 	end
@@ -971,11 +971,11 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     if n>1  % normalize standard deviation by the number of sections
         specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); 
     else specstd   = [];
-    end;
+    end
 	return;
     
     function myfprintf(verbose, varargin)
         if strcmpi(verbose, 'on')
             fprintf(varargin{:});
-        end;
+        end
         

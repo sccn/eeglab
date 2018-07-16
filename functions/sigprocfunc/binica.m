@@ -90,13 +90,13 @@ if nargin < 1 | nargin > 25
     more off
     return
 end
-if size(data,3) > 1, data = reshape(data, size(data,1), size(data,2)*size(data,3) ); end;
+if size(data,3) > 1, data = reshape(data, size(data,1), size(data,2)*size(data,3) ); end
 
 icadefs % import ICABINARY and SC
 if ~exist('SC')
   fprintf('binica(): You need to update your icadefs file to include ICABINARY and SC.\n')
   return
-end;
+end
 if exist(SC) ~= 2
   fprintf('binica(): No ica source file ''%s'' is in your Matlab path, check...\n', SC);
   return
@@ -113,7 +113,7 @@ else
 		fprintf('binica(): using binary ica file ''%s''\n', ICABINARYdir);
 	else
 		fprintf('binica(): using binary ica file ''\?/%s''\n', ICABINARY);
-	end;
+	end
 end
 
 [flags,args] = read_sc(SC); % read flags and args in master SC file
@@ -175,7 +175,7 @@ else
         if ~isnumeric(tmpint)
             fprintf('\nbinica(): FileNum argument needs to be a number.  Will use random number instead.\n')
             tmpint=[];
-        end;
+        end
         tmpint=int2str(tmpint);
   end
 
@@ -216,7 +216,7 @@ if ~ischar(data) % data variable given
       floatwrite(data,tmpdata,'ieee-be');
   else
       floatwrite(data,tmpdata);
-  end;
+  end
   datafile = tmpdata;
 
 else % data filename given
@@ -279,7 +279,7 @@ if exist('wtsin') % specify WeightsInfile from 'weightsin' flag, arg
            floatwrite(wtsin,winfn,'ieee-be');
        else
            floatwrite(wtsin,winfn);
-       end;
+       end
        fprintf('   saving input weights:\n  ');
        weightsinfile = winfn; % weights in file name
      elseif exist(wtsin) == 2 % file

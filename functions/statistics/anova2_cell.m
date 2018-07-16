@@ -80,9 +80,9 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
         for i = 1:a
             for ii = 1:b
                 dataabs{i,ii} = abs(data{i,ii});
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     VE = zeros( [ sz(1:end-1) 1], 'single' );
     m  = zeros( [ sz(1:end-1) size(data) ], 'single' );
@@ -98,10 +98,10 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
                 case 6, m(:,:,:,:,:,i,ii) = tmpm;
                 case 7, m(:,:,:,:,:,:,i,ii) = tmpm;
                 otherwise error('Dimension not supported');
-            end;
+            end
             VE = VE+sum( bsxfun(@minus, dataabs{i,ii}, tmpm).^2, nd);
-        end;
-    end;
+        end
+    end
     X  = mean(mean(m,nd+1),nd);
     Xj = mean(m,nd+1);
     Xk = mean(m,nd);
@@ -125,8 +125,8 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
 %             for ii = 1:b
 %                 m(i,ii) = mymean(data{i,ii});
 %                 VE      = VE+sum( (dataabs{i,ii}-m(i,ii)).^2 );
-%             end;
-%         end;
+%             end
+%         end
 %         X  = mean(mean(m));
 %         Xj = mean(m,2);
 %         Xk = mean(m,1);
@@ -146,8 +146,8 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
 %                 tmpm = mymean(data{i,ii}, 2);
 %                 m(:,i,ii) = tmpm;
 %                 VE        = VE+sum( (dataabs{i,ii}-repmat(tmpm, [1 size(data{i,ii},2)])).^2, 2);
-%             end;
-%         end;
+%             end
+%         end
 %         X  = mean(mean(m,3),2);
 %         Xj = mean(m,3);
 %         Xk = mean(m,2);
@@ -167,8 +167,8 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
 %                 tmpm = mymean(data{i,ii}, 3);
 %                 m(:,:,i,ii) = tmpm;
 %                 VE          = VE+sum( (dataabs{i,ii}-repmat(tmpm, [1 1 size(data{i,ii},3)])).^2, 3);
-%             end;
-%         end;
+%             end
+%         end
 %         X  = mean(mean(m,4),3);
 %         Xj = mean(m,4);
 %         Xk = mean(m,3);
@@ -188,8 +188,8 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
 %                 tmpm = mymean(data{i,ii}, 4);
 %                 m(:,:,:,i,ii) = tmpm;
 %                 VE            = VE+sum( (dataabs{i,ii}-repmat(tmpm, [1 1 1 size(data{i,ii},4)])).^2, 4);
-%             end;
-%         end;
+%             end
+%         end
 %         X  = mean(mean(m,5),4);
 %         Xj = mean(m,5);
 %         Xk = mean(m,4);
@@ -200,7 +200,7 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
 %         Xk = repmat(Xk, [1 1 1 size(m,4)  1]);
 %         VI = c*sum( sum( ( m - Xj - Xk + repmat(X, [1 1 1 size(m,4) size(m,5)]) ).^2, 5 ), 4 );
 %                 
-%     end;
+%     end
     
     SR2 = VR/(a-1);
     SC2 = VC/(b-1);
@@ -225,11 +225,11 @@ function val = myndims(a)
             val = 1;
         else
             val = 2;
-        end;
+        end
     end; 
   
 function res = mymean( data, varargin) % deal with complex numbers
     res = mean( data, varargin{:});
     if ~isreal(data)
         res = abs( res );
-    end;
+    end

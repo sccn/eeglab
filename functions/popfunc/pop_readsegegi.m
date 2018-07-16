@@ -38,9 +38,9 @@ if nargin < 1
 	% ask user
 	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose first EGI RAW file -- pop_readsegegi()'); 
     drawnow;
-	if filename == 0 return; end;
+	if filename == 0 return; end
 	filename = fullfile(filepath, filename);
-end;
+end
 
 % load datas
 % ----------
@@ -58,7 +58,7 @@ orifilename = [ basename sprintf('%3.3d', index) tailname ];
 if ~exist(orifilename)
     disp ([ 'First file of series ''' orifilename ''' not found' ] );
     error([ 'First file of series ''' orifilename ''' not found' ] );
-end;
+end
 
 while cont
     tmpfilename = [ basename sprintf('%3.3d', index) tailname ];
@@ -70,14 +70,14 @@ while cont
         index = index + 1;
     catch,
         cont = 0;
-    end;
-end;
+    end
+end
 
 % add one channel with the event data
 % -----------------------------------
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
-end;
+end
 EEG.comments        = [ 'Original files: ' orifilename ' to ' tmpfilename ];
 EEG.filepath        = '';
 EEG.setname 		= 'EGI file';
@@ -95,8 +95,8 @@ if ~isempty(Eventdata)
         EEG = pop_chanevent( EEG, orinbchans-size(Eventdata,1)+index, 'edge', 'leading', ...
                              'delevent', 'off', 'typename', Head.eventcode(index,:), ...
                              'nbtype', 1, 'delchan', 'on');
-    end;
-end;
+    end
+end
 
 % importing channel locations
 % ---------------------------
@@ -105,7 +105,7 @@ if all(EEG.data(end,1:10) == 0)
     EEG.data(end,:)   = [];
     EEG.nbchan        = size(EEG.data,1);
     EEG = eeg_checkset(EEG);
-end;
+end
 EEG = readegilocs(EEG);
 
 EEG = eeg_checkset(EEG);

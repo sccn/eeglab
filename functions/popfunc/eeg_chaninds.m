@@ -34,37 +34,37 @@ function finalinds = eeg_chaninds(EEG, channames, errorifnotfound);
     if nargin < 2
         help eeg_chaninds;
         return;
-    end;
+    end
     if nargin < 3
         errorifnotfound = 1;
-    end;
+    end
     
     if isfield(EEG, 'chanlocs')
          chanlocs = EEG.chanlocs;
     else chanlocs = EEG;
-    end;
+    end
     
     % decode string if necessary
     % --------------------------
     if ischar(channames)
         channames = parsetxt( channames );
-    end;
+    end
 
     finalinds   = [];
     if isempty(chanlocs)
          tmpallchans = [];
     else tmpallchans = lower({ chanlocs.labels });
-    end;
-    if isempty(channames), finalinds = [1:length(chanlocs)]; return; end;
+    end
+    if isempty(channames), finalinds = [1:length(chanlocs)]; return; end
     for c = 1:length(channames)
         chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
         if isempty(chanind), 
             chanind = str2double(channames{c});
-            if isnan(chanind), chanind = []; end;
+            if isnan(chanind), chanind = []; end
             if errorifnotfound && isempty(chanind)
                 error(sprintf('Channel %s not found', channames{c})); 
-            end;
-        end;
+            end
+        end
         finalinds   = [ finalinds chanind ];
-    end;
+    end
     finalinds = sort(finalinds);

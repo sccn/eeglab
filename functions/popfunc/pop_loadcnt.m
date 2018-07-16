@@ -72,7 +72,7 @@ if nargin < 1
 	% ask user
 	[filename, filepath] = uigetfile('*.CNT;*.cnt', 'Choose a CNT file -- pop_loadcnt()'); 
     drawnow;
-	if filename == 0 return; end;
+	if filename == 0 return; end
     
 	% popup window parameters
 	% -----------------------
@@ -94,7 +94,7 @@ if nargin < 1
                      { 'style' 'edit' 'string' '' } ...
                      { 'style' 'text' 'string' '    Note: requires to enable memory mapping in EEGLAB memory options and only works for 32-bit files' } };                  
 	result = inputgui( uigeom, uilist, 'pophelp(''pop_loadcnt'')', 'Load a CNT dataset');    
-	if length( result ) == 0 return; end;
+	if length( result ) == 0 return; end
 
 	% decode parameters
 	% -----------------
@@ -102,20 +102,20 @@ if nargin < 1
     if result{1}, options = [ options ', ''dataformat'', ''int16''' ];
     elseif result{2}, options = [ options ', ''dataformat'', ''int32''' ];
     elseif result{3}, options = [ options ', ''dataformat'', ''auto''' ];
-    end;
+    end
     if ~isempty(result{4}), 
         timer =  eval( [ '[' result{4} ']' ]);
         options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
     end;   
-    if result{5}, options = [ options ', ''keystroke'', ''on''' ]; end;
-    if ~isempty(result{6}), options = [ options ',' result{6} ]; end;
+    if result{5}, options = [ options ', ''keystroke'', ''on''' ]; end
+    if ~isempty(result{6}), options = [ options ',' result{6} ]; end
     % Conditional pass if ~isempty(result{7}), options = ... 
     % [options ', ''memmapfile''', result{7} ] ; end ;
     % Always pass the memmapfile paramter? 
     options = [ options ', ''memmapfile'', ''', result{7} '''' ] ;
 else
 	options = vararg2str(varargin);
-end;
+end
 
 % load datas
 % ----------
@@ -133,11 +133,11 @@ if nargin > 0
 	end;	
 else
 	eval( [ 'r = loadcnt( fullFileName ' options ');' ]);
-end;
+end
 
 if isfield(r, 'dat')
     error('pop_loadcnt is not compatible with current loadcnt version, please use latest loadcnt() version');
-end;
+end
 % Check to see if data is in memory or in a file.
 EEG.data            = r.data;
 EEG.comments        = [ 'Original file: ' fullFileName ];
@@ -151,7 +151,7 @@ if ~isempty(I)
     EEG.event(1:length(I),1) = [ r.event(I).stimtype ];
     EEG.event(1:length(I),2) = [ r.event(I).offset ]+1;
     EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
-end;
+end
 
 % modified by Andreas Widmann  2005/05/12  14:15:00
 try, % this piece of code makes the function crash sometimes - Arnaud Delorme 2006/04/27
@@ -160,9 +160,9 @@ try, % this piece of code makes the function crash sometimes - Arnaud Delorme 20
         disp('pop_loadcnt note: event field ''type'' set to ''boundary'' for data discontinuities');
         for index = 1:length(temp)
             EEG.event(temp(index)).type = 'boundary';
-        end;
+        end
     end
-catch, end;
+catch, end
 % end modification
 
 % process keyboard entries
@@ -176,9 +176,9 @@ if ~isempty(findstr('keystroke', lower(options)))
                 EEG.event(index).type = [ 'keypad' num2str(r.event(index).keypad_accept) ];
             else
                 EEG.event(index).type = [ 'keyboard' num2str(r.event(index).keyboard) ];
-            end;
-        end;
-    end;
+            end
+        end
+    end
 else
     % removeing keystroke events
     % --------------------------
@@ -186,13 +186,13 @@ else
     for index = 1:length(EEG.event)
         if EEG.event(index).type == 0
             rmind = [rmind index];
-        end;
-    end;
+        end
+    end
     if ~isempty(rmind)
         fprintf('Ignoring %d keystroke events\n', length(rmind));
         EEG.event(rmind) = [];
-    end;
-end;
+    end
+end
 
 % import channel locations (Neuroscan coordinates are not wrong)
 % ------------------------
@@ -200,8 +200,8 @@ end;
 %y            = celltomat( { r.electloc.y_coord } );
 for index = 1:length(r.electloc)
     names{index} = deblank(char(r.electloc(index).lab'));
-    if size(names{index},1) > size(names{index},2), names{index} = names{index}'; end;
-end;
+    if size(names{index},1) > size(names{index},2), names{index} = names{index}'; end
+end
 EEG.chanlocs  = struct('labels', names);
 %EEG.chanlocs = readneurolocs( { names x y } );
 %disp('WARNING: Electrode locations imported from CNT files may not reflect true locations');
@@ -230,5 +230,5 @@ if length(options) > 2
     command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
 else
     command = sprintf('EEG = pop_loadcnt(''%s'');',fullFileName); 
-end;
+end
 return;

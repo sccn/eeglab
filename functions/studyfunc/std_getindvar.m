@@ -39,14 +39,14 @@ function [ factor factorvals subjects paired ] = std_getindvar(STUDY, mode, scan
 if nargin < 1
     help std_getindvar;
     return;
-end;
+end
 
 factor     = {};
 factorvals = {};
 paired     = {};
 subjects   = {};
-if nargin < 2, mode = 'both'; end;
-if nargin < 3, scandesign = 0; end;
+if nargin < 2, mode = 'both'; end
+if nargin < 3, scandesign = 0; end
 countfact = 1;
 setinfo = STUDY.datasetinfo;
 
@@ -67,16 +67,16 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                     eval( [ 'datind = strmatch(tmpvals{c}, { setinfo.' ff{index} '}, ''exact'');' ] );
                     subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
                     intersectSubject = intersect(intersectSubject, subjects{  countfact}{c});
-                end;
+                end
                 
                 numValues = cellfun(@length, subjects{  countfact});
                 if length(intersectSubject) == numValues(1) && length(unique(numValues)) == 1
                     paired{countfact} = 'on'; % trial data always paired
                 else
                     paired{countfact} = 'off';
-                end;
+                end
                 countfact = countfact + 1;
-            end;
+            end
         else
             eval( [ 'tmpvals = unique_bc([ setinfo.' ff{index} ']);' ] );
             if length(tmpvals) > 1
@@ -89,19 +89,19 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                     eval( [ 'datind = find(tmpvals(c) == [ setinfo.' ff{index} ']);' ] );
                     subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
                     intersectSubject = intersect(intersectSubject, subjects{  countfact}{c});
-                end;
+                end
                 
                 numValues = cellfun(@length, subjects{  countfact});
                 if length(intersectSubject) == numValues(1) && length(unique(numValues)) == 1
                     paired{countfact} = 'on'; % trial data always paired
                 else
                     paired{countfact} = 'off';
-                end;
+                end
                 countfact = countfact + 1;
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 
 % add ind. variables for trials
 % -----------------------------
@@ -122,16 +122,16 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                         if isnumeric(tmpTrialVals{1})
                             % convert to string if necessary
                             tmpTrialVals = cellfun(@num2str, tmpTrialVals, 'uniformoutput', false);
-                        end;
+                        end
                         tmpvals = unique_bc(tmpTrialVals);
                     else tmpvals = {};
-                    end;
+                    end
                     if isempty(alltmpvals)
                         alltmpvals = tmpvals;
                     else
                         alltmpvals = { alltmpvals{:} tmpvals{:} };
-                    end;
-                end;
+                    end
+                end
                 alltmpvals = unique_bc(alltmpvals);
                 if length(alltmpvals) > 1
                     factor{    countfact} = ff{index};
@@ -139,16 +139,16 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                     subjects{  countfact} = {};
                     paired{countfact}     = 'on'; % trial data always paired
                     countfact = countfact + 1;
-                end;
+                end
             else
                 alltmpvals = [];
                 for ind = 1:length(setinfo)
                     if isfield(setinfo(ind).trialinfo, ff{index}) && ~iscell( setinfo(ind).trialinfo(1).(ff{index}))
                         eval( [ 'tmpvals = unique_bc([ setinfo(ind).trialinfo(1).' ff{index} ' ]);' ] );
                     else tmpvals = [];
-                    end;
+                    end
                     alltmpvals = [ alltmpvals tmpvals ];
-                end;
+                end
                 alltmpvals = unique_bc(alltmpvals);
                 if length(alltmpvals) > 1
                     factor{    countfact} = ff{index};
@@ -156,11 +156,11 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                     subjects{  countfact} = {};
                     paired{countfact}     = 'off'; % pairing is irrelevant for continuous var
                     countfact = countfact + 1;
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end
 
 % scan existing design for additional combinations
 % ------------------------------------------------
@@ -169,29 +169,29 @@ if scandesign
         for iVar = 1:length(STUDY.design(desind).variable)
             if strcmpi(STUDY.design(desind).variable(iVar).vartype, 'categorical')
                 pos1 = strmatch(STUDY.design(desind).variable(iVar).label, factor, 'exact');
-                if ~isempty(pos1), add1 = mysetdiff(STUDY.design(desind).variable(iVar).value, factorvals{pos1}); else add1 = []; end;
+                if ~isempty(pos1), add1 = mysetdiff(STUDY.design(desind).variable(iVar).value, factorvals{pos1}); else add1 = []; end
                 for addInd = 1:length(add1)
                     duplicate = 0;
                     for iVarVal = 1:length(factorvals{pos1})
                         if isequal(factorvals{pos1}{iVarVal}, add1{addInd})
                             duplicate = 1;
-                        end;
-                    end;
+                        end
+                    end
                     if ~duplicate
                         factorvals{pos1} = { factorvals{pos1}{:} add1{addInd} }; 
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+                    end
+                end
+            end
+        end
+    end
+end
 
 function cellout = mysetdiff(cell1, cell2);
 
     if ischar(cell2{1})
          indcell = cellfun(@iscell, cell1);
     else indcell = cellfun(@(x)(length(x)>1), cell1);
-    end;
+    end
     cellout = cell1(indcell);
 
 %     if ischar(cell1{1}) && ischar(cell2{1})
@@ -202,5 +202,5 @@ function cellout = mysetdiff(cell1, cell2);
 %          cellout = setdiff_bc(cell1, cellfun(@(x)(num2str(x)),cell2, 'uniformoutput', false));
 %     elseif ~ischar(cell1{1}) && ischar(cell2{1})
 %          cellout = setdiff_bc(cellfun(@(x)(num2str(x)),cell1, 'uniformoutput', false), cell2);
-%     end;
+%     end
     

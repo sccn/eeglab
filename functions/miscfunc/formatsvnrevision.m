@@ -14,8 +14,8 @@ while ~feof(fid)
     txt = fgetl(fid);
     if length(txt) > 4 && strcmpi(txt(1:4), '----')
         state = 1;
-        if feof(fid), return; end;
-    end;
+        if feof(fid), return; end
+    end
     if state == 1,
         % get rev number
         txt  = fgetl(fid);
@@ -30,15 +30,15 @@ while ~feof(fid)
         [tmp file ext] = fileparts(file);
         file = [ file ext ];
         state = 2;
-    end;
+    end
     if isempty(txt)
         state = 3;
-    end;
+    end
     if state == 3
         revinfo = fgetl(fid);
         revinfo = revinfo(1:end);
         state = 1;
         fprintf('** %s, %s (SVN %s - Arno)\n', file, revinfo, revnum);
-    end;
-end;
+    end
+end
 cd(oldpwd);

@@ -43,7 +43,7 @@ HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down'
 % Checking MATLAB version
 tmpvers = version;
 indp = find(tmpvers == '.');
-if str2num(tmpvers(indp(1)+1)) >= 1, tmpvers = [ tmpvers(1:indp(1)) '0' tmpvers(indp(1)+1:end) ]; end;
+if str2num(tmpvers(indp(1)+1)) >= 1, tmpvers = [ tmpvers(1:indp(1)) '0' tmpvers(indp(1)+1:end) ]; end
 indp = find(tmpvers == '.');
 VERS = str2num(tmpvers(1:indp(2)-1));                            
 
@@ -87,8 +87,8 @@ elseif VERS >= 8.04
           W_MAIN = findobj('tag', 'EEGLAB');
           if isempty(W_MAIN)
             disp('Mac OSX retina display detected. If this is not desired comment out line 83 of icadefs.m');
-          end;
-        end;
+          end
+        end
         
         % AXES FONTSIZE
         if retinaDisplay
@@ -135,7 +135,7 @@ elseif VERS >= 8.04
         TEXT_FONTSIZE_S = TEXT_FONTSIZE - 2; % Miscellaneous font sizes Small
         TEXT_FONTSIZE_L = TEXT_FONTSIZE + 4; % Miscellaneous font sizes Large
     end
-end;
+end
 
 clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
 
@@ -164,7 +164,7 @@ try
     set(0,'DefaultUicontrolFontSize',GUI_FONTSIZE);
 catch
     % most likely Octave here
-end;
+end
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/wiki/EEGLAB'; % online version
 DEFAULT_SRATE = 256.0175;      % default local sampling rate (rarely used)
@@ -176,8 +176,8 @@ lowscreendepth = 0;
 if ~exist('OCTAVE_VERSION')
     if get(0, 'screendepth') <=8 % if mono or 8-bit color
 	lowscreendepth = 1; 
-    end;
-end;
+    end
+end
 if lowscreendepth    
     %fprintf('icadefs(): Setting display parameters for mono or 8-bit color\n');
     BACKCOLOR           = [1 1 1];    % Background figure color 
@@ -196,7 +196,7 @@ else % if full color screen
     GUIBACKCOLOR        = BACKEEGLABCOLOR;% EEGLAB GUI background color <---------
     GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
     PLUGINMENUCOLOR     = [.5 0 .5];      % plugin menu color
-end;
+end
 
 
 % THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS

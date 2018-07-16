@@ -46,8 +46,8 @@ if ismatlab
     if license('test','optim_toolbox')
         p = fileparts(which('fmins'));
         error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
-    end;
-end;
+    end
+end
 
 x0 = x(:);  % Work with column vector internally.
 n = length(x0);

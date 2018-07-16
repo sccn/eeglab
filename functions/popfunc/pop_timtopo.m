@@ -57,7 +57,7 @@ if nargin < 3
 	                 ['ERP data and scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ], ...
 			         ''  };
 	result       = inputdlg2( promptstr, 'ERP data and scalp maps -- pop_timtopo()', 1, inistr, 'pop_timtopo');
-	if size(result,1) == 0 return; end;
+	if size(result,1) == 0 return; end
 	timerange    = eval( [ '[' result{1} ']' ] );
 	topotime     = eval( [ '[' result{2} ']' ] );
 	plottitle    = result{3};
@@ -70,17 +70,17 @@ else
 			options = [ options ', ''' varargin{i} '''' ];
 		else
 			options = [ options ', [' num2str(varargin{i}) ']' ];
-		end;
+		end
 	end;	
-end;
-try, icadefs; set(gcf, 'color', BACKCOLOR, 'Name', ' timtopo()'); catch, end;
+end
+try, icadefs; set(gcf, 'color', BACKCOLOR, 'Name', ' timtopo()'); catch, end
 
 if exist('plottitle') ~= 1
     plottitle = ['ERP data and scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ];
-end;
+end
     
 if ~isempty(EEG.chanlocs)
-    if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
+    if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end
 	SIGTMP = reshape(EEG.data, size(EEG.data,1), EEG.pnts, EEG.trials);
 	posi = round( (timerange(1)/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
 	posf = round( (timerange(2)/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
@@ -95,7 +95,7 @@ if ~isempty(EEG.chanlocs)
 else
 	fprintf('Cannot make plot without channel locations\n');
 	return;
-end;
+end
 return;
 
 		

@@ -23,9 +23,9 @@ function s = ndims(a)
     if ~strcmpi(a.fileformat, 'transposed')
         if a.data.Format{2}(3) == 1, s = 2;
         else                         s = 3;
-        end;
+        end
     else
         if a.data.Format{2}(2) == 1, s = 2;
         else                         s = 3;
-        end;
-    end;
+        end
+    end

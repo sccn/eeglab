@@ -41,10 +41,10 @@ if nargin < 1
 end;   
 if isempty(ALLEEG)
     error('pop_compareerps: cannot process empty sets of data');
-end;
+end
 if exist('plottitle') ~= 1
 	plottitle = '';
-end;
+end
 if nargin < 2
    % which set to save
 	% -----------------
@@ -53,21 +53,21 @@ if nargin < 2
 	                 'Plot title ([]=automatic):' };
 	inistr       = { '1' '' '' };
 	result       = inputdlg2( promptstr, 'Compare dataset ERPs -- pop_compareerps()', 1,  inistr, 'pop_compareerps');
-	if length(result) == 0 return; end;
+	if length(result) == 0 return; end
 	setlist   	 = eval( [ '[' result{1} ']' ] );
 	chansubset   = eval( [ '[' result{2} ']' ] );
-	if isempty( chansubset ), chansubset = 1:ALLEEG(setlist(1)).nbchan; end;
+	if isempty( chansubset ), chansubset = 1:ALLEEG(setlist(1)).nbchan; end
 	plottitle    = result{3};
     if isempty(plottitle)
         plottitle = [ 'Compare datasets number (blue=first; red=sec.)' int2str(setlist) ];
-    end;
+    end
     figure;
-end;
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+end
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 tracing = [];
 for setindex = setlist
 	tracing  = [ tracing squeeze(mean(ALLEEG(setindex).data,3))];
-end;
+end
 
 % save channel names
 % ------------------

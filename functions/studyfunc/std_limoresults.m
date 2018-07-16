@@ -45,7 +45,7 @@ function std_limoresults(STUDY,varargin)
 if nargin < 1
     help std_limoresults;
     return;
-end;
+end
 measure_list = {'daterp', 'datspec', 'icaerp', 'icaspec'};
 opt = finputcheck(varargin, { 'plottype'       'integer'   [1 2 3]              []     ;
                               'flagdata'       'integer'   [1,0]                ''     ;
@@ -56,18 +56,18 @@ opt = finputcheck(varargin, { 'plottype'       'integer'   [1 2 3]              
                               'chanindx'       'integer'   []                   []      ;
                               'regressor'      'cell'      []                   {};
                               'stats'          'cell'      { }                  {}}, 'std_limoresults');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 % Stats
 for i = 1:2:numel(opt.stats)
     handles.(opt.stats{i}) = opt.stats{i+1};
 end
 
-try handles.p         ; catch, handles.p         = 0.05; end;
-try handles.MCC       ; catch, handles.MCC       = 1;    end;
-try handles.dir       ; catch, handles.dir       = pwd;  end;
-try handles.bootstrap ; catch, handles.bootstrap = 0;    end;
-try handles.tfce      ; catch, handles.tfce      = 0;    end;
+try handles.p         ; catch, handles.p         = 0.05; end
+try handles.MCC       ; catch, handles.MCC       = 1;    end
+try handles.dir       ; catch, handles.dir       = pwd;  end
+try handles.bootstrap ; catch, handles.bootstrap = 0;    end
+try handles.tfce      ; catch, handles.tfce      = 0;    end
 
 % Limo indx
 limostruct_indx = find(~cellfun(@isempty,strfind({STUDY.design(STUDY.currentdesign).limo.datatype},opt.measure)));

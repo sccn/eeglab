@@ -54,7 +54,7 @@ com = '';
 if nargin < 1 
     help pop_export;
     return;
-end;
+end
 
 if nargin < 2
     commandload = [ '[filename, filepath] = uiputfile(''*'', ''Select a text file'');' ...
@@ -84,24 +84,24 @@ if nargin < 2
    bcheck = [1.7 0.25 0.7 0.6];
    uigeom = { [1 2 0.5] bcheck bcheck bcheck bcheck bcheck [3 0.7 0.8 0.6] [3 2 0.05 0.05] };
    result = inputgui( uigeom, uilist, 'pophelp(''pop_export'');', 'Export data - pop_export()' );
-   if length( result ) == 0 return; end;
+   if length( result ) == 0 return; end
    
    % decode options
    % --------------
-   if isempty(result{1}), error('File name required'); end;
+   if isempty(result{1}), error('File name required'); end
    filename = result{1};
    options = {};
    if result{2},  options = { options{:} 'ica' 'on' }; end; 
    if result{3},  options = { options{:} 'erp' 'on' }; end; 
    if result{4},  options = { options{:} 'transpose' 'on' }; end; 
-   if ~result{5}, options = { options{:} 'elec' 'off' }; end;
-   if ~result{6}, options = { options{:} 'time' 'off' }; end;
-   if ~strcmpi(result{7}, '1E-3'), options = { options{:} 'timeunit' eval(result{7}) }; end;
-   if ~strcmpi(result{8}, '7'),    options = { options{:} 'precision' eval(result{8}) }; end;
-   if ~isempty(result{9}), options = { options{:} 'expr' result{9} }; end;
+   if ~result{5}, options = { options{:} 'elec' 'off' }; end
+   if ~result{6}, options = { options{:} 'time' 'off' }; end
+   if ~strcmpi(result{7}, '1E-3'), options = { options{:} 'timeunit' eval(result{7}) }; end
+   if ~strcmpi(result{8}, '7'),    options = { options{:} 'precision' eval(result{8}) }; end
+   if ~isempty(result{9}), options = { options{:} 'expr' result{9} }; end
 else
     options = varargin;
-end;
+end
 
 % test inputs
 % -----------
@@ -114,7 +114,7 @@ g = finputcheck(options, { ...
     'erp'       'string'    { 'on';'off' }     'off';
     'precision' 'integer'   [0 Inf]            7;
     'expr'      'string'    []                 '' }, 'pop_export');
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % select data
 % ----------
@@ -125,10 +125,10 @@ if strcmpi(g.ica, 'on');
 	else
         x = EEG.icaweights*EEG.icasphere*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
         x = reshape(x, size(x,1), EEG.pnts, EEG.trials);
-    end;
+    end
 else
     x = EEG.data;
-end;
+end
 
 % select erp
 % ----------
@@ -136,13 +136,13 @@ if strcmpi(g.erp, 'on');
     x = mean(x, 3);
 else 
     x = reshape(x, size(x,1), size(x,2)*size(x,3));
-end;
+end
 
 % write data
 % ----------
 if ~isempty(g.expr)
     eval([ g.expr ';' ]);
-end;
+end
 
 % add time axis
 % -------------
@@ -165,21 +165,21 @@ if strcmpi(g.transpose, 'on');
     for index = 1:size(x,1)
         if strcmpi(g.time, 'on'), tmpind = index-1;
         else                      tmpind = index;
-        end;
+        end
         if strcmpi(g.elec, 'on') 
             if tmpind > 0
                 if ~isempty(EEG.chanlocs) & ~strcmpi(g.ica, 'on')
                     fprintf(fid, '%s\t', EEG.chanlocs(tmpind).labels);
                 else fprintf(fid, '%d\t', tmpind);
-                end;
+                end
             else 
                 fprintf(fid, ' \t');
-            end;
-        end;
+            end
+        end
         strprintf = [ strprintf '%.' num2str(g.precision) 'f\t' ];
-    end;
+    end
     strprintf(end) = 'n';
-    if strcmpi(g.elec, 'on'), fprintf(fid, '\n'); end;
+    if strcmpi(g.elec, 'on'), fprintf(fid, '\n'); end
     fprintf(fid, strprintf, x);    
 else 
     % writing electrodes
@@ -187,21 +187,21 @@ else
     for index = 1:size(x,1)
         if strcmpi(g.time, 'on'), tmpind = index-1;
         else                      tmpind = index;
-        end;
+        end
         if strcmpi(g.elec, 'on') 
             if tmpind > 0
                 if ~isempty(EEG.chanlocs) & ~strcmpi(g.ica, 'on')
                     fprintf(fid,'%s\t', EEG.chanlocs(tmpind).labels);
                 else fprintf(fid,'%d\t', tmpind);
-                end;
+                end
             else 
                 fprintf(fid, ' \t');
-            end;
-        end;
+            end
+        end
         fprintf(fid,[ '%.' num2str(g.precision) 'f\t' ], x(index, :));
         fprintf(fid, '\n');
-    end;
-end;
+    end
+end
 fclose(fid);
 
 com = sprintf('pop_export(EEG,%s);', vararg2str({ filename, options{:} })); 

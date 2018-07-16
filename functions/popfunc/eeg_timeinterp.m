@@ -46,14 +46,14 @@ function EEG = eeg_timeinterp( EEG, samples, varargin);
     if nargin < 2
         help eeg_timeinterp;
         return;
-    end;
+    end
     
     opt = finputcheck(varargin, { 'epochinds'   'integer'   []       [1:EEG.trials]; ...
                                   'interpwin'   'integer'   []       5; ...
                                   'elecinds'    'integer'   []       [1:EEG.nbchan]; ...
                                   'epochcont'   'string'    { 'on';'off' }  'off' }, 'eeg_timeinterp');
 
-    if ischar(opt), error(opt); end;
+    if ischar(opt), error(opt); end
     
     srange = samples(2)-samples(1);
     data   = EEG.data;
@@ -62,7 +62,7 @@ function EEG = eeg_timeinterp( EEG, samples, varargin);
     if strcmpi(opt.epochcont, 'on')
         data(:,end+1:end+srange*opt.interpwin,1:end-1) = data(:,1:srange*opt.interpwin,2:end);
         pnts = pnts + srange*opt.interpwin;
-    end;
+    end
     
     % determine region to interpolate
     % and region to use for interpolation
@@ -70,14 +70,14 @@ function EEG = eeg_timeinterp( EEG, samples, varargin);
     samplesin  = [min(samples(1)-srange*opt.interpwin,1):samples(1)-1 samples(2)+1:min(samples(2)+srange*opt.interpwin, pnts)];
     samplesout = [samples(1):samples(2)];
     
-    if length(opt.epochinds) > 1, fprintf('Trials:'); end;
+    if length(opt.epochinds) > 1, fprintf('Trials:'); end
     for index = opt.epochinds
         for elec = opt.elecinds
             EEG.data(elec,samplesout,index) = spline( samplesin, data(elec, samplesin, index), samplesout);
-        end;
+        end
         if length(opt.epochinds) > 1, 
             fprintf('.'); 
-            if mod(index,40) == 01, fprintf('\n'); end;
-        end;
-    end;
-    if length(opt.epochinds) > 1, fprintf('\n'); end;
+            if mod(index,40) == 01, fprintf('\n'); end
+        end
+    end
+    if length(opt.epochinds) > 1, fprintf('\n'); end

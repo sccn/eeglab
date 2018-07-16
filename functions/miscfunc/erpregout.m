@@ -47,19 +47,19 @@ function [data, erp, factors] = erpregout(data, tlim, reglim);
     if nargin < 1
         help erpregout;
         return;
-    end;
+    end
     if nargin < 2
         tlim = [0 1];
-    end;
+    end
     if nargin < 3
         reglim = tlim;
-    end;
+    end
     if ndims(data) == 2
         data = reshape(data, 1, size(data,1), size(data,2));
         redim = 1;
     else
         redim = 0;
-    end;
+    end
     
     % find closest points
     % -------------------
@@ -73,15 +73,15 @@ function [data, erp, factors] = erpregout(data, tlim, reglim);
     for chan = 1:size(data,1)
         fprintf('Channel %d (trials out of %d):', chan, size(data,3));
         for trial = 1:size(data,3)
-            if ~mod(trial, 10) , fprintf('%d ', trial); end;
-            if ~mod(trial, 200), fprintf('\n', trial); end;
+            if ~mod(trial, 10) , fprintf('%d ', trial); end
+            if ~mod(trial, 200), fprintf('\n', trial); end
             [factors(chan, trial) tmpf exitflag] = fminbnd('erpregoutfunc', 0, 10, [], ...
                                    data(chan, begpoint:endpoint, trial), erp(chan, begpoint:endpoint));
             data(chan,:,trial) = data(chan,:,trial) - factors(chan, trial)*erp(chan, :);
-        end;
+        end
         fprintf('\n');
-    end;
+    end
     
     if redim
         data = squeeze(data);
-    end;
+    end

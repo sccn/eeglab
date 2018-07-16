@@ -62,7 +62,7 @@ function [EEG allrmchan specdata specfreqs com] = pop_rejchanspec(EEG, varargin)
 if nargin < 1
     help pop_rejchanspec;
     return;
-end;
+end
 allrmchan = [];
 specdata  = [];
 specfreqs = [];
@@ -88,27 +88,27 @@ if nargin < 2
     geom = { [2 1] [2 1] [2 1] [2 1] [2 0.3 0.7] [2 0.3 0.7] [2 0.3 0.7] };
     result = inputgui( 'uilist', uilist, 'geometry', geom, 'title', 'Reject channel using spectrum -- pop_rejchanspec()', ...
         'helpcom', 'pophelp(''pop_rejchan'')');
-    if isempty(result), return; end;
+    if isempty(result), return; end
     
     options = { 'elec' eval( [ '[' result{1} ']' ] ) 'stdthresh' str2num(result{3}) 'freqlims' str2num(result{2}) };
     if ~isempty(result{4})
         options = { options{:} 'absthresh' str2num(result{4}) };
-    end;
+    end
     if result{5}, 
          options = { options{:} 'averef', 'on' }; 
-    end;
+    end
     if result{6}, 
          options = { options{:} 'plothist', 'on' }; 
-    end;
+    end
     % Begin: Added by Romain on 22 July 2010
     if result{7}, 
          options = { options{:} 'plotchans', 'on' }; 
-    end;
+    end
     % End: Added by Romain on 22 July 2010
     
 else
     options = varargin;
-end;
+end
 
 % decode options
 % --------------
@@ -122,13 +122,13 @@ opt = finputcheck( options, { 'averef'    'string'    { 'on';'off' }       'off'
                               'specfreqs' 'real'   []                      [];
                               'absthresh' 'real'   []                      [];
                               'stdthresh' 'real'   []                      5 }, 'pop_rejchanspec');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 % compute average referecne if necessary
 if strcmpi(opt.averef, 'on')
      NEWEEG = pop_reref(EEG, [], 'exclude', setdiff([1:EEG.nbchan], opt.elec));
 else NEWEEG = EEG;
-end;
+end
 if isempty(opt.specdata)
     [tmpspecdata specfreqs] = pop_spectopo(NEWEEG, 1, [], 'EEG' , 'percent', 100, 'freqrange',[0 EEG.srate/2], 'plot', 'off');
     % add back 0 channels
@@ -139,15 +139,15 @@ if isempty(opt.specdata)
         specdata(goodchan,:) = tmpspecdata;
     else
         specdata = tmpspecdata;
-    end;
+    end
 else
     specdata  = opt.specdata;
     specfreqs = opt.specfreqs;
-end;
+end
 
 if size(opt.stdthresh,1) == 1 && size(opt.freqlims,1) > 1
     opt.stdthresh = ones(length(opt.stdthresh), size(opt.freqlims,1))*opt.stdthresh;  
-end;
+end
 
 allrmchan = [];
 for index = 1:size(opt.freqlims,1)
@@ -167,23 +167,23 @@ for index = 1:size(opt.freqlims,1)
         else 
             rmchan = find(selectedspec > m+s*opt.stdthresh(index));
         end
-    end;
+    end
     
     % print out results
     % -----------------
     if isempty(rmchan)
          textout = sprintf('Range %2.1f-%2.1f Hz: no channel removed\n',  opt.freqlims(index,1), opt.freqlims(index,2));
     else textout = sprintf('Range %2.1f-%2.1f Hz: channels %s removed\n', opt.freqlims(index,1), opt.freqlims(index,2), int2str(opt.elec(rmchan')));
-    end;
+    end
     fprintf(textout);
     if strcmpi(opt.verbose, 'on')
         for inde = 1:length(opt.elec)
             if ismember(inde, rmchan)
                  fprintf('Elec %s power: %1.2f *\n', EEG.chanlocs(opt.elec(inde)).labels, selectedspec(inde));
             else fprintf('Elec %s power: %1.2f\n', EEG.chanlocs(opt.elec(inde)).labels  , selectedspec(inde));
-            end;
-        end;
-    end;
+            end
+        end
+    end
     allrmchan = [ allrmchan rmchan' ];    
     
     % plot histogram
@@ -205,11 +205,11 @@ for index = 1:size(opt.freqlims,1)
                 threshold =  m+s*opt.stdthresh(index,1);
                 plot([threshold threshold], yl, 'r');
             end
-        end;
+        end
         title(textout);
-    end;
+    end
     
-end;
+end
 allrmchan = unique_bc(allrmchan);
 
 com = sprintf('EEG = pop_rejchan(EEG, %s);', vararg2str(options));
@@ -230,13 +230,13 @@ if strcmpi(opt.plotchans, 'on')
     tmpchanlocs = EEG.chanlocs;
     if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { tmpchanlocs(opt.elec).labels }';
     else                       tmplocs = []; tmpelec = mattocell([1:EEG.nbchan]');
-    end;
+    end
     eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
         'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors, 'eloc_file', tmplocs, 'command', tmpcom);
 else
     EEG = pop_select(EEG, 'nochannel', opt.elec(allrmchan));
-end;
+end
 
 if nargin < 2
     allrmchan = sprintf('EEG = pop_rejchanspec(EEG, %s);', vararg2str(options));
-end;
+end

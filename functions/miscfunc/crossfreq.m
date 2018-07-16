@@ -150,12 +150,12 @@ function [crossfcoh, timesout1, freqs1, freqs2, cohboot, alltfX, alltfY] = ...
 if nargin < 1
     help crossfreq; 
     return; 
-end;
+end
 
 % deal with 3-D inputs
 % --------------------
-if ndims(X) == 3, X = reshape(X, size(X,2), size(X,3)); end;
-if ndims(Y) == 3, Y = reshape(Y, size(Y,2), size(Y,3)); end;
+if ndims(X) == 3, X = reshape(X, size(X,2), size(X,3)); end
+if ndims(Y) == 3, Y = reshape(Y, size(Y,2), size(Y,3)); end
 frame = size(X,2);
 
 g = finputcheck(varargin, ...
@@ -187,12 +187,12 @@ g = finputcheck(varargin, ...
                   'wavelet2'      'real'     [0 Inf]                   [];
                   'winsize'       'integer'  [0 Inf]                   max(pow2(nextpow2(frame)-3),4) }, 'crossfreq');
 
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % more defaults
 % -------------
-if isempty(g.wavelet2), g.wavelet2 = g.wavelet; end;
-if isempty(g.freqs2),   g.freqs2   = g.freqs;   end;
+if isempty(g.wavelet2), g.wavelet2 = g.wavelet; end
+if isempty(g.freqs2),   g.freqs2   = g.freqs;   end
 
 % remove ERP if necessary
 % -----------------------
@@ -202,7 +202,7 @@ trials = size(X,2);
 if strcmpi(g.rmerp, 'on')
     X = X - repmat(mean(X,2), [1 trials]);
     Y = Y - repmat(mean(Y,2), [1 trials]);
-end;
+end
 
 % perform timefreq decomposition
 % ------------------------------
@@ -224,24 +224,24 @@ if ~isempty(g.subwin)
     alltfY    = alltfY(:, ind2, :);
     timesout1 = timesout1(ind1);
     timesout2 = timesout2(ind2);
-end;
+end
 if length(timesout1) ~= length(timesout2) | any( timesout1 ~= timesout2)
     disp('Warning: Time points are different for X and Y. Use ''timesout'' to specify common time points');
     disp('Searching for common points');
     [vals ind1 ind2 ] = intersect_bc(timesout1, timesout2);
-    if length(vals) < 10, error('Less than 10 common data points'); end;
+    if length(vals) < 10, error('Less than 10 common data points'); end
     timesout1 = vals;
     timesout2 = vals;
     alltfX = alltfX(:, ind1, :);
     alltfY = alltfY(:, ind2, :);
-end;
+end
 
 % scan accross frequency and time
 % -------------------------------
 if isempty(g.alpha)
     disp('Warning: if significance mask is not applied, result might be slightly')
     disp('different (since angle is not made uniform and amplitude interpolated)')
-end;
+end
 
 cohboot =[];
 for find1 = 1:length(freqs1)
@@ -270,11 +270,11 @@ for find1 = 1:length(freqs1)
                 else
                     tmp = corrcoef( cos(tmpalltfy), tmpalltfx);
                     crossfcoh(find1,find2,ti) = tmp(2);
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end
 
     
 

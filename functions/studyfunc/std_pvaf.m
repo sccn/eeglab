@@ -48,13 +48,13 @@ function [pvafAve pvafs] = std_pvaf(STUDY, ALLEEG, cluster, varargin);
 if nargin < 3
     help std_pvaf;
     return;
-end;
+end
 
 [opt addOptions] = finputcheck(varargin, { 'design'  'integer'   []   STUDY.currentdesign; 
                                            'rmclust' 'integer'   []   []; 
                                            'interp'  'struct'    { }   struct([]);
                                            'rmcomps' 'cell'      []    cell(1,length(ALLEEG)) }, 'std_pvaf', 'ignore');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 DES = STUDY.design(opt.design);
 for iCell = 1:length(DES.cell)
@@ -65,8 +65,8 @@ for iCell = 1:length(DES.cell)
          pvafs(iCell) = eeg_pvaf(EEG, [1:size(EEG.icaweights,1)], addOptions{:});
          %pvafs(iCell) = eeg_pvaf(EEG, complist, 'artcomps', rmlistcomp, addOptions{:});
     else pvafs(iCell) = NaN;
-    end;
-end;
+    end
+end
 pvafAve = nan_mean(pvafs);
 
     

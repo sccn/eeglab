@@ -119,14 +119,14 @@ function [m_raw pvals indexout] = pac_cont(X, Y, srate, varargin);
 if nargin < 1
     help pac_cont;
     return;
-end;
+end
 
 % deal with 3-D inputs
 % --------------------
-if ndims(X) == 3 || ndims(Y) == 3, error('Cannot process 3-D input'); end;
-if size(X,1) > 1, X = X'; end;
-if size(Y,1) > 1, Y = Y'; end;
-if size(X,1) ~= 1 || size(Y,1) ~= 1, error('Cannot only process vector input'); end;
+if ndims(X) == 3 || ndims(Y) == 3, error('Cannot process 3-D input'); end
+if size(X,1) > 1, X = X'; end
+if size(Y,1) > 1, Y = Y'; end
+if size(X,1) ~= 1 || size(Y,1) ~= 1, error('Cannot only process vector input'); end
 frame = size(X,2);
 pvals = [];
 
@@ -153,16 +153,16 @@ g = finputcheck(varargin, ...
     'vert'          'real'     []                    [];
     'winsize'       'integer'  [0 Inf]                   max(pow2(nextpow2(frame)-3),4) }, 'pac');
 
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 if ~isempty(g.filterphase)
      x_freqphase = feval(g.filterphase, X(:)');
 else x_freqphase = feval(g.filterfunc, X(:)', srate, g.freqphase(1), g.freqphase(end));
-end;
+end
 if ~isempty(g.filteramp)
      x_freqamp   = feval(g.filteramp, Y(:)');
 else x_freqamp   = feval(g.filterfunc, Y(:)', srate, g.freqamp(  1), g.freqamp( end));
-end;
+end
 z_phasedata = hilbert(x_freqphase);
 z_ampdata   = hilbert(x_freqamp);
 phase       = angle(z_phasedata);
@@ -180,7 +180,7 @@ g.causal  = 'off';
 if ~isempty(g.alpha)
     m_raw = zeros(1,length(indexout));
     pvals = zeros(1,length(indexout));
-end;
+end
 fprintf('Computing PAC:\n');
 for iWin = 1:length(indexout)
     x_phaseEpoch = x_freqphase(indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
@@ -204,13 +204,13 @@ for iWin = 1:length(indexout)
         
         if iWin == 145
             %dsfsd; 
-        end;
+        end
         
         %amplitude_filt = sgolayfilt(amplitude, 3, 101);
         if ~isempty(g.filterphase)
              amplitude_filt = feval(g.filterphase, z_ampEpoch);
         else amplitude_filt = feval(g.filterfunc , z_ampEpoch, srate, g.freqphase(1), g.freqphase(end));
-        end;
+        end
         z_amplitude_filt = hilbert(amplitude_filt);
         
         phase_amp_modulation = angle(z_amplitude_filt);
@@ -224,7 +224,7 @@ for iWin = 1:length(indexout)
             x = X(indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
             hold on; plot(x, 'g');
             dsfsd;
-        end;
+        end
         [r_ESC pval_corr] = corrcoef(x_phaseEpoch, abs(z_ampEpoch));
         m_raw(iWin)   = r_ESC(1,2);
         pvals(iWin)   = pval_corr(1,2);
@@ -236,7 +236,7 @@ for iWin = 1:length(indexout)
         pvals(iWin)   = stats.p(2,1);
         m_raw(iWin)   = b(1);
         
-    end;
+    end
     
     %% compute statistics (instantaneous)
     % -----------------------------------
@@ -248,7 +248,7 @@ for iWin = 1:length(indexout)
         maxskip=numpoints-srate; % max variation half a second
         if maxskip < 1
             error('Window size shorter than 1 second; too short for computing surrogate data');
-        end;
+        end
         skip=ceil(numpoints.*rand(numsurrogate*4,1));
         skip(skip>maxskip)=[];
         skip(skip<minskip)=[];
@@ -282,11 +282,11 @@ for iWin = 1:length(indexout)
                 figure;
                 plot(-log10(pvals));
                 hold on; plot(-log10(pvals2), 'r');
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
-end;
+end
 fprintf('\n');
 
 % Computes alpha
@@ -294,7 +294,7 @@ fprintf('\n');
 if ~isempty(g.alpha) && strcmpi(g.instantstat, 'off')
     if isempty(g.baseline)
         g.baseline = [ timesout1(1) timesout1(end) ];
-    end;
+    end
     baselineInd = find(timesout1 >= g.baseline(1) & timesout1 <= g.baseline(end));
     
     m_raw_base = abs(m_raw(baselineInd));
@@ -302,29 +302,29 @@ if ~isempty(g.alpha) && strcmpi(g.instantstat, 'off')
     if strcmpi(g.statlim, 'surrogate')
         for index = 1:length(m_raw)
             pvals(index) = stat_surrogate_pvals(m_raw_base, m_raw(index), 'upper');
-        end;
+        end
     else
         [surrogate_mean,surrogate_std]=normfit(m_raw_base);
         m_norm_length=(abs(m_raw)-surrogate_mean)/surrogate_std;
         pvals = normcdf(0, m_norm_length, 1);
-    end;
+    end
     if strcmpi(g.mcorrect, 'fdr')
         pvals = fdr(pvals);
-    end;
-end;
+    end
+end
 
 %% plot results
 % -------------
 if strcmpi(g.nofig, 'on')
     return
-end;
+end
 if strcmpi(g.newfig, 'on')
     figure;
-end;
+end
 if ~isempty(g.alpha)
     plotcurve(timesout1, m_raw, 'maskarray', pvals < g.alpha);
 else plotcurve(timesout1, m_raw);
-end;
+end
 xlabel('Time (ms)');
 ylabel('PAC (0 to 1)');
 title(g.title);
@@ -336,8 +336,8 @@ if ~isempty(g.vert)
     yl = ylim;
     for index = 1:length(g.vert)
         plot([g.vert(index) g.vert(index)], yl, 'g');
-    end;
-end;
+    end
+end
 
 % -------------
 % gettime function identical to timefreq function
@@ -355,7 +355,7 @@ if isempty(timevar) % no pre-defined time points
             ntimevar = frames-winsize;
             if ntimevar < 0
                 error('Not enough data points, reduce the window size or lowest frequency');
-            end;
+            end
             verboseprintf(verbose, ['Value of ''timesout'' must be <= frame-winsize, ''timesout'' adjusted to ' int2str(ntimevar) '\n']);
         end
         npoints = ntimevar(1);
@@ -363,7 +363,7 @@ if isempty(timevar) % no pre-defined time points
         if strcmpi(causal, 'on')
              timevals = linspace(tlimits(1)+2*wintime, tlimits(2), npoints);
         else timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
-        end;
+        end
         verboseprintf(verbose, 'Generating %d time points (%1.1f to %1.1f ms)\n', npoints, min(timevals), max(timevals));
     else
         % subsample data
@@ -372,10 +372,10 @@ if isempty(timevar) % no pre-defined time points
         if strcmpi(causal, 'on')
             timeindices = [ceil(winsize+nsub):nsub:length(timevect)];
         else timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
-        end;
+        end
         timevals    = timevect( timeindices ); % the conversion at line 741 leaves timeindices unchanged
         verboseprintf(verbose, 'Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
-    end;
+    end
 else
     timevals = timevar;
     % check boundaries
@@ -384,18 +384,18 @@ else
     if strcmpi(causal, 'on')
          tmpind  = find( (timevals >= tlimits(1)+2*wintime-0.0001) & (timevals <= tlimits(2)) );
     else tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) );
-    end;
+    end
     % 0.0001 account for numerical innacuracies on opteron computers
     if isempty(tmpind)
         error('No time points. Reduce time window or minimum frequency.');
-    end;
+    end
     if  length(timevals) ~= length(tmpind)
         verboseprintf(verbose, 'Warning: %d out of %d time values were removed (now %3.2f to %3.2f ms) so the lowest\n', ...
             length(timevals)-length(tmpind), length(timevals), timevals(tmpind(1)), timevals(tmpind(end)));
         verboseprintf(verbose, '         frequency could be computed with the requested accuracy\n');
-    end;
+    end
     timevals = timevals(tmpind);
-end;
+end
 
 % find closet points in data
 % --------------------------
@@ -403,17 +403,17 @@ timeindices = round(eeg_lat2point(timevals, 1, srate, tlimits, 1E-3));
 if length(timeindices) < length(unique(timeindices))
     timeindices = unique_bc(timeindices)
     verboseprintf(verbose, 'Warning: duplicate times, reduce the number of output times\n');
-end;
+end
 if length(unique(timeindices(2:end)-timeindices(1:end-1))) > 1
     verboseprintf(verbose, 'Finding closest points for time variable\n');
     verboseprintf(verbose, 'Time values for time/freq decomposition is not perfectly uniformly distributed\n');
 else
     verboseprintf(verbose, 'Distribution of data point for time/freq decomposition is perfectly uniform\n');
-end;
+end
 timevals    = timevect(timeindices);
 
 function verboseprintf(verbose, varargin)
 if strcmpi(verbose, 'on')
     fprintf(varargin{:});
-end;
+end
 

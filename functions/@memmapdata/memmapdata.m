@@ -34,8 +34,8 @@ function dataout = memmapdata(data, datadims);
         if length(data) > 3
             if strcmpi('.dat', data(end-3:end))
                 dataout.fileformat = 'transposed';
-            end;
-        end;
+            end
+        end
         
         % check that the file is not empty
         % --------------------------------
@@ -44,15 +44,15 @@ function dataout = memmapdata(data, datadims);
             error([ 'Data file ''' data '''not found' ]);
         elseif a(1).bytes == 0
             error([ 'Empty data file ''' data '''' ]);
-        end;
+        end
         
         if ~strcmpi(dataout.fileformat, 'transposed')
             dataout.data = memmapfile(data, 'writable', false, 'format', { 'single' datadims 'x' });
         else
             dataout.data = memmapfile(data, 'writable', false, 'format', { 'single' [ datadims(2:end) datadims(1) ] 'x' });            
-        end;
+        end
         dataout = class(dataout,'memmapdata');
     else 
         dataout = data;
-    end;
+    end
 

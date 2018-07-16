@@ -37,7 +37,7 @@ function [ probaMap, sortbox ] = realproba( data, bins );
 if nargin < 1
 	help realproba;
 	return;
-end;
+end
 if nargin < 2
 	bins = round(size(data,1)*size(data,2)/5);
 end;	
@@ -50,10 +50,10 @@ if bins > 0
 	minimum =  min(data(:));
 	maximum =  max(data(:));
 	data = floor((data - minimum )/(maximum - minimum)*(bins-1))+1;
-    if any(any(isnan(data))), warning('Binning failed - could be due to zeroed out channel'); end;
+    if any(any(isnan(data))), warning('Binning failed - could be due to zeroed out channel'); end
 	for index=1:SIZE
 		sortbox(data(index)) = sortbox(data(index))+1;
-	end;
+	end
 	probaMap = sortbox(data) / SIZE;
 	sortbox  = sortbox / SIZE;
 else
@@ -63,5 +63,5 @@ else
 	probaMap = exp(-0.5*( data.*data ))/(2*pi);
 	probaMap = probaMap/sum(probaMap); % because the total surface under a normalized Gaussian is 2
 	sortbox  = probaMap/sum(probaMap);
-end;
+end
 return;

@@ -45,8 +45,8 @@ if ~ischar(varargin{1}) %intial settings
     if nargin > 2
         if strcmpi(varargin{3}, 'components')
             comps = true;
-        end;
-    end;
+        end
+    end
     
     if isempty(ALLEEG)
         error('STUDY contains no datasets');
@@ -76,7 +76,7 @@ if ~ischar(varargin{1}) %intial settings
     if comps == true
         str_name       = sprintf('Pre-compute component measures for STUDY ''%s'' - ''%s''', ...
                          STUDY.name, STUDY.design(STUDY.currentdesign).name);
-        if length(str_name) > 80, str_name = [ str_name(1:80) '...' ]; end;
+        if length(str_name) > 80, str_name = [ str_name(1:80) '...' ]; end
         guiadd1 = { {'style' 'checkbox'   'string' '' 'tag' 'compallersp' 'value' 1 }  ...
                     {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP only for components selected by RV (set) or for all components (unset)' } };
         guiadd2 = { {'style' 'checkbox'   'string' '' 'tag' 'scalp_on' 'value' 0 }  ...
@@ -86,7 +86,7 @@ if ~ischar(varargin{1}) %intial settings
         geomadd2     = { geomline };
     else
         str_name       = sprintf('Pre-compute channel measures for STUDY ''%s''', STUDY.name);
-        if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
+        if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end
         guiadd1  = { {'style' 'checkbox'   'string' '' 'tag' 'interpolate_on' 'value' 1 'callback' warninterp }  ...
             {'style' 'text'       'string' 'Spherical interpolation of missing channels (performed after optional ICA removal below)' } ...
             {'style' 'checkbox'   'string' ' ' 'tag' 'rmica1_on' 'value' 0 'callback' cb_ica1 }  ...
@@ -98,7 +98,7 @@ if ~ischar(varargin{1}) %intial settings
         geomadd1 = { geomline geomline [0.35 4 2] }; 
         geomvertadd1 = [ 1 1 2 ];
         geomadd2 = { };
-    end;
+    end
             
     gui_spec = { ...
     {'style' 'text'       'string' str_name 'FontWeight' 'Bold' 'horizontalalignment' 'left'}, {},...
@@ -142,9 +142,9 @@ if ~ischar(varargin{1}) %intial settings
         tmpchanlocs = ALLEEG(index).chanlocs;
         tmpchans = { tmpchanlocs.labels };
         allchans = unique_bc({ allchans{:} tmpchanlocs.labels });
-        if length(allchans) == length(tmpchans), keepindex = index; end;
-    end;
-    if keepindex, tmpchanlocs = ALLEEG(keepindex).chanlocs; allchans = { tmpchanlocs.labels }; end;
+        if length(allchans) == length(tmpchans), keepindex = index; end
+    end
+    if keepindex, tmpchanlocs = ALLEEG(keepindex).chanlocs; allchans = { tmpchanlocs.labels }; end
     
     chanlist = {};
     firsttimeersp = 1;
@@ -157,7 +157,7 @@ if ~ischar(varargin{1}) %intial settings
                                                       'helpcom', ' pophelp(''std_precomp'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_precomp()', ...
                                                       'userdata', fig_arg);	
-	if isempty(precomp_param), return; end;
+	if isempty(precomp_param), return; end
     
     if comps == 1
         options = { STUDY ALLEEG 'components' };
@@ -165,9 +165,9 @@ if ~ischar(varargin{1}) %intial settings
         options = { STUDY ALLEEG userdat2{4} };
     end
     options = { options{:} 'savetrials' 'on' }; % always save single trials
-    if ~isfield(os, 'interpolate_on'), os.interpolate_on = 0; end;
-    if ~isfield(os, 'scalp_on'),    os.scalp_on = 0; end;
-    if ~isfield(os, 'compallersp'), os.compallersp = 1; end;
+    if ~isfield(os, 'interpolate_on'), os.interpolate_on = 0; end
+    if ~isfield(os, 'scalp_on'),    os.scalp_on = 0; end
+    if ~isfield(os, 'compallersp'), os.compallersp = 1; end
     warnflag = 0;
     
     % rm_ica option is on
@@ -176,7 +176,7 @@ if ~ischar(varargin{1}) %intial settings
         if os.rmica1_on == 1 
             options = { options{:} 'rmicacomps' 'on' };
         end
-    end;
+    end
     
     % remove ICA cluster
     % ------------------
@@ -184,7 +184,7 @@ if ~ischar(varargin{1}) %intial settings
         if os.rmica2_on == 1 
             options = { options{:} 'rmclust' os.rmica2_val };
         end
-    end;
+    end
     
     % interpolate option is on
     % ------------------------
@@ -249,7 +249,7 @@ if ~ischar(varargin{1}) %intial settings
     if os.itc_on  == 1 
         tmpparams = eval( [ '{' os.ersp_params '}' ] );
         options = { options{:} 'itc' 'on' };
-        if os.ersp_on  == 0, options = { options{:} 'erspparams' tmpparams }; end;
+        if os.ersp_on  == 0, options = { options{:} 'erspparams' tmpparams }; end
         warnflag = checkFilePresent(STUDY, 'itc', comps, warnflag, os.recomp_on);
     end       
         
@@ -258,7 +258,7 @@ if ~ischar(varargin{1}) %intial settings
     if length(options) == 4
         warndlg2('No measure selected: aborting.'); 
         return; 
-    end;
+    end
     [STUDY ALLEEG] = std_precomp(options{:});
     com = sprintf('[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
     
@@ -278,7 +278,7 @@ else
             if ~isempty(tmp)
                 set(findobj('parent', hdl, 'tag', 'chans'), 'string', tmp2);
                 userdat{4} = tmp3;
-            end;
+            end
             set(hdl, 'userdata',userdat); 
      
         case 'chaneditbox'
@@ -302,7 +302,7 @@ else
             if firsttimeersp
                 warndlg2(strvcat('Checking both ''ERSP'' and ''ITC'' does not require further', ...
                                  'computing time. However it requires disk space'));
-            end;
+            end
             
         case 'setspec'
             set_spec = get(findobj('parent', hdl, 'tag', 'spectra_on'), 'value'); 
@@ -356,7 +356,7 @@ else
                                                          'after computation'));
                 icadefs;
                 set(gcf, 'color', BACKCOLOR);
-            %catch, warndlg2('Error while calling function, check parameters'); end;
+            %catch, warndlg2('Error while calling function, check parameters'); end
 
         case 'testersp'
             try,
@@ -364,7 +364,7 @@ else
                 tmpstruct = struct(ersp_params{:});
                 [ tmpX, tmpt, tmpf, ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'parallel', 'off', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
                 std_plottf(tmpt, tmpf, { tmpX });
-            catch, warndlg2('Error while calling function, check syntax'); end;
+            catch, warndlg2('Error while calling function, check syntax'); end
                 
         case 'testerpimage'
             % THIS CODE IS NOT FUNCTIONAL ANY MORE
@@ -385,9 +385,9 @@ else
                 axis off;  
                 icadefs;
                 set(gcf, 'color', BACKCOLOR);
-            catch, warndlg2('Error while calling function, check parameters'); end;
+            catch, warndlg2('Error while calling function, check parameters'); end
                 
-    end;
+    end
 end
 STUDY.saved = 'no';
 
@@ -395,14 +395,14 @@ STUDY.saved = 'no';
 % ------------------------
 function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute);
     
-    if ~recompute, return; end;
+    if ~recompute, return; end
     if warnflag, return; end; % warning has already been issued
     
     oneSubject = STUDY.design(STUDY.currentdesign).cases.value{1};
     if comps
          dataFilename = [ oneSubject '.ica' datatype ];
     else dataFilename = [ oneSubject '.dat' datatype ];
-    end;
+    end
     allSubjects = { STUDY.datasetinfo.subject };
     inds = strmatch( oneSubject, allSubjects, 'exact');
     filepath = STUDY.datasetinfo(inds(1)).filepath;
@@ -414,8 +414,8 @@ function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute
         res = questdlg2(textmsg, 'Precomputed datafiles already present on disk', 'No', 'Yes', 'Yes');
         if strcmpi(res, 'No')
             error('User aborded precomputing measures');
-        end;
-    end;
+        end
+    end
     warnflag = 1;
     
        

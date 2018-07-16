@@ -88,7 +88,7 @@ end;
 
 if nargin < 3
     fields = {};
-end;
+end
 epocheventout = [];
     
 switch format
@@ -107,7 +107,7 @@ case 'struct'
               command = [ command '''' fields{index} ''', mattocell( epoch(:,' num2str(index) ')'',' ...
                             '[1], ones(1,size(epoch,1))),' ];
           end;                  
-      end;
+      end
       eval( [command(1:end-1) ');' ] );
 
       if exist('epochevent') == 1
@@ -116,9 +116,9 @@ case 'struct'
                  epoch(index).event = epochevent{index};
              else
                  epoch(index).event = epochevent(index);
-             end;
-         end;
-      end;
+             end
+         end
+      end
    end
 
 case 'array'
@@ -128,7 +128,7 @@ case 'array'
         % time locking event
         
         selectedType = fields;
-        if iscell(fields) && ~isempty(fields), selectedType = fields{1}; end;
+        if iscell(fields) && ~isempty(fields), selectedType = fields{1}; end
   	    fields = fieldnames( epoch );
         
         eval( [ 'values = { epoch.' fields{1} ' };' ]);
@@ -136,7 +136,7 @@ case 'array'
         if any(cellfun(@length, values) > 1)
             if ~isfield(epoch, 'eventlatency')
                 error('eventlatency field not present in data epochs');
-            end;
+            end
             
             if isempty(selectedType)
                 % find indices of time locking events
@@ -145,9 +145,9 @@ case 'array'
                     tmpevent = find( abs(epochlat) < 0.02 );
                     if isempty(tmpevent)
                         error('time locking event missing, cannot convert to array');
-                    end;
+                    end
                     epochSubIndex(index) = tmpevent;
-                end;
+                end
             else
                 % find indices of specific event type (if several take the
                 % first one
@@ -156,16 +156,16 @@ case 'array'
                     tmpeventind = strmatch( selectedType, epochtype );
                     if length(tmpeventind) > 1
                         fprintf('Warning: epoch %d has several events of "type" %s, taking the fist one\n', index, selectedType);
-                    end;
+                    end
                     if isempty(tmpeventind)
                          epochSubIndex(index) = NaN;
                     else epochSubIndex(index) = tmpeventind(1);
-                    end;
-                end;
-            end;
+                    end
+                end
+            end
         else
             epochSubIndex = ones(1, length(epoch));
-        end;
+        end
         
         % copy values to array
         tmp = cell( length(epoch), length( fields ));
@@ -179,13 +179,13 @@ case 'array'
                 elseif ~ischar(tmpval)
                      tmp(trial, index) = { tmpval(epochSubIndex(trial)) };
                 else tmp(trial, index) = { tmpval };
-                end;
-            end;
-        end;
+                end
+            end
+        end
         epoch = tmp;
-    end;
+    end
     otherwise, error('unrecognised format');   
-end;
+end
 
 return;
 
@@ -199,7 +199,7 @@ function epochfield = getnewfields( epochfield, nbfields )
                epochfield =  { epochfield{:} [ 'var' int2str(count) ] };
                nbfields = nbfields-1;
             else    count = count+1;
-            end;
+            end
         end;                        
    else
         epochfield = epochfield(1:end+nbfields);

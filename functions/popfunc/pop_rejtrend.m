@@ -79,7 +79,7 @@ function [EEG, com] = pop_rejtrend( EEG, icacomp, elecrange, winsize, ...
 
 com = '';
 if nargin < 1
-   help pop_rejtrend;
+   help pop_rejtrend
    return;
 end;  
 if nargin < 2
@@ -93,11 +93,11 @@ if icacomp == 0
         	case 'NO', disp('Operation cancelled'); return;   
         	case 'YES', [ EEG com ] = pop_runica(EEG);
     	end % switch
-	end;
+	end
 end;	
 if exist('reject') ~= 1
     reject = 1;
-end;
+end
 if nargin < 3
     
     % which set to save
@@ -132,7 +132,7 @@ if nargin < 3
     figname = fastif(~icacomp, 'Trend rejection in component(s) -- pop_rejtrend()','Data trend rejection -- pop_rejtrend()');
     result = inputgui( geometry,uilist,'pophelp(''pop_rejtrend'');', figname);
     size_result  = size( result );
-    if size_result(1) == 0 return; end;
+    if size_result(1) == 0 return; end
     elecrange    = result{1};
     winsize      = result{2};
     minslope     = result{3};
@@ -140,11 +140,11 @@ if nargin < 3
     superpose    = result{5};
     reject       = result{6};
     calldisp     = 1;
-end;
+end
 
-if ~exist('superpose','var'), superpose = 0; end;
-if ~exist('reject','var'),    reject    = 0; end;
-if ~exist('calldisp','var'),  calldisp  = 1; end;
+if ~exist('superpose','var'), superpose = 0; end
+if ~exist('reject','var'),    reject    = 0; end
+if ~exist('calldisp','var'),  calldisp  = 1; end
 
 if nargin < 9
     calldisp = 1;
@@ -156,7 +156,7 @@ if ischar(elecrange) % convert arguments if they are in text format
 	winsize   = eval( [ '[' winsize ']' ]  );
 	minslope  = eval( [ '[' minslope ']' ]  );
 	minstd    = eval( [ '[' minstd ']' ]  );
-end;
+end
 
 fprintf('Selecting trials...\n');
 if icacomp == 1
@@ -182,7 +182,7 @@ if calldisp
         			macrorejE = 'EEG.reject.rejconstE';
     else			macrorej  = 'EEG.reject.icarejconst';
         			macrorejE = 'EEG.reject.icarejconstE';
-    end;
+    end
 	colrej = EEG.reject.rejconstcol;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 
@@ -193,7 +193,7 @@ if calldisp
 		eegplot( icaacttmp, 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	end;	
-end;
+end
 if ~isempty(rej)
 	if icacomp	== 1
 		EEG.reject.rejconst = rej;
@@ -201,11 +201,11 @@ if ~isempty(rej)
 	else
 		EEG.reject.icarejconst = rej;
 		EEG.reject.icarejconstE = rejE;
-	end;
+	end
     if reject
         EEG = pop_rejepoch(EEG, rej, 0);
-    end;
-end;
+    end
+end
 
 com = [ com sprintf('EEG = pop_rejtrend(EEG,%s);', ...
 		vararg2str({icacomp,elecrange,winsize,minslope,minstd,superpose,reject})) ]; 

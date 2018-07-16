@@ -40,7 +40,7 @@ function [STUDY, centroid] = std_readtopoclust(STUDY,ALLEEG, clsind);
 if nargin < 3
     help readtopoclust;
     return;
-end;
+end
     
 if isempty(clsind)
     for k = 2: length(STUDY.cluster) % don't include the ParentCluster
@@ -57,7 +57,7 @@ if Ncond == 0
 end 
 centroid = cell(length(clsind),1);
 fprintf('Computing the requested mean cluster scalp maps (only done once)\n');
-if ~isfield( STUDY.cluster, 'topo' ), STUDY.cluster(1).topo = []; end;
+if ~isfield( STUDY.cluster, 'topo' ), STUDY.cluster(1).topo = []; end
 cond = 1;
 
 for clust = 1:length(clsind) %go over all requested clusters
@@ -73,7 +73,7 @@ for clust = 1:length(clsind) %go over all requested clusters
                 [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
                 if ~isfield(centroid{clust}, 'topotmp') || isempty(centroid{clust}.topotmp)
                     centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
-                end;
+                end
                 centroid{clust}.topotmp(:,k) = grid(1:4:end); % for inversion
                 centroid{clust}.topo{k} = grid;
                 centroid{clust}.topox = xi;
@@ -89,7 +89,7 @@ for clust = 1:length(clsind) %go over all requested clusters
             for cond  = 1
                 if clsind(1) > 0
                     ncomp = length(STUDY.cluster(clsind(clust)).comps);
-                end;
+                end
                 [ tmp pol ] = std_comppol(centroid{clust}.topotmp);
                 fprintf('%d/%d polarities inverted while reading component scalp maps\n', ...
                         length(find(pol == -1)), length(pol));
@@ -98,8 +98,8 @@ for clust = 1:length(clsind) %go over all requested clusters
                     centroid{clust}.topo{k} = pol(k)*centroid{clust}.topo{k};
                     if k == 1, allscalp = centroid{clust}.topo{k}/nitems;
                     else       allscalp = centroid{clust}.topo{k}/nitems + allscalp;
-                    end;
-                end;
+                    end
+                end
                 STUDY.cluster(clsind(clust)).topox   = centroid{clust}.topox;
                 STUDY.cluster(clsind(clust)).topoy   = centroid{clust}.topoy;
                 STUDY.cluster(clsind(clust)).topoall = centroid{clust}.topo;
@@ -113,7 +113,7 @@ for clust = 1:length(clsind) %go over all requested clusters
         centroid{clust}.topoy = STUDY.cluster(clsind(clust)).topoy;
         centroid{clust}.topo  = STUDY.cluster(clsind(clust)).topoall;
         
-    end;
+    end
     
 end
 

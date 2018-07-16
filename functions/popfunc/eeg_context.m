@@ -335,7 +335,7 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
                     else
                       trglt = EEG.epoch(ep).eventlatency{e}(1); % this shouldn't happen
                       fprintf('EEG.epoch(%d).eventlatency{%d} length > 1 ??\n',ep,e);
-                    end;
+                    end
                   end
                   if trglt == 0
                       targepochs(targetcount) = ep;
@@ -543,14 +543,14 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
     fprintf('%d. ',targetcount)
     if targetcount<1000, fprintf(' '); end
     if targetcount<100, fprintf(' '); end
-    if targetcount<10, fprintf(' '); end;
+    if targetcount<10, fprintf(' '); end
     if uidx > 1
       %fprintf('event %-4d ttype %s - delays: ',evidx,num2str(EEG.urevent(evidx).type));
      for k=1:npos
       fprintf('(%d) ',ur_nbrs(targetcount,k));
       if ur_nbrs(targetcount,k)<1000, fprintf(' '); end
       if ur_nbrs(targetcount,k)<100, fprintf(' '); end
-      if ur_nbrs(targetcount,k)<10, fprintf(' '); end;
+      if ur_nbrs(targetcount,k)<10, fprintf(' '); end
       fprintf('%2.0f ',delays(targetcount,k));
      end
      if ~exist('NO_FIELD','var')
@@ -588,7 +588,7 @@ end % event loop
 %
 %%%%%%%%% delete watibar %%%%%%%%
 %
-if ishandle(wb), delete(wb); end;
+if ishandle(wb), delete(wb); end
 
 if ~alltargs
   fprintf('Returning info on the %d of %d target events that have epochs centered on them.\n',...

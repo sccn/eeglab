@@ -40,16 +40,16 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
     if nargin < 1
         help eeg_readoptions;
         return;
-    end;
+    end
     
     if nargin < 2
         opt_backup = [];
-    end;
+    end
     
     if ischar(filename)
          fid = fopen(filename, 'r');
     else fid = filename;
-    end;
+    end
     
     % skip header
     % -----------
@@ -58,7 +58,7 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
     while (str(1) == '%')
         header = [ header str];
         str = fgets( fid );
-    end;
+    end
     
     % read variables values and description
     % --------------------------------------
@@ -79,11 +79,11 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
             dsc = deblank( dsc(end:-1:1) );
             opt(index).description = deblank( dsc(end:-1:1) );
             opt(index).value       = str2num(  opt(index).value );
-        end;
+        end
         
         str = fgets( fid ); % jump a line
         index = index+1;
-    end;
+    end
     fclose(fid);
 
     % replace in backup structure if any
@@ -94,8 +94,8 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
                 ind = strmatch(opt_backup(index).varname, { opt.varname }, 'exact');
                 if ~isempty(ind) & ~isempty(opt_backup(index).varname)
                     opt_backup(index).value = opt(ind).value;
-                end;
-            end;
-        end;
+                end
+            end
+        end
         opt = opt_backup;
-    end;
+    end

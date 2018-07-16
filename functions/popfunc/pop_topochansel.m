@@ -140,7 +140,7 @@ while c==1
         selx = [];sely = []; indexnr = [];
         return
     end
-end;
+end
 
 las_x(length(las_x)+1)=las_x(1);
 las_y(length(las_y)+1)=las_y(1);

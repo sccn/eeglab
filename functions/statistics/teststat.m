@@ -173,7 +173,7 @@ a{5} = { tmpa tmpb };
 a{6} = { tmpa tmpb tmpc };
 
 for method = 1:2
-    if method == 2, opt = {'arraycomp', 'off'}; else opt = {}; end;
+    if method == 2, opt = {'arraycomp', 'off'}; else opt = {}; end
     for dim = 1:length(a)
         [sa1] = statcond(a{dim}, 'mode', 'bootstrap', 'verbose', 'off', 'paired', 'on',  'returnresamplingarray', 'on', opt{:}, 'naccu', 10);
         [sa2] = statcond(a{dim}, 'mode', 'perm'     , 'verbose', 'off', 'paired', 'on',  'returnresamplingarray', 'on', opt{:}, 'naccu', 10);
@@ -188,29 +188,29 @@ for method = 1:2
                 sa2{t} = sa2{t}(end,:); 
                 sa3{t} = sa3{t}(end,:); 
                 sa4{t} = sa4{t}(end,:); 
-            end;
+            end
         elseif nd == 3
             for t=1:length(sa1), 
                 sa1{t} = squeeze(sa1{t}(end,end,:));
                 sa2{t} = squeeze(sa2{t}(end,end,:));
                 sa3{t} = squeeze(sa3{t}(end,end,:));
                 sa4{t} = squeeze(sa4{t}(end,end,:));
-            end;
+            end
         elseif nd == 4
             for t=1:length(sa1), 
                 sa1{t} = squeeze(sa1{t}(end,end,end,:)); 
                 sa2{t} = squeeze(sa2{t}(end,end,end,:));
                 sa3{t} = squeeze(sa3{t}(end,end,end,:));
                 sa4{t} = squeeze(sa4{t}(end,end,end,:));
-            end;
-        end;
+            end
+        end
         
         % for paired bootstrap, we make sure that the resampling has only shuffled between conditions
         % for instance [101 2 1003 104 ...] is an acceptable sequence 
         if all(rem(sa1{1}(:)',10) == [1:9 0]) && all(rem(sa1{2}(:)',10) == [1:9 0])
             fprintf('Bootstrap paired dim%d resampling method %d Pass\n', dim, method);
         else  error('Bootstrap paired resampling Error');
-        end;
+        end
         % for paired permutation, in addition, we make sure that the sum accross condition is constant
         % which is not true for bootstrap
         msa = meansa(sa2); msa = msa(:)-msa(1);
@@ -218,23 +218,23 @@ for method = 1:2
             all(round(msa) == [0:9]') && length(unique(sa2{1})) == 10 && length(unique(sa2{2})) == 10
             fprintf('Permutation paired dim%d resampling method %d Pass\n', dim, method);
         else  error('Permutation paired resampling Error');
-        end;
+        end
         % for unpaired bootstrap, only make sure there are enough unique
         % values
         if length(unique(sa3{1})) > 3 && length(unique(sa3{2})) > 3
              fprintf('Bootstrap unpaired dim%d reampling method %d Pass\n', dim, method);
         else   error('Bootstrap unpaired reampling Error');
-        end;
+        end
         % for unpaired permutation, the number of unique values must be 10
         % and the sum must be constant (not true for bootstrap)
         if length(unique(sa4{1})) == 10 && length(unique(sa4{2})) == 10 && ( floor(mean(meansa(sa4))) == 55 || floor(mean(meansa(sa4))) == 372 )
              fprintf('Permutation unpaired dim%d reampling method %d Pass\n', dim, method);
         else   error('Permutation unpaired reampling Error');
-        end;
+        end
        
         disp('------------------------');
-    end;
-end;
+    end
+end
 
 % function to check 
 function assertsame(varargin)
@@ -243,14 +243,14 @@ for ind = 1:length(varargin)
     if length(varargin{1}) > 2
         for tmpi = 1:length(varargin{1})-1
             assertsame(varargin{1}(tmpi:tmpi+1));
-        end;
+        end
         return;
     else
         if (varargin{ind}(1)-varargin{ind}(2)) > abs(mean(varargin{ind}))*0.01
             error('Test failed');
-        end;
-    end;
-end;
+        end
+    end
+end
 disp('Test pass');
 
 function [meanmat] = meansa(mat)
@@ -258,7 +258,7 @@ function [meanmat] = meansa(mat)
 meanmat = zeros(size(mat{1}));
 for index = 1:length(mat)
     meanmat = meanmat+mat{index}/length(mat);
-end;
+end
 
 function stats = rm_anova2(Y,S,F1,F2,FACTNAMES)
 %

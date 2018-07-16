@@ -72,7 +72,7 @@ if ~exist('pnas.flt')
     p = which('eeglab');
     p = p(1:findstr(p,'eeglab.m')-1);
     addpath([ p 'sample_data' ] );
-end;
+end
 
 % name of channel locations file
 chan_locs  = 'pnas_chan14.locs';
@@ -99,7 +99,7 @@ axis('off')
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Load an ascii ERP data matrix 
@@ -129,7 +129,7 @@ pos = get(gcf,'Position'); % record figure position to use as a base for later f
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -147,7 +147,7 @@ plotdata(data,frames,[0 995 -10 10],'ERP Data', chan_locs2 ,0,'(2 conditions)');
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -163,7 +163,7 @@ plottopo(data,chan_locs,frames,[0 995 -10 10],'ERP Data');
 
 if ~exist('icademoauto')  
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -178,7 +178,7 @@ timtopo(data(:,1:frames),chan_locs,[0 995 -10 10],[250 320 390 500],'Target Hits
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -197,7 +197,7 @@ fprintf('Try using the on-screen and menu control elements...\n')
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -219,7 +219,7 @@ subplot(1,2,2)
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -235,7 +235,7 @@ fprintf('Now decompose both epochs at once using the ICA algorithm, runica() ...
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 [weights,sphere,activations,bias,signs,lrates] = runica(data);
 
@@ -243,7 +243,7 @@ fprintf('\nDone!\n');
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -274,7 +274,7 @@ fprintf('\nDone!\n');
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the activation waveforms of all the components 
@@ -291,7 +291,7 @@ figure('Position',pos+3*off);
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the contributions to the first epoch of data by the first reordered 
@@ -308,7 +308,7 @@ figure('Position',pos+4*off);
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the contributions to the first epoch of data by the 5 largest
@@ -326,7 +326,7 @@ figure('Position',pos+4*off);
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the envelopes of the data epoch 1 and the first 10 components
@@ -343,7 +343,7 @@ figure('Position',pos+5*off);
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 fprintf('Now plotting envelopes PLUS scalp maps using envtopo().\n');
@@ -357,7 +357,7 @@ figure('Position',pos+5.5*off);
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot a close-up of the decomposition of epoch 2, channel 2.
@@ -378,7 +378,7 @@ fprintf('\n Note that two components make up most of the response peak.\n');
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the scalp maps of the first four reordered components 
@@ -393,7 +393,7 @@ figure('Position',pos+7*off);
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Display the projected epoch-1 data for reordered ICA component windex(7) 
@@ -412,7 +412,7 @@ figure('Position',pos+8*off);
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Make and display a brief movie of a small segment of the first data epoch
@@ -431,11 +431,11 @@ try,
   seemovie(Movie,-5,Colormap); 
 catch,
     disp('Problem generating movie');
-end;
+end
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Run testica script using optimum parameters 
@@ -454,7 +454,7 @@ if ~exist('icademoauto')
     testica(chans,epochs*frames,14,-0.05,1.4);
 else 
     [testresult] = testica(chans,epochs*frames,14,-0.05,1.4);
-end;
+end
 
 % model 14 sources with a wide range of sizes & positive kurtosis
 

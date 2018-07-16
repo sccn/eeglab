@@ -70,11 +70,11 @@ if nargin == 2
     size1 = size(winv,1);
 	avematrix = eye(size1)-ones(size1)*1/size1;
 	W = pinv(avematrix*winv);
-end;
+end
 if nargin >= 3
 	winv = pinv(W*S);
     size1 = size(winv,1);
 	avematrix = eye(size1)-ones(size1)*1/size1;
 	W = pinv(avematrix*winv);
 	S = eye(chans);
-end;
+end

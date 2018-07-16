@@ -129,11 +129,11 @@ g = finputcheck(varargin, { 'subjind'     'integer'  []               [];
                             'volmesh_fname' 'string'  []  'volmesh_local.mat';
                             'mri'         { 'struct','string' } [] '';
                             'norm2JointProb' 'string'  { 'on','off' } 'off'});
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 if ~strcmpi(g.method, 'alldistance') & isempty(g.subjind)
     error('Subject indices are required for this method');
-end;
-if ~iscell(g.weight), g.weight = { g.weight }; end;
+end
+if ~iscell(g.weight), g.weight = { g.weight }; end
 
 % plotting dipplot
 % ----------------
@@ -142,23 +142,23 @@ if ~iscell(dipplotargs) % convert input
         if size(dipplotargs,1) == 3, dipplotargs = dipplotargs';
         elseif size(dipplotargs,2) ~= 3
             error('If an array of dipoles is given as entry, there must be 3 columns or 3 rows for x y z');
-        end;
+        end
         model = [];
         for idip = 1:length(dipplotargs)
             model(idip).posxyz = dipplotargs(idip,:);
             model(idip).momxyz = [1 0 0];
             model(idip).rv = 0.5;
-        end;
+        end
         dipplotargs = model;
-    end;
+    end
     dipplotargs = { dipplotargs 'coordformat' g.coordformat };
 else 
     dipplotargs = { dipplotargs{:} 'coordformat' g.coordformat };
-end;
+end
 struct = dipplot(dipplotargs{:}, 'plot', g.dipplot, 'density', 'off');
 if nargout == 0
     drawnow;
-end;
+end
 
 % retrieve coordinates in MNI space
 % ---------------------------------
@@ -166,14 +166,14 @@ if 0 % deprecated
      % find dipoles 
      % ------------
     hmesh = findobj(gcf, 'tag', 'mesh');
-    if isempty(hmesh), error('Current figure must contain dipoles'); end;
+    if isempty(hmesh), error('Current figure must contain dipoles'); end
     hh = [];
     disp('Finding dipoles...');
     dips = zeros(1,200);
     for index = 1:1000
         hh = [ hh(:); findobj(gcf, 'tag', ['dipole' int2str(index) ]) ];
         dips(index) = length(findobj(gcf, 'tag', ['dipole' int2str(index) ]));
-    end;
+    end
     
     disp('Retrieving dipole positions ...');
     count = 1;
@@ -185,8 +185,8 @@ if 0 % deprecated
             allz(count) = tmp.eleccoord(1,3);
             alli(count) = index;
             count = count + 1;
-        end;
-    end;
+        end
+    end
 end;    
 
 % check weights
@@ -195,22 +195,22 @@ if ~isempty(g.weight{1})
     if ~iscell(g.weight)
         if length(g.weight) ~= length(struct)
             error('There must be as many elements in the weight matrix as there are dipoles')
-        end;
+        end
     else
         if length(g.weight{1}) ~= length(struct) || length(g.weight{1}) ~= length(g.weight{end})
             error('There must be as many elements in the weight matrix as there are dipoles')
-        end;
-    end;
+        end
+    end
 else
     g.weight = { ones( 1, length(struct)) };
-end;
+end
 if ~isempty(g.subjind)
     if length(g.subjind) ~= length(struct)
         error('There must be as many element in the subject matrix as there are dipoles')
-    end;
+    end
 else
     g.subjind = ones( 1, length(struct));
-end;
+end
 
 % decoding dipole locations
 % -------------------------
@@ -227,8 +227,8 @@ for index = 1:length(struct)
         allw2(count) = g.weight{end}(index)/dips;
         alls(count) = g.subjind(index);
         count = count + 1;
-    end;
-end;
+    end
+end
 g.weight{1}    = allw1;
 g.weight{end}  = allw2;
 g.subjind = alls;
@@ -258,16 +258,16 @@ if ischar(g.mri)
             warning on;
         catch,
             error('Cannot load file using read_fcdc_mri');
-        end;
-    end;
+        end
+    end
     g.mri = mri; % output the anatomic mri image 
-end;
+end
 
 
 % reserve array for density
 % -------------------------
 prob3d = {zeros(ceil(g.mri.dim/g.subsample)) };
-for i = 2:length(g.weight), prob3d{i} = prob3d{1}; end;
+for i = 2:length(g.weight), prob3d{i} = prob3d{1}; end
 
 % compute voxel size
 % ------------------
@@ -284,11 +284,11 @@ if strcmpi(g.method, 'relentropy') | strcmpi(g.method, 'entropy') %%%%% entropy 
         tmpind = find(g.subjind == vals(index)); % dipoles for the subject
         totcount(index) = length(tmpind); % store the number of subject dipoles
         newind(tmpind) = index; % put subject index into newind
-    end;
+    end
     g.subjind = newind;
     gp = totcount/sum(totcount);
     globent = -sum(gp.*log(gp));
-end;
+end
 
 % compute volume inside head mesh
 % -------------------------------
@@ -334,11 +334,11 @@ if ~exist(filename)
     try, 
         save('-mat', filename, 'allpoints', 'allinds', 'Inside', 'Outside');
         disp('Saving file containing inside/outide voxel indices...');
-    catch, end;
+    catch, end
 else
     disp('Loading file containing inside/outide voxel indices...');
     load('-mat',filename);
-end;
+end
 InsidePoints  = allpoints(:, Inside);
 InsideIndices = allinds(:, Inside);
 
@@ -366,12 +366,12 @@ if ~strcmpi(g.method, 'alldistance')
             if strcmpi(g.method, 'relentropy')
                 p      = p(1:end-1)./totcount; 
                 % this should be uniform if p conforms to global count for all subjects
-            end;
+            end
             p      = p/sum(p);
             p(find(p == 0)) = [];
             for tmpi = 1:length(g.weight)
                 prob3d{1}(InsideIndices(1,i), InsideIndices(2,i), InsideIndices(3,i)) = -sum(p.*log(p));
-            end;
+            end
         else
             % distance to each subject
             ordsubjs  = g.subjind(indsort);
@@ -380,15 +380,15 @@ if ~strcmpi(g.method, 'alldistance')
                 if strcmpi(g.method,'distance')
                     use_dipoles(index) = tmpind(1); % find their nearest dipole 
                 end
-            end;
+            end
             for tmpi = 1:length(g.weight)
                 prob3d{tmpi}(InsideIndices(1,i), InsideIndices(2,i), InsideIndices(3,i)) = ...
                    sum(tmpweights{tmpi}(use_dipoles).*exp(-tmpsort(use_dipoles)/ ...
                            (2*g.methodparam^2))); % 3-D gaussian smooth
-            end;
-        end;
-        if mod(i,100) == 0, fprintf('%d ', i); end;
-    end;
+            end
+        end
+        if mod(i,100) == 0, fprintf('%d ', i); end
+    end
 else % 'alldistance'
     % distance calculation: can scan dipoles instead of voxels (since linear)
     % --------------------------------------------------------
@@ -398,8 +398,8 @@ else % 'alldistance'
     fprintf('Computing (of %d):', size(allx,2));
     for tmpi=1:length(g.weight)
         tmpprob{tmpi} = zeros(1, size(InsidePoints,2));
-    end;
-    if length(g.weight) > 1, tmpprob2 = tmpprob; end;
+    end
+    if length(g.weight) > 1, tmpprob2 = tmpprob; end
     for i = 1:size(allx,2)
         alldists = (InsidePoints(1,:) - allx(i)).^2 + ...
                    (InsidePoints(2,:) - ally(i)).^2 + ...
@@ -407,20 +407,20 @@ else % 'alldistance'
 %         alldists = 1;  % TM
         for tmpi=1:length(g.weight)
             tmpprob{tmpi} = tmpprob{tmpi} + g.weight{tmpi}(i)*exp(-alldists/(2*g.methodparam^2)); % 3-D gaussian smooth
-            if any(isinf(tmpprob{tmpi})), error('Infinite value in probability calculation'); end;
-        end;
-        if mod(i,50) == 0, fprintf('%d ', i); end;
-    end;
+            if any(isinf(tmpprob{tmpi})), error('Infinite value in probability calculation'); end
+        end
+        if mod(i,50) == 0, fprintf('%d ', i); end
+    end
     % copy values to 3-D mesh
     % -----------------------
     for i = 1:length(Inside)
         pnts = allinds(:,Inside(i));
         for tmpi = 1:length(g.weight)
             prob3d{tmpi}(pnts(1), pnts(2), pnts(3)) = tmpprob{tmpi}(i);
-        end;
-    end;
+        end
+    end
     
-end;
+end
 fprintf('\n');
 
 % normalize for points inside and outside the volume
@@ -431,7 +431,7 @@ if strcmpi(g.method, 'alldistance') && strcmpi(g.normalization,'on')
         if any(prob3d{i}(:)<0)
             fprintf('WARNING: Some probabilities are negative, this will likely cause problems when normalizing probabilities.\n');
             fprintf('It is highly recommended to turn normaliziation off by using ''normalization'' key to ''off''.\n');
-        end;
+        end
         totval = sum(prob3d{i}(:));  % total values in the head
         switch g.norm2JointProb
             case 'off'
@@ -442,8 +442,8 @@ if strcmpi(g.method, 'alldistance') && strcmpi(g.normalization,'on')
             case 'on'
                 prob3d{i} = prob3d{i}/totval;
         end
-    end;
-end;
+    end
+end
 
 % resample matrix
 % ----------------
@@ -458,8 +458,8 @@ if g.subsample ~= 1
             newprob3d(:,:,index) = prob3d{i}(X,Y,Z(index));
         end;    
         prob3d{i} = newprob3d;
-    end;
-end;
+    end
+end
 
 % 3-D smoothing
 % -------------
@@ -467,8 +467,8 @@ if g.smooth ~= 0
     disp('Smoothing...');
     for i =1:length(g.weight)
         prob3d{i} = smooth3d(prob3d{i}, g.smooth);
-    end;
-end;
+    end
+end
 
 % plotting
 % --------
@@ -476,7 +476,7 @@ if strcmpi(g.plot, 'off')
     close gcf;
 else
     mri3dplot( prob3d, g.mri, g.plotargs{:}); % plot the density using mri3dplot()
-end;
+end
 return;
 
 %%

@@ -53,7 +53,7 @@ for index = 2:length(varargin)
         if isempty(warning_shown)
             disp('Warning: different channel montage order for the different datasets');
             warning_shown = 1;
-        end;
+        end
         
         % trying to preserve order of the longest array
         %----------------------------------------------
@@ -61,7 +61,7 @@ for index = 2:length(varargin)
             tmp     = alllocs;
             alllocs = tmplocs;
             tmplocs = tmp;
-        end;
+        end
         allchans = { alllocs.labels tmplocs.labels };
         [uniquechan ord1 ord2 ]  = unique_bc( allchans );
         
@@ -71,9 +71,9 @@ for index = 2:length(varargin)
         
         newlocs = concatlocs(alllocs, tmplocs(tmplocsind));
 
-    end;
+    end
     alllocs = newlocs;
-end;
+end
 
 % union of two channel location structure
 % without loosing the order information
@@ -115,9 +115,9 @@ function alllocs = myunion(locs1, locs2)
            %alllocs(count3) = locs2(count2);
            count2 = count2 + 1;
            count3 = count3 + 1;
-       end;
+       end
        
-   end;
+   end
     
 % concatenate channel structures with different fields   
 function loc3 = concatlocs(loc1, loc2);
@@ -131,14 +131,14 @@ function loc3 = concatlocs(loc1, loc2);
         catch
             try loc3 = [ loc1 loc2 ];
             catch, loc3 = [ loc1(:)' loc2(:)' ];
-            end;
-        end;
+            end
+        end
     else
         loc3 = loc1;
         for index = 1:length(loc2)
             loc3 = copyfields(loc3, length(loc1)+index, loc2(index));
-        end;
-    end;
+        end
+    end
 
 % copy fields of a structure to another one
 function [struct1] = copyfields(struct1, index1, struct2)
@@ -151,6 +151,6 @@ function [struct1] = copyfields(struct1, index1, struct2)
     else
         for index = 1:length(fields2)
             struct1 = setfield(struct1, {index1}, fields2{index}, getfield(struct2, fields2{index}));
-        end;
-    end;
+        end
+    end
     

@@ -55,7 +55,7 @@ function [X] = std_topo(EEG, comps, option, varargin)
 if nargin < 1
     help std_topo;
     return;
-end;
+end
 if isfield(EEG,'icaweights')
    numc = size(EEG.icaweights,1);
 else
@@ -69,12 +69,12 @@ end
 
 if nargin < 3
     option = 'none';
-end;
+end
 
 g = finputcheck( varargin, { 'recompute'   'string'   { 'on','off' }   'off' ;...
                              'fileout'     'string'   []                EEG.filepath},...
                              'std_topo');
-% if ischar(g), error(g); end;
+% if ischar(g), error(g); end
 
 % figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
 
@@ -91,7 +91,7 @@ if exist(fullfile(g.fileout, [ EEG.filename(1:end-3) 'icatopo' ])) && strcmpi(g.
             tmp = tmp(:)';
         else
             tmp = tmp(:)';
-        end;
+        end
         
         tmp = tmp(find(~isnan(tmp)));
         if k == 1
@@ -110,7 +110,7 @@ for k = 1:numc
     chanlocs = EEG.chanlocs(EEG.icachansind);
     if isempty( [ chanlocs.theta ] )
         error('Channel locations are required for computing scalp topographies');
-    end;
+    end
     [hfig grid plotrad Xi Yi] = topoplot( EEG.icawinv(:,k), chanlocs, ...
                                           'verbose', 'off',...
                                            'electrodes', 'on' ,'style','both',...
@@ -140,7 +140,7 @@ for k = 1:length(comps)
         tmp = tmp(:)';
     else
         tmp = tmp(:)';
-    end;
+    end
 
     tmp = tmp(find(~isnan(tmp)));
     if k == 1

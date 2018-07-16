@@ -63,22 +63,22 @@ function [tval, df] = ttest2_cell(a,b,c) % assumes equal variances
     if nargin < 1
         help ttest2_cell;
         return;
-    end;
+    end
     
     homogenous = 'homogenous';
     if nargin > 1 && ischar(b)
         homogenous = b;
-    end;
+    end
     if nargin > 2 && ischar(c)
         homogenous = c;
-    end;
+    end
     if iscell(a), 
         b = a{2}; 
         a = a{1}; 
-    end;
+    end
     if ~strcmpi(homogenous, 'inhomogenous') && ~strcmpi(homogenous, 'homogenous')
         error('Value for homogenous parameter can only be ''homogenous'' or ''inhomogenous''');
-    end;
+    end
 
     nd    = myndims(a);
     na    = size(a, nd);
@@ -103,7 +103,7 @@ function [tval, df] = ttest2_cell(a,b,c) % assumes equal variances
         sp    = sqrt(((na-1)*sda.^2+(nb-1)*sdb.^2)/(na+nb-2));
         tval  = (meana-meanb)./sp/sqrt(1/na+1/nb);
         df    = na+nb-2;
-    end;
+    end
         
     % check values againg Matlab statistics toolbox
     % [h p ci stats] = ttest2(a', b');
@@ -119,14 +119,14 @@ function val = myndims(a)
             val = 1;
         else
             val = 2;
-        end;
+        end
     end; 
   
 function res = mymean( data, varargin) % deal with complex numbers
     res = mean( data, varargin{:});
     if ~isreal(data)
         res = abs( res );
-    end;
+    end
 
 function res = mystd( data, varargin) % deal with complex numbers
     if ~isreal(data)
@@ -134,6 +134,6 @@ function res = mystd( data, varargin) % deal with complex numbers
     else
         res = sqrt(sum( bsxfun(@minus, data, mean( data, varargin{2})).^2, varargin{2})/(size(data,varargin{2})-1)); % 8 percent speedup
         %res = std( data, varargin{:});
-    end;
+    end
     
     

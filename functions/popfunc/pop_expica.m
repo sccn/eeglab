@@ -37,24 +37,24 @@ com = '';
 if nargin < 1 
     help pop_expica;
     return;
-end;
+end
 
 if nargin < 2
     whichica = 'weights';
-end;
+end
 switch lower(whichica)
  case {'weights' 'inv'}, ;
  otherwise error('Unrecognized option for ''whichica'' parameter');
-end;
+end
 
 if nargin < 3
 	% ask user
 	[filename, filepath] = uiputfile('*.*', [ 'File name for ' ...
                         fastif(strcmpi(whichica, 'inv'), 'inverse', 'weight') ' matrix -- pop_expica()']); 
     drawnow;
-	if filename == 0 return; end;
+	if filename == 0 return; end
 	filename = [filepath filename];
-end;
+end
 
 % save datas
 % ----------
@@ -62,7 +62,7 @@ if strcmpi(whichica, 'inv')
     tmpmat = double(EEG.icawinv);
 else
     tmpmat = double(EEG.icaweights*EEG.icasphere);
-end;
+end
 save(filename, '-ascii', 'tmpmat');
 
 com = sprintf('pop_expica(EEG, ''%s'', ''%s'');', whichica, filename); 

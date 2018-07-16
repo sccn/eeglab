@@ -121,7 +121,7 @@ if nargin < 2
 end
 if srate == 0,
 	srate = DEFAULT_SRATE;
-end;
+end
 if PLOT_TIME == 0
    PLOT_TIME = ceil(frames/srate);
    if PLOT_TIME > DEFAULT_EPOCH
@@ -147,7 +147,7 @@ maxtime = frames / srate;       %size of matrix in seconds
 		channamefile = 0;
 	else
 		% fprintf('Chan info file %s opened\n',channamefile);
-	end;
+	end
 	if errorcode==0,
 		channames = fscanf(chid,'%d %f %f %s',[7 MAXEEGPLOTCHANS]);
 		channames = channames';
@@ -157,18 +157,18 @@ maxtime = frames / srate;       %size of matrix in seconds
 			for j=1:c
 				if channames(i,j)=='.',
 					channames(i,j)=' '; % convert dots to spaces
-				end;
-			end;
-		end;
+				end
+			end
+		end
 		% fprintf('%d channel names read from file.\n',r);
 		if (r>chans)
 			fprintf('Using first %d names.\n',chans);
 			channames = channames(1:chans,:);
-		end;
+		end
 		if (r<chans)
 			fprintf('Only %d channel names read.\n',r);
-		end;
-	end;
+		end
+	end
   end
   if channamefile ==0, % plot channel numbers
 	channames = [];
@@ -179,7 +179,7 @@ maxtime = frames / srate;       %size of matrix in seconds
 			numeric = ['  '  int2str(c)];
 		end
 		channames = [channames;numeric];
-	end;
+	end
   end; % setting channames
 
 channames = str2mat(channames, ' ');	% add padding element to Y labels

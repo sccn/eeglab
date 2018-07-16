@@ -175,8 +175,8 @@ if nargin < 1                 % if several arguments, assign values
             curref = [ int2str(abs(EEGOUT.ref)) ];
         else
             curref = [ int2str(abs(EEGOUT.ref)) ];
-        end;
-    end;
+        end
+    end
                         
     uilist = { ...
          { 'Style', 'text', 'string', 'Data file/array (click on the selected option)', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
@@ -230,7 +230,7 @@ if nargin < 1                 % if several arguments, assign values
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } };
 
     [ results newcomments ] = inputgui( geometry, uilist, 'pophelp(''pop_importdata'');', 'Import dataset info -- pop_importdata()');
-    if length(results) == 0, return; end;
+    if length(results) == 0, return; end
 	args = {};
 
     % specific to importdata (not identical to pop_editset
@@ -241,29 +241,29 @@ if nargin < 1                 % if several arguments, assign values
 	   case 3, args = { args{:}, 'dataformat', 'float32le' };
 	   case 4, args = { args{:}, 'dataformat', 'float32be' };
 	   case 5, args = { args{:}, 'dataformat', 'matlab' };
-	end;
+	end
     i = 3;
-	if ~isempty( results{i+7} ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end;
-	if ~isempty( results{2} ) ,   args = { args{:}, 'data',              results{2}  }; end;
+	if ~isempty( results{i+7} ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end
+	if ~isempty( results{2} ) ,   args = { args{:}, 'data',              results{2}  }; end
 
 	if ~isempty( results{i  } ) , args = { args{:}, 'setname',           results{i  }  }; end;    
-	if ~isempty( results{i+1} ) , args = { args{:}, 'srate',     str2num(results{i+1}) }; end;
-	if ~isempty( results{i+2} ) , args = { args{:}, 'subject',           results{i+2}  }; end;
-	if ~isempty( results{i+3} ) , args = { args{:}, 'pnts',      str2num(results{i+3}) }; end;
-	if ~isempty( results{i+4} ) , args = { args{:}, 'condition',         results{i+4}  }; end;
-    if ~isempty( results{i+5} ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end;
-    if ~isempty( results{i+6} ) , args = { args{:}, 'session',   str2num(results{i+6}) }; end;
-    if ~isempty( results{i+8} ) , args = { args{:}, 'group',             results{i+8}  }; end;
-    if ~isempty( results{i+9} ) , args = { args{:}, 'ref',       str2num(results{i+9}) }; end;
-	if ~isempty( newcomments ) , args = { args{:}, 'comments',  newcomments          }; end;
+	if ~isempty( results{i+1} ) , args = { args{:}, 'srate',     str2num(results{i+1}) }; end
+	if ~isempty( results{i+2} ) , args = { args{:}, 'subject',           results{i+2}  }; end
+	if ~isempty( results{i+3} ) , args = { args{:}, 'pnts',      str2num(results{i+3}) }; end
+	if ~isempty( results{i+4} ) , args = { args{:}, 'condition',         results{i+4}  }; end
+    if ~isempty( results{i+5} ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end
+    if ~isempty( results{i+6} ) , args = { args{:}, 'session',   str2num(results{i+6}) }; end
+    if ~isempty( results{i+8} ) , args = { args{:}, 'group',             results{i+8}  }; end
+    if ~isempty( results{i+9} ) , args = { args{:}, 'ref',       str2num(results{i+9}) }; end
+	if ~isempty( newcomments ) , args = { args{:}, 'comments',  newcomments          }; end
     
     if abs(str2num(results{i+5})) > 10,
         fprintf('WARNING: are you sure the epoch start time (%3.2f) is in seconds\n');
-    end;
+    end
     
-	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end;
-	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end;
-	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end;
+	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end
+	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end
+	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end
 
     % generate the output command
     % ---------------------------
@@ -275,15 +275,15 @@ if nargin < 1                 % if several arguments, assign values
     %    if ~isempty( args{i+1} )
     %        if ischar( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
     %        else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-    %        end;
+    %        end
     %    else
     %        com = sprintf('%s, ''%s'', []', com, args{i} );
-    %    end;
-    %end;
+    %    end
+    %end
     %com = [ 'EEG = pop_importdata(' com(2:end) ');'];
 
 else % no interactive inputs
     EEGOUT = pop_editset(EEGOUT, varargin{:});
-end;
+end
 
 return;

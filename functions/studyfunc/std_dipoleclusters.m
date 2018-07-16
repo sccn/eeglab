@@ -50,14 +50,14 @@ function std_dipoleclusters(STUDY,ALLEEG, varargin);
 if nargin < 2
     help std_dipoleclusters;
     return;
-end;
+end
 
 % Set default values------------------------------------------------------------------------
     if strcmp(STUDY.cluster(2),'outlier 2') % don't plot outlier cluster #2
         clustvec = [3:length(STUDY.cluster)]; % plot all clusters in STUDY
     else
         clustvec = [2:length(STUDY.cluster)]; % plot all clusters in STUDY
-    end;
+    end
     onecolor = [];
     colvec = [];
     centroid = 'off';
@@ -79,7 +79,7 @@ end;
           if length(rowcolplace) < 3
               fprintf('\nThe variable ''rowcolplace'' must contain 3 values.\n');
               return;
-          end;
+          end
           row = rowcolplace(1);
           col = rowcolplace(2);
           place = rowcolplace(3);          
@@ -114,7 +114,7 @@ end;
             [origlist{subjidx} idx] = unique_bc(origlist{subjidx});
             sets{subjidx} = currset;
         end;    
-    end;
+    end
     %-----------------------------------------------------------
     % extract dipole info for ALL ICs to be plotted subj by subj
     for nx = 1:length(origlist)
@@ -123,13 +123,13 @@ end;
             EEG = ALLEEG(sets{nx}); % call in a dataset from subj
             if isfield(EEG.dipfit.model,'diffmap')
                 EEG.dipfit.model = rmfield(EEG.dipfit.model,'diffmap');      
-            end;
+            end
             if isfield(EEG.dipfit.model,'active')
                 EEG.dipfit.model = rmfield(EEG.dipfit.model,'active');      
-            end;
+            end
             if isfield(EEG.dipfit.model,'select')
                 EEG.dipfit.model = rmfield(EEG.dipfit.model,'select');      
-            end;
+            end
             dipsources.posxyz = EEG.dipfit.model(origlist{nx}(1)).posxyz;
             dipsources.momxyz = EEG.dipfit.model(origlist{nx}(1)).momxyz;
             dipsources.rv = EEG.dipfit.model(origlist{nx}(1)).rv;p=1;
@@ -139,9 +139,9 @@ end;
                 dipsources(1,p).momxyz = EEG.dipfit.model(origlist{nx}(w)).momxyz;
                 dipsources(1,p).rv = EEG.dipfit.model(origlist{nx}(w)).rv;  
                 p=p+1;
-            end;
+            end
             allbesa1{nx} = dipsources; new = 0;
-        end;
+        end
     end;    
 
     %-----------------------------------------------------------
@@ -165,8 +165,8 @@ end;
                                 centr2(end,2) = centr2(end,2)*-1; centr1(end,2) = centr1(end,2)*-1;
                             else
                                 centr2 = [centr2;allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz(2,:)];
-                            end;
-                        end;
+                            end
+                        end
                         new = 0;
                     else
                         allbesa(1,end+1) = allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k)));
@@ -177,13 +177,13 @@ end;
                                 centr2(end,2) = centr2(end,2)*-1; centr1(end,2) = centr1(end,2)*-1;
                             else
                                 centr2 = [centr2;allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz(2,:)];
-                            end;
-                       end;
+                            end
+                       end
                     end;                    
                     colset{pp} = cols(clst,:); pp = pp+1;                 
-                end;
-            end;
-        end;
+                end
+            end
+        end
         if length(allbesa) > 1
             centr = mean(centr,1);
             centr2 = mean(centr2,1);
@@ -197,12 +197,12 @@ end;
                 centrstr2(bic).momxyz = allbesa(end).momxyz(1,:);
                 centrstr2(bic).rv = 2;
                 bic = bic + 1; % separate count for bilaterals
-            end;
-        end;
-    end;
+            end
+        end
+    end
     if figureon == 1
         figure; row = 2; col = 2; place= 1;
-    end;
+    end
     %-------------------------------------------
     % PLOT the clusster dipoles:
     
@@ -213,7 +213,7 @@ end;
                 prjimg = 'off';
             else
                 prjimg = 'on';
-            end;
+            end
             sbplot(row,col,place)
             if strcmp(centroid,'only')
                 dipplot(centrstr,'image','mri','gui','off','dipolelength',0,'dipolesize',40,'normlen','on','spheres','on','color',centcols,'projlines','off','projimg',prjimg,'coordformat',EEG.dipfit.coordformat);hold on; view(90,0);      
@@ -221,7 +221,7 @@ end;
                     dipplot(centrstr2,'image','mri','gui','off','dipolelength',0,'dipolesize',40,'normlen','on','spheres','on','color',centcols,'projlines','off','projimg',prjimg,'coordformat',EEG.dipfit.coordformat);hold on; view(90,0); camzoom(.8)   
                 else
                     camzoom(1)  
-                end;
+                end
             elseif strcmp(centroid,'add')
                 dipplot(allbesa,'image','mri','gui','off','dipolelength',0,'dipolesize',25,'normlen','on','spheres','on','color',colset,'projlines','off','projimg',prjimg,'coordformat',EEG.dipfit.coordformat);hold on; view(90,0);     
                 dipplot(centrstr,'image','mri','gui','off','dipolelength',0,'dipolesize',40,'normlen','on','spheres','on','color',centcols2,'projlines','off','projimg',prjimg,'coordformat',EEG.dipfit.coordformat);hold on; view(90,0); camzoom(.8)  
@@ -229,17 +229,17 @@ end;
                     dipplot(centrstr2,'image','mri','gui','off','dipolelength',0,'dipolesize',40,'normlen','on','spheres','on','color',centcols2,'projlines','off','projimg',prjimg,'coordformat',EEG.dipfit.coordformat);hold on; view(90,0);camzoom(.8)   
                 else
                     camzoom(1)  
-                end;
+                end
             else
                 dipplot(allbesa,'image','mri','gui','off','dipolelength',0,'dipolesize',25,'normlen','on','spheres','on','color',colset,'projlines','off','projimg',prjimg,'coordformat',EEG.dipfit.coordformat);hold on; view(90,0);  camzoom(1.1)                   
-            end;
+            end
             if viewnum(sbpt) == 3
                 view(0,0)
             elseif viewnum(sbpt) == 1
                 view(0,90)
             elseif viewnum(sbpt) == 4
                 view(63,22);
-            end;
+            end
             place = place+1;
         end;  
         if ~isempty(ttl)
@@ -251,7 +251,7 @@ end;
                 ph = text(-75,-75,125,ttl); set(ph,'color','r');
             elseif sbpt == 3 % 2d image:
                 ph = text(-100,-50,130,ttl); set(ph,'color','r');
-            end;
-        end;
-    end;
+            end
+        end
+    end
     

@@ -118,12 +118,12 @@ function [crossfcoh, timesout1, freqs1, freqs2, crossfcohall, alltfX, alltfY] = 
 if nargin < 1
     help pac; 
     return; 
-end;
+end
 
 % deal with 3-D inputs
 % --------------------
-if ndims(X) == 3, X = reshape(X, size(X,2), size(X,3)); end;
-if ndims(Y) == 3, Y = reshape(Y, size(Y,2), size(Y,3)); end;
+if ndims(X) == 3, X = reshape(X, size(X,2), size(X,3)); end
+if ndims(Y) == 3, Y = reshape(Y, size(Y,2), size(Y,3)); end
 frame = size(X,2);
 
 g = finputcheck(varargin, ...
@@ -158,12 +158,12 @@ g = finputcheck(varargin, ...
                   'wavelet2'      'real'     [0 Inf]                   [];
                   'winsize'       'integer'  [0 Inf]                   max(pow2(nextpow2(frame)-3),4) }, 'pac');
 
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % more defaults
 % -------------
-if isempty(g.wavelet2), g.wavelet2 = g.wavelet; end;
-if isempty(g.freqs2),   g.freqs2   = g.freqs;   end;
+if isempty(g.wavelet2), g.wavelet2 = g.wavelet; end
+if isempty(g.freqs2),   g.freqs2   = g.freqs;   end
 
 % remove ERP if necessary
 % -----------------------
@@ -173,7 +173,7 @@ trials = size(X,2);
 if strcmpi(g.rmerp, 'on')
     X = X - repmat(mean(X,2), [1 trials]);
     Y = Y - repmat(mean(Y,2), [1 trials]);
-end;
+end
 
 % perform timefreq decomposition
 % ------------------------------
@@ -195,24 +195,24 @@ if ~isempty(g.subwin)
     alltfY    = alltfY(:, ind2, :);
     timesout1 = timesout1(ind1);
     timesout2 = timesout2(ind2);
-end;
+end
 if length(timesout1) ~= length(timesout2) | any( timesout1 ~= timesout2)
     disp('Warning: Time points are different for X and Y. Use ''timesout'' to specify common time points');
     [vals ind1 ind2 ] = intersect_bc(timesout1, timesout2);
     fprintf('Searching for common time points: %d found\n', length(vals));
-    if length(vals) < 10, error('Less than 10 common data points'); end;
+    if length(vals) < 10, error('Less than 10 common data points'); end
     timesout1 = vals;
     timesout2 = vals;
     alltfX = alltfX(:, ind1, :);
     alltfY = alltfY(:, ind2, :);
-end;
+end
 
 % scan accross frequency and time
 % -------------------------------
 %if isempty(g.alpha)
 %    disp('Warning: if significance mask is not applied, result might be slightly')
 %    disp('different (since angle is not made uniform and amplitude interpolated)')
-%end;
+%end
 
 cohboot =[];
 if ~strcmpi(g.method, 'latphase')
@@ -242,32 +242,32 @@ if ~strcmpi(g.method, 'latphase')
                 else
                     tmp = corrcoef( cos(tmpalltfy), tmpalltfx);
                     crossfcoh(find1,find2,ti) = tmp(2);
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end
 elseif 1
     % this option computes power at a given latency
     % then computes the same as above (vectors)
     
     %if isempty(g.powerlat)
     %    error('You need to specify a latency for the ''powerlat'' option');
-    %end;
+    %end
         
     gammapower = mean(10*log10(alltfX(:,:,:).*conj(alltfX)),1); % average all frequencies for power
     if isempty(g.gammapowerlim)
         g.gammapowerlim = [ min(gammapower(:)) max(gammapower(:)) ];
-    end;
+    end
     fprintf('Gamma power limits: %3.2f to %3.2f\n', g.gammapowerlim(1), g.gammapowerlim(2)); 
     power = 10*log10(alltfY(:,:,:).*conj(alltfY));
     if isempty(g.powerlim)
         for freq = 1:size(power,1)
             g.powerlim(freq,:) = [ min(power(freq,:)) max(power(freq,:)) ];
-        end;
-    end;
+        end
+    end
     for freq = 1:size(power,1)
         fprintf('Freq %d power limits: %3.2f to %3.2f\n', freqs2(freq), g.powerlim(freq,1), g.powerlim(freq,2)); 
-    end;
+    end
             
     % power plot
     %figure; plot(timesout2/1000, (mean(power(9,:,:),3)-mean(power(9,:)))/50);
@@ -286,7 +286,7 @@ elseif 1
     % get power indices
     if isempty(g.gammabase)
         g.gammabase = mean(gammapower(:));
-    end;
+    end
     fprintf('Gamma power average: %3.2f\n', g.gammabase); 
     gammapoweradd  = gammapower-g.gammabase;
     gammapower     = floor((gammapower-g.gammapowerlim(1))/(g.gammapowerlim(2)-g.gammapowerlim(1))*(matsize-2))+1;
@@ -307,25 +307,25 @@ elseif 1
                     matrixfinalgammapower(freq,trial,posx(freq,time,trial),posy(freq,time,trial))+gammapoweradd(1,time,trial);
                 matrixfinalcount(freq,trial,posx(freq,time,trial),posy(freq,time,trial)) = ...
                     matrixfinalcount(freq,trial,posx(freq,time,trial),posy(freq,time,trial))+1;
-            end;
-        end;
+            end
+        end
         %matrixfinal(freq,:,:,:) = convn(squeeze(matrixfinal(freq,:,:,:)), gs, 'same');
         %tmpmat = posx(index,:)+(posy(index,:)-1)*64+(gammapower(:)-1)*64*64;
         matrixfinalcount(freq, find(matrixfinalcount(freq,:) == 0)) = 1;
         matrixfinalgammapower(freq,:,:,:) = matrixfinalgammapower(freq,:,:,:)./matrixfinalcount(freq,:,:,:);
-    end;
+    end
     
     % average and smooth
     matrixfinalgammapowermean = squeeze(mean(matrixfinalgammapower,2));
     for freq = 1:length(freqs2)
         matrixfinalgammapowermean(freq,:,:) = conv2(squeeze(matrixfinalgammapowermean(freq,:,:)), gauss2d(5,5), 'same');
-    end;
+    end
     %matrixfinalgammapower = matrixfinalgammapower/size(alltfX,3)/size(alltfX,2);
     
     %vect = linspace(-pi,pi,50);    
     %for f = 1:length(freqs2)
     %    crossfcoh(f,:) = hist(tmpalltfy(f,:), vect);
-    %end;
+    %end
     
     % smoothing of output image
     % -------------------------
@@ -343,18 +343,18 @@ else
     
     %if isempty(g.powerlat)
     %    error('You need to specify a latency for the ''powerlat'' option');
-    %end;
+    %end
         
     gammapower = mean(10*log10(alltfX(:,:,:).*conj(alltfX)),1); % average all frequencies for power
     if isempty(g.gammapowerlim)
         g.gammapowerlim = [ min(gammapower(:)) max(gammapower(:)) ];
-    end;
+    end
     power = 10*log10(alltfY(:,:,:).*conj(alltfY));
     if isempty(g.powerlim)
         for freq = 1:size(power,1)
             g.powerlim(freq,:) = [ min(power(freq,:)) max(power(freq,:)) ];
-        end;
-    end;
+        end
+    end
 
     % power plot
     %figure; plot(timesout2/1000, (mean(power(9,:,:),3)-mean(power(9,:)))/50);
@@ -392,20 +392,20 @@ else
                     matrixfinalgammapower(freq,posx(freq,time,trial),posy(freq,time,trial))+gammapoweradd(1,time,trial);
                 matrixfinalcount(freq,posx(freq,time,trial),posy(freq,time,trial)) = ...
                     matrixfinalcount(freq,posx(freq,time,trial),posy(freq,time,trial))+1;
-            end;
-        end;
+            end
+        end
         %matrixfinal(freq,:,:,:) = convn(squeeze(matrixfinal(freq,:,:,:)), gs, 'same');
         %tmpmat = posx(index,:)+(posy(index,:)-1)*64+(gammapower(:)-1)*64*64;
         matrixfinalcount(freq, find(matrixfinalcount(freq,:) == 0)) = 1;
         matrixfinalgammapower(freq,:,:) = matrixfinalgammapower(freq,:,:)./matrixfinalcount(freq, :,:);
         matrixfinalgammapower(freq,:,:) = conv2(squeeze(matrixfinalgammapower(freq,:,:)), gauss2d(5,5), 'same');
-    end;
+    end
     %matrixfinalgammapower = matrixfinalgammapower/size(alltfX,3)/size(alltfX,2);
     
     %vect = linspace(-pi,pi,50);    
     %for f = 1:length(freqs2)
     %    crossfcoh(f,:) = hist(tmpalltfy(f,:), vect);
-    %end;
+    %end
     
     % smoothing of output image
     % -------------------------
@@ -416,7 +416,7 @@ else
 
     crossfcoh = matrixfinalgammapower;
     
-end;
+end
 
 % 7/31/2014 Ramon: crossfcohall sometimes does not exist depending on choice of input options
 if ~exist('crossfcohall', 'var')

@@ -36,12 +36,12 @@ function hist2(data1, data2, bins);
 if nargin < 1
     help hist2;
     return;
-end;
+end
 if nargin < 3
     bins = linspace(min(min(data1), min(data2)), max(max(data1), max(data2)), 100);
 elseif length(bins) == 1
     bins = linspace(min(min(data1), min(data2)), max(max(data1), max(data2)), bins);
-end;
+end
 
 hist(data1, bins);
 hold on; hist(data2, bins);

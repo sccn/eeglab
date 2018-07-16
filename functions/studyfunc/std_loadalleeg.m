@@ -46,7 +46,7 @@ function ALLEEG = std_loadalleeg(varargin)
     if nargin < 1
         help std_loadalleeg;
         return;
-    end;
+    end
 
     genpath = '';
     oldgenpath = '';
@@ -57,11 +57,11 @@ function ALLEEG = std_loadalleeg(varargin)
         catch,
             paths = cell(1,length(datasets));
             paths(:) = { '' };
-        end;
+        end
         genpath = varargin{1}.filepath;
         if isfield(varargin{1}.etc, 'oldfilepath')
             oldgenpath = varargin{1}.etc.oldfilepath;
-        end;
+        end
     else
         paths = varargin{1};
         if nargin > 1
@@ -69,7 +69,7 @@ function ALLEEG = std_loadalleeg(varargin)
         else
             datasets = paths;
             paths    = cell(size(datasets));
-        end;
+        end
     end
    
     set = 1;
@@ -84,15 +84,15 @@ function ALLEEG = std_loadalleeg(varargin)
     if length(oldgenpath) > 0 && oldgenpath(2) == ':' && ~strcmpi(comp(1:2), 'PC')
         oldgenpath = [ filesep oldgenpath(4:end) ];
         oldgenpath(find(oldgenpath == '\')) = filesep;
-    end;
+    end
     
     for dset = 1:length(paths)
         if ~isempty(paths{dset})
             if paths{dset}(2) == ':' && ~strcmpi(comp(1:2), 'PC') 
                 paths{dset} = [ filesep paths{dset}(4:end) ];
                 paths{dset}(find(paths{dset} == '\')) = filesep;
-            end;
-        end;
+            end
+        end
         
         [sub2 sub1] = fileparts(char(paths{dset}));
         [sub3 sub2] = fileparts(sub2);
@@ -116,15 +116,15 @@ function ALLEEG = std_loadalleeg(varargin)
                 indCommon = 1;
                 while indCommon <= length(oldgenpath) && indCommon <= length(paths{1}) && paths{1}(indCommon) == oldgenpath(indCommon)
                     indCommon = indCommon+1;
-                end;
+                end
                 indCommon = indCommon-1;
                 if indCommon > 1 % do not change path if nothing in common between the two paths
                     genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
-                end;
-            end;
+                end
+            end
         else
             relativePath = char(paths{dset});
-        end;
+        end
         
         % load data files
         if exist(fullfile(relativePath, datasets{dset})) == 2
@@ -154,7 +154,7 @@ function ALLEEG = std_loadalleeg(varargin)
                           'Is it possible that it might have been deleted?' 10 ...
                           'If this is the case, re-create the STUDY using the remaining datasets' ];
             error(txt);
-        end;
+        end
         
         EEG = eeg_checkset(EEG);
         if ~option_storedisk
@@ -162,7 +162,7 @@ function ALLEEG = std_loadalleeg(varargin)
         elseif ~ischar(EEG.data)
             EEG.data   = 'in set file';
             EEG.icaact = [];
-        end;
+        end
         
         [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
     end
@@ -171,9 +171,9 @@ function ALLEEG = std_loadalleeg(varargin)
     if strcmpi(warnfold, 'on') & ~strcmpi(pwd, genpath)
         disp('Changing current path to STUDY path...');
         cd(genpath);
-    end;
+    end
     if strcmpi(warnfold, 'on') 
         disp('This STUDY has a relative path set for the datasets');
         disp('so the current path MUST remain the STUDY path');
-    end;
+    end
         

@@ -27,7 +27,7 @@ function tmp_fld = gettempfolder(errorflag);
 
 if nargin < 1
     errorflag = 0;
-end;
+end
 
 tmp_fld = getenv('TEMP');
 if isempty(tmp_fld) && isunix
@@ -39,9 +39,9 @@ if isempty(tmp_fld) && isunix
         try
             mkdir('/tmp');
             tmp_fld = '/tmp';
-        catch, end;
-    end;
-end;
+        catch, end
+    end
+end
 if isempty(tmp_fld) && errorflag
     error('Cannot find a temporary folder to store data files');
-end;
+end

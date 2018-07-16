@@ -46,9 +46,9 @@ for index = 1:length(A)
 		if indexA > 0 & indexA <= length(A)
             R(index) = R(index) + B(indexB)*A(indexA);
             sumconvo = sumconvo + B(indexB);
-		end;
-	end;
+		end
+	end
 	R(index) = R(index) / sumconvo;
-end;
+end
 
 return;

@@ -44,16 +44,16 @@ function eeg_multieegplot( data, rej, rejE, oldrej, oldrejE, varargin);
 if nargin < 1
    help eeg_multieegplot;
    return;
-end;
+end
 if nargin < 4
    oldrej = [];
-end;
+end
 if nargin < 5
    oldrejE = [];
-end;
+end
 if ~exist('command')
 	command = '';
-end;
+end
 chans = size(data,1);
 pnts  = size(data,2);
 
@@ -81,7 +81,7 @@ if ndims(data) > 2 % --------------- considering epoched EEG data
    		% -----------------
 		%[tmp I] = unique_bc( rejeegplot(:,1) );
 		%rejeegplot = rejeegplot(I,:);
-   end;
+   end
 else % ---------------------------------------- considering continuous EEG
    % for continuous EEG, electrodes (rejE and oldrejE) are not considered yet
    % because there would be a format problem (these rejection are stored in
@@ -97,8 +97,8 @@ else % ---------------------------------------- considering continuous EEG
    if ~isempty(oldrej)
        tmp = [ oldrej(:, 3:4) colold*ones(s,1) zeros(size(oldrej,1), chans) ]; 
        rejeegplot = [rejeegplot; tmp];
-   end;
-end;
+   end
+end
 
 if isempty(varargin)   
 	eegplot(data, 'winlength', 5, 'position', [100 300 800 500], 'winrej', rejeegplot, 'xgrid', 'off');

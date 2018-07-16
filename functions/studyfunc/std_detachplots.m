@@ -49,10 +49,10 @@ try
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
-    else g= []; end;
+    else g= []; end
 catch
     disp('std_detachplots() error: calling convention {''key'', value, ... } error'); return;
-end;
+end
 
 try g.data;         catch, g.data          =   [];  end; % Name of plots
 try g.figtitles;    catch, g.figtitles     =   [];  end; % Name of plots
@@ -96,7 +96,7 @@ if isempty(g.handles)
         idata = g.data{i_nplots};
         
         % Filtering data to be plotted
-        if ~isempty(g.filter), idata = myfilt(idata, 1000/(g.timevec(2)-g.timevec(1)), 0, g.filter); end;
+        if ~isempty(g.filter), idata = myfilt(idata, 1000/(g.timevec(2)-g.timevec(1)), 0, g.filter); end
         
         len = size(idata,2);
         if len > 0 % A non-empty cluster

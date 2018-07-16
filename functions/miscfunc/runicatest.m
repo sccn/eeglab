@@ -532,7 +532,7 @@ elseif floor(epochs) ~= epochs,
 elseif nsub > ncomps
     fprintf('runica(): there can be at most %d sub-Gaussian components!\n',ncomps);
     return
-end;
+end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process the data %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -612,7 +612,7 @@ if exist('Specgramflag') == 1
   if isempty(fs)
     fprintf('runica(): specified frequency range too narrow!\n');
     return
-  end;
+  end
     
   specdata = reshape(tmp(fs,:),1,length(fs)*size(tmp,2));
   specdata = [real(specdata) imag(specdata)];
@@ -759,7 +759,7 @@ end
       pause(0);
       if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
           close; error('USER ABORT');
-      end;
+      end
       if biasflag                                                   
        u=weights*data(:,bootstrap(t:t+block-1)) + bias*onesrow;      
       else                                                             
@@ -956,7 +956,7 @@ end
 
   if ~laststep
     laststep = step;
-  end;
+  end
   lrates = lrates(1,1:laststep);           % truncate lrate history vector
   %
   %%%%%%%%%%%%%% Orient components towards max positive activation %%%%%%

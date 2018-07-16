@@ -171,7 +171,7 @@ if ischar(chanlocs1)
 
         % update GUI
         % ----------
-        if strcmpi(com, 'redraw'), redrawgui(fid); return; end;
+        if strcmpi(com, 'redraw'), redrawgui(fid); return; end
 
         % select electrodes and warp montage
         % ----------------------------------
@@ -180,10 +180,10 @@ if ischar(chanlocs1)
             [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
             try,
                 [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
-                if ~isempty(transform), dat.transform = transform; end;
+                if ~isempty(transform), dat.transform = transform; end
             catch,
                 warndlg2(strvcat('Transformation failed', lasterr));
-            end;
+            end
         elseif strcmpi(com, 'warp')
             [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
 
@@ -192,19 +192,19 @@ if ischar(chanlocs1)
                 tmpelec2 = dat.elec2;
                 for index = 1:length(clist2)
                     tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
-                end;
+                end
                 %try,
                     [ tmp dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
                 %catch,
                 %    warndlg2(strvcat('Transformation failed', lasterr));
-                %end;
-            end;
-        end;
+                %end
+            end
+        end
         set(fid, 'userdata', dat);
         redrawgui(fid); 
         return;
-    end;
-end;
+    end
+end
 
 % check input arguments
 % ---------------------
@@ -220,7 +220,7 @@ g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'autoscale'  'string' { 'on','off' } 'on';
                             'helpmsg'    'string' { 'on','off' } 'off';
                             'mesh'       ''      []   defaultmesh });
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % load mesh if any
 % ----------------
@@ -229,8 +229,8 @@ if ~isempty(g.mesh)
         try
             g.mesh  = load(g.mesh);
         catch, g.mesh = [];
-        end;
-    end;
+        end
+    end
     if ischar(g.mesh)
       if ~exist(g.mesh,'file') 
         fprintf('coregister(): mesh file not found\n');
@@ -246,7 +246,7 @@ if ~isempty(g.mesh)
                 else
                     dat.meshpnt = g.mesh.vol.bnd(1).pnt;
                     dat.meshtri = g.mesh.vol.bnd(1).tri;
-                end;
+                end
             elseif isfield(g.mesh, 'bnd')
                 dat.meshpnt = g.mesh.bnd(1).pnt;
                 dat.meshtri = g.mesh.bnd(1).tri;
@@ -258,19 +258,19 @@ if ~isempty(g.mesh)
                 dat.meshtri = g.mesh.faces;
             else
                 error('Unknown Matlab mesh file');
-            end;
+            end
         else
             dat.meshpnt = g.mesh{1};
             dat.meshtri = g.mesh{2};
-        end;
+        end
     else
         dat.meshpnt = [];
         dat.meshtri = [];
-    end;
+    end
 else
     dat.meshpnt = [];
     dat.meshtri = [];
-end;
+end
 
 % transform to arrays chanlocs1
 % -------------------------
@@ -293,7 +293,7 @@ if ~isempty(chanlocs2)
 else 
     elec2 = [];
     dat.transform = [ 0 0 0 0 0 0 1 1 1 ];
-end;
+end
 
 % copy or compute alignment matrix
 % --------------------------------
@@ -309,13 +309,13 @@ else
         ratio   = mean(avgrad2)/mean(avgrad1);
     else
         ratio = 1;
-    end;
+    end
     if ~isempty(g.alignfid)
         
         % autoscale
         % ---------
         [ electransf transform ] = align_fiducials(electmp, elec2, g.alignfid);
-        if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end;
+        if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end
         
     elseif ~isempty(g.warp)
         if ischar(g.warp)
@@ -327,21 +327,21 @@ else
                 tmpelec2 = elec2;
                 for index = 1:length(clist2)
                     tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
-                end;
+                end
                 try,
                     [ electransf dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
                 catch,
                     warndlg2(strvcat('Transformation failed', lasterr));
-                end;
-            end;
+                end
+            end
         else
             [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
-        end;
+        end
     else
         dat.transform = [0 0 0 0 0 0 ratio ratio ratio];
-    end;
+    end
     
-end;
+end
 
 % manual mode off
 % ---------------
@@ -352,12 +352,12 @@ if strcmpi(g.manual, 'off'),
         dat.electransf.pnt = dat.transform*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     else
         dat.electransf.pnt = traditionaldipfit(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
-    end;
+    end
     dat.electransf.pnt   = dat.electransf.pnt(1:3,:)';
     dat.electransf.label = dat.elec1.label;
     chanlocs1    = dat.electransf;
     return; 
-end;
+end
 
 % find common electrode names
 % ---------------------------
@@ -372,7 +372,7 @@ dat.label1     = 0;
 dat.label2     = 0;
 dat.meshon     = 1;
 fid = figure('userdata', dat, 'name', 'coregister()', 'numbertitle', 'off');
-try, icadefs; catch, end;
+try, icadefs; catch, end
 
 if 1
     header    = 'dattmp = get(gcbf, ''userdata'');';
@@ -475,7 +475,7 @@ if 1
         else
             cb_helpme = [ cb_helpme '''Then re-open the graphic interface function you were using.''), ''Warning'');' ];
         end;    
-    end;
+    end
     h = uicontrol( opt{:}, [0.87 0.95 .13 .05], 'style', 'pushbutton', 'string', 'Help me', 'callback',  cb_helpme);
     h = uicontrol( opt{:}, [0.87 0.90 .13 .05], 'style', 'pushbutton', 'string', 'Funct. help', 'callback', 'pophelp(''coregister'');' );
 
@@ -497,7 +497,7 @@ if 1
     h = uicontrol( opt{:}, [0 0.85  .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Labels on', 'callback', cb_label2 );
     h = uicontrol( opt{:}, [0 0.8   .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Electrodes', 'callback', cb_elecshow2 );
         
-end;
+end
 
 coregister('redraw', fid);
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
@@ -508,7 +508,7 @@ waitfor( findobj('parent', fid, 'tag', 'ok'), 'userdata');
 try
     tmpobj = findobj(fid); % figure still exist ?
     if isempty(tmpobj), error(' '); end % After MATLAB 2014b
-catch, transformmat = []; chanlocs1 = []; return; end;
+catch, transformmat = []; chanlocs1 = []; return; end
 dat = get(fid, 'userdata');
 transformmat = dat.transform;
 chanlocs1    = dat.electransf;
@@ -540,7 +540,7 @@ function plotelec(elec, elecshow, color, tag);
     if ~isempty(fids)
         h2 = plot3(X1(fids),Y1(fids),Z1(fids), 'o', 'color', color*2/3); hold on;
         set(h2, 'tag', tag, 'marker', '.', 'markersize', 35); % make bigger if fiducial
-    end;
+    end
 
     % plot axis and labels
     %- -------------------
@@ -560,7 +560,7 @@ function plotelec(elec, elecshow, color, tag);
              'VerticalAlignment','middle','Color',[0 0 0],...
              'FontSize',10)
         box on
-    end;
+    end
     lim = abs(lim(1)); axis([-lim lim -lim lim -lim*0.5 lim]);
     axis equal;
 
@@ -571,13 +571,13 @@ function indices = decodelabels( chanlocs, strchan );
     label1020 = { 'nz' 'lpa' 'rpa' 'Fp1', 'Fpz', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8',  'T7', 'C3', 'Cz', 'C4', 'T8',  'P7', 'P3', 'Pz', 'P4', 'P8', 'O1', 'Oz', 'O2'}'; % 21 channels
     label1010 = { 'nz' 'lpa' 'rpa' 'Fp1', 'Fpz', 'Fp2', 'AF9', 'AF7', 'AF5', 'AF3', 'AF1', 'AFz', 'AF2', 'AF4', 'AF6', 'AF8', 'AF10', 'F9', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'F10', 'FT9', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'FC6', 'FT8', 'FT10', 'T9', 'T7', 'C5', 'C3', 'C1', 'Cz', 'C2', ...
              'C4', 'C6', 'T8', 'T10', 'TP9', 'TP7', 'CP5', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'CP6', 'TP8', 'TP10', 'P9', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8', 'P10', 'PO9', 'PO7', 'PO5', 'PO3', 'PO1', 'POz', 'PO2', 'PO4', 'PO6', 'PO8', 'PO10', 'O1', 'Oz', 'O2', 'I1', 'Iz', 'I2'}'; ...
-    if ~ischar(strchan), indices = strchan; return; end;
+    if ~ischar(strchan), indices = strchan; return; end
     switch strchan
      case '21 elec (10/20 system)', indices = pop_chancoresp( struct('labels', chanlocs.label), struct('labels', label1020), 'gui', 'off');
      case '86 elec (10/10 system)', indices = pop_chancoresp( struct('labels', chanlocs.label), struct('labels', label1010), 'gui', 'off');
      case 'all elec (10/5 system)', indices = 1:length(chanlocs.label);
     otherwise, error('Unknown option');
-  end;
+  end
     
 % plot electrode labels
 % ---------------------
@@ -612,17 +612,17 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
     diff1 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     transf(6) = -transf(6);
     diff2 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
-    if diff1 < diff2, transf(6) = -transf(6); end;
+    if diff1 < diff2, transf(6) = -transf(6); end
     
     diff1 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     transf(5) = -transf(5);
     diff2 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
-    if diff1 < diff2, transf(5) = -transf(5); end;
+    if diff1 < diff2, transf(5) = -transf(5); end
     
     diff1 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     transf(4) = -transf(4);
     diff2 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
-    if diff1 < diff2, transf(4) = -transf(4); end;
+    if diff1 < diff2, transf(4) = -transf(4); end
 
     % rescale if necessary
     % --------------------
@@ -653,7 +653,7 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     
     transf = elec3.m;
     transf(4:6) = transf(4:6)/180*pi;
-    if length(transf) == 6, transf(7:9) = 1; end;
+    if length(transf) == 6, transf(7:9) = 1; end
     transf = checktransf(transf, elec1, elec2);
     
     dpre = mean(sqrt(sum((elec1.pnt(ind1,:) - elec2.pnt(ind2,:)).^2, 2)));
@@ -683,7 +683,7 @@ function transf = checktransf(transf, elec1, elec2)
     diff2  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
     diff2  = mean(sum(diff2.^2,2));
     
-    if diff1 < diff2, transf(6) = -transf(6); else diff1 = diff2; end;
+    if diff1 < diff2, transf(6) = -transf(6); else diff1 = diff2; end
 
     transf(4) = -transf(4); % yaw angle is sometimes inverted
     transfmat = traditionaldipfit(transf);
@@ -692,7 +692,7 @@ function transf = checktransf(transf, elec1, elec2)
     diff2  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
     diff2  = mean(sum(diff2.^2,2));
     
-    if diff1 < diff2, transf(4) = -transf(4); end;
+    if diff1 < diff2, transf(4) = -transf(4); end
     
 % redraw GUI
 % ----------
@@ -713,7 +713,7 @@ function redrawgui(fid)
         dat.electransf.pnt = dat.transform*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     else
         dat.electransf.pnt = traditionaldipfit(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
-    end;
+    end
     dat.electransf.pnt   = dat.electransf.pnt(1:3,:)';
     dat.electransf.label = dat.elec1.label;
     set(fid, 'userdata', dat);
@@ -727,12 +727,12 @@ function redrawgui(fid)
     else 
         axes(h);
         %axis off;
-    end;
+    end
     plotelec(dat.electransf, dat.elecshow1, dat.color1, 'elec1');
     if ~isempty(dat.elec2)
         dat.elecshow2 = decodelabels( dat.elec2, dat.elecshow2 );
         plotelec(dat.elec2, dat.elecshow2, dat.color2, 'elec2');
-    end;
+    end
     set(h, 'tag', 'plot3d');
     
     % plot mesh
@@ -752,13 +752,13 @@ function redrawgui(fid)
             lighting phong
             s = plotnose([85 0 -75 0 0 pi/2 10 10 40]);
             set(s, 'tag', 'mesh');
-        end;
-    end;
+        end
+    end
     meshobj = findobj(gcf, 'tag', 'mesh');
     if dat.meshon
          set( meshobj, 'visible', 'on');
     else set( meshobj, 'visible', 'off');
-    end;
+    end
     
     % plot electrodes
     % ---------------
@@ -766,10 +766,10 @@ function redrawgui(fid)
     delete(findobj(gcf, 'tag', 'elec2labels'));        
     if dat.label1
         plotlabels(dat.electransf, dat.elecshow1, dat.color1, 'elec1labels');
-    end;
+    end
     if dat.label2
         plotlabels(dat.elec2, dat.elecshow2, dat.color2*0.5, 'elec2labels');
-    end;
+    end
     
     %view(tmpview);
     rotate3d on    
@@ -781,10 +781,10 @@ function s = plotnose(transf, col)
 
     if nargin < 1
         transf = [0 0 0 0 0 0 1 1 1];
-    end;
+    end
     if nargin < 2
         col = [1 0.75 0.65 ];
-    end;
+    end
         
     x=[ % cube
      NaN -1 1 NaN

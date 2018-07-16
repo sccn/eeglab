@@ -42,7 +42,7 @@ command = '';
 if nargin < 1
 	% ask user
 	folder = uigetdir('*.*', 'Choose a directory -- pop_fileiodir()'); 
-	if folder == 0 return; end;
+	if folder == 0 return; end
     drawnow;
     
     % open file to get infos
@@ -58,19 +58,19 @@ if nargin < 1
         uilist{end+1} = { 'style' 'text' 'String' [ 'Trial range (default all [1 ' int2str(dat.nTrials) '])' ] };
         uilist{end+1} = { 'style' 'edit' 'string' '' };
         geom = { geom{:} [3 1] };
-    end;
+    end
     result = inputgui( geom, uilist, 'pophelp(''pop_fileiodir'')', 'Load data using FILE-IO -- pop_fileiodir()');
-    if length(result) == 0 return; end;
+    if length(result) == 0 return; end
 
     options = {};
     result = { result{:} '' };
-    if ~isempty(result{1}), options = { options{:} 'channels' eval( [ '[' result{1} ']' ] ) }; end;
-    if ~isempty(result{2}), options = { options{:} 'samples'  eval( [ '[' result{2} ']' ] ) }; end;
-    if ~isempty(result{3}), options = { options{:} 'trials'   eval( [ '[' result{3} ']' ] ) }; end;
+    if ~isempty(result{1}), options = { options{:} 'channels' eval( [ '[' result{1} ']' ] ) }; end
+    if ~isempty(result{2}), options = { options{:} 'samples'  eval( [ '[' result{2} ']' ] ) }; end
+    if ~isempty(result{3}), options = { options{:} 'trials'   eval( [ '[' result{3} ']' ] ) }; end
 else
     dat = ft_read_header(folder);
     options = varargin;
-end;
+end
 
 [EEG command] = pop_fileio(folder, options{:});
 

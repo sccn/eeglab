@@ -180,20 +180,20 @@ if ischar(opt), error(opt); end
 if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end
 if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end
 if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end
-%if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end;
-%if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end;
+%if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end
+%if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end
     
 % build command list for history
 % ------------------------------
 listcom = { 'name' opt.name 'delfiles' opt.delfiles 'defaultdesign' opt.defaultdesign };
-if ~isempty(opt.values1), listcom = { listcom{:} 'variable1' opt.variable1 'values1' opt.values1 'vartype1' opt.vartype1 }; end;
-if ~isempty(opt.values2), listcom = { listcom{:} 'variable2' opt.variable2 'values2' opt.values2 'vartype2' opt.vartype2 }; end;
-if ~isempty(opt.values2), listcom = { listcom{:} 'variable3' opt.variable2 'values3' opt.values2 'vartype3' opt.vartype3 }; end;
-if ~isempty(opt.values2), listcom = { listcom{:} 'variable4' opt.variable2 'values4' opt.values2 'vartype4' opt.vartype4 }; end;
-if ~isempty(opt.subjselect),  listcom = { listcom{:} 'subjselect'  opt.subjselect }; end;
-if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end;
-if ~isempty(opt.filepath),    listcom = { listcom{:} 'filepath'  opt.filepath }; end;
-if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end;
+if ~isempty(opt.values1), listcom = { listcom{:} 'variable1' opt.variable1 'values1' opt.values1 'vartype1' opt.vartype1 }; end
+if ~isempty(opt.values2), listcom = { listcom{:} 'variable2' opt.variable2 'values2' opt.values2 'vartype2' opt.vartype2 }; end
+if ~isempty(opt.values2), listcom = { listcom{:} 'variable3' opt.variable2 'values3' opt.values2 'vartype3' opt.vartype3 }; end
+if ~isempty(opt.values2), listcom = { listcom{:} 'variable4' opt.variable2 'values4' opt.values2 'vartype4' opt.vartype4 }; end
+if ~isempty(opt.subjselect),  listcom = { listcom{:} 'subjselect'  opt.subjselect }; end
+if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end
+if ~isempty(opt.filepath),    listcom = { listcom{:} 'filepath'  opt.filepath }; end
+if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end
     
 % select specific subjects
 % ------------------------

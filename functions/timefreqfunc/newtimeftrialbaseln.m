@@ -40,7 +40,7 @@ function PP = newtimeftrialbaseln(PPori, timesout, varargin)
 if nargin < 3
     help newtimefbaseln;
     return;
-end;
+end
 
 [g timefreqopts ] = finputcheck(varargin, ...
     {'basenorm'      'string'    {'on','off'} 'off';
@@ -48,8 +48,8 @@ end;
     'trialbase'     'string'    {'on','off','full'} 'off';
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimeftrialbaseln', 'ignore');
-if ischar(g) error(g); return; end;
-PP = PPori; if ~iscell(PP), PP = { PP }; end;
+if ischar(g) error(g); return; end
+PP = PPori; if ~iscell(PP), PP = { PP }; end
 
 % ---------------
 % baseline length
@@ -59,7 +59,7 @@ if size(g.baseline,2) == 2
     for index = 1:size(g.baseline,1)
         tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
         baseln = union_bc(baseln, tmptime);
-    end;
+    end
     if length(baseln)==0
         error( [ 'There are no sample points found in the default baseline.' 10 ...
             'This may happen even though data time limits overlap with' 10 ...
@@ -71,7 +71,7 @@ else
          baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
     else baseln = 1:length(timesout); % use all times as baseline
     end
-end;
+end
 
 for ind = 1:length(PP(:))
     
@@ -82,7 +82,7 @@ for ind = 1:length(PP(:))
     % -----------------------------------------
     if strcmpi(g.trialbase, 'on'), tmpbase = baseln;
     else                           tmpbase = 1:size(P,2); % full baseline
-    end;
+    end
     if ~strcmpi(g.trialbase, 'off')
         if ndims(P) == 4
             mbase = mean(P(:,:,tmpbase,:),3);
@@ -90,7 +90,7 @@ for ind = 1:length(PP(:))
                 mstd = std(P(:,:,tmpbase,:),[],3);
                 P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
             else P = bsxfun(@rdivide, P, mbase);
-            end;
+            end
         else
             mbase = mean(P(:,tmpbase,:),2);
             if strcmpi(g.basenorm, 'on')
@@ -99,10 +99,10 @@ for ind = 1:length(PP(:))
             else
                 P = P./repmat(mbase,[1 size(P,2) 1]);
                 %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     PP{ind} = P;
-end;
-if ~iscell(PPori) PP = PP{1}; end;
+end
+if ~iscell(PPori) PP = PP{1}; end

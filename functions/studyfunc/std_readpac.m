@@ -57,11 +57,11 @@ end
     'timerange'  'real'    []       [] }, ...
     'std_readpac', 'ignore');
 
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 %STUDY = pop_pacparams(STUDY, 'default');
-%if isempty(opt.timerange), opt.timerange = STUDY.etc.pacparams.timerange; end;
-%if isempty(opt.freqrange), opt.freqrange = STUDY.etc.pacparams.freqrange; end;
+%if isempty(opt.timerange), opt.timerange = STUDY.etc.pacparams.timerange; end
+%if isempty(opt.freqrange), opt.freqrange = STUDY.etc.pacparams.freqrange; end
 
 nc = max(length(STUDY.condition),1);
 ng = max(length(STUDY.group),1);
@@ -78,7 +78,7 @@ else
     len2 = length(opt.clusters2);
     opt.indices1 = opt.clusters1;
     opt.indices2 = opt.clusters2;
-end;
+end
 
 STUDY = std_convertoldsetformat(STUDY); %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX REMOVE WHEN READY TO GET RID OF OLD FORMAT
 
@@ -93,7 +93,7 @@ for ind1 = 1:len1 % usually only one channel/component
         else
             tmpstruct1 = STUDY.cluster(opt.indices1(ind1));
             tmpstruct2 = STUDY.cluster(opt.indices2(ind2));
-        end;
+        end
         allinds1       = tmpstruct1.allinds;
         setinds1       = tmpstruct1.setinds;
         allinds2       = tmpstruct2.allinds;
@@ -108,26 +108,26 @@ for ind1 = 1:len1 % usually only one channel/component
                     %if isequal( STUDY.etc.pacparams.timerange, opt.timerange) & ...
                     %        isequal( STUDY.etc.pacparams.freqrange, opt.freqrange) & ~isempty(tmpstruct.pacdata)
                     dataread = 1;
-                end;
-            end;
-        end;
+                end
+            end
+        end
 
         if ~dataread
             
             % reserve arrays
             % --------------
 %             pacarray = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
-%             tmpind1 = 1; while(isempty(setinds{tmpind1})), tmpind1 = tmpind1+1; end;
-%             tmpind2 = 1; while(isempty(setinds{tmpind2})), tmpind2 = tmpind2+1; end;
+%             tmpind1 = 1; while(isempty(setinds{tmpind1})), tmpind1 = tmpind1+1; end
+%             tmpind2 = 1; while(isempty(setinds{tmpind2})), tmpind2 = tmpind2+1; end
 %             if ~isempty(opt.channels1)
 %                  [ tmp allfreqs alltimes ] = std_readpac( ALLEEG, 'channels1'  , setinds1{tmpind}(1), 'channels2'  , setinds2{tmpind}(1), 'timerange', opt.timerange, 'freqrange', opt.freqrange);
 %             else [ tmp allfreqs alltimes ] = std_readpac( ALLEEG, 'components1', setinds1{tmpind}(1), 'components2', setinds2{tmpind}(1), 'timerange', opt.timerange, 'freqrange', opt.freqrange);
-%             end;
+%             end
 %             for c = 1:nc
 %                 for g = 1:ng
 %                     pacarray{c, g} = repmat(zero, [length(alltimes), length(allfreqs), length(allinds1{c,g}) ]);
-%                 end;
-%             end;
+%                 end
+%             end
 
             % read the data and select channels
             % ---------------------------------
@@ -141,20 +141,20 @@ for ind1 = 1:len1 % usually only one channel/component
                         
                         % get dataset indices for this subject
                         [inds1 inds2] = getsubjcomps(STUDY, subj, setinds1{c,g}, setinds2{c,g});
-                        if setinds1{c,g}(inds1) ~= setinds2{c,g}(inds2), error('Wrong subject index'); end;
-                        if ~strcmpi(ALLEEG(setinds1{c,g}(inds1)).subject, STUDY.subject(subj)), error('Wrong subject index'); end;
+                        if setinds1{c,g}(inds1) ~= setinds2{c,g}(inds2), error('Wrong subject index'); end
+                        if ~strcmpi(ALLEEG(setinds1{c,g}(inds1)).subject, STUDY.subject(subj)), error('Wrong subject index'); end
                                                 
                         if ~isempty(inds1) & ~isempty(inds2)
                             if ~isempty(opt.channels1)
                                  [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(setinds1{c,g}(subj)), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
                             else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(setinds1{c,g}(subj)), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
-                            end;
+                            end
                             
                             % collapse first 2 dimentions (comps x comps)
                             if ndims(pacarraytmp) == 4
                                  pacarraytmp = reshape(pacarraytmp,    size(pacarraytmp,1)*size(pacarraytmp,2), size(pacarraytmp,3), size(pacarraytmp,4));
                             else pacarraytmp = reshape(pacarraytmp, 1, size(pacarraytmp,1),size(pacarraytmp,2));
-                            end;
+                            end
                             if strcmpi(opt.onepersubj, 'on')
                                 pacarray{c, g}(:,:,count) = squeeze(mean(pacarraytmp,1));
                                 count = count+1;
@@ -162,12 +162,12 @@ for ind1 = 1:len1 % usually only one channel/component
                                 for tmpi = 1:size(pacarraytmp,1)
                                     pacarray{c, g}(:,:,count) = pacarraytmp(tmpi,:,:);
                                     count = count+1;
-                                end;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
             
             % copy data to structure
             % ----------------------
@@ -178,17 +178,17 @@ for ind1 = 1:len1 % usually only one channel/component
             else STUDY.cluster(opt.indices1(ind1)).pacfreqs = allfreqs;
                  STUDY.cluster(opt.indices1(ind1)).pactimes = alltimes;
                  STUDY.cluster(opt.indices1(ind1)).pacdata{opt.indices2(ind2)} = pacarray;
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 
 % return structure
 % ----------------
 if ~isempty(opt.channels1)
      clustinfo = STUDY.changrp(opt.indices1);
 else clustinfo = STUDY.cluster(opt.indices1);
-end;
+end
 
 % get components common to a given subject
 % ----------------------------------------
@@ -199,10 +199,10 @@ function [inds1 inds2] = getsubjcomps(STUDY, subj, setlist1, setlist2, complist1
     datasets = strmatch(STUDY.subject{subj}, { STUDY.datasetinfo.subject } ); % all datasets of subject
     [tmp1] = intersect_bc(setlist1, datasets);
     [tmp2] = intersect_bc(setlist2, datasets);
-    if length(tmp1) > 1, error('This function does not support sessions for subjects'); end;
-    if length(tmp2) > 1, error('This function does not support sessions for subjects'); end;
-    if tmp1 ~= tmp2, error('Different datasets while it should be the same'); end;
-    if ~isempty(tmp1), inds1 = find(setlist1 == tmp1); end;
-    if ~isempty(tmp2), inds2 = find(setlist2 == tmp2); end;
+    if length(tmp1) > 1, error('This function does not support sessions for subjects'); end
+    if length(tmp2) > 1, error('This function does not support sessions for subjects'); end
+    if tmp1 ~= tmp2, error('Different datasets while it should be the same'); end
+    if ~isempty(tmp1), inds1 = find(setlist1 == tmp1); end
+    if ~isempty(tmp2), inds2 = find(setlist2 == tmp2); end
 
 

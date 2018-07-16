@@ -51,14 +51,14 @@ function [handles] = plotsphere(pos, rad, varargin);
     if nargin < 2
         help plotsphere;
         return;
-    end;
+    end
     
     g = finputcheck(varargin, { 'color'    { 'real','string' } []         [1 0 0];
                                 'nvert'    'integer'           [2 Inf]    15;
                                 'proj'     'real'              []         [];
                                 'colormap' 'real'              []         jet(64);
                                 'projcol'  { 'real','string' } []         [0 0 0] }, 'plotsphere');
-    if ischar(g), error(g); end;
+    if ischar(g), error(g); end
     
     % decode color if necessary
     % -------------------------
@@ -66,12 +66,12 @@ function [handles] = plotsphere(pos, rad, varargin);
         g.color = g.colormap(g.color,:);
     elseif ischar(g.color)
         g.color = strcol2real(g.color);
-    end;
+    end
     if ~ischar(g.projcol) & length(g.projcol) == 1
         g.projcol = g.colormap(g.projcol,:);
     elseif ischar(g.projcol)
         g.projcol = strcol2real(g.projcol);
-    end;
+    end
             
     % ploting sphere
     % ==============
@@ -92,12 +92,12 @@ function [handles] = plotsphere(pos, rad, varargin);
     if ~isempty(g.proj)
         colorarray  = repmat(reshape(g.projcol, 1,1,3), [size(zs,1) size(zs,2) 1]);
         if ~isnan(g.proj(1)), handles(end+1) = surf(g.proj(1)*ones(size(xs)), ys, zs, colorarray, ...
-                                                    'edgecolor', 'none', 'facelighting', 'none'); end;
+                                                    'edgecolor', 'none', 'facelighting', 'none'); end
         if ~isnan(g.proj(2)), handles(end+1) = surf(xs, g.proj(2)*ones(size(ys)), zs, colorarray, ...
-                                                    'edgecolor', 'none', 'facelighting', 'none'); end;
+                                                    'edgecolor', 'none', 'facelighting', 'none'); end
         if ~isnan(g.proj(3)), handles(end+1) = surf(xs, ys, g.proj(3)*ones(size(zs)), colorarray, ...
-                                                    'edgecolor', 'none', 'facelighting', 'none'); end;
-    end;
+                                                    'edgecolor', 'none', 'facelighting', 'none'); end
+    end
     
 function color = strcol2real(color)
     switch color
@@ -110,4 +110,4 @@ function color = strcol2real(color)
      case 'k', color = [0 0 0];
      case 'w', color = [1 1 1];
      otherwise, error('Unknown color'); 
-    end;
+    end

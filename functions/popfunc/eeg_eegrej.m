@@ -41,13 +41,13 @@ com = '';
 if nargin < 2
 	help eeg_eegrej;
 	return;
-end;
+end
 if nargin<3
     probadded = [];
 end
 if isempty(regions)
 	return;
-end;
+end
 
 % regions = sortrows(regions,3); % Arno and Ramon on 5/13/2014 for bug 1605
 
@@ -56,7 +56,7 @@ if size(regions,2) > 2
     regions = sortrows(regions,3);
 else
     regions = sortrows(regions,1);
-end;
+end
 
 try
     % For AMICA probabilities...Temporarily add model probabilities as channels
@@ -98,11 +98,11 @@ if isfield(EEG.event, 'latency'),
      tmpalllatencies = [ tmpevent.latency ];
 
 else tmpalllatencies = []; 
-end;
+end
 
 % handle regions from eegplot
 % ---------------------------
-if size(regions,2) > 2, regions = regions(:, 3:4); end;
+if size(regions,2) > 2, regions = regions(:, 3:4); end
 regions = combineregions(regions);
 
 [EEG.data, EEG.xmax, event2, boundevents] = eegrej( EEG.data, regions, EEG.xmax-EEG.xmin, EEG.event);
@@ -117,7 +117,7 @@ EEG.xmax   = EEG.xmax+EEG.xmin;
 EEG = eeg_checkset(EEG, 'eventconsistency');
 if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency > EEG.pnts
     EEG.event(end) = []; % remove last event if necessary
-end;
+end
 
 % double check event latencies
 % the function that insert boundary events and recompute latency is
@@ -166,10 +166,10 @@ if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) 
         duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
         if ~isequal(duration1, duration2)
             warning(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
-        end;
+        end
     catch, warning('Unknown error when checking event latency - please send us your dataset');
-    end;
-end;
+    end
+end
 
 % debuging code below
 % regions, n1 = 1525; n2 = 1545; n = n2-n1+1;
@@ -190,8 +190,8 @@ com = sprintf('EEG = eeg_eegrej( EEG, %s);', vararg2str({ regions }));
 %         disp('Warning: overlapping regions detected and fixed in eeg_eegrej');
 %         newregions(index-1,:) = [regions(index-1,1) regions(index,2) ];
 %         newregions(index,:)   = [];
-%     end;
-% end;
+%     end
+% end
 
 function res = issameevent(evt1, evt2)
 
@@ -203,8 +203,8 @@ elseif isfield(evt1, 'duration') && isnan(evt1.duration) && isfield(evt2, 'durat
     evt2.duration = 1;
     if isequal(evt1,evt2)
         return;
-    end;
-end;
+    end
+end
 res = false;
 return;
 

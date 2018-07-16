@@ -81,7 +81,7 @@ function [X, t] = std_erp(EEG, varargin); %comps, timerange)
 if nargin < 1
     help std_erp;
     return;
-end;
+end
 
 % decode inputs
 % -------------
@@ -92,13 +92,13 @@ if ~isempty(varargin)
             options = { 'components' varargin{1} 'timerange' varargin{2} };
         else
             options = { 'channels' -varargin{1} 'timerange' varargin{2} };
-        end;
+        end
     else
         options = varargin;
-    end;
+    end
 else
     options = varargin;
-end;
+end
 
 g = finputcheck(options, { 'components' 'integer' []         [];
                            'channels'   'cell'    {}         {};
@@ -111,9 +111,9 @@ g = finputcheck(options, { 'components' 'integer' []         [];
                            'interp'     'struct'  { }        struct([]);
                            'timerange'  'real'    []         [];        % the timerange option is deprecated and has no effect
                            'recompute'  'string'  { 'on','off' } 'off' }, 'std_erp');
-if ischar(g), error(g); end;
-if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
-if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
+if ischar(g), error(g); end
+if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
+if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
 if isfield(EEG,'icaweights')
    numc = size(EEG(1).icaweights,1);
 else
@@ -127,14 +127,14 @@ end
 %
 % % filename 
 % % --------
-if isempty(g.fileout), g.fileout = fullfile(EEG(1).filepath, EEG(1).filename(1:end-4)); end;
+if isempty(g.fileout), g.fileout = fullfile(EEG(1).filepath, EEG(1).filename(1:end-4)); end
 if ~isempty(g.channels)
     filenameshort = [ g.fileout '.daterp'];
     prefix = 'chan';
 else    
     filenameshort = [ g.fileout '.icaerp'];
     prefix = 'comp';
-end;
+end
 %filename = fullfile( EEG(1).filepath, filenameshort);
 filename = filenameshort;
 
@@ -148,8 +148,8 @@ if exist(filename) && strcmpi(g.recompute, 'off') && nargout > 0
         [X tmp t] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
     else
         [X tmp t] = std_readfile(setinfo, 'channels', g.channels,  'timelimits', g.timerange, 'measure', 'erp');
-    end;
-    if ~isempty(X), return; end;
+    end
+    if ~isempty(X), return; end
     
 end 
    
@@ -164,17 +164,17 @@ end
 %    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
 %        reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
 %    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
-%end;
+%end
 %if strcmpi(prefix, 'comp'), X = TMP.icaact;
 %else                        X = TMP.data;
-%end;
+%end
 options = {};
-if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
-if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
+if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end
+if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end
 if isempty(g.channels)
      X = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
 else X = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
-end;
+end
 
 % Remove baseline mean
 % --------------------
@@ -183,7 +183,7 @@ trials   = size(X,3);
 timevals = EEG(1).times;
 if ~isempty(g.timerange)
     disp('Warning: the ''timerange'' option is deprecated and has no effect');
-end;
+end
 if ~isempty(X)
     if ~isempty(g.rmbase)
         disp('Removing baseline...');
@@ -202,15 +202,15 @@ if ~isempty(X)
             X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts size(X,3)]) .* X;
         else
             X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts]) .* mean(X,3); % calculate ERP
-        end;
+        end
     elseif strcmpi(g.savetrials, 'off')
         X = mean(X, 3);
-    end;
-end;
+    end
+end
 eeglab_options;
 if option_single
     X = single(X);
-end;
+end
 
 % Save ERPs in file (all components or channels)
 % ----------------------------------------------
@@ -225,16 +225,16 @@ else
     else
         tmpchanlocs = EEG(1).chanlocs;
         savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels }, fileNames, g.trialindices, g.trialinfo);
-    end;
+    end
     %[X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
-end;
+end
 
 % compute full file names
 % -----------------------
 function res = computeFullFileName(filePaths, fileNames);
 for index = 1:length(fileNames)
     res{index} = fullfile(filePaths{index}, fileNames{index});
-end;
+end
 
 % -------------------------------------
 % saving ERP information to Matlab file
@@ -245,10 +245,10 @@ function savetofile(filename, t, X, prefix, comps, params, labels, dataFiles, da
     allerp = [];
     for k = 1:length(comps)
         allerp = setfield( allerp, [ prefix int2str(comps(k)) ], squeeze(X(k,:,:)));
-    end;
+    end
     if nargin > 6 && ~isempty(labels)
         allerp.labels = labels;
-    end;
+    end
     allerp.times       = t;
     allerp.datatype    = 'ERP';
     allerp.parameters  = params;

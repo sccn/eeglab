@@ -40,13 +40,13 @@ com = '';
 if nargin < 1
 	help pop_saveh;
 	return;
-end;
+end
 	
 if nargin < 3
 	[curfilename, curfilepath] = uiputfile('eeglabhist.m', 'Save the EEGLAB session command history with .m extension -- pop_saveh()');
     drawnow;
-	if curfilename == 0 return; end;
-end;
+	if curfilename == 0 return; end
+end
 
 
 fid = fopen( [ curfilepath '/' curfilename ], 'w');
@@ -59,18 +59,18 @@ if iscell(allcoms)
     disp('Saving the EEGLAB session command history...');
     for index = length(allcoms):-1:1
         fprintf(fid, '%s\n', allcoms{index});
-    end;
+    end
     fprintf(fid, 'eeglab redraw;\n');
 else
     disp('Saving the current EEG dataset command history...');
     fprintf(fid, '%s\n', allcoms);
-end;
+end
 fclose(fid);
 
 if iscell(allcoms) && nargout == 1
     com = sprintf('pop_saveh( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
 else
     com = sprintf('pop_saveh( EEG.history, ''%s'', ''%s'');', curfilename, curfilepath);
-end;
+end
 
 return;

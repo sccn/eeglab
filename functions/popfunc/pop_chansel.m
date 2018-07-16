@@ -69,7 +69,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     else                    chan_indices = 1:length(chans);
     end
     if isstruct(chans), chans = { chans.(g.field) }; end
-    if strcmpi(g.field, 'type'), chans = unique_bc(chans); end;
+    if strcmpi(g.field, 'type'), chans = unique_bc(chans); end
         
     % convert selection to integer
     % ----------------------------

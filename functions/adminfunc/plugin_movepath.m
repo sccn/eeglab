@@ -44,10 +44,10 @@ try
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
-    else g = []; end;
+    else g = []; end
 catch
     disp('plugin_movepath() error: calling convention {''key'', value, ... } error'); return;
-end;
+end
 
 try g.warns;   catch, g.warns  = 0;  end; % NO warnings by default
 
@@ -73,7 +73,7 @@ if ismatlab
     oldpath = matlabpath;
 else
     oldpath = path;
-end;
+end
 
 % Retreiving path
 comp = computer;
@@ -81,12 +81,12 @@ if strcmpi(comp(1:2), 'PC')
     newpathtest = [ pluginfolder ';' ];
 else
     newpathtest = [ pluginfolder ':' ];
-end;
+end
 ind = strfind(oldpath, newpathtest);
 
 % Checking out if the work is already done
-if strcmp(pluginpos,'begin') && ind == 1, return; end;
-if strcmp(pluginpos,'end')   && strcmp(oldpath(end-length(pluginfolder):end),pluginfolder), return; end;
+if strcmp(pluginpos,'begin') && ind == 1, return; end
+if strcmp(pluginpos,'end')   && strcmp(oldpath(end-length(pluginfolder):end),pluginfolder), return; end
     
 % Shooting down warnings
 if ~g.warns
@@ -122,4 +122,4 @@ if v(1) > '4'
     res = 1;
 else
     res = 0;
-end;
+end

@@ -68,9 +68,9 @@ for ind1 = 1:a
         case 6, AS(:,:,:,:,:,ind1,:)   = AS(:,:,:,:,:,ind1,:)   + reshape(data{ind1},[sz(1:nd-1) 1 n]);
         case 7, AS(:,:,:,:,:,:,ind1,:) = AS(:,:,:,:,:,:,ind1,:) + reshape(data{ind1},[sz(1:nd-1) 1 n]);
         otherwise     error('Dimension not supported');
-    end;
+    end
     sq = sq + sum(data{ind1}.^2,nd);
-end;
+end
 dimA = nd+1;
 dimB = nd;
 
@@ -110,5 +110,5 @@ function val = myndims(a)
             val = 1;
         else
             val = 2;
-        end;
-    end;
+        end
+    end

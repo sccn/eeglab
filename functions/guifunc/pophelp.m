@@ -33,17 +33,17 @@ function pophelp( funct, nonmatlab );
 if nargin <1
 	help pophelp;
 	return;
-end;
+end
 if nargin <2
 	nonmatlab = 0;
-end;
+end
 
 if exist('help2html')
     if length(funct) > 3 && strcmpi(funct(end-3:end), '.txt')
         web(funct);
     else
         pathHelpHTML = fileparts(which('help2html'));
-        if ~isempty(findstr('NFT', pathHelpHTML)), rmpath(pathHelpHTML); end;
+        if ~isempty(findstr('NFT', pathHelpHTML)), rmpath(pathHelpHTML); end
         text1 = help2html(funct);
         if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
             try,
@@ -53,13 +53,13 @@ if exist('help2html')
                                ' The ''pop'' function above calls the eponymous Matlab function below' 10 ...
                                ' and could use some of its optional parameters' 10 ...
                                '___________________________________________________________________</pre><br><br>' text2 ];
-            catch, end;
-        end;
+            catch, end
+        end
 
         web([ 'text://' text1 ]);
-    end;
+    end
 else
-    if isempty(funct), return; end;
+    if isempty(funct), return; end
     doc1 = readfunc(funct, nonmatlab);
     if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
         try,
@@ -72,31 +72,31 @@ else
                            ' _________________________________________________________________ ' ...
                            ' ' ...
                     doc2{:} };
-        catch, end;
-    end;
+        catch, end
+    end
 
     textgui(doc1);1000
     h = findobj('parent', gcf, 'style', 'slider');
     try, icadefs; catch, 
         GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
         GUITEXTCOLOR   = 'k'; 
-    end;
+    end
     set(h, 'backgroundcolor', GUIBUTTONCOLOR);
     h = findobj('parent', gcf, 'style', 'pushbutton');
     set(h, 'backgroundcolor', GUIBUTTONCOLOR);
     h = findobj('parent', gca);
     set(h, 'color', GUITEXTCOLOR);
     set(gcf, 'color', BACKCOLOR);
-end;
+end
 return;
 
 function [doc] = readfunc(funct, nonmatlab)
 
 doc = {};
 if iseeglabdeployed
-    if isempty(find(funct == '.')), funct = [ funct '.m' ]; end;
+    if isempty(find(funct == '.')), funct = [ funct '.m' ]; end
     funct = fullfile(eeglabexefolder, 'help', funct);
-end;
+end
 if nonmatlab	
 	fid = fopen( funct, 'r');
 else
@@ -104,17 +104,17 @@ else
 		fid = fopen( funct, 'r');
 	else
 		fid = fopen( [funct '.m'], 'r');
-	end;
-end;
+	end
+end
 
 if fid == -1
 	error('File not found');
-end;
+end
 
 sub = 1;
 try, 
-    if ~isunix, sub = 0; end;
-catch, end;
+    if ~isunix, sub = 0; end
+catch, end
 
 if nonmatlab
 	str = fgets( fid );
@@ -122,13 +122,13 @@ if nonmatlab
 		str = deblank(str(1:end-sub));
         doc = { doc{:} str(1:end) };    
         str = fgets( fid );
-	end;
+	end
 else
 	str = fgets( fid );
 	while (str(1) == '%')
 		str = deblank(str(1:end-sub));
         doc = { doc{:} str(2:end) };    
 		str = fgets( fid );
-	end;
-end;
+	end
+end
 fclose(fid);

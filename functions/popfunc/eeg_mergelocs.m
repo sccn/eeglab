@@ -55,7 +55,7 @@ try
             if isempty(warning_shown)
                 disp('Warning: different channel montage or electrode order for the different datasets');
                 warning_shown = 1;
-            end;
+            end
 
             % trying to preserve order of the longest array
             %----------------------------------------------
@@ -63,7 +63,7 @@ try
                 tmp     = alllocs;
                 alllocs = tmplocs;
                 tmplocs = tmp;
-            end;
+            end
             allchans = { alllocs.labels tmplocs.labels };
             [uniquechan ord1 ord2 ]  = unique_bc( allchans );
 
@@ -73,16 +73,16 @@ try
 
             newlocs = [ alllocs tmplocs(tmplocsind) ];
 
-        end;
+        end
         alllocs = newlocs;
-    end;
+    end
 catch,
     % temporary fix for dissimilar structures
     % should check channel structure consistency instead
     % using checkchan function
     disp('Channel merging warning: dissimilar fields in the two structures');
     [alllocs warn ] = eeg_mergelocs_diffstruct(varargin{:});
-end;
+end
 
 % Checking consistency of chanlocs
 alllocs = eeg_checkchanlocs(alllocs);
@@ -122,6 +122,6 @@ function alllocs = myunion(locs1, locs2)
            alllocs(count3) = locs2(count2);
            count2 = count2 + 1;
            count3 = count3 + 1;
-       end;
+       end
        
-   end;
+   end

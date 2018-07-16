@@ -30,7 +30,7 @@ function f=loglike(W, S);
     M = size(W,1);
     if ndims(S) == 3
         S = reshape(S, size(S,1), size(S,3)*size(S,2)); 
-    end;
+    end
     N = size(S,2);
     
     % detect infinite and remove them

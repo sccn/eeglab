@@ -36,11 +36,11 @@ function p1 = plotmesh(faces, vertex, normal, newfig)
     if nargin < 2
         help plotmesh;
         return;
-    end;
+    end
        
     FaceColor  = [.8 .55 .35]*1.1; % ~= ruddy Caucasian - pick your complexion!
     
-    if any(any(faces == 0)), faces = faces+1; end;
+    if any(any(faces == 0)), faces = faces+1; end
     %vertex(:,3) = -vertex(:,3);
     %FCmap = [jet(64); FaceColor; FaceColor; FaceColor];
     %colormap(FCmap)
@@ -49,17 +49,17 @@ function p1 = plotmesh(faces, vertex, normal, newfig)
     %size(W)
     if nargin < 4
         figure; 
-    end;
+    end
     if nargin < 3 
         normal = [];
-    end;
+    end
     if isempty(normal)
         p1 = patch('vertices', vertex, 'faces', faces, ...
                    'facecolor', [1,.75,.65]);
     else
         p1 = patch('vertices', vertex, 'faces', faces, ...
                    'facecolor', [1,.75,.65], 'vertexnormals', normal);
-    end;
+    end
         %           'FaceVertexCdata',W(:), 'FaceColor','interp', 'vertexnormals', normal);
     set(p1,'EdgeColor','none')
     

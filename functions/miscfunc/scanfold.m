@@ -33,12 +33,12 @@
 
 function [ cellres, textres ] = scanfold(foldname, ignorelist, maxdepth)
 
-if nargin < 2, ignorelist = {}; end;
-if nargin < 3, maxdepth = 100; end;
+if nargin < 2, ignorelist = {}; end
+if nargin < 3, maxdepth = 100; end
 foldcontent = dir(foldname);
 textres = '';
 cellres = {};
-if maxdepth == 0, return; end;
+if maxdepth == 0, return; end
 for i = 1:length(foldcontent)
     if (exist(foldcontent(i).name) == 7 || strcmpi(foldcontent(i).name, 'functions')) && ~ismember(foldcontent(i).name, ignorelist)
         if ~strcmpi(foldcontent(i).name, '..') && ~strcmpi(foldcontent(i).name, '.')
@@ -46,14 +46,14 @@ for i = 1:length(foldcontent)
             [tmpcellres tmpres] = scanfold(fullfile(foldname, foldcontent(i).name), ignorelist, maxdepth-1);
             textres = [ textres tmpres ];
             cellres = { cellres{:} tmpcellres{:} };
-        end;
+        end
     elseif length(foldcontent(i).name) > 2
         if strcmpi(foldcontent(i).name(end-1:end), '.m')
             textres = [ textres ' -a ' foldcontent(i).name ];
             cellres = { cellres{:} foldcontent(i).name };
-        end;
+        end
     else 
         disp( [ 'Skipping ' fullfile(foldname, foldcontent(i).name) ]);
-    end;
-end;
+    end
+end
 return;

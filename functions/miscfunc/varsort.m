@@ -52,7 +52,7 @@ end
 if framestot==0,
     fprintf('Gvarsort(): cannot process an empty activations array.\n\n');
     return
-end;
+end
 
 [srows,scols] = size(sphere);
 [wrows,wcols] = size(weights);
@@ -60,7 +60,7 @@ end;
 if nargin<3,
     fprintf('Gvarsort(): needs at least 3 arguments.\n\n');
     return
-end;
+end
 
 % activations = (wrows,wcols)X(srows,scols)X(chans,framestot)
 if chans ~= scols | srows ~= wcols,

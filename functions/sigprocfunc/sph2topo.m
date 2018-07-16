@@ -91,4 +91,4 @@ if exist('method')== 1 & method == 1
 else
   angle  = -horiz;
   radius = 0.5 - az/180;
-end;
+end

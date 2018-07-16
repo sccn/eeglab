@@ -29,7 +29,7 @@ function varargout = uiputfile2(varargin);
     if nargin < 1
         help uiputfile2;
         return;
-    end;
+    end
     
     % remember old folder
     %% search for the (mat) file which contains the latest used directory 
@@ -42,15 +42,15 @@ function varargout = uiputfile2(varargin);
             if isempty(tmp_fld) & isunix
                 if exist('/tmp') == 7
                     tmp_fld = '/tmp';
-                end;
-            end;
+                end
+            end
             if exist(fullfile(tmp_fld,'eeglab.cfg'))
                 load(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
                 s = ['cd([''' Path '''])'];
-                if exist(Path) == 7, eval(s); end;
-            end;
-        end;
-    catch, end;
+                if exist(Path) == 7, eval(s); end
+            end
+        end
+    catch, end
 
     %% Show the open dialog and save the latest directory to the file
     % ---------------------------------------------------------------
@@ -69,9 +69,9 @@ function varargout = uiputfile2(varargin);
                     eval(['cd ' tmp_fld]);
                     system('chmod 777 eeglab.cfg');
                 end
-            end;
-        end;
-    catch, end;
+            end
+        end
+    catch, end
     cd(olddir) 
     
 

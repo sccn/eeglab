@@ -18,20 +18,20 @@ function [allkeywordstrue, transform] = lookupchantemplate(chanfile, tmpl);
 if nargin < 2
     help lookupchantemplate;
     return;
-end;
+end
 
 allkeywordstrue = 0;
 transform = [];
 for ind = 1:length(tmpl)
     allkeywordstrue = 1;
-    if isempty(tmpl(ind).keywords), allkeywordstrue = 0; end;
+    if isempty(tmpl(ind).keywords), allkeywordstrue = 0; end
     for k = 1:length(tmpl(ind).keywords)
-        if isempty(findstr(lower(chanfile), lower(tmpl(ind).keywords{k}))), allkeywordstrue = 0; end;
-    end;
+        if isempty(findstr(lower(chanfile), lower(tmpl(ind).keywords{k}))), allkeywordstrue = 0; end
+    end
     if allkeywordstrue,
         transform = tmpl(ind).transform;
         break;
-    end;
-end;
+    end
+end
 
 

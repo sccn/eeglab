@@ -113,7 +113,7 @@ end
 
 if nargin < 7,
     righttitle = 0; 
-end;
+end
 if nargin < 6
     colors = 0;
 end
@@ -149,22 +149,22 @@ end
          fprintf('\nWARNING: %d points at end of data will not be plotted.\n',...
                     framestotal-datasets*frames);
     end
-  end;
+  end
 
   if chans>MAXPLOTDATACHANS,
     fprintf('plotdata: not set up to plot more than %d channels.\n',...
                        MAXPLOTDATACHANS);
     return
-  end;
+  end
   if datasets>MAXPLOTDATAEPOCHS 
       fprintf('plotdata: not set up to plot more than %d epochs.\n',...
                        MAXPLOTDATAEPOCHS);
     return
-  end;
+  end
   if datasets<1
       fprintf('plotdata: cannot plot less than 1 epoch!\n');
       return
-  end;
+  end
 %
 %%%%%%%%%%%%% Extend the size of the plotting area in the window %%%%%%%%%%%%
 %
@@ -180,7 +180,7 @@ end
 %
   if isnumeric(channels) & channels(1)==0,
     channels = [1:size(data,1)];
-  end;
+  end
   if isnumeric(channels),
       channames = num2str(channels(:));                   %%CJH
   else
@@ -191,14 +191,14 @@ end
 %    if chid <3,
 %        fprintf('plotdata(): cannot open file %s.\n',channels);
 %        return
-%     end;
+%     end
 %     if isempty( findstr( lower(channels), '.loc') )
 %    		channames = fscanf(chid,'%s',[4 Inf]);
 %    		channames = channames';
 %     else
 %        	channames = fscanf(chid,'%d %f %f  %s',[7 128]);
 %    		channames = char(channames(4:7,:)');
-%     end;
+%     end
 %     ii = find(channames == '.');
 %     channames(ii) = ' ';
     
@@ -208,9 +208,9 @@ end
     %    for j=1:c
     %        if channames(i,j)=='.',
     %            channames(i,j)=' ';
-    %        end;
-    %    end;
-    %end;
+    %        end
+    %    end
+    %end
 %    end; % setting channames
 
 %
@@ -226,7 +226,7 @@ end
     if cid <3,
         fprintf('plotdata: cannot open file %s.\n',colors);
         return
-    end;
+    end
     colors = fscanf(cid,'%s',[3 Inf]);
     colors = colors';
        [r c] = size(colors);
@@ -234,13 +234,13 @@ end
         for j=1:c
             if colors(i,j)=='.',
                 colors(i,j)=' ';
-            end;
-        end;
-    end;
+            end
+        end
+    end
   else % use default color order (no yellow!)
      colors =['r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  '];
      colors = [colors; colors];  % make > 64 available
-  end;
+  end
   for c=1:size(colors,1)   % make white traces black unless axis color is white
     if colors(c,1)=='w' & axcolor~=[1 1 1]
          colors(c,1)='k';
@@ -263,12 +263,12 @@ end
       fprintf( ...
        'plotdata: limits should be 0 or an array [xmin xmax ymin ymax].\n');
       return
-    end;
+    end
     xmin = limits(1);
     xmax = limits(2);
     ymin = limits(3);
     ymax = limits(4);
-  end;
+  end
 
   if xmax == 0 & xmin == 0,
     x = (0:1:frames-1);
@@ -277,7 +277,7 @@ end
   else
     dx = (xmax-xmin)/(frames-1);
     x=xmin*ones(1,frames)+dx*(0:frames-1); % compute x-values
-  end;
+  end
   if xmax<=xmin,
       fprintf('plotdata() - xmax must be > xmin.\n')
       return
@@ -302,7 +302,7 @@ end
     fprintf('\nPlotting positive up. Assuming data are spectra.\n');
     xlabel = 'Freq (Hz)';
     ymin = 0;                        % plot positive-up
-  end;
+  end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set up plotting environment %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -330,7 +330,7 @@ end
       set(h,'FontSize',FONTSIZE);            % choose font size
       set(h,'YLim',[ymin ymax]);            % set default plotting parameters
       set(h,'XLim',[xmin xmax]);
-  end;
+  end
 
   msg = ['\nPlotting %d traces of %d frames with colors: '];
   for c=1:datasets
@@ -374,7 +374,7 @@ end
             ymin = double(ymin);
             ymax = double(ymax);
 
-            if ymin == ymax, ymin = ymin-1; ymax = ymax+1; end;
+            if ymin == ymax, ymin = ymin-1; ymax = ymax+1; end
             plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(mod(P,length(colors))+1));   
             
             if SIGN > 0
@@ -417,8 +417,8 @@ end
                     set(h,'FontSize',TICKFONTSIZE);         % choose font size
                     set(h,'HorizontalAlignment','center',...
                       'Clipping','off');  % center text
-                end;
-        end;
+                end
+        end
       %
       %%%%%%%%%%%%%%%%%%%%% Plot spectral data positive-up [0,ymax] %%%%%%%%%%%%%%%%%%%%%%%%
       %
@@ -431,7 +431,7 @@ end
         % ymaxm = 10.^ceil(log(ymax)/log(10.));
         % if ymaxm/2. > ymax,
         %    ymaxm = ymaxm/2.;
-        % end;
+        % end
 
         axis([xmin xmax ymin ymaxm]);      % set axis values
 
@@ -446,7 +446,7 @@ end
           axis('off');h=text(signx,0,'0'); 
             set(h,'FontSize',TICKFONTSIZE);
             set(h,'HorizontalAlignment','right','Clipping','off');    
-         end;
+         end
 
          if I==chans,                    % draw freq scale on lowest right plot
             ytick = -0.25*ymax;
@@ -506,7 +506,7 @@ end
                   % axis('off'),h=text(xmax+0.10*xdiff,ymax/2,[channames(I,:)]);
                   %    set(h,'HorizontalAlignment','left');      % print after traces
                   
-              end;
+              end
           end; 
       end; 
       
@@ -531,7 +531,7 @@ end
 if plottitle
 	h = textsc(plottitle, 'title');
 	set(h, 'fontsize', FONTSIZE);
-end;
+end
 axcopy(gcf, 'axis on');
 
 if 0,    % START DETOUR XXXXXXXXXXXXX

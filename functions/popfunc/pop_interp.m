@@ -43,7 +43,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
     if nargin < 1
         help pop_interp;
         return;
-    end;
+    end
     
     if nargin < 2
         disp('Warning: interpolation can be done on the fly in studies'); 
@@ -56,8 +56,8 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         if isfield(EEG.chaninfo, 'nodatchans')
             if ~isempty(EEG.chaninfo.nodatchans)
                 enablenondat = 'on';
-            end;
-        end;
+            end
+        end
                   
         uilist = { { 'Style' 'text' 'string' 'What channel(s) do you want to interpolate' 'fontweight' 'bold' } ...
                    { 'style' 'text' 'string' 'none selected' 'tag' 'chanlist' } ...
@@ -72,18 +72,18 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                
         geom = { 1 1 1 1 1 1 1 [1.1 1] };
         [res userdata tmp restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'helpcom', 'pophelp(''pop_interp'')');
-        if isempty(res) | isempty(userdata), return; end;
+        if isempty(res) | isempty(userdata), return; end
         
         if restag.method == 1
              method = 'spherical';
         else method = 'invdist';
-        end;
+        end
         bad_elec = userdata.chans;
         
         com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
         if ~isempty(findstr('nodatchans', userdata.chanstr))
             eval( [ userdata.chanstr '=[];' ] );
-        end;
+        end
         
     elseif ischar(EEG)
         command = EEG;
@@ -100,7 +100,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                 userdata.chanstr = [ 'EEG.chaninfo.nodatchans([' num2str(chanlisttmp) '])' ];
                 set(fig, 'userdata', userdata);
                 set(findobj(fig, 'tag', 'chanlist'), 'string', chanliststr);
-            end;
+            end
         elseif strcmpi(command, 'datchan')
             global EEG;
             tmpchaninfo = EEG.chanlocs;
@@ -110,7 +110,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                 userdata.chanstr = [ '[' num2str(chanlisttmp) ']' ];
                 set(fig, 'userdata', userdata);
                 set(findobj(fig, 'tag', 'chanlist'), 'string', chanliststr);
-            end;
+            end
         else
             global ALLEEG EEG;
             tmpanswer = inputdlg2({ 'Dataset index' }, 'Choose dataset', 1, { '' });
@@ -137,21 +137,21 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                             else
                                 userdata.chans   = TMPEEG.chanlocs(chanlist(sort(chaninds)));
                                 userdata.chanstr = [ 'ALLEEG(' tmpanswer{1} ').chanlocs([' num2str(chanlist(sort(chaninds))) '])' ];
-                            end;
+                            end
                             set(fig, 'userdata', userdata);
                             tmpchanlist(2,:) = { ' ' };
                             set(findobj(gcbf, 'tag', 'chanlist'), 'string', [ tmpchanlist{:} ]);
                         else
                             warndlg2('No new channels selected');
-                        end;
+                        end
                     else
                         warndlg2('Wrong index');
-                    end;
-                end;
-            end;
-        end;
+                    end
+                end
+            end
+        end
         return;
-    end;
+    end
     
     EEG = eeg_interp(EEG, bad_elec, method);
     

@@ -544,14 +544,14 @@ elseif floor(epochs) ~= epochs,
 elseif nsub > ncomps
     fprintf('runica(): there can be at most %d sub-Gaussian components!\n',ncomps);
     return
-end;
+end
 
 if ~isempty(logfile)
     fid = fopen(logfile, 'w');
-    if fid == -1, error('Cannot open logfile for writing'); end;
+    if fid == -1, error('Cannot open logfile for writing'); end
 else
     fid = [];
-end;
+end
 verb = verbose;
 
 if weights ~= 0,                    % initialize weights
@@ -577,10 +577,10 @@ if isnan(nochange)
     else
         nochangeupdated = 1; % for fprinting purposes
         nochange = DEFAULT_STOP;
-    end;
+    end
 else 
     nochangeupdated = 0;
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process the data %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -616,7 +616,7 @@ icaprintf(verb,fid,'Learning rate will be multiplied by %g whenever angledelta >
 
 if nochangeupdated 
     icaprintf(verb,fid,'More than 32 channels: default stopping weight change 1E-7\n');
-end;
+end
 icaprintf(verb,fid,'Training will end when wchange < %g or after %d steps.\n', nochange,maxsteps);
 if biasflag,
     icaprintf(verb,fid,'Online bias adjustment will be used.\n');
@@ -632,8 +632,8 @@ if strcmpi(submean, 'on')
     rowmeans = mean(data,2);
     for index = 1:size(data,1)
         data(index,:) = data(index,:) - rowmeans(index);      % subtract row means
-    end;
-end;
+    end
+end
 icaprintf(verb,fid,'Final training data range: %g to %g\n', min(min(data,[],2)),max(max(data,[],2)));
 
 %
@@ -786,9 +786,9 @@ if biasflag & extended
             pause(0);
             if ~isempty(get(0, 'currentfigure'))   % look for user abort
                 if strcmp(get(gcf, 'tag'), 'stop')
-                    if ~isempty(fid), fclose(fid); end;
+                    if ~isempty(fid), fclose(fid); end
                     close; error('USER ABORT');
-                end;
+                end
             end
             
             %% promote data block (only) to double to keep u and weights double
@@ -957,7 +957,7 @@ if biasflag & ~extended
             pause(0);
             if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
                 close; error('USER ABORT');
-            end;
+            end
             
             u=(weights*sphere)*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
             y=1./(1+exp(-u));                                                
@@ -1236,7 +1236,7 @@ if ~biasflag & ~extended
             pause(0);
             if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
                 close; error('USER ABORT');
-            end;
+            end
             u=(weights*sphere)*double(data(:,timeperm(t:t+block-1)));
             y=1./(1+exp(-u));                                                %
             weights = weights + lrate*(BI+(1-2*y)*u')*weights;
@@ -1350,7 +1350,7 @@ end
   
   if ~laststep
     laststep = step;
-  end;
+  end
   lrates = lrates(1,1:laststep);           % truncate lrate history vector
 
   %
@@ -1371,7 +1371,7 @@ end
               data(r,:) = data(r,:)+ser(r); % add back row means 
           end
           data = (weights*sphere)*data; % OK in single
-      end;
+      end
   end
   %
   % NOTE: Now 'data' are the component activations = weights*sphere*raw_data
@@ -1405,7 +1405,7 @@ end
   %
   for index = 1:size(data,1)
       meanvar(index) = sum(winv(:,index).^2).*sum(double(data(index,:)).^2)/((chans*frames)-1); % from Rey Ramirez 8/07
-  end;
+  end
   
   %
   %%%%%%%%%%%%%% Sort components by mean variance %%%%%%%%%%%%%%%%%%%%%%%%
@@ -1420,7 +1420,7 @@ end
       icaprintf(verb,fid,'Making the max(abs(activations)) positive ...\n');
       for index = 1:ize(data,2)
           [tmp ix(index)] = max(abs(data(index,:))); % = max abs activations
-      end;
+      end
       signsflipped = 0;
       for r=1:ncomps
          if sign(data(r,ix(r))) < 0
@@ -1470,7 +1470,7 @@ function icaprintf(verb,fid, varargin);
             fprintf(fid, varargin{:});
         end;        
         fprintf(varargin{:});
-    end;
+    end
     
 
 % this function compute covariance
@@ -1486,7 +1486,7 @@ catch,
         for i2=1:size(a,1)
             %c(i1,i2) = sum(double((a(i1,:)-mean(a(i1,:)))).*(double(a(i2,:)-mean(a(i2,:)))))/(size(a,2)-1);            
             c(i1,i2) = sum(double(a(i1,:).*a(i2,:)))/(size(a,2)-1); % mean has already been subtracted
-        end;
-    end;
-end;
+        end
+    end
+end
     

@@ -42,19 +42,19 @@ function [ laplac, sumLaplac2D ] = del2map( map, filename, draw )
 if nargin < 2
 	help del2map;
 	return;
-end;
+end
 
 % process several maps
 if size(map,2) > 1
     if size(map,1) > 1
         for index = 1:size(map,2)
             laplac(:,index) = del2map( map(:,index), filename);
-        end;
+        end
         return;
     else
         map = map';
-    end;
-end;
+    end
+end
 
 MAXCHANS = size(map,1);
 GRID_SCALE = 2*MAXCHANS+5;
@@ -71,7 +71,7 @@ else
     if exist('draw') == 1 & draw ~= 0
         line( [(x-0.01)' (x+0.01)']', [(y-0.01)' (y+0.01)']');
         line( [(x+0.01)' (x-0.01)']', [(y-0.01)' (y+0.01)']');
-    end;
+    end
 end;	
 
 % locates nearest position of electrod in the grid 
@@ -81,7 +81,7 @@ yi = linspace(-0.5,0.5,GRID_SCALE);   % y-axis description (row vector)
 for i=1:MAXCHANS
    [useless_var horizidx(i)] = min(abs(x(i) - xi));    % find pointers to electrode
    [useless_var vertidx(i)] = min(abs(y(i) - yi));     % positions in Zi
-end;
+end
    
 % Compute gradient
 % ----------------
@@ -99,13 +99,13 @@ for i=1:size(map,2)
 	if exist('draw') == 1 & draw ~= 0
 		if size(map,2) > 1
 			subplot(ceil(sqrt(size(map,2))), ceil(sqrt(size(map,2))), i);
-		end;
+		end
 		plot(y, x, 'x', 'Color', 'black', 'markersize', 5); hold on
 		contour(Xi, Yi, laplac2D); hold off;
 		%line( [(x-0.01)' (x+0.01)']', [(y-0.01)' (y+0.01)']', 'Color','black');
 		%line( [(x+0.01)' (x-0.01)']', [(y-0.01)' (y+0.01)']', 'Color','black');
 		title( int2str(i) );
-	end;
+	end
 end;                                                             %
 
 return;

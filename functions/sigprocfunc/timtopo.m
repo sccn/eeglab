@@ -71,22 +71,22 @@ icadefs;
 %         
 %     else
 %         varargin = { 'limits' limits 'plottimes' plottimes 'title' titl 'plotchans' plotchans 'voffsets' voffsets varargin{:} };        
-%     end;
-% end;
+%     end
+% end
 
 
 
 if nargin > 2 && ~ischar(varargin{1})
    options = {};
-   if length(varargin) > 0, options = { options{:} 'limits' varargin{1} }; end;
-   if length(varargin) > 1, options = { options{:} 'plottimes' varargin{2} }; end;
-   if length(varargin) > 2, options = { options{:} 'title'      varargin{3} }; end;
-   if length(varargin) > 3, options = { options{:} 'plotchans' varargin{4} }; end;
-   if length(varargin) > 4, options = { options{:} 'voffsets'     varargin{5} }; end;
-   if length(varargin) > 5, options = { options{:} varargin{6:end} }; end;
+   if length(varargin) > 0, options = { options{:} 'limits' varargin{1} }; end
+   if length(varargin) > 1, options = { options{:} 'plottimes' varargin{2} }; end
+   if length(varargin) > 2, options = { options{:} 'title'      varargin{3} }; end
+   if length(varargin) > 3, options = { options{:} 'plotchans' varargin{4} }; end
+   if length(varargin) > 4, options = { options{:} 'voffsets'     varargin{5} }; end
+   if length(varargin) > 5, options = { options{:} varargin{6:end} }; end
 else
    options = varargin;
-end;
+end
 
 fieldlist = { 'limits'        'real'     []                       0;
               'plottimes'     'real'     []                       [];
@@ -96,16 +96,16 @@ fieldlist = { 'limits'        'real'     []                       0;
               'plotenvelope'  'real'     [0 1]                    0};
 [g topoargs] = finputcheck(options, fieldlist, 'timtopo', 'ignore');
 
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 %Set Defaults
-if isempty(g.title), g.title = ''; end;
-if isempty(g.voffsets) || g.voffsets == 0, g.voffsets = zeros(1,MAX_TOPOS); end;
-if isempty(g.plotchans) || isequal(g.plotchans,0), g.plotchans = 1:chans; end;
+if isempty(g.title), g.title = ''; end
+if isempty(g.voffsets) || g.voffsets == 0, g.voffsets = zeros(1,MAX_TOPOS); end
+if isempty(g.plotchans) || isequal(g.plotchans,0), g.plotchans = 1:chans; end
 plottimes_set=1;   % flag variable
-if isempty(g.plottimes) || any(isnan(g.plottimes)), plottimes_set = 0;end;
+if isempty(g.plottimes) || any(isnan(g.plottimes)), plottimes_set = 0;end
 limitset = 0; %flag variable
-if isempty(g.limits), g.limits = 0; end;
-if length(g.limits)>1, limitset = 1; end;
+if isempty(g.limits), g.limits = 0; end
+if length(g.limits)>1, limitset = 1; end
 
 
 % if nargin < 7 | voffsets == 0
@@ -170,7 +170,7 @@ end
   else
     fprintf('timtopo(): limits format not correct. See >> help timtopo.\n');
     return
-  end;
+  end
 
   if xmax == 0 & xmin == 0,
     x = (0:1:frames-1);
@@ -179,7 +179,7 @@ end
   else
     dx = (xmax-xmin)/(frames-1);
     x=xmin*ones(1,frames)+dx*(0:frames-1); % compute x-values
-  end;
+  end
   if xmax<=xmin,
       fprintf('timtopo() - in limits, maxms must be > minms.\n')
       return
@@ -207,9 +207,9 @@ if plottimes_set == 0
 	  g.plottimes = x(plotframes);
   else
 	  g.plottimes(find(isnan(g.plottimes))) = x(plotframes);
-  end;
+  end
   plottimes_set = 1;
-end;
+end
 
 if plottimes_set == 1
   ntopos = length(g.plottimes);
@@ -465,8 +465,8 @@ end
     try,
 		if ~isempty( strmatch( 'absmax', varargin))
 			text(0.86,0.624,'0','FontSize',axfont,'HorizontalAlignment','Center');
-		end;
-	catch, end;
+		end
+	catch, end
   end
 
 %

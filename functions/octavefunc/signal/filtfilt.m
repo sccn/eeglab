@@ -58,7 +58,7 @@ rotflag = 0;
 if size(x,1) == 1
     rotflag == 1;
     x = x';			% make it a column vector
-end;
+end
 
 lx = size(x,1);
 a = a(:).';

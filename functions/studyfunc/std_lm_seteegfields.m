@@ -46,13 +46,13 @@ try
         for i = 1:2:numel(options)
             opt.(options{i}) = options{i+1};
         end
-    else opt= []; end;
+    else opt= []; end
 catch
     error('limo_create_single_trials() error: calling convention {''key'', value, ... } error');
-end;
+end
 
-try, opt.format;           catch, opt.format        = 'cell';      end;
-try, opt.datatype;         catch, opt.datatype      = 'channels';  end;
+try, opt.format;           catch, opt.format        = 'cell';      end
+try, opt.datatype;         catch, opt.datatype      = 'channels';  end
 
 % Getting measureflags
 % --------------------

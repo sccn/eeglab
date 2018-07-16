@@ -1,6 +1,6 @@
 function restartEeglabFlag = plugin_extract(type, pluginlist, page)
 
-if nargin < 3, page = 1; end;
+if nargin < 3, page = 1; end
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
 pluginsPerPage    = 15;
@@ -9,7 +9,7 @@ pluginsPerPage    = 15;
 %str = evalc('!unzip');
 %if length(str) < 200
 %    error([ '"unzip" could not be found. Instal unzip and make sure' 10 'it is accessible under Matlab by adding the program to' 10 'the path and typing "!unzip"' ]);
-%end;
+%end
 
 if ~isstruct(type)
     plugin = plugin_getweb(type, pluginlist, 'newlist');
@@ -18,7 +18,7 @@ if ~isstruct(type)
     plugin = plugin(scoreOrder);
 else
     plugin    = type;
-end;
+end
 
 % select page
 allPlugins = plugin;
@@ -27,17 +27,17 @@ moreThanOnePage = 0;
 if numPlugin > pluginsPerPage
     plugin = plugin(pluginsPerPage*(page-1)+1:min(length(plugin),pluginsPerPage*page));
     moreThanOnePage = 1;
-end;
+end
 
 % find which menu to show
 newInstallFlag  = false;
 installedFlag   = false;
 deactivatedFlag = false;
 for iPlugin = length(plugin):-1:1
-    if ~plugin(iPlugin).installed, newInstallFlag = true; end;
-    if plugin(iPlugin).installed && ~strcmpi(plugin(iPlugin).status, 'deactivated'),  installedFlag  = true; end;
-    if strcmpi(plugin(iPlugin).status, 'deactivated'), deactivatedFlag = true; end;
-end;
+    if ~plugin(iPlugin).installed, newInstallFlag = true; end
+    if plugin(iPlugin).installed && ~strcmpi(plugin(iPlugin).status, 'deactivated'),  installedFlag  = true; end
+    if strcmpi(plugin(iPlugin).status, 'deactivated'), deactivatedFlag = true; end
+end
  %---
  % Initialize fields install/remove
  if ~isstruct(type)
@@ -49,18 +49,18 @@ end;
              newInstallFlag = true;
              allPlugins(iPlugin).install = 0;
              allPlugins(iPlugin).remove  = 0;
-         end;
+         end
          if allPlugins(iPlugin).installed && ~strcmpi(allPlugins(iPlugin).status, 'deactivated')
              installedFlag  = true;
              allPlugins(iPlugin).install = 0;
              allPlugins(iPlugin).remove  = 0;
-         end;
+         end
          if strcmpi(allPlugins(iPlugin).status, 'deactivated')
              deactivatedFlag = true;
              allPlugins(iPlugin).install = 0;
              allPlugins(iPlugin).remove  = 0;
-         end;
-     end;
+         end
+     end
  end
  %---
  
@@ -92,12 +92,12 @@ if newInstallFlag
             description = plugin(iRow).description;
             if length(description) > maxchar+2
                 description = [ description(1:min(maxchar,length(description))) '...' ];
-            end;
+            end
             
             enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
             
             userdata = '';
-            if plugin(iRow).installed && plugin(iRow).installorupdate, userdata = 'colortored'; end;
+            if plugin(iRow).installed && plugin(iRow).installorupdate, userdata = 'colortored'; end
             
             callbacktoinstall = ['tmpobj = get(gcbf, ''userdata''); tmpobj(' int2str(pluginIndices(end)) ').install = ~tmpobj(' int2str(pluginIndices(end)) ').install; set(gcbf, ''userdata'', tmpobj); clear tmpobj;'];
             
@@ -111,9 +111,9 @@ if newInstallFlag
                 { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % -----------------
 % installed plugins
@@ -137,7 +137,7 @@ if installedFlag
             description = plugin(iRow).description;
             if length(description) > maxchar+2
                 description = [ description(1:min(maxchar,length(description))) '...' ];
-            end;
+            end
             
             enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
             
@@ -147,7 +147,7 @@ if installedFlag
                 userdata = 'colortored';
             else
                 textnew = description;
-            end;
+            end
             
             callbackinstall = ['tmptag = get(gcbo, ''tag'');' ...
                                'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
@@ -175,9 +175,9 @@ if installedFlag
                 { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % -------------------
 % deactivated plugins
@@ -204,7 +204,7 @@ if deactivatedFlag
             description = plugin(iRow).description;
             if length(description) > maxchar+2
                 description = [ description(1:min(maxchar,length(description))) '...' ];
-            end;
+            end
             
             userdata = '';
             enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
@@ -235,9 +235,9 @@ if deactivatedFlag
                 { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
-        end;
-    end;
-end;
+        end
+    end
+end
 
 evalStr = [ 'uisettxt(gcf, ''update''         , ''Update''     , ''rotation'', 90, ''fontsize'', 14);' ...
             'uisettxt(gcf, ''deactivate''     , ''Deactivate'' , ''rotation'', 90, ''fontsize'', 14);' ...
@@ -254,8 +254,8 @@ evalStr = [ 'uisettxt(gcf, ''update''         , ''Update''     , ''rotation'', 9
         
 if 1
     % version with button
-    if page == 1,                       enablePpage = 'off'; else enablePpage = 'on'; end;
-    if page*pluginsPerPage > numPlugin, enableNpage = 'off'; else enableNpage = 'on'; end;
+    if page == 1,                       enablePpage = 'off'; else enablePpage = 'on'; end
+    if page*pluginsPerPage > numPlugin, enableNpage = 'off'; else enableNpage = 'on'; end
     callBackPpage = [ 'tmpobj = get(gcbf, ''userdata''); close gcbf; restartEeglabFlag = plugin_extract(tmpobj, [], ' int2str(page-1) '); clear tmpobj;' ];
     callBackNpage = [ 'tmpobj = get(gcbf, ''userdata''); close gcbf; restartEeglabFlag = plugin_extract(tmpobj, [], ' int2str(page+1) '); clear tmpobj;' ];
     
@@ -267,13 +267,13 @@ if 1
     geomvert = [ geomvert 1 1];    
     [res plugin] = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr, 'addbuttons', 'off', 'skipline', 'off', 'userdata', allPlugins);
     
-    try, restartEeglabFlag = evalin('base', 'restartEeglabFlag;'); catch, end;
+    try, restartEeglabFlag = evalin('base', 'restartEeglabFlag;'); catch, end
     evalin('base', 'clear restartEeglabFlag;');
 else
     % no buttons
     res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr);
-end;
-if isempty(res), return; end;
+end
+if isempty(res), return; end
 
 % install plugins
 % ---------------
@@ -294,9 +294,9 @@ for iRow = 1:length(plugin)
                         plugin_reactivate(plugin(iRow).foldername);
                     else
                         plugin_remove(plugin(iRow).foldername);
-                    end;
-                end;
-            end;
+                    end
+                end
+            end
         else
             if plugin(iRow).installed
                 fprintf('Updating extension %s\n', plugin(iRow).name);
@@ -305,12 +305,12 @@ for iRow = 1:length(plugin)
                     plugin_reactivate(plugin(iRow).foldername);
                 else
                     plugin_remove(plugin(iRow).foldername);
-                end;
+                end
             else
                 fprintf('Installing extension %s\n', plugin(iRow).name);
                 plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
-            end;
-        end;
+            end
+        end
     elseif plugin(iRow).remove
         if ~firstPlugin, disp('---------------------------------'); end; firstPlugin = 0; 
         restartEeglabFlag = true;
@@ -321,9 +321,9 @@ for iRow = 1:length(plugin)
         else
             fprintf('Deactivating extension %s\n', plugin(iRow).name);
             plugin_deactivate(plugin(iRow).foldername);
-        end;
-    end;
-end;
+        end
+    end
+end
 
 function str = myweb(url);
 
@@ -331,4 +331,4 @@ function str = myweb(url);
     %     str = [ 'web(''' url ''');' ];
     %else
         str = [ 'web(''' url ''', ''-browser'');' ];
-    %end;
+    %end

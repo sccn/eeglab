@@ -30,16 +30,16 @@
 %                remove references to TRUE and FALSE.
 
 function [centr,clst,sse] = kmeans_st(X,k,restarts)
-  if (nargin<3) restarts = []; end;
+  if (nargin<3) restarts = []; end
   
   if (isempty(restarts))
     restarts = 0;
-  end;
+  end
 
   [n,p] = size(X);
   if (k<1 | k>n)
     error('KMEANS: k out of range 1-N');
-  end;
+  end
 
   max_iter = 50;
   highval = 10e8;
@@ -74,7 +74,7 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
         grp(indx) = t3 * ones(length(indx),1);
         indx = find(grp==t2);
         grp(indx) = t3 * ones(length(indx),1);
-      end;
+      end
 
       grpid = uniquef(grp);                % Unique group identifiers
       centr = zeros(k,p);
@@ -86,13 +86,13 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
           centr(kk,:) = mean(Xk);
         else
           centr(kk,:) = Xk;
-        end;
-      end;
+        end
+      end
 
     else                                % Else if randomized,
       rndprm = randperm(n);               % Pull out random set of points
       centr = X(rndprm(1:k),:);
-    end;
+    end
 
     % For each point i, find its two closest centers, c1(i) and c2(i), and
     % assign it to c1(i)
@@ -100,7 +100,7 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
     dist = zeros(n,k);
     for kk = 1:k                        % Dists to centers of all clusters
       dist(:,kk) = eucl(X,centr(kk,:));
-    end;
+    end
     [d,indx] = sort(dist');             % Sort points separately
 
     c1 = indx(1,:)';
@@ -115,10 +115,10 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
 %        centr(kk,:) = mean(X(indx,:));
 %      else
 %        centr(kk,:) = X(indx,:);
-%      end;
+%      end
       centr(kk,:) = means(X(indx,:));
       nclst(kk) = len_indx;
-    end;
+    end
 
     % Initialize working matrices
 
@@ -131,7 +131,7 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
 
     for i = 1:n               % Adjusted dist from each pt to own cluster center
       R1(i) = adj2(c1(i)) * eucl(X(i,:),centr(c1(i),:))^2;
-    end;
+    end
 
     % Iterate
 
@@ -157,7 +157,7 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
             indx = find(~live);             %   find min R2 over live clusters only
             R2([L1;indx]) = highval * ones(length(indx)+1,1);
             [r2min,L2] = min(R2);
-          end;
+          end
 
           if (r2min >= R1(i))             % No reallocation necessary
             c2(i) = L2;
@@ -172,9 +172,9 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
                 centr(kk,:) = mean(X(indx,:));
               else
                 centr(kk,:) = X(indx,:);
-              end;
+              end
               nclst(kk) = len_indx;
-            end;
+            end
 
             adj1([L1,L2]) = nclst([L1,L2]) ./ (nclst([L1,L2])+1);
             adj2([L1,L2]) = nclst([L1,L2]) ./ (nclst([L1,L2])-1+eps);
@@ -182,13 +182,13 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
 
             live([L1,L2]) = [1,1];          % Put into live set
             update([L1,L2]) = [n,n];        % Reinitialize update counters
-          end;
+          end
         end;  % if nclst(L1)>1
 
         indx = find(update<1);          % Remove clusters from live set
         if (~isempty(indx))             %   that haven't been recently updated
           live(indx) = zeros(length(indx),1);
-        end;
+        end
       end;  % while (i<n & any(live))
 
       if (any(live))
@@ -209,7 +209,7 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
                 indx = find(c1==kk);
                 centr(kk,:) = mean(X(indx,:));
                 nclst(kk) = length(indx);
-              end;
+              end
 
               adj1([L1,L2]) = nclst([L1,L2]) ./ (nclst([L1,L2])+1);
               adj2([L1,L2]) = nclst([L1,L2]) ./ (nclst([L1,L2])-1+eps);
@@ -217,23 +217,23 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
 
               live([L1,L2]) = [1,1];          % Put into live set
               update([L1,L2]) = [n,n];        % Reinitialize update counters
-            end;
-          end;
-        end;
+            end
+          end
+        end
       end;  % if any(live)
     end;  % while iter<max_iter & any(live)
 
     sse = 0;                          % Calc final total sum-of-squares
     for i=1:n
       sse = sse + eucl(X(i,:),centr(c1(i),:))^2;
-    end;
+    end
 
     if (sse < best_sse)               % Update best solution so far
       best_sse = sse;
       best_c1 = c1;
       best_centr = centr;
       restart_iter = restarts;
-    end;
+    end
   end;  % while (restart_iter > 0)
 
   clst =  best_c1;

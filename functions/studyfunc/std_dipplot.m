@@ -98,7 +98,7 @@ for k = 3:2:nargin
                     error('std_dipplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
-            if length(cls) == 1, mode = 'apart'; else mode = 'together'; end;
+            if length(cls) == 1, mode = 'apart'; else mode = 'together'; end
         case 'comps'
             if strcmpi(STUDY.etc.dipparams.density, 'on')
                 disp('Single dipole should not be plotted using dipole density, reverting to dipole plotting');
@@ -145,7 +145,7 @@ if isempty(cls)
         end
     end
     cls = tmp;
-end;
+end
 
 if strcmpi(mode, 'apart')  % case each cluster on a separate figure
     for clus = 1: length(cls) % For each cluster requested
@@ -593,7 +593,7 @@ for ci = 1:length(comp_ind)
         warndlg2(strvcat('There is no dipole information available in', ...
                        [ 'dataset ' num2str(abset) ' for this component, abort plotting']), 'Aborting plot dipoles');
         return;
-    end;
+    end
     if ~isfield(STUDY.cluster(cls),'dipole')
         STUDY = std_centroid(STUDY,ALLEEG, cls , 'dipole');
     elseif isempty(STUDY.cluster(cls).dipole)
@@ -655,8 +655,8 @@ function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
                     if all(posxyz(2,:) == [ 0 0 0 ])
                         posxyz(2,:) = [];
                         momxyz(2,:) = [];
-                    end;
-                end;
+                    end
+                end
                 tmppos = tmppos + mean(posxyz,1);
                 tmpmom = tmpmom + mean(momxyz,1);
                 tmprv = tmprv + ALLEEG(abset).dipfit.model(comp).rv;
@@ -700,8 +700,8 @@ function dipole = computecentroid(alldipoles)
                 if all(alldipoles(k).posxyz(2,:) == [ 0 0 0 ])
                     alldipoles(k).posxyz(2,:) = [];
                     alldipoles(k).momxyz(2,:) = [];
-                end;
-            end;
+                end
+            end
             if ~isempty(alldipoles(k).posxyz)
                 dipole.posxyz = dipole.posxyz + mean(alldipoles(k).posxyz,1);
                 dipole.momxyz = dipole.momxyz + mean(alldipoles(k).momxyz,1);
@@ -710,14 +710,14 @@ function dipole = computecentroid(alldipoles)
             elseif warningon
                 disp('Some components do not have dipole information');
                 warningon = 0;
-            end;
+            end
         end
         dipole.posxyz = dipole.posxyz/count;
         dipole.momxyz = dipole.momxyz/count;
         dipole.rv     = dipole.rv/count;
         if isfield(alldipoles, 'maxr')
             dipole.maxr = alldipoles(1).max_r;
-        end;
+        end
         
 function [cluster_dip_models, options] = dipgroups(ALLEEG, STUDY, cls, comp_to_disp, cluster_dip_models, options);
 

@@ -41,7 +41,7 @@ function [gradx, grady] = gradplot( map, locs_file, draw )
 if nargin < 2
 	help gradplot;
 	return;
-end;
+end
 
 NCHANS = size(map,1);
 GRID_SCALE = 2*NCHANS+5;
@@ -86,7 +86,7 @@ vertidx=zeros(1, NCHANS); % preallocation
 for c=1:NCHANS
    [useless_var horizidx(c)] = min(abs(y(c) - xi)); % find pointers to electrode
    [useless_var  vertidx(c)] = min(abs(x(c) - yi));  % positions in Zi
-end;
+end
    
 % -------------------
 % Compute gradient(s)
@@ -160,7 +160,7 @@ hold off
 axis off
 
 
-	end;
-end;
+	end
+end
 
 return;

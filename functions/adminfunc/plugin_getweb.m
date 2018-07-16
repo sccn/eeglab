@@ -1,11 +1,11 @@
 function plugin = plugin_getweb(type, pluginOri, mode)
 
-if nargin < 1, help plugin_getweb; return; end;
-if nargin < 2, pluginOri = []; end;
+if nargin < 1, help plugin_getweb; return; end
+if nargin < 2, pluginOri = []; end
 if nargin < 3, mode = 'merge'; end; % 'merge' or 'newlist' or 'update'
 
 % convert plugin list format if necessary
-if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end;
+if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end
 
 try
     disp( [ 'Retreiving URL with ' type ' extensions...' ] );
@@ -13,10 +13,10 @@ try
         [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_import');
     else
         [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_process');
-    end;
+    end
 catch,
     error('Cannot connect to the Internet to retrieve extension list');
-end;
+end
 
 % retreiving download statistics
 try
@@ -26,11 +26,11 @@ try
 catch,
     stats = {};
     disp('Cannot connect to the Internet to retrieve statistics for extensions');
-end;
+end
 
 if status == 0
     error('Cannot connect to the Internet to retrieve extension list');
-end;
+end
 
 % parse the web page
 % ------------------
@@ -38,19 +38,19 @@ try
     plugin = parseTable(tmp);
 catch
     error('Cannot parse extension list - please contact eeglab@sccn.ucsd.edu');
-end;
+end
 
 % find correspondance with plugin list
 % ------------------------------------
 if ~isempty(pluginOri)
      currentNames = lower({ pluginOri.name });
 else currentNames = {};
-end;
+end
 allMatch = [];
 allMatchPluginInd = [];
 for iRow = 1:length(plugin)
     % fix links
-    if isfield(plugin, 'zip'), plugin(iRow).zip = strrep(plugin(iRow).zip, '&amp;', '&'); end;
+    if isfield(plugin, 'zip'), plugin(iRow).zip = strrep(plugin(iRow).zip, '&amp;', '&'); end
         
     % get number of downloads
     if ~isempty(stats)
@@ -60,11 +60,11 @@ for iRow = 1:length(plugin)
              if length(stats) > 2 && ~isempty(stats{3}{indMatch(1)})
                  plugin(iRow).version   = stats{3}{indMatch(1)};
                  plugin(iRow).zip       = stats{4}{indMatch(1)};
-             end;
+             end
         else plugin(iRow).downloads = 0;
-        end;
+        end
     else plugin(iRow).downloads = 0;
-    end;
+    end
     
     % match with existiting plugins
     indMatch = strmatch(lower(plugin(iRow).name), currentNames, 'exact');
@@ -76,7 +76,7 @@ for iRow = 1:length(plugin)
     else
         if length(indMatch) > 1
             disp([ 'Warning: duplicate extension ' plugin(iRow).name ' instaled' ]); 
-        end;
+        end
         plugin(iRow).currentversion = pluginOri(indMatch).currentversion;
         plugin(iRow).foldername     = pluginOri(indMatch).foldername;
         plugin(iRow).status         = pluginOri(indMatch).status;
@@ -85,12 +85,12 @@ for iRow = 1:length(plugin)
             plugin(iRow).installorupdate = 0;
         else
             plugin(iRow).installorupdate = 1;
-        end;
+        end
         allMatch = [ allMatch indMatch(:)' ];
         allMatchPluginInd = [allMatchPluginInd iRow];
-    end;
+    end
     
-end;
+end
 
 if strcmpi(mode, 'update')
     plugin = plugin(allMatchPluginInd);
@@ -109,7 +109,7 @@ if ~isempty(plugin)
 %     plugin(1).description     = 'test';
 %     plugin(1).webdoc          = 'test';
 %     plugin(1).name            = 'test';
-end;
+end
 
 if strcmpi(mode, 'merge') && ~isempty(pluginOri)
     indices = setdiff([1:length(pluginOri)], allMatch);
@@ -120,16 +120,16 @@ if strcmpi(mode, 'merge') && ~isempty(pluginOri)
         for indField = 1:length(fields)
             value  = getfield(pluginOri, { indices(indPlugin)  }, fields{ indField });
             plugin = setfield(plugin   , { lenPlugin+indPlugin }, fields{ indField }, value);
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % parse the web table
 % ===================
 function plugin = parseTable(tmp);
 
 plugin = [];
-if isempty(tmp), return; end;
+if isempty(tmp), return; end
 
 % get table content
 % -----------------
@@ -145,15 +145,15 @@ posBegRow = findstr('<tr>' , tableContent);
 posEndRow = findstr('</tr>', tableContent);
 if length(posBegRow) ~= length(posEndRow) || isempty(posBegRow)
     error('Cannot connect to the Internet to retrieve plugin list');
-end;
+end
 for iRow = 1:length(posBegRow)
     rowContent = tableContent(posBegRow(iRow)+4:posEndRow(iRow)-1);
     posBegCol = findstr('<td>' , rowContent);
     posEndCol = findstr('</td>', rowContent);
     for iCol = 1:length(posBegCol)
         table{iRow,iCol} = rowContent(posBegCol(iCol)+4:posEndCol(iCol)-1);
-    end;
-end;
+    end
+end
 
 %% extract zip link and plugin name from first column
 % --------------------------------------------------
@@ -167,7 +167,7 @@ for iRow = 1:size(table,1)
     plugin(iRow).description = deblank(tmp(end:-1:1));
     [tmp plugin(iRow).zip] = parsehttplink(table{iRow,4});
     
-end;
+end
 
 function [txt link] = parsehttplink(currentRow)
     openTag  = find(currentRow == '<');
@@ -185,6 +185,6 @@ function [txt link] = parsehttplink(currentRow)
         
         for iTag = length(openTag):-1:1
             currentRow(openTag(iTag):closeTag(iTag)) = [];
-        end;
+        end
         txt = currentRow;
-    end;
+    end

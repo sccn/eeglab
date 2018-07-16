@@ -35,5 +35,5 @@ if s1
 	res = s2;
 else
 	res = s3;
-end;
+end
 return;

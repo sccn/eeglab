@@ -68,7 +68,7 @@ end;
 
 if size(signal,2) == 1 % transpose if necessary
 	signal = signal';
-end;
+end
 
 nbchan = size(signal,1);
 pnts = size(signal,2);
@@ -87,8 +87,8 @@ else
 			catch
 				kurto(rc, index) = kurt(signal(rc,:,index));
 			end;	
-		end;
-	end;
+		end
+	end
 
 	% normalize the last dimension
 	% ----------------------------	
@@ -101,15 +101,15 @@ else
             if size(tmpkurt,2) == 1
                  tmpkurt = tmpkurt(minind:maxind);
             else tmpkurt = tmpkurt(:,minind:maxind);
-            end;
-        end;
+            end
+        end
 	    switch ndims( signal )
 	    	case 2,	kurto = (kurto-mean(tmpkurt)) / std(tmpkurt);
 	    	case 3,	kurto = (kurto-mean(tmpkurt,2)*ones(1,size(kurto,2)))./ ...
 				        (std(tmpkurt,0,2)*ones(1,size(kurto,2)));
-		end;
-	end;
-end;
+		end
+	end
+end
 
 % reject
 % ------	
@@ -118,7 +118,7 @@ if threshold(1) ~= 0
     	rej = (threshold(1) > kurto) | (kurto > threshold(2));
     else
     	rej = abs(kurto) > threshold;
-    end;
+    end
 else
 	rej = zeros(size(kurto));
 end;	

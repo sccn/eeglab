@@ -55,13 +55,13 @@ yi = [];
 xi = [];
 if nargin < 4
     option = 'none';
-end;
+end
 if nargin < 5
     mode = '2Dmap';
-end;
+end
 filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']),ALLEEG(abset).filepath);
 tmpfile  = which(filename);
-if ~isempty(tmpfile), filename = tmpfile; end;
+if ~isempty(tmpfile), filename = tmpfile; end
 
 % 061411, 2:51pm
 % Modified by Joaquin
@@ -71,12 +71,12 @@ while getfield(dir(filename), 'bytes') < 5000
     topo = load( '-mat', filename);
     filename = correctfile(topo.file, ALLEEG(abset).filepath);
     tmpfile  = which(filename);
-    if ~isempty(tmpfile), filename = tmpfile; end;
+    if ~isempty(tmpfile), filename = tmpfile; end
     if(i>100) 
         error('too many attempts to find valid icatopo');
     end
     i = i+1;
-end;
+end
 
 for k = 1:length(comps)
 
@@ -88,20 +88,20 @@ for k = 1:length(comps)
                          [ 'comp' int2str(comps(k)) '_y'] );
         catch
             error( [ 'Cannot read file ''' filename '''' ]);
-        end;
+        end
     elseif k == 1
         try
             topo = load( '-mat', filename);
         catch
             error([ 'Missing scalp topography file - also necessary for ERP polarity' 10 'Try recomputing scalp topographies for components' ]);
-        end;
-    end;
+        end
+    end
     
     try,
         tmp =  getfield(topo, [ 'comp' int2str(comps(k)) '_grid' ]);
     catch,
         error([ 'Empty scalp topography file - also necessary for ERP polarity' 10 'Try recomputing scalp topographies for components' ]);
-    end;
+    end
         
     if strcmpi(option, 'gradient')
         [tmpx, tmpy]  = gradient(tmp); % Gradient
@@ -109,11 +109,11 @@ for k = 1:length(comps)
         tmp(:,:,2) = tmpy;
     elseif strcmpi(option, 'laplacian')
         tmp = del2(tmp); % Laplacian
-    end;
+    end
 
     if length(comps) > 1 | strcmpi(mode, 'preclust')
         tmp = tmp(find(~isnan(tmp))); % remove NaN for more than 1 component
-    end;
+    end
     if k == 1
         X = zeros([ length(comps) size(tmp) ]) ;
     end
@@ -121,7 +121,7 @@ for k = 1:length(comps)
     if k == 1 
         yi   = getfield(topo, [ 'comp' int2str(comps(k)) '_y']);
         xi   = getfield(topo, [ 'comp' int2str(comps(k)) '_x']);
-    end;
+    end
 end
 X = squeeze(X);
 
@@ -132,7 +132,7 @@ function filename = correctfile(filename, datasetpath)
     if filename(2) == ':' & ~strcmpi(comp(1:2), 'PC') 
         filename = [filesep filename(4:end) ];
         filename(find(filename == '\')) = filesep;
-    end;
+    end
     
     if ~exist(filename)
         [tmpp tmpf ext] = fileparts(filename);
@@ -146,8 +146,8 @@ function filename = correctfile(filename, datasetpath)
                 filename = fullfile(datasetpath, [ tmpf ext ]);
                 if ~exist(filename)
                     error([ 'Cannot load file ''' [ tmpf ext ] '''' 10 'Go back and recompute the data file.' 10 'Note that plotting ICA component ERPs require' 10 'to precompute ICA topographies (see tutorial)']);
-                end;
-            end;
-        end;
+                end
+            end
+        end
     end;        
     

@@ -14,7 +14,7 @@ end
 if nargin<2
 	frames = size(data,2); 
 	data = reshape(data, size(data,1), size(data,2)*size(data,3));
-end;
+end
 
 chans = size(data,1);
 datalength = size(data,2);

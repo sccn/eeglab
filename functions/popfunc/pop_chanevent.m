@@ -100,7 +100,7 @@ command = '';
 if nargin < 1
     help pop_chanevent;
     return;
-end;
+end
 
 if nargin < 2
 	geometry = { [1.5 1 1] [1] [1.5 1 1] [1.5 1 1] [1.5 1 1] [1.5 0.2 0.36 0.84] ...
@@ -150,23 +150,23 @@ if nargin < 2
 			   { 'style' 'checkbox' 'value' 0 } { } };
 	result       = inputgui( geometry, strgui, 'pophelp(''pop_chanevent'');', 'Extract event from channel(s) - pop_chanevent()');
 	
-	if length(result) == 0 return; end;
+	if length(result) == 0 return; end
 	chan   = eval( [ '[' result{1} ']' ] );
     options = {};
-	if ~isempty(result{2}), options = { options{:} 'oper' result{2} }; end;
+	if ~isempty(result{2}), options = { options{:} 'oper' result{2} }; end
 	switch result{3},
 		case 1, options = { options{:} 'edge' 'leading' };
 		case 2, options = { options{:} 'edge' 'both' };
 		case 3, options = { options{:} 'edge' 'trailing' };
 	end; 
     options = { options{:} 'edgelen' eval( [ '[' result{4} ']' ] ) };
-    if result{5},  options = { options{:} 'duration' 'on' }; end;
-	if ~result{6}, options = { options{:} 'delchan'  'off'}; end;
-	if ~result{7}, options = { options{:} 'delevent' 'off'}; end;
-	if result{8},  options = { options{:} 'nbtype'  1}; end;
+    if result{5},  options = { options{:} 'duration' 'on' }; end
+	if ~result{6}, options = { options{:} 'delchan'  'off'}; end
+	if ~result{7}, options = { options{:} 'delevent' 'off'}; end
+	if result{8},  options = { options{:} 'nbtype'  1}; end
 else
     options = varargin;
-end;
+end
 listcheck = { 'edge'      'string'     { 'both';'leading';'trailing'}     'both';
               'edgelen'   'integer'    [1 Inf]                            1;
               'delchan'   'string'     { 'on';'off' }                     'on';
@@ -176,13 +176,13 @@ listcheck = { 'edge'      'string'     { 'both';'leading';'trailing'}     'both'
               'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
               'nbtype'    'integer'    [1 NaN]                             NaN };
 g = finputcheck( options, listcheck, 'pop_chanedit');
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % check inut consistency
 % ----------------------
 if strcmpi(g.duration, 'on') & ~strcmpi(g.edge, 'leading')
     error('Must detect leading edge to extract event duration');
-end;
+end
 
 % process events
 % --------------
@@ -190,8 +190,8 @@ fprintf('pop_chanevent: importing events from data channel %d ...\n', chan);
 counte = 1; % event counter
 events(10000).latency = 0;
 if isnan(g.nbtype)
-    if length(unique(EEG.data(chan, :))) == 2, g.nbtype = 1; end;
-end;
+    if length(unique(EEG.data(chan, :))) == 2, g.nbtype = 1; end
+end
 
 for ci = chan
     X = EEG.data(ci, :);
@@ -205,7 +205,7 @@ for ci = chan
         end
         try, eval( g.oper );
         catch, error('pop_chanevent: error executing preprocessing string');
-        end;
+        end
     end;    
     
     % extract edges
@@ -215,7 +215,7 @@ for ci = chan
      case 'both'    , tmpevent1 = find( tmpdiff > 0)-1; tmpevent2 = find( tmpdiff < 0);
      case 'trailing', tmpevent2 = find( tmpdiff < 0);
      case 'leading' , tmpevent1 = find( tmpdiff > 0)-1; tmpdur = find( tmpdiff < 0);
-    end;
+    end
     
     % fuse close events if necessary
     % ------------------------------
@@ -224,30 +224,30 @@ for ci = chan
         tmpevent1(tmpclose) = [];
         tmpevent    = tmpevent1+1;
         tmpeventval = tmpevent1+2;
-    end;
+    end
     if exist('tmpevent2')
         tmpclose = find( tmpevent2(2:end)-tmpevent2(1:end-1) < g.edgelen); % not +1
         tmpevent2(tmpclose) = [];
         tmpevent    = tmpevent2+1;
         tmpeventval = tmpevent2;
-    end;
+    end
     if exist('tmpevent1') & exist('tmpevent2')
         tmpevent    = sort([ tmpevent1+1 tmpevent2+1]);
         tmpeventval = sort([ tmpevent1+2 tmpevent2]);
-    end;
+    end
     
     % adjust edges for duration  if necessary
     % ---------------------------------------
     if strcmpi(g.duration, 'on')
         tmpclose = find( tmpdur(2:end)-tmpdur(1:end-1) < g.edgelen); % not +1 (take out the first)
         tmpdur(tmpclose) = [];
-        if tmpdur(1) < tmpevent(1), tmpdur(1) = []; end;
-        if length(tmpevent) > length(tmpdur), tmpdur(end+1) = EEG.pnts; end;
+        if tmpdur(1) < tmpevent(1), tmpdur(1) = []; end
+        if length(tmpevent) > length(tmpdur), tmpdur(end+1) = EEG.pnts; end
         if length(tmpevent) ~= length(tmpdur)
             error([ 'Error while attempting to extract event durations' 10 ...
                     'Maybe edges are not perfectly defined, try increasing edge length' ]);
-        end;
-    end;
+        end
+    end
 
     if isempty(tmpevent), 
         fprintf('No event found for channel %d\n', ci);
@@ -257,16 +257,16 @@ for ci = chan
                 events(counte).type    = g.typename;
             else
                 events(counte).type    = X(tmpeventval(tmpi));
-            end;
+            end
             events(counte).latency = tmpevent(tmpi);
             if strcmpi(g.duration, 'on')
                 events(counte).duration = tmpdur(tmpi) - tmpevent(tmpi);
-            end;
+            end
             counte = counte+1;
-        end;
-    end;
+        end
+    end
     events = events(1:counte-1);
-end;
+end
 
 % resort events
 % --------------
@@ -275,23 +275,23 @@ if strcmp(g.delevent, 'on')
     if EEG.trials > 1
         for index = 1:length(events)
             EEG.event(index).epoch = 1+floor((EEG.event(index).latency-1) / EEG.pnts);
-        end;
-    end;
+        end
+    end
 else
 	for index = 1:length(events)
 		EEG.event(end+1).type  = events(index).type;
 		EEG.event(end).latency = events(index).latency;
         if EEG.trials > 1 | isfield(EEG.event, 'epoch');
             EEG.event(end).epoch = 1+floor((EEG.event(end).latency-1) / EEG.pnts);
-        end;
-	end;
+        end
+	end
     if EEG.trials > 1
         EEG = pop_editeventvals( EEG, 'sort', {  'epoch' 0 'latency', [0] } );
     else
         EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-    end;
-end;
-if isfield(EEG.event, 'urevent'), EEG.event = rmfield(EEG.event, 'urevent'); end;
+    end
+end
+if isfield(EEG.event, 'urevent'), EEG.event = rmfield(EEG.event, 'urevent'); end
 EEG = eeg_checkset(EEG, 'eventconsistency');
 EEG = eeg_checkset(EEG, 'makeur');
 
@@ -299,9 +299,9 @@ EEG = eeg_checkset(EEG, 'makeur');
 % ---------------
 if strcmp(g.delchan, 'on')
 	EEG = pop_select(EEG, 'nochannel', chan);
-end;
+end
 
 if nargin < 2
     command = sprintf('EEG = pop_chanevent(EEG, %s);', vararg2str({ chan options{:} })); 
-end;
+end
 return;

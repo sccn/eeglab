@@ -82,7 +82,7 @@ end
 
 if iscell(data), nchans = size(data{1},1);
 else             nchans = size(data,1);
-end;
+end
 g = finputcheck(varargin, { 'chanlocs'  ''    []          '';
     'chans'     'integer'               [1 size(data,1)]  [1:nchans];
     'geom'      'integer'               [1 Inf]     [];
@@ -93,8 +93,8 @@ g = finputcheck(varargin, { 'chanlocs'  ''    []          '';
     'calbar'    'real'                  []          [];
     'axcopycom' 'string'                []          '';
     'axsize'    'float'                 [0 1]       [nan nan]}, 'metaplottopo' );
-if ischar(g), error(g); end;
-if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); end;
+if ischar(g), error(g); end
+if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); end
 
 [chans,framestotal]=size(data);           % data size
 
@@ -147,8 +147,8 @@ if ~isempty(data)
         data{2} = data{2}(g.chans,:);
     else
         data = data(g.chans,:);
-    end;
-end;
+    end
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%% Print plot info %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -210,7 +210,7 @@ else % read chan_locs file
         [tmp channames Th Rd] = readlocs(g.chanlocs);
         channames = strvcat(channames);
         nonemptychans = [1:length(channames)];
-    end;
+    end
     Th = pi/180*Th;                 % convert degrees to radians
     Rd = Rd;
 
@@ -230,7 +230,7 @@ else % read chan_locs file
     for index = 1:length(emptychans)
         xvals(emptychans(index)) = 0.7+0.2*floor((index-1)/totalchans);
         yvals(emptychans(index)) = -0.4+mod(index-1,totalchans)/totalchans;
-    end;
+    end
     channames = channames(g.chans,:);
     xvals     = xvals(g.chans);
     yvals     = yvals(g.chans);
@@ -244,7 +244,7 @@ if length(xvals) > 1
     xvals = (xvals-mean([max(xvals) min(xvals)]))/(max(xvals)-min(xvals)); % recenter
     xvals = gcapos(1)+gcapos(3)/2+PLOT_WIDTH*xvals;   % controls width of plot
     % array on current axes
-end;
+end
 yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
 % array on current axes
 %
@@ -256,7 +256,7 @@ fprintf('Plotting all channel...');
 for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%%
 
     xcenter = xvals(c); if isnan(xcenter), xcenter = 0.5; end; 
-    ycenter = yvals(c); if isnan(ycenter), ycenter = 0.5; end;
+    ycenter = yvals(c); if isnan(ycenter), ycenter = 0.5; end
     Axes = [Axes axes('Units','Normal','Position', ...
         [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])];
     hold on;
@@ -272,10 +272,10 @@ for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%
         eval( [ 'func = @' g.plotfunc ';' ] );
         if iscell(data), tmp = { g.plotargs{1:g.datapos(1)-1} data{1}(c,:) g.plotargs{g.datapos(1):g.datapos(2)-1} data{2}(c,:) g.plotargs{g.datapos(2):end}};
         else             tmp = { g.plotargs{1:g.datapos-1}    data(c,:)    g.plotargs{g.datapos:end} };
-        end;
+        end
         tmp = { tmp{:} 'title' channames(c,:) 'plotmode' 'topo'};
         feval(func, tmp{:});
-    end;
+    end
     outchannames{c} = deblank(channames(c,:));
 end; % c, chans / subplot
 
@@ -290,12 +290,12 @@ if ~isempty(g.calbar)
     axis('off');
     if   g.calbar(3) < g.calbar(4), g.ydir = 1;
     else g.calbar(5) = g.calbar(3); g.calbar(3) = []; g.ydir = -1;
-    end;
+    end
     [xmin xmax ymin ymax] = deal(g.calbar(1), g.calbar(2),g.calbar(3), g.calbar(4));
     figure(curfig);p=plot([0 0],[ymin ymax],'color','k'); % draw vert axis at zero
     if g.ydir == -1
         set(gca, 'ydir', 'reverse');
-    end;
+    end
     hold on
     figure(curfig);p=plot([xmin xmax],[0 0],'color','k'); % draw horizontal axis
     xlim([xmin xmax]);
@@ -331,7 +331,7 @@ if ~isempty(g.calbar)
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
     
-end;
+end
 
 %        'set(gcbf, ''''unit'''', ''''pixel'''');' ...
 %        'tmp = get(gcbf, ''''position'''');' ...

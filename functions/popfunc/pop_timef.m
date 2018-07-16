@@ -66,8 +66,8 @@ else
 	popup = ischar(num) | isempty(num);
 	if ischar(num)
 		lastcom = num;
-	end;
-end;
+	end
+end
 
 % pop up window
 % -------------
@@ -112,7 +112,7 @@ if popup
 	result = inputgui( geometry, uilist, 'pophelp(''pop_timef'');', ...
 					   fastif(typeproc, 'Plot channel time frequency -- pop_timef()', ...
 							  'Plot component time frequency -- pop_timef()'));
-	if length( result ) == 0 return; end;
+	if length( result ) == 0 return; end
 
 	num	     = eval( [ '[' result{1} ']' ] ); 
 	tlimits	 = eval( [ '[' result{2} ']' ] ); 
@@ -126,15 +126,15 @@ if popup
     % add topoplot
     % ------------
     if isfield(EEG.chanlocs, 'theta')
-        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
+        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end
         if typeproc == 1
             options = [options ', ''topovec'', ' int2str(num) ...
                         ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
         else
             options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
                        '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
-        end;
-    end;
+        end
+    end
     
     % add title
     % ---------
@@ -143,30 +143,30 @@ if popup
             chanlabel = EEG.chanlocs(num).labels;
         else
             chanlabel = int2str(num);
-        end;
+        end
 	    switch lower(result{4})
 	       case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel ...
 	       ' power and inter-trial coherence' fastif(~ isempty(EEG.setname), [' (' EEG.setname ')''' ], '''') ];
 	       otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel ...
 	       ' power and inter-trial phase coherence' fastif(~ isempty(EEG.setname), [' (' EEG.setname ')''' ], '''') ];
-	    end;
-	end;
+	    end
+	end
 	if ~isempty( result{5} )
 		options      = [ options ', ''alpha'',' result{5} ];
-	end;
+	end
 	if ~isempty( result{6} )
 		  options = [ options ',' result{6} ];
-	end;
+	end
 	if ~result{7}
 		options = [ options ', ''plotersp'', ''off''' ];
-	end;
+	end
 	if ~result{8}
 		options = [ options ', ''plotitc'', ''off''' ];
-	end;
-	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+	end
+	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 else
     options = [ ',' vararg2str(varargin) ];
-end;
+end
 
 % compute epoch limits
 % --------------------
@@ -193,19 +193,19 @@ end;
 % -------
 outstr = '';
 if ~popup
-    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
-    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
-end;
+    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end
+    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end
+end
 
 % plot the datas and generate output command
 % --------------------------------------------
 if length( options ) < 2
     options = '';
-end;
+end
 if nargin < 4
     varargout{1} = sprintf('figure; pop_timef( EEG, %d, %d, %s, %s %s);', typeproc, num, ...
                            vararg2str({tlimits}), vararg2str({cycles}), options);
-end;
+end
 com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)	
 
@@ -220,4 +220,4 @@ function txt = context(var, allvars, alltext);
 	else
 		disp([ 'warning: variable ''' var ''' not found']);
 		txt = '';
-	end;
+	end

@@ -264,7 +264,7 @@ if (nargin==1),
 				% arrow with -- linestyle
 				h15 = arrow([-.5 -3 -3],[1 -3 -3],'LineStyle','--','EdgeColor','g');
 				
-				if (nargout>=1), h=[h1;h2;h3;h4;h5;h6;h7;h8;h9;h10;h11;h12;h13;h14;h15]; end;
+				if (nargout>=1), h=[h1;h2;h3;h4;h5;h6;h7;h8;h9;h10;h11;h12;h13;h14;h15]; end
 			else,	
 				set(hs,'YData',10.^get(hs,'YData'));
 				shading('interp');
@@ -272,7 +272,7 @@ if (nargin==1),
 				title('Demo of the capabilities of the ARROW function in 2-D');
 				hold on; [C,H]=contour(x,y,z,20); hold off;
 				for k=H', set(k,'ZData',(axlim(6)+1)*ones(size(get(k,'XData'))),...
-				                'YData',10.^get(k,'YData'),'Color','k'); end;
+				                'YData',10.^get(k,'YData'),'Color','k'); end
 				set(gca,'YScale','log');
 				axis([axlim(1:2) 10.^axlim(3:4)]);
 				
@@ -286,19 +286,19 @@ if (nargin==1),
 				           24,[90;60;120],[],[0;0;4]);
 				set(h2(2),'EdgeColor','g','FaceColor','c');
 				set(h2(3),'EdgeColor','m','FaceColor','r');
-				if (nargout>=1), h=[h1;h2]; end;
-			end;
+				if (nargout>=1), h=[h1;h2]; end
+			end
 		else,
 			error(['ARROW got an unknown single-argument string ''' deblank(arg1) '''.']);
-		end;
+		end
 		return;
-	end;
-end;
+	end
+end
 
 % Check # of arguments
 if (nargin==0), help arrow ; return;
 elseif (nargout>3), error('ARROW produces at most 3 output arguments.');
-end;
+end
 
 % find first property number
 firstprop = nargin+1;
@@ -307,17 +307,17 @@ if (nargin<=3), % to speed things up a bit
 	elseif (ischar(arg1)), firstprop=1;
 	elseif (ischar(arg2)), firstprop=2;
 	elseif (nargin==3),
-		if (ischar(arg3)), firstprop=3; end;
-	end;
+		if (ischar(arg3)), firstprop=3; end
+	end
 else,
 	for k=1:nargin,
 		curarg = eval(['arg' num2str(k)]);
 		if (ischar(curarg)),
 			firstprop = k;
 			break;
-		end;
-	end;
-end;
+		end
+	end
+end
 
 % check property list
 if (firstprop<=nargin),
@@ -325,18 +325,18 @@ if (firstprop<=nargin),
 		curarg = eval(['arg' num2str(k)]);
 		if ((~ischar(curarg))|(min(size(curarg))~=1)),
 			error('ARROW requires that a property name be a single string.');
-		end;
-	end;
+		end
+	end
 	if (rem(nargin-firstprop,2)~=1),
 		error(['ARROW requires that the property ''' eval(['arg' num2str(nargin)]) ...
 		       ''' be paired with a property value.']);
-	end;
-end;
+	end
+end
 
 % default output
-if (nargout>0), h=[]; end;
-if (nargout>1), yy=[]; end;
-if (nargout>2), zz=[]; end;
+if (nargout>0), h=[]; end
+if (nargout>1), yy=[]; end
+if (nargout>2), zz=[]; end
 
 % set values to empty matrices
 start      = [];
@@ -383,11 +383,11 @@ if (firstprop>2),
 	elseif (firstprop==8), start=arg1; stop=arg2; len=arg3(:); baseangle=arg4(:); tipangle=arg5(:); wid=arg6(:); page=arg7(:);
 	elseif (firstprop==9), start=arg1; stop=arg2; len=arg3(:); baseangle=arg4(:); tipangle=arg5(:); wid=arg6(:); page=arg7(:); crossdir=arg8;
 	else, error('ARROW takes at most 8 non-property arguments.');
-	end;
+	end
 elseif (firstprop==2),
 	% assume arg1 is a set of handles
 	oldh = arg1(:);
-end;
+end
 
 % parse property pairs
 extraprops=char([]);
@@ -403,7 +403,7 @@ for k=firstprop:2:nargin,
 	elseif (all(prop(1:3)=='wid')),        wid        = val(:);
 	elseif (all(prop(1:4)=='page')),       page       = val;
 	elseif (all(prop(1:5)=='cross')),      crossdir   = val;
-	elseif (all(prop(1:4)=='norm')),       if (ischar(val)), crossdir=val; else, crossdir=val*sqrt(-1); end;
+	elseif (all(prop(1:4)=='norm')),       if (ischar(val)), crossdir=val; else, crossdir=val*sqrt(-1); end
 	elseif (all(prop(1:3)=='end')),        ends       = val;
 	elseif (all(prop(1:5)=='linew')),      linewidth  = val(:);
 	elseif (all(prop(1:5)=='lines')),      linestyle  = val;
@@ -414,88 +414,88 @@ for k=firstprop:2:nargin,
 	elseif (all(prop(1:6)=='handle')),     oldh       = val(:);
 	elseif (all(prop(1:5)=='userd')),      %ignore it
 	else, extraprops=[extraprops ',arg' num2str(k) ',arg' num2str(k+1)];
-	end;
-end;
+	end
+end
 
 % Check if we got 'default' values
-if (ischar(start     )),  s=lower([start(:)'      '   ']); if (all(s(1:3)=='def')), start      = defstart;      else, error(['ARROW does not recognize ''' start(:)'     ''' as a valid ''Start'' string.']); end; end;
-if (ischar(stop      )),  s=lower([stop(:)'       '   ']); if (all(s(1:3)=='def')), stop       = defstop;       else, error(['ARROW does not recognize ''' stop(:)'      ''' as a valid ''Stop'' string.']); end; end;
-if (ischar(len       )),  s=lower([len(:)'        '   ']); if (all(s(1:3)=='def')), len        = deflen;        else, error(['ARROW does not recognize ''' len(:)'       ''' as a valid ''Length'' string.']); end; end;
-if (ischar(baseangle )),  s=lower([baseangle(:)'  '   ']); if (all(s(1:3)=='def')), baseangle  = defbaseangle;  else, error(['ARROW does not recognize ''' baseangle(:)' ''' as a valid ''BaseAngle'' string.']); end; end;
-if (ischar(tipangle  )),  s=lower([tipangle(:)'   '   ']); if (all(s(1:3)=='def')), tipangle   = deftipangle;   else, error(['ARROW does not recognize ''' tipangle(:)'  ''' as a valid ''TipAngle'' string.']); end; end;
-if (ischar(wid       )),  s=lower([wid(:)'        '   ']); if (all(s(1:3)=='def')), wid        = defwid;        else, error(['ARROW does not recognize ''' wid(:)'       ''' as a valid ''Width'' string.']); end; end;
-if (ischar(crossdir  )),  s=lower([crossdir(:)'   '   ']); if (all(s(1:3)=='def')), crossdir   = defcrossdir;   else, error(['ARROW does not recognize ''' crossdir(:)'  ''' as a valid ''CrossDir'' or ''NormalDir'' string.']); end; end;
-if (ischar(page      )),  s=lower([page(:)'       '   ']); if (all(s(1:3)=='def')), page       = defpage;       else, error(['ARROW does not recognize ''' page(:)'      ''' as a valid ''Page'' string.']); end; end;
-if (ischar(ends      )),  s=lower([ends(:)'       '   ']); if (all(s(1:3)=='def')), ends       = defends;       end; end;
-if (ischar(linewidth )),  s=lower([linewidth(:)'  '   ']); if (all(s(1:3)=='def')), linewidth  = deflinewidth;  else, error(['ARROW does not recognize ''' linewidth(:)' ''' as a valid ''LineWidth'' string.']); end; end;
-if (ischar(linestyle )),  s=lower([linestyle(:)'  '   ']); if (all(s(1:3)=='def')), linestyle  = deflinestyle;  end; end;
-if (ischar(edgecolor )),  s=lower([edgecolor(:)'  '   ']); if (all(s(1:3)=='def')), edgecolor  = defedgecolor;  end; end;
-if (ischar(facecolor )),  s=lower([facecolor(:)'  '   ']); if (all(s(1:3)=='def')), facecolor  = deffacecolor;  end; end;
-if (ischar(oldh      )),  s=lower([oldh(:)'       '   ']); if (all(s(1:3)=='def')), oldh       = [];            else, error(['ARROW does not recognize ''' oldh(:)'      ''' as a valid ''ObjectHandles'' string.']); end; end;
+if (ischar(start     )),  s=lower([start(:)'      '   ']); if (all(s(1:3)=='def')), start      = defstart;      else, error(['ARROW does not recognize ''' start(:)'     ''' as a valid ''Start'' string.']); end; end
+if (ischar(stop      )),  s=lower([stop(:)'       '   ']); if (all(s(1:3)=='def')), stop       = defstop;       else, error(['ARROW does not recognize ''' stop(:)'      ''' as a valid ''Stop'' string.']); end; end
+if (ischar(len       )),  s=lower([len(:)'        '   ']); if (all(s(1:3)=='def')), len        = deflen;        else, error(['ARROW does not recognize ''' len(:)'       ''' as a valid ''Length'' string.']); end; end
+if (ischar(baseangle )),  s=lower([baseangle(:)'  '   ']); if (all(s(1:3)=='def')), baseangle  = defbaseangle;  else, error(['ARROW does not recognize ''' baseangle(:)' ''' as a valid ''BaseAngle'' string.']); end; end
+if (ischar(tipangle  )),  s=lower([tipangle(:)'   '   ']); if (all(s(1:3)=='def')), tipangle   = deftipangle;   else, error(['ARROW does not recognize ''' tipangle(:)'  ''' as a valid ''TipAngle'' string.']); end; end
+if (ischar(wid       )),  s=lower([wid(:)'        '   ']); if (all(s(1:3)=='def')), wid        = defwid;        else, error(['ARROW does not recognize ''' wid(:)'       ''' as a valid ''Width'' string.']); end; end
+if (ischar(crossdir  )),  s=lower([crossdir(:)'   '   ']); if (all(s(1:3)=='def')), crossdir   = defcrossdir;   else, error(['ARROW does not recognize ''' crossdir(:)'  ''' as a valid ''CrossDir'' or ''NormalDir'' string.']); end; end
+if (ischar(page      )),  s=lower([page(:)'       '   ']); if (all(s(1:3)=='def')), page       = defpage;       else, error(['ARROW does not recognize ''' page(:)'      ''' as a valid ''Page'' string.']); end; end
+if (ischar(ends      )),  s=lower([ends(:)'       '   ']); if (all(s(1:3)=='def')), ends       = defends;       end; end
+if (ischar(linewidth )),  s=lower([linewidth(:)'  '   ']); if (all(s(1:3)=='def')), linewidth  = deflinewidth;  else, error(['ARROW does not recognize ''' linewidth(:)' ''' as a valid ''LineWidth'' string.']); end; end
+if (ischar(linestyle )),  s=lower([linestyle(:)'  '   ']); if (all(s(1:3)=='def')), linestyle  = deflinestyle;  end; end
+if (ischar(edgecolor )),  s=lower([edgecolor(:)'  '   ']); if (all(s(1:3)=='def')), edgecolor  = defedgecolor;  end; end
+if (ischar(facecolor )),  s=lower([facecolor(:)'  '   ']); if (all(s(1:3)=='def')), facecolor  = deffacecolor;  end; end
+if (ischar(oldh      )),  s=lower([oldh(:)'       '   ']); if (all(s(1:3)=='def')), oldh       = [];            else, error(['ARROW does not recognize ''' oldh(:)'      ''' as a valid ''ObjectHandles'' string.']); end; end
 
 % check transpose on arguments; convert strings to numbers
-if (((size(start   ,1)==2)|(size(start   ,1)==3))&((size(start   ,2)==1)|(size(start   ,2)>3))), start    = start';    end;
-if (((size(stop    ,1)==2)|(size(stop    ,1)==3))&((size(stop    ,2)==1)|(size(stop    ,2)>3))), stop     = stop';     end;
-if (((size(crossdir,1)==2)|(size(crossdir,1)==3))&((size(crossdir,2)==1)|(size(crossdir,2)>3))), crossdir = crossdir'; end;
-if ((size(linestyle,2)>2)&(size(linestyle,1)<=2)), linestyle=linestyle'; end;
+if (((size(start   ,1)==2)|(size(start   ,1)==3))&((size(start   ,2)==1)|(size(start   ,2)>3))), start    = start';    end
+if (((size(stop    ,1)==2)|(size(stop    ,1)==3))&((size(stop    ,2)==1)|(size(stop    ,2)>3))), stop     = stop';     end
+if (((size(crossdir,1)==2)|(size(crossdir,1)==3))&((size(crossdir,2)==1)|(size(crossdir,2)>3))), crossdir = crossdir'; end
+if ((size(linestyle,2)>2)&(size(linestyle,1)<=2)), linestyle=linestyle'; end
 if (all(size(edgecolor))),
 	if (ischar(edgecolor)),
 		col = lower(edgecolor(:,1));
 		edgecolor = zeros(length(col),3);
-		ii=find(col=='y'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 0]; end;
-		ii=find(col=='m'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 0 1]; end;
-		ii=find(col=='c'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 1 1]; end;
-		ii=find(col=='r'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 0 0]; end;
-		ii=find(col=='g'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 1 0]; end;
-		ii=find(col=='b'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 0 1]; end;
-		ii=find(col=='w'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 1]; end;
-		ii=find(col=='k'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 0 0]; end;
-		ii=find(col=='f'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 1]*inf; end;
-		ii=find(col=='n'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 1]*(-inf); end;
+		ii=find(col=='y'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 0]; end
+		ii=find(col=='m'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 0 1]; end
+		ii=find(col=='c'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 1 1]; end
+		ii=find(col=='r'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 0 0]; end
+		ii=find(col=='g'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 1 0]; end
+		ii=find(col=='b'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 0 1]; end
+		ii=find(col=='w'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 1]; end
+		ii=find(col=='k'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[0 0 0]; end
+		ii=find(col=='f'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 1]*inf; end
+		ii=find(col=='n'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 1]*(-inf); end
 	elseif ((size(edgecolor,2)~=3)&(size(edgecolor,1)==3)),
 		edgecolor=edgecolor';
 	elseif (size(edgecolor,2)~=3),
 		error('ARROW requires that color specifications must be a ?x3 RGB matrix.');
-	end;
-end;
+	end
+end
 if (all(size(facecolor))),
 	if (ischar(facecolor)),
 		col = lower(facecolor(:,1));
 		facecolor = zeros(length(col),3);
-		ii=find(col=='y'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 0]; end;
-		ii=find(col=='m'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 0 1]; end;
-		ii=find(col=='c'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 1 1]; end;
-		ii=find(col=='r'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 0 0]; end;
-		ii=find(col=='g'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 1 0]; end;
-		ii=find(col=='b'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 0 1]; end;
-		ii=find(col=='w'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 1]; end;
-		ii=find(col=='k'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 0 0]; end;
-		ii=find(col=='f'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 1]*inf; end;
-		ii=find(col=='n'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 1]*(-inf); end;
+		ii=find(col=='y'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 0]; end
+		ii=find(col=='m'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 0 1]; end
+		ii=find(col=='c'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 1 1]; end
+		ii=find(col=='r'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 0 0]; end
+		ii=find(col=='g'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 1 0]; end
+		ii=find(col=='b'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 0 1]; end
+		ii=find(col=='w'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 1]; end
+		ii=find(col=='k'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[0 0 0]; end
+		ii=find(col=='f'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 1]*inf; end
+		ii=find(col=='n'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 1]*(-inf); end
 	elseif ((size(facecolor,2)~=3)&(size(facecolor,1)==3)),
 		facecolor=facecolor';
 	elseif (size(facecolor,2)~=3),
 		error('ARROW requires that color specifications must be a ?x3 RGB matrix.');
-	end;
-end;
+	end
+end
 if (all(size(ends))),
 	if (ischar(ends)),
 		endsorig = ends;
 		col = lower([ends(:,1:min(3,size(ends,2))) ones(size(ends,1),max(0,3-size(ends,2)))*' ']);
 		ends = NaN*ones(size(ends,1),1);
 		oo = ones(1,size(ends,1));
-		ii=find(all(col'==['non']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*0; end;
-		ii=find(all(col'==['sto']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*1; end;
-		ii=find(all(col'==['sta']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*2; end;
-		ii=find(all(col'==['bot']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*3; end;
+		ii=find(all(col'==['non']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*0; end
+		ii=find(all(col'==['sto']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*1; end
+		ii=find(all(col'==['sta']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*2; end
+		ii=find(all(col'==['bot']'*oo)'); if (all(size(ii))), ends(ii)=ones(length(ii),1)*3; end
 		if (any(isnan(ends))),
 			ii = min(find(isnan(ends)));
 			error(['ARROW does not recognize ''' deblank(endsorig(ii,:)) ''' as a valid ''Ends'' value.']);
-		end;
+		end
 	else,
 		ends = ends(:);
-	end;
-end;
+	end
+end
 oldh = oldh(:);
 
 % check object handles
@@ -503,16 +503,16 @@ if (all(size(oldh))),
 	oldh = oldh.';
 	objs = findobj;
 	if (length(objs)==0), error('ARROW found no graphics handles.');
-	elseif (length(objs)==1), objs=[objs;objs]; end;
+	elseif (length(objs)==1), objs=[objs;objs]; end
 	if (~all(any(objs(:,ones(1,length(oldh)))==oldh(ones(length(objs),1),:)))),
 		error('ARROW got invalid object handles.');
-	end;
+	end
 	oldh = oldh.';
-end;
+end
 
 % Check for an empty Start or Stop (but not both) with no object handles
 if ((~all(size(oldh)))&(all(size(start))~=all(size(stop)))),
-	if (~all(size(start))), start=stop; end;
+	if (~all(size(start))), start=stop; end
 	ii = find(all(diff(start)'==0)');
 	if (size(start,1)==1),
 		stop = start;
@@ -525,11 +525,11 @@ if ((~all(size(oldh)))&(all(size(start))~=all(size(stop)))),
 			jj(ii) = zeros(length(ii),1);
 			jj = jj(find(jj>0));
 			start = start(jj,:);
-		end;
+		end
 		stop = start(2:size(start,1),:);
 		start = start(1:size(start,1)-1,:);
-	end;
-end;
+	end
+end
 
 % largest argument length
 argsizes = [length(oldh) size(start,1) size(stop,1)                ...
@@ -551,12 +551,12 @@ args=['length(ObjectHandle)  '; ...
       '#colors in FaceColor  '];
 if (any(imag(crossdir(:))~=0)),
 	args(9,:) = '#rows(NormalDir)      ';
-end;
+end
 if (~all(size(oldh))),
 	narrows = max(argsizes);
 else,
 	narrows = length(oldh);
-end;
+end
 
 % Check size of arguments
 ii = find((argsizes~=0)&(argsizes~=1)&(argsizes~=narrows));
@@ -564,14 +564,14 @@ if (all(size(ii))),
 	s = args(ii',:);
 	while ((size(s,2)>1)&((abs(s(:,size(s,2)))==0)|(abs(s(:,size(s,2)))==abs(' ')))),
 		s = s(:,1:size(s,2)-1);
-	end;
+	end
 	s = [ones(length(ii),1)*'ARROW requires that  ' s ...
 	     ones(length(ii),1)*['  equal the # of arrows (' num2str(narrows) ').' c]];
 	s = s';
 	s = s(:)';
 	s = s(1:length(s)-1);
 	error(char(s));
-end;
+end
 
 % check element length in Start, Stop, and CrossDir
 if (all(size(start))),
@@ -579,15 +579,15 @@ if (all(size(start))),
 		start = [start NaN*ones(size(start,1),1)];
 	elseif (size(start,2)~=3),
 		error('ARROW requires 2- or 3-element Start points.');
-	end;
-end;
+	end
+end
 if (all(size(stop))),
 	if (size(stop,2)==2),
 		stop = [stop NaN*ones(size(stop,1),1)];
 	elseif (size(stop,2)~=3),
 		error('ARROW requires 2- or 3-element Stop points.');
-	end;
-end;
+	end
+end
 if (all(size(crossdir))),
 	if (size(crossdir,2)<3),
 		crossdir = [crossdir NaN*ones(size(crossdir,1),3-size(crossdir,2))];
@@ -596,42 +596,42 @@ if (all(size(crossdir))),
 			error('ARROW requires 2- or 3-element CrossDir vectors.');
 		else,
 			error('ARROW requires 2- or 3-element NormalDir vectors.');
-		end;
-	end;
-end;
+		end
+	end
+end
 
 % fill empty arguments
-if (~all(size(start     ))),   start      = [NaN NaN NaN];      end;
-if (~all(size(stop      ))),   stop       = [NaN NaN NaN];      end;
-if (~all(size(len       ))),   len        = NaN;                end;
-if (~all(size(baseangle ))),   baseangle  = NaN;                end;
-if (~all(size(tipangle  ))),   tipangle   = NaN;                end;
-if (~all(size(wid       ))),   wid        = NaN;                end;
-if (~all(size(page      ))),   page       = NaN;                end;
-if (~all(size(crossdir  ))),   crossdir   = [NaN NaN NaN];      end;
-if (~all(size(ends      ))),   ends       = NaN;                end;
-if (~all(size(linewidth ))),   linewidth  = NaN;                end;
+if (~all(size(start     ))),   start      = [NaN NaN NaN];      end
+if (~all(size(stop      ))),   stop       = [NaN NaN NaN];      end
+if (~all(size(len       ))),   len        = NaN;                end
+if (~all(size(baseangle ))),   baseangle  = NaN;                end
+if (~all(size(tipangle  ))),   tipangle   = NaN;                end
+if (~all(size(wid       ))),   wid        = NaN;                end
+if (~all(size(page      ))),   page       = NaN;                end
+if (~all(size(crossdir  ))),   crossdir   = [NaN NaN NaN];      end
+if (~all(size(ends      ))),   ends       = NaN;                end
+if (~all(size(linewidth ))),   linewidth  = NaN;                end
 if (~all(size(linestyle ))),   linestyle  = char(['-']);      end; % was NaN
-if (~all(size(edgecolor ))),   edgecolor  = [NaN NaN NaN];      end;
-if (~all(size(facecolor ))),   facecolor  = [NaN NaN NaN];      end;
+if (~all(size(edgecolor ))),   edgecolor  = [NaN NaN NaN];      end
+if (~all(size(facecolor ))),   facecolor  = [NaN NaN NaN];      end
 
 % expand single-column arguments
 o = ones(narrows,1);
-if (size(start     ,1)==1),   start      = o * start     ;   end;
-if (size(stop      ,1)==1),   stop       = o * stop      ;   end;
-if (length(len       )==1),   len        = o * len       ;   end;
-if (length(baseangle )==1),   baseangle  = o * baseangle ;   end;
-if (length(tipangle  )==1),   tipangle   = o * tipangle  ;   end;
-if (length(wid       )==1),   wid        = o * wid       ;   end;
-if (length(page      )==1),   page       = o * page      ;   end;
-if (size(crossdir  ,1)==1),   crossdir   = o * crossdir  ;   end;
-if (length(ends      )==1),   ends       = o * ends      ;   end;
-if (length(linewidth )==1),   linewidth  = o * linewidth ;   end;
-if (size(linestyle ,1)==1),   linestyle  = o * linestyle ;   end;
-if (size(edgecolor ,1)==1),   edgecolor  = o * edgecolor ;   end;
-if (size(facecolor ,1)==1),   facecolor  = o * facecolor ;   end;
+if (size(start     ,1)==1),   start      = o * start     ;   end
+if (size(stop      ,1)==1),   stop       = o * stop      ;   end
+if (length(len       )==1),   len        = o * len       ;   end
+if (length(baseangle )==1),   baseangle  = o * baseangle ;   end
+if (length(tipangle  )==1),   tipangle   = o * tipangle  ;   end
+if (length(wid       )==1),   wid        = o * wid       ;   end
+if (length(page      )==1),   page       = o * page      ;   end
+if (size(crossdir  ,1)==1),   crossdir   = o * crossdir  ;   end
+if (length(ends      )==1),   ends       = o * ends      ;   end
+if (length(linewidth )==1),   linewidth  = o * linewidth ;   end
+if (size(linestyle ,1)==1),   linestyle  = o * linestyle ;   end
+if (size(edgecolor ,1)==1),   edgecolor  = o * edgecolor ;   end
+if (size(facecolor ,1)==1),   facecolor  = o * facecolor ;   end
 ax = o * gca;
-if (size(linestyle ,2)==1),   linestyle  = char([linestyle o*' ']); end;
+if (size(linestyle ,2)==1),   linestyle  = char([linestyle o*' ']); end
 linestyle = char(linestyle);
 
 % if we've got handles, get the defaults from the handles
@@ -653,16 +653,16 @@ if (all(size(oldh))),
 			if (isarrow),
 				start0 = ud(1:3);
 				stop0  = ud(4:6);
-				if (isnan(len(k))),           len(k)        = ud( 7);   end;
-				if (isnan(baseangle(k))),     baseangle(k)  = ud( 8);   end;
-				if (isnan(tipangle(k))),      tipangle(k)   = ud( 9);   end;
-				if (isnan(wid(k))),           wid(k)        = ud(10);   end;
-				if (isnan(page(k))),          page(k)       = ud(11);   end;
-				if (isnan(crossdir(k,1))),    crossdir(k,1) = ud(12);   end;
-				if (isnan(crossdir(k,2))),    crossdir(k,2) = ud(13);   end;
-				if (isnan(crossdir(k,3))),    crossdir(k,3) = ud(14);   end;
-				if (isnan(ends(k))),          ends(k)       = ud(15);   end;
-			end;
+				if (isnan(len(k))),           len(k)        = ud( 7);   end
+				if (isnan(baseangle(k))),     baseangle(k)  = ud( 8);   end
+				if (isnan(tipangle(k))),      tipangle(k)   = ud( 9);   end
+				if (isnan(wid(k))),           wid(k)        = ud(10);   end
+				if (isnan(page(k))),          page(k)       = ud(11);   end
+				if (isnan(crossdir(k,1))),    crossdir(k,1) = ud(12);   end
+				if (isnan(crossdir(k,2))),    crossdir(k,2) = ud(13);   end
+				if (isnan(crossdir(k,3))),    crossdir(k,3) = ud(14);   end
+				if (isnan(ends(k))),          ends(k)       = ud(15);   end
+			end
 			if (isline),
 				fromline(k) = 1;
 				if (isarrow),
@@ -674,11 +674,11 @@ if (all(size(oldh))),
 					z  = get(oh,'ZData');
 					if (any(size(x)~=[1 2])|any(size(y)~=[1 2])),
 						error('ARROW only converts two-point lines.');
-					end;
-					if (~all(size(z))), z=NaN*ones(size(x)); end;
+					end
+					if (~all(size(z))), z=NaN*ones(size(x)); end
 					start0 = [x(1) y(1) z(1)];
 					stop0  = [x(2) y(2) z(2)];
-				end;
+				end
 				ec = get(oh,'Color');
 				ls = [get(oh,'LineStyle') '  ']; ls=char(ls(1:2));
 				lw = get(oh,'LineWidth');
@@ -686,34 +686,34 @@ if (all(size(oldh))),
 				fc = get(oh,'FaceColor');if (ischar(fc)),
 					if (strcmp(fc,'none')), fc=-inf*[1 1 1];
 					elseif (strcmp(fc,'flat')), fc=inf*[1 1 1];
-					else, fc=[1 1 1]; end;
-					end;
+					else, fc=[1 1 1]; end
+					end
 				ec = get(oh,'EdgeColor');if (ischar(ec)),
 					if (strcmp(ec,'none')), ec=-inf*[1 1 1];
 					elseif (strcmp(ec,'flat')), ec=inf*[1 1 1];
-					else, ec=[1 1 1]; end;
-					end;
+					else, ec=[1 1 1]; end
+					end
 				ls = char('- ');
 				lw = get(oh,'LineWidth');
-			end;
+			end
 			ax(k) = get(oh,'Parent');
 		else,
 			error(['ARROW cannot convert ' ohtype ' objects.']);
-		end;
+		end
 		oldlinewidth(k)   = lw;
 		oldlinestyle(k,:) = ls;
 		oldedgecolor(k,:) = ec;
 		oldfacecolor(k,:) = fc;
-		ii=find(isnan(start(k,:)));      if (all(size(ii))),  start(k,ii)=start0(ii);  end;
-		ii=find(isnan(stop( k,:)));      if (all(size(ii))),  stop( k,ii)=stop0( ii);  end;
-		if (isnan(linewidth(k))),        linewidth(k)     = lw;  end;
-		if (isnan(linestyle(k,1))),      linestyle(k,1:2) = ls;  end;
-		if (any(isnan(facecolor(k,:)))), facecolor(k,:)   = fc;  end;
-		if (any(isnan(edgecolor(k,:)))), edgecolor(k,:)   = ec;  end;
-	end;
+		ii=find(isnan(start(k,:)));      if (all(size(ii))),  start(k,ii)=start0(ii);  end
+		ii=find(isnan(stop( k,:)));      if (all(size(ii))),  stop( k,ii)=stop0( ii);  end
+		if (isnan(linewidth(k))),        linewidth(k)     = lw;  end
+		if (isnan(linestyle(k,1))),      linestyle(k,1:2) = ls;  end
+		if (any(isnan(facecolor(k,:)))), facecolor(k,:)   = fc;  end
+		if (any(isnan(edgecolor(k,:)))), edgecolor(k,:)   = ec;  end
+	end
 else
 	fromline = [];
-end;
+end
 
 % set up the UserData data
 % (do it here so it is not corrupted by log10's and such)
@@ -722,7 +722,7 @@ ud = [start stop len baseangle tipangle wid page crossdir ends];
 % Set Page defaults
 if isnan(page)
     page = ~isnan(page);
-end;
+end
 
 % Get axes limits, range, min; correct for aspect ratio and log scale
 axm      = zeros(3,narrows);
@@ -738,7 +738,7 @@ if (oneax),
 else,
 	T        = zeros(16,narrows);
 	invT     = zeros(16,narrows);
-end;
+end
 axnotdone = ones(size(ax));
 while (any(axnotdone)),
 	ii = min(find(axnotdone));
@@ -762,7 +762,7 @@ while (any(axnotdone)),
 	else,
 		set(curax,'Units','pixels');
 		curap = get(curax,'Position');
-	end;
+	end
 	set(curax,'Units',u);
 	set(curax,'Position',axposoldunits);
 	% adjust limits for log scale on axes
@@ -775,8 +775,8 @@ while (any(axnotdone)),
 			error('ARROW does not support non-positive limits on log-scaled axes.');
 		else,
 			axl(ii) = log10(axl(ii));
-		end;
-	end;
+		end
+	end
 	% correct for aspect ratio
 	if (~isnan(ar(1))),
 		if (curap(3) < ar(1)*curap(4)),
@@ -785,8 +785,8 @@ while (any(axnotdone)),
 		else,
 			curap(1) = curap(1) + (curap(3)-curap(4)*ar(1))/2;
 			curap(3) = curap(4)*ar(1);
-		end;
-	end;
+		end
+	end
 	% correct for 'equal'
 	% may only want to do this for 2-D views, but seems right for 3-D also
 	if (~isnan(ar(2))),
@@ -796,8 +796,8 @@ while (any(axnotdone)),
 		else,
 			incr = ar(2)*(axl(1,2)-axl(1,1))*curap(4)/curap(3) - (axl(2,2)-axl(2,1));
 			axl(2,:) = axl(2,:) + incr/2*[-1 1];
-		end;
-	end;
+		end
+	end
 	% compute the range of 2-D values
 	curT = get(curax,'Xform');
 	lim = curT*[0 1 0 1 0 1 0 1;0 0 1 1 0 0 1 1;0 0 0 0 1 1 1 1;1 1 1 1 1 1 1 1];
@@ -810,7 +810,7 @@ while (any(axnotdone)),
 		curinvT = curinvT.';
 		curT = curT(:);
 		curinvT = curinvT(:);
-	end;
+	end
 	% check which arrows to which cur corresponds
 	ii = find((ax==curax)&(page==curpage));
 	oo = ones(1,length(ii));
@@ -826,9 +826,9 @@ while (any(axnotdone)),
 	else,
 		T(:,ii)    = curT    * oo;
 		invT(:,ii) = curinvT * oo;
-	end;
+	end
 	axnotdone(ii) = zeros(1,length(ii));
-end;
+end
 
 % correct for log scales
 curxyzlog = xyzlog.';
@@ -840,25 +840,25 @@ if (all(size(ii))),
 		crossdir(ii) = real(log10(crossdir(ii)));
 	else,
 		jj = find(imag(crossdir(ii))==0);
-		if (all(size(jj))), crossdir(jj) = real(log10(crossdir(jj))); end;
+		if (all(size(jj))), crossdir(jj) = real(log10(crossdir(jj))); end
 		jj = find(imag(crossdir(ii))~=0);
-		if (all(size(jj))), crossdir(jj) = real(log10(imag(crossdir(jj))))*sqrt(-1); end;
-	end;
-end;
+		if (all(size(jj))), crossdir(jj) = real(log10(imag(crossdir(jj))))*sqrt(-1); end
+	end
+end
 
 % take care of defaults, page was done above
-ii=find(isnan(start(:)       ));  if (all(size(ii))),  start(ii)       = axm(ii)+axr(ii)/2;                end;
-ii=find(isnan(stop(:)        ));  if (all(size(ii))),  stop(ii)        = axm(ii)+axr(ii)/2;                end;
-ii=find(isnan(crossdir(:)    ));  if (all(size(ii))),  crossdir(ii)    = zeros(length(ii),1);              end;
-ii=find(isnan(len            ));  if (all(size(ii))),  len(ii)         = ones(length(ii),1)*deflen;        end;
-ii=find(isnan(baseangle      ));  if (all(size(ii))),  baseangle(ii)   = ones(length(ii),1)*defbaseangle;  end;
-ii=find(isnan(tipangle       ));  if (all(size(ii))),  tipangle(ii)    = ones(length(ii),1)*deftipangle;   end;
-ii=find(isnan(wid            ));  if (all(size(ii))),  wid(ii)         = ones(length(ii),1)*defwid;        end;
-ii=find(isnan(ends           ));  if (all(size(ii))),  ends(ii)        = ones(length(ii),1)*defends;       end;
-ii=find(isnan(linewidth      ));  if (all(size(ii))),  linewidth(ii)   = ones(length(ii),1)*deflinewidth;  end;
-ii=find(any(isnan(edgecolor')));  if (all(size(ii))),  edgecolor(ii,:) = ones(length(ii),1)*defedgecolor;  end;
-ii=find(any(isnan(facecolor')));  if (all(size(ii))),  facecolor(ii,:) = ones(length(ii),1)*deffacecolor;  end;
-ii=find(isnan(linestyle(:,1) ));  if (all(size(ii))),  linestyle(ii,:) = ones(length(ii),1)*deflinestyle;  end;
+ii=find(isnan(start(:)       ));  if (all(size(ii))),  start(ii)       = axm(ii)+axr(ii)/2;                end
+ii=find(isnan(stop(:)        ));  if (all(size(ii))),  stop(ii)        = axm(ii)+axr(ii)/2;                end
+ii=find(isnan(crossdir(:)    ));  if (all(size(ii))),  crossdir(ii)    = zeros(length(ii),1);              end
+ii=find(isnan(len            ));  if (all(size(ii))),  len(ii)         = ones(length(ii),1)*deflen;        end
+ii=find(isnan(baseangle      ));  if (all(size(ii))),  baseangle(ii)   = ones(length(ii),1)*defbaseangle;  end
+ii=find(isnan(tipangle       ));  if (all(size(ii))),  tipangle(ii)    = ones(length(ii),1)*deftipangle;   end
+ii=find(isnan(wid            ));  if (all(size(ii))),  wid(ii)         = ones(length(ii),1)*defwid;        end
+ii=find(isnan(ends           ));  if (all(size(ii))),  ends(ii)        = ones(length(ii),1)*defends;       end
+ii=find(isnan(linewidth      ));  if (all(size(ii))),  linewidth(ii)   = ones(length(ii),1)*deflinewidth;  end
+ii=find(any(isnan(edgecolor')));  if (all(size(ii))),  edgecolor(ii,:) = ones(length(ii),1)*defedgecolor;  end
+ii=find(any(isnan(facecolor')));  if (all(size(ii))),  facecolor(ii,:) = ones(length(ii),1)*deffacecolor;  end
+ii=find(isnan(linestyle(:,1) ));  if (all(size(ii))),  linestyle(ii,:) = ones(length(ii),1)*deflinestyle;  end
 ii=find(isnan(linestyle(:,2) ));  if (all(size(ii))),  linestyle(ii,2) = ones(length(ii),1)*' ';           end; %just in case
 
 % transpose all values
@@ -889,7 +889,7 @@ oldfacecolor = oldfacecolor.';
 %   if (oneax), X=T*tmp1;
 %   else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=T.*tmp1;
 %         tmp2=zeros(4,4*N); tmp2(:)=tmp1(:);
-%         X=zeros(4,N); X(:)=sum(tmp2)'; end;
+%         X=zeros(4,N); X(:)=sum(tmp2)'; end
 %   X = X ./ (X(:,4)*ones(1,4));
 
 % for all points with start==stop, start=stop-(verysmallvalue)*(up-direction);
@@ -901,7 +901,7 @@ if (all(size(ii))),
 		if (oneax), twoD=T*tmp1;
 		else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=T(:,ii).*tmp1;
 		      tmp2=zeros(4,4*length(ii)); tmp2(:)=tmp1(:);
-		      twoD=zeros(4,length(ii)); twoD(:)=sum(tmp2)'; end;
+		      twoD=zeros(4,length(ii)); twoD(:)=sum(tmp2)'; end
 		twoD=twoD./(ones(4,1)*twoD(4,:));
 	%	move the start point down just slightly
 		tmp1 = twoD + [0;-1/1000;0;0]*(limrange(2,ii)./ap(2,ii));
@@ -909,9 +909,9 @@ if (all(size(ii))),
 		if (oneax), threeD=invT*tmp1;
 		else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=invT(:,ii).*tmp1;
 		      tmp2=zeros(4,4*length(ii)); tmp2(:)=tmp1(:);
-		      threeD=zeros(4,length(ii)); threeD(:)=sum(tmp2)'; end;
+		      threeD=zeros(4,length(ii)); threeD(:)=sum(tmp2)'; end
 		start(:,ii) = (threeD(1:3,:)./(ones(3,1)*threeD(4,:))).*axr(:,ii)+axm(:,ii);
-end;
+end
 
 % compute along-arrow points
 %	transform Start points
@@ -919,14 +919,14 @@ end;
 	if (oneax), X0=T*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=T.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      X0=zeros(4,narrows); X0(:)=sum(tmp2)'; end;
+	      X0=zeros(4,narrows); X0(:)=sum(tmp2)'; end
 	X0=X0./(ones(4,1)*X0(4,:));
 %	transform Stop points
 	tmp1=[(stop-axm)./axr;ones(1,narrows)];
 	if (oneax), Xf=T*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=T.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      Xf=zeros(4,narrows); Xf(:)=sum(tmp2)'; end;
+	      Xf=zeros(4,narrows); Xf(:)=sum(tmp2)'; end
 	Xf=Xf./(ones(4,1)*Xf(4,:));
 %	compute pixel distance between points
 	D = sqrt(sum(((Xf(1:2,:)-X0(1:2,:)).*(ap./limrange)).^2));
@@ -943,12 +943,12 @@ end;
 		ii=find((ends==1)&(D<len2));
 		if (all(size(ii))),
 			slen0(ii) = D(ii)-len2(ii);
-		end;
+		end
 	%	for no end arrowhead
 		ii=find((ends==2)&(D<slen2));
 		if (all(size(ii))),
 			len0(ii) = D(ii)-slen2(ii);
-		end;
+		end
 	len1  = len1  + len0;
 	len2  = len2  + len0;
 	slen1 = slen1 + slen0;
@@ -958,42 +958,42 @@ end;
 	if (oneax), tmp3=invT*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=invT.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end;
+	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end
 	stoppoint = tmp3(1:3,:)./(ones(3,1)*tmp3(4,:)).*axr+axm;
 %	compute tippoints
 	tmp1=X0.*(ones(4,1)*(len1./D))+Xf.*(ones(4,1)*(1-len1./D));
 	if (oneax), tmp3=invT*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=invT.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end;
+	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end
 	tippoint = tmp3(1:3,:)./(ones(3,1)*tmp3(4,:)).*axr+axm;
 %	compute basepoints
 	tmp1=X0.*(ones(4,1)*(len2./D))+Xf.*(ones(4,1)*(1-len2./D));
 	if (oneax), tmp3=invT*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=invT.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end;
+	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end
 	basepoint = tmp3(1:3,:)./(ones(3,1)*tmp3(4,:)).*axr+axm;
 %	compute startpoints
 	tmp1=X0.*(ones(4,1)*(1-slen0./D))+Xf.*(ones(4,1)*(slen0./D));
 	if (oneax), tmp3=invT*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=invT.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end;
+	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end
 	startpoint = tmp3(1:3,:)./(ones(3,1)*tmp3(4,:)).*axr+axm;
 %	compute stippoints
 	tmp1=X0.*(ones(4,1)*(1-slen1./D))+Xf.*(ones(4,1)*(slen1./D));
 	if (oneax), tmp3=invT*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=invT.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end;
+	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end
 	stippoint = tmp3(1:3,:)./(ones(3,1)*tmp3(4,:)).*axr+axm;
 %	compute sbasepoints
 	tmp1=X0.*(ones(4,1)*(1-slen2./D))+Xf.*(ones(4,1)*(slen2./D));
 	if (oneax), tmp3=invT*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=invT.*tmp1;
 	      tmp2=zeros(4,4*narrows); tmp2(:)=tmp1(:);
-	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end;
+	      tmp3=zeros(4,narrows); tmp3(:)=sum(tmp2)'; end
 	sbasepoint = tmp3(1:3,:)./(ones(3,1)*tmp3(4,:)).*axr+axm;
 
 % compute cross-arrow directions for arrows with NormalDir specified
@@ -1001,7 +1001,7 @@ if (any(imag(crossdir(:))~=0)),
 	ii = find(any(imag(crossdir)~=0));
 	crossdir(:,ii) = cross((stop(:,ii)-start(:,ii))./axr(:,ii), ...
 	                       imag(crossdir(:,ii))).*axr(:,ii);
-end;
+end
 
 % compute cross-arrow directions
 basecross  = crossdir + basepoint;
@@ -1018,7 +1018,7 @@ if (all(size(ii))),
 		if (oneax), X0=T*tmp1;
 		else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=T(:,[ii ii ii ii]).*tmp1;
 		      tmp2=zeros(4,16*numii); tmp2(:)=tmp1(:);
-		      X0=zeros(4,4*numii); X0(:)=sum(tmp2)'; end;
+		      X0=zeros(4,4*numii); X0(:)=sum(tmp2)'; end
 		X0=X0./(ones(4,1)*X0(4,:));
 	%	transform stop points
 		tmp1 = [(2*stop(:,ii)-start(:,ii)-axm(:,ii))./axr(:,ii);ones(1,numii)];
@@ -1026,7 +1026,7 @@ if (all(size(ii))),
 		if (oneax), Xf=T*tmp1;
 		else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=T(:,[ii ii ii ii]).*tmp1;
 		      tmp2=zeros(4,16*numii); tmp2(:)=tmp1(:);
-		      Xf=zeros(4,4*numii); Xf(:)=sum(tmp2)'; end;
+		      Xf=zeros(4,4*numii); Xf(:)=sum(tmp2)'; end
 		Xf=Xf./(ones(4,1)*Xf(4,:));
 	%	compute perpendicular directions
 		pixfact = ((limrange(1,ii)./limrange(2,ii)).*(ap(2,ii)./ap(1,ii))).^2;
@@ -1043,13 +1043,13 @@ if (all(size(ii))),
 		if (oneax), Xp=invT*Xp;
 		else, tmp1=[Xp;Xp;Xp;Xp]; tmp1=invT(:,[ii ii ii ii]).*tmp1;
 		      tmp2=zeros(4,16*numii); tmp2(:)=tmp1(:);
-		      Xp=zeros(4,4*numii); Xp(:)=sum(tmp2)'; end;
+		      Xp=zeros(4,4*numii); Xp(:)=sum(tmp2)'; end
 		Xp=(Xp(1:3,:)./(ones(3,1)*Xp(4,:))).*axr(:,[ii ii ii ii])+axm(:,[ii ii ii ii]);
 		basecross(:,ii)  = Xp(:,0*numii+(1:numii));
 		tipcross(:,ii)   = Xp(:,1*numii+(1:numii));
 		sbasecross(:,ii) = Xp(:,2*numii+(1:numii));
 		stipcross(:,ii)  = Xp(:,3*numii+(1:numii));
-end;
+end
 
 % compute all points
 %	compute start points
@@ -1061,7 +1061,7 @@ end;
 	if (oneax), X0=T*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=[T T T T T T T T T T T].*tmp1;
 	      tmp2=zeros(4,44*narrows); tmp2(:)=tmp1(:);
-	      X0=zeros(4,11*narrows); X0(:)=sum(tmp2)'; end;
+	      X0=zeros(4,11*narrows); X0(:)=sum(tmp2)'; end
 	X0=X0./(ones(4,1)*X0(4,:));
 %	compute stop points
 	tmp1 = ([start tipcross basecross sbasecross stipcross stop stipcross sbasecross basecross tipcross start] ...
@@ -1070,7 +1070,7 @@ end;
 	if (oneax), Xf=T*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=[T T T T T T T T T T T].*tmp1;
 	      tmp2=zeros(4,44*narrows); tmp2(:)=tmp1(:);
-	      Xf=zeros(4,11*narrows); Xf(:)=sum(tmp2)'; end;
+	      Xf=zeros(4,11*narrows); Xf(:)=sum(tmp2)'; end
 	Xf=Xf./(ones(4,1)*Xf(4,:));
 %	compute lengths
 	len0  = len.*((ends==1)|(ends==3)).*tan(tipangle/180*pi);
@@ -1085,7 +1085,7 @@ end;
 	if (oneax), tmp3=invT*tmp1;
 	else, tmp1=[tmp1;tmp1;tmp1;tmp1]; tmp1=[invT invT invT invT invT invT invT invT invT invT invT].*tmp1;
 	      tmp2=zeros(4,44*narrows); tmp2(:)=tmp1(:);
-	      tmp3=zeros(4,11*narrows); tmp3(:)=sum(tmp2)'; end;
+	      tmp3=zeros(4,11*narrows); tmp3(:)=sum(tmp2)'; end
 	pts = tmp3(1:3,:)./(ones(3,1)*tmp3(4,:)) .* axr11 + axm11;
 
 % correct for ones where the crossdir was specified
@@ -1102,12 +1102,12 @@ if (all(size(ii))),
 	ii = ii'*ones(1,8) + ones(length(ii),1)*[1:4 6:9]*narrows;
 	ii = ii(:)';
 	pts(:,ii) = st(:,ii) + D1;
-end;
+end
 
 
 % readjust for log scale on axes
 tmp1=[xyzlog xyzlog xyzlog xyzlog xyzlog xyzlog xyzlog xyzlog xyzlog xyzlog xyzlog];
-ii = find(tmp1(:)); if (all(size(ii))), pts(ii)=10.^pts(ii); end;
+ii = find(tmp1(:)); if (all(size(ii))), pts(ii)=10.^pts(ii); end
 
 % compute the x,y,z coordinates of the patches;
 ii = narrows*(0:10)'*ones(1,narrows) + ones(11,1)*(1:narrows);
@@ -1128,28 +1128,28 @@ if (nargout<=1),
 	else,
 		fromline = p;
 		H = zeros(narrows,1);
-	end;
+	end
 %	% new patches
 	ii = find(p&fromline);
 	if (all(size(ii))),
-		if (all(size(oldh))), delete(oldh(ii)); end;
+		if (all(size(oldh))), delete(oldh(ii)); end
 		H(ii) = patch(x(:,ii),y(:,ii),z(:,ii),zeros(11,length(ii)),'Tag',ArrowTag);
-	end;
+	end
 %	% new lines
 	ii = find((~p)&(~fromline));
 	if (all(size(ii))),
-		if (all(size(oldh))), delete(oldh(ii)); end;
+		if (all(size(oldh))), delete(oldh(ii)); end
 		H(ii) = line(x(:,ii),y(:,ii),z(:,ii),'Tag',ArrowTag);
-	end;
+	end
 %	% additional properties
 	for k=1:narrows,
 		s = 'set(H(k),''UserData'',ud(k,:)';
 		if (p(k)~=fromline(k)), % modifying the data
 			s = [s ',''XData'',x(:,k)'',''YData'',y(:,k)'',''ZData'',z(:,k)'''];
-		end;
+		end
 		if ((~isnan(linewidth(k)))&(linewidth(k)~=oldlinewidth(k))),
 			s=[s ',''LineWidth'',linewidth(k)'];
-		end;
+		end
 		if (p(k)), % a patch
 			if (any(edgecolor(:,k)~=oldedgecolor(:,k))|(fromline(k))),
 				if (edgecolor(1,k)==inf),
@@ -1158,8 +1158,8 @@ if (nargout<=1),
 					s=[s ',''EdgeColor'',''none'''];
 				else,
 					s=[s ',''EdgeColor'',edgecolor(:,k)'''];
-				end;
-			end;
+				end
+			end
 			if (any(facecolor(:,k)~=oldfacecolor(:,k))|(fromline(k))),
 				if (facecolor(1,k)==inf),
 					s=[s ',''FaceColor'',''flat'''];
@@ -1167,8 +1167,8 @@ if (nargout<=1),
 					s=[s ',''FaceColor'',''none'''];
 				else,
 					s=[s ',''FaceColor'',facecolor(:,k)'''];
-				end;
-			end;
+				end
+			end
 		else, % a line
 			s = [s ',''LineStyle'',''' deblank(char(linestyle(:,k)')) ''''];
 			if (any(facecolor(:,k)~=oldfacecolor(:,k))|any(edgecolor(:,k)~=oldedgecolor(:,k))), % a line
@@ -1176,16 +1176,16 @@ if (nargout<=1),
 					s = [s ',''Color'',facecolor(:,k)'''];
 				else,
 					s = [s ',''Color'',edgecolor(:,k)'''];
-				end;
-			end;
-		end;
+				end
+			end
+		end
 		eval([s extraprops ');']);
-	end;
+	end
 	% set the output
-	if (nargout>0), h=H; end;
+	if (nargout>0), h=H; end
 else,
 	% don't create the patch, just return the data
 	h=x;
 	yy=y;
 	zz=z;
-end;
+end

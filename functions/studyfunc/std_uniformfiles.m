@@ -32,7 +32,7 @@ function uniformlabels = std_uniformfiles( STUDY, ALLEEG );
 if nargin < 2
     help std_checkconsist;
     return;
-end;
+end
 
 filetypes = { 'daterp' 'datspec' 'datersp' 'datitc' 'dattimef' };
 
@@ -61,13 +61,13 @@ for index = 1:length(filetypes)
                 tmpval = tmpstruct(dat).labels;
                 if ~isequal(firstval, tmpval)
                      uniformlabels(count) = 0;
-                end;
-            end;
+                end
+            end
             selectedtypes{count} = filetypes{index};
             count = count+1;
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % check output
 % ------------
@@ -78,18 +78,18 @@ if any(uniformlabels == 0)
             if uniformlabels(index)
                  fprintf('  Data files with extention "%s" have interpolated channels\n',  selectedtypes{index});
             else fprintf('  Data files with extention "%s" have non-interpolated channels\n', selectedtypes{index});
-            end;
-        end;
+            end
+        end
         uniformlabels = -1;
     else
         uniformlabels = 0;
-    end;
+    end
 else
     if ~(length(unique(uniformlabels)) == 1)
         fprintf('Warning: Data files have different number of channel in each file\n');
         for index = 1:length(selectedtypes)
             fprintf('  Data files with extention "%s" have %d channels\n',  selectedtypes{index}, uniformlabels(index));
-        end;
-    end;
+        end
+    end
     uniformlabels = 1;
-end;
+end

@@ -394,7 +394,7 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     else
         model.defaults.lowf    = [];
         model.defaults.highf   = [];
-    end;
+    end
     
 elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
@@ -427,8 +427,8 @@ STUDY.limo.chanloc  = limoChanlocs.expected_chanlocs;
 %     % Computing univariate one sample t-test for each parameters
 %     % ----------------------------------------------------------
 %     nparams = 0;
-%     if exist('categ','var'),   nparams = max(categ); end;
-%     if exist('contvar','var'), nparams = nparams + size(contvar,2); end;
+%     if exist('categ','var'),   nparams = max(categ); end
+%     if exist('contvar','var'), nparams = nparams + size(contvar,2); end
 %     
 %     foldername = [STUDY.filename(1:end-6) '_GLM' num2str(STUDY.currentdesign) '_' model.defaults.type '_' model.defaults.analysis '_'];
 %     nbootval   = 0;

@@ -38,7 +38,7 @@ function EEG = readegilocs(EEG, fileloc);
 if nargin < 1
     help readegilocs;
     return;
-end;
+end
 
 % importing channel locations
 % ---------------------------
@@ -50,14 +50,14 @@ if nargin < 2
         case { 128 129 }, fileloc = 'GSN129.sfp';
         case { 256 257 }, fileloc = 'GSN-HydroCel-257.sfp';
         otherwise, found = 0;
-    end;
-end;
+    end
+end
 if found
     fprintf('EGI channel location automatically detected %s ********* WARNING please check that this the proper file\n', fileloc);
     if EEG.nbchan == 64 || EEG.nbchan == 65 || EEG.nbchan == 256 || EEG.nbchan == 257
         fprintf( [ 'Warning: this function assumes you have a 64-channel system Version 2\n' ...
                    '         if this is not the case, update the channel location with the proper file' ]);
-    end;
+    end
     % remove the last channel for 33 channels
 
     peeglab = fileparts(which('eeglab.m'));
@@ -71,7 +71,7 @@ if found
         if EEG.nbchan == 256
             chaninfo.nodatchans = locs([end]);
             locs([end]) = [];
-        end;
+        end
     elseif mod(EEG.nbchan,2) == 0, 
         chaninfo.nodatchans = locs([1 2 3 end]);
         locs([1 2 3 end]) = [];
@@ -83,4 +83,4 @@ if found
     EEG.chanlocs   = locs;
     EEG.urchanlocs = locs;
     EEG.chaninfo   = chaninfo;
-end;
+end

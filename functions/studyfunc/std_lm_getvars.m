@@ -64,10 +64,10 @@ try
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
-    else g= []; end;
+    else g= []; end
 catch
     error('std_lm_getcatvars() error: calling convention {''key'', value, ... } error'); return;
-end;
+end
 
 try, g.design;         catch, g.design      = 1 ;       end; % By default will be use the fisrt design if not especified
 try, g.vartype;        catch, g.vartype     = 'cat';    end; % 'cat' or 'cont'
@@ -109,7 +109,7 @@ for i = 1:length(varindx)
 end
 % Cleaning  'g.factors' from empty cells
 for i = 1 : length(g.factors)
-    if isempty(g.factors{i}) || all(strcmp(g.factors{i},'')), g.factors(i) = []; end;
+    if isempty(g.factors{i}) || all(strcmp(g.factors{i},'')), g.factors(i) = []; end
 end
 
 %% Number of trials and index

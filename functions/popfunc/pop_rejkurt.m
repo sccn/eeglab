@@ -91,10 +91,10 @@ if nargin < 1
 end;  
 if nargin < 2
    icacomp = 1;
-end;
+end
 if exist('reject') ~= 1
     reject = 1;
-end;
+end
 if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
@@ -103,7 +103,7 @@ if icacomp == 0
         	case 'NO', disp('Operation cancelled'); return;   
         	case 'YES', [ EEG com ] = pop_runica(EEG);
     	end % switch
-	end;
+	end
 end;	
 
 if nargin < 3
@@ -141,18 +141,18 @@ if nargin < 3
     result = inputgui( geometry,uilist,'pophelp(''pop_rejkurt'');', figname);
    
     size_result  = size( result );
-    if size_result(1) == 0, locthresh = []; globthresh = []; return; end;
+    if size_result(1) == 0, locthresh = []; globthresh = []; return; end
     elecrange    = result{1};
     locthresh    = result{2};
     globthresh   = result{3};
-    switch result{4}, case 1, vistype=0; otherwise, vistype=1; end;
+    switch result{4}, case 1, vistype=0; otherwise, vistype=1; end
     superpose    = result{5};
     reject       = result{6};
-end;
+end
 
-if ~exist('vistype','var'),   vistype   = 0;   end;
-if ~exist('reject','var'),    reject    = 0;    end;
-if ~exist('superpose','var'), superpose = 1; end;
+if ~exist('vistype','var'),   vistype   = 0;   end
+if ~exist('reject','var'),    reject    = 0;    end
+if ~exist('superpose','var'), superpose = 1; end
 
 if ischar(elecrange) % convert arguments if they are in text format 
     calldisp   = 1;
@@ -161,7 +161,7 @@ if ischar(elecrange) % convert arguments if they are in text format
 	globthresh = eval( [ '[' globthresh ']' ]  );
 else
     calldisp = 0;
-end;
+end
 
 if exist('plotflag','var') && ismember(plotflag,[1,0])
     calldisp = plotflag;
@@ -180,7 +180,7 @@ if icacomp == 1
     tmpdata = eeg_getdatact(EEG);
     if isempty(EEG.stats.kurtE )
 		[ EEG.stats.kurtE rejE ] = rejkurt( tmpdata, locthresh, EEG.stats.kurtE, 1); 
-	end;
+	end
 	[ tmp rejEtmp ] = rejkurt( tmpdata(elecrange, :,:), locthresh, EEG.stats.kurtE(elecrange, :), 1); 
     rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
@@ -196,7 +196,7 @@ else
     icaacttmp = eeg_getica(EEG);
     if isempty(EEG.stats.icakurtE )
 		[ EEG.stats.icakurtE rejE ] = rejkurt( icaacttmp, locthresh, EEG.stats.icakurtE, 1); 
-	end;
+	end
 	[ tmp rejEtmp ] = rejkurt( icaacttmp(elecrange, :,:), locthresh, EEG.stats.icakurtE(elecrange, :), 1); 
 	rejE    = zeros(size(icaacttmp,1), size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
@@ -205,7 +205,7 @@ else
 	tmpdata = permute(icaacttmp, [3 1 2]);
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
 	[ EEG.stats.icakurt rej] = rejkurt( tmpdata, globthresh, EEG.stats.icakurt, 1); 
-end;
+end
 rej = rej' | max(rejE, [], 1);
 fprintf('%d/%d trials marked for rejection\n', sum(rej), EEG.trials);
 
@@ -215,7 +215,7 @@ if calldisp
 	        			macrorejE = 'EEG.reject.rejkurtE';
 	    else			macrorej  = 'EEG.reject.icarejkurt';
 	        			macrorejE = 'EEG.reject.icarejkurtE';
-	    end;
+	    end
 		
 		colrej = EEG.reject.rejkurtcol;
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
@@ -245,7 +245,7 @@ else
 	rej = rejtmp | rej;
 	nrej =  sum(rej);
 	fprintf('%d trials marked for rejection\n', nrej);
-end;
+end
 if ~isempty(rej)
 	if icacomp	== 1
 		EEG.reject.rejkurt = rej;
@@ -253,17 +253,17 @@ if ~isempty(rej)
 	else
 		EEG.reject.icarejkurt = rej;
 		EEG.reject.icarejkurtE = rejE;
-	end;
+	end
     if reject
         EEG = pop_rejepoch(EEG, rej, 0);
-    end;
-end;
+    end
+end
 nrej = sum(rej);
 
 com = [ com sprintf('EEG = pop_rejkurt(EEG,%s);',...
 		vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject,vistype, [], plotflag})) ];
 if nargin < 3 & nargout == 2
 	locthresh = com;
-end;
+end
 
 return;

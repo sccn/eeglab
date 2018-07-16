@@ -51,7 +51,7 @@ function [l1,l2,l3,l4] = rsadjust( l3, l4, mu, sigma2, m3);
         ltmp = l4;
         l4   = l3;
         l3   = ltmp;
-    end;
+    end
     
     A = 1/(1 + l3) - 1/(1 + l4);
     B = 1/(1 + 2*l3) + 1/(1 + 2*l4) - 2*beta(1+l3, 1+l4);
@@ -61,8 +61,8 @@ function [l1,l2,l3,l4] = rsadjust( l3, l4, mu, sigma2, m3);
     % compute l2 (and its sign)
     % ------------------------
     l2 = sqrt( (B-A^2)/sigma2 );    
-    if m3 == 0, m3 = -0.000000000000001; end;
-    if (m3*(C - 2*A*B + 2*A^3)) < 0, l2 = -l2; end;
+    if m3 == 0, m3 = -0.000000000000001; end
+    if (m3*(C - 2*A*B + 2*A^3)) < 0, l2 = -l2; end
     %l22 = ((C - 2*A*B + 2*A^3)/m3)^(1/3) % also equal to l2
        
     % compute l1

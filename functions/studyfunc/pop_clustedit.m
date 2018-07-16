@@ -282,9 +282,9 @@ if ~ischar(varargin{1})
                     show_options{count} = ['         ' STUDY.cluster(indclust3).name ' (' num2str(length(STUDY.cluster(indclust3).comps))  ' ICs)'];
                     cls(count) = indclust3;
                     count = count+1;
-                end;
-            end;
-        end;
+                end
+            end
+        end
         show_options = { ['All cluster centroids'] show_options{:} }; 
     end
     all_comps = length(STUDY.cluster(1).comps);
@@ -332,14 +332,14 @@ if ~ischar(varargin{1})
     % enable buttons
     % --------------
     filename = fullfile(STUDY.datasetinfo(1).filepath, STUDY.datasetinfo(1).subject);
-    if exist([filename '.icaspec']) ,   spec_enable = 'on'; else spec_enable  = 'off'; end;
-    if exist([filename '.icaerp'] )  ,   erp_enable = 'on'; else erp_enable   = 'off'; end;
-    if exist([filename '.icaerpim'] ), erpim_enable = 'on'; else erpim_enable = 'off'; end;
-    if exist([filename '.icatimef']) ,   ersp_enable = 'on'; else ersp_enable  = 'off'; end;
+    if exist([filename '.icaspec']) ,   spec_enable = 'on'; else spec_enable  = 'off'; end
+    if exist([filename '.icaerp'] )  ,   erp_enable = 'on'; else erp_enable   = 'off'; end
+    if exist([filename '.icaerpim'] ), erpim_enable = 'on'; else erpim_enable = 'off'; end
+    if exist([filename '.icatimef']) ,   ersp_enable = 'on'; else ersp_enable  = 'off'; end
     filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-4));
-    if exist([filename '.icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end;
+    if exist([filename '.icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end
     
-    if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end;
+    if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end
     
     % userdata below
     % --------------
@@ -349,8 +349,8 @@ if ~ischar(varargin{1})
     fig_arg{2}    = N;
         
     str_name       = sprintf('STUDY ''%s'' - ''%s'' component clusters', STUDY.name, STUDY.design(STUDY.currentdesign).name);
-    if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
-    if length(cls) > 1, vallist = 1; else vallist = 2; end;
+    if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end
+    if length(cls) > 1, vallist = 1; else vallist = 2; end
     geomline = [1 0.35 1];
     geometry = { [0.8 3] [1] geomline geomline geomline geomline geomline geomline geomline geomline ...
                  geomline geomline [1] geomline geomline geomline };
@@ -399,14 +399,14 @@ if ~ischar(varargin{1})
        addui = varargin{4};
        if ~isfield(addui, 'uilist')
            error('Additional GUI definition (argument 4) requires the field "uilist"');
-       end;
+       end
        if ~isfield(addui, 'geometry')
            addui.geometry = mat2cell(ones(1,length(addui.uilist)));
-       end;
+       end
        uilist = { uilist{:}, addui.uilist{:} };
        geometry = { geometry{:} addui.geometry{:} };
        geomvert = [ geomvert ones(1,length(addui.geometry)) ];
-   end;
+   end
    
    [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''pop_clustoutput'')', ...
@@ -439,7 +439,7 @@ else
     if clus == 1 & length(cls) == 1
         warndlg2('No cluster', 'No cluster');
         return;
-    end;
+    end
     
     try
         switch  varargin{1}
@@ -500,7 +500,7 @@ else
                         end
                     end
                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) '], ''design'', ' int2str(design) ');' ];
-                    %if strcmpi(plotting_option, 'dipplot'), a = [a(1:end-2) ',''mode'', ''together'');' ]; end;
+                    %if strcmpi(plotting_option, 'dipplot'), a = [a(1:end-2) ',''mode'', ''together'');' ]; end
                     eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 end
                 userdat{1}{2} = STUDY;
@@ -510,7 +510,7 @@ else
                 [STUDY com] = pop_dipparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -518,7 +518,7 @@ else
                 [STUDY com] = pop_erpparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -526,7 +526,7 @@ else
                 [STUDY com] = pop_statparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -534,7 +534,7 @@ else
                 [STUDY com] = pop_specparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -542,7 +542,7 @@ else
                 [STUDY com] = pop_erpimparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -550,7 +550,7 @@ else
                 [STUDY com] = pop_erspparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -561,7 +561,7 @@ else
                 count = 1;
                 if clust ~= 1 %specific cluster
                     STUDY.cluster(cls(clust-1)).selected = comp;
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -585,8 +585,8 @@ else
                         if ~isempty(STUDY.cluster(cls(cind-1)).selected)
                             selected = min(STUDY.cluster(cls(cind-1)).selected, 1+length(STUDY.cluster(cls(cind-1)).comps(1,:)));
                             STUDY.cluster(cls(cind-1)).selected = selected;
-                        end;
-                    end;
+                        end
+                    end
 
                 else % All clusters accept 'Notclust' and 'Outliers'
                     count = 1;
@@ -604,7 +604,7 @@ else
                         end
                     end
                 end
-                if selected > length(compid), selected = 1; end;
+                if selected > length(compid), selected = 1; end
                 set(findobj('parent', hdl, 'tag', 'clust_comp'), 'value', selected, 'String', compid);
 
             case 'plotsum'

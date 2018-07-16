@@ -97,7 +97,7 @@ if iscell(varargin{1}) % channel plotting
             disp('include them in pre-clustering. There, specify 0 dimensions if you do');
             disp('now want a property (scalp map, ERSP, etc...) to be included');
             disp('in the clustering procedure. See the clustering tutorial.');
-        end;
+        end
 
     end  % Finished all conditions
     return;
@@ -191,7 +191,7 @@ for k = 1: len
         disp('include them in pre-clustering. There, specify 0 dimensions if you do');
         disp('not want a property (scalp map, ERSP, etc...) to be included');
         disp('in the clustering procedure. See the clustering tutorial.');
-    end;
+    end
     
 end  % Finished all conditions
 
@@ -201,6 +201,6 @@ if ishandle(erpAxisHangle) % make sure it is a valid graphics handle
     
     set(erpAxisHangle,'YTickLabelMode','auto');
     set(erpAxisHangle,'YTickMode','auto');
-end;
+end
 delete(h_wait)
 

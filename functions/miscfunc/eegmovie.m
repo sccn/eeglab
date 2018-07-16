@@ -100,7 +100,7 @@ if nargin > 5 && ~ischar(varargin{3}) || nargin == 4 && ~ischar(varargin{2})
     if nargin>=4, options = { options{:} 'title'       varargin{1} }; end
 else
     options = varargin;
-end;
+end
 
 opt = finputcheck(options, { 'startsec'    'real'    {}    0;
                              'minmax'      'real'    {}    0;
@@ -114,7 +114,7 @@ opt = finputcheck(options, { 'startsec'    'real'    {}    0;
                              'time'        'string'  { 'on' 'off' }    'off';
                              'topoplotopt' 'cell'    {}    {};
                              'headplotopt' 'cell'    {}    {} }, 'eegmovie');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 if opt.minmax ==0,
 	datamin = min(min(data));
 	datamax = max(max(data));
@@ -135,7 +135,7 @@ end
 if srate ==0,
 	srate = DEFAULT_SRATE;
 end
-if strcmpi(opt.time, 'on'), opt.framenum = 'off'; end;
+if strcmpi(opt.time, 'on'), opt.framenum = 'off'; end
 
 mframes = length(opt.movieframes);
 fprintf('Making a movie of %d frames\n',mframes)
@@ -152,12 +152,12 @@ if strcmpi(opt.timecourse, 'on')
         adddots = '...';
         for iChan = 1:length(eloc_locs)
             fprintf(fid, '0 0 0 %s\n', [ eloc_locs(iChan).labels adddots(length(eloc_locs(iChan).labels):end) ]);
-        end;
+        end
         fclose(fid);
         eegplotold('noui',-data,srate,0,'tmp_file.loc',opt.startsec,'r');
     else
         eegplotold('noui',-data,srate,0,eloc_locs,opt.startsec,'r');
-    end;
+    end
     
     % set(axeegplot,'XTick',[])                %%CJH
     % plot negative up
@@ -170,8 +170,8 @@ if strcmpi(opt.timecourse, 'on')
        frameind = (opt.vert(ind)-opt.startsec)*srate+1;
        line([frameind frameind],limits,'color','k'); % draw vertical line at map timepoint
        set(axeegplot,'Xtick',frameind,'XtickLabel',num2str(opt.vert(ind),'%4.3f'));
-    end;
-end;
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%% topoplot/headplot axis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -190,7 +190,7 @@ if strcmpi(opt.mode, '3d')
     if isequal(opt.camerapath, 0)
         opt.camerapath = [-127 0 30 0];
         fprintf('Using default view [-127 0 30 0].');
-    end;
+    end
     if size(opt.camerapath,2)~=4
         error('Camerapath parameter must have exact 4 columns');
     end
@@ -206,7 +206,7 @@ if strcmpi(opt.mode, '3d')
     elevation = opt.camerapath(1,3);
     el_step   = opt.camerapath(1,4);
     
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%% "Roll'em!" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -219,7 +219,7 @@ for f = 1:length(opt.movieframes)                      % make the movie, frame b
        x1 = opt.startsec+(indFrame-1)/srate;
        l1 = line([indFrame indFrame],limits,'color','b'); % draw vertical line at map timepoint
        set(axeegplot,'Xtick',indFrame,'XtickLabel',num2str(x1,'%4.3f'));
-   end;
+   end
    
    % plot headplot or topoplot
    axes(axtopoplot)
@@ -260,7 +260,7 @@ for f = 1:length(opt.movieframes)                      % make the movie, frame b
            'PlotBoxAspectRatioMode','manual',...
            'DataAspectRatioMode','manual');    % keep camera distance constant
        
-   end;
+   end
                                          
    % show frame number
    if strcmpi(opt.framenum, 'on') 
@@ -269,17 +269,17 @@ for f = 1:length(opt.movieframes)                      % make the movie, frame b
    elseif strcmpi(opt.time, 'on') 
        txt = sprintf('%3.3f s', opt.startsec+(indFrame-1)/srate); 
        text(-0.5,-0.5,txt,'FontSize',14);    
-   end;
+   end
 
    Movie(:,f) = getframe(gcf);
    drawnow
    if strcmpi(opt.timecourse, 'on')
        delete(l1)
-   end;
+   end
    
    % print advancement
    fprintf('.',f);
-   if rem(indFrame,10) == 0, fprintf('%d',f); end;
+   if rem(indFrame,10) == 0, fprintf('%d',f); end
    if rem(indFrame,50) == 0, fprintf('\n'); end
 end
 fprintf('\nDone\n');

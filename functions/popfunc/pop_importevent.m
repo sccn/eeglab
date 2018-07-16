@@ -132,12 +132,12 @@ if nargin<2 & EEG.trials > 1
 				  'this function is usually used to import events into continuous data.', ...
 				  'For epoched data, use menu item ''File > Import epoch info'''), ...
 				'pop_importevent warning', 'OK', 'OK');
-end;
+end
 	
 % remove the event field
 % ----------------------
 if ~isempty(EEG.event), allfields = fieldnames(EEG.event);
-else                    allfields = {}; end;
+else                    allfields = {}; end
     
 if nargin<2
         commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
@@ -172,34 +172,34 @@ if nargin<2
 					  { 'Style', 'checkbox', 'value' 1 } { },...
                };
         results = inputgui( geometry, uilist, 'pophelp(''pop_importevent'');', 'Import event info -- pop_importevent()' );
-        if length(results) == 0, return; end;
+        if length(results) == 0, return; end
 
 	    % decode top inputs
 	    % -----------------
 	    args = {};
-	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end;
-	    if results{2} == 0 & ~isempty(EEG.event), args = { args{:}, 'append', 'no' }; end;
+	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end
+	    if results{2} == 0 & ~isempty(EEG.event), args = { args{:}, 'append', 'no' }; end
 	    if ~isempty( results{3} ), 
             if ischar( results{3} ) && ~exist(results{3})
                 args = { args{:}, 'event', evalin('base', results{3}) }; 
             else
                 args = { args{:}, 'event', results{3} }; 
-            end;
-        end;
-	    if ~isempty( results{4} ), args = { args{:}, 'fields', parsetxt(results{4}) }; end;
+            end
+        end
+	    if ~isempty( results{4} ), args = { args{:}, 'fields', parsetxt(results{4}) }; end
         
 	    % handle skipline 
 	    % ---------------     
-	    if ~isempty(eval(results{end-3})), if eval(results{end-3}) ~= 0,  args = { args{:}, 'skipline', eval(results{end-3}) }; end; end;
+	    if ~isempty(eval(results{end-3})), if eval(results{end-3}) ~= 0,  args = { args{:}, 'skipline', eval(results{end-3}) }; end; end
 
 	    % handle timeunit 
 	    % -------------     
-	    if ~isempty(eval(results{end-2})), if eval(results{end-2}) ~= 0,  args = { args{:}, 'timeunit', eval(results{end-2}) }; end; end;
+	    if ~isempty(eval(results{end-2})), if eval(results{end-2}) ~= 0,  args = { args{:}, 'timeunit', eval(results{end-2}) }; end; end
 
 	    % handle alignment 
 	    % ----------------     
-	    if ~isempty(eval(results{end-1})), if ~isnan(eval(results{end-1})),  args = { args{:}, 'align', eval(results{end-1}) }; end; end;
-	    if ~results{end} ~= 0,  args = { args{:}, 'optimalign', 'off' }; end;
+	    if ~isempty(eval(results{end-1})), if ~isnan(eval(results{end-1})),  args = { args{:}, 'align', eval(results{end-1}) }; end; end
+	    if ~results{end} ~= 0,  args = { args{:}, 'optimalign', 'off' }; end
         
 else % no interactive inputs
     args = varargin;
@@ -211,11 +211,11 @@ else % no interactive inputs
     for index=1:2:length(args)
         if iscell(args{index+1}), if iscell(args{index+1}{1}) args{index+1} = args{index+1}{1}; end; end; % double nested 
         if ischar(args{index+1}) & length(args{index+1}) > 2 & args{index+1}(1) == '''' & args{index+1}(end) == ''''             
-            args{index+1} = args{index+1}(2:end-1); end;
-        %else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end;
-        %end;
+            args{index+1} = args{index+1}(2:end-1); end
+        %else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end
+        %end
     end;                
-end;
+end
 
 EEG.event = importevent( [], EEG.event, EEG.srate, args{:});
 

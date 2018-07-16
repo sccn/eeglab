@@ -42,16 +42,16 @@ function chanlocs = readneurolocs( filename, varargin)
 if nargin < 1
     help readneurolocs;
     return;
-end;
+end
 if nargin < 2
     plottag = 0;
-end;
+end
 
 % read location file
 % ------------------
 if ischar(filename)
     locs  = loadtxt( filename );
-end;
+end
 
 if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
     if ~ischar(filename)
@@ -64,14 +64,14 @@ if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
             % --------------------------------
             while isnumeric( locs{end,1} ) & locs{end,1} ~= 0
                 locs  = locs(1:end-1,:);
-            end;
+            end
 
             % find first numerical index
             % --------------------------
             index = 1;
             while ischar( locs{index,1} )
                 index = index + 1;
-            end;
+            end
 
             % extract location array
             % ----------------------
@@ -82,8 +82,8 @@ if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
             for index = 1:length(names)
                 if ~ischar(names{index})
                     names{index} = int2str(names{index});
-                end;
-            end;
+                end
+            end
             x = chans(:,3);
             y = -chans(:,4);
         else
@@ -94,8 +94,8 @@ if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
             x      = x/513.1617*44;
             y      = y/513.1617*44;
             names = locs(:,end-2);
-        end;
-    end;
+        end
+    end
 
     % second solution using angle
     % ---------------------------
@@ -110,7 +110,7 @@ if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
 
     for index = 1:length(chanlocs)
         chanlocs(index).labels = num2str(chanlocs(index).labels);
-    end;
+    end
 
     % re-calibration
     % --------------
@@ -120,11 +120,11 @@ else % 5 rows, xyz positions
     try
         for index = 1:size(locs,1)
             locs{index,3} = - locs{index,3};
-        end;
+        end
         chanlocs = struct('labels', locs(:,1), 'type', locs(:,2), 'X', locs(:,4), 'Y', locs(:,3), 'Z', locs(:,5));
         chanlocs = convertlocs( chanlocs, 'cart2all');
     catch
         chanlocs = readlocs(filename, 'filetype', 'custom', 'format', { 'labels' 'ignore' '-Y' 'X' 'Z' });
-    end;
-end;
+    end
+end
     

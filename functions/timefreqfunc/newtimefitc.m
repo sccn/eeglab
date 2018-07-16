@@ -45,22 +45,22 @@ switch itctype
         catch, % scan rows if out of memory
             for index =1:size(tfdecomp,1)
                 itcvals(index,:,:) = sum(tfdecomp(index,:,:,:),nd) ./ sqrt(sum(tfdecomp(index,:,:,:) .* conj(tfdecomp(index,:,:,:)),nd) * size(tfdecomp,nd));
-            end;
-        end;
+            end
+        end
     case 'phasecoher2',
         try,
             itcvals = sum(tfdecomp,nd) ./ sum(sqrt(tfdecomp .* conj(tfdecomp)),nd);
         catch, % scan rows if out of memory
             for index =1:size(tfdecomp,1)
                 itcvals(index,:,:) = sum(tfdecomp(index,:,:,:),nd) ./ sum(sqrt(tfdecomp(index,:,:,:) .* conj(tfdecomp(index,:,:,:))),nd);
-            end;
-        end;
+            end
+        end
     case 'phasecoher',
         try,
             itcvals = sum(tfdecomp ./ sqrt(tfdecomp .* conj(tfdecomp)) ,nd) / size(tfdecomp,nd);
         catch, % scan rows if out of memory
             for index =1:size(tfdecomp,1)
                 itcvals(index,:,:) = sum(tfdecomp(index,:,:,:) ./ sqrt(tfdecomp(index,:,:,:) .* conj(tfdecomp(index,:,:,:))) ,nd) / size(tfdecomp,nd);
-            end;
-        end;
+            end
+        end
 end

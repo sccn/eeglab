@@ -130,7 +130,7 @@ if datamean ~= 0,
   for e=1:epochs
       data(:,(e-1)*frames+1:e*frames) = ...
          data(:,(e-1)*frames+1:e*frames) - datamean(:,e)*ones(1,frames);
-  end;
+  end
 end
 if verbose == 1
   fprintf('Final input data range: %g to %g\n', ...

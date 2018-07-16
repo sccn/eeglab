@@ -92,6 +92,6 @@ function [STUDY, specdata, allfreqs, pgroup, pcond, pinter] = std_specplot(STUDY
 if nargin < 2
     help std_specplot;
     return;
-end;
+end
 
 [STUDY, specdata, allfreqs, pgroup, pcond, pinter] = std_erpplot(STUDY, ALLEEG, 'datatype', 'spec', 'unitx', 'Hz', varargin{:});

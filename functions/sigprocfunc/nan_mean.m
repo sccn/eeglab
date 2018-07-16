@@ -25,7 +25,7 @@ function out = nan_mean(in, dim)
     if nargin < 1
         help nan_mean;
         return;
-    end;
+    end
     if nargin < 2
         if size(in,1) ~= 1
             dim = 1;
@@ -33,8 +33,8 @@ function out = nan_mean(in, dim)
             dim = 2;
         else 
             dim = 3; 
-        end;
-    end;
+        end
+    end
     tmpin = in;
     tmpin(find(isnan(in(:)))) = 0;
     denom = sum(~isnan(in),dim);

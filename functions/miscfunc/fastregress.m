@@ -21,7 +21,7 @@ function [ypred, alpha, rsq, B, intercept] = fastregress(x, y, ploting);
     
     if nargin < 1
         help fastregress; return;
-    end;
+    end
     
     % this part is useless but still works
     %B=polyfit(x, y, 1);         % B is the slope
@@ -51,4 +51,4 @@ function [ypred, alpha, rsq, B, intercept] = fastregress(x, y, ploting);
         xnew       = x(tmp);
         plot(xnew, ynew, 'r');
         legend(sprintf('R^2=%f', rsq), sprintf('p  =%f', alpha));
-    end;
+    end

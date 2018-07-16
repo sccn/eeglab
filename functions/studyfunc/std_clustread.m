@@ -70,7 +70,7 @@ end
 
 if ~iscell(infotype), 
     infotype = { infotype }; 
-end;
+end
 
 clustinfo = [];
 clustinfo.name       = STUDY.cluster(cluster).name;
@@ -107,10 +107,10 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel | componen
                                   STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
                         for cc = 1:length(condition)
                             clustinfo.ersp{condition(cc), k} = ersp(:,:,cc);
-                        end;
+                        end
                         clustinfo.ersp_freqs = logfreqs;
                         clustinfo.ersp_times = timevals;
-                    end;
+                    end
                 case 'itc'
                     [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, ...
                              STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
@@ -119,7 +119,7 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel | componen
                     clustinfo.itc{n,k}       = itc;
 
                 case 'dipole'
-                    if n == 1, clustinfo.dipole(k) = ALLEEG(abset).dipfit.model(comp); end;
+                    if n == 1, clustinfo.dipole(k) = ALLEEG(abset).dipfit.model(comp); end
 
                 case { 'map' 'scalp' 'topo' }
                     if n == 1
@@ -129,10 +129,10 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel | componen
                          clustinfo.yi = yi;
                         end
                         clustinfo.scalp{k} = grid;
-                    end;
+                    end
                 otherwise, error('Unrecognized ''infotype'' entry');
             end; % switch
-        end;
+        end
     end; % infotype
 end % comp
 

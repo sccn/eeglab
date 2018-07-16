@@ -78,7 +78,7 @@ if ~ischar(varargin{1}) %intial settings
                     'This is because some datasets do not have ICA pairs. Look for NaN values in ' 10 ...
                     'STUDY.cluster(1).sets which indicate missing datasets. Each column in this ' 10 ...
                     'array indicate datasets with common ICA decompositions' ]);
-    end;
+    end
     if length(STUDY.design(STUDY.currentdesign).cases.value) ~= length(STUDY.subject)
         warndlg2( [ 'GO BACK TO THE DESIGN INTERFACE AND SELECT A DESIGN THAT ' 10 ...
                     'INCLUDES ALL DATASETS. Some subjects or datasets have been excluded' 10 ...
@@ -117,9 +117,9 @@ if ~ischar(varargin{1}) %intial settings
                 show_options{count} = ['         ' STUDY.cluster(indclust3).name ' (' num2str(length(STUDY.cluster(indclust3).comps))  ' ICs)'];
                 cls(count) = indclust3;
                 count = count+1;
-            end;
-        end;
-    end;
+            end
+        end
+    end
 
     % callbacks
     % ---------
@@ -244,13 +244,13 @@ if ~ischar(varargin{1}) %intial settings
     %        {'style' 'text'       'string'  '(empty=all)'} {} };
     %    geometry{3} = [2.5 0.25 0.4];
     %    geomvert(3) = 1;
-    %end;
+    %end
     disp('Even though the graphics have changed, this function remains 100% backward compatible.');
 	[preclust_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''std_preclust'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_preclust()', ...
                                                       'userdata', fig_arg);	
-	if isempty(preclust_param), return; end;
+	if isempty(preclust_param), return; end
     
     options = { STUDY, ALLEEG, 1};
     
@@ -315,7 +315,7 @@ if ~ischar(varargin{1}) %intial settings
     if length(options) == 3
         warndlg2('No measure selected: aborting.'); 
         return; 
-    end;
+    end
     
     [STUDY ALLEEG] = std_preclust(options{:});
     com = sprintf('[STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
@@ -327,7 +327,7 @@ if ~ischar(varargin{1}) %intial settings
 %             [filepath filename ext] = fileparts(os.studyfile);
 %             STUDY.filename = [ filename ext ];
 %             STUDY.filepath = filepath;
-%         end;
+%         end
 %         STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
 %         com = sprintf('%s\nSTUDY = pop_savestudy(STUDY, ALLEEG, %s);',  com, ...
 %                       vararg2str( { 'filename', STUDY.filename, 'filepath', STUDY.filepath }));
@@ -425,7 +425,7 @@ else
 
                 set(findobj('parent', hdl, 'string','Measures to Cluster on:'), 'string','Load                                  Dims.   Rel. Wt.');
                 set(findobj('parent', hdl, 'string','Measures'), 'string', 'Measures                         Dims.   Rel. Wt.');
-            end;
+            end
 
                 
 %             set_mpcluster =  get(findobj('parent', hdl, 'tag', 'spectra_on'), 'value'); 

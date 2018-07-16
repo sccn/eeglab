@@ -106,7 +106,7 @@ for im = 1:m
 	CM(:,Range)	= sqrt(2)*Qij ;  
 	Range 		= Range + m ;
    end ;
-end;
+end
 
 %%% joint diagonalization of the cumulant matrices
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,12 +120,12 @@ if 1, 	%% Init by diagonalizing a *single* cumulant matrix.  It seems to save
 	[V,D]	= eig(CM(:,1:m));	% For instance, this one
 	for u=1:m:m*nbcm,		% updating accordingly the cumulant set given the init
 		CM(:,u:u+m-1) = CM(:,u:u+m-1)*V ; 
-	end;
+	end
 	CM	= V'*CM;
 
 else,	%% The dont-try-to-be-smart init
 	V	= eye(m) ; % la rotation initiale
-end;
+end
 
 seuil	= 1/sqrt(T)/100; % A statistically significant threshold
 encore	= 1;

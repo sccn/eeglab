@@ -102,15 +102,15 @@ if ~ischar(varargin{1})
             pathwarn = 'on';
         elseif STUDY.datasetinfo(1).filepath(1) == '.'
             pathwarn = 'on';
-        end;
-    end;
+        end
+    end
     if isempty(STUDY.filepath) && exist(STUDY.datasetinfo(1).filename) == 2
         pathwarn = 'off';
     end
     if strcmpi(pathwarn, 'on')
         warndlg2(strvcat('You have changed your working path and data files are', ...
                          'no longer available; Cancel, and go back to your STUDY folder'), 'warning');
-    end;
+    end
         
     STUDY.tmphist = '';
     ALLEEG = varargin{2};
@@ -120,7 +120,7 @@ if ~ischar(varargin{1})
     elseif isempty(STUDY.changrp)
         STUDY = std_changroup(STUDY, ALLEEG);
         disp('Warning: history not saved for group creation');
-    end;
+    end
     
     show_chan          = ['pop_chanplot(''showchan'',gcf);'];
     show_onechan       = ['pop_chanplot(''showchanlist'',gcf);'];
@@ -164,18 +164,18 @@ if ~ischar(varargin{1})
     show_options = {};
     for index = 1:length(STUDY.changrp)
         show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
-    end;
+    end
     
     % enable buttons
     % --------------
     filename = fullfile(STUDY.datasetinfo(1).filepath, STUDY.datasetinfo(1).subject);
-    if exist([filename '.datspec']) , spec_enable = 'on'; else  spec_enable  = 'off'; end;
-    if exist([filename '.daterp'] )  , erp_enable = 'on'; else   erp_enable  = 'off'; end;
-    if exist([filename '.dattimef']) ,ersp_enable = 'on'; else  ersp_enable  = 'off'; end;
-    if exist([filename '.dattimef'])  ,itc_enable = 'on'; else   itc_enable  = 'off'; end;
-    if exist([filename '.daterpim']),erpim_enable = 'on'; else erpim_enable  = 'off'; end;
+    if exist([filename '.datspec']) , spec_enable = 'on'; else  spec_enable  = 'off'; end
+    if exist([filename '.daterp'] )  , erp_enable = 'on'; else   erp_enable  = 'off'; end
+    if exist([filename '.dattimef']) ,ersp_enable = 'on'; else  ersp_enable  = 'off'; end
+    if exist([filename '.dattimef'])  ,itc_enable = 'on'; else   itc_enable  = 'off'; end
+    if exist([filename '.daterpim']),erpim_enable = 'on'; else erpim_enable  = 'off'; end
     
-    if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end;
+    if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end
     
     % userdata below
     % --------------
@@ -188,7 +188,7 @@ if ~ischar(varargin{1})
     std_line = [0.9 0.35 0.9];
     geometry = { [0.8 3] [1] [0.6 0.35 0.1 0.1 0.9] std_line std_line std_line std_line std_line std_line  };
     str_name       = sprintf('STUDY name ''%s'' - ''%s''', STUDY.name, STUDY.design(STUDY.currentdesign).name);
-    if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
+    if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end
              
     % list of designs
     uilist   = { ...
@@ -226,14 +226,14 @@ if ~ischar(varargin{1})
         addui = varargin{3};
         if ~isfield(addui, 'uilist')
             error('Additional GUI definition (argument 4) requires the field "uilist"');
-        end;
+        end
         if ~isfield(addui, 'geometry')
             addui.geometry = mat2cell(ones(1,length(addui.uilist)));
-        end;
+        end
         uilist = { uilist{:}, addui.uilist{:} };
         geometry = { geometry{:} addui.geometry{:} };
         geomvert = [ geomvert ones(1,length(addui.geometry)) ];
-    end;
+    end
     [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
         'helpcom', 'pophelp(''pop_chanplot'')', ...
         'title', 'View and edit current channels -- pop_chanplot()' , 'userdata', fig_arg, ...
@@ -286,7 +286,7 @@ else
                 %    changrpstruct = STUDY.changrp(changrp);
                 %    allsubjects   = unique_bc({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
                 %    subject = allsubjects{onechan-1};
-                %end;
+                %end
 
                 plotting_option = varargin{1};
                 plotting_option = [ plotting_option(9:end) 'plot' ];
@@ -297,7 +297,7 @@ else
                  else
                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'', ''design'', ' int2str(design) ' );' ];
                     eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
-                 end;
+                 end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
 
@@ -305,7 +305,7 @@ else
                 [STUDY com] = pop_statparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)
 
@@ -313,7 +313,7 @@ else
                 [STUDY com] = pop_erpparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -321,7 +321,7 @@ else
                 [STUDY com] = pop_specparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -329,7 +329,7 @@ else
                 [STUDY com] = pop_erspparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -337,14 +337,14 @@ else
                 [STUDY com] = pop_erpimparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
             case 'showchanlist' % save the list of selected channels
                 if length(changrp) == 1
                     STUDY.changrp(changrp).selected = onechan;
-                end;
+                end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
@@ -365,20 +365,20 @@ else
                     allsubjects = STUDY.design(STUDY.currentdesign).cases.value;
                     for l = 1:length(allsubjects)
                         chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
-                    end;
+                    end
                 else
                     for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
                         chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ];
-                    end;
-                end;
+                    end
+                end
 
                 selected = 1;
                 if isfield(changrp, 'selected') & length(cind) == 1
                     if ~isempty(STUDY.changrp(cind).selected)
                         selected = min(STUDY.changrp(cind).selected, 1+length(chanid));
                         STUDY.changrp(cind).selected = selected;
-                    end;
-                end;
+                    end
+                end
 
                 set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
 
@@ -390,7 +390,7 @@ else
                 chanid{1} = 'All subjects';
                 for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
                     chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ' All' ];
-                end;
+                end
                 selected = 1;
                 set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
 
@@ -404,17 +404,17 @@ else
 
             case 'create_group'
                 channames = { STUDY.changrp(changrp).name };
-                for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end;
+                for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end
                 channamestr = strcat(channames{:});
                 res = inputdlg2({ 'Name of channel group', 'Channels to group' }, 'Create channel group', 1, { '' channamestr(2:end) });
-                if isempty(res), return; end;
+                if isempty(res), return; end
                 STUDY.changrp(end+1).name = res{1};
                 allchans(end+1)         = { res{1} };
                 chanlabels = parsetxt(res{2});
                 if length(chanlabels) == 1
                     warndlg2('Cannot create a channel group with a single channel');
                     return;
-                end;
+                end
                 STUDY.changrp(end).channels = chanlabels;
                 tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(end));
                 STUDY.changrp(end).chaninds = tmp.chaninds;
@@ -430,14 +430,14 @@ else
                 set(tmpobj, 'string', tmptext, 'value', length(tmptext));
 
             case 'edit_group'
-                if length(changrp) > 1, return; end;
-                if length(STUDY.changrp(changrp).channels) < 2, return; end;
+                if length(changrp) > 1, return; end
+                if length(STUDY.changrp(changrp).channels) < 2, return; end
                 channames = STUDY.changrp(changrp).channels;
-                for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end;
+                for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end
                 channamestr = strcat(channames{:});
                 res = inputdlg2({ 'Name of channel group', 'Channels to group' }, 'Create channel group', ...
                                 1, { STUDY.changrp(changrp).name channamestr(2:end) });
-                if isempty(res), return; end;
+                if isempty(res), return; end
                 STUDY.changrp(end+1).name = '';
                 STUDY.changrp(changrp)    = STUDY.changrp(end);
                 STUDY.changrp(end)        = [];
@@ -456,13 +456,13 @@ else
                 show_options = {};
                 for index = 1:length(STUDY.changrp)
                     show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
-                end;
+                end
                 tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
                 set(tmpobj, 'string', show_options, 'value', changrp);
 
             case 'delete_group'
-                if length(changrp) > 1, return; end;
-                if length(STUDY.changrp(changrp).channels) < 2, return; end;
+                if length(changrp) > 1, return; end
+                if length(STUDY.changrp(changrp).channels) < 2, return; end
                 STUDY.changrp(changrp)    = [];
 
                 % list of channel groups
@@ -470,7 +470,7 @@ else
                 show_options = {};
                 for index = 1:length(STUDY.changrp)
                     show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
-                end;
+                end
                 tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
                 set(tmpobj, 'string', show_options, 'value', changrp-1);
 

@@ -71,7 +71,7 @@ end;
 
 if isempty(EEG.chanlocs)
     error('Pop_headplot: this dataset does not contain channel locations. Use menu item: Edit > Dataset info');
-end;
+end
 
 if nargin < 3 % Open GUI input window
     % remove old spline file
@@ -83,9 +83,9 @@ if nargin < 3 % Open GUI input window
             if byteperelec/EEG.nbchan < 625, % old head plot file
                 EEG.splinefile = [];
                 disp('Warning: Wrong montage or old-version spline file version detected and removed; new spline file required');
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     % show the file be recomputed
     % ---------------------------
@@ -97,10 +97,10 @@ if nargin < 3 % Open GUI input window
                 EEG.splinefile = EEG.icasplinefile;
             else
                 compute_file = 1;
-            end;
+            end
         else
             compute_file = 1;
-        end;
+        end
     else % ************* Component plot       
         fieldname    = 'icasplinefile';
         if isempty(EEG.icasplinefile) && exist(EEG.icasplinefile, 'file')
@@ -108,11 +108,11 @@ if nargin < 3 % Open GUI input window
                 EEG.icasplinefile = EEG.splinefile;
             else
                 compute_file = 1;
-            end;
+            end
         else
             compute_file = 1;
-        end;
-    end;
+        end
+    end
             
     if compute_file
         
@@ -123,7 +123,7 @@ if nargin < 3 % Open GUI input window
                          'parameters should allow creating the correct spline file.'), 'Headplot() warning');
     else
     	pop_options      = {};
-    end;
+    end
     
  	% graphic interface
 	% -----------------
@@ -142,7 +142,7 @@ if nargin < 3 % Open GUI input window
     transform = [];
     if isfield(EEG.chaninfo, 'filename')
         [tmp transform] = lookupchantemplate(lower(EEG.chaninfo.filename), template);
-    end;
+    end
             
 	if typeplot
 		txt = sprintf('Making headplots for these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
@@ -156,7 +156,7 @@ if nargin < 3 % Open GUI input window
     else
         enableload = 'on';
         enablecomp = 'off';
-    end;
+    end
     cb_load = [ 'set(findobj(gcbf, ''tag'', ''load''), ''enable'', ''on'');' ...
                 'set(findobj(gcbf, ''tag'', ''comp''), ''enable'', ''off'');' ...
                 'set(findobj(gcbf, ''tag'', ''compcb''), ''value'', 0);' ];
@@ -258,13 +258,13 @@ if nargin < 3 % Open GUI input window
     optiongui = { 'uilist', txt, 'title', fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', ...
                        'Component head plot(s) -- pop_headplot()'), 'geometry', geom 'userdata' defaulttransform };
 	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
-    if isempty(result), return; end;
-    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; else return; end;
+    if isempty(result), return; end
+    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; else return; end
     
     while test_wrong_parameters(currentfig)
     	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
-        if isempty(result), return; end;
-    end;
+        if isempty(result), return; end
+    end
     close(currentfig);
     
     % decode setup parameters
@@ -272,34 +272,34 @@ if nargin < 3 % Open GUI input window
     options = {};
     if result{1},               options = { options{:} 'load'    result{2} };
     else
-        if ~ischar(result{5})    result{5} = defaultmat{result{5}}; end;
+        if ~ischar(result{5})    result{5} = defaultmat{result{5}}; end
         if isempty(result{7})   setupopt = { result{4} 'meshfile' result{5} };  % no coreg
         else                    setupopt = { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) };
                                 fprintf('Transformation matrix: %s\n', result{7});
-        end;
+        end
         options = { options{:} 'setup' setupopt };
         if ~strcmpi(result{5}, 'mheadnew.mat'), EEG.headplotmeshfile = result{5}; 
-        else EEG.headplotmeshfile = ''; end;
-    end;
+        else EEG.headplotmeshfile = ''; end
+    end
     
     % decode other parameters
     % -----------------------
     arg2 = eval( [ '[' result{8} ']' ] );
 	if length(arg2) > EEG.nbchan
 		tmpbut = questdlg2(['This will draw ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
-		if strcmp(tmpbut, 'Cancel'), return; end;
-	end;
+		if strcmp(tmpbut, 'Cancel'), return; end
+	end
     if length(arg2) == 0, error('please choose a latency(s) to plot'); end
 	topotitle  = result{9};
 	rowcols    = eval( [ '[ ' result{10} ' ]' ] );
     tmpopts    = eval( [ '{ ' result{11} ' }' ] );
     if ~isempty(tmpopts)
         options    = { options{:} tmpopts{:} };
-    end;
-	if size(arg2(:),1) == 1, figure; end;
+    end
+	if size(arg2(:),1) == 1, figure; end
 else % Pass along parameters and bypass GUI input
     options = varargin;
-end;
+end
 
 % Check if pop_headplot input 'colorbar' was called, and don't send it to headplot
 loc = strmatch('colorbar', options(1:2:end), 'exact');
@@ -320,9 +320,9 @@ if ~isempty(loc)
         EEG.splinefile    = options{ loc+1 };
     else            
         EEG.icasplinefile = options{ loc+1 };
-    end;
+    end
     options(loc:loc+1) = [];
-end;
+end
 loc = strmatch('setup', options(1:2:end)); loc = loc*2-1;
 if ~isempty(loc)
     if typeplot
@@ -331,12 +331,12 @@ if ~isempty(loc)
     else
         headplot('setup', EEG.chanlocs, options{loc+1}{1}, 'chaninfo', EEG.chaninfo, 'ica', 'on', options{ loc+1 }{2:end});
         EEG.icasplinefile = options{loc+1}{1};
-    end;
+    end
     options(loc:loc+1) = [];
     compute_file = 1;
 else
     compute_file = 0;
-end;
+end
 
 % search for existing file if necessary
 % -------------------------------------
@@ -345,24 +345,24 @@ if typeplot == 1 % ********** data plot
     if isempty(EEG.splinefile)            
         if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
             EEG.splinefile = EEG.icasplinefile;
-        end;
-    end;
+        end
+    end
 else % ************* Component plot       
     fieldname    = 'icasplinefile';
     if isempty(EEG.icasplinefile)
         if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
             EEG.icasplinefile = EEG.splinefile;
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % headplot mesh file
 % ------------------
 if isfield(EEG, 'headplotmeshfile')
     if ~isempty(EEG.headplotmeshfile)
         options = { options{:} 'meshfile' EEG.headplotmeshfile };
-    end;
-end;
+    end
+end
 
 % check parameters
 % ----------------
@@ -372,11 +372,11 @@ end;
 if typeplot
     if isempty(EEG.splinefile)
         error('Pop_headplot: cannot find spline file, aborting...');
-    end;
+    end
 else
     if isempty(EEG.icasplinefile)
         error('Pop_headplot: cannot find spline file, aborting...');
-    end;
+    end
 end;    
 SIZEBOX = 150;
 nbgraph = size(arg2(:),1);
@@ -404,7 +404,7 @@ if typeplot
     maplimits = [ -maplimits maplimits ];
 else
     maplimits = [-1 1];
-end;
+end
 	
 % plot the graphs
 % ---------------
@@ -414,23 +414,23 @@ disp('                  might slightly differ from the one they had during coreg
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
-            if index> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
+            if index> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end
         	figure;
         	pos = get(gcf,'Position');
 			posx = max(0, pos(1)+(pos(3)-SIZEBOX*rowcols(2))/2);
 			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
 			set(gcf,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
-			try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+			try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
         end;    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
-	end;
+	end
 
 	if ~isnan(arg2(index))
 		if typeplot
             headplot( SIGTMPAVG(:,index), EEG.splinefile, 'maplimits', maplimits, options{:});
 			if nbgraph == 1, title( topotitle );
 			else title([int2str(arg2(index)) ' ms']);
-			end;
+			end
 		else
             if arg2(index) < 0
                 headplot( -EEG.icawinv(:, -arg2(index)), EEG.icasplinefile, options{:});
@@ -439,8 +439,8 @@ for index = 1:size(arg2(:),1)
             end;    			
 			if nbgraph == 1, title( topotitle );
 			else title(['' int2str(arg2(index))]);
-			end;
-		end;
+			end
+		end
 		drawnow;
 		axis equal; 
 		rotate3d off;
@@ -464,7 +464,7 @@ if colorbar_switch
     end
 end
         
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 
 
 if nbgraph> 1, 
@@ -472,14 +472,14 @@ if nbgraph> 1,
     set(a, 'fontweight', 'bold');
     axcopy(gcf, [ 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position'''');' ...
                   'set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d(gcf); clear postmp;' ]);
-end;
+end
 
 % generate output command
 % -----------------------
 com = sprintf('pop_headplot(EEG, %d, %s, ''%s'', [%s], %s);', typeplot, vararg2str(arg2), ...
               topotitle, int2str(rowcols), vararg2str( pop_options ) );
-if compute_file, com = [ 'EEG = ' com ]; end;
-if nbgraph== 1,  com = [ 'figure; ' com ]; rotate3d(gcf); end;
+if compute_file, com = [ 'EEG = ' com ]; end
+if nbgraph== 1,  com = [ 'figure; ' com ]; rotate3d(gcf); end
 
 return;
 
@@ -501,13 +501,13 @@ function bool = test_wrong_parameters(hdl)
                                 'To bypass co-registration (not recommended), enter', ...
                                 '"0 0 0 0 0 0 1 1 1" as the "Tailairach transformation matrix.');
             bool = 1;
-        end;
+        end
         if isempty(coreg3)
             textlines = strvcat(textlines, ' ', 'You need to enter an output file name.');
             bool = 1;
-        end;
+        end
         
         if bool
             warndlg2( textlines, 'Error');
-        end;
-    end;
+        end
+    end

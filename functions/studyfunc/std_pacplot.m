@@ -39,6 +39,6 @@ function [STUDY, allpac, alltimes, allfreqs, pgroup, pcond, pinter] = std_pacplo
 if nargin < 2
     help std_pacplot;
     return;
-end;
+end
 
 [STUDY allpac alltimes allfreqs pgroup pcond pinter ] = std_erspplot(STUDY, ALLEEG, 'datatype', 'pac', varargin{:});

@@ -32,7 +32,7 @@ function [boolval npersubj] = std_checkfiles(STUDY, ALLEEG);
 if nargin < 2
     help std_checkfiles;
     return;
-end;
+end
 return;
 
 filetypes = { 'daterp' 'datspec' 'datersp' 'datitc' 'dattimef' ...
@@ -52,7 +52,7 @@ for index = 1:length(filetypes)
     [ tmpstruct compinds filepresent ] = std_fileinfo(ALLEEG, filetypes{index});
     if ~isempty(tmpstruct)
         fprintf('Files of type "%s" detected, checking...',  filetypes{index});
-    end;
+    end
     
     % check if the structures are equal
     % ---------------------------------
@@ -77,33 +77,33 @@ for index = 1:length(filetypes)
                             for cind = 1:length(firstval)
                                 if isreal(firstval{cind}) && ~isempty(firstval{cind}) && isnan(firstval{cind}(1))
                                     firstval{cind} = 'NaN';
-                                end;
-                            end;
+                                end
+                            end
                             for cind = 1:length(tmpval)
                                 if isreal(tmpval{cind}) && ~isempty(tmpval{cind}) && isnan(tmpval{cind}(1))
                                     tmpval{cind} = 'NaN';
-                                end;
-                            end;
-                        end;
+                                end
+                            end
+                        end
                         
                         if ~isequal(firstval, tmpval)
                             if ~strcmpi(fields{f_ind}, 'labels') || strcmpi(uniformchannels, 'on')
-                                if firstpass == 1, fprintf('\n'); firstpass = 0; end;
+                                if firstpass == 1, fprintf('\n'); firstpass = 0; end
                                 fprintf('  Error, difference accross data files for field "%s"\n', fields{f_ind});
                                 notequal = 1;
                                 passall = 0;
                                 break;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
     
     % check the consistency of changrp and cluster with saved information
     % -------------------------------------------------------------------
-    if isempty(tmpstruct), notequal = 1; end;
+    if isempty(tmpstruct), notequal = 1; end
     if filetypes{index}(1) == 'd' && notequal == 0        
         % scan all channel labels
         % -----------------------
@@ -122,25 +122,25 @@ for index = 1:length(filetypes)
                                     fprintf('\nError: channel index in STUDY.changrp(%d) for dataset %d is "%d" but "%d" in data files\n', cind, inddat, tmpchan, tmpchan2);
                                     notequal = 1;
                                     break;
-                                end;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
     elseif notequal == 0 && ~isempty(STUDY.cluster) % components
         % check that the cell structures are present
         % ------------------------------------------
         if ~isfield(STUDY.cluster, 'setinds')
             STUDY.cluster(1).setinds = [];
             STUDY.cluster(1).allinds = [];
-        end;
+        end
         for cind = 1:length(STUDY.cluster)
             if isempty(STUDY.cluster(cind).setinds)
                 STUDY.cluster(cind) = std_setcomps2cell(STUDY, cind);
-            end;
-        end;
+            end
+        end
         for cind = 1:length(STUDY.cluster)
             if notequal == 0
                 for inddat = 1:length(ALLEEG)
@@ -149,7 +149,7 @@ for index = 1:length(filetypes)
                     tmpcomp = [];
                     for jind = 1:length(indnonempty)
                         tmpcomp = [ tmpcomp STUDY.cluster(cind).allinds{indnonempty(jind)}(tmpind{indnonempty(jind)}) ];
-                    end;
+                    end
                     
                     if ~isempty(setdiff(tmpcomp, compinds{inddat}))
                         if ~(isempty(compinds{inddat}) && strcmpi(filetypes{index}, 'icatopo'))
@@ -157,18 +157,18 @@ for index = 1:length(filetypes)
                             notequal = 1;
                             passall  = 0;
                             break;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
-    if notequal == 0, fprintf(' Pass\n'); end;
-end;
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if notequal == 0, fprintf(' Pass\n'); end
+end
 
 if ~passall
     disp('**** Recompute any measure above not receiving a "Pass" by')
     disp('**** calling menu items "STUDY > Precompute Channel/Component measures" ');
     disp('**** and by selecting the "Recompute even if present on disk" checkbox');
-end;
+end
 disp('Checking completed.');

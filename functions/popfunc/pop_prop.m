@@ -55,14 +55,14 @@ com = '';
 if nargin < 1
 	help pop_prop;
 	return;   
-end;
+end
 if nargin < 5
 	spec_opt = {};
-end;
+end
 if nargin == 1
 	typecomp = 1;    % defaults
         chanorcomp = 1;
-end;
+end
 if typecomp == 0 & isempty(EEG.icaweights)
    error('No ICA weights recorded for this dataset -- first run ICA on it');
 end;   
@@ -71,22 +71,22 @@ if nargin == 2
                      'Spectral options (see spectopo() help):' };
 	inistr       = { '1' '''freqrange'', [2 50]' };
 	result       = inputdlg2( promptstr, 'Component properties - pop_prop()', 1,  inistr, 'pop_prop');
-	if size( result, 1 ) == 0 return; end;
+	if size( result, 1 ) == 0 return; end
    
 	chanorcomp   = eval( [ '[' result{1} ']' ] );
     spec_opt     = eval( [ '{' result{2} '}' ] );
-end;
+end
 
 % plotting several component properties
 % -------------------------------------
 if length(chanorcomp) > 1
     for index = chanorcomp
         pop_prop(EEG, typecomp, index, 0, spec_opt);  % call recursively for each chanorcomp
-    end;
+    end
 	com = sprintf('pop_prop( EEG, %d, [%s], NaN, %s);',...
                   typecomp, int2str(chanorcomp), vararg2str( { spec_opt } ));
     return;
-end;
+end
 
 % should test for > number of components ??? -sm. 
 % yes (max num components is not necessarily same as nbchan). -jri
@@ -106,7 +106,7 @@ try, icadefs;
 catch, 
 	BACKCOLOR = [0.8 0.8 0.8];
 	GUIBUTTONCOLOR   = [0.8 0.8 0.8]; 
-end;
+end
 basename = [fastif(typecomp,'Channel ', 'Component ') int2str(chanorcomp) ];
 
 fhandle = figure('name', ['pop_prop() - ' basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
@@ -131,10 +131,10 @@ if isfield(EEG.chanlocs, 'theta')
     else             % plot component map
         topoplot( EEG.icawinv(:,chanorcomp), EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
                  'shading', 'interp', 'numcontour', 3); axis square;
-    end;
+    end
 else
     axis(h,'off');
-end;
+end
 basename = [fastif(typecomp,'Channel ', 'IC') int2str(chanorcomp) ];
 % title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
 title(basename, 'fontsize', 14);
@@ -166,7 +166,7 @@ if EEG.trials > 1
          era_limits = get_era_limits(era);
          erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times*1000, ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '','erp_vltg_ticks',era_limits);   
-    end;
+    end
     axes(hhh);
     title(sprintf('%s activity \\fontsize{10}(global offset %3.3f)', basename, offset), 'fontsize', 14);
 else
@@ -203,7 +203,7 @@ else
     else
             axis(hh,'off');
             text(0.1, 0.3, [ 'No erpimage plotted' 10 'for small continuous data']);
-    end;
+    end
     axes(hhh);
 end;	
 
@@ -211,12 +211,12 @@ end;
 % -----------------
 if ~exist('winhandle')
     winhandle = NaN;
-end;
+end
 if ishandle(winhandle) 
 	h = axes('Parent', fhandle,'units','normalized', 'position',[5 10 95 35].*s+q);
 else
 	h = axes('Parent', fhandle,'units','normalized', 'position',[5 0 95 40].*s+q);
-end;
+end
 %h = axes('units','normalized', 'position',[45 5 60 40].*s+q);
 try
 	eeglab_options; 
@@ -228,8 +228,8 @@ try
         else
     		icaacttmp = (EEG.icaweights(chanorcomp,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts); 
 			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chanorcomp), spec_opt{:} );
-		end;
-	end;
+		end
+	end
     % set up new limits
     % -----------------
     %freqslim = 50;
@@ -268,7 +268,7 @@ if ishandle(winhandle)
     	status = EEG.reject.gcompreject(chanorcomp);
     else
         status = 0;
-    end;
+    end
 	hr = uicontrol(fhandle, 'Style', 'pushbutton', 'backgroundcolor', eval(fastif(status,COLREJ,COLACC)), ...
 				'string', fastif(status, 'REJECT', 'ACCEPT'), 'Units','Normalized', 'Position', [40 -10 15 6].*s+q, 'userdata', status, 'tag', 'rejstatus');
 	command = [ 'set(gcbo, ''userdata'', ~get(gcbo, ''userdata''));' ...
@@ -337,12 +337,12 @@ if ishandle(winhandle)
 	set( hval, 'callback', command); 
 	if isempty( EEG.stats.compenta )
 		set(hval, 'enable', 'off');
-	end;
+	end
 	
 	com = sprintf('pop_prop( EEG, %d, %d, 0, %s);', typecomp, chanorcomp, vararg2str( { spec_opt } ) );
 else
 	com = sprintf('pop_prop( EEG, %d, %d, NaN, %s);', typecomp, chanorcomp, vararg2str( { spec_opt } ) );
-end;
+end
 
 return;
 

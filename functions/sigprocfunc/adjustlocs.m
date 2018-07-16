@@ -71,7 +71,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
     if nargin < 1
         help adjustlocs;
         return;
-    end;
+    end
     
     % check input parameters
     % ----------------------
@@ -85,7 +85,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                                  'autorotate' 'string'  { 'on','off' }    'on';
                                  'uniform'    'string'  { 'on','off' }    'on';
                                  'coordinates' 'string' { 'pol','sph','cart' } 'sph' });
-    if ischar(g), error(g); end;
+    if ischar(g), error(g); end
     
     names = { chanlocs.labels };
     
@@ -110,24 +110,24 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                 if mod(indelec(index),2)
                     if ~ismember(indelec(index)+1, indelec)
                         ind2remove = [ ind2remove index ];
-                    end;
+                    end
                 else
                     if ~ismember(indelec(index)-1, indelec)
                         ind2remove = [ ind2remove index ];
-                    end;
-                end;
-            end;
+                    end
+                end
+            end
             indelec(ind2remove) = [];
             if find(indelec == 80), indelec(end) = []; end; % for Cz
         
             g.center = tmpnames1020(indelec);
-        end;
+        end
         if isempty(g.center)
             disp('No electrodes found for auto-centering')
         else
             disp([ num2str(length(g.center)) ' landmark electrodes found for position auto-centering' ])
-        end;
-    end;
+        end
+    end
 
     % auto rotate
     % -----------
@@ -135,7 +135,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         if exist('locs1020') ~= 1
             disp('Reading template 10-20 file');
             locs1020 = readlocs('eeglab1020.ced');
-        end;
+        end
                 
         % scan electrodes for horiz pos
         % -----------------------------
@@ -151,8 +151,8 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             disp('No electrodes found for auto planar rotation')
         else
             disp([ num2str(length(g.rotate)/2) ' landmark electrodes found for auto planar rotation' ])
-        end;
-    end;
+        end
+    end
 
     % auto scale
     % ----------
@@ -160,7 +160,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         if exist('locs1020') ~= 1
             disp('Reading template 10-20 file');
             locs1020 = readlocs('eeglab1020.ced');
-        end;
+        end
         
         if strcmpi(g.uniform, 'off')
             % remove all vertical electrodes for horizontal scaling
@@ -186,8 +186,8 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                     g.hscale(2:2:2*length(indelec)+1) = [ locs1020horiz.Y ];
                 else
                     g.hscale(2:2:2*length(indelec)+1) = tmpradius1020(indelec);
-                end;
-            end;
+                end
+            end
             
             % scan electrodes for vert. pos
             % -----------------------------
@@ -204,7 +204,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                     g.vscale(2:2:2*length(indelec)+1) = [ locs1020vert.X ];
                 else
                     g.vscale(2:2:2*length(indelec)+1) = tmpradius1020(indelec);
-                end;
+                end
             end;    
         else
             % uniform scaling
@@ -224,13 +224,13 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                     g.scale(2:2:2*length(indelec)+1) = tmpabsxyz(indelec);
                 else
                     g.scale(2:2:2*length(indelec)+1) = tmpradius1020(indelec);
-                end;
-            end;
-        end;
+                end
+            end
+        end
         if strcmpi(g.coordinates, 'sph')
             g.coordinates = 'pol'; % use polar coordinates for scaling
-        end;
-    end;
+        end
+    end
     
     % get X and Y coordinates
     % -----------------------
@@ -239,12 +239,12 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         if strcmpi(g.coordinates, 'sph')
             X = X/0.25*46;
             Y = Y/0.25*46;
-        end;
+        end
     else
         X = [ chanlocs.X ];
         Y = [ chanlocs.Y ];
         Z = [ chanlocs.Z ];
-    end;
+    end
     
     % recenter
     % --------
@@ -253,15 +253,15 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             tmpindex = strmatch( lower(g.center{index}), lower(names), 'exact' );
             if isempty(tmpindex)
                 error(['Electrode ''' g.center{index} ''' not found for re-centering']);
-            end;
+            end
             indexelec(index) = tmpindex;
-        end;
+        end
         showmsg('Using electrode', 'for re-centering', g.center);
         centerx = mean(X(indexelec));
         centery = mean(Y(indexelec));
         X = X - centerx;
         Y = Y - centery;
-    end;
+    end
 
     % planar rotation
     % ---------------    
@@ -273,9 +273,9 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             tmpindex = strmatch( lower(g.rotate{index}), lower(names), 'exact' );
             if isempty(tmpindex)
                 error(['Electrode ''' g.rotate{index} ''' not found for left-right scaling']);
-            end;
+            end
             elec((index+1)/2) = tmpindex;
-        end;
+        end
         vals = [ g.rotate{2:2:end} ];
         
         % compute average scaling factor
@@ -286,7 +286,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         %diffangle2 = allangles + vals;
         %if abs(diffangle1) > abs(diffangle2), diffangle = diffangle2;
         %else                                  diffangle = diffangle1;
-        %end;
+        %end
         tmpind    = find(diffangle >  180); diffangle(tmpind) = diffangle(tmpind)-360;
         tmpind    = find(diffangle < -180); diffangle(tmpind) = diffangle(tmpind)+360;
         anglerot  = mean(diffangle);
@@ -294,7 +294,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         X = real(tmpcplx);
         Y = imag(tmpcplx);
         showmsg('Using electrode', ['for planar rotation (' num2str(anglerot,2) ' degrees)'], g.rotate(1:2:end));
-    end;
+    end
     
     % computing scaling factors
     % -------------------------
@@ -306,9 +306,9 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             tmpindex = strmatch( lower(g.scale{index}), lower(names), 'exact' );
             if isempty(tmpindex)
                 error(['Electrode ''' g.scale{index} ''' not found for left-right scaling']);
-            end;
+            end
             elec((index+1)/2) = tmpindex;
-        end;
+        end
         vals = [ g.scale{2:2:end} ];
         
         % compute average scaling factor
@@ -326,9 +326,9 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                 tmpindex = strmatch( lower(g.hscale{index}), lower(names), 'exact' );
                 if isempty(tmpindex)
                     error(['Electrode ''' g.hscale{index} ''' not found for left-right scaling']);
-                end;
+                end
                 elec((index+1)/2) = tmpindex;
-            end;
+            end
             vals = [ g.hscale{2:2:end} ];
             showmsg('Using electrode', [ 'for left-right spherical re-scaling (x' num2str(1/hscalefact,4) ')'], g.hscale(1:2:end));
             
@@ -337,8 +337,8 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             hscalefact = mean(abs(Y(elec))./vals); % *46/0.25; %/44/0.25;
             if isempty(g.vscale)
                 vscalefact =  hscalefact;
-            end;
-        end;
+            end
+        end
         if ~isempty(g.vscale)
             % find electrodes
             % ---------------
@@ -347,9 +347,9 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                 tmpindex = strmatch( lower(g.vscale{index}), lower(names), 'exact' );
                 if isempty(tmpindex)
                     error(['Electrode ''' g.vscale{index} ''' not found for rear-front scaling']);
-                end;
+                end
                 elec((index+1)/2) = tmpindex;
-            end;
+            end
             vals = [ g.vscale{2:2:end} ];
             showmsg('Using electrode', ['for rear-front spherical re-scaling (x' num2str(1/vscalefact,4) ')'], g.vscale(1:2:end));
             
@@ -358,9 +358,9 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             vscalefact = mean(abs(X(elec))./vals); % *46/0.25; %/44/0.25;
             if isempty(g.vscale)
                 hscalefact =  vscalefact;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     % uniform?
     % --------
@@ -368,7 +368,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         disp('uniform scaling: averaging left-right and rear-front scaling factor');
         hscalefact = mean([hscalefact vscalefact]);
         vscalefact = hscalefact;
-    end;
+    end
     
     % scaling data
     % ------------
@@ -376,7 +376,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         Y = Y/hscalefact;
         X = X/vscalefact;
         Z = Z/((hscalefact+vscalefact)/2);
-    end;
+    end
     
     % updating structure
     % ------------------
@@ -385,7 +385,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         phi = phi/pi*180;
         if strcmpi(g.coordinates, 'pol')
             theta = theta/0.25*46;
-        end;
+        end
         
         % convert to other types of coordinates
         % -------------------------------------
@@ -398,9 +398,9 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             chanlocs(index).X = X(index);
             chanlocs(index).Y = Y(index);
             chanlocs(index).Z = Z(index);
-        end;
+        end
         chanlocs = convertlocs(chanlocs, 'cart2all');
-    end;
+    end
     
 function showmsg(begmsg, endmsg, struct);
     if length(struct) <= 1
@@ -411,5 +411,5 @@ function showmsg(begmsg, endmsg, struct);
         disp([ begmsg ' ''' struct{1} ''', ''' struct{2} ''' and ''' struct{3}  ''' ' endmsg]);
     else
         disp([ begmsg ' ''' struct{1} ''', ''' struct{2} ''', ''' struct{3}  ''' ... ' endmsg]);
-    end;
+    end
     

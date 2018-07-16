@@ -61,14 +61,14 @@ if ~strcmpi(get(fig, 'type'), 'axes')
     hndl   = childs(find(strcmpi(get(childs,'Type'),'axes')));
 else
     hndl=fig;
-end;
+end
 offidx=[];
 if exist('command') ~= 1
     comstr = 'copyaxis';
 else
    command_dbl = double(command);
    comstr = double(['copyaxis(''' char(command_dbl) ''')']); 
-end;
+end
 for a=1:length(hndl)                    % make all axes visible
     %allobjs = findobj('parent',hndl(a));
     %--
@@ -76,14 +76,14 @@ for a=1:length(hndl)                    % make all axes visible
     for index = 1:length(allobjs)
         if isempty(get(allobjs(index), 'ButtonDownFcn'))
             set(allobjs(index), 'ButtonDownFcn', char(comstr));
-        end;
-    end;
+        end
+    end
 end
 if ~strcmpi(get(fig, 'type'), 'axes')
     figure(fig);
 else
     figure(get(fig, 'parent'));
-end;
+end
 if exist('command') ~= 1
     set(hndl(a),'ButtonDownFcn','copyaxis');
 else

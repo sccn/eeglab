@@ -98,12 +98,12 @@ end
       fprintf( ...
        'ploterp: limits should be 0 or an array [xmin xmax ymin ymax].\n');
       return
-    end;
+    end
     xmin = limits(1);
     xmax = limits(2);
     ymin = limits(3);
     ymax = limits(4);
-  end;
+  end
 
   if xmax == 0 & xmin == 0,
     x = (0:1:frames-1);
@@ -112,7 +112,7 @@ end
   else
     dx = (xmax-xmin)/(frames-1);
     x=xmin*ones(1,frames)+dx*(0:frames-1); % compute x-values
-  end;
+  end
   if xmax<=xmin,
       fprintf('ploterp() - xmax must be > xmin.\n')
       return

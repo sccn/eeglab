@@ -41,7 +41,7 @@ function [gradx, grady] = gradmap( map, filename, draw )
 if nargin < 2
 	help gradmap;
 	return;
-end;
+end
 
 MAXCHANS = size(map,1);
 GRID_SCALE = 2*MAXCHANS+5;
@@ -68,7 +68,7 @@ vertidx=zeros(1, MAXCHANS); % preallocation
 for i=1:MAXCHANS
    [useless_var horizidx(i)] = min(abs(y(i) - xi));    % find pointers to electrode
    [useless_var vertidx(i)] = min(abs(x(i) - yi));     % positions in Zi
-end;
+end
    
 draw = 1;
 
@@ -91,8 +91,8 @@ for i=1:size(map,2)
             quiver(imresize(FX, 0.5), imresize(FY, 0.5)); hold off
         else
             disp('Warning: cannot plot because imresize function is missing (image processing toolbox)');
-        end;
-	end;
+        end
+	end
 end;                                                       
 
 return;

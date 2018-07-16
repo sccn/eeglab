@@ -73,17 +73,17 @@ if nargin<1
 	fprintf('Not enought arguments\n'); 
 	help loadeeg 
 	return;
-end;
-if nargin<2 chanlist='all'; end;
-if nargin<3 TrialList='all'; end;
-if nargin<4 typerange='all'; end;
-if nargin<5 acceptype='all'; end;
-if nargin<6 rtrange  ='all'; end;
-if nargin<7 responsetype='all'; end;
-if nargin<8 format='auto'; end;
+end
+if nargin<2 chanlist='all'; end
+if nargin<3 TrialList='all'; end
+if nargin<4 typerange='all'; end
+if nargin<5 acceptype='all'; end
+if nargin<6 rtrange  ='all'; end
+if nargin<7 responsetype='all'; end
+if nargin<8 format='auto'; end
 format = lower(format);
 
-if ~strcmpi(format, 'short') && ~strcmpi(format, 'int32') && ~strcmpi(format, 'auto'), error('loadeeg: format error'); end;
+if ~strcmpi(format, 'short') && ~strcmpi(format, 'int32') && ~strcmpi(format, 'auto'), error('loadeeg: format error'); end
 
 % open file for reading
 % ---------------------
@@ -91,7 +91,7 @@ fid=fopen(FILENAME,'r','ieee-le');
 if fid<0
 	fprintf('Error LOADEEG: File %s not found\n', FILENAME);  
 	return;
-end;
+end
 
 % determine the actual file format if auto is requested
 %------------------------------------------------------
@@ -104,10 +104,10 @@ if strcmpi(format, 'auto')
         is32bit = fread(fid,1,'char');       
         if (is32bit == 1)
             format = 'int32'
-        end;
-    end;
+        end
+    end
     frewind(fid);
-end;
+end
 
 % read general part of the erp header and set variables
 % -----------------------------------------------------
@@ -136,7 +136,7 @@ fprintf('Electrode configuration\n');
 for elec = 1:chan
    	channel_label_tmp = fread(fid, 10, 'uchar');
 	chan_names(elec,:) = channel_label_tmp';
-	for index = 2:9 if chan_names(elec,index) == 0 chan_names(elec,index)=' '; end; end;
+	for index = 2:9 if chan_names(elec,index) == 0 chan_names(elec,index)=' '; end; end
 	erp = fread(fid, 47-10, 'uchar');
 	baseline(elec) = fread(fid, 1, 'ushort');
 	erp = fread(fid, 10, 'uchar');
@@ -146,7 +146,7 @@ for elec = 1:chan
 	fprintf('%s: baseline: %d\tsensitivity: %f\tcalibration: %f\n', ...
             char(chan_names(elec,1:4)), baseline(elec), sensitivity(elec), calib(elec));
 	factor(elec) = calib(elec) * sensitivity(elec) / 204.8;
-end;
+end
 %fprintf('Electrode configuration\n');
 %for elec = 1:chan
 %	erp = fread(fid, 47, 'uchar');
@@ -157,19 +157,19 @@ end;
 %	calib(elec) = fread(fid, 1, 'float32');
 %	fprintf('baseline: %d\tsensitivity: %f\tcalibration: %f\n', baseline(elec), sensitivity(elec), calib(elec));
 %	factor(elec) = calib(elec) * sensitivity(elec) / 204.8;
-%end;
+%end
 
 xsize    = chan * pnts;
 buf_size = chan * pnts ;			% size in shorts
 
 % set tags for conditions
 % -----------------------
-if ischar(chanlist) && strcmpi(chanlist, 'all'), chanlist = [1:chan]; end;
-if ischar(TrialList) && strcmpi(TrialList, 'all'),	trialtagI     = 1; else trialtagI     = 0; end;
-if ischar(acceptype) && strcmpi(acceptype, 'all'),	acceptagI     = 1; else acceptagI     = 0; end;
-if ischar(typerange) && strcmpi(typerange, 'all'), 	typetagI      = 1; else typetagI      = 0; end;
-if ischar(responsetype) && strcmpi(responsetype, 'all'),	responsetagI  = 1; else responsetagI  = 0; end;
-if ischar(rtrange) && strcmpi(rtrange, 'all'), 	rttagI        = 1; else rttagI        = 0; end;
+if ischar(chanlist) && strcmpi(chanlist, 'all'), chanlist = [1:chan]; end
+if ischar(TrialList) && strcmpi(TrialList, 'all'),	trialtagI     = 1; else trialtagI     = 0; end
+if ischar(acceptype) && strcmpi(acceptype, 'all'),	acceptagI     = 1; else acceptagI     = 0; end
+if ischar(typerange) && strcmpi(typerange, 'all'), 	typetagI      = 1; else typetagI      = 0; end
+if ischar(responsetype) && strcmpi(responsetype, 'all'),	responsetagI  = 1; else responsetagI  = 0; end
+if ischar(rtrange) && strcmpi(rtrange, 'all'), 	rttagI        = 1; else rttagI        = 0; end
 
 count_selected = 1;
 fprintf('Reserving array (can take some time)\n');
@@ -177,7 +177,7 @@ if ischar(TrialList)
     signal = zeros( chan, pnts*nsweeps);
 else
     signal = zeros( chan, pnts*length(TrialList));
-end;
+end
 fprintf('Array reserved, scanning file\n');
 
 for sweep = 1:nsweeps
@@ -195,11 +195,11 @@ for sweep = 1:nsweeps
 
 	% store the sweep or reject the sweep
 	% -----------------------------------
-	if trialtagI trialtag = 1;        else trialtag = ismember_bc(sweep, TrialList); end;
-	if acceptagI acceptag = 1;        else acceptag =  ismember(s_accept, acceptype); end;
-	if typetagI  typetag  = 1; 	  else typetag  =  ismember(s_type, typerange); end;
-	if responsetagI responsetag  = 1; else responsetag  = ismember_bc(s_response, responsetype); end;
-	if rttagI       rttag  = 1; 	  else rttag  =  ismember(s_rt, rtrange); end;
+	if trialtagI trialtag = 1;        else trialtag = ismember_bc(sweep, TrialList); end
+	if acceptagI acceptag = 1;        else acceptag =  ismember(s_accept, acceptype); end
+	if typetagI  typetag  = 1; 	  else typetag  =  ismember(s_type, typerange); end
+	if responsetagI responsetag  = 1; else responsetag  = ismember_bc(s_response, responsetype); end
+	if rttagI       rttag  = 1; 	  else rttag  =  ismember(s_rt, rtrange); end
 
 	if typetag
 		if trialtag
@@ -221,28 +221,28 @@ for sweep = 1:nsweeps
 						% -----------------------------------------------------
 						for elec = 1:chan
 							buf(elec, :) = (buf(elec, :)-baseline(elec)-0.0)*factor(elec);
-						end;
+						end
                         try
                             signal(:,[((count_selected-1)*pnts+1):count_selected*pnts]) = buf;
                             count_selected = count_selected + 1;
-                            if not(mod(count_selected,10)) fprintf('%d sweeps selected out of %d\n', count_selected-1, sweep); end;
+                            if not(mod(count_selected,10)) fprintf('%d sweeps selected out of %d\n', count_selected-1, sweep); end
                         catch,
                             disp('Warning: File truncated, aborting file read.');
                             count_selected = count_selected + 1;
                             break;
-                        end;
-					end;
-				end;
-			end;
-		end;
-	end;
+                        end
+					end
+				end
+			end
+		end
+	end
 
 	if unreaded_buf 
         if strcmpi(format, 'short'), fseek(fid, buf_size*2, 'cof'); 
         else                         fseek(fid, buf_size*4, 'cof'); 
-        end;
+        end
     end;				
-end;
+end
 nsweeps = count_selected-1;
 fclose(fid);
 

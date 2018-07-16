@@ -28,19 +28,19 @@ function [vals, okornot, strval] = listdlg2(varargin);
 if nargin < 2
    help listdlg2;
    return;
-end;
+end
 for index = 1:length(varargin)
-	if iscell(varargin{index}), varargin{index} = { varargin{index} }; end;
-	if ischar(varargin{index}), varargin{index} = lower(varargin{index}); end;
-end;
+	if iscell(varargin{index}), varargin{index} = { varargin{index} }; end
+	if ischar(varargin{index}), varargin{index} = lower(varargin{index}); end
+end
 g = struct(varargin{:});
 
-try,  g.promptstring;  catch, g.promptstring = ''; end;
-try,  g.liststring;    catch, error('''liststring'' must be defined'); end;
-try,  g.selectionmode; catch, g.selectionmode = 'multiple'; end;
-try,  g.listsize;      catch, g.listsize = []; end;
-try,  g.initialvalue;  catch, g.initialvalue = []; end;
-try,  g.name;          catch, g.name = ''; end;
+try,  g.promptstring;  catch, g.promptstring = ''; end
+try,  g.liststring;    catch, error('''liststring'' must be defined'); end
+try,  g.selectionmode; catch, g.selectionmode = 'multiple'; end
+try,  g.listsize;      catch, g.listsize = []; end
+try,  g.initialvalue;  catch, g.initialvalue = []; end
+try,  g.name;          catch, g.name = ''; end
 
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
@@ -50,22 +50,22 @@ else
     allstr = '';
     for index = 1:length(g.liststring)
         allstr = [ allstr '|' g.liststring{index} ];
-    end;
+    end
     allstr = allstr(2:end);
-end;
+end
 
 geometry = {[1] [1 1]};
 geomvert = [min(length(g.liststring), 10) 1];
 if ~strcmpi(g.selectionmode, 'multiple') | ...
         (iscell(g.liststring) & length(g.liststring) == 1) | ...
         (isstr (g.liststring) & size  (g.liststring,1) == 1 & isempty(find(g.liststring == '|')))
-	if isempty(g.initialvalue), g.initialvalue = 1; end;
+	if isempty(g.initialvalue), g.initialvalue = 1; end
     minval = 1;
 	maxval = 1;
 else
     minval = 0;
     maxval = 2;
-end;
+end
 listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'max', maxval, 'min', minval } ...
 		  { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', ['set(gcbf, ''userdata'', ''cancel'');'] }  ...
 		  { 'Style', 'pushbutton', 'string', 'Ok'    , 'callback', ['set(gcbf, ''userdata'', ''ok'');'] } };
@@ -74,7 +74,7 @@ if ~isempty(g.promptstring)
 	geometry = {[1] geometry{:}};
 	geomvert = [2 geomvert];
 	listui = { { 'Style', 'text', 'string', g.promptstring } listui{:}};
-end;
+end
 [tmp tmp2 allobj] = supergui( fig, geometry, geomvert, listui{:} );
 
 % assign value to listbox
@@ -86,7 +86,7 @@ set(lstbox, 'value', g.initialvalue);
 if ~isempty(g.listsize)
 	pos = get(gcf, 'position');
 	set(gcf, 'position', [ pos(1:2) g.listsize]);
-end;
+end
 h = findobj( 'parent', fig, 'tag', 'listboxvals');
 	
 okornot = 0;
@@ -101,18 +101,18 @@ try,
     if iscell(g.liststring)
         for index = vals
             strval = [ strval ' ' g.liststring{index} ];
-        end;
+        end
     else
         for index = vals
             strval = [ strval ' ' g.liststring(index,:) ];
-        end;
+        end
     end;        
 	strval = strval(2:end);
 	if strcmp(get(fig, 'userdata'), 'cancel')
 		okornot = 0;
 	else
 		okornot = 1;
-	end;
+	end
 	close(fig);
     drawnow;
-end;
+end

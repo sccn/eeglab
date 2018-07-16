@@ -247,7 +247,7 @@ elseif plotit
       maxc=max(pvs)
    else 
       maxc=100; 
-   end;
+   end
 
    pvstr=sprintf('Total pv: %3.1f%%',pv);
    tx=text(-0.9,-0.6,pvstr);

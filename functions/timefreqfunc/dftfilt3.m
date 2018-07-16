@@ -95,7 +95,7 @@ function [wavelet,cycles,freqresol,timeresol] = dftfilt3( freqs, cycles, srate, 
 % Rey fixed all input parameter sorting. 
 if nargin < 3
     error(' A minimum of 3 arguments is required');
-end;
+end
 numargin=length(varargin);
 if rem(numargin,2)
     error('There is an uneven number key/value inputs. You are probably missing a keyword or its value.')
@@ -140,8 +140,8 @@ elseif length(cycles) == 2
          %cycles=logspace(log10(cycles(1)),log10(cycles(2)),length(freqs)); %rey
     else
         cycles = linspace(cycles(1), cycles(2), length(freqs));
-    end;
-end;
+    end
+end
 if cycles==0
     type='sinus';
 end
@@ -181,8 +181,8 @@ for index = 1:length(freqs)
         wavelet(index,:) = win .* hanning(winsize)'; 
         %wavelet{index} = win .* hanning(winsize)';
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    end;
-end;
+    end
+end
 
 
 

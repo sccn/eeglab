@@ -35,7 +35,7 @@ function chanlocs = readeetraklocs( filename )
     if nargin < 1
         help readeetraklocs;
         return;
-    end;
+    end
     
     % read location file
     % ------------------
@@ -49,15 +49,15 @@ function chanlocs = readeetraklocs( filename )
         if ischar(locs{ind,1}) 
             if strcmpi(locs{ind,1}, 'Labels')
                 indlabels = ind;
-            end;
+            end
             if strcmpi(locs{ind,1}, 'Positions')
                 indpos = ind;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     if isempty(indpos) | isempty(indlabels)
         error('Could not find ''Labels'' or ''Position'' tag in electrode file');
-    end;
+    end
     
     % get positions
     % -------------
@@ -71,6 +71,6 @@ function chanlocs = readeetraklocs( filename )
         chanlocs(index).X      = positions{index,1};
         chanlocs(index).Y      = positions{index,2};
         chanlocs(index).Z      = positions{index,3};
-    end;
+    end
         
     chanlocs = convertlocs(chanlocs, 'cart2all');

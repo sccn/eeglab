@@ -38,18 +38,18 @@ function eeglab_error
               tmplasterr, tmp.stack(1).name, tmp.stack(1).line);
         else
             tmplasterr = sprintf('%s,\n', tmplasterr);
-        end;
+        end
         errordlg2(tmplasterr, header);
     else
         try
             tmp = lasterror;
             if length(tmp.stack(1).name) && all(tmp.stack(1).name(1:3) == 'ft_')
                 ft_error = true;
-            end;
+            end
             tmperr = [ 'EEGLAB error in function ' tmp.stack(1).name '() at line ' int2str(tmp.stack(1).line) ':' 10 10 lasterr ];
         catch % Matlab 5 and when the stack is empty
             tmperr = [ 'EEGLAB error:' 10 10 tmplasterr ];
-        end;
+        end
         if ~ft_error
             tmperr = [ tmperr 10 10 'If you think this is a bug, please submit a detailed ' 10 ...
                                     'description of how to reproduce the problem (and upload' 10 ...
@@ -58,9 +58,9 @@ function eeglab_error
             tmperr = [ tmperr 10 10 'This is a problem with FIELDTRIP. The Fieldtrip version you downloaded' 10 ...
                                     'is corrupted. Please manually replace Fieldtrip with an earlier version' 10 ...
                                     'and/or email the Fieldtrip developpers so they can fix the issue.' ];
-        end;
+        end
         errordlg2(tmperr, header);
-    end;
+    end
     
     function [ val str header ] = testeeglaberror(str)
         header = 'EEGLAB error';
@@ -73,6 +73,6 @@ function eeglab_error
                 funcname = str(1:indendofline(1)-1);
                 str = str(indendofline(1)+1:end);
                 header = [ funcname ' error' ];
-            end;
+            end
         catch
-        end;
+        end

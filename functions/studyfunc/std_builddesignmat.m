@@ -40,7 +40,7 @@
 
 function [tmpdmat,colLabels,catflag] = std_builddesignmat(design, trialinfo, expanding)
 
-if nargin < 3, expanding = 0; end;
+if nargin < 3, expanding = 0; end
 ntrials = length(trialinfo);
 varindx = 1:length(design.variable);
 
@@ -137,8 +137,8 @@ if expanding == 1
              nCols = nCols+length(design.variable(varindx(iCol)).value);
         else
             nCols = nCols+1;
-        end;
-    end;
+        end
+    end
     
     tmpdmatExpanded = NaN(size(tmpdmat,1),nCols);
     countCol = 0;
@@ -172,16 +172,16 @@ if expanding == 1
                 elseif isnumeric(design.variable(varindx(iCol)).value{iUnique})
                     colLabels{countCol} = [design.variable(varindx(iCol)).label '-' int2str(design.variable(varindx(iCol)).value{iUnique})];
                 end
-            end;
+            end
         else
             countCol = countCol+1;
             colLabels{countCol} = design.variable(varindx(iCol)).label;
             tmpdmatExpanded(:,countCol) = tmpdmat(:,iCol);
-        end;
-    end;
+        end
+    end
 
     tmpdmat = tmpdmatExpanded;
-end;
+end
 
 tmpdmat(:,end+1) = 1;
 colLabels{numel(colLabels)+1}  = 'constant';

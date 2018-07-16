@@ -40,7 +40,7 @@ if ~exist('fform')
 end
 if nargin < 4
     transp = 'normal';
-end;
+end
 
 if strcmpi(transp,'normal')
     if strcmpi(class(A), 'mmo')
@@ -51,39 +51,39 @@ if strcmpi(transp,'normal')
         % -----------------------
         [fpath1 fname1 ext1] = fileparts(fname);
         [fpath2 fname2 ext2] = fileparts(A.data.Filename);
-        if isempty(fpath1), fpath1 = pwd; end;
+        if isempty(fpath1), fpath1 = pwd; end
         
         fname1 = fullfile(fpath1, [fname1 ext1]);
         fname2 = fullfile(fpath2, [fname2 ext2]);
         if ~isempty(findstr(fname1, fname2))
             disp('Warning: raw data already saved in memory mapped file (no need to resave it)');
             return;
-        end;
+        end
         
         fid = fopen(fname,'wb',fform);
-        if fid == -1, error('Cannot write output file, check permission and space'); end;
+        if fid == -1, error('Cannot write output file, check permission and space'); end
         if size(A,3) > 1
             for ind = 1:size(A,3)
                 tmpdata = A(:,:,ind);
                 fwrite(fid,tmpdata,'float');
-            end;
+            end
         else
             blocks = [ 1:round(size(A,2)/10):size(A,2)];
-            if blocks(end) ~= size(A,2), blocks = [blocks size(A,2)]; end;
+            if blocks(end) ~= size(A,2), blocks = [blocks size(A,2)]; end
             for ind = 1:length(blocks)-1
                 tmpdata = A(:, blocks(ind):blocks(ind+1));
                 fwrite(fid,tmpdata,'float');
-            end;
-        end;
+            end
+        end
     else
         fid = fopen(fname,'wb',fform);
-        if fid == -1, error('Cannot write output file, check permission and space'); end;
+        if fid == -1, error('Cannot write output file, check permission and space'); end
         fwrite(fid,A,'float');
-    end;
+    end
 else
     % save transposed
     for ind = 1:size(A,1)
         fwrite(fid,A(ind,:),'float');
-    end;
+    end
 end;    
 fclose(fid);

@@ -56,10 +56,10 @@ end;
 popup=0;
 if nargin < 3
 	popup = 1;
-end;
+end
 if nargin < 4
 	percent=5;
-end;
+end
 
 % pop up window
 % -------------
@@ -67,17 +67,17 @@ if (nargin < 3 & typeproc==1)
 	promptstr    = { 'Channel number:'; 'Trim percentage (each end):' };
 	inistr       = { '1';'5' };
 	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
-	if length( result ) == 0 return; end;
+	if length( result ) == 0 return; end
 	cnum   	     = eval( [ '[' result{1} ']' ] ); % the brackets allow processing Matlab arrays
 	percent      = eval( [ '[' result{2} ']' ] );
 elseif (nargin < 3 & typeproc==0)
 	promptstr    = { 'Component number:'; 'Trim percentage (each end):' };
 	inistr       = { '1'; '5' };
 	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
-	if length( result ) == 0 return; end;
+	if length( result ) == 0 return; end
 	cnum    	 = eval( [ '[' result{1} ']' ] ); % the brackets allow processing Matlab arrays
     percent      = eval( [ '[' result{2} ']' ] );
-end;
+end
 
 if length(cnum) ~= 1 | (cnum-floor(cnum)) ~= 0
 	error('pop_signalstat(): Channel/component number must be a single integer');
@@ -112,9 +112,9 @@ end;
 % -------
 outstr = '';
 if ~popup
-    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
-    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
-end;
+    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end
+    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end
+end
 
 % return the string command
 % -------------------------
@@ -127,20 +127,20 @@ if ~isempty(EEG.chanlocs)
     if isfield(EEG.chanlocs, 'theta')
         if ~isempty(EEG.chanlocs(cnum).theta)
             plotloc = 1;
-        end;
-    end;
-end;
+        end
+    end
+end
 if plotloc
     if typeproc == 1
         com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs );', outstr);
     else
         com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs(EEG.icachansind) );', outstr);
-    end;
+    end
 else
     com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2);', outstr);
-end;
+end
 
 eval(com)	
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 
 return;

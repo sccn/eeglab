@@ -38,7 +38,7 @@ function [STUDY, allitc, alltimes, allfreqs, pgroup, pcond, pinter, events] = st
 if nargin < 2
     help std_erpimageplot;
     return;
-end;
+end
 
 events = [];
 STUDY = pop_erpimparams(STUDY, 'default');
@@ -73,18 +73,18 @@ else
     
     if ~isempty(opt.topotime) && ~isempty(opt.topotrial)
         error('Cannot plot topography when ERP-image is in trial concatenation mode');
-    end;
+    end
     if ~isempty(opt.trialrange)
         error('Cannot select trial range when ERP-image is in trial concatenation mode');
-    end;
+    end
     if strcmpi(opt.groupstats, 'on') || strcmpi(opt.condstats, 'on') 
         disp('Warning: cannot perform statistics when ERP-image is in trial concatenation mode');
-    end;
+    end
     
     % options
     if ~isempty(opt.colorlimits), options = { 'caxis' opt.colorlimits opt.erpimageopt{:} };
     else                          options = { 'cbar' 'on' opt.erpimageopt{:}  };
-    end;
+    end
     
     if ~isempty(opt.channels)
         [STUDY allerpimage alltimes alltrials tmp events] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'erpim', 'subject', opt.subject, ...
@@ -103,16 +103,16 @@ else
         for iCond = 1:length(allconditions)
             for iGroup = 1:length(allgroups)
                 tmpevents = events{iCond, iGroup};
-                if isempty(tmpevents), tmpevents = zeros(1, size(allerpimage{iCond, iGroup},2)); end;
+                if isempty(tmpevents), tmpevents = zeros(1, size(allerpimage{iCond, iGroup},2)); end
                 subplot(length(allconditions), length(allgroups), (iCond-1)*length(allgroups) + iGroup);
                 
                 % use color scale for last plot
                 if ~isempty(opt.colorlimits) && iCond == length(allconditions) && iGroup == length(allgroups)
                     options = { options{:} 'cbar' 'on' };
-                end;
+                end
                 erpimage(allerpimage{iCond, iGroup}, tmpevents, alltimes, alltitles{iCond, iGroup}, params.smoothing, params.nlines, options{:});
-            end;
-        end;
+            end
+        end
         
     else
         for cInd = 1:length(opt.clusters)
@@ -131,16 +131,16 @@ else
             for iCond = 1:length(allconditions)
                 for iGroup = 1:length(allgroups)
                     tmpevents = events{iCond, iGroup};
-                    if isempty(tmpevents), tmpevents = zeros(1, size(allerpimage{iCond, iGroup},2)); end;
+                    if isempty(tmpevents), tmpevents = zeros(1, size(allerpimage{iCond, iGroup},2)); end
                     subplot(length(allconditions), length(allgroups), (iCond-1)*length(allgroups) + iGroup);
                     
                     % use color scale for last plot
                     if ~isempty(opt.colorlimits) && iCond == length(allconditions) && iGroup == length(allgroups)
                         options = { options{:} 'cbar' 'on' };
-                    end;
+                    end
                     erpimage(allerpimage{iCond, iGroup}, tmpevents, alltimes, alltitles{iCond, iGroup}, params.smoothing, params.nlines, options{:});
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end

@@ -54,17 +54,17 @@ function [indata, times, events, boundevents] = eegrej( indata, regions, times, 
 if nargin < 2
    help eegrej;
 	return;
-end;
+end
 
 if nargin < 4
     events = [];
-end;
+end
 
 if ischar(indata)
   datlen = evalin('base', [ 'size(' indata ',2)' ]);
 else
   datlen = size(indata, 2);
-end;
+end
 
 reject = zeros(1,datlen);
 
@@ -76,12 +76,12 @@ regions = sortrows(sort(regions,2));        % Sorting regions %regions = sort(re
 for i=2:size(regions,1)
     if regions(i-1,2) >= regions(i,1)
         regions(i,1) = regions(i-1,2)+1;
-    end;
-end;
+    end
+end
 
 for i=1:size(regions,1)
     reject(regions(i,1):regions(i,2)) = 1;
-end;
+end
 
 % recompute event times
 % ---------------------
@@ -99,15 +99,15 @@ if ~isempty(events)
         
         % remove events within the selected regions
         eventLatencies( oriEventLatencies > regions(i,1) ) = eventLatencies( oriEventLatencies > regions(i,1) )-(regions(i,2)-regions(i,1)+1);
-        %if i == 24, dsafds; end;
+        %if i == 24, dsafds; end
         
-    end;
+    end
     for iEvent = 1:length(events)
         events(iEvent).latency = eventLatencies(iEvent);
-    end;
+    end
         
     events(rmEvent) = [];
-end;
+end
 
 % generate boundaries latencies
 % -----------------------------
@@ -120,12 +120,12 @@ for iRegion1=1:size(regions,1)
         selectedEvent = oriEvents(rejectedEvents{iRegion1});
         indBound      = strmatch('boundary', { selectedEvent.type });
         duration(iRegion1) = duration(iRegion1) + sum([selectedEvent(indBound).duration]);
-    end;
+    end
     
 	for iRegion2=iRegion1+1:size(regions)
 		boundevents(iRegion2) = boundevents(iRegion2) - (regions(iRegion1,2)-regions(iRegion1,1)+1);
-    end;
-end;
+    end
+end
 boundevents = boundevents+0.5;
 boundevents(boundevents < 0) = [];
 
@@ -153,7 +153,7 @@ if ischar(indata)
   evalin('base', 'delete(''tmpeegrej.fdt'')');  
 else
   indata(:,reject == 1) = [];
-end;
+end
 times = times * size(indata,2) / length(reject);
 
 % merge boundary events
@@ -163,11 +163,11 @@ for iBound = length(boundevents):-1:2
         duration(iBound-1) = duration(iBound-1)+duration(iBound);
         boundevents(iBound) = [];
         duration(iBound) = [];
-    end;
-end;
+    end
+end
 if ~isempty(boundevents) && boundevents(end) > size(indata,2)
     boundevents(end) = [];
-end;
+end
 
 % insert boundary events
 % ----------------------
@@ -176,13 +176,13 @@ for iRegion1=1:length(boundevents)
         events(end+1).type = 'boundary';
         events(end).latency  = boundevents(iRegion1);
         events(end).duration = duration(iRegion1);
-    end;
-end;
+    end
+end
 if ~isempty(events) && isfield(events, 'latency')
     events([ events.latency ] < 1) = [];
     alllatencies = [ events.latency ];
     [tmp, sortind] = sort(alllatencies);
     events = events(sortind);
-end;
+end
 
 return;

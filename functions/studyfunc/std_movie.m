@@ -48,7 +48,7 @@ function [STUDY, M] = std_movie(STUDY, ALLEEG, varargin);
 if nargin < 2
     help std_specplot;
     return;
-end;
+end
 
 [opt addparams ] = finputcheck( varargin, ...
                              { 'erspfreq'    'real'    [] [];
@@ -59,10 +59,10 @@ end;
                                'limitend'    'real'    [] [];
                                'moviemode'   'string'  { 'ersptime','erp','spec' } 'spec' }, 'std_movie', 'ignore');
 
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 tmpchanlocs =  ALLEEG(1).chanlocs;
-if isempty(opt.channels), opt.channels = { tmpchanlocs.labels }; end;
-if ~strcmpi(opt.moviemode, 'spec'), error('Only spec has been implemented so far'); end;
+if isempty(opt.channels), opt.channels = { tmpchanlocs.labels }; end
+if ~strcmpi(opt.moviemode, 'spec'), error('Only spec has been implemented so far'); end
 
 % read data once
 % --------------
@@ -71,22 +71,22 @@ STUDY = std_specplot(STUDY, ALLEEG, 'channels', opt.channels, 'topofreq', [10 11
 % find first data channel with info
 % ---------------------------------
 for cind = 1:length(STUDY.changrp)
-    if ~isempty(STUDY.changrp(cind).specdata), break; end;
-end;
+    if ~isempty(STUDY.changrp(cind).specdata), break; end
+end
 
 % generate movie
 % --------------
 if isempty(opt.movieparams), 
     opt.movieparams(1) = STUDY.changrp(cind).specfreqs(1);
     opt.movieparams(2) = STUDY.changrp(cind).specfreqs(end);
-end;
+end
 if length(opt.movieparams) == 2
     opt.movieparams(3) = opt.movieparams(2);
     opt.movieparams(2) = STUDY.changrp(cind).specfreqs(2)-STUDY.changrp(cind).specfreqs(1);
-end;
+end
 if length(opt.movieparams) == 3
     opt.movieparams = [opt.movieparams(1):opt.movieparams(2):opt.movieparams(3)];
-end;
+end
 
 % find limits
 % -----------
@@ -95,30 +95,30 @@ if isempty(opt.limitbeg)
     opt.limitbeg = [ min(specdata{1}) max(specdata{1}) ];
     [STUDY specdata] = std_specplot(STUDY, ALLEEG, 'channels', opt.channels, 'topofreq', opt.movieparams(end)); close;
     opt.limitend = [ min(specdata{1}) max(specdata{1}) ];
-end;
+end
 lowlims  = linspace(opt.limitbeg(1), opt.limitend(1), length(opt.movieparams));
 highlims = linspace(opt.limitbeg(2), opt.limitend(2), length(opt.movieparams));
 
 % limits at specific frequencies
 % ------------------------------
 if ~isempty(opt.freqslim)
-    if opt.freqslim(1)   ~= opt.movieparams(1)  , opt.freqslim = [ opt.movieparams(1) opt.freqslim ]; end;
-    if opt.freqslim(end) ~= opt.movieparams(end), opt.freqslim = [ opt.freqslim opt.movieparams(end) ]; end;
+    if opt.freqslim(1)   ~= opt.movieparams(1)  , opt.freqslim = [ opt.movieparams(1) opt.freqslim ]; end
+    if opt.freqslim(end) ~= opt.movieparams(end), opt.freqslim = [ opt.freqslim opt.movieparams(end) ]; end
 
     for ind = 1:length(opt.freqslim)
         [tmp indf(ind)] = min(abs(opt.freqslim(ind) - opt.movieparams));
         [STUDY specdata] = std_specplot(STUDY, ALLEEG, 'channels', opt.channels, 'topofreq', opt.movieparams(indf(ind))); close;
         minimum(ind) = min(specdata{1});
         maximum(ind) = max(specdata{1});
-    end;
+    end
     indf(1)  = 0;
     lowlims  = [ ];
     highlims = [ ];
     for ind = 2:length(opt.freqslim)
         lowlims  = [lowlims linspace(minimum(ind-1), minimum(ind), indf(ind)-indf(ind-1)) ];
         highlims = [highlims linspace(maximum(ind-1), maximum(ind), indf(ind)-indf(ind-1)) ];
-    end;
-end;
+    end
+end
 
 % make movie
 % ----------
@@ -128,5 +128,5 @@ for ind = 1:length(opt.movieparams)
     set(gcf, 'position', [pos(1) pos(2) pos(3)*2 pos(4)*2]);
     M(ind) = getframe(gcf);
     close;
-end;
+end
 figure; axis off; movie(M);

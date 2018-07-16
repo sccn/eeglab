@@ -4,7 +4,7 @@ if nargin < 3
     var = [];
     values = [];
     cat = 0;
-end;
+end
 if isstruct(varlist)
     
     indVar = 1;
@@ -14,18 +14,18 @@ if isstruct(varlist)
         indVar = strmatch(var, varlist.factors, 'exact');
     else
         indVar = 1;
-    end;
+    end
     
     if isempty(values)
         if varlist.numerical(indVar)
             indCat = 2; % continous
             indVal = [1:length(varlist.factorvals{indVar})];
-        end;
+        end
     else
         for iVal = 1:length(values)
             indVal(iVal) = std_indvarmatch(values{iVal}, varlist.factorvals{indVar});
-        end;
-    end;
+        end
+    end
     
     curValues = encodevals(varlist.factorvals{indVar});
     cb_selectfact  = 'pop_addindepvar(''selectfact'', gcbf);';
@@ -49,16 +49,16 @@ if isstruct(varlist)
         {w h [1 10] [1 1] } ...
         };
     
-    for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;
+    for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end
     streval = [ 'pop_studydesign2(''selectdesign'', gcf);' ];
     [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'title', 'Add variable', 'geom', geometry, 'userdata', varlist);
-    if isempty(tmp), var = []; cat = 0; return, end;
+    if isempty(tmp), var = []; cat = 0; return, end
         
     var    = usrdat.factors{ result.lbfact0 };
     values = usrdat.factorvals{ result.lbfact0 }(result.lbval0 );
     cat    = result.vartype;
     if cat == 2, cat = 0; end; % continuous
-    if ~cat, values = []; end;
+    if ~cat, values = []; end
     
 elseif ischar(varlist)
     com = varlist;
@@ -68,7 +68,7 @@ elseif ischar(varlist)
             
         case 'vartype', % select a specific ind. var. (update value listboxes)
             val1  = get(findobj(fig, 'tag', 'vartype'), 'value');
-            if val1 == 1, enableFlag = 'on'; else enableFlag = 'off'; end;
+            if val1 == 1, enableFlag = 'on'; else enableFlag = 'off'; end
             set(findobj(fig, 'tag', 'text1'  ),  'enable', enableFlag);  
             set(findobj(fig, 'tag', 'lbval0') ,  'enable', enableFlag);
             set(findobj(fig, 'tag', 'combine1'), 'enable', enableFlag);
@@ -83,7 +83,7 @@ elseif ischar(varlist)
                 set(findobj(fig, 'tag', 'vartype'), 'value', 2, 'string', 'Categorical variable|Continuous variable', 'ListboxTop', length(usrdat.factorvals{val1})); 
             else
                 set(findobj(fig, 'tag', 'vartype'), 'value', 1, 'string', 'Categorical variable', 'ListboxTop', length(usrdat.factorvals{val1})); 
-            end;
+            end
             pop_addindepvar('vartype', fig);
                 
             return;
@@ -95,11 +95,11 @@ elseif ischar(varlist)
             if length(vals) == 1
                 warndlg2('You need to select several values to combine them');
                 return;
-            end;
+            end
             if ~iscell(usrdat.factorvals{val1})
                 warndlg2('Cannot combine values from numerical variables');
                 return;
-            end;
+            end
             % combine values for string and integers
             if ischar(usrdat.factorvals{val1}{1}) || iscell(usrdat.factorvals{val1}{1})
                 tmpcell = {};
@@ -108,27 +108,27 @@ elseif ischar(varlist)
                         tmpcell = { tmpcell{:} usrdat.factorvals{val1}{indCell}{:} };
                     else
                         tmpcell = { tmpcell{:} usrdat.factorvals{val1}{indCell} };
-                    end;
-                end;
+                    end
+                end
                 usrdat.factorvals{val1}{end+1} = unique_bc(tmpcell);
             else
                 usrdat.factorvals{val1}{end+1} = unique_bc([ usrdat.factorvals{val1}{vals} ]);
-            end;
+            end
             set(findobj(fig, 'tag', 'lbval0'), 'string', encodevals(usrdat.factorvals{val1}));
             set(fig, 'userdata', usrdat);
             pop_addindepvar('vartype', fig);
                 
             return;            
-    end;
-end;
+    end
+end
 
 function res = strmatchmult(a, b)
-    if isempty(b), res = []; return; end;
+    if isempty(b), res = []; return; end
     res = zeros(1,length(a));
     for index = 1:length(a)
         tmpi = std_indvarmatch(a{index}, b);
         res(index) = tmpi(1); % in case there is a duplicate
-    end;
+    end
     %[tmp ind] = mysetdiff(b, a);
     %res = setdiff_bc([1:length(b)], ind);
 
@@ -137,14 +137,14 @@ function cellarray = mysort(cellarray)
             % also there is no reason the order should be different
     if ~isempty(cellarray) && ischar(cellarray{1})
         cellarray = sort(cellarray);
-    end;
+    end
 
 function [cellout inds ] = mysetdiff(cell1, cell2);
     if (~isempty(cell1) && ischar(cell1{1})) || (~isempty(cell2) && ischar(cell2{1}))
          [ cellout inds ] = setdiff_bc(cell1, cell2);
     else [ cellout inds ] = setdiff_bc([ cell1{:} ], [ cell2{:} ]);
          cellout = mattocell(cellout);
-    end;
+    end
     
 % encode string an numerical values for list boxes
 function cellout = encodevals(cellin)
@@ -160,9 +160,9 @@ function cellout = encodevals(cellin)
                 cellout{index} =  cellin{index}{1};
                 for indcell = 2:length(cellin{index})
                     cellout{index} = [ cellout{index} ' & ' cellin{index}{indcell} ];
-                end;
-            end;
-        end;
+                end
+            end
+        end
     else
         for index = 1:length(cellin)
             if length(cellin{index}) == 1
@@ -171,7 +171,7 @@ function cellout = encodevals(cellin)
                 cellout{index} =  num2str(cellin{index}(1));
                 for indcell = 2:length(cellin{index})
                     cellout{index} = [ cellout{index} ' & ' num2str(cellin{index}(indcell)) ];
-                end;
-            end;
-        end;
-    end;
+                end
+            end
+        end
+    end

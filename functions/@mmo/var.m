@@ -22,10 +22,10 @@ function sumval = var(obj,flag,dim)
     
     if nargin < 2
         flag = 0;
-    end;
+    end
     if nargin < 3
         dim = 1;
-    end;
+    end
     
     meanvalsq = mean(obj,dim).^2;
     
@@ -37,8 +37,8 @@ function sumval = var(obj,flag,dim)
         ss.subs{dim} = index;
         tmpdata = subsref(obj, ss);
         sumval = sumval + tmpdata.*tmpdata - meanvalsq;
-    end;
+    end
     if isempty(flag) || flag == 0
          sumval = sumval/(size(obj,dim)-1);
     else sumval = sumval/size(obj,dim);
-    end;
+    end

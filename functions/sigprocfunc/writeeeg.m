@@ -82,34 +82,34 @@ for i=1:2:length( varargin )
         HDR = setfield(HDR, varargin{i}(1:ind-1), {1}, varargin{i}(ind+1:end), val);
     else
         HDR = setfield(HDR, varargin{i}, varargin{i+1});
-    end;
-end;
+    end
+end
 
 HDR.FileName = filename;
 HDR.FLAG.UCAL = 0;
 
 % select file format 
-if ~isfield(HDR, 'EVENT'),                     HDR.EVENT = []; end;
-if ~isfield(HDR, 'TYPE'),                      HDR.TYPE ='GDF'; end;
-if ~isfield(HDR, 'Patient')                    HDR.Patient = []; end;
-if ~isfield(HDR.Patient, 'ID')                 HDR.Patient.ID = 'P0000'; end;
-if ~isfield(HDR.Patient, 'Sex')                HDR.Patient.Sex = 0; end;
-if ~isfield(HDR.Patient, 'Name')               HDR.Patient.Name = 'Anonymous'; end;
+if ~isfield(HDR, 'EVENT'),                     HDR.EVENT = []; end
+if ~isfield(HDR, 'TYPE'),                      HDR.TYPE ='GDF'; end
+if ~isfield(HDR, 'Patient')                    HDR.Patient = []; end
+if ~isfield(HDR.Patient, 'ID')                 HDR.Patient.ID = 'P0000'; end
+if ~isfield(HDR.Patient, 'Sex')                HDR.Patient.Sex = 0; end
+if ~isfield(HDR.Patient, 'Name')               HDR.Patient.Name = 'Anonymous'; end
 if ~isfield(HDR.Patient, 'Handedness')         HDR.Patient.Handedness = 0; end;% 	unknown, 1:left, 2:right, 3: equal
 
 % description of recording device 
-if ~isfield(HDR,'Manufacturer')                HDR.Manufacturer = []; end;
-if ~isfield(HDR.Manufacturer, 'Name'),         HDR.Manufacturer.Name = 'BioSig/EEGLAB'; end;
-if ~isfield(HDR.Manufacturer, 'Model'),        HDR.Manufacturer.Model = 'writeeeg.m'; end;
-if ~isfield(HDR.Manufacturer, 'Version'),      HDR.Manufacturer.Version = '$Revision'; end;
-if ~isfield(HDR.Manufacturer, 'SerialNumber'), HDR.Manufacturer.SerialNumber = '00000000'; end;
+if ~isfield(HDR,'Manufacturer')                HDR.Manufacturer = []; end
+if ~isfield(HDR.Manufacturer, 'Name'),         HDR.Manufacturer.Name = 'BioSig/EEGLAB'; end
+if ~isfield(HDR.Manufacturer, 'Model'),        HDR.Manufacturer.Model = 'writeeeg.m'; end
+if ~isfield(HDR.Manufacturer, 'Version'),      HDR.Manufacturer.Version = '$Revision'; end
+if ~isfield(HDR.Manufacturer, 'SerialNumber'), HDR.Manufacturer.SerialNumber = '00000000'; end
 
 % recording identification, max 80 char.
 if ~isfield(HDR,'RID')                         HDR.RID = ''; end; %StudyID/Investigation [consecutive number];
-if ~isfield(HDR,'REC')                         HDR.REC = []; end;
+if ~isfield(HDR,'REC')                         HDR.REC = []; end
 if ~isfield(HDR.REC, 'Hospital')               HDR.REC.Hospital = ''; end; 
-if ~isfield(HDR.REC, 'Techician')              HDR.REC.Techician = ''; end;
-if ~isfield(HDR.REC, 'Equipment')              HDR.REC.Equipment = ''; end;
+if ~isfield(HDR.REC, 'Techician')              HDR.REC.Techician = ''; end
+if ~isfield(HDR.REC, 'Equipment')              HDR.REC.Equipment = ''; end
 if ~isfield(HDR.REC, 'IPaddr')             	   HDR.REC.IPaddr = [127,0,0,1]; end; % IP address of recording system 	
 if ~isfield(HDR.Patient, 'Weight')             HDR.Patient.Weight = 0; end; 	% undefined 
 if ~isfield(HDR.Patient, 'Height')             HDR.Patient.Height = 0; end;	% undefined 
@@ -122,19 +122,19 @@ if ~isfield(HDR.Patient,'AlcoholAbuse')        HDR.Patient.AlcoholAbuse = 0; end
 if ~isfield(HDR.Patient,'DrugAbuse')           HDR.Patient.DrugAbuse = 0; end;  	   %	0: unknown 1: NO 2: YES 
     
 % recording time [YYYY MM DD hh mm ss.ccc]
-if ~isfield(HDR,'T0')                          HDR.T0 = clock; end;
-if ~isfield(HDR,'SPR')                         HDR.SPR = size(x,2); end;
-if  isfield(HDR,'label')                       HDR.Label = HDR.label; HDR = rmfield(HDR, 'label'); end;
-if HDR.SPR > 1000, HDR.SPR = round(srate); end;
+if ~isfield(HDR,'T0')                          HDR.T0 = clock; end
+if ~isfield(HDR,'SPR')                         HDR.SPR = size(x,2); end
+if  isfield(HDR,'label')                       HDR.Label = HDR.label; HDR = rmfield(HDR, 'label'); end
+if HDR.SPR > 1000, HDR.SPR = round(srate); end
    
 % channel identification, max 80 char. per channel
 if ~isfield(HDR,'Label')
     for i = 1:size(x,1)
         chans{i} = sprintf('Chan %d', i);
-    end;
+    end
     HDR.Label = chans;
-end;
-if iscell(HDR.Label), HDR.Label = char(HDR.Label{:}); end;
+end
+if iscell(HDR.Label), HDR.Label = char(HDR.Label{:}); end
 
 if ~isempty(HDR.EVENT) 
     if ~isfield(HDR.EVENT, 'TYP')
@@ -147,28 +147,28 @@ if ~isempty(HDR.EVENT)
         if isfield(HDR.EVENT, 'type')
             for index = 1:length(HDR.EVENT)
                 HDR.EVENT(index).type = num2str(HDR.EVENT(index).type);
-            end;
+            end
             alltypes = unique_bc( { HDR.EVENT.type } );
-        end;
+        end
         for i = 1:length(HDR.EVENT)
             if isfield(HDR.EVENT, 'type')
                 ind = str2num(HDR.EVENT(i).type);
                 if isempty(ind)
                     ind = strmatch(HDR.EVENT(i).type, alltypes, 'exact');
-                end;
+                end
                 EVENT.TYP(i) = ind;
-            end;
+            end
             if isfield(HDR.EVENT, 'latency')
                 EVENT.POS(i) = HDR.EVENT(i).latency;
-            end;
+            end
             if isfield(HDR.EVENT, 'duration')
                 EVENT.DUR(i) = HDR.EVENT(i).duration;
-            end;
-        end;
+            end
+        end
         HDR.EVENT = EVENT;
         HDR.EVENT.SampleRate = srate;
-    end;
-end;
+    end
+end
 
 % reformat data
 HDR.NRec = size(x,3);
@@ -189,7 +189,7 @@ elseif ~strcmpi(HDR.TYPE, 'GDF') % GDF can save events
     x(end,round(HDR.EVENT.POS')) = HDR.EVENT.TYP';
     HDR.Label = char(HDR.Label, 'Status');
     HDR.EVENT.POS = [];
-end;
+end
 
 % number of channels
 HDR.NS = size(x,1);
@@ -197,11 +197,11 @@ HDR.NS = size(x,1);
 if ~isfield(HDR,'Transducer')
     HDR.Transducer = cell(1,HDR.NS);
     HDR.Transducer(:) = { '' };
-end;
+end
 if ~isfield(HDR,'PhysDim')
     HDR.PhysDim = cell(1,HDR.NS);
     HDR.PhysDim(:) = { 'uV' };
-end;
+end
 
 % Duration of one block in seconds
 HDR.SampleRate = srate;

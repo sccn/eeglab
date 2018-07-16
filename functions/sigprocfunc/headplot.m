@@ -179,7 +179,7 @@ if ischar(values)
     if nargin < 3
         help headplot;
         return;
-    end;
+    end
     eloc_file = arg1;
     spline_file = varargin{1};
         
@@ -193,7 +193,7 @@ if ischar(values)
                                        'comment'      'string'  []                         '' }, 'headplot', 'ignore');
     if ischar(g), 
         error(g);
-    end;
+    end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Open electrode file
@@ -203,13 +203,13 @@ if ischar(values)
     
     % channels to plot
     % ----------------
-    if isempty(g.plotchans), g.plotchans = [1:length(eloc_file)]; end;
-    if ~isfield(g.chaninfo, 'nosedir'),     g.chaninfo(1).nosedir     = '+x'; end;
+    if isempty(g.plotchans), g.plotchans = [1:length(eloc_file)]; end
+    if ~isfield(g.chaninfo, 'nosedir'),     g.chaninfo(1).nosedir     = '+x'; end
     indices = intersect_bc(g.plotchans, indices);
     
     % if ICA select subset of channels if necessary
     % ---------------------------------------------
-    if ~isfield(g.chaninfo, 'icachansind'), g.chaninfo(1).icachansind = 1:length(eloc_file); end;
+    if ~isfield(g.chaninfo, 'icachansind'), g.chaninfo(1).icachansind = 1:length(eloc_file); end
     if strcmpi(g.ica, 'on'), 
         rmchans2 = setdiff_bc( g.chaninfo.icachansind, indices ); % channels to remove (non-plotted) 
         newinds = 1:length(g.chaninfo.icachansind);     
@@ -218,12 +218,12 @@ if ischar(values)
         for index = 1:length(rmchans2)
             chanind = find(g.chaninfo.icachansind == rmchans2(index));
             allrm   = [ allrm chanind ];
-        end;
+        end
 
         newinds(allrm) = [];        
         indices   = newinds;
         eloc_file = eloc_file(g.chaninfo.icachansind); 
-    end;
+    end
     
     fprintf('Headplot: using existing XYZ coordinates\n');
     ElectrodeNames = strvcat({ eloc_file.labels });
@@ -246,11 +246,11 @@ if ischar(values)
         elseif strcmpi(lower(g.chaninfo.nosedir), '-x')
             rotate = pi;
         else rotate = pi/2;
-        end;
+        end
         allcoords = (Yeori + Xeori*sqrt(-1))*exp(sqrt(-1)*rotate);
         Xeori     = imag(allcoords);
         Yeori     = real(allcoords);
-    end;
+    end
     newcoords = [ Xeori Yeori Zeori ];
     
     %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 -1.57], 100, -[6 0 46]);
@@ -291,7 +291,7 @@ if ischar(values)
             end
             G(i,:) = gx;
         end
-    end;
+    end
     fprintf('Calculating splining matrix...\n')
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -329,7 +329,7 @@ if ischar(values)
     else 
         fprintf('Using original electrode locations on head...\n');
         newElect = newcoords;
-    end;
+    end
     
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % plot mesh and electrodes only
@@ -340,13 +340,13 @@ if ischar(values)
             newElect(:,2) = Ye;
             newElect(:,3) = Ze;        
             POS(index1,:) = spherePOS; HeadCenter = [ 0 0 0 ];
-        end;
+        end
         plotmesh(TRI1, POS, NORM);
         plotelecopt.labelflag = 0;
         plotelec(newElect, ElectrodeNames, HeadCenter, plotelecopt);
         rotate3d;
         return;
-    end;
+    end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Calculate g(x) for sphere mesh vertices
@@ -370,8 +370,8 @@ if ischar(values)
         try,  save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', ...
                    'ElectrodeNames', 'indices', 'comment', 'headplot_version', 'transform');
         catch, error('headplot: save spline file error, out of space or file permission problem');
-        end;
-    end;
+        end
+    end
     tmpinfo = dir(spline_file);
     fprintf('Saving (%dk) file %s\n',round(tmpinfo.bytes/1000), spline_file);
     return
@@ -449,7 +449,7 @@ else
        'material'     'string'            [] 'dull';
        'orilocs'    { 'string','struct' } [] '';            
        'labels'     'integer' [0 1 2]        0 }, 'headplot');
-   if ischar(g) error(g); end;
+   if ischar(g) error(g); end
    plotelecopt.electrodes3d = g.electrodes3d;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -463,8 +463,8 @@ else
   if exist('indices'), 
       try,
           values = values(indices);
-      catch, error('problem of index or electrode number with splinefile'); end;
-  end;
+      catch, error('problem of index or electrode number with splinefile'); end
+  end
   enum = length(values);
   if enum ~= length(Xe)
 	  close;
@@ -487,8 +487,8 @@ else
           transmat  = traditionaldipfit( g.transform ); % arno
           newElect  = transmat*[ newElect ones(size(newElect,1),1)]';
           newElect  = newElect(1:3,:)';
-      end;
-  end;
+      end
+  end
   
   % --------------
   % load mesh file
@@ -545,7 +545,7 @@ else
       'FaceColor','interp', 'cdatamapping', 'direct', 'tag', 'mesh');    %%%%%%%%% Plot scalp map %%%%%%%%%
   if exist('NORM') == 1 & ~isempty(NORM)
       set(p1, 'vertexnormals', NORM);
-  end;
+  end
   
   if ~isempty(TRI2)
       FCmap = [g.colormap; g.colormap(end,:); FaceColor; FaceColor; FaceColor];
@@ -555,7 +555,7 @@ else
                  'FaceVertexCdata',W(:)); %%%%%%%% Plot face and lower head %%%%%%
   else 
       p2 = [];
-  end;
+  end
 
   axis([-125 125 -125 125 -125 125])
   axis off % hide axis frame
@@ -589,7 +589,7 @@ else
     if ~isempty(p2)
         set(p2,'DiffuseStrength',.6,'SpecularStrength',0,...
                'AmbientStrength',.4,'SpecularExponent',5)
-    end;
+    end
     set(p1,'DiffuseStrength',.6,'SpecularStrength',0,...
     'AmbientStrength',.3,'SpecularExponent',5)
     lighting phong  % all this gives a matte reflectance
@@ -733,7 +733,7 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
             if strcmpi(opt.electrodes3d, 'off')
                 line([newElect(i,1) HeadCenter(1)],[newElect(i,2) HeadCenter(2)],...
                      [newElect(i,3) HeadCenter(3)],'color',opt.MarkerColor,'linewidth',1);
-            end;
+            end
             if opt.labelflag == 1        % plot electrode numbers
                 t=text(newNames(i,1),newNames(i,2),newNames(i,3),int2str(i)); 
                 set(t,'Color',opt.NamesColor,'FontSize',opt.NamesSize,'FontWeight','bold',...
@@ -768,8 +768,8 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
                         'phong', 'ambientstrength', 0.3);
 
                     cylnderHeight = 1;
-                    if newElect(i,3) < 10, addZ = -30; else addZ = 0; end;
-                    if newElect(i,3) < -20, addZ = -60; else addZ = 0; end;
+                    if newElect(i,3) < 10, addZ = -30; else addZ = 0; end
+                    if newElect(i,3) < -20, addZ = -60; else addZ = 0; end
                     xx   = newElect(i,1) - ( newElect(i,1)-HeadCenter(1) ) * 0.01 * cylnderHeight;
                     xxo1 = newElect(i,1) + ( newElect(i,1)-HeadCenter(1) ) * 0.01 * cylnderHeight;
                     yy   = newElect(i,2) - ( newElect(i,2)-HeadCenter(2) ) * 0.01 * cylnderHeight;
@@ -777,11 +777,11 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
                     zz   = newElect(i,3) - ( newElect(i,3)-HeadCenter(3)-addZ ) * 0.01 * cylnderHeight;
                     zzo1 = newElect(i,3) + ( newElect(i,3)-HeadCenter(3)-addZ ) * 0.01 * cylnderHeight;
                     [xc yc zc] = adjustcylinder2( handles, [xx yy zz], [xxo1 yyo1 zzo1] );
-                end;
+                end
                 
             end
         end
-    end;
+    end
     
 % get mesh information
 % --------------------
@@ -811,7 +811,7 @@ if ~isstruct(meshfile)
         %try, TRI2 = load('mheadnewtri2.txt', '-ascii'); catch, end; % lower head
         %index1 = load('mheadnewindex1.txt', '-ascii');
         meshfile.center = load('mheadnewcenter.txt', '-ascii');
-    end;
+    end
 end;        
         
 if isfield(meshfile, 'vol')
@@ -822,7 +822,7 @@ if isfield(meshfile, 'vol')
     else
         POS  = meshfile.vol.bnd(1).pnt;
         TRI1 = meshfile.vol.bnd(1).tri;
-    end;
+    end
 elseif isfield(meshfile, 'bnd')
     POS  = meshfile.bnd(1).pnt;
     TRI1 = meshfile.bnd(1).tri;
@@ -836,12 +836,12 @@ elseif isfield(meshfile, 'vertices')
     TRI1 = meshfile.faces;
 else
     error('Unknown Matlab mesh file');
-end;
-if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end;
-if exist('TRI2')   ~= 1, TRI2 = []; end;
-if exist('NORM')   ~= 1, NORM = []; end;
-if exist('TRI1')   ~= 1, error('Variable ''TRI1'' not defined in mesh file'); end;
-if exist('POS')    ~= 1, error('Variable ''POS'' not defined in mesh file'); end;
-if exist('center') ~= 1, center = [0 0 0]; disp('Using [0 0 0] for center of head mesh'); end;
+end
+if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end
+if exist('TRI2')   ~= 1, TRI2 = []; end
+if exist('NORM')   ~= 1, NORM = []; end
+if exist('TRI1')   ~= 1, error('Variable ''TRI1'' not defined in mesh file'); end
+if exist('POS')    ~= 1, error('Variable ''POS'' not defined in mesh file'); end
+if exist('center') ~= 1, center = [0 0 0]; disp('Using [0 0 0] for center of head mesh'); end
 newPOS = POS(index1,:);
 

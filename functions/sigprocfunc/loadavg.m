@@ -58,17 +58,17 @@ function [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg( FILENAM
 if nargin<1 
 	help loadavg 
 	return; 
-end;
+end
 
 if nargin < 2 || version == 2
     disp('Reading using method 2');
     [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg_bcl( FILENAME );
     signal = signal';
     return;
-end;
+end
 disp('Reading using method 1');
 
-%if isempty(find(FILENAME=='.')) FILENAME=[FILENAME '.eeg']; end;
+%if isempty(find(FILENAME=='.')) FILENAME=[FILENAME '.eeg']; end
 
 BOOL='int16';
 ULONG='int32'; 
@@ -77,7 +77,7 @@ fid=fopen(FILENAME,'r','ieee-le');
 if fid<0
 	fprintf(2,['Error LOADEEG: File ' FILENAME ' not found\n']);  
 	return;
-end;
+end
 
 S_nsweeps_offset_total    = 362;
 S_nsweeps_offset_accepted = 364;
@@ -108,7 +108,7 @@ packed_sizeof_SETUP       = 900;
 fseek(fid, S_nsweeps_offset_accepted, 'bof');  	nsweeps = fread(fid, 1, 'ushort');
 if nsweeps == 0
     fseek(fid, S_nsweeps_offset_total, 'bof');  	nsweeps = fread(fid, 1, 'ushort');
-end;
+end
 fseek(fid, S_pnts_offset, 'bof');  		pnts = fread(fid, 1, 'ushort');
 fseek(fid, S_nchans_offset, 'bof');	  	chan = fread(fid, 1, 'ushort');
 fseek(fid, S_variance_offset, 'bof');  	variance_flag = fread(fid, 1, 'uchar');
@@ -123,7 +123,7 @@ fprintf('sampling rate (Hz)         : %f\n', rate);
 fprintf('xmin (s)                   : %f\n', xmin);
 fprintf('xmax (s)                   : %f\n', xmax);
 fprintf('number of trials (s)       : %d\n', nsweeps);
-if nsweeps == 0, nsweeps = 1; end;
+if nsweeps == 0, nsweeps = 1; end
 
 % read electrode configuration
 % ----------------------------
@@ -131,7 +131,7 @@ fprintf('Electrode configuration\n');
 for elec = 1:chan
    	channel_label_tmp = fread(fid, 10, 'uchar');
 	chan_names(elec,:) = channel_label_tmp';
-	for index = 2:9 if chan_names(elec,index) == 0 chan_names(elec,index)=' '; end; end;
+	for index = 2:9 if chan_names(elec,index) == 0 chan_names(elec,index)=' '; end; end
 	erp = fread(fid, 47-10, 'uchar');
 	baseline(elec) = fread(fid, 1, 'ushort');
 	erp = fread(fid, 10, 'uchar');
@@ -141,7 +141,7 @@ for elec = 1:chan
 	fprintf('%s: baseline: %d\tsensitivity: %f\tcalibration: %f\n', ...
             char(chan_names(elec,1:4)), baseline(elec), sensitivity(elec), calib(elec));
 	factor(elec) = calib(elec) * sensitivity(elec) / 204.8;
-end;
+end
 
 xsize    = chan * pnts;
 buf_size = chan * pnts ;			% size in shorts
@@ -160,12 +160,12 @@ for elec = 1:chan
 	% --------------------------------
 	fseek(fid, 5, 'cof');
 	signal(:, elec) = fread(fid, pnts, 'float32') * factor(elec) / nsweeps;
-end;
+end
 
 if variance_flag
 	for elec = 1:chan
 		variance(:, elec) = fread(fid, pnts, 'float32');
-	end;
+	end
 else
 	variance = 'novariance';
 end;	
@@ -240,8 +240,8 @@ function [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg_bcl(FILE
 			for index = 2:9
 				if chan_names(elec,index) == 0
 					chan_names(elec,index)=' ';
-				end;
-			end;
+				end
+			end
 			fseek(fid, 61, 'cof');%skip 61 bytes
 			electrodes(elec).calib= fread(fid, 1, 'float32');
 
@@ -254,7 +254,7 @@ function [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg_bcl(FILE
 			%     
 			% 	fprintf('%s: baseline: %d\tsensitivity: %f\tcalibration: %f\n', ...
 			% char(chan_names(elec,1:4)), baseline(elec), sensitivity(elec), electrodes(elec).calib);
-		end;
+		end
 
 		signal   = zeros(pnts, chan);
 		variance = zeros(pnts, chan);
@@ -269,15 +269,15 @@ function [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg_bcl(FILE
 			fseek(fid, 5, 'cof');
 			signal(:, elec) =fread(fid, pnts, 'float32')*electrodes(elec).calib/nsweeps;
 
-		end;
+		end
 
 		if variance_flag
 			for elec = 1:chan
 				variance(:, elec) = fread(fid, pnts, 'float32')*electrodes(elec).calib/nsweeps;% not sure
-			end;
+			end
 		else
 			variance = 'novariance';
-		end;
+		end
 		%%
 		if ~strcmpi(chanNameList{1},'all')
 			chanIDX=ones(1,chan);

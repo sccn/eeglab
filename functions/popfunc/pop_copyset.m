@@ -45,16 +45,16 @@ com = '';
 if nargin < 2
 	help pop_copyset;
 	return;
-end;
+end
 if isempty(ALLEEG)
 	error(['Pop_copyset error: cannot copy' 10 'single dataset mode']);
 end;	
 if set_in == 0
     error('Pop_copyset error: cannot copy dataset'); return;
-end;
+end
 if isempty(ALLEEG(set_in).data)
     error('Pop_copyset error: cannot copy empty dataset'); return;
-end;
+end
 
 if nargin < 3
 	% which set to save
@@ -62,9 +62,9 @@ if nargin < 3
 	promptstr    = { 'Index of the new dataset:'};
 	inistr       = { int2str(set_in+1) };
 	result       = inputdlg2( promptstr, 'Copy dataset -- pop_copyset()', 1,  inistr, 'pop_copyset');
-	if size( result ) == 0, EEG = []; CURRENTSET = 0; return; end;
+	if size( result ) == 0, EEG = []; CURRENTSET = 0; return; end
 	set_out   	 = eval( result{1} );
-end;
+end
 ALLEEG = eeg_store(ALLEEG, eeg_retrieve(ALLEEG, set_in), set_out);
 EEG    = eeg_retrieve(ALLEEG, set_out);
 CURRENTSET = set_out;

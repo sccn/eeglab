@@ -133,14 +133,14 @@ if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
 end
 if (1+trans)*hicutoff/nyq > 1
     error('high cutoff frequency too close to Nyquist frequency');
-end;
+end
 
 if locutoff > 0 & hicutoff > 0,    % bandpass filter
     if revfilt
         fprintf('eegfilt() - performing %d-point notch filtering.\n',filtorder);
     else
         fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
-    end;
+    end
     fprintf('            If a message, ''Matrix is close to singular or badly scaled,'' appears,\n');
     fprintf('            then Matlab has failed to design a good filter. As a workaround, \n');
     fprintf('            for band-pass filtering, first highpass the data, then lowpass it.\n');
@@ -183,8 +183,8 @@ if revfilt
         error('Cannot reverse filter using ''fir1'' option');
     else
         m = ~m;
-    end;
-end;
+    end
+end
 
 if strcmp(firtype, 'firls')
     filtwts = firls(filtorder,f,m); % get FIR filter coefficients
@@ -197,13 +197,13 @@ for e = 1:epochs                % filter each epoch, channel
             if causal
                  smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filter(  filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
             else smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
-            end;
+            end
         catch,
             if causal
                  smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filter(  filtwts,1,double(data(c,(e-1)*epochframes+1:e*epochframes)));
             else smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(filtwts,1,double(data(c,(e-1)*epochframes+1:e*epochframes)));
-            end;
-        end;
+            end
+        end
         if epochs == 1
             if rem(c,20) ~= 0, fprintf('.');
             else               fprintf('%d',c);

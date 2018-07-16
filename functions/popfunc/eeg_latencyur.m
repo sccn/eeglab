@@ -42,7 +42,7 @@ function latout = eeg_latencyur( events, latin );
     if nargin < 2
         help eeg_latencyur;
         return;
-    end;
+    end
 
     boundevents = { events.type };
     latout      = latin;
@@ -53,9 +53,9 @@ function latout = eeg_latencyur( events, latin );
             for index  = indbound'
                 lowerVals = find(latout > events(index).latency);
                 latout(lowerVals) = latout(lowerVals)-events(index).duration;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     return;
     
     % build array of 0 and 1 (0 no data)
@@ -72,9 +72,9 @@ function latout = eeg_latencyur( events, latin );
                 currentdur = events(index).duration;
                 points(round(currentlat):round(currentlat+currentdur)) = 0;
                 currentadd = currentadd + currentdur;
-            end;
-        end;
-    end;
+            end
+        end
+    end
     8;
     
     

@@ -102,11 +102,11 @@ if icacomp == 0
         	case 'NO', disp('Operation cancelled'); return;   
         	case 'YES', [ EEG com ] = pop_runica(EEG);
     	end % switch
-	end;
+	end
 end;	
 if exist('reject') ~= 1
     reject = 1;
-end;
+end
 
 if nargin < 3
     
@@ -145,19 +145,19 @@ if nargin < 3
     result = inputgui( geometry,uilist,'pophelp(''pop_jointprob'');', figname);
     
     size_result  = size( result );
-    if size_result(1) == 0, locthresh = []; globthresh = []; return; end;
+    if size_result(1) == 0, locthresh = []; globthresh = []; return; end
     elecrange    = result{1};
     locthresh    = result{2};
     globthresh   = result{3};
-    switch result{4}, case 1, vistype=0; otherwise, vistype=1; end;
+    switch result{4}, case 1, vistype=0; otherwise, vistype=1; end
     superpose    = result{5};
     reject       = result{6};
     
-end;
+end
 
-if ~exist('vistype'  ,'var'), vistype   = 0; end;
-if ~exist('reject'   ,'var'), reject    = 0; end;
-if ~exist('superpose','var'), superpose = 1; end;
+if ~exist('vistype'  ,'var'), vistype   = 0; end
+if ~exist('reject'   ,'var'), reject    = 0; end
+if ~exist('superpose','var'), superpose = 1; end
 
 if ischar(elecrange) % convert arguments if they are in text format 
     calldisp = 1;
@@ -166,7 +166,7 @@ if ischar(elecrange) % convert arguments if they are in text format
 	globthresh = eval( [ '[' globthresh ']' ]  );
 else
     calldisp = 0;
-end;
+end
 
 if exist('plotflag','var') && ismember(plotflag,[1,0])
     calldisp = plotflag;
@@ -185,7 +185,7 @@ if icacomp == 1
     tmpdata = eeg_getdatact(EEG);
     if isempty(EEG.stats.jpE)
 		[ EEG.stats.jpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.jpE, 1); 
-	end;
+	end
 	[ tmp rejEtmp ] = jointprob( tmpdata(elecrange,:,:), locthresh, EEG.stats.jpE(elecrange,:), 1); 
     rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
@@ -200,7 +200,7 @@ else
 	fprintf('Computing joint probability for components...\n');
     if isempty(EEG.stats.icajpE)
 		[ EEG.stats.icajpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.icajpE, 1); 
-	end;
+	end
 	[ tmp rejEtmp ] = jointprob( tmpdata(elecrange,:), locthresh, EEG.stats.icajpE(elecrange,:), 1); 
     rejE    = zeros(size(tmpdata,1), size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
@@ -210,7 +210,7 @@ else
 	tmpdata2 = reshape(tmpdata2, size(tmpdata2,1), size(tmpdata2,2)*size(tmpdata2,3));
 	[ EEG.stats.icajp  rej] = jointprob( tmpdata2, globthresh, EEG.stats.icajp, 1); 
 	clear tmpdata2;
-end;
+end
 rej = rej' | max(rejE, [], 1);
 fprintf('%d/%d trials marked for rejection\n', sum(rej), EEG.trials);
 
@@ -220,7 +220,7 @@ if calldisp
 	        			macrorejE = 'EEG.reject.rejjpE';
 	    else			macrorej  = 'EEG.reject.icarejjp';
 	        			macrorejE = 'EEG.reject.icarejjpE';
-	    end;
+	    end
 		colrej = EEG.reject.rejjpcol;
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
 
@@ -249,7 +249,7 @@ else
 	rej = rejtmp | rej;
 	nrej =  sum(rej);
 	fprintf('%d trials marked for rejection\n', nrej);
-end;
+end
 if ~isempty(rej)
 	if icacomp	== 1
 		EEG.reject.rejjp = rej;
@@ -257,17 +257,17 @@ if ~isempty(rej)
 	else
 		EEG.reject.icarejjp = rej;
 		EEG.reject.icarejjpE = rejE;
-	end;
+	end
     if reject
         EEG = pop_rejepoch(EEG, rej, 0);
-    end;
-end;
+    end
+end
 nrej = sum(rej);
 
 com = [ com sprintf('EEG = pop_jointprob(EEG,%s);', ...
 		vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject, vistype, [],plotflag})) ]; 
 if nargin < 3 & nargout == 2
 	locthresh = com;
-end;
+end
 
 return;

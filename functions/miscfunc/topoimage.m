@@ -90,7 +90,7 @@ elseif times==1,
     return
 else
     freqs = 0;
-end;
+end
 
 axcolor= get(0,'DefaultAxesXcolor'); % find what the default x-axis color is
 plotfile = 'topoimage.ps';
@@ -165,12 +165,12 @@ end
     fprintf('topoimage(): min channel index (%g) < 1.\n',...
                        min(channels));
     return
-  end;
+  end
   if length(channels)>MAXPLOTDATACHANS,
     fprintf('topoimage(): not set up to plot more than %d channels.\n',...
                        MAXPLOTDATACHANS);
     return
-  end;
+  end
 %
 %%%%%%%%%%%%% Extend the size of the plotting area in the window %%%%%%%%%%%%
 %
@@ -188,7 +188,7 @@ end
     % channames = zeros(MAXPLOTDATACHANS,4);
     % for c=1:length(channels),
     %     channames(c,:)= sprintf('%4d',channels(c));
-    % end;
+    % end
     channames = num2str(channels(:));                   %%CJH
   else,
     if ~ischar(channels)
@@ -199,7 +199,7 @@ end
     if chid <3,
         fprintf('topoimage(): cannot open file %s.\n',channels);
         return
-    end;
+    end
     channames = fscanf(chid,'%s',[4 MAXPLOTDATACHANS]);
     channames = channames';
        [r c] = size(channames);
@@ -207,9 +207,9 @@ end
         for j=1:c
             if channames(i,j)=='.',
                 channames(i,j)=' ';
-            end;
-        end;
-    end;
+            end
+        end
+    end
   end; % setting channames
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot and label specified channels %%%%%%%%%%%%%%%%%%
@@ -229,7 +229,7 @@ chans = length(channels);
     if cid <3,
         fprintf('topoimage: cannot open file %s.\n',colors);
         return
-    end;
+    end
     colors = fscanf(cid,'%s',[3 MAXPLOTDATAEPOCHS]);
     colors = colors';
        [r c] = size(colors);
@@ -237,13 +237,13 @@ chans = length(channels);
         for j=1:c
             if colors(i,j)=='.',
                 colors(i,j)=' ';
-            end;
-        end;
-    end;
+            end
+        end
+    end
   else % use default color order (no yellow!)
      colors =['r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  '];
      colors = [colors; colors];  % make > 64 available
-  end;
+  end
   for c=1:length(colors)   % make white traces black unless axis color is white
     if colors(c,1)=='w' & axcolor~=[1 1 1]
          colors(c,1)='k';
@@ -262,14 +262,14 @@ chans = length(channels);
       fprintf( ...
        'topoimage: limits should be 0 or an array [xmin xmax ymin ymax zmin zmax].\n');
       return
-    end;
+    end
     xmin = limits(1);
     xmax = limits(2);
     ymin = limits(3);
     ymax = limits(4);
     zmin = limits(5);
     zmax = limits(6);
-  end;
+  end
 
   if xmax == 0 & xmin == 0,
     x = [0:1:times-1];
@@ -279,7 +279,7 @@ chans = length(channels);
     dx = (xmax-xmin)/(times-1);
     x=xmin*ones(1,times)+dx*(0:times-1); % compute x-values
     xmax = xmax*times/times;
-  end;
+  end
   if xmax<=xmin,
       fprintf('topoimage() - xmax must be > xmin.\n')
       return

@@ -42,7 +42,7 @@ if channamefile ~= 0 & channamefile ~= '0'	% read file of channel names
       channamefile = 0;
    else
       fprintf('Channamefile %s opened\n',channamefile);
-   end;
+   end
    if errorcode==0,
       channames = fscanf(chid,'%s',[6 MAXCHANS]);
       channames = channames';
@@ -51,18 +51,18 @@ if channamefile ~= 0 & channamefile ~= '0'	% read file of channel names
 	    for j=1:c
 		if channames(i,j)=='.',
 		   channames(i,j)=' ';
-		end;
-	    end;
-	 end;
+		end
+	    end
+	 end
          % fprintf('%d channel names read from file.\n',r);
 	 if (r>chans)
 	    fprintf('Using first %d names.\n',chans);
 	    channames = channames(1:chans,:);
-	 end;
+	 end
 	 if (r<chans)
 	    fprintf('Only %d channel names read.\n',r);
-	 end;
-   end;
+	 end
+   end
 end
 if channamefile == 0 | channamefile == '0', % plot channel numbers
    channames = [];
@@ -73,7 +73,7 @@ if channamefile == 0 | channamefile == '0', % plot channel numbers
 	 numeric = ['  '  int2str(c)];
       end
       channames = [channames;numeric];
-   end;
+   end
 end; % setting channames
 
 channames = str2mat(channames, ' ');	% add padding element to Y labels

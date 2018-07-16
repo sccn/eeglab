@@ -42,7 +42,7 @@ function trialinfo = std_combtrialinfo(datasetinfo, inds, trials)
 if nargin < 1
     help std_combtrialinfo;
     return;
-end;
+end
 
 % Inds or subjectname
 if isnumeric(inds)
@@ -65,8 +65,8 @@ if ~isfield(datasetinfo, 'trialinfo')
 else
     % check if duration field is present
     for iDat = inds(:)'
-        if ~isfield(datasetinfo(iDat).trialinfo, 'duration') datasetinfo(iDat).trialinfo(1).duration = []; end;
-    end;
+        if ~isfield(datasetinfo(iDat).trialinfo, 'duration') datasetinfo(iDat).trialinfo(1).duration = []; end
+    end
     try
         trialinfo = [ datasetinfo(inds(:)').trialinfo ];
     catch
@@ -86,7 +86,7 @@ else
         trialinfo = [ datasetinfo(inds(:)').trialinfo ];
     end
     nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
-end;
+end
 
 for iDat = 1:length(inds)
     % Checking if field do not exist or if exist and is empty
@@ -101,4 +101,4 @@ for iDat = 1:length(inds)
     if ~isfield(trialinfo,'session') || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).session}))     
         [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
     end
-end;
+end

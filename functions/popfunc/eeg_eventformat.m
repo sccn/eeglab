@@ -67,7 +67,7 @@ if nargin < 2
    return;
 end;	
 
-if exist('fields') ~= 1, fields = { 'type', 'latency' }; end;
+if exist('fields') ~= 1, fields = { 'type', 'latency' }; end
 
 [event eventfield] = eeg_epochformat( event, format, fields);
 

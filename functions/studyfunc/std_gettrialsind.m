@@ -61,7 +61,7 @@ eventvals = [];
 if nargin < 1
     help std_gettrialsind;
     return; 
-end;
+end
 
 % Input stuff
 try
@@ -73,10 +73,10 @@ try
         for i = 1:2:numel(varsin)
             queryvars.(varsin{i}) = varsin{i+1};
         end
-    else queryvars = []; end;
+    else queryvars = []; end
 catch
     disp('std_gettrialsind() error: calling convention {''key'', value, ... } error'); return;
-end;
+end
 
 % Checking if fisrt entry is string or struct
 if isstruct(filename)
@@ -104,35 +104,35 @@ for iVar = 1 :  length(varnames)
     if ischar(indvarvals) && (isempty(indvarvals) || any(indvarvals == '<'))
         if ischar(dattrials{1})
             error(sprintf('Type error - excepting string numerical for field %s in data file', varnames{iVar}));
-        end;
+        end
         if isempty(indvarvals)
             hits(:,iVar) = ~cellfun(@isempty, dattrials);
         else % test for range
             indGreater = find(indvarvals == '<');
-            if length(indGreater) ~= 1, error('Undefined range for continuous var'); end;
-            if any(indvarvals == '='), error('<= or =< not allowed for continuous var'); end;
+            if length(indGreater) ~= 1, error('Undefined range for continuous var'); end
+            if any(indvarvals == '='), error('<= or =< not allowed for continuous var'); end
             lowerBound = str2num(indvarvals(1:indGreater-1));
             upperBound = str2num(indvarvals(indGreater+1:end));
             hits(:,iVar) = cellfun(@(x)(~isempty(x)&&x>lowerBound&&x<upperBound), dattrials);
-        end;
+        end
         dattrials(~hits(:,iVar)) = { NaN };
         eventvals(end+1,:) = [ dattrials{:} ];
     else
         % case of categorical variable
         if ischar(dattrials{1})
-            if ischar(indvarvals) indvarvals = { indvarvals }; end;
+            if ischar(indvarvals) indvarvals = { indvarvals }; end
             if ~iscell(indvarvals)
                 error(sprintf('Type error - excepting numerical values for field %s', varnames{iVar}));
-            end;
+            end
             for iVal = 1:length(indvarvals) % programmed for speed - AD
                 hits(strmatch(indvarvals{iVal}, dattrials, 'exact'),iVar) = 1;
                 % older version not compatible with old Matlab
                 % hits(:,iVar) = hits(:,iVar) | strncmp(indvarvals{iVal}, dattrials, 100)';
-            end;
+            end
         else
             if iscell(indvarvals)
                 error(sprintf('Type error - excepting string values for field %s', varnames{iVar}));
-            end;
+            end
             excl = find(cellfun(@isempty, dattrials));
             if ~(isempty(excl))
                 [dattrials{excl}] = deal(nan);
@@ -140,9 +140,9 @@ for iVar = 1 :  length(varnames)
             dattrials = [ dattrials{:} ];
             for iVal = 1:length(indvarvals) % programmed for speed - AD
                 hits(:,iVar) = hits(:,iVar) | [ dattrials == indvarvals(iVal) ]';
-            end;
-        end;
-    end;
+            end
+        end
+    end
 end
 
 % Retreiving overlapped values
@@ -150,4 +150,4 @@ hits = sum(hits,2);
 trialindsx = find(hits == length(varnames));
 if ~isempty(eventvals)
     eventvals  = eventvals(:,trialindsx);
-end;
+end

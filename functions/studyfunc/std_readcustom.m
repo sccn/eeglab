@@ -53,14 +53,14 @@ function [ returndata ] = std_readcustom(STUDY, ALLEEG, fileext, varargin)
     if nargin < 2
         help std_sift;
         return;
-    end;
+    end
     
     [g arguments] = finputcheck(varargin, { 'design'     'integer'           [] STUDY.currentdesign;
                                             'datafield'  { 'string' 'cell' } [] {};
                                             'eegfield'   'string'            [] '';
                                             'eegrmdata'  'string'            { 'on' 'off' } 'on' }, 'std_sift', 'mode', 'ignore');
-    if ischar(g), error(g); end;
-    if ~iscell(g.datafield), g.datafield = { g.datafield }; end;
+    if ischar(g), error(g); end
+    if ~iscell(g.datafield), g.datafield = { g.datafield }; end
     
     % Scan design and save data
     % -------------------------
@@ -75,12 +75,12 @@ function [ returndata ] = std_readcustom(STUDY, ALLEEG, fileext, varargin)
             for index = 1:length(STUDY.design(g.design).cell)
                 condind = std_indvarmatch( STUDY.design(g.design).cell(index).value{1}, STUDY.design(g.design).variable(1).value);
                 grpind  = std_indvarmatch( STUDY.design(g.design).cell(index).value{2}, STUDY.design(g.design).variable(2).value);
-                if isempty(STUDY.design(g.design).variable(1).value), condind = 1; end;
-                if isempty(STUDY.design(g.design).variable(2).value), grpind  = 1; end;
+                if isempty(STUDY.design(g.design).variable(1).value), condind = 1; end
+                if isempty(STUDY.design(g.design).variable(2).value), grpind  = 1; end
                 if cInd == condind && gInd == grpind
                     cellInds = [ cellInds index ];
-                end;
-            end;
+                end
+            end
             
             desset = STUDY.design(g.design).cell(cellInds);
             clear EEGTMP data;
@@ -92,23 +92,23 @@ function [ returndata ] = std_readcustom(STUDY, ALLEEG, fileext, varargin)
                 % put data in EEG structure if necessary
                 if ~isempty(g.eegfield)
                     EEGTMPTMP = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', cellInds(iDes));
-                    if strcmpi(g.eegrmdata, 'on'), EEGTMPTMP.data = []; EEGTMPTMP.icaact = []; end;
+                    if strcmpi(g.eegrmdata, 'on'), EEGTMPTMP.data = []; EEGTMPTMP.icaact = []; end
                     EEGTMPTMP.(g.eegfield) = tmpData;
                     EEGTMP(iDes) = EEGTMPTMP;
                 elseif length(g.datafield) == 1
-                    if ~ischar(tmpData.(g.datafield{1})), error('Field content cannot be a string'); end;
+                    if ~ischar(tmpData.(g.datafield{1})), error('Field content cannot be a string'); end
                     data(iDes,:,:,:) = tmpData.(g.datafield{1});
                 elseif isfield(tmpData, 'data') && isempty(g.datafield)
                     data(iDes,:,:,:) = tmpData.data;
                 else
                     data(iDes) = tmpData;
-                end;
-            end;
+                end
+            end
             data = shiftdim(data,1);
             if ~isempty(g.eegfield)
                 returndata{cInd,gInd} = EEGTMP;
             else
                 returndata{cInd,gInd} = data;
-            end;
-        end;
-    end;
+            end
+        end
+    end

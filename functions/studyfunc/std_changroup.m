@@ -48,7 +48,7 @@ function STUDY = std_changroup(STUDY, ALLEEG, alllocs, interp);
 
 if nargin < 4
     interp = 'off';
-end;
+end
 
 % union of all channel structures
 % -------------------------------
@@ -56,19 +56,19 @@ inputloc = 0;
 if nargin >= 3
     if ~isempty(alllocs)
         inputloc = 1;
-    end;
-end;
+    end
+end
 if ~inputloc
     alllocs = eeg_mergelocs(ALLEEG.chanlocs);
-end;
+end
 
 % create group for each electrode
 % -------------------------------
 if isstruct(alllocs)
     alllocs = { alllocs.labels };
-end;
+end
 STUDY.changrp = [];
 for indc = 1:length(alllocs)
     STUDY.changrp(indc).name     = alllocs{indc};
     STUDY.changrp(indc).channels = { alllocs{indc} };
-end;
+end

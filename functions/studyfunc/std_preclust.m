@@ -112,7 +112,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     if nargin < 2
         help std_preclust;
         return;
-    end;
+    end
     
     if nargin == 2
         cluster_ind = 1; % default to clustering the whole STUDY 
@@ -126,19 +126,19 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     xmax  = ALLEEG(STUDY.datasetinfo(1).index).xmax;
     for index = 1:length(STUDY.datasetinfo)
         ind = STUDY.datasetinfo(index).index;
-        if srate ~= ALLEEG(ind).srate, error(sprintf('Dataset %d does not have the same sampling rate as dataset 1', ind)); end;
+        if srate ~= ALLEEG(ind).srate, error(sprintf('Dataset %d does not have the same sampling rate as dataset 1', ind)); end
         if ~all([ ALLEEG.trials ] == 1)
-            if abs(xmin-ALLEEG(ind).xmin) > 1e-7, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
-            if abs(xmax-ALLEEG(ind).xmax) > 1e-7, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
-            if pnts ~= ALLEEG(ind).pnts, error(sprintf('Dataset %d does not have the same number of point as dataset 1', ind)); end;
-        end;
-    end;
+            if abs(xmin-ALLEEG(ind).xmin) > 1e-7, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end
+            if abs(xmax-ALLEEG(ind).xmax) > 1e-7, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end
+            if pnts ~= ALLEEG(ind).pnts, error(sprintf('Dataset %d does not have the same number of point as dataset 1', ind)); end
+        end
+    end
     
     % Get component indices that are part of the cluster 
     % --------------------------------------------------
     if isempty(cluster_ind)
         cluster_ind = 1;
-    end;
+    end
     if length(cluster_ind) ~= 1
         error('Only one cluster can be sub-clustered. To sub-cluster multiple clusters, first merge them.');
     end
@@ -166,7 +166,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     % -----------------------------------------------
     if update_flag % dipole information is used to select components
         error('Update flag is obsolete');
-    end;
+    end
     
     % scan all commands
     % -----------------
@@ -177,7 +177,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         % decode inputs
         % -------------
         strcom = varargin{index}{1};
-        if any(strcom == 'X'), disp('character ''X'' found in command'); end;
+        if any(strcom == 'X'), disp('character ''X'' found in command'); end
         %defult values
         npca = NaN;
         norm = 1;
@@ -224,7 +224,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         if strcmpi(strcom, 'scalp'),           scalpmodif = 'none';
         elseif strcmpi(strcom, 'scalpLaplac'), scalpmodif = 'laplacian';
         else                                   scalpmodif = 'gradient';
-        end;
+        end
         
         % check that all datasets are in preclustering for current design
         % ---------------------------------------------------------------
@@ -234,7 +234,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             error( [ 'Some datasets not included in preclustering' 10 ... 
                      'because of partial STUDY design. You need to' 10 ...
                      'use a STUDY design that includes all datasets.' ]);
-        end;
+        end
         
         switch strcom
             
@@ -260,7 +260,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     icomp = STUDY.cluster(cluster_ind).comps(si);
                     fprintf('Pre-clustering array row %d, adding interpolated scalp maps for dataset %d component %d...\n', si, idat, icomp);
                     data(si,:) = std_readtopo(ALLEEG, idat, icomp, scalpmodif, 'preclust');
-                end;
+                end
                 
             % select ica equivalent dipole locations
             % --------------------------------------
@@ -329,7 +329,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 [STUDY data] = std_readersp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'freqrange', freqrange, 'measure', strcom);
                 data = reshape(data{1}, [size(data{1},1)*size(data{1},2) size(data{1},3)])';
                 
-        end;
+        end
 
         % adjust number of PCA values
         % ---------------------------
@@ -393,8 +393,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             normval = std(clustdatatmp(:,1));
             for icol = 1:size(clustdatatmp,2)
                 clustdatatmp(:,icol) = clustdatatmp(:,icol) /normval;
-            end;
-        end;
+            end
+        end
         if weight ~= 1
             clustdata(:,end+1:end+size(clustdatatmp,2)) = clustdatatmp * weight;
         else
@@ -403,7 +403,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         
         if strcmpi(strcom, 'itc') || strcmpi(strcom, 'ersp')
             erspmode = 'already_computed';
-        end;
+        end
     end
     
     % Compute a second PCA of the already PCA'd data if there are too many PCA dimensions.
@@ -419,7 +419,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     STUDY.etc.preclust.preclustparams = varargin;
     if isfield(STUDY.etc.preclust, 'preclustcomps')
         STUDY.etc.preclust = rmfield(STUDY.etc.preclust, 'preclustcomps');
-    end;
+    end
     
     % The preclustering level is equal to the parent cluster that the components belong to.
     if ~isempty(cluster_ind)
@@ -451,13 +451,13 @@ function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
 % the function below checks the precense of the centroid field
 function cluster = checkcentroidfield(cluster, varargin);
     for kk = 1:length(cluster)
-        if ~isfield('centroid', cluster(kk)), cluster(kk).centroid = []; end;
+        if ~isfield('centroid', cluster(kk)), cluster(kk).centroid = []; end
         for vi = 1:length(varargin)
             if isfield(cluster(kk).centroid, varargin{vi})
                 cluster(kk).centroid = rmfield(cluster(kk).centroid, varargin{vi});
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     % rapid filtering for ERP (from std_plotcurve)
 % -----------------------

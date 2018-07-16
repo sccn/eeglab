@@ -1,14 +1,14 @@
 function obj3 = binaryopp(f, obj1, obj2)
 
-    if isa(obj2, 'mmo'), tmpobj = obj2; obj2 = obj1; obj1 = tmpobj; clear tmpobj; end;
+    if isa(obj2, 'mmo'), tmpobj = obj2; obj2 = obj1; obj1 = tmpobj; clear tmpobj; end
     if ~isequal(size(obj1), size(obj2)) && prod(size(obj2)) ~= 1
         error('Matrix dimensions must agree.');
-    end;
+    end
     data1 = memmapfile(obj1.dataFile, 'writable', obj1.writable, 'format', { 'single' obj1.dimensions 'x' });
     if isa(obj2, 'mmo'), 
          data2 = memmapfile(obj2.dataFile, 'writable', obj2.writable, 'format', { 'single' obj2.dimensions 'x' });
     else data2 = obj2;
-    end;
+    end
 
     % make new memory mapped data file (blank)
     % --------------------------------
@@ -22,9 +22,9 @@ function obj3 = binaryopp(f, obj1, obj2)
         if prod(size(data2)) == 1
              tmpdata = f(subsref(data1.Data.x, ss), data2);
         else tmpdata = f(subsref(data1.Data.x, ss), subsref(data2.Data.x, ss));
-        end;
+        end
         fwrite(fid, tmpdata, 'float');
-    end;
+    end
     fclose(fid);    
     
     % create object

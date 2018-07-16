@@ -60,34 +60,34 @@ function [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, bootsid
 if nargin < 6
 	help condstat;
 	return;
-end;
+end
 
 if ~ischar(formula) & ~iscell(formula)
 	error('The first argument must be a string formula or cell array of string');
-end;
+end
 if ischar(formula)
 	formula = { formula };
-end;
+end
 if ischar(bootside)
 	bootside = { bootside };
-end;
+end
 for index = 1:length(bootside)
 	if ~strcmpi(bootside, 'both') & ~strcmpi(bootside, 'upper')
 		error('Bootside must be either ''both'' or ''upper''');
-	end;
+	end
 end;	
 if ischar(condboot)
 	condboot = { condboot };
-end;
+end
 for index = 1:length(condboot)
-	if isempty(condboot{index}), condboot{index} = 'complex'; end;
+	if isempty(condboot{index}), condboot{index} = 'complex'; end
 end;	
 		
 for index = 1:length(varargin)
 	if ~iscell(varargin) | length(varargin{index}) ~=2
 		error('Except for the first arguments, all other arguments given to the function must be cell arrays of two numerical array');
-	end;
-end;
+	end
+end
 
 % accumulate coherence images (all arrays [nb_points x timesout x trials])
 % ---------------------------
@@ -99,8 +99,8 @@ for index=1:length(varargin)
 		cond2trials = size(tmpvar2,ndims(tmpvar2));
 		for tmpi = 1:length(formula) 
 			accres{tmpi} = zeros(size(tmpvar1,1), size(tmpvar1,2), naccu);
-		end;
-	end;
+		end
+	end
 	
 	if ndims(tmpvar1) == 2
 		eval( [ 'arg' int2str(index) '=zeros(size(tmpvar1,1), cond1trials+cond2trials);' ] );
@@ -110,8 +110,8 @@ for index=1:length(varargin)
 		eval( [ 'arg' int2str(index) '=zeros(size(tmpvar1,1), size(tmpvar1,2), cond1trials+cond2trials);' ] );
 		eval( [ 'arg' int2str(index) '(:,:,1:cond1trials)=tmpvar1;' ] );
 		eval( [ 'arg' int2str(index) '(:,:,cond1trials+1:end)=tmpvar2;' ] );
-	end;
-end;
+	end
+end
 
 fprintf('Accumulating permutation statistics:');
 alltrials = [1:cond1trials+cond2trials];
@@ -129,7 +129,7 @@ for index = 1:length(formula)
 	 case 'angle', formula{index} = [ 'angle(' formula{index} ')/(2*pi)' ];
 	 case 'complex', ;
 	 otherwise, condboot, error('condstat argument must be either ''abs'', ''angle'', ''complex'' or empty');
-	end;
+	end
 
 	% computing difference (non-shuffled)
 	% -----------------------------------
@@ -148,8 +148,8 @@ for index = 1:length(formula)
 	else % 3 dimensions
 		formula1 = [ formula1 arrayname '(:,:,index) = ' formula{index}  ';'];
 		formula2 = [ formula2 arrayname '(:,:,index) = ' arrayname '(:,:,index) - ' formula{index}  ';'];	
-	end;
-end;
+	end
+end
 
 % accumulating (shuffling)
 % -----------------------
@@ -162,7 +162,7 @@ for index=1:naccu
 	eval( formula1 );
 	X = alltrials(cond1trials+1:end);
 	eval( formula2 );
-end;
+end
 
 % significance level
 % ------------------
@@ -178,7 +178,7 @@ for index= 1:length(formula)
                             % think of a meaningful warning though...
                             % TF 2007.06.04
 		accarray = sqrt(accarray .* conj(accarray)); % faster than abs()
-    end;
+    end
 	
     % compute bootstrap significance level
     i = round(naccu*alpha);
@@ -192,7 +192,7 @@ for index= 1:length(formula)
 			 accarraytmp(:,:,2) = mean(accarray(:,:,1:i),3);
 			 accarraytmp(:,:,1) = mean(accarray(:,:,naccu-i+1:naccu),3);
 			 accarray = accarraytmp;
-		 end;
+		 end
 	 
 	 case 2, 
 	     accarray = sort(accarray,2); % always sort on naccu (when 3D, naccu is the second dim)
@@ -202,7 +202,7 @@ for index= 1:length(formula)
 			 accarraytmp(:,2) = mean(accarray(:,1:i),2);
 			 accarraytmp(:,1) = mean(accarray(:,naccu-i+1:naccu),2);
 			 accarray = accarraytmp;
-		 end;
+		 end
 	 case 1, 
 	     accarray = sort(accarray,1); % always sort on naccu (when 3D, naccu is the second dim)
          if strcmpi(bootside{min(length(bootside), index)}, 'upper');
@@ -211,17 +211,17 @@ for index= 1:length(formula)
 			 accarraytmp(2) = mean(accarray(1:i),1);
 			 accarraytmp(1) = mean(accarray(naccu-i+1:naccu),1);
 			 accarray = accarraytmp;
-		 end;
-    end;
+		 end
+    end
     accres{index} = accarray;
-end;
+end
 
 if length(res1) == 1
 	res1 = res1{1};
 	res2 = res2{1};
 	diffres = diffres{1};
 	accres = accres{1};
-end;
+end
 fprintf('\n');
 return;
 
@@ -231,8 +231,8 @@ return;
 % $$$ fprintf(fid, 'function [accres] = tmpfunc(alltrials, cond1trials, naccu,'); 
 % $$$ for index=1:length(varargin)
 % $$$ 	fprintf(fid, 'arg%d', index);
-% $$$ 	if index ~=length(varargin), fprintf(fid,','); end;
-% $$$ end;
+% $$$ 	if index ~=length(varargin), fprintf(fid,','); end
+% $$$ end
 % $$$ fprintf(fid, ')\n');
 % $$$ commandstr = [ 'for index=1:naccu, ' ]
 % $$$ % 			   'if rem(index,10) == 0,  disp(index); end;' ];

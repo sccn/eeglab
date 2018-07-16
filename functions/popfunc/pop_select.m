@@ -106,7 +106,7 @@ com = '';
 if nargin < 1
     help pop_select;
     return;
-end;
+end
 if isempty(EEG(1).data)
     disp('Pop_select error: cannot process empty dataset'); return;
 end;    
@@ -138,7 +138,7 @@ if nargin < 2
            { }, { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'enable', fastif(length(EEG)>1, 'off', 'on'), 'callback', ...
                           'eegplot(EEG.data, ''srate'', EEG.srate, ''winlength'', 5, ''limits'', [EEG.xmin EEG.xmax]*1000, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
    results = inputgui( geometry, uilist, 'pophelp(''pop_select'');', 'Select data -- pop_select()' );
-   if length(results) == 0, return; end;
+   if length(results) == 0, return; end
 
    
    % decode inputs
@@ -146,29 +146,29 @@ if nargin < 2
    args = {};
    if ~isempty( results{1} )
        if ~results{2}, args = { args{:}, 'time', eval( [ '[' results{1} ']' ] ) };
-       else            args = { args{:}, 'notime', eval( [ '[' results{1} ']' ] ) }; end;
-   end;
+       else            args = { args{:}, 'notime', eval( [ '[' results{1} ']' ] ) }; end
+   end
 
    if ~isempty( results{3} )
        if ~results{4}, args = { args{:}, 'point', eval( [ '[' results{3} ']' ] ) };
-       else            args = { args{:}, 'nopoint', eval( [ '[' results{3} ']' ] ) }; end;
-   end;
+       else            args = { args{:}, 'nopoint', eval( [ '[' results{3} ']' ] ) }; end
+   end
 
    if ~isempty( results{5} )
        if ~results{6}, args = { args{:}, 'trial', eval( [ '[' results{5} ']' ] ) };
-       else            args = { args{:}, 'notrial', eval( [ '[' results{5} ']' ] ) }; end;
-   end;
+       else            args = { args{:}, 'notrial', eval( [ '[' results{5} ']' ] ) }; end
+   end
 
    if ~isempty( results{7} )
        [ chaninds chanlist ] = eeg_decodechan(EEG.chanlocs, results{7});
-       if isempty(chanlist), chanlist = chaninds; end;
+       if isempty(chanlist), chanlist = chaninds; end
        if ~results{8}, args = { args{:}, 'channel'  , chanlist };
-       else            args = { args{:}, 'nochannel', chanlist }; end;
-   end;
+       else            args = { args{:}, 'nochannel', chanlist }; end
+   end
 
 else
     args = varargin;
-end;
+end
 
 %----------------------------AMICA---------------------------------
 if isfield(EEG.etc,'amica') && isfield(EEG.etc.amica,'prob_added')
@@ -176,11 +176,11 @@ if isfield(EEG.etc,'amica') && isfield(EEG.etc.amica,'prob_added')
        if strcmpi(args{index}, 'channel')
            args{index+1} = [ args{index+1} EEG.nbchan-(0:2*EEG.etc.amica.num_models-1)];
            
-       end;
+       end
        
        
-    end;
-end;
+    end
+end
 %--------------------------------------------------------------------
         
 % process multiple datasets
@@ -188,11 +188,11 @@ end;
 if length(EEG) > 1
     [ EEG com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
     return;
-end;
+end
 
 if isempty(EEG.chanlocs), chanlist = [1:EEG.nbchan];
 else                      chanlocs = EEG.chanlocs; chanlist = { chanlocs.labels };
-end;
+end
 g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'notime'  'real'      []         []; ...
                         'trial'   'integer'   []         [1:EEG.trials]; ...
@@ -205,15 +205,15 @@ g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'notrialcond' 'integer'   []         []; ...
                         'sort'        'integer'   []         []; ...
                         'sorttrial'   'string'    { 'on','off' } 'on' }, 'pop_select');
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 if ~isempty(g.sort)
     if g.sort, g.sorttrial = 'on';
     else       g.sorttrial = 'off';
-    end;
-end;
+    end
+end
 if strcmpi(g.sorttrial, 'on')
     g.trial = sort(setdiff( g.trial, g.notrial ));
-    if isempty(g.trial), error('Error: dataset is empty'); end;
+    if isempty(g.trial), error('Error: dataset is empty'); end
 else
     g.trial(ismember(g.trial,g.notrial)) = [];
     % still warn about & remove duplicate trials (may be removed in the future)
@@ -226,21 +226,21 @@ end
 
 if isempty(g.channel) && ~iscell(g.nochannel) && ~iscell(chanlist)
     g.channel = [1:EEG.nbchan];
-end;
+end
 
 if iscell(g.channel) && ~iscell(g.nochannel) && ~isempty(EEG.chanlocs)
      noChannelAsCell = {};
      for nochanId = 1:length(g.nochannel)
          noChannelAsCell{nochanId} = EEG.chanlocs(g.nochannel(nochanId)).labels;
-     end;
+     end
      g.nochannel =   noChannelAsCell; 
-end;
+end
 
 if strcmpi(g.sorttrial, 'on')
     if iscell(g.channel)
          g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
     else g.channel = sort(setdiff( g.channel, g.nochannel ));
-    end;
+    end
 else
     g.channel(ismember(lower(g.channel),lower(g.nochannel))) = [];
     % still warn about & remove duplicate channels (may be removed in the future)
@@ -264,46 +264,46 @@ if ~isempty(EEG.chanlocs)
             g.channel = inds(I);
         end
     end
-end;
+end
 
 if ~isempty(g.time) && (g.time(1) < EEG.xmin*1000) && (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
-end;
+end
 if min(g.trial) < 1 || max( g.trial ) > EEG.trials  
    error('Wrong trial range');
-end;
+end
 if ~isempty(g.channel)
     if min(double(g.channel)) < 1 || max(double(g.channel)) > EEG.nbchan  
         error('Wrong channel range');
-    end;
-end;
+    end
+end
 
 if size(g.point,2) > 2, 
     g.point = [g.point(1) g.point(end)];
     disp('Warning: vector format for point range is deprecated');
-end;
+end
 if size(g.nopoint,2) > 2, 
     g.nopoint = [g.nopoint(1) g.nopoint(end)];
     disp('Warning: vector format for point range is deprecated');
-end;
+end
 if ~isempty( g.point )
     g.time = zeros(size(g.point));
     for index = 1:length(g.point(:))
         g.time(index) = eeg_point2lat(g.point(index), 1, EEG.srate, [EEG.xmin EEG.xmax]);
-    end;
+    end
     g.notime = [];
-end;
+end
 if ~isempty( g.nopoint )
     g.notime = zeros(size(g.nopoint));
     for index = 1:length(g.nopoint(:))
         g.notime(index) = eeg_point2lat(g.nopoint(index), 1, EEG.srate, [EEG.xmin EEG.xmax]);
-    end;
+    end
     g.time = [];
-end;
+end
 if ~isempty( g.notime )
     if size(g.notime,2) ~= 2
         error('Time/point range must contain 2 columns exactly');
-    end;
+    end
     if g.notime(2) == EEG.xmax
         g.time = [EEG.xmin g.notime(1)];
     else
@@ -311,21 +311,21 @@ if ~isempty( g.notime )
             g.time = [g.notime(2) EEG.xmax];
         elseif EEG.trials > 1
             error('Wrong notime range. Remember that it is not possible to remove a slice of time for data epochs.');
-        end;
-    end;
-    if g.notime(end) > EEG.xmax, g.notime(end) = EEG.xmax; end;
-    if g.notime(1)   < EEG.xmin, g.notime(1)   = EEG.xmin; end;
+        end
+    end
+    if g.notime(end) > EEG.xmax, g.notime(end) = EEG.xmax; end
+    if g.notime(1)   < EEG.xmin, g.notime(1)   = EEG.xmin; end
     if floor(max(g.notime(:))) > EEG.xmax 
         error('Time/point range exceed upper data limits');
-    end;
+    end
     if min(g.notime(:)) < EEG.xmin
         error('Time/point range exceed lower data limits');
-    end;
-end;
+    end
+end
 if ~isempty(g.time)
     if size(g.time,2) ~= 2
         error('Time/point range must contain 2 columns exactly');
-    end;
+    end
     for index = 1:length(g.time)
         if g.time(index) > EEG.xmax
             g.time(index) = EEG.xmax;
@@ -333,16 +333,16 @@ if ~isempty(g.time)
         elseif g.time(index) < EEG.xmin
             g.time(index) = EEG.xmin;
             disp('Lower time limits exceed data, corrected');
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % select trial values
 %--------------------
 if ~isempty(g.trialcond)
    try, tt = struct( g.trialcond{:} ); catch
       error('Trial conditions format error');
-   end;
+   end
    ttfields = fieldnames (tt);
    for index = 1:length(ttfields)
         if ~isfield( EEG.epoch, ttfields{index} )
@@ -354,17 +354,17 @@ if ~isempty(g.trialcond)
 	    Itrialtmp = intersect_bc(Itriallow, Itrialhigh);
 	    g.trial = intersect_bc( g.trial(:)', Itrialtmp(:)');
    end;	   
-end;
+end
 
 if isempty(g.trial)
    error('Empty dataset, no trial');
-end;
+end
 if length(g.trial) ~= EEG.trials
 	fprintf('Removing %d trial(s)...\n', EEG.trials - length(g.trial));
-end;
+end
 if length(g.channel) ~= EEG.nbchan
 	fprintf('Removing %d channel(s)...\n', EEG.nbchan - length(g.channel));
-end;
+end
 
 try
     % For AMICA probabilities...
@@ -445,18 +445,18 @@ if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
                     keepevent = [keepevent indexevent];
                     if isfield(EEG.event, 'latency')
                         EEG.event(indexevent).latency = EEG.event(indexevent).latency - (EEG.event(indexevent).epoch-1)*EEG.pnts + (newindex-1)*EEG.pnts;
-                    end;
+                    end
                     EEG.event(indexevent).epoch = newindex;
-                end;
-            end;
+                end
+            end
             diffevent = setdiff_bc([1:length(EEG.event)], keepevent);
             if ~isempty(diffevent)
                 disp(['Pop_select: removing ' int2str(length(diffevent)) ' unreferenced events']);
                 EEG.event(diffevent) = [];
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 
 
 % performing removal
@@ -468,7 +468,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
         try,   tmpevent = EEG.event;
                tmpeventlatency = [ tmpevent.latency ];
         catch, tmpeventlatency = [];
-        end;
+        end
         alllatencies = 1-(EEG.xmin*EEG.srate); % time 0 point
         alllatencies = linspace( alllatencies, EEG.pnts*(EEG.trials-1)+alllatencies, EEG.trials);
         [EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, ...
@@ -476,7 +476,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
         tmptime = tmptime/EEG.srate;
         if g.time(1) ~= tmptime(1) & g.time(2)-1/EEG.srate ~= tmptime(2)
             fprintf('pop_select(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', tmptime(1), tmptime(2)+1/EEG.srate);
-        end;
+        end
         EEG.xmin = tmptime(1);
         EEG.xmax = tmptime(2);
         EEG.pnts = size(EEG.data,2);
@@ -495,9 +495,9 @@ if ~isempty(g.time) | ~isempty(g.notime)
                     newevent(count).epoch   = index;
                     newevent(count).latency = newevent(count).latency - alllatencies(index) - tmptime(1)*EEG.srate + 1 + EEG.pnts*(index-1);
                     count = count + 1;
-                end;
-            end;
-        end;
+                end
+            end
+        end
         EEG.event = newevent;
         
         % erase event-related fields from the epochs
@@ -505,27 +505,27 @@ if ~isempty(g.time) | ~isempty(g.notime)
         if ~isempty(EEG.epoch)
             fn = fieldnames(EEG.epoch);
             EEG.epoch = rmfield(EEG.epoch,{fn{strmatch('event',fn)}});
-        end;
+        end
     else
         if isempty(g.notime)
             if length(g.time) == 2 && EEG.xmin < 0
                 disp('Warning: negative minimum time; unchanged to ensure correct latency of initial boundary event');
-            end;
+            end
             g.notime = g.time';
             g.notime = g.notime(:);
             if g.notime(1) ~= 0, g.notime = [EEG.xmin g.notime(:)'];
             else                 g.notime = [g.notime(2:end)'];
-            end;
+            end
             if g.time(end) == EEG.xmax, g.notime(end) = [];
             else                        g.notime(end+1) = EEG.xmax;
-            end;
+            end
             
             for index = 1:length(g.notime)
                 if g.notime(index) ~= 0  & g.notime(index) ~= EEG.xmax
                     if mod(index,2), g.notime(index) = g.notime(index) + 1/EEG.srate;
                     else             g.notime(index) = g.notime(index) - 1/EEG.srate;
-                    end;
-                end;
+                    end
+                end
             end;        
             g.notime = reshape(g.notime, 2, length(g.notime)/2)';
         end;   
@@ -536,12 +536,12 @@ if ~isempty(g.time) | ~isempty(g.notime)
         
         % fixing if last region is the same
         if flag
-            if ~isempty(find((points(end,1)-points(end,2))== 0)), points(end,:) = []; end;
+            if ~isempty(find((points(end,1)-points(end,2))== 0)), points(end,:) = []; end
         end
         
         EEG = eeg_eegrej(EEG, points);
     end
-end;
+end
 
 % performing removal
 % ------------------
@@ -552,12 +552,12 @@ if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3)
     diff2 = setdiff_bc([1:size(EEG.data,3)], g.trial);
     if ~isempty(diff1)
          EEG.data(diff1, :, :) = [];
-    end;
+    end
     if ~isempty(diff2)
          EEG.data(:, :, diff2) = [];
-    end;
+    end
 end
-if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end;
+if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end
 EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);
 EEG.nbchan    = length(g.channel);
@@ -566,7 +566,7 @@ if ~isempty(EEG.chanlocs)
 end;    
 if ~isempty(EEG.epoch)
    EEG.epoch = EEG.epoch( g.trial );
-end;
+end
 if ~isempty(EEG.specdata)
 	if length(g.point) == EEG.pnts
    		EEG.specdata = EEG.specdata(g.channel, :, g.trial);
@@ -574,7 +574,7 @@ if ~isempty(EEG.specdata)
    		EEG.specdata = [];
    		fprintf('Warning: spectral data were removed because of the change in the numner of points\n');
    	end;		
-end;
+end
 
 % ica specific
 % ------------
@@ -588,7 +588,7 @@ if ~isempty(EEG.icachansind)
     for index = length(rmchans):-1:1
         chanind           = find(EEG.icachansind == rmchans(index));
         icachans(chanind) = [];
-    end;
+    end
         
     % new channels indices
     % --------------------
@@ -598,13 +598,13 @@ if ~isempty(EEG.icachansind)
         if any(EEG.icachansind == g.channel(index))
             newinds(count) = index;
             count          = count+1;
-        end;
-    end;
+        end
+    end
     EEG.icachansind = newinds;
     
 else
     icachans = 1:size(EEG.icasphere,2);
-end;
+end
 
 if ~isempty(EEG.icawinv)
     flag_rmchan = (length(icachans) ~= size(EEG.icawinv,1));
@@ -613,31 +613,31 @@ if ~isempty(EEG.icawinv)
         EEG.icaweights = pinv(EEG.icawinv);
         EEG.icasphere  = eye(size(EEG.icaweights,2));
     end
-end;
+end
 if ~isempty(EEG.specicaact)
     if length(g.point) == EEG.pnts
         EEG.specicaact = EEG.specicaact(icachans, :, g.trial);
     else
         EEG.specicaact = [];
         fprintf('Warning: spectral ICA data were removed because of the change in the numner of points\n');
-    end;
-end;
+    end
+end
 
 % check if only one epoch
 % -----------------------
 if EEG.trials == 1
     if isfield(EEG.event, 'epoch')
         EEG.event = rmfield(EEG.event, 'epoch');
-    end;
+    end
     EEG.epoch = [];
-end;
+end
 if isfield(EEG.reject, 'gcompreject') && isequal(g.channel,1:size(EEG.data,1))
     tmpgcompreject = EEG.reject.gcompreject;
     EEG.reject = [];
     EEG.reject.gcompreject = tmpgcompreject;
 else
     EEG.reject = [];
-end;
+end
 EEG.stats  = [];
 EEG.reject.rejmanual = [];
 % for stats, can adapt remove the selected trials and electrodes
@@ -660,8 +660,8 @@ if ~isempty(EEG.event)
     % go to array format if necessary
     if isstruct(EEG.event), format = 'struct';
     else                     format = 'array';
-    end;
-    switch format, case 'struct', EEG = eventsformat(EEG, 'array'); end;
+    end
+    switch format, case 'struct', EEG = eventsformat(EEG, 'array'); end
     
     % keep only events related to the selected trials
     Indexes = [];
@@ -670,10 +670,10 @@ if ~isempty(EEG.event)
         currentevents = find( EEG.event(:,2) == g.trial(index));
         Indexes = [ Indexes ones(1, length(currentevents))*index ];
         Ievent  = union_bc( Ievent, currentevents );
-    end;
+    end
     EEG.event = EEG.event( Ievent,: );
     EEG.event(:,2) = Indexes(:);
     
-    switch format, case 'struct', EEG = eventsformat(EEG, 'struct'); end;
-end;
+    switch format, case 'struct', EEG = eventsformat(EEG, 'struct'); end
+end
 

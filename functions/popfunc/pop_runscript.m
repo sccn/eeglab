@@ -30,15 +30,15 @@ com = [];
 if nargin <1
     [filename filepath] = uigetfile('*.*', 'Please select input script -- pop_runscript()');
     
-    if filename(1) == 0, return; end;
+    if filename(1) == 0, return; end
 
     filename = fullfile(filepath, filename);
-end;
+end
 
 str = readtxtfile(filename);
 try
     evalin('base', str);
 catch
     lasterr
-end;
+end
 com = sprintf('pop_runscript(''%s'');', filename);

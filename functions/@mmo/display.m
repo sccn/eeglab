@@ -21,6 +21,6 @@
 function display(obj);
 
     tmpMMO = memmapfile(obj.dataFile, 'writable', obj.writable, 'format', { 'single' obj.dimensions 'x' });
-    if obj.transposed, disp('Warning: data does not display properly for memory mapped file which have been transposed'); end;
+    if obj.transposed, disp('Warning: data does not display properly for memory mapped file which have been transposed'); end
     disp(tmpMMO.data.x);
     

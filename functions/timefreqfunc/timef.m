@@ -300,7 +300,7 @@ end
 if ~isempty(varargin)
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
-end;
+end
 g.tlimits = tlimits;
 g.frames   = frames;
 g.srate   = Fs;
@@ -309,38 +309,38 @@ if length(varwin)>1
 	g.cyclesfact = varwin(2);
 else 
 	g.cyclesfact = 1;
-end;
+end
 
-try, g.title;      catch, g.title = DEFAULT_TITLE; end;
-try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frames)-3),4); end;
-try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end;
-try, g.timesout;   catch, g.timesout = DEFAULT_NWIN; end;
-try, g.padratio;   catch, g.padratio = DEFAULT_OVERSMP; end;
-try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
-try, g.topovec;    catch, g.topovec = []; end;
-try, g.elocs;      catch, g.elocs = DEFAULT_ELOC; end;
+try, g.title;      catch, g.title = DEFAULT_TITLE; end
+try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frames)-3),4); end
+try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end
+try, g.timesout;   catch, g.timesout = DEFAULT_NWIN; end
+try, g.padratio;   catch, g.padratio = DEFAULT_OVERSMP; end
+try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end
+try, g.topovec;    catch, g.topovec = []; end
+try, g.elocs;      catch, g.elocs = DEFAULT_ELOC; end
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
-try, g.marktimes;  catch, g.marktimes = DEFAULT_MARKTIME; end;
-try, g.powbase;    catch, g.powbase = NaN; end;
-try, g.pboot;      catch, g.pboot = NaN; end;
-try, g.rboot;      catch, g.rboot = NaN; end;
-try, g.plotersp;   catch, g.plotersp = 'on'; end;
-try, g.plotitc;    catch, g.plotitc  = 'on'; end;
-try, g.detrep;     catch, g.detrep = 'off'; end;
-try, g.detret;     catch, g.detret = 'off'; end;
-try, g.baseline;   catch, g.baseline = 0; end;
-try, g.baseboot;   catch, g.baseboot = 1; end;
-try, g.linewidth;  catch, g.linewidth = 2; end;
-try, g.naccu;      catch, g.naccu = 200; end;
-try, g.mtaper;     catch, g.mtaper = []; end;
-try, g.vert;       catch, g.vert = []; end;
-try, g.type;       catch, g.type = 'phasecoher'; end;
-try, g.phsamp;     catch, g.phsamp = 'off'; end;
-try, g.plotphase;  catch, g.plotphase = 'on'; end;
-try, g.itcmax;     catch, g.itcmax = []; end;
-try, g.erspmax;    catch, g.erspmax = []; end;
-try, g.verbose;    catch, g.verbose = 'on'; end;
-try, g.chaninfo;   catch, g.chaninfo = []; end;
+try, g.marktimes;  catch, g.marktimes = DEFAULT_MARKTIME; end
+try, g.powbase;    catch, g.powbase = NaN; end
+try, g.pboot;      catch, g.pboot = NaN; end
+try, g.rboot;      catch, g.rboot = NaN; end
+try, g.plotersp;   catch, g.plotersp = 'on'; end
+try, g.plotitc;    catch, g.plotitc  = 'on'; end
+try, g.detrep;     catch, g.detrep = 'off'; end
+try, g.detret;     catch, g.detret = 'off'; end
+try, g.baseline;   catch, g.baseline = 0; end
+try, g.baseboot;   catch, g.baseboot = 1; end
+try, g.linewidth;  catch, g.linewidth = 2; end
+try, g.naccu;      catch, g.naccu = 200; end
+try, g.mtaper;     catch, g.mtaper = []; end
+try, g.vert;       catch, g.vert = []; end
+try, g.type;       catch, g.type = 'phasecoher'; end
+try, g.phsamp;     catch, g.phsamp = 'off'; end
+try, g.plotphase;  catch, g.plotphase = 'on'; end
+try, g.itcmax;     catch, g.itcmax = []; end
+try, g.erspmax;    catch, g.erspmax = []; end
+try, g.verbose;    catch, g.verbose = 'on'; end
+try, g.chaninfo;   catch, g.chaninfo = []; end
 try, g.hzdir;      catch, g.hzdir = HZDIR; end; % default from icadefs
 lasterr('');
 
@@ -357,7 +357,7 @@ end
 switch lower(g.verbose)
     case { 'on', 'off' }, ;
     otherwise error('verbose must be either on or off');
-end;
+end
 if (~ischar(g.title))
 	error('Title must be a string.');
 end
@@ -404,7 +404,7 @@ if isempty(g.topovec)
 	g.topovec = [];
 	if isempty(g.elocs)
 		error('Channel location file must be specified.');
-	end;
+	end
 end
 if isempty(g.elocs)
 	g.elocs = DEFAULT_ELOC;
@@ -434,8 +434,8 @@ if ~isnumeric(g.vert)
 else
 	if min(g.vert) < g.tlimits(1) | max(g.vert) > g.tlimits(2)
         error('vertical line(s) time out-of-bound');
-	end;
-end;
+	end
+end
 
 if ~isnan (g.rboot)
   if size(g.rboot) == [1,1]
@@ -443,7 +443,7 @@ if ~isnan (g.rboot)
         g.rboot = g.rboot*ones(g.winsize*g.padratio/2);
     end
   end
-end;
+end
 
 if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   if length(g.mtaper) < 3
@@ -451,14 +451,14 @@ if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
     
     if g.mtaper(1) * g.mtaper(2) < 1
         error('mtaper 2 first arguments'' product must be higher than 1');
-    end;
+    end
     if length(g.mtaper) == 2
         g.mtaper(3) = floor( 2*g.mtaper(2)*g.mtaper(1) - 1);
     end
     if length(g.mtaper) == 3
         if g.mtaper(3) > 2 * g.mtaper(1) * g.mtaper(2) -1
             error('mtaper number too high (maximum (2*N*W-1))');
-        end;
+        end
     end
     disp(['Using ' num2str(g.mtaper(3)) ' tapers.']);
     NW = g.mtaper(1)*g.mtaper(2);   % product NW
@@ -469,7 +469,7 @@ if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   else    
     g.alltapers = g.mtaper;
     disp('mtaper argument not [N W] or [N W K]; considering raw taper matrix');
-  end;
+  end
 
   g.winsize = size(g.alltapers, 1);
   g.pad = max(pow2(nextpow2(g.winsize)),256); % pad*nextpow
@@ -489,40 +489,40 @@ end;
 switch lower(g.plotphase)
     case { 'on', 'off' }, ;
     otherwise error('plotphase must be either on or off');
-end;
+end
 switch lower(g.plotersp)
     case { 'on', 'off' }, ;
     otherwise error('plotersp must be either on or off');
-end;
+end
 switch lower(g.plotitc)
     case { 'on', 'off' }, ;
     otherwise error('plotitc must be either on or off');
-end;
+end
 switch lower(g.detrep)
     case { 'on', 'off' }, ;
     otherwise error('detrep must be either on or off');
-end;
+end
 switch lower(g.detret)
     case { 'on', 'off' }, ;
     otherwise error('detret must be either on or off');
-end;
+end
 switch lower(g.phsamp)
     case { 'on', 'off' }, ;
     otherwise error('phsamp must be either on or off');
-end;
+end
 if ~isnumeric(g.linewidth)
     error('linewidth must be numeric');
-end;
+end
 if ~isnumeric(g.naccu)
     error('naccu must be numeric');
-end;
+end
 if ~isnumeric(g.baseline)
     error('baseline must be numeric');
-end;
+end
 switch g.baseboot
     case {0,1}, ;
     otherwise, error('baseboot must be 0 or 1');
-end;
+end
 switch g.type
     case { 'coher', 'phasecoher', 'phasecoher2' },;
     otherwise error('Type must be either ''coher'' or ''phasecoher''');
@@ -531,7 +531,7 @@ if isnan(g.baseline)
     g.unitpower = 'uV/Hz';
 else
     g.unitpower = 'dB';
-end;
+end
 
 if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
     freqs = linspace(0, g.srate/2, g.padratio*g.winsize/2+1);
@@ -621,7 +621,7 @@ switch g.type
     case 'phasecoher',  myprintf(g.verbose,'  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frames);
     case 'phasecoher2', myprintf(g.verbose,'  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frames);
     case 'coher',       myprintf(g.verbose,'  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frames);
-end;
+end
 myprintf(g.verbose,'  of %d frames sampled at %g Hz.\n',g.frames,g.srate);
 myprintf(g.verbose,'Each trial contains samples from %d ms before to\n',g.tlimits(1));
 myprintf(g.verbose,'  %.0f ms after the timelocking event.\n',g.tlimits(2));
@@ -665,7 +665,7 @@ for i=1:trials
 		tmpX = X([1:g.winsize]+floor((j-1)*stp)+(i-1)*g.frames); 
                                                       % pull out data g.frames
 		tmpX = tmpX - mean(tmpX); % remove the mean for that window
-        switch g.detret, case 'on', tmpX = detrend(tmpX); end;
+        switch g.detret, case 'on', tmpX = detrend(tmpX); end
 		if ~any(isnan(tmpX))
 		  if (g.cycles == 0) % FFT
             if ~isempty(g.mtaper)   % apply multitaper (no hanning window)
@@ -719,7 +719,7 @@ for i=1:trials
              		  case 'on'
                 	    cumulX(:,j) = cumulX(:,j)+abs(tmpX); % accumulate for PA
           		  end
-              end;
+              end
          end
           Wn(j) = 1;
         end
@@ -748,7 +748,7 @@ for i=1:trials
 		    switch g.type
 		        case 'coher',       cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX).^2;
 		        case 'phasecoher2', cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
-            end;
+            end
             j = j+1;
           end
           Rbn = Rbn + 1;
@@ -770,7 +770,7 @@ switch g.type
   R = R ./ ( sqrt( trials*cumulX ) );
   if ~isnan(g.alpha)
 	  Rboot = Rboot ./ ( sqrt( trials*cumulXboot ) );
-  end;
+  end
  case 'phasecoher2',
   R = R ./ ( cumulX );
   if ~isnan(g.alpha)
@@ -807,7 +807,7 @@ if ~isnan( g.baseline ) & ~isnan( mbase )
     P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 g.timesout])); % convert to (10log10) dB
 else
     P = 10 * log10(P);
-end;
+end
 
 Rsign = sign(imag(R));
 if nargout > 7
@@ -868,7 +868,7 @@ if g.plot
     pos = get(gca,'position');
     q = [pos(1) pos(2) 0 0];
     s = [pos(3) pos(4) pos(3) pos(4)];
-end;
+end
 
 switch lower(g.plotersp)
  case 'on' 
@@ -893,11 +893,11 @@ switch lower(g.plotersp)
         imagesc(times,freqs(dispf),PP(dispf,:),ersp_caxis); 
     else
         imagesc(times,freqs(dispf),PP(dispf,:));
-    end;
+    end
     set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 	if ~isempty(g.erspmax)
 		caxis([-g.erspmax g.erspmax]);
-	end;
+	end
     
 	hold on
 	plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth); % plot time 0
@@ -912,8 +912,8 @@ switch lower(g.plotersp)
 	if ~isempty(g.vert)
 		for index = 1:length(g.vert)
 			line([g.vert(index), g.vert(index)], [min(freqs(dispf)) max(freqs(dispf))], 'linewidth', 1, 'color', 'm');
-		end;
-	end;
+		end
+	end
 
 	h(2) = gca;
 	h(3) = cbar('vert'); % ERSP colorbar axes
@@ -962,7 +962,7 @@ switch lower(g.plotersp)
         freqdir = 'normal';
     end
     set(h(5),'xdir',freqdir);  % make frequency ascend or descend
-end;
+end
 
 switch lower(g.plotitc)
   case 'on'
@@ -989,7 +989,7 @@ switch lower(g.plotitc)
 	end
 	if ~isempty(g.itcmax)
 		caxis([-g.itcmax g.itcmax]);
-	end;
+	end
 	tmpcaxis = caxis;
     set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 
@@ -1008,8 +1008,8 @@ switch lower(g.plotitc)
 			line([g.vert(index), g.vert(index)], ...
                   [min(freqs(dispf)) max(freqs(dispf))], ...
                   'linewidth', 1, 'color', 'm');
-		end;
-	end;
+		end
+	end
 
 	h(7) = gca;
 	h(8) = cbar('vert');
@@ -1043,7 +1043,7 @@ switch lower(g.plotitc)
     ylabel('\muV')
     if (~isempty(g.topovec))
       if length(g.topovec) ~= 1, ylabel(''); end; % ICA component
-    end;
+    end
 
 	E = mean(R(dispf,:)');
 	h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
@@ -1081,13 +1081,13 @@ switch lower(g.plotitc)
 			   'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
 		else
 		  topoplot(g.topovec,g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
-		end;
+		end
 		    axis('square')
 	end
 end; % switch
 
 if g.plot
-	try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+	try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
     if (length(g.title) > 0)
 	    axes('Position',pos,'Visible','Off');               
 	    h(13) = text(-.05,1.01,g.title);
@@ -1097,7 +1097,7 @@ if g.plot
     end
 
     axcopy(gcf);
-end;
+end
 
 % symmetric Hanning tapering function
 % -----------------------------------
@@ -1113,4 +1113,4 @@ end
 function myprintf(verbose, varargin)
     if strcmpi(verbose, 'on')
         fprintf(varargin{:});
-    end;
+    end

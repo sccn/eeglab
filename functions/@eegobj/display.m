@@ -10,7 +10,7 @@ function display(this);
         fieldorder = fieldnames(TMP2);
         for index = 2:length(TMP)
             TMP2(index) = orderfields(TMP(index).EEG, fieldorder);
-        end;
+        end
         TMP2
-    end;
+    end
     

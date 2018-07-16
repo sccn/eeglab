@@ -150,9 +150,9 @@ if (segmented),
            readtotal = readtotal + count;
         end
 
-	if (j >= nsegs), break; end;
+	if (j >= nsegs), break; end
 
-    end;
+    end
 
 else
     % read unsegmented data
@@ -176,7 +176,7 @@ else
               readtotal = readtotal + count;
           end
 
-          if (j >= nframes), break; end;
+          if (j >= nframes), break; end
 
         end
     end

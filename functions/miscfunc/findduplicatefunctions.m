@@ -27,11 +27,11 @@ for iFolder = 1:length(delim)-1
                         fullFileName1 = fullfile(currentFolder, currentFile);
                         fullFileName2 = which(currentFile);
                         fprintf('Potential conflict between %s and %s\n', fullFileName1, fullFileName2);
-                    end;
-                end;
-            end;
-        end;
+                    end
+                end
+            end
+        end
         addpath(currentFolder);
         
-    end;
-end;
+    end
+end

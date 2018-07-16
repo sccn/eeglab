@@ -116,17 +116,17 @@ end
 %
 if chanlist == 0,
     chanlist = [1:chans];
-end;
+end
 if compnums == 0,
     compnums = [1:wr];
-end;
+end
 if size(compnums,1)>1,        % handle column of compnums !
     compnums = compnums';
-end;
+end
 if length(compnums) > 256,
     fprintf('plotproj(): cannot plot more than %d channels of data at once.\n',256);
     return
-end;
+end
 
 if channels ~= 0  % if chan name file given
    if ~all(chanlist == [1:length(chanlist)])
@@ -157,7 +157,7 @@ for s=compnums,            % for each component
    proj = icaproj(data,weights,s);   % let offsets distribute 
    projdata = [projdata proj(chanlist,:)];  % append projected data onto projdata
    % size(projdata) = [length(chanlist)  framestot*(length(compnums)+1)]
-end;
+end
 fprintf('\n');
 %     
 % Compute percentage of variance accounted for

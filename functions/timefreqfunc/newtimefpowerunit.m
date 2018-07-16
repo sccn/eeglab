@@ -32,11 +32,11 @@ function unitPower = newtimefpowerunit(tmpparams)
 if nargin < 1
     help newtimefunit;
     return;
-end;
+end
 
-if ~isfield(tmpparams, 'baseline'), tmpparams.baseline = 0;     end;
-if ~isfield(tmpparams, 'scale'   ), tmpparams.scale    = 'log'; end;
-if ~isfield(tmpparams, 'basenorm'), tmpparams.basenorm = 'off'; end;
+if ~isfield(tmpparams, 'baseline'), tmpparams.baseline = 0;     end
+if ~isfield(tmpparams, 'scale'   ), tmpparams.scale    = 'log'; end
+if ~isfield(tmpparams, 'basenorm'), tmpparams.basenorm = 'off'; end
 if strcmpi(tmpparams.scale, 'log')
     if strcmpi(tmpparams.basenorm, 'on')
         unitPower = '10*log(std.)'; % impossible
@@ -44,7 +44,7 @@ if strcmpi(tmpparams.scale, 'log')
         unitPower = '10*log10(\muV^{2}/Hz)';
     else
         unitPower = 'dB';
-    end;
+    end
 else
     if strcmpi(tmpparams.basenorm, 'on')
         unitPower = 'std.';
@@ -52,5 +52,5 @@ else
         unitPower = '\muV^{2}/Hz';
     else
         unitPower = '% of baseline';
-    end;
-end;
+    end
+end

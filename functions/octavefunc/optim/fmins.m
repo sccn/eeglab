@@ -59,8 +59,8 @@ function ret=fmins(funfun, X0, options, grad, varargin)
         if license('test','optim_toolbox')
             p = fileparts(which('fmins'));
             error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
-        end;
-    end;
+        end
+    end
 
     stopit = [1e-3, inf, inf, 1, 0, -1];
     minfun = 'nmsmax'; 

@@ -51,7 +51,7 @@ function [STUDY neighbors limostruct] = std_prepare_neighbors(STUDY, ALLEEG, var
 neighbors = [];
 if nargin < 2
     return;
-end;
+end
 
 [opt addopts] = finputcheck( varargin, {  'force'    'string'  { 'on','off' }   'off';
                                           'channels' 'cell'    {}               {} }, 'std_stat', 'ignore');

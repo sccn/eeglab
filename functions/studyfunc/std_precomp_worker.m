@@ -38,37 +38,37 @@ function feature = std_precomp_worker(filename, varargin)
 if nargin < 2
     help std_precomp_worker;
     return;
-end;
+end
 
 g = struct(varargin{2:end});
 
 % load dataset
 % ------------
 [STUDY ALLEEG] = pop_loadstudy('filename', filename);
-if ~isfield(g, 'design'), g.design = STUDY.currentdesign; end;
+if ~isfield(g, 'design'), g.design = STUDY.currentdesign; end
 if isfield(g, 'erp') || isfield(g, 'spec') || isfield(g, 'erpim') || isfield(g, 'scalp')
     error('This function is currently designed to compute time-frequency decompositions only'); 
-end;
+end
 if ~isfield(g, 'ersp') && ~isfield(g, 'itc')
     error('You must compute either ERSP or ITC when using the EC2 cluster'); 
-end;
+end
 
 % run std_precomp (THIS IS THE PART WE WANT TO PARALELIZE)
 % ---------------
 % for index = 1:length(STUDY.design(g.design).cell)
 %     [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, varargin{:}, 'cell', index);
-% end;
+% end
 std_precomp(STUDY, ALLEEG, varargin{:});
 
 filebase = STUDY.design(g.design).cell(g.cell).filebase;
 if isfield(g, 'channel')
     fileERSP = [ filebase '.datersp' ];
     fileITC  = [ filebase '.datitc' ];
-    if exist(fileERSP), feature.ersp = load('-mat', fileERSP); end;
-    if exist(fileITC ), feature.itc  = load('-mat', fileITC ); end;
+    if exist(fileERSP), feature.ersp = load('-mat', fileERSP); end
+    if exist(fileITC ), feature.itc  = load('-mat', fileITC ); end
 else
     fileERSP = [ filebase '.icaersp' ];
     fileITC  = [ filebase '.icaitc' ];
-    if exist(fileERSP), feature.ersp = load('-mat', fileERSP); end;
-    if exist(fileITC ), feature.itc  = load('-mat', fileITC ); end;
-end;
+    if exist(fileERSP), feature.ersp = load('-mat', fileERSP); end
+    if exist(fileITC ), feature.itc  = load('-mat', fileITC ); end
+end

@@ -23,13 +23,13 @@ function [s varargout] = size(obj,dim)
     if obj.transposed
         if length(obj.dimensions) ~= 2 && length(obj.dimensions) ~= 3
             error('Transposed array must be 2 or 3 dims');
-        end;
+        end
         if length(obj.dimensions) == 2 tmpdimensions = [obj.dimensions(2) obj.dimensions(1)];
         else                           tmpdimensions = [obj.dimensions(3) obj.dimensions(1:end-1)];
-        end;
+        end
     else
         tmpdimensions = obj.dimensions;
-    end;
+    end
     
     s = tmpdimensions;
     
@@ -38,7 +38,7 @@ function [s varargout] = size(obj,dim)
             s = 1;
         else
             s = s(dim);
-        end;
+        end
     else
         if nargout > 1
             s = [s 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
@@ -46,8 +46,8 @@ function [s varargout] = size(obj,dim)
             s = s(1);
             for index = 1:max(nargout,1)-1
                 varargout{index} = alls(index+1);
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
     

@@ -48,7 +48,7 @@ function [data,header] = readedf(filename);
 if nargin < 1
     help readedf;
     return;
-end;
+end
     
 fp = fopen(filename,'r','ieee-le');
 if fp == -1,

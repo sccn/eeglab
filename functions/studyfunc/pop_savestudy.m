@@ -42,9 +42,9 @@ com = '';
 if nargin < 1
 	help pop_savestudy;
 	return;
-end;
-if isempty(STUDY)  , error('pop_savestudy(): cannot save empty STUDY'); end;
-if length(STUDY) >1, error('pop_savestudy(): cannot save multiple STUDY sets'); end;
+end
+if isempty(STUDY)  , error('pop_savestudy(): cannot save empty STUDY'); end
+if length(STUDY) >1, error('pop_savestudy(): cannot save multiple STUDY sets'); end
 
 % backward compatibility
 % ----------------------
@@ -53,15 +53,15 @@ if nargin > 1
         options = { EEG varargin{:} };
     else
         options = varargin;
-    end;
-end;
+    end
+end
 
 if nargin < 3
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.study', ...
                     'Save STUDY with .study extension -- pop_savestudy()'); 
-    if isequal(filename,0), return; end;
+    if isequal(filename,0), return; end
     if ~strncmp(filename(end-5:end), '.study',6)
         if isempty(strfind(filename,'.'))
             filename = [filename '.study'];
@@ -77,7 +77,7 @@ end
 g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
                             'filepath'   'string'   []     STUDY.filepath;
                             'savemode'   'string'   { 'standard','resave' } 'standard' });
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 
 % fields to remove
 % ----------------
@@ -89,10 +89,10 @@ fields = { 'erptimes'  'erpdata' ...
 for fInd = 1:length(fields)
     if isfield(STUDY.changrp, fields{fInd})
         STUDY.changrp = rmfield(STUDY.changrp, fields{fInd});
-    end;
+    end
     if isfield(STUDY.changrp, fields{fInd})
         STUDY.cluster = rmfield(STUDY.cluster, fields{fInd});
-    end;
+    end
 end;    
 
 % resave mode
@@ -102,7 +102,7 @@ if strcmpi(g.savemode, 'resave')
     disp('Re-saving study file');
     g.filename = STUDY.filename;
     g.filepath = STUDY.filepath;
-end;
+end
 
 if isempty(g.filename)
     disp('pop_savestudy(): no STUDY filename: make sure the STUDY has a filename');
@@ -127,7 +127,7 @@ STUDY = std_rmalldatafields(STUDY);
 eeglab_options;
 if option_saveversion6, save('-v6' , STUDYfile, 'STUDY');
 else                    save('-v7.3' , STUDYfile, 'STUDY');
-end;
+end
 STUDY = STUDYTMP;
 
 % history

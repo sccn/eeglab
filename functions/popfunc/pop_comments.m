@@ -52,7 +52,7 @@ function [newcomments, com] = pop_comments( comments, plottitle, newcomments, co
 com = '';
 if exist('comments') ~=1, comments = '';
 elseif iscell(comments), comments = strvcat(comments{:}); 
-end;
+end
 
 % remove trailing blanks and make multiline
 comments = strmultiline( comments, 53);
@@ -63,13 +63,13 @@ if nargin < 3
 	catch,
 		BACKCOLOR  =  [.8 .8 .8];     
 		GUIBUTTONCOLOR   = [.8 .8 .8];    
-	end;
+	end
 	figure('menubar', 'none', 'tag', 'comment', 'color', BACKCOLOR, 'userdata', 0, ...
 		   'numbertitle', 'off', 'name', 'Read/Enter comments -- pop_comments()');
 	pos = get(gca,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
-	if exist('plottitle') ~=1, plottitle = ''; end;
+	if exist('plottitle') ~=1, plottitle = ''; end
 	
 	h = title(plottitle);
 	set(h, 'fontname','Helvetica','fontweight', 'bold', 'interpreter', 'none');
@@ -119,28 +119,28 @@ if nargin < 3
     tmppos = strmatch('Courier', lf);
     if ~isempty(tmppos)
         set(hh, 'fontname', lf{tmppos(1)}, 'fontsize', 10);
-    end;
+    end
     
     waitfor(gcf, 'userdata');
 
     % find return mode
-    if isempty(get(0, 'currentfigure')), return; end;
+    if isempty(get(0, 'currentfigure')), return; end
     tmp = get(gcf, 'userdata');
     if ~isempty(tmp) & ischar(tmp)    
         newcomments = tmp; % ok button
     else return;
-    end;
+    end
 
 	close(findobj('tag', 'comment'));
 else
     if iscell(newcomments)
         newcomments = strvcat(newcomments{:});
-    end;
+    end
     if nargin > 3 & concat == 1
         newcomments = strvcat(comments, newcomments);
-    end;
+    end
     return;
-end;
+end
 
 I = find( comments(:) == '''');
 comments(I) = ' ';  
@@ -148,15 +148,15 @@ if nargout > 1
         if ~strcmp( comments, newcomments)
           allsame = 1;
             for index = 1:size(comments, 1)
-                if ~strcmp(comments(index,:), newcomments(index,:)), allsame = 0; end;
-            end;
+                if ~strcmp(comments(index,:), newcomments(index,:)), allsame = 0; end
+            end
         else
             allsame = 0;
-        end;
+        end
         if allsame & ~isempty(comments)
              com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', vararg2str(newcomments(index+1:end,:)));
         else 
             com =sprintf('EEG.comments = pop_comments('''', '''', %s);', vararg2str(newcomments));     
-        end;
-end;
+        end
+end
 return;

@@ -33,8 +33,8 @@ function pop_rejmenu( EEG, icacomp );
 if icacomp == 0
 	if isempty( EEG.icasphere )
 		disp('Error: you must first run ICA on the data'); return;
-	end;
-end;
+	end
+end
 
 if icacomp == 1 	rejtitle = 'Reject trials using data statistics - pop_rejmenu()'; tagmenu = 'rejtrialraw';
 else            	rejtitle = 'Reject trials using component activity statistics - pop_rejmenu()'; tagmenu = 'rejtrialica';
@@ -42,7 +42,7 @@ end;
 
 if ~isempty( findobj('tag', tagmenu))
 	error('cannot open two identical windows; close the first one first');
-end;
+end
 
 figure('visible', 'off', 'numbertitle', 'off', 'name', rejtitle, 'tag', tagmenu);
 
@@ -62,7 +62,7 @@ checkstatus = [ 'rejstatus = get( findobj(''parent'', gcbf, ''tag'', ''rejstatus
 
 if icacomp, ICAPREFIX = '';
 else        ICAPREFIX = 'ica';
-end;
+end
 % tmp_comall is used when returning from eegplot
 tmp_comall =      [ 'set(findobj(''''parent'''', findobj(''''tag'''', ''''' tagmenu ...
 					'''''), ''''tag'''', ''''mantrial''''), ''''string'''', num2str(sum(EEG.reject.' ICAPREFIX 'rejmanual)));' ...
@@ -208,18 +208,18 @@ lisboxoptions = { 'string', [ 'Show only the new trials marked for rejection by 
 	sizekurt = 0;
 	sizespec = 0;
 	if icacomp == 1
-		if ~isempty(EEG.reject.rejmanual), sizeman   = length(find(EEG.reject.rejmanual)); end;
-		if ~isempty(EEG.reject.rejconst),  sizetrend = length(find(EEG.reject.rejconst)); end;
-		if ~isempty(EEG.reject.rejjp),     sizejp    = length(find(EEG.reject.rejjp)); end;
-		if ~isempty(EEG.reject.rejkurt),   sizekurt  = length(find(EEG.reject.rejkurt)); end;
-		if ~isempty(EEG.reject.rejfreq),   sizespec  = length(find(EEG.reject.rejfreq)); end;
+		if ~isempty(EEG.reject.rejmanual), sizeman   = length(find(EEG.reject.rejmanual)); end
+		if ~isempty(EEG.reject.rejconst),  sizetrend = length(find(EEG.reject.rejconst)); end
+		if ~isempty(EEG.reject.rejjp),     sizejp    = length(find(EEG.reject.rejjp)); end
+		if ~isempty(EEG.reject.rejkurt),   sizekurt  = length(find(EEG.reject.rejkurt)); end
+		if ~isempty(EEG.reject.rejfreq),   sizespec  = length(find(EEG.reject.rejfreq)); end
 	else 
-		if ~isempty(EEG.reject.icarejmanual), sizeman   = length(find(EEG.reject.icarejmanual)); end;
-		if ~isempty(EEG.reject.icarejconst),  sizetrend = length(find(EEG.reject.icarejconst)); end;
-		if ~isempty(EEG.reject.icarejjp),     sizejp    = length(find(EEG.reject.icarejjp)); end;
-		if ~isempty(EEG.reject.icarejkurt),   sizekurt  = length(find(EEG.reject.icarejkurt)); end;
+		if ~isempty(EEG.reject.icarejmanual), sizeman   = length(find(EEG.reject.icarejmanual)); end
+		if ~isempty(EEG.reject.icarejconst),  sizetrend = length(find(EEG.reject.icarejconst)); end
+		if ~isempty(EEG.reject.icarejjp),     sizejp    = length(find(EEG.reject.icarejjp)); end
+		if ~isempty(EEG.reject.icarejkurt),   sizekurt  = length(find(EEG.reject.icarejkurt)); end
 		if ~isempty(EEG.reject.icarejfreq),   sizespec  = length(find(EEG.reject.icarejfreq)); end;	
-	end;
+	end
 		
     stdl = [0.25 1.2 0.8 1.2 0.8]; % standard line
 	titl = [0.9 0.18 1.55]; % title line

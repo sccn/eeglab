@@ -36,10 +36,10 @@ NBBLANK = 6; % number of blank for each submenu input
 	if nargin < 1
 		help getallmenus;
 		return;
-	end;
+	end
 	if nargin < 2
 		level = 0;
-	end;
+	end
 	
 	txt = '';
 	nb = 0;
@@ -53,12 +53,12 @@ NBBLANK = 6; % number of blank for each submenu input
 			txt = [ txtmp txt ];
 			labels = { tmplab labels{:} };
 			nb = nb+nbtmp;
-		end;
-	end;
+		end
+	end
 	try
 		txt = [ get(handler, 'Label') 10 txt ];
 		nb = nb+1;
-	catch, end;
+	catch, end
 	if isempty(labels)
 		labels = { nb };
 	end;	
@@ -72,9 +72,9 @@ if nargin < 2
 	lines = find( txt == 10 );
 	for index = 1:length(lines)-1
 		tmptext = txt(lines(index)+1:lines(index+1)-1); 	
-		if maxlength < length( tmptext ), maxlength = length( tmptext ); end;
+		if maxlength < length( tmptext ), maxlength = length( tmptext ); end
 		newtext(index, 1:length(tmptext)) = tmptext;
-	end;
+	end
 	txt = char( newtext(1:index+1, 1:maxlength) );
 end;		
 return;

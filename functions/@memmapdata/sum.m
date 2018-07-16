@@ -22,7 +22,7 @@ function [s] = sum(a,dim)
     
     if nargin < 2
         dim = 1;
-    end;
+    end
     
     %b = (:,:,:);
     if ~strcmpi(a.fileformat, 'transposed')
@@ -37,10 +37,10 @@ function [s] = sum(a,dim)
             if dim == 1
                  dim = 2;
             else dim = 1;
-            end;
+            end
             s = sum(a.data.data.x, dim)';
-        end;
-    end;
+        end
+    end
     return;
     
     % do pnts by pnts if dim = 1
@@ -49,16 +49,16 @@ function [s] = sum(a,dim)
 %         s = zeros(size(a,2), size(a,3));
 %         for i=1:size(a,2)
 %             s(i,:) = mean(a.data.data.x(:,i,:));
-%         end;
+%         end
 %     elseif dim == 1
 %          s = zeros(size(a,1), size(a,1));
 %         for i=1:size(a,1)
 %             s(i,:) = mean(a.data.data.x(:,:,:));
-%         end;
+%         end
 %        
 %         
 %     s = builtin('sum', rand(10,10), dim);
     
     %if length(size(a)) > 2
     %else s = sum(a(:,:,:), dim);
-    %end;
+    %end

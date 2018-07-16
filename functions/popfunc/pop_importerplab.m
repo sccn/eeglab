@@ -43,10 +43,10 @@ com = ''; % this initialization ensure that the function will return something
 if nargin < 1
 	help pop_importerplab;
 	return;
-end;
+end
 if nargin < 3
     ncbins = false;
-end;
+end
 
 % pop up window
 % -------------
@@ -82,11 +82,11 @@ if nargin < 3
     file1  = results.file1;
     file2  = results.file2;
     ncbins = results.ncbins;
-end;
-if isempty(file1), error(sprintf('Empty file %s', file1)); end;
-if isempty(file2), error(sprintf('Empty file %s', file2)); end;
-if ~exist(file1), error(sprintf('Could not find file %s', file1)); end;
-if ~exist(file2), error(sprintf('Could not find file %s', file2)); end;
+end
+if isempty(file1), error(sprintf('Empty file %s', file1)); end
+if isempty(file2), error(sprintf('Empty file %s', file2)); end
+if ~exist(file1), error(sprintf('Could not find file %s', file1)); end
+if ~exist(file2), error(sprintf('Could not find file %s', file2)); end
 
 dataFile1 = loadtxt(file1);
 dataFile2 = loadtxt(file2, 'delim', 9);
@@ -104,19 +104,19 @@ for iLine = 1:size(dataFile2,1)
     labelInd = strfind( dataFile2{iLine}, 'label');
     if length(indEq) < 1
         error(sprintf('Could not find equal for line %d in file %s', iLine, file2));
-    end;
+    end
     label    = dataFile2{iLine}(labelInd+5:end);
     bin      = recodebin(dataFile2{iLine}(1:indEq(1)-1));
     if isempty(labelInd)
         error(sprintf('Could not find "label" for line %d in file %s', iLine, file2));
-    end;
+    end
 
     if length(begPar) < 1 || length(endPar) < 1 || begPar(1) > labelInd
         binrange = deblank(dataFile2{iLine}(indEq+1:labelInd-1));
         indMinus = find(binrange == '-');
         if length(indEq) < 1
             error(sprintf('Could not find minus in bin range for line %d in file %s', iLine, file2));
-        end;
+        end
         bin1 = recodebin(binrange(1:indMinus-1));
         bin2 = recodebin(binrange(indMinus+1:end));
         metabin(mCount).bin   = bin;
@@ -130,8 +130,8 @@ for iLine = 1:size(dataFile2,1)
         bininfo(bCount).label  = label;
         bininfo(bCount).eventrange = str2num(dataFile2{iLine}(begPar(1)+1:endPar(1)-1));
         bCount = bCount+1;
-    end;
-end;
+    end
+end
 
 % scan events
 % -----------
@@ -143,11 +143,11 @@ for iEvent = 1:length(EEG.event)
     typeInd = find(type == oldEvents);
     if length(typeInd) ~= 1
         error('Could not find type in event list');
-    end;
+    end
     typeIndForBin = eventInds(typeInd);
     EEG.event(iEvent).newtype  = recodeeventlabel(newName{typeInd});
     EEG.event(iEvent).eventind = typeIndForBin;
-end;
+end
 if ncbins
     for iEvent = 1:length(EEG.event)
         typeIndForBin = EEG.event(iEvent).eventind;
@@ -155,10 +155,10 @@ if ncbins
             if any(typeIndForBin == bininfo(iBin).eventrange)
                  EEG.event(iEvent).(recodelabel(bininfo(iBin).label)) = 1;
             else EEG.event(iEvent).(recodelabel(bininfo(iBin).label)) = 0;
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 
 % scan metabin and transform to bin
 % ---------------------------------
@@ -173,7 +173,7 @@ for iMeta = 1:length(metabin)
     if length(indBin1) ~= 1 || length(indBin2) ~= 1
         warning([ 'Cannot calculate contrast for ' metabin(iMeta).bin ' using ' metabin(iMeta).binrange{1} ' which is already a contrast bin' ]); 
     else
-        if length(indBin2) ~= 1, error([ metabin(iMeta).binrange{2} ' not found or found twice' ]); end;
+        if length(indBin2) ~= 1, error([ metabin(iMeta).binrange{2} ' not found or found twice' ]); end
         if ~isempty(intersect(bininfo(indBin1).eventrange, bininfo(indBin2).eventrange))
             warning([ 'cannot calculate contrast for ' metabin(iMeta).bin ' because ' metabin(iMeta).binrange{1} ' and ' metabin(iMeta).binrange{2} ' share some common event codes' ]);
         else
@@ -185,11 +185,11 @@ for iMeta = 1:length(metabin)
                     EEG.event(iEvent).(recodelabel(metabin(iMeta).label)) = doubledeblank(bininfo(indBin2).label);
                 else
                     EEG.event(iEvent).(recodelabel(metabin(iMeta).label)) = 'none of these';
-                end;
-            end;
-        end;
-    end;
-end;
+                end
+            end
+        end
+    end
+end
 warning(wb);
 
 % return the string command
@@ -204,7 +204,7 @@ if str(1) ~= 'b'
     str = [ 'bin' str ];
 elseif str(2) ~= 'i'
     str = [ 'bin' str(2:end) ];
-end;
+end
 
 function str = recodeeventlabel(str)
 str(find(str == '"')) = [];
@@ -218,7 +218,7 @@ str(find(str == '(')) = '_';
 str(find(str == '/')) = '_';
 str(find(str == '-')) = '_';
 str(find(str == '&')) = '_';
-if ~isempty(str2num(str(1))) str = [ 'f' str ]; end;
+if ~isempty(str2num(str(1))) str = [ 'f' str ]; end
 
 function str = doubledeblank(str)
 

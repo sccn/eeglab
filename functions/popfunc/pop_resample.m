@@ -70,10 +70,10 @@ if nargin < 2
 	promptstr    = {['New sampling rate']};
 	inistr       = { num2str(EEG(1).srate) };
 	result       = inputdlg2( promptstr, 'Resample current dataset -- pop_resample()', 1,  inistr, 'pop_resample');
-	if length(result) == 0 return; end;
+	if length(result) == 0 return; end
 	freq         = eval( result{1} );
 
-end;
+end
 
 % Default cutoff frequency (pi rad / smp)
 if nargin < 3 || isempty(fc)
@@ -93,7 +93,7 @@ end
 if length(EEG) > 1
     [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
     return;
-end;
+end
 
 % finding the best ratio
 % [p,q] = rat(freq/EEG.srate, 0.0001) % not used right now 
@@ -114,12 +114,12 @@ if isfield(EEG, 'event') & isfield(EEG.event, 'type') & ischar(EEG.event(1).type
         bounds = [ tmpevent(bounds).latency ];
         bounds(bounds <= 0 | bounds > size(EEG.data,2)) = []; % Remove out of range boundaries
         bounds(mod(bounds, 1) ~= 0) = round(bounds(mod(bounds, 1) ~= 0) + 0.5); % Round non-integer boundary latencies
-    end;
+    end
     bounds = [1 bounds size(EEG.data, 2) + 1]; % Add initial and final boundary event
     bounds = unique(bounds); % Sort (!) and remove doublets
 else 
     bounds = [1 size(EEG.data,2) + 1]; % [1:size(EEG.data,2):size(EEG.data,2)*size(EEG.data,3)+1];
-end;
+end
 
 eeglab_options;
 if option_donotusetoolboxes
@@ -129,7 +129,7 @@ elseif exist('resample') == 2
 else usesigproc = 0;
     disp('Signal Processing Toolbox absent: using custom interpolation instead of resample() function.');
     disp('This method uses cubic spline interpolation after anti-aliasing (see >> help spline)');    
-end;
+end
 
 fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
 eeglab_options;
@@ -143,21 +143,21 @@ for index1 = 1:size(EEG.data,1)
         for ind = 1:length(bounds)-1
             tmpres  = [ tmpres; myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q, usesigproc, fc, df ) ];
             indices = [ indices size(tmpres,1)+1 ];
-        end;
+        end
         if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
         else                    EEG.pnts  = size(tmpres,1);
-        end;
+        end
         if option_memmapdata == 1
              tmpeeglab = mmo([], [EEG.nbchan, EEG.pnts, EEG.trials]);
         else tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
-        end;
+        end
     else
         for ind = 1:length(bounds)-1
             tmpres(indices(ind):indices(ind+1)-1,:) = myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q, usesigproc, fc, df);
-        end;
+        end
     end; 
     tmpeeglab(index1,:, :) = tmpres;
-end;
+end
 fprintf('\n');	
 EEG.srate   = EEG.srate*p/q;
 EEG.data = tmpeeglab;
@@ -226,17 +226,17 @@ if isfield(EEG.event, 'latency')
                         EEG.urevent(iUrevt).latency = (EEG.urevent(iUrevt).latency - bounds(iBnd)) * p / q + indices(iBnd);
                     end
 
-                end;
+                end
             catch
                 disp('pop_resample warning: ''urevent'' problem, reinitializing urevents');
                 EEG = rmfield(EEG, 'urevent');
-            end;
-        end;
+            end
+        end
     
     end
     
     EEG = eeg_checkset(EEG, 'eventconsistency');
-end;
+end
 
 % resample for multiple channels ica
 EEG.icaact = [];
@@ -256,8 +256,8 @@ function tmpeeglab = myresample(data, p, q, usesigproc, fc, df)
     if length(data) < 2
         tmpeeglab = data;
         return;
-    end;
-    %if size(data,2) == 1, data = data'; end;
+    end
+    %if size(data,2) == 1, data = data'; end
     if usesigproc
         % padding to avoid artifacts at the beginning and at the end
         % Andreas Widmann May 5, 2011

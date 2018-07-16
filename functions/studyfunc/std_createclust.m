@@ -56,7 +56,7 @@ function [STUDY] = std_createclust(STUDY, ALLEEG, varargin)
 if nargin< 2
     help std_createclust;
     return;
-end;
+end
 
 % decoding options for backward compatibility
 % -------------------------------------------
@@ -65,22 +65,22 @@ if length(varargin) > 0 && ~ischar(varargin{1})
     % STUDY, IDX, algorithm, parentClusterNumber
     if isnumeric(ALLEEG)
         options = { options{:} 'clusterind' ALLEEG };
-        if nargin > 3, options = { options{:} 'centroid'      varargin{1} }; end;
-        if nargin > 4, options = { options{:} 'algorithm'     varargin{2} }; end;
+        if nargin > 3, options = { options{:} 'centroid'      varargin{1} }; end
+        if nargin > 4, options = { options{:} 'algorithm'     varargin{2} }; end
         ALLEEG = [];
-    end;
+    end
 elseif length(varargin) < 2
     options = { options{:} 'name' varargin{1} };
 else
     options =  varargin;
-end;
+end
 opt = finputcheck(options, { 'name'             'string'   []  'Cls';
                              'clusterind'       'integer'  []  length(STUDY.cluster)+1;
                              'parentcluster'    'string'   { 'on','off' }  'off';
                              'algorithm'        'cell'     []  {};
                              'ignore0'          'string'   { 'on','off' }  'off';
                              'centroid'         'real'     []  [] }, 'std_createclust');
-if ischar(opt), error(opt); end;
+if ischar(opt), error(opt); end
 
 % opt.clusterind - index of cluster for each component. Ex: 63 components and 2
 % clusters: opt.clusterind will be a 61x1 vector of 1 and 2 (and 0=outlisers)
@@ -96,10 +96,10 @@ if strcmpi(opt.parentcluster, 'on')
     STUDY.cluster = [];
     for index = 1:length(sameica)
         newcomps = STUDY.datasetinfo(sameica{index}(1)).comps;
-        if isempty(newcomps), newcomps = [1:size(ALLEEG(sameica{index}(1)).icaweights,1)]; end;
+        if isempty(newcomps), newcomps = [1:size(ALLEEG(sameica{index}(1)).icaweights,1)]; end
         comps = [ comps newcomps ];
         sets(length(sameica{index}):-1:1,end+1:end+length(newcomps)) = repmat( sameica{index}', [1 length(newcomps) ] );
-    end;
+    end
     sets(find(sets == 0))   = NaN;
     STUDY.cluster(1).name   = 'Parentcluster 1';
     STUDY.cluster(1).sets   = sets;
@@ -122,7 +122,7 @@ else
             if ~isempty(STUDY.cluster(k).parent)
                 %strcmp(STUDY.cluster(k).parent,STUDY.cluster(STUDY.etc.preclust.clustlevel).name) 
                 STUDY.cluster(k).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
-            end;
+            end
         end
     end
     len = length(STUDY.cluster);
@@ -143,7 +143,7 @@ else
     elseif ~isfield(STUDY.etc.preclust, 'clustlevel')
         STUDY.etc.preclust.clustlevel = 1;
         STUDY.etc.preclust.preclustdata = [];
-    end;
+    end
     
     % create all clusters
     % -------------------
@@ -168,13 +168,13 @@ else
              STUDY.cluster(k+len).preclust.preclustdata   = STUDY.etc.preclust.preclustdata(tmp,:);
              STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
         else STUDY.cluster(k+len).preclust.preclustdata   = [];
-        end;
+        end
 
         %update parents clusters with cluster child indices
         % -------------------------------------------------
         STUDY.cluster(STUDY.etc.preclust.clustlevel).child{end+1} = STUDY.cluster(k+nc).name;
     end
-end;
+end
 
 
 % Find out the highst cluster id number (in cluster name), to find
@@ -184,7 +184,7 @@ end;
 % % find max cluster ID
 % 
 % max_id = 0;
-% if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; end;
+% if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; end
 % for k = 1:length(STUDY.cluster)
 %     ti = strfind(STUDY.cluster(k).name, ' ');
 %     clus_id = STUDY.cluster(k).name(ti(end) + 1:end);
@@ -199,10 +199,10 @@ end;
 %     if ~iscell(STUDY.cluster(1).child)
 %          STUDY.cluster(1).child = { opt.name };
 %     else STUDY.cluster(1).child = { STUDY.cluster(1).child{:} opt.name };
-%     end;
+%     end
 % else  
 %     STUDY.cluster(clustind).parent{1} = 'manual'; % update parent cluster if exists.
-% end;
+% end
 % STUDY.cluster(clustind).name = opt.name;
 % STUDY.cluster(clustind).child = [];
 % STUDY.cluster(clustind).comps = [];
@@ -219,17 +219,17 @@ end;
 %     if ~isempty(opt.subjects)
 %         if length(opt.subjects) ~= length(opt.components)
 %             error('If subjects are specified, the length of the cell array must be the same as for the components');
-%         end;
+%         end
 %         alls = { ALLEEG.subject };
 %         for index = 1:length(opt.subjects)
 %             tmpinds = strmatch(opt.subjects{index}, alls, 'exact');
 %             if isempty(tmpinds)
 %                 error('Cannot find subject');
-%             end;
+%             end
 %             opt.datasets(1:length(tmpinds),index) = tmpinds;
-%         end;
+%         end
 %         opt.datasets(opt.datasets(:) == 0) = NaN;
-%     end;
+%     end
 %     
 %     % deal with cell array inputs
 %     % ---------------------------
@@ -241,13 +241,13 @@ end;
 %                 if iscell(opt.datasets)
 %                      newdats  = [ newdats  opt.datasets{ind1}' ];
 %                 else newdats  = [ newdats  opt.datasets(:,ind1) ];
-%                 end;
+%                 end
 %                 newcomps = [ newcomps opt.components{ind1}(ind2) ];
-%             end;
-%         end;
+%             end
+%         end
 %         opt.datasets   = newdats;
 %         opt.components = newcomps;
-%     end;
+%     end
 %     
 %     % create .sets, .comps, .setinds, .allinds fields
 %     % -----------------------------------------------
@@ -258,4 +258,4 @@ end;
 %     STUDY.cluster(clustind) = std_setcomps2cell( STUDY, clustind);
 %     %[ STUDY.cluster(finalinds(ind)) setinds allinds ] =
 %         %std_setcomps2cell(STUDY, finalinds(ind));
-% end;
+% end

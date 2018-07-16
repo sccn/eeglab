@@ -221,47 +221,47 @@ if nargin <= 2 | ischar(varargin{1})
 	%       for backwards compatibility 11/2004 -sm
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
-	if ischar(g), error(g); end;
-    if g.plotproj && strcmp(g.sumenv, 'fill'), g.sumenv = 'on'; end;
+	if ischar(g), error(g); end
+    if g.plotproj && strcmp(g.sumenv, 'fill'), g.sumenv = 'on'; end
 
 else % dprecated - old style input args
 	if nargin > 3,    g.chanlocs = varargin{1};
 	else              g.chanlocs = [];
-	end;
+	end
         if ischar(varargin{2}), help envtopo; return; end
 	if nargin > 4,	  g.limits = varargin{2};
 	else              g.limits = 0; % [];
-	end;
+	end
         if ischar(varargin{3}), help envtopo; return; end
 	if nargin > 5,    g.compnums = varargin{3};
 	else              g.compnums = [];
-	end;
+	end
         if ~ischar(varargin{4}), help envtopo; return; end
 	if nargin > 6,    g.title = varargin{4};
 	else              g.title = '';
-	end;
+	end
         if ischar(varargin{5}), help envtopo; return; end
 	if nargin > 7,    g.plotchans = varargin{5};
 	else              g.plotchans = [];
-	end;
+	end
         if ischar(varargin{6}), help envtopo; return; end
 	if nargin > 8,    g.voffsets = varargin{6};
 	else              g.voffsets = [];
-	end;
+	end
         if ischar(varargin{7}), help envtopo; return; end
 	if nargin > 9,    g.colorfile = varargin{7};
 	else              g.colorfile = '';
 	                  g.colors = '';
-	end;
+	end
         if ischar(varargin{8}), help envtopo; return; end
 	if nargin > 10,   g.fillcomp = varargin{8};
 	else              g.fillcom = 0;
-	end;
+	end
         if ischar(varargin{9}), help envtopo; return; end
 	if nargin > 11,   g.vert = varargin{9};
 	else              g.vert = [];
-	end;
-    if nargin > 12, varargin =varargin(10:end); end;
+	end
+    if nargin > 12, varargin =varargin(10:end); end
     g.sumenv = 'on';
     g.sortvar = 'mp';
     g.pvaf = []; 
@@ -272,7 +272,7 @@ else % dprecated - old style input args
     g.subcomps = 0;
     g.envmode = 'avg';
     g.dispmaps = 'on';
-end;
+end
 if ~isempty(g.figure), figure(g.figure); end;        % remember the current figure (for Matlab 7.0.0 bug)
 
 if ~isempty(g.pvaf) 
@@ -292,7 +292,7 @@ end
 % 
 if ndims(data) == 3
     data = mean(data,3); % average the data if 3-D
-end;
+end
 [chans,frames] = size(data); 
 
 if frames > MAX_FRAMES
@@ -346,7 +346,7 @@ if length(g.limits) == 1   % make g.limits at least of length 2
     g.limits(1) = 0; g.limits(2) = 0;
 else
     g.limits(2) = g.limits(2)/1000;  % 
-end;
+end
 g.limcontrib = g.limcontrib/1000; % the time range in which to select largest components
 
 %
@@ -412,7 +412,7 @@ if any(g.limcontrib ~= 0)
 else
     limframe1 = 1;
     limframe2 = frames;
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%% Read line color information %%%%%%%%%%%%%%%%%%%%%
@@ -435,7 +435,7 @@ if exist(g.colorfile) == 2  % if an existing file
         else
             colors = fscanf(cid,'%s',[3 MAXENVPLOTCHANS]);
             colors = colors';
-        end;
+        end
 else
         colors = g.colorfile;
 end
@@ -449,10 +449,10 @@ end
               colors(i,j)='-';
             elseif j>2
               colors(i,j)=' ';
-            end;
-          end;
-        end;
-      end;
+            end
+          end
+        end
+      end
 colors(1,1) = 'k'; % make sure 1st color (for data envelope) is black
 
 %
@@ -538,7 +538,7 @@ if ~isempty(g.subcomps)
   end
   fprintf('\n');
   g.icaact(g.subcomps,:) = zeros(length(g.subcomps),size(data,2));
-end;
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Process components %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -687,7 +687,7 @@ for c = 1:ncomps
           fprintf('IC%1.0f relative power of back-projection: %g\n',c,sortvar(c));
       else
           error('''sortvar'' argument unknown');
-      end;
+      end
 
 end % component c
 fprintf('\n');
@@ -812,7 +812,7 @@ else
                                   - sumproj(:,limframe1:limframe2)).^2)); 
     sumppaf = 100-100*sumppaf/rmsproj;
     ot   = 'ppaf';
-end;
+end
 
 if ~xunitframes
    fprintf('    Summed component ''%s'' in interval [%4g %4g] ms: %4.2f%%\n',...
@@ -1131,8 +1131,8 @@ if strcmpi(g.dispmaps, 'on')
         maxvolt = 0;
         for n=1:ntopos
             maxvolt = max(max(abs(maxproj(:,n))), maxvolt);
-        end;
-    end;
+        end
+    end
     
     [tmp tmpsort] = sort(maporder);
     [tmp tmpsort] = sort(tmpsort);
@@ -1161,14 +1161,14 @@ if strcmpi(g.dispmaps, 'on')
    ['text(-0.6, -0.6, ''' g.sortvar ': ' sprintf('%6.2f', sortvar(tmpsort(t))) ''');']);
         else 
 			axis off;
-        end;
+        end
 
         %
         %%%%%%%%%%%%% Scale colors %%%%%%%%%%%%%%%%%%%%%%%%%
         %
         if strcmpi(g.actscale, 'on')
             caxis([-maxvolt maxvolt]);
-        end;
+        end
         %
         %%%%%%%%%%%%%%%%%%%%%%%% label components %%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -1186,9 +1186,9 @@ if strcmpi(g.dispmaps, 'on')
                     for j=1:c
                         if compnames(i,j)=='.',
                             compnames(i,j)=' ';
-                        end;
-                    end;
-                end;
+                        end
+                    end
+                end
                 numlabels=0;
             end
         end
@@ -1231,11 +1231,11 @@ if strcmpi(g.dispmaps, 'on')
 		%	'verticalalignment','middle');
 %         text(1,0.61,'-','FontSize',FONTSIZE,'HorizontalAlignment','Center');
         text(1,g.axisoff+0.01,'-','FontSize',FONTSIZE,'HorizontalAlignment','Center');
-    end;
+    end
     axes(axall)
     set(axall,'layer','top'); % bring component lines to top
     
-end;
+end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% turn on axcopy %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1247,7 +1247,7 @@ return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function envdata = envelope(data, envmode)  % also in release as env()
   if nargin < 2
       envmode = 'avg';
-  end;
+  end
   if strcmpi(envmode, 'rms'); % return rms of pos and neg vals at each time point 
       warning off;
       datnaeg = (data < 0).*data; % zero out positive values
@@ -1268,6 +1268,6 @@ function envdata = envelope(data, envmode)  % also in release as env()
           mindata = min([data;data]); % min at each time point
           envdata = [maxdata;mindata];
       end
-  end;
+  end
   
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

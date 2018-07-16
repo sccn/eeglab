@@ -35,7 +35,7 @@ function [x, i, j]=shuffle( y, dim)
 if nargin < 1
 	help shuffle;
 	return;
-end;
+end
 if nargin < 2
 	if size(y,1) ~= 1
 		dim = 1;
@@ -44,9 +44,9 @@ if nargin < 2
 			dim = 2;
 		else
 			dim = 3;
-		end;
-	end;
-end;
+		end
+	end
+end
 	
 r =size(y, dim);
 a = rand(1,r);

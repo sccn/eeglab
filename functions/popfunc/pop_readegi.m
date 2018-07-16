@@ -40,7 +40,7 @@ function [EEG, command] = pop_readegi(filename, datachunks, forceversion, filelo
 
 EEG = [];
 command = '';
-if nargin < 4, fileloc = 'auto'; end;
+if nargin < 4, fileloc = 'auto'; end
 disp('Warning: This function can only import continuous files or');
 disp('         epoch files with only one length for data epochs');
 
@@ -49,7 +49,7 @@ if nargin < 1
     [filename, filepath] = uigetfile('*.RAW;*.raw', ...
         'Choose an EGI RAW file -- pop_readegi()');
     drawnow;
-    if filename == 0 return; end;
+    if filename == 0 return; end
     filename = [filepath filename];
     
     fid = fopen(filename, 'rb', 'b');
@@ -64,7 +64,7 @@ if nargin < 1
             case { 64 65 }, fileloc =  {floc{2} floc{3:4} floc{1}};
             case { 128 129 }, fileloc = {floc{3} floc{4} floc{1:2}};
             case { 256 257 }, fileloc = {floc{4} floc{1:3}};
-        end;
+        end
         uilist = { { 'style' 'text' 'string' sprintf('Segment/frame number (default: 1:%d)', head.segments) } ...
                    { 'style' 'edit' 'string' '' } ...
                    { 'style' 'text' 'string' 'Channel location file (in eeglab/sample_locs)' } ...
@@ -83,14 +83,14 @@ if nargin < 1
 %         promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) 'Channel location file (in eeglab/sample_locs)' };
 %         inistr       = { '' fileloc(res{2})};
 %         result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
-        if length(result) == 0 return; end;
+        if length(result) == 0 return; end
         datachunks   = eval( [ '['  result{1} ']' ] );
         fileloc      = char(fileloc(result{2}));
     else
         datachunks   = [];
         disp('Only one segment, cannot read portion of the file');
-    end;
-end;
+    end
+end
 
 % load data
 % ----------
@@ -108,7 +108,7 @@ else
 end
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
-end;
+end
 EEG.comments        = [ 'Original file: ' filename ];
 EEG.setname 		= 'EGI file';
 EEG.nbchan          = size(EEG.data,1);
@@ -127,7 +127,7 @@ if ~isempty(Eventdata)
             'delevent', 'off', 'typename', Head.eventcode(index,:), ...
             'nbtype', 1, 'delchan', 'on');
         Head.eventcode(end,:) = [];
-    end;
+    end
     
     % renaming event codes
     % --------------------
@@ -142,8 +142,8 @@ if ~isempty(Eventdata)
             if isempty(indtim) & ~isempty(indepoc)
                 for index = indepoc
                     EEG.event(index).type = 'boundary';
-                end;
-            end;
+                end
+            end
             % other wise if both non-empty data epochs
             if ~isempty(indtim) & ~isempty(indepoc)
                 if rem(size(EEG.data,2) / (length(indepoc)+1),1) == 0
@@ -151,11 +151,11 @@ if ~isempty(Eventdata)
                     EEG.trials       = length(indepoc)+1;
                 else
                     disp('Warning: data epochs detected but wrong data size');
-                end;
-            end;
-        end;
-    catch, disp('Warning: event renaming failed'); end;
-end;
+                end
+            end
+        end
+    catch, disp('Warning: event renaming failed'); end
+end
 
 % adding segment category indices
 % -------------------------------
@@ -164,20 +164,20 @@ if ~isempty(SegCatIndex) && EEG.trials > 1
         if ~isempty(EEG.event)
             for index = 1:length(EEG.event)
                 EEG.event(index).category = Head.catname{SegCatIndex(EEG.event(index).epoch)};
-            end;
+            end
         else % create time-locking events
             for trial = 1:EEG.trials
                 EEG.event(trial).epoch    = trial;
                 EEG.event(trial).type     = 'TLE';
                 EEG.event(trial).latency  = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;
                 EEG.event(trial).category = Head.catname{SegCatIndex(trial)};
-            end;
-        end;
+            end
+        end
     catch,
         disp('Warning: error while importing trial categories');
         EEG.event = rmfield(EEG.event, 'category');
-    end;
-end;
+    end
+end
 EEG = eeg_checkset(EEG, 'makeur');
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
@@ -189,23 +189,23 @@ if nargin < 1
         'to your montage as EGI has different versions of caps.' 10 ...
         'Check your montage in the channel editor and import' 10 ...
         'the correct location file if necessary.' ]);
-end;
+end
 if all(EEG.data(end,1:10) == 0)
     disp('Deleting empty data reference channel (reference channel location is retained)');
     EEG.data(end,:)   = [];
     EEG.nbchan        = size(EEG.data,1);
     EEG = eeg_checkset(EEG);
-end;
+end
 if ~isempty(fileloc)
     if strcmpi(fileloc, 'auto')
         EEG = readegilocs(EEG);
     else
         EEG = readegilocs(EEG, fileloc);
-    end;
-end;
+    end
+end
 
 if nargin < 1
     command = sprintf('EEG = pop_readegi(''%s'', %s);', filename, vararg2str({datachunks forceversion fileloc }) );
-end;
+end
 
 return;

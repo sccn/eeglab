@@ -35,12 +35,12 @@ com = '';
 if nargin < 1
    help pop_writelocs;
    return;
-end;
+end
 
 if isfield(chans, 'shrink')
     chans = rmfield(chans, 'shrink');
     disp('Warning: shrink factor ignored');
-end;
+end
 
 disp('WARNING: ELECTRODE COORDINATES MUST BE WITH NOSE ALONG THE +X DIMENSION TO BE EXPORTED')
 disp('         IF NOT, THE EXPORTED FILE COORDINATES MAY BE INACURATE')
@@ -56,9 +56,9 @@ indformat  = [];
 for index = 1:length(chanformat), 
     if ~ischar(chanformat(index).importformat)
         indformat = [ indformat index ];
-    end;
-    if isempty(chanformat(index).skipline), chanformat(index).skipline = 0; end;
-end;
+    end
+    if isempty(chanformat(index).skipline), chanformat(index).skipline = 0; end
+end
 listtype   = { chanformat(indformat).type };
 formatinfo = { chanformat(indformat).importformat };
 formatskip = [ chanformat(indformat).skipline ];
@@ -147,7 +147,7 @@ if nargin < 2
    
    res = inputgui(geometry, listui, 'pophelp(''writelocs'');', ...
       'Exporting electrode location file -- pop_writelocs()', { listcolformat {} formatinfo formatskip }, fig, [1 3 1 1 3 1 1 1 3 ]);
-   if gcf ~= fig, return; end;
+   if gcf ~= fig, return; end
    exportfields = get(fig, 'userdata');
    exportfields = exportfields{2};
    close(fig);
@@ -157,12 +157,12 @@ if nargin < 2
    if isempty(filename), 
       errordlg2('Error: Empty file name', 'Error');
       return;
-   end;
+   end
    options = { 'filetype' listtype{res{2}} 'format' exportfields ...
          'header' fastif(res{5}, 'on', 'off') 'customheader' res{6} };
 else
 	options = varargin;   
-end;
+end
 
 % generate history
 % ----------------
@@ -176,5 +176,5 @@ else
     else
         writelocs(chans, filename, options{:});
         com = sprintf('pop_writelocs( %s, ''%s'', %s);', inputname(1), filename, vararg2str(options));
-    end;
-end;
+    end
+end

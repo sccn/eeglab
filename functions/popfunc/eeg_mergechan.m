@@ -63,6 +63,6 @@ function alllocs = myunion(locs1, locs2)
            alllocs(count3) = locs2(count2);
            count2 = count2 + 1;
            count3 = count3 + 1;
-       end;
+       end
        
-   end;
+   end

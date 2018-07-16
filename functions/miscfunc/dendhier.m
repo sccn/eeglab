@@ -27,7 +27,7 @@ function [links,topology,node] = dendhier(links,topology,node)
     prevdist = topology(prevnode,4);
     links = [links; c1 clst prevdist dist];
     [links,topology,node] = dendhier(links,topology,prevnode);
-  end;
+  end
 
   if (c2 <= n)
     links = [links; c2 clst 0 dist];
@@ -36,6 +36,6 @@ function [links,topology,node] = dendhier(links,topology,node)
     prevdist = topology(prevnode,4);
     links = [links; c2 clst prevdist dist];
     [links,topology,node] = dendhier(links,topology,prevnode);
-  end;
+  end
 
   return;

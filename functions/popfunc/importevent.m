@@ -99,7 +99,7 @@ I = [];
 % remove the event field
 % ----------------------
 if ~isempty(oldevent), allfields = fieldnames(oldevent);
-else                   allfields = {}; end;
+else                   allfields = {}; end
     
 g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
                          'skipline'    'integer'  [0 Inf]               0;
@@ -112,8 +112,8 @@ g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
                          'optimoffset' 'string'  { 'on';'off' }         'off';
                          'optimmeas'   'string'  { 'median';'mean' }    'mean';
                          'delim'       {'integer';'string'}   []        char([9 32 44])}, 'importevent');
-if ischar(g), error(g); end;
-if ~isempty(g.indices), g.append = 'yes'; end;
+if ischar(g), error(g); end
+if ~isempty(g.indices), g.append = 'yes'; end
 g.delim = char(g.delim);    
 
 % call from pop_importevent
@@ -121,19 +121,19 @@ g.delim = char(g.delim);
 if ~isempty(g.event)
     event = g.event;
     if ~ischar(event)
-        if size(event,2) > size(event,1), event = event'; end;
+        if size(event,2) > size(event,1), event = event'; end
         if iscell(event)
             eventStr = cellfun(@ischar, event);
             eventNum = cellfun(@isnumeric, event);
             if all(eventStr(1,:)) && ~all(eventStr(:,1))
                 event = event';
-            end;
+            end
             if all(eventNum(1,:)) && ~all(eventNum(:,1))
                 event = event';
-            end;
-        end;
-    end;
-end;
+            end
+        end
+    end
+end
 g.event = event;
 
 % determine latency for old event alignment
@@ -150,7 +150,7 @@ if ~isnan(g.align.val)
     end;    
     switch g.append
         case {'yes' '''yes'''}, disp('Setevent warning: cannot align and append events at the same time; disabling event alignment');
-    end;
+    end
     if g.align.val < 0
         g.align.event = oldevent(1).latency;
     else
@@ -163,7 +163,7 @@ if ~isnan(g.align.val)
                           int2str([ oldevent(1:min(10, length(oldevent))).latency ]));
 else
     g.oldevents = [];
-end;
+end
 
 
 tmpfields = fieldnames(g);
@@ -179,13 +179,13 @@ end
 % ------------------------
 for curfield = tmpfields'
     if ~isempty(event), allfields = fieldnames(event);
-    else                    allfields = {}; end;
+    else                    allfields = {}; end
     switch lower(curfield{1})
         case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
         case 'event', % load an ascii file
             switch g.append 
                 case { '''no''' 'no' } % ''no'' for backward compatibility
-                      if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
+                      if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
                       if length(tmparray) == length(event)
                          disp('Adding new field to event structure');
@@ -205,8 +205,8 @@ for curfield = tmpfields'
                           for index = 1:length(event)
                               event(index).init_index = index;
                               event(index).init_time  = event(index).latency*g.timeunit;
-                          end;
-                      end;
+                          end
+                      end
                       if latencypresent
                           event = recomputelatency( event, 1:length(event), srate, ...
                                                         g.timeunit, g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
@@ -214,12 +214,12 @@ for curfield = tmpfields'
                 case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
-                      if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
+                      if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
-                      if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(event); end;
+                      if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(event); end
                       if length(g.indices) ~= size(tmparray,1)
                           error('Set error: number of row in file does not match the number of event given as input'); 
-                      end;
+                      end
 
                       % add field
                       % ---------
@@ -236,18 +236,18 @@ for curfield = tmpfields'
                       for index = 1:size(tmparray,1)
                           event(index+offset).init_index = index;
                           event(index+offset).init_time  = event(index+offset).latency*g.timeunit;
-                      end;
+                      end
                       if latencypresent
                           event = recomputelatency( event, g.indices, srate, g.timeunit, ...
                                                         g.align, g.oldevents, g.optimalign, g.optimmeas, g.optimoffset);
                       end
-            end;
-      end;
-end;
+            end
+      end
+end
 
 if isempty(event) % usefull 0xNB empty structure
     event = [];
-end;
+end
 
 %% remove the events wit out-of-bound latencies
 % --------------------------------------------
@@ -259,9 +259,9 @@ if isfield(event, 'latency') && latencypresent
             fprintf( 'importevent warning: %d/%d event(s) have invalid latencies and were removed\n', ...
                      length(res), length(event));
             event( res ) = [];
-        end;
-    end;
-end;
+        end
+    end
+end
 
 %% interpret the variable name
 % ---------------------------
@@ -275,7 +275,7 @@ function array = load_file_or_array( varname, skipline, delim );
              array = mattocell(varname);
          else
              array = varname;
-         end;
+         end
     end;     
 return;
 
@@ -288,34 +288,34 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
     if ~isfield(event, 'latency'), 
         if isfield(event, 'duration')
             error('A duration field cannot be defined if a latency field has not been defined');
-        end;
+        end
         return; 
-    end;
+    end
     if ~isnan(timeunit)
         for index = indices
             event(index).latency  = event(index).latency*srate*timeunit;
             if isfield(event, 'duration')
                 event(index).duration = event(index).duration*srate*timeunit;
-            end;
-        end;
-    end;
+            end
+        end
+    end
 
     % alignment with old events
     % -------------------------
     if ~isnan( align.val )
         if align.val >= 0, alignlatency = event(1).latency;
         else               alignlatency = event(-align.val+1).latency;
-        end;
+        end
         for index = indices
              event(index).latency = event(index).latency-alignlatency+align.event;
-        end;
+        end
         if length(event) ~= align.nbevent
             disp('Setevent warning: the number of pre-existing events do not correspond to the number of events');
             disp('                  that were read, so their latencies may have been wrongly re-aligned');
         end;           
         fprintf(align.txt);
         fprintf('New event latencies (10 first): %s ...\n', int2str(round([ event(1:min(10, length(event))).latency ])));
-    end;
+    end
     if strcmpi(optimalign, 'on') & ~isempty(oldevents)
         newlat = [ event.latency     ];
         oldlat = [ oldevents.latency ];
@@ -328,7 +328,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         else
             newlat = newlat-newlat(1-align.val);
             oldlat = oldlat-oldlat(1);
-        end;
+        end
         initcond = [1];
         if strcmpi(optimoffset, 'on')
             initcond = [initcond 0];
@@ -337,7 +337,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             newfactor = fminsearch('eventalign',initcond,[],newlat, oldlat, optimmeas);
         catch 
             newfactor = fminsearch('eventalign',initcond,[],[],newlat, oldlat, optimmeas); % Octave
-        end;
+        end
         if length(newfactor) == 1
             newfactor = [newfactor 0]; % add 0 offset
         end
@@ -350,7 +350,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             difference2 = eventalign( newfactor, newlat, oldlat, optimmeas);
             fprintf('The average difference before correction was %f sample points\n', difference1);
             fprintf('The average difference after correction is %f sample points\n', difference2);
-        end;
+        end
         
         %diffarray = abs(newfactor*newlat-oldlat)';
         %[allmins poss] = min(diffarray);

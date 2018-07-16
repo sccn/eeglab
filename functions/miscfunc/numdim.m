@@ -41,7 +41,7 @@ function lambda = numdim( a )
     if nargin < 1
         help numdim;
         return;
-    end;
+    end
     
 % Akaike, Identification toolbox (linear identification)
 

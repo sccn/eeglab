@@ -41,7 +41,7 @@ function [sweeps] = eeg_countepochs(EEG, epochmarker);
 if nargin < 1
 	help eeg_countepochs;
 	return;
-end;
+end
 
 % Initialize an array which will keep counts
 clearvars types counts
@@ -54,7 +54,7 @@ for trial=1:length(EEG.epoch)
     % Default 'epochmarker' to 'type' if no input was provided.
     if nargin < 2
         epochmarker = 'type';
-    end;
+    end
     
     % Look for epochs that have >1 event and find which event is epoched around
     eventindex = 1; % if only 1 event, eventindex=1

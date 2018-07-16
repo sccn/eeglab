@@ -60,10 +60,10 @@ com = '';
 if nargin < 1
     help pop_eegfilt;
     return;
-end;
+end
 if isempty(EEG(1).data)
     disp('Pop_eegfilt() error: cannot filter an empty dataset'); return;
-end;
+end
 
 % warning
 % -------
@@ -71,7 +71,7 @@ if exist('filtfilt') ~= 2
     disp('Warning: cannot find the signal processing toolbox');
     disp('         a simple fft/inverse fft filter will be used');
     usefft = 1;
-end;
+end
 
 if nargin < 2
     % which set to save
@@ -94,33 +94,33 @@ if nargin < 2
     result = inputgui( 'geometry', geometry, 'uilist', uilist, 'title', 'Filter the data -- pop_eegfilt()', ...
         'helpcom', 'pophelp(''pop_eegfilt'')');
     
-    if isempty(result), return; end;
-    if isempty(result{1}), result{1} = '0'; end;
-    if isempty(result{2}), result{2} = '0'; end;
+    if isempty(result), return; end
+    if isempty(result{1}), result{1} = '0'; end
+    if isempty(result{2}), result{2} = '0'; end
     
     locutoff   	 = eval( result{1} );
     hicutoff 	 = eval( result{2} );
     if isempty( result{3} )
         filtorder = [];
     else filtorder    = eval( result{3} );
-    end;
+    end
     revfilt = 0;
     if result{4},
         revfilt = 1;
         if locutoff == 0 | hicutoff == 0,
             error('Need both lower and higher edge for notch filter');
-        end;
-    end;
+        end
+    end
     if result{5}
          usefft = 1;
     else usefft = 0;
-    end;
+    end
     if result{6}
          causal = 1;
     else causal = 0;
-    end;
+    end
     plotfreqz = result{7};
-    if locutoff == 0 & hicutoff == 0 return; end;
+    if locutoff == 0 & hicutoff == 0 return; end
     if result{8}
         firtype = 'fir1';
     else
@@ -129,16 +129,16 @@ if nargin < 2
 else
     if nargin < 3
         hicutoff = 0;
-    end;
+    end
     if nargin < 4
         filtorder = [];
-    end;
+    end
     if nargin < 5
         revfilt = 0;
-    end;
+    end
     if nargin < 6
         usefft = 0;
-    end;
+    end
     if nargin < 7
         plotfreqz = 0;
     end
@@ -148,13 +148,13 @@ else
     if nargin < 8
         causal = 0;
     end
-end;
+end
 
 if locutoff && hicutoff
     disp('WARNING: BANDPASS FILTERS SOMETIMES DO NOT WORK (MATLAB BUG)')
     disp('WARNING: PLOT SPECTRUM AFTER FILTERING TO ASSESS FILTER EFFICIENCY')
     disp('WARNING: IF FILTER FAILS, LOWPASS DATA THEN HIGHPASS DATA')
-end;
+end
 
 % process multiple datasets
 % -------------------------
@@ -162,14 +162,14 @@ if length(EEG) > 1
     [ EEG com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
         { locutoff, hicutoff, filtorder, revfilt } );
     return;
-end;
+end
 
 options = { EEG.srate, locutoff, hicutoff, 0 };
 if ~isempty( filtorder )
     options = { options{:} filtorder };
 else
     options = { options{:} 0 };
-end;
+end
 
 options = {options{:} revfilt firtype causal};
 
@@ -182,7 +182,7 @@ if EEG.trials == 1
                 [EEG.data, b] = eegfilt( EEG.data, options{:});
             else
                 EEG.data = eegfiltfft( EEG.data, options{1:6});            % 7/30/2014 Ramon: {:} to {1:6}; 
-            end;
+            end
         else
             options{4} = 0;
             disp('Pop_eegfilt:finding continuous data boundaries');
@@ -190,7 +190,7 @@ if EEG.trials == 1
             boundaries = tmplat(boundaries);
             boundaries = [0 floor(boundaries-0.49) EEG.pnts];
             try, warning off MATLAB:divideByZero
-            catch, end;
+            catch, end
             for n=1:length(boundaries)-1
                 if boundaries(n)+1 < boundaries(n+1)
                     try
@@ -201,27 +201,27 @@ if EEG.trials == 1
                         else
                             EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
                                 eegfiltfft(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{1:6});  % 7/30/2014 Ramon: {:} to {1:6}; 
-                        end;
+                        end
                     catch
                         fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
                         if locutoff ~= 0 & hicutoff == 0
                             tmprange = [boundaries(n)+1:boundaries(n+1)];
                             EEG.data(:,tmprange) = ...
                                 EEG.data(:,tmprange) - repmat(mean(EEG.data(:,tmprange),2), [1 length(tmprange)]);
-                        end;
-                    end;
-                end;
+                        end
+                    end
+                end
             end
             try, warning on MATLAB:divideByZero
-            catch, end;
+            catch, end
         end
     else
         if ~usefft
             [EEG.data, b] = eegfilt( EEG.data, options{:});
         else
             EEG.data = eegfiltfft( EEG.data, options{1:6});                % 7/30/2014 Ramon: {:} to {1:6}; 
-        end;
-    end;
+        end
+    end
 else
     EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
     options{4} = EEG.pnts;
@@ -229,9 +229,9 @@ else
         [EEG.data, b] = eegfilt( EEG.data, options{:});
     else
         EEG.data = eegfiltfft( EEG.data, options{1:6});                    % 7/30/2014 Ramon: {:} to {1:6}; 
-    end;
+    end
     % Note: reshape does not reserve new memory while EEG.data(:,:) does
-end;
+end
 EEG.icaact = [];
 
 if ~usefft & plotfreqz & exist('b') == 1

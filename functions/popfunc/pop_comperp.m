@@ -91,13 +91,13 @@ erp1 = '';
 if nargin < 1
    help pop_comperp;
    return;
-end;
+end
 if isempty(ALLEEG)
     error('pop_comperp: cannot process empty sets of data');
-end;
+end
 if nargin < 2
    flag = 1;
-end;
+end
 allcolors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
               'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm'};
 erp1 = '';
@@ -141,30 +141,30 @@ if nargin < 3
     
     % remove geometry textbox for ICA components
     result = inputgui( uigeom, uilist, 'pophelp(''pop_comperp'')', 'ERP grand average/RMS - pop_comperp()');
-    if length(result) == 0, return; end;
+    if length(result) == 0, return; end
 
     %decode parameters list
     options = {};
     datadd = eval( [ '[' result{1} ']' ]);
-    if result{2},  options = { options{:} 'addavg'  'on' }; else, options = { options{:} 'addavg'  'off' }; end;
-    if result{3},  options = { options{:} 'addstd'  'on' }; else, options = { options{:} 'addstd'  'off' }; end;
-    if result{4},  options = { options{:} 'addall'  'on' }; end;
+    if result{2},  options = { options{:} 'addavg'  'on' }; else, options = { options{:} 'addavg'  'off' }; end
+    if result{3},  options = { options{:} 'addstd'  'on' }; else, options = { options{:} 'addstd'  'off' }; end
+    if result{4},  options = { options{:} 'addall'  'on' }; end
     datsub = eval( [ '[' result{5} ']' ]);
-    if result{6},  options = { options{:} 'subavg'  'on' }; end;
-    if result{7},  options = { options{:} 'substd'  'on' }; end;
-    if result{8},  options = { options{:} 'suball'  'on' }; end;
-    if result{9},  options = { options{:} 'diffavg' 'on' }; else, options = { options{:} 'diffavg' 'off' }; end;
-    if result{10}, options = { options{:} 'diffstd' 'on' }; else, options = { options{:} 'diffstd' 'off' }; end;
-    if result{11}, options = { options{:} 'diffall' 'on' }; end;
+    if result{6},  options = { options{:} 'subavg'  'on' }; end
+    if result{7},  options = { options{:} 'substd'  'on' }; end
+    if result{8},  options = { options{:} 'suball'  'on' }; end
+    if result{9},  options = { options{:} 'diffavg' 'on' }; else, options = { options{:} 'diffavg' 'off' }; end
+    if result{10}, options = { options{:} 'diffstd' 'on' }; else, options = { options{:} 'diffstd' 'off' }; end
+    if result{11}, options = { options{:} 'diffall' 'on' }; end
     
-    if result{12},           options = { options{:} 'chans' eval( [ '[' result{12} ']' ]) }; end;
-    if ~isempty(result{13}), options = { options{:} 'alpha' str2num(result{13}) }; end;
-    if result{14},           options = { options{:} 'mode' 'rms' }; end;
-    if ~isempty(result{15}), options = { options{:} 'lowpass' str2num(result{15}) }; end;
+    if result{12},           options = { options{:} 'chans' eval( [ '[' result{12} ']' ]) }; end
+    if ~isempty(result{13}), options = { options{:} 'alpha' str2num(result{13}) }; end
+    if result{14},           options = { options{:} 'mode' 'rms' }; end
+    if ~isempty(result{15}), options = { options{:} 'lowpass' str2num(result{15}) }; end
     if ~isempty(result{16}), options = { options{:} 'tplotopt' eval([ '{ ' result{16} ' }' ]) }; end; 
 else 
     options = varargin;
-end;
+end
 
 if nargin == 3
   datsub = []; % default 
@@ -172,7 +172,7 @@ end
 
 % decode inputs
 % -------------
-if isempty(datadd), error('First edit box (datasets to add) can not be empty'); end;
+if isempty(datadd), error('First edit box (datasets to add) can not be empty'); end
 g = finputcheck( options, ... 
                  { 'chans'    'integer'  []               [1:ALLEEG(datadd(1)).nbchan];
                    'title'    'string'   []               '';
@@ -196,50 +196,50 @@ g = finputcheck( options, ...
                    'tplotopt' 'cell'     []              {};
                    'mode'     'string'  {'ave';'rms'}    'ave';
                    'multcmp'  'integer'  [0 Inf]         [] });
-if ischar(g), error(g); end;
+if ischar(g), error(g); end
 if length(datadd) == 1
     disp('Cannot perform statistics using only 1 dataset');
     g.alpha = [];
-end;
+end
 
 h = figure; axcopy
 
-try, icadefs; set(h, 'color', BACKCOLOR); axis off; catch, end;
+try, icadefs; set(h, 'color', BACKCOLOR); axis off; catch, end
 
 % backward compatibility of param
 % -------------------------------
 if ~strcmpi(g.diffonly, 'none')
-    if strcmpi(g.diffonly, 'off'), g.addavg = 'on'; g.subavg = 'on'; end;
-end;
+    if strcmpi(g.diffonly, 'off'), g.addavg = 'on'; g.subavg = 'on'; end
+end
 if ~strcmpi(g.allerps, 'none')
     if isempty(datsub)
          g.addall  = g.allerps;
     else g.diffall = g.allerps;
-    end;
-end;
+    end
+end
 if ~strcmpi(g.std, 'none')
     if isempty(datsub)
          g.addstd  = g.std;
     else g.diffstd = g.std;
-    end;
-end;
+    end
+end
 
 % check consistency
 % -----------------
 if length(datsub) > 0 & length(datadd) ~= length(datsub)
     error('The number of component to subtract must be the same as the number of components to add');
-end;
+end
 
 % if only 2 dataset entered, toggle average to single trial
 % ---------------------------------------------------------
 if length(datadd) == 1 &strcmpi(g.addavg, 'on')
     g.addavg  = 'off';
     g.addall = 'on';
-end;
+end
 if length(datsub) == 1 &strcmpi(g.subavg, 'on')
     g.subavg  = 'off';
     g.suball = 'on';
-end;
+end
 if length(datsub) == 1 & length(datadd) == 1 &strcmpi(g.diffavg, 'on')
     g.diffavg  = 'off';
     g.diffall = 'on';
@@ -254,11 +254,11 @@ nbchan = ALLEEG(datadd(1)).nbchan;
 chanlocs = ALLEEG(datadd(1)).chanlocs;
 unionIndices = union_bc(datadd, datsub);
 for index = unionIndices(:)'
-    if ALLEEG(index).pnts ~= pnts,     error(['Dataset '  int2str(index) ' does not have the same number of points as others']); end;
-    if ALLEEG(index).xmin ~= xmin,     error(['Dataset '  int2str(index) ' does not have the same xmin as others']); end;
-    if ALLEEG(index).xmax ~= xmax,     error(['Dataset '  int2str(index) ' does not have the same xmax as others']); end;
-    if ALLEEG(index).nbchan ~= nbchan, error(['Dataset '  int2str(index) ' does not have the same number of channels as others']); end;
-end;
+    if ALLEEG(index).pnts ~= pnts,     error(['Dataset '  int2str(index) ' does not have the same number of points as others']); end
+    if ALLEEG(index).xmin ~= xmin,     error(['Dataset '  int2str(index) ' does not have the same xmin as others']); end
+    if ALLEEG(index).xmax ~= xmax,     error(['Dataset '  int2str(index) ' does not have the same xmax as others']); end
+    if ALLEEG(index).nbchan ~= nbchan, error(['Dataset '  int2str(index) ' does not have the same number of channels as others']); end
+end
     
 if ~isempty(g.alpha) & length(datadd) == 1
     error([ 'T-tests require more than one ''' datadd ''' dataset' ]);
@@ -270,10 +270,10 @@ for index = 1:length(datadd)
     TMPEEG = eeg_checkset(ALLEEG(datadd(index)),'loaddata');
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
     else          erp1ind(:,:,index)  = mean(eeg_getdatact(TMPEEG, 'component', [1:size(TMPEEG.icaweights,1)]),3);
-    end;
+    end
     addnames{index} = [ '#' int2str(datadd(index)) ' ' TMPEEG.setname ' (n=' int2str(TMPEEG.trials) ')' ];
     clear TMPEEG;
-end;
+end
 
 % optional: subtract
 % ------------------
@@ -289,10 +289,10 @@ if length(datsub) > 0 % dataset to subtract
         TMPEEG = eeg_checkset(ALLEEG(datsub(index)),'loaddata');
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
         else          erp2ind(:,:,index)  = mean(eeg_getdatact(TMPEEG, 'component', [1:size(TMPEEG.icaweights,1)]),3);
-        end;
+        end
         subnames{index} = [ '#' int2str(datsub(index)) ' ' TMPEEG.setname '(n=' int2str(TMPEEG.trials) ')' ];
         clear TMPEEG
-    end;
+    end
     
     l1 = size(erp1ind,3);
     l2 = size(erp2ind,3);
@@ -317,7 +317,7 @@ if length(datsub) > 0 % dataset to subtract
         regions = p2regions(pvalues, g.alpha, [xmin xmax]*1000);
     else 
         pvalues= [];
-    end;
+    end
     
 else
     [erptoplot, erpstd, colors, colstd, legend] = preparedata( erp1ind, g.addavg, g.addstd, g.addall, g.mode, '', addnames, 'k', allcolors);
@@ -331,8 +331,8 @@ else
         regions = p2regions(pvalues, g.alpha, [xmin xmax]*1000);
     else 
         pvalues= [];
-    end;
-end;
+    end
+end
     
 % lowpass data
 % ------------
@@ -341,10 +341,10 @@ if ~isempty(g.lowpass)
         erptoplot = eegfilt(erptoplot, srate, 0, g.lowpass);
     else
         erptoplot = eegfiltfft(erptoplot, srate, 0, g.lowpass);
-    end;
-end;
-if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end;
-if ~isfield(chanlocs, 'theta'), chanlocs = []; end;
+    end
+end
+if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end
+if ~isfield(chanlocs, 'theta'), chanlocs = []; end
 
 % select time range
 % -----------------
@@ -357,7 +357,7 @@ if ~isempty(g.tlim)
     erptoplot  = reshape(erptoplot, size(erptoplot,1), pnts*size(erptoplot,3));    
     xmin = g.tlim(1);
     xmax = g.tlim(2);
-end;
+end
 
 % plot data
 % ---------
@@ -376,11 +376,11 @@ if length(datsub) > 0 % dataset to subtract
 else
     erp2 = [];
     erpsub = [];
-end;
+end
 
 if nargin < 3 & nargout == 1
     erp1 = sprintf('pop_comperp( ALLEEG, %d, %s);', flag, vararg2str({ datadd datsub options{:} }) );
-end;
+end
 return;
 
 % convert significance values to alpha
@@ -393,9 +393,9 @@ function regions = p2regions( pvalues, alpha, limits);
         pos    = pos/length(pvalues)*(limits(2) - limits(1))+limits(1);
         neg    = find([signif(2:end)] < 0);
         neg    = neg/length(pvalues)*(limits(2) - limits(1))+limits(1);
-        if length(pos) ~= length(neg), signif, pos, neg, error('Region error'); end;
+        if length(pos) ~= length(neg), signif, pos, neg, error('Region error'); end
         regions{index} = [neg;pos];
-    end;
+    end
     
 % process data
 % ------------
@@ -417,13 +417,13 @@ function [erptoplot, erpstd, colors, colstd, legend] = preparedata( erpind, plot
                     legend = { legend{:} [ dataset{1}{index} ' - ' dataset{2}{index} ] };
                 else
                     legend = { legend{:} dataset{index} };
-                end;
+                end
             else
                 legend = { legend{:} [ 'Dataset ' int2str(dataset(index)) ] };
-            end;
+            end
             colors = { colors{:}  allcolors{index} };
-        end;
-    end;
+        end
+    end
     
     % plot average
     % ------------
@@ -433,10 +433,10 @@ function [erptoplot, erpstd, colors, colstd, legend] = preparedata( erpind, plot
              legend      = { legend{:} [ tag 'Average' ] };
         else granderp    = sqrt(mean(erpind.^2,3));
              legend      = { legend{:} [ tag 'RMS' ] };
-        end;
+        end
         colors    = { colors{:}  {coloravg;'linewidth';2 }};
         erptoplot = [ erptoplot granderp];
-    end;
+    end
 
     % plot standard deviation
     % -----------------------
@@ -450,8 +450,8 @@ function [erptoplot, erpstd, colors, colstd, legend] = preparedata( erpind, plot
             colstd    = { { coloravg 'linestyle' ':' } };
         else 
             disp('Warning: cannot show standard deviation without showing average');
-        end;
-    end;
+        end
+    end
 
 % ------------------------------------------------------------------
     
@@ -534,7 +534,7 @@ else
     n2 = size(d2,dim);
     df = n1 + n2 - 2;
     pvar = ((n1 - 1) * v1 + (n2 - 1) * v2) / df ;     
-end;
+end
 disp(['Computing t-values, df:' int2str(df) ]);
 
 t = (a1 - a2) ./ sqrt( pvar * (1/n1 + 1/n2)) ;

@@ -32,7 +32,7 @@ function EEG = eeg_epoch2continuous(EEG)
 if nargin < 1
     help eeg_epoch2continuous;
     return;
-end;
+end
 
 EEG.data = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3));
 
@@ -40,12 +40,12 @@ for index = 1:EEG.trials-1
     EEG.event(end+1).type     = 'boundary';
     EEG.event(end  ).latency  = index*EEG.pnts-0.5;
     EEG.event(end  ).duration = NaN;
-end;
+end
 
 EEG.pnts   = size(EEG.data,2);
 EEG.trials = 1;
 if ~isempty(EEG.event) && isfield(EEG.event, 'epoch')
     EEG.event = rmfield(EEG.event, 'epoch');
-end;
+end
 
 EEG = eeg_checkset(EEG);

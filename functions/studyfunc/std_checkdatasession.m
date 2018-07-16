@@ -56,10 +56,10 @@ try
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
-    else g= []; end;
+    else g= []; end
 catch
     disp('std_checkdatasession() error: calling convention {''key'', value, ... } error'); return;
-end;
+end
 
 try, g.session;    catch, g.session   = [];        end; % Index for sessions
 try, g.verbose;    catch, g.verbose    = 1;        end;   % By default verbose
@@ -68,7 +68,7 @@ isession = ~(cellfun(@isempty, {STUDY.datasetinfo.session}));
 if std(isession) == 0
     flags = zeros(size(isession));
     return; 
-end;
+end
 
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -81,7 +81,7 @@ if isempty(g.session)
     sameica = std_findsameica(ALLEEG);
     
     if length(sameica) ~= length(alleeg_indx)
-        if g.verbose, display('--- Data from same sessions found in the STUDY ---'); end;
+        if g.verbose, display('--- Data from same sessions found in the STUDY ---'); end
         
         UniqueSubj = unique({STUDY.datasetinfo.subject});
         
@@ -93,7 +93,7 @@ if isempty(g.session)
             c = 1;
             for j = 1:length(temp_sameica)
                 [STUDY.datasetinfo(SubjInd(cell2mat(temp_sameica(j)))).session] = deal(c);
-                if g.verbose, display(['Datasets with indices [' num2str(SubjInd(cell2mat(temp_sameica(j)))) '] assigned to session ' num2str(c)]); end;
+                if g.verbose, display(['Datasets with indices [' num2str(SubjInd(cell2mat(temp_sameica(j)))) '] assigned to session ' num2str(c)]); end
                 c = c + 1;
                 
             end
@@ -104,7 +104,7 @@ if isempty(g.session)
         [STUDY.datasetinfo.session] = deal(1);
     end
     
-    if g.verbose, display('--- Session fields in current STUDY succesfully updated ---'); end;
+    if g.verbose, display('--- Session fields in current STUDY succesfully updated ---'); end
     
     flags = zeros(1,length(UniqueSubj));
     for i = 1: length(UniqueSubj)
@@ -124,7 +124,7 @@ elseif ~(isempty(g.session))
             STUDY.datasetinfo(i).session = g.session(i); %Assigning values
         end
         
-        if g.verbose, display('--- Session fields in current STUDY succesfully updated ---'); end;
+        if g.verbose, display('--- Session fields in current STUDY succesfully updated ---'); end
         
     else
         error('Error in std_checkdatasession(): Vector dimensions inconsisten with STUDY');

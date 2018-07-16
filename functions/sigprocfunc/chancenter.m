@@ -47,7 +47,7 @@ optim = 0;
 if nargin<4
     help chancenter
     return;
-end;
+end
 
 if nargin > 4 & gui
     error('Chancenter: 4th input'' gui'' is obsolete. Use pop_chancenter instead');
@@ -55,8 +55,8 @@ else
 	if isempty(center)
 		optim = 1;
 		center = [0 0 0];
-	end;
-end;
+	end
+end
 
 options = {'MaxFunEvals',1000*length(center)};
 x = x - center(1);  % center the data
@@ -66,7 +66,7 @@ radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
 if ~isempty(radius)
      wobble = std(radius);              % test if xyz values are on a sphere
 else wobble = [];
-end;
+end
 fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
 newcenter = center;
 

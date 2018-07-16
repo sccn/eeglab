@@ -43,7 +43,7 @@ indices = [];
 if nargin < 1
     help std_indvarmatch;
     return;
-end;
+end
 
 % match values
 % ------------
@@ -53,23 +53,23 @@ if all(cellfun(@isstr, allvals)) % string
     else
         for indcell = 1:length(val)
             indices = [ indices std_indvarmatch(val{indcell}, allvals) ];
-        end;
-    end;
+        end
+    end
 elseif all(cellfun(@length, allvals) == 1) % numerical
     if length(val) == 1
         indices = find( val == [allvals{:}]);
     else
         for ind = 1:length(val)
             indices = [ indices std_indvarmatch(val(ind), allvals) ];
-        end;
-    end;
+        end
+    end
 else
     % mixed with cell array
     indices = [];
     for index = 1:length(allvals)
         if isequal(val, allvals{index})
             indices = [indices index]; 
-        end;
-    end;
-end;
+        end
+    end
+end
 return;

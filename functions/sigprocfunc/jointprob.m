@@ -72,7 +72,7 @@ end;
 
 if size(signal,2) == 1 % transpose if necessary
 	signal = signal';
-end;
+end
 
 [nbchan pnts sweeps] = size(signal);
 jp  = zeros(nbchan,sweeps);
@@ -92,8 +92,8 @@ else
 			datatmp = dataProba((index-1)*pnts+1:index*pnts);
 			jp(rc, index) = - sum( log( datatmp ) ); 
 			     % - sum( datatmp .* log( datatmp ) ); would be the entropy
-		end;
-	end;
+		end
+	end
 
 	% normalize the last dimension
 	% ----------------------------	
@@ -102,15 +102,15 @@ else
         if normalize == 2,
             tmpjp = sort(jp);
             tmpjp = tmpjp(round(length(tmpjp)*0.1):end-round(length(tmpjp)*0.1));
-        end;
+        end
         try, 
             switch ndims( signal )
              case 2,	jp = (jp-mean(tmpjp)) / std(tmpjp);
              case 3,	jp = (jp-mean(tmpjp,2)*ones(1,size(jp,2)))./ ...
                   (std(tmpjp,0,2)*ones(1,size(jp,2)));
-            end;
-        catch, error('Error while normalizing'); end;
-	end;
+            end
+        catch, error('Error while normalizing'); end
+	end
 end	
 
 % reject
@@ -120,7 +120,7 @@ if threshold ~= 0
     	rej = (threshold(1) > jp) | (jp > threshold(2));
     else
     	rej = abs(jp) > threshold;
-    end;
+    end
 else
 	rej = zeros(size(jp));
 end;	

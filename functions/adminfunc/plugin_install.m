@@ -1,6 +1,6 @@
 function result = plugin_install(zipfilelink, name, version, forceInstall);
 
-    if nargin < 4, forceInstall = false; end;
+    if nargin < 4, forceInstall = false; end
     result = 1;
 
     % get plugin path
@@ -15,7 +15,7 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
 %     [tmp zipfile ext] = fileparts(zipfilelink);
 %     zipfile = [ zipfile ext ];
 %     equalPos = find(zipfile == '=');
-%     if ~isempty(equalPos) zipfile  = zipfile(equalPos(end)+1:end); end;
+%     if ~isempty(equalPos) zipfile  = zipfile(equalPos(end)+1:end); end
     depth = length(dbstack);
     try
         pluginSize = plugin_urlsize(zipfilelink);
@@ -24,7 +24,7 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
              res = questdlg2( [ 'Extension ' name ' size is ' pluginSizeStr 'MB. Are you sure' 10 ...
                                 'you want to download this extension?' ], 'Warning', 'No', 'Yes', 'Yes');
              if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); result = -1; return; end;               
-        end;
+        end
     catch,
         msg = [ 'Could not download extension. Host site might be' 10 ...
                 'unavailable, too slow or you do not have permission' 10 ...
@@ -37,10 +37,10 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
             warndlg2(msg);
         else
             disp(msg);
-        end;
+        end
         result = -1;
         return;
-    end;
+    end
     disp([ 'Downloading extension ' name '(' pluginSizeStr 'Mb)...' ]);
     
     try
@@ -58,10 +58,10 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
             warndlg2(msg);
         else
             disp(msg);
-        end;
+        end
         result = -1;
         return;
-    end;
+    end
 
     % unzip plugin
     % ------------
@@ -73,10 +73,10 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
             warndlg2(msg);
         else
             disp(msg);
-        end;
+        end
         result = -1;
         return;
-    end;
+    end
     disp([ 'Unzipping extension file... ']);
     unzip(fullfile(generalPluginPath, zipfile), newPluginPath);
     
@@ -88,7 +88,7 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
     pluginContent = dir(newPluginPath);
     if length(pluginContent) > 3
         return;
-    end;
+    end
     for index = 1:length(pluginContent)
         if ~strcmpi(pluginContent(index).name, '.') && ~strcmpi(pluginContent(index).name, '..')
             fullFolder = fullfile(newPluginPath, pluginContent(index).name);
@@ -96,8 +96,8 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
                 % move files from folder
                 movefile(fullfile(fullFolder, '*'), newPluginPath);
                 rmdir(fullFolder, 's');
-            end;
-        end;
-    end;
+            end
+        end
+    end
     fprintf('Extension %s version %s now installed\n', name, version); 
     

@@ -47,7 +47,7 @@ count = 1;
 for index = 1:1/oversmp:maxfreq*len/cycle % scan frequencies
 	w(:,count) = j * index * cycle * linspace(-pi+2*pi/len, pi-2*pi/len, len)'; % exp(-w) is a sinus curve
 	count = count+1; % -2*pi/len ensures that we really scan from -pi to pi without redundance (-pi=+pi) 
-end;
+end
 b = exp(-w);
 
 %srate = 2*pi/len;						    % Angular increment.

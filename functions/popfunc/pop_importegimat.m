@@ -36,20 +36,20 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
 
     EEG = [];
     com = '';
-    if nargin < 3, latpoint0 = 0; end;
-    if nargin < 4, dataField = 'Session'; end;
+    if nargin < 3, latpoint0 = 0; end
+    if nargin < 4, dataField = 'Session'; end
     if nargin < 1 
         % ask user
         [filename, filepath] = uigetfile('*.mat', 'Choose a Matlab file from Netstation -- pop_importegimat()'); 
-        if filename == 0 return; end;
+        if filename == 0 return; end
         filename = fullfile(filepath, filename);
         tmpdata = load('-mat', filename);
         fieldValues = fieldnames(tmpdata);
         sessionPos = strmatch('Session', fieldValues);
         posFieldData = 1; 
-        if ~isempty(sessionPos), posFieldData = sessionPos; end;
+        if ~isempty(sessionPos), posFieldData = sessionPos; end
         
-        if ~isfield(tmpdata, 'samplingRate'), srate = 250; else srate = tmpdata.samplingRate; end;
+        if ~isfield(tmpdata, 'samplingRate'), srate = 250; else srate = tmpdata.samplingRate; end
         % epoch data files only
         promptstr    = { { 'style' 'text'       'string' 'Sampling rate (Hz)' } ...
                          { 'style' 'edit'       'string'  int2str(srate) } ...
@@ -67,15 +67,15 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
         srate = str2num(result{1});
         latpoint0 = str2num(result{2});
         dataField = fieldValues{result{3}};
-        if isempty(latpoint0), latpoint0 = 0; end;
-    end;
+        if isempty(latpoint0), latpoint0 = 0; end
+    end
    
     EEG = eeg_emptyset;
     fprintf('Reading EGI Matlab file %s\n', filename);
     tmpdata = load('-mat', filename);
     if isfield(tmpdata, 'samplingRate') % continuous file
         srate = tmpdata.samplingRate;
-    end;
+    end
 
     fieldValues = fieldnames(tmpdata);
     if all(cellfun(@(x)isempty(findstr(x, 'Segment')), fieldValues))
@@ -92,7 +92,7 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
         allfields = fieldnames(tmpdata);
         for index = 1:length(allfields)
             allfields{index} = allfields{index}(1:findstr(allfields{index}, 'Segment')-2);
-        end;
+        end
         datatypes = unique_bc(allfields);
         datatypes(cellfun(@isempty, datatypes)) = [];
 
@@ -109,7 +109,7 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
                     if counttrial == 1
                         EEG.pnts = size(datatrial,2);
                         EEG.data = repmat(single(0), [size(datatrial,1), size(datatrial,2), 1000]);
-                    end;
+                    end
                     EEG.data(:,:,counttrial) = datatrial;
 
                     EEG.event(counttrial).type    = datatypes{index};
@@ -118,9 +118,9 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
 
                     counttrial = counttrial+1;
                     latency = latency + EEG.pnts;
-                end;
-            end;
-        end;
+                end
+            end
+        end
         fprintf('%d trials read\n', counttrial-1);
         EEG.data(:,:,counttrial:end) = [];
 
@@ -129,7 +129,7 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
         EEG.trials   = counttrial-1;
         if latpoint0 ~= 1
             EEG.xmin     = -latpoint0/1000;
-        end;
+        end
         EEG = eeg_checkset(EEG);
 
         % channel location
@@ -139,9 +139,9 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
             EEG.data(end,:)   = [];
             EEG.nbchan        = size(EEG.data,1);
             EEG = eeg_checkset(EEG);
-        end;
+        end
         EEG = readegilocs(EEG);
 
         com = sprintf('EEG = pop_importegimat(''%s'', %3.2f, %3.2f, %d);', filename, srate, latpoint0, dataField);
-    end;
+    end
     

@@ -8,7 +8,7 @@ function  [IDX,C,sumd,D,outliers] = robust_kmeans(data,N,STD,MAXiter,method)
 
 if nargin < 5
     method = 'kmeans';
-end;
+end
 
 flag  = 1;
 not_outliers = 1:size(data,1);
@@ -64,7 +64,7 @@ while flag
         tmp = sum((C-ones(N,1)*data(old_outliers(k),:)).^2,2)'; % Find the distance of each former outlier to the current cluster
         if isempty(find(tmp <= std_all*rSTD))  %Check if the outlier is still an outlier (far from each cluster center more than STD-1 times its std).
             returned_outliers = [returned_outliers old_outliers(k)];
-        end;
+        end
     end
     outliers = not_outliers(outliers);
     outliers = [outliers returned_outliers ];
@@ -76,7 +76,7 @@ while flag
         [IDX,C,sumd,D] = kmeans(data(not_outliers,:),N,'replicates',30,'emptyaction','drop');
     else
         [IDX,C,sumd,D] = kmeanscluster(data(not_outliers,:),N);
-    end;
+    end
     old_outliers = outliers;
     old_IDX = zeros(size(data,1),1);
     old_IDX(sort(not_outliers)) = IDX;

@@ -56,7 +56,7 @@ if nargin < 2
 	if filename == 0
         return;  end
 	filename = [filepath filename];
-end;
+end
 
 if nargin < 3
     unit = 'samples';  end

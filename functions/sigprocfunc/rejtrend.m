@@ -53,7 +53,7 @@ function [rej, rejE] = rejtrend( signal, pointrange, maxslope, minstd, step);
 SST_TOLERANCE = 1000*pointrange*1.1921e-07;
 
 if nargin < 3
-	help rejtrend;
+	help rejtrend
 	return;
 end;	
 if nargin < 5

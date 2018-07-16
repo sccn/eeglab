@@ -67,7 +67,7 @@ function f = writecnt(filename,cntdataset,varargin)
 if ~isempty(varargin)
 	 WriteOptions=struct(varargin{:});
 else WriteOptions = []; 
-end;
+end
 
 try, WriteOptions.t1;         catch, WriteOptions.t1=0; end
 try, WriteOptions.sample1;    catch, WriteOptions.sample1=[]; end
@@ -370,7 +370,7 @@ enddata = h.eventtablepos;   % after data
 if strcmpi(WriteOptions.dataformat, 'int16')
      nums    = (enddata-begdata)/h.nchannels/2;
 else nums    = (enddata-begdata)/h.nchannels/4;
-end;
+end
 
 % number of sample to write
 % -------------------------
@@ -378,17 +378,17 @@ if ~isempty(WriteOptions.sample1)
    WriteOptions.t1      = WriteOptions.sample1/h.rate;
 else 
    WriteOptions.sample1 = WriteOptions.t1*h.rate;
-end;
+end
 if strcmpi(WriteOptions.dataformat, 'int16')
      startpos = WriteOptions.t1*h.rate*2*h.nchannels;
 else startpos = WriteOptions.t1*h.rate*4*h.nchannels;
-end;
+end
 if isempty(WriteOptions.ldnsamples)
      if ~isempty(WriteOptions.lddur)
           WriteOptions.ldnsamples = round(WriteOptions.lddur*h.rate); 
      else WriteOptions.ldnsamples = nums;
-     end;
-end;
+     end
+end
 
 % scaling data from microvolts
 % ----------------------------
@@ -417,20 +417,20 @@ if type == 'cnt'
         if channel_off <= 1
               for temploop =1:WriteOptions.ldnsamples;
                   fwrite(fid, dat(1:h.nchannels, temploop), WriteOptions.dataformat)';
-            end;
+            end
         else
               for temploop =1:h.nchannels;
                   fwrite(fid, dat(temploop, 1:channel_off), WriteOptions.dataformat)';
-            end;
+            end
           
             counter = 1;	
             while counter*channel_off < WriteOptions.ldnsamples
 
                   for temploop =1:h.nchannels;
                     fwrite(fid, dat(temploop, counter*channel_off+1:counter*channel_off+channel_off), WriteOptions.dataformat)';
-                end;
+                end
                 counter = counter + 1;
-            end;
+            end
         end;	
     end % if WriteOptions.data
       

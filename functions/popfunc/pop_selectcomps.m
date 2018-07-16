@@ -54,36 +54,36 @@ if nargin < 2
     initstr   = { [ '1:' int2str(size(EEG.icaweights,1)) ] };
     
     result = inputdlg2(promptstr, 'Reject comp. by map -- pop_selectcomps',1, initstr);
-    if isempty(result), return; end;
+    if isempty(result), return; end
     compnum = eval( [ '[' result{1} ']' ]);
 
     if length(compnum) > PLOTPERFIG
         ButtonName=questdlg2(strvcat(['More than ' int2str(PLOTPERFIG) ' components so'],'this function will pop-up several windows'), ...
                              'Confirmation', 'Cancel', 'OK','OK');
-        if ~isempty( strmatch(lower(ButtonName), 'cancel')), return; end;
-    end;
+        if ~isempty( strmatch(lower(ButtonName), 'cancel')), return; end
+    end
 
-end;
+end
 fprintf('Drawing figure...\n');
 currentfigtag = ['selcomp' num2str(rand)]; % generate a random figure tag
 
 if length(compnum) > PLOTPERFIG
     for index = 1:PLOTPERFIG:length(compnum)
         pop_selectcomps(EEG, compnum([index:min(length(compnum),index+PLOTPERFIG-1)]));
-    end;
+    end
 
     com = [ 'pop_selectcomps(EEG, ' vararg2str(compnum) ');' ];
     return;
-end;
+end
 
 if isempty(EEG.reject.gcompreject)
 	EEG.reject.gcompreject = zeros( size(EEG.icawinv,2));
-end;
+end
 try, icadefs; 
 catch, 
 	BACKCOLOR = [0.8 0.8 0.8];
 	GUIBUTTONCOLOR   = [0.8 0.8 0.8]; 
-end;
+end
 
 % set up the figure
 % -----------------
@@ -102,13 +102,13 @@ if ~exist('fig','var')
         sizewy = 90/rows;
 	else 
         sizewy = 80/rows;
-    end;
+    end
     pos = get(gca,'position'); % plot relative to current axes
 	hh = gca;
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
 	axis off;
-end;
+end
 
 % figure rows and columns
 % -----------------------  
@@ -117,7 +117,7 @@ if EEG.nbchan > 64
     plotelec = 0;
 else
     plotelec = 1;
-end;
+end
 count = 1;
 for ri = compnum
 	if exist('fig','var')
@@ -139,7 +139,7 @@ for ri = compnum
 		% -------------
         if ~strcmp(get(gcf, 'tag'), currentfigtag);
             figure(findobj('tag', currentfigtag));
-        end;
+        end
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
         if plotelec
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
@@ -147,7 +147,7 @@ for ri = compnum
         else
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
                       'off', 'style' , 'fill','electrodes','off', 'chaninfo', EEG.chaninfo, 'numcontour', 8);
-        end;
+        end
 		axis square;
 
 		% plot the button
@@ -159,11 +159,11 @@ for ri = compnum
                            [X Y+sizewy sizewx sizewy*0.25].*s+q, 'tag', ['comp' num2str(ri)]);
         command = sprintf('pop_prop( EEG, 0, %d, gcbo, { ''freqrange'', [1 50] });', ri);
 		set( button, 'callback', command );
-	end;
+	end
 	set( button, 'backgroundcolor', eval(fastif(EEG.reject.gcompreject(ri), COLREJ,COLACC)), 'string', int2str(ri)); 	
 	drawnow;
 	count = count +1;
-end;
+end
 
 % draw the bottom button
 % ----------------------
@@ -188,7 +188,7 @@ if ~exist('fig','var')
 			'Position',[90 -10  15 sizewy*0.25].*s+q, 'callback',  command);
 			% sprintf(['eeg_global; if %d pop_rejepoch(%d, %d, find(EEG.reject.sigreject > 0), EEG.reject.elecreject, 0, 1);' ...
 		    %		' end; pop_compproj(%d,%d,1); close(gcf); eeg_retrieve(%d); eeg_updatemenu; '], rejtrials, set_in, set_out, fastif(rejtrials, set_out, set_in), set_out, set_in));
-end;
+end
 
 com = [ 'pop_selectcomps(EEG, ' vararg2str(compnum) ');' ];
 return;		

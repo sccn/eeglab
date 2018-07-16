@@ -26,11 +26,11 @@ function a = reshape(a,d1,d2,d3)
         d1 = [ d1 d2 d3 ];
     elseif nargin > 2
         d1 = [ d1 d2 ];
-    end;
+    end
     
     if prod(size(a)) ~= prod(d1)
         error('Wrong dimensions for reshaping');
-    end;
+    end
     
     if ~strcmpi(a.fileformat, 'transposed')
         a.data.format{2} = d1;
@@ -41,5 +41,5 @@ function a = reshape(a,d1,d2,d3)
             a.data.format{2} = [d1(2) d1(1)];
         else
             a.data.format{2} = d1([2 3 1]);
-        end;
-    end;
+        end
+    end

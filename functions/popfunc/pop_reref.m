@@ -82,7 +82,7 @@ if nargin < 1
 end;   
 if isempty(EEG.data)
     error('Pop_reref: cannot process empty data');
-end;
+end
 
 % gui inputs
 % ----------
@@ -94,7 +94,7 @@ if nargin < 2
     % ----------------------
     if length(EEG.chanlocs) == EEG.nbchan+1
         includeref = 1;
-    end;
+    end
     
     geometry = { [1] [1] [1.8 1 0.3] [1] [1] [1] [1.8 1 0.3] [1.8 1 0.3] };
     cb_setref = [ 'set(findobj(''parent'', gcbf, ''tag'', ''refbr'')    , ''enable'', ''on'');' ...
@@ -120,7 +120,7 @@ if nargin < 2
                     'else,' ...
                     '   tmpchaninfo = EEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.nodatchans.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval); clear tmpchanlocs tmp tmpval;' ...
                     'end;' ];
-    if isempty(EEG.chanlocs), cb_chansel1 = ''; cb_chansel2 = ''; cb_chansel3 = ''; end;
+    if isempty(EEG.chanlocs), cb_chansel1 = ''; cb_chansel2 = ''; cb_chansel3 = ''; end
     
     % find current reference (= reference most used)
     % ----------------------------------------------
@@ -131,12 +131,12 @@ if nargin < 2
         for ind = unique_bc(allinds)
             if length(find(allinds == ind)) > length(find(allinds == maxind))
                 maxind = ind;
-            end;
-        end;
+            end
+        end
         curref = curref{maxind};
-        if isempty(curref), curref = 'unknown'; end;
+        if isempty(curref), curref = 'unknown'; end
     else curref = 'unknown';
-    end;
+    end
     
     uilist = { { 'style' 'text' 'string' [ 'Current data reference state is: ' curref] } ...
                ...
@@ -160,7 +160,7 @@ if nargin < 2
                { 'style' 'pushbutton' 'string' '...' 'callback' cb_chansel3 } };
     
     [result tmp tmp2 restag] = inputgui(geometry, uilist, 'pophelp(''pop_reref'')', 'pop_reref - average reference or re-reference data');
-    if isempty(result), return; end;
+    if isempty(result), return; end
 
     % decode inputs
     % -------------
@@ -173,37 +173,37 @@ if nargin < 2
              chanind  = [];
              for iElec = 1:length(allelecs)
                  chanind = [chanind strmatch( allelecs{iElec}, tmpallchans, 'exact') ];
-             end;
+             end
              options = { options{:} 'refloc' EEG.chaninfo.nodatchans(chanind) }; 
          catch, disp('Error with old reference: ignoring it');
-         end;
-    end;
-    if ~isempty(restag.exclude), options = { options{:} 'exclude' eeg_chaninds(EEG, restag.exclude) }; end;
-    if restag.keepref,           options = { options{:} 'keepref' 'on' }; end;
-    if restag.ave,               ref = []; end;
+         end
+    end
+    if ~isempty(restag.exclude), options = { options{:} 'exclude' eeg_chaninds(EEG, restag.exclude) }; end
+    if restag.keepref,           options = { options{:} 'keepref' 'on' }; end
+    if restag.ave,               ref = []; end
     if restag.rerefstr           
         if isempty(restag.reref)
             warndlg2('Aborting: you must enter one or more reference channels'); 
             return;
         else
             ref = eeg_chaninds(EEG, restag.reref); 
-        end;
-    end;
-    if restag.interp == 1, options = { options{:} 'interpchan' [] }; end;
+        end
+    end
+    if restag.interp == 1, options = { options{:} 'interpchan' [] }; end
 else
     options = varargin;
-end;
-if ischar(ref), ref = { ref }; end;
-if iscell(ref), ref = eeg_chaninds(EEG, ref); end;
+end
+if ischar(ref), ref = { ref }; end
+if iscell(ref), ref = eeg_chaninds(EEG, ref); end
 optionscall = options;
 
 g = struct(optionscall{:});
-if ~isfield(g, 'exclude'),       g.exclude       = [];    end;
-if ~isfield(g, 'keepref'),       g.keepref       = 'off'; end;
-if ~isfield(g, 'refloc') ,       g.refloc        = [];    end;
-if ~isfield(g, 'interpchan') ,   g.interpchan    = 'off'; end;
-if ~isfield(g, 'addrefchannel'), g.addrefchannel = 0;     end;
-if ~isfield(g, 'enforcetype'),   g.enforcetype   = 0;     end;
+if ~isfield(g, 'exclude'),       g.exclude       = [];    end
+if ~isfield(g, 'keepref'),       g.keepref       = 'off'; end
+if ~isfield(g, 'refloc') ,       g.refloc        = [];    end
+if ~isfield(g, 'interpchan') ,   g.interpchan    = 'off'; end
+if ~isfield(g, 'addrefchannel'), g.addrefchannel = 0;     end
+if ~isfield(g, 'enforcetype'),   g.enforcetype   = 0;     end
 %--- Interpolation code START
 interpflag = 0;
 if ~isequal('off', g.interpchan )
@@ -309,9 +309,9 @@ if ~isempty(refchan)
         for ind = 1:length(allf)
             EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n }, ...
                 allf{ind}, getfield(refchan, allf{ind}));
-        end;
-    end;
-end;
+        end
+    end
+end
 if ~isempty(g.refloc)
     allinds = [];
     tmpchaninfo = EEG.chaninfo;
@@ -320,9 +320,9 @@ if ~isempty(g.refloc)
             error('There is no such reference channel');
         end
         allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
-    end;
+    end
     EEG.chaninfo.nodatchans(allinds) = [];
-end;
+end
     
 % legacy EEG.ref field
 % --------------------
@@ -331,8 +331,8 @@ if isfield(EEG, 'ref')
         EEG.ref = 'averef';
     elseif strcmpi(EEG.ref, 'averef') && ~isempty(ref)
         EEG.ref = 'common';
-    end;
-end;
+    end
+end
 
 EEG.nbchan = size(EEG.data,1);
 EEG = eeg_checkset(EEG);
@@ -355,7 +355,7 @@ if ~isempty(EEG.icaweights)
         fprintf('Re-referencing ICA matrix\n');
         if isempty(orichanlocs)
             error('Cannot re-reference ICA decomposition without channel locations')
-        end;
+        end
         
         newICAchaninds = zeros(orinbchan, size(EEG.icawinv,2));
         newICAchaninds(EEG.icachansind,:) = EEG.icawinv;
@@ -375,8 +375,8 @@ if ~isempty(EEG.icaweights)
                 rminds(find(icachansind(i) == rminds)) = [];
             else
                 icachansind(i) = [];
-            end;
-        end;
+            end
+        end
         newICAchaninds(rminds,:) = [];
         EEG.icawinv = newICAchaninds;
         
@@ -389,9 +389,9 @@ if ~isempty(EEG.icaweights)
             EEG.icaweights = pinv(EEG.icawinv);
             EEG.icasphere  = eye(length(icachansind));
         end;    
-    end;
+    end
     EEG = eeg_checkset(EEG);
-end;
+end
 
 % generate the output command
 % ---------------------------

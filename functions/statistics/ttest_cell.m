@@ -54,9 +54,9 @@ function [tval, df] = ttest_cell(a,b)
     if nargin < 1
         help ttest_cell;
         return;
-    end;
+    end
     
-    if iscell(a), b = a{2}; a = a{1}; end;
+    if iscell(a), b = a{2}; a = a{1}; end
     tmpdiff = a-b;
     diff = mymean(tmpdiff,    myndims(a));
     sd   = mystd( tmpdiff,[], myndims(a));
@@ -77,14 +77,14 @@ function val = myndims(a)
             val = 1;
         else
             val = 2;
-        end;
+        end
     end; 
   
 function res = mymean( data, varargin) % deal with complex numbers
     res = mean( data, varargin{:});
     if ~isreal(data)
         res = abs( res );
-    end;
+    end
 
 function res = mystd( data, varargin) % deal with complex numbers
     if ~isreal(data)
@@ -92,6 +92,6 @@ function res = mystd( data, varargin) % deal with complex numbers
     else
         res = sqrt(sum( bsxfun(@minus, data, mean( data, varargin{2})).^2, varargin{2})/(size(data,varargin{2})-1)); % 8 percent speedup
         %res = std( data, varargin{:});
-    end;
+    end
     
     
