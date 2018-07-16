@@ -131,7 +131,7 @@ end
 if (min(size(X))~=1 || length(X)<2)
 	fprintf('crossf(): xdata must be a row or column vector.\n');
     return
-elseif (min(size(Y))~=1 | length(Y)<2)
+elseif (min(size(Y))~=1 || length(Y)<2)
 	fprintf('crossf(): ydata must be a row or column vector.\n');
     return
 elseif (length(X) ~= length(Y))
@@ -141,7 +141,7 @@ end
 
 if (nargin < 3)
 	epoch = DEFAULT_EPOCH;
-elseif (~isnumeric(epoch) | length(epoch)~=1 | epoch~=round(epoch))
+elseif (~isnumeric(epoch) || length(epoch)~=1 || epoch~=round(epoch))
 	fprintf('crossf(): Value of frames must be an integer.\n');
     return
 elseif (epoch <= 0)
@@ -154,7 +154,7 @@ end
 
 if (nargin < 4)
 	timelim = DEFAULT_TIMELIM;
-elseif (~isnumeric(timelim) | sum(size(timelim))~=3)
+elseif (~isnumeric(timelim) || sum(size(timelim))~=3)
 	error('crossf(): Value of tlimits must be a vector containing two numbers.');
 elseif (timelim(1) >= timelim(2))
 	error('crossf(): tlimits interval must be [min,max].');
@@ -168,7 +168,7 @@ end
 
 if (nargin < 6)
 	Fs = DEFAULT_FS;
-elseif (~isnumeric(Fs) | length(Fs)~=1)
+elseif (~isnumeric(Fs) || length(Fs)~=1)
 	error('crossf(): Value of srate must be a number.');
 elseif (Fs <= 0)
 	error('crossf(): Value of srate must be positive.');
@@ -176,7 +176,7 @@ end
 
 if (nargin < 7)
 	varwin = DEFAULT_VARWIN;
-elseif (~isnumeric(varwin) | length(varwin)~=1)
+elseif (~isnumeric(varwin) || length(varwin)~=1)
 	error('crossf(): Value of cycles must be a number.');
 elseif (varwin < MAX_BASELN)
 	error('crossf(): Value of cycles must be either zero or positive.');
@@ -184,11 +184,11 @@ end
 
 if (nargin < 8)
 	winsize = max(pow2(nextpow2(epoch)-3),4);
-elseif (~isnumeric(winsize) | length(winsize)~=1 | winsize~=round(winsize))
+elseif (~isnumeric(winsize) || length(winsize)~=1 || winsize~=round(winsize))
 	error('crossf(): Value of winsize must be an integer number.');
 elseif (winsize <= 0)
 	error('crossf(): Value of winsize must be positive.');
-elseif (varwin == 0 & pow2(nextpow2(winsize)) ~= winsize)
+elseif (varwin == 0 && pow2(nextpow2(winsize)) ~= winsize)
 	error('crossf(): Value of winsize must be an integer power of two [1,2,4,8,16,...]');
 elseif (winsize > epoch)
 	error('crossf(): Value of winsize must be less than epoch length.');
@@ -196,7 +196,7 @@ end
 
 if (nargin < 9)
 	nwin = DEFAULT_NWIN;
-elseif (~isnumeric(nwin) | length(nwin)~=1 | nwin~=round(nwin))
+elseif (~isnumeric(nwin) || length(nwin)~=1 || nwin~=round(nwin))
 	error('crossf(): Value of nwin must be an integer number.');
 elseif (nwin <= 0)
 	error('crossf(): Value of nwin must be positive.');
@@ -207,7 +207,7 @@ end
 
 if (nargin < 10)
 	oversmp = DEFAULT_OVERSMP;
-elseif (~isnumeric(oversmp) | length(oversmp)~=1 | oversmp~=round(oversmp))
+elseif (~isnumeric(oversmp) || length(oversmp)~=1 || oversmp~=round(oversmp))
 	error('crossf(): Value of oversmp must be an integer number.');
 elseif (oversmp <= 0)
 	error('crossf(): Value of oversmp must be positive.');
@@ -217,7 +217,7 @@ end
 
 if (nargin < 11)
 	maxfreq = DEFAULT_MAXFREQ;
-elseif (~isnumeric(maxfreq) | length(maxfreq)~=1)
+elseif (~isnumeric(maxfreq) || length(maxfreq)~=1)
 	error('crossf(): Value of maxfreq must be a number.');
 elseif (maxfreq <= 0)
 	error('crossf(): Value of maxfreq must be positive.');
@@ -225,9 +225,9 @@ end
 
 if (nargin < 12)
 	alpha = DEFAULT_ALPHA;
-elseif (~isnumeric(alpha) | length(alpha)~=1)
+elseif (~isnumeric(alpha) || length(alpha)~=1)
 	error('crossf(): Value of alpha must be a number.');
-elseif (round(NACCU*alpha) < 2 | alpha > .5)
+elseif (round(NACCU*alpha) < 2 || alpha > .5)
 	fprintf('crossf(): Value of alpha must be in the range (~0,0.5]');
     return 
 else

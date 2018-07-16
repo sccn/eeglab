@@ -160,7 +160,7 @@ if ~isempty(opt.component) && ~isempty(EEG.icaact)
     
     data = EEG.icaact(opt.component,:,:);
     
-elseif ~isempty(opt.component) & exist(filename)
+elseif ~isempty(opt.component) && exist(filename)
     
     % reading ICA file
     % ----------------

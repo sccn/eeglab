@@ -295,7 +295,7 @@ wts_passed = 0;                      % flag weights passed as argument
          if ~lrate,
             lrate = DEFAULT_LRATE;
          end
-      elseif strcmp(Keyword,'block') | strcmp(Keyword,'blocksize')
+      elseif strcmp(Keyword,'block') || strcmp(Keyword,'blocksize')
          if ischar(Value)
             fprintf('runica(): block size value must be a number')
             return
@@ -304,14 +304,14 @@ wts_passed = 0;                      % flag weights passed as argument
          if ~block,
            block = DEFAULT_BLOCK; 
          end
-      elseif strcmp(Keyword,'stop') | strcmp(Keyword,'nochange') ...
+      elseif strcmp(Keyword,'stop') || strcmp(Keyword,'nochange') ...
                     | strcmp(Keyword,'stopping')
          if ischar(Value)
             fprintf('runica(): stop wchange value must be a number')
             return
          end
          nochange = Value;
-      elseif strcmp(Keyword,'maxsteps') | strcmp(Keyword,'steps')
+      elseif strcmp(Keyword,'maxsteps') || strcmp(Keyword,'steps')
          if ischar(Value)
             fprintf('runica(): maxsteps value must be an integer')
             return
@@ -324,7 +324,7 @@ wts_passed = 0;                      % flag weights passed as argument
             fprintf('runica(): maxsteps value (%d) must be a positive integer',maxsteps)
             return
          end
-      elseif strcmp(Keyword,'anneal') | strcmp(Keyword,'annealstep')
+      elseif strcmp(Keyword,'anneal') || strcmp(Keyword,'annealstep')
          if ischar(Value)
             fprintf('runica(): anneal step value (%2.4f) must be a number (0,1)',Value)
             return
@@ -334,7 +334,7 @@ wts_passed = 0;                      % flag weights passed as argument
             fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
             return
          end
-      elseif strcmp(Keyword,'annealdeg') | strcmp(Keyword,'degrees')
+      elseif strcmp(Keyword,'annealdeg') || strcmp(Keyword,'degrees')
          if ischar(Value)
             fprintf('runica(): annealdeg value must be a number')
             return
@@ -342,7 +342,7 @@ wts_passed = 0;                      % flag weights passed as argument
          annealdeg = Value;
          if ~annealdeg,
              annealdeg = DEFAULT_ANNEALDEG;
-         elseif annealdeg > 180 | annealdeg < 0
+         elseif annealdeg > 180 || annealdeg < 0
           fprintf('runica(): annealdeg (%3.1f) is out of bounds [0,180]',...
                 annealdeg);
           return
@@ -358,7 +358,7 @@ wts_passed = 0;                      % flag weights passed as argument
           fprintf('runica(): momentum value is out of bounds [0,1]')
           return
          end
-      elseif strcmp(Keyword,'sphering') | strcmp(Keyword,'sphereing') ...
+      elseif strcmp(Keyword,'sphering') || strcmp(Keyword,'sphereing') ...
                 | strcmp(Keyword,'sphere')
          if ~ischar(Value)
            fprintf('runica(): sphering value must be on, off, or none')
@@ -386,7 +386,7 @@ wts_passed = 0;                      % flag weights passed as argument
               return
            end
          end
-      elseif strcmp(Keyword,'specgram') | strcmp(Keyword,'spec')
+      elseif strcmp(Keyword,'specgram') || strcmp(Keyword,'spec')
 
          if ~exist('specgram') < 2 % if ~exist or defined workspace variable
            fprintf(...
@@ -440,7 +440,7 @@ wts_passed = 0;                      % flag weights passed as argument
          end
          Specgramflag = 1; % set flag to perform specgram()
 
-      elseif strcmp(Keyword,'extended') | strcmp(Keyword,'extend')
+      elseif strcmp(Keyword,'extended') || strcmp(Keyword,'extend')
          if ischar(Value)
            fprintf('runica(): extended value must be an integer (+/-)')
            return

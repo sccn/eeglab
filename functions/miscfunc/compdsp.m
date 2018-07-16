@@ -145,7 +145,7 @@ if isnan(act)
   fprintf('\n');
 elseif size(act,2) ~= frames
   error('Supplied activations do not match data length');
-elseif size(act,1) ~=  ncomps & size(act,1) ~= length(compnums)
+elseif size(act,1) ~=  ncomps && size(act,1) ~= length(compnums)
   error('Number of supplied activations matrix does not match data or weights');
 elseif size(act,1) ==  ncomps 
   act = act(compnums,:); % cut down matrix to desired components

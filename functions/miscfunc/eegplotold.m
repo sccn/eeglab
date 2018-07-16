@@ -151,7 +151,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
     YLabels = flipud(str2mat(YLabels,' '));
   elseif length(eloc_file) == chans
     YLabels = num2str(eloc_file');
-  elseif length(eloc_file) == 1 & eloc_file(1) == 0
+  elseif length(eloc_file) == 1 && eloc_file(1) == 0
     YLabels = num2str((1:chans)');  % Use numbers
   else
     YLabels = [];    % no labels used

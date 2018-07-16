@@ -196,7 +196,7 @@ if ~isnan(g.rboot)
 % ***********************************
 % case 2: randomize polarity or phase
 % ***********************************
-elseif strcmpi(g.boottype, 'rand') & strcmpi(g.randmode, 'inverse')
+elseif strcmpi(g.boottype, 'rand') && strcmpi(g.randmode, 'inverse')
     fprintf('Bootstat function: randomize inverse values\n');
     fprintf('Processing permutation statistics for %s (naccu=%d):', g.label, g.naccu);
     

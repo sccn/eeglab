@@ -117,7 +117,7 @@ end
 if nargin < 7,
   axwidth  = DEFAULT_AXWIDTH;
   axheight = DEFAULT_AXHEIGHT;
-elseif size(axsize) == [1 1] & axsize(1) == 0
+elseif all(size(axsize) == [1 1]) && axsize(1) == 0
   axwidth  = DEFAULT_AXWIDTH;
   axheight = DEFAULT_AXHEIGHT;
 elseif size(axsize) == [1 2]

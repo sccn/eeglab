@@ -246,7 +246,7 @@ end
 
 if nargin < 2 || isempty(frames) || isnan(frames) 
 	frames = DEFAULT_EPOCH;
-elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
+elseif (~isnumeric(frames) || length(frames)~=1 || frames~=round(frames))
 	error('Value of frames must be an integer.');
 elseif (frames <= 0)
 	error('Value of frames must be positive.');
@@ -259,7 +259,7 @@ end
 
 if nargin < 3 || isnan(tlimits) || isempty(tlimits)
 	tlimits = DEFAULT_TIMLIM;
-elseif (~isnumeric(tlimits) | sum(size(tlimits))~=3)
+elseif (~isnumeric(tlimits) || sum(size(tlimits))~=3)
 	error('Value of tlimits must be a vector containing two numbers.');
 elseif (tlimits(1) >= tlimits(2))
 	error('tlimits interval must be ascending.');
@@ -267,7 +267,7 @@ end
 
 if (nargin < 4)
 	Fs = DEFAULT_FS;
-elseif (~isnumeric(Fs) | length(Fs)~=1)
+elseif (~isnumeric(Fs) || length(Fs)~=1)
 	error('Value of srate must be a number.');
 elseif (Fs <= 0)
 	error('Value of srate must be positive.');
@@ -289,7 +289,7 @@ end
 
 if (nargin < 5)
 	varwin = DEFAULT_VARWIN;
-elseif (~isnumeric(varwin) | length(varwin)>2)
+elseif (~isnumeric(varwin) || length(varwin)>2)
 	error('Value of cycles must be a number.');
 elseif (varwin < 0)
 	error('Value of cycles must be zero or positive.');
@@ -366,7 +366,7 @@ if (~isnumeric(g.winsize) || length(g.winsize)~=1 || g.winsize~=round(g.winsize)
 	error('Value of winsize must be an integer number.');
 elseif (g.winsize <= 0)
 	error('Value of winsize must be positive.');
-elseif (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
+elseif (g.cycles == 0 && pow2(nextpow2(g.winsize)) ~= g.winsize)
 	error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
 elseif (g.winsize > g.frames)
 	error('Value of winsize must be less than frames per epoch.');
@@ -408,7 +408,7 @@ if isempty(g.topovec)
 end
 if isempty(g.elocs)
 	g.elocs = DEFAULT_ELOC;
-elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
+elseif (~ischar(g.elocs)) && ~isstruct(g.elocs)
 	error('Channel location file must be a valid text file.');
 end
 
@@ -609,7 +609,7 @@ end
 if ~isnan(g.alpha) && length(baseln)==0
   myprintf(g.verbose,'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
   return
-elseif ~isnan(g.alpha) & g.baseboot
+elseif ~isnan(g.alpha) && g.baseboot
   myprintf(g.verbose,'   %d bootstrap windows in baseline (center times < %g).\n',...
           length(baseln), g.baseline)
 end

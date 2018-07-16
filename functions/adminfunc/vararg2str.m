@@ -88,7 +88,7 @@ for index = 1:length(allargs)
 			else
 				strout = [ strout ',' str2str( tmpvar ) ];
 			end
-		elseif isnumeric( tmpvar ) | islogical( tmpvar )
+		elseif isnumeric( tmpvar ) || islogical( tmpvar )
 			strout = [ strout ',' array2str( tmpvar ) ];
 		elseif iscell( tmpvar )
             tmpres = vararg2str( tmpvar );

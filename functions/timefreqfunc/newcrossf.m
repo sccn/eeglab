@@ -300,7 +300,7 @@ if ~iscell(X)
 	if (min(size(X))~=1 || length(X)<2)
 		fprintf('crossf(): x must be a row or column vector.\n');
 		return
-	elseif (min(size(Y))~=1 | length(Y)<2)
+	elseif (min(size(Y))~=1 || length(Y)<2)
 		fprintf('crossf(): y must be a row or column vector.\n');
 		return
 	elseif (length(X) ~= length(Y))
@@ -311,20 +311,20 @@ end
 
 if (nargin < 3)
    frame = DEFAULT_EPOCH;
-elseif (~isnumeric(frame) | length(frame)~=1 | frame~=round(frame))
+elseif (~isnumeric(frame) || length(frame)~=1 || frame~=round(frame))
    fprintf('crossf(): Value of frames must be an integer.\n');
    return
 elseif (frame <= 0)
    fprintf('crossf(): Value of frames must be positive.\n');
    return
-elseif ~iscell(X) & (rem(size(X,2),frame) ~= 0) & (rem(size(X,1),frame) ~= 0)
+elseif ~iscell(X) && (rem(size(X,2),frame) ~= 0) && (rem(size(X,1),frame) ~= 0)
    fprintf('crossf(): Length of data vectors must be divisible by frames.\n');
    return
 end
 
 if (nargin < 4)
    tlimits = DEFAULT_TIMELIM;
-elseif (~isnumeric(tlimits) | sum(size(tlimits))~=3)
+elseif (~isnumeric(tlimits) || sum(size(tlimits))~=3)
    error('crossf(): Value of tlimits must be a vector containing two numbers.');
 elseif (tlimits(1) >= tlimits(2))
    error('crossf(): tlimits interval must be [min,max].');
@@ -332,7 +332,7 @@ end
 
 if (nargin < 5)
    Fs = DEFAULT_FS;
-elseif (~isnumeric(Fs) | length(Fs)~=1)
+elseif (~isnumeric(Fs) || length(Fs)~=1)
    error('crossf(): Value of srate must be a number.');
 elseif (Fs <= 0)
    error('crossf(): Value of srate must be positive.');
@@ -340,7 +340,7 @@ end
 
 if (nargin < 6)
    varwin = DEFAULT_VARWIN;
-elseif (~isnumeric(varwin) | length(varwin)>2)
+elseif (~isnumeric(varwin) || length(varwin)>2)
    error('crossf(): Value of cycles must be a number or a (1,2) vector.');
 elseif (varwin < 0)
    error('crossf(): Value of cycles must be either zero or positive.');
@@ -482,7 +482,7 @@ end
 
 if isempty(g.elocs)
    g.elocs = '';
-elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
+elseif (~ischar(g.elocs)) && ~isstruct(g.elocs)
    error('Channel location file must be a valid text file.');
 end
 

@@ -80,7 +80,7 @@ if nargin<5
 else
   if isempty(filtnums)
       filtnums = [];
-  elseif length(filtnums)==1 & filtnums(1)==0
+  elseif length(filtnums)==1 && filtnums(1)==0
      filtnums = [];
   elseif length(filtnums) ~= 3
      fprintf('\ncaliper(): filter parameters (filtnums) must have length 3.\n')

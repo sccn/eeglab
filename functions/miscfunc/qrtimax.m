@@ -48,7 +48,7 @@ MAX_ITERATIONS = 50;
 
 if nargin < 3
 	reorder = 1;
-elseif isempty(reorder) | reorder == 0
+elseif isempty(reorder) || reorder == 0
 	reorder = 1; % set default
 else
 	reorder = strcmp('reorder',reorder);

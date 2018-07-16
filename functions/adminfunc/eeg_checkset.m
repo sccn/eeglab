@@ -384,7 +384,7 @@ for inddataset = 1:length(ALLEEG)
                             if strcmpi(EEG.event(1).type, 'boundary') && isfield(EEG.event, 'duration')
                                 if EEG.event(1).duration < 1
                                     EEG.event(1) = [];
-                                elseif EEG.event(1).latency > 0 & EEG.event(1).latency < 1
+                                elseif EEG.event(1).latency > 0 && EEG.event(1).latency < 1
                                     EEG.event(1).latency = 0.5;
                                 end
                             end
