@@ -400,7 +400,7 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
      %%%%%%%%%% cycle through neighbor types %%%%%%%%%%%%%
      %
      while ~isneighbor & nidx<=length(neighbors)     % for each neighbor event type
-       if strcmpi(uidxtype,neighbors(nidx)) || strcmp(neighbors,'_ALL')
+       if strcmpi(uidxtype,neighbors(nidx)) || any(strcmp(neighbors,'_ALL'))
          isneighbor=1;                               % flag 'neighbors' event
          curpos = curpos+1;
          %

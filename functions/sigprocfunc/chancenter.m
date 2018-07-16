@@ -70,7 +70,7 @@ end
 fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
 newcenter = center;
 
-if  wobble/mean(radius) > 0.01 && optim==1
+if ~isempty(wobble) && wobble/mean(radius) > 0.01 && optim==1
 	% Find center
 	% ----------------------------------------------
 	fprintf('Optimizing center position...\n');

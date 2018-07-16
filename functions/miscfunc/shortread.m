@@ -47,7 +47,7 @@
 
 function A = shortread(fname,Asize,fform,offset)
 
-if ~exist('fform') || isempty(fform)|fform==0
+if ~exist('fform') || isempty(fform) || fform(1)==0
 	fform = 'native';
 end
 

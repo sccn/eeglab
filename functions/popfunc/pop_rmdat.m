@@ -146,7 +146,7 @@ for bind = 1:length(allinds)
     evtlat = EEG.event(allinds(bind)).latency;
     evtbeg = evtlat+EEG.srate*timelims(1);
     evtend = evtlat+EEG.srate*timelims(2);
-    if any(bndlat > evtbeg && bndlat < evtend)
+    if any(bndlat > evtbeg & bndlat < evtend)
         % find the closer upper and lower boundaries
         bndlattmp = bndlat(bndlat > evtbeg & bndlat < evtend);
         diffbound = bndlattmp-evtlat;
@@ -158,12 +158,11 @@ for bind = 1:length(allinds)
             (evtbeg-evtlat)/EEG.srate, (evtend-evtlat)/EEG.srate);
     end
     if ~isempty(array) && evtbeg < array(end)
-        array(end) = evtend
+        array(end) = evtend;
     else
         array = [ array; evtbeg  evtend];
     end
 end
-array
 
 if ~isempty(array) && array(1) < 1, array(1) = 1; end
 if ~isempty(array) && array(end) > EEG.pnts, array(end) = EEG.pnts; end

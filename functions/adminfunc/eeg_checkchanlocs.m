@@ -221,7 +221,7 @@ if nargin < 3, nchans = length(chans); end
 complicated = false;        % whether we need complicated treatment of datachans & co further down the road.....
 
 if isfield(chans,'type')
-    mask = strcmpi({chans.type},'FID') || strcmpi({chans.type},'IGNORE');
+    mask = strcmpi({chans.type},'FID') | strcmpi({chans.type},'IGNORE');
     if any(mask)
         [chans(mask).datachan] = deal(0);
         complicated = true;

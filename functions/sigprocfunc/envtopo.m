@@ -871,8 +871,8 @@ end
 
 if strcmpi(g.sumenv,'on')  || strcmpi(g.sumenv,'fill') %%%%%%%% if 'sunvenv' %%%%%%%%%
  sumenv = envelope(sumproj(:,:), g.envmode);
- if ~ylimset && max(sumenv) > ymax, ymax = max(sumenv(1,:)); end
- if ~ylimset && min(sumenv) < ymin, ymin = min(sumenv(2,:)); end
+ if ~ylimset && max(sumenv(:)) > ymax, ymax = max(sumenv(1,:)); end
+ if ~ylimset && min(sumenv(:)) < ymin, ymin = min(sumenv(2,:)); end
  if strcmpi(g.sumenv,'fill')  
     %
     % Plot the summed projection filled 

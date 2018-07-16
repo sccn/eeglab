@@ -473,7 +473,7 @@ end
 if nargin<3
     times = NO;
 end
-if (length(times) == 1) || (times == NO),  % make default times
+if (length(times) == 1) || (length(times) == 1 && times(1) == NO)  % make default times
     times = 0:frames-1;
     srate = 1000*(length(times)-1)/(times(length(times))-times(1));
     fprintf('Using sampling rate %g Hz.\n',srate);
@@ -904,10 +904,10 @@ if nargin > 6
                 Arg = eval(['arg' int2str(a+1-6)]);
                 if strcmpi(Arg, 'on'),     Erpflag = YES; erp_ptiles=1; a = a+1;
                 elseif strcmpi(Arg, 'off') Erpflag = NO;  a = a+1;
-                elseif strcmpi(Arg,'1') || (Arg==1) Erplag = YES; erp_ptiles=1; a=a+1;
-                elseif strcmpi(Arg,'2') || (Arg==2) Erplag = YES; erp_ptiles=2; a=a+1;
-                elseif strcmpi(Arg,'3') || (Arg==3) Erplag = YES; erp_ptiles=3; a=a+1;
-                elseif strcmpi(Arg,'4') || (Arg==4) Erplag = YES; erp_ptiles=4; a=a+1;
+                elseif strcmpi(Arg,'1') || (Arg(1)==1) Erplag = YES; erp_ptiles=1; a=a+1;
+                elseif strcmpi(Arg,'2') || (Arg(1)==2) Erplag = YES; erp_ptiles=2; a=a+1;
+                elseif strcmpi(Arg,'3') || (Arg(1)==3) Erplag = YES; erp_ptiles=3; a=a+1;
+                elseif strcmpi(Arg,'4') || (Arg(1)==4) Erplag = YES; erp_ptiles=4; a=a+1;
                 end
             end
         elseif strcmpi(Arg,'rmerp')
@@ -1497,9 +1497,9 @@ end
 if exist('phargs') == 1 % if phase-sort the data trials
     if length(phargs) >= 4 && phargs(3) ~= phargs(4) % find max frequency
         % in specified band
-        if exist('psd') == 2 % requires Signal Processing Toolbox
+        if exist('pwelch') == 2 % requires Signal Processing Toolbox
             fprintf('Computing data spectrum using psd().\n');
-            [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
+            [pxx,freqs] = pwelch(data(:), frames, 0, max(1024, pow2(ceil(log2(frames)))), srate);
         else % EEGLAB native work-around
             fprintf('Computing data spectrum using spec().\n');
             [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
@@ -1616,9 +1616,9 @@ if exist('phargs') == 1 % if phase-sort the data trials
     %
 elseif exist('ampargs') == 1 % if amplitude-sort
     if length(ampargs) == 4 % find max frequency in specified band
-        if exist('psd') == 2
+        if exist('pwelch') == 2
             fprintf('Computing data spectrum using psd().\n');
-            [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
+            [pxx,freqs] = pwelch(data(:),frames,0,max(1024, pow2(ceil(log2(frames)))),srate);
         else
             fprintf('Computing data spectrum using spec().\n');
             [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
@@ -2040,8 +2040,8 @@ end
 %
 if length(coherfreq) == 2 && coherfreq(1) ~= coherfreq(2) && freq <= 0
     % find max frequency in specified band - should use Matlab pwelch()?
-    if exist('psd') == 2 % from Signal Processing Toolbox
-        [pxx,tmpfreq] = psd(urdata(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
+    if exist('pwelch') == 2 % from Signal Processing Toolbox
+        [pxx,tmpfreq] = pwelch(urdata(:),frames,0,max(1024,pow2(ceil(log2(frames)))),srate);
     else % substitute from EEGLAB
         [pxx,tmpfreq] = spec(urdata(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
     end
@@ -3431,9 +3431,9 @@ if (~isempty(lospecHz)) && strcmpi(NoShow, 'no')
     end
     
     % [Pxx, Pxxc, F] = PSD(X,NFFT,Fs,WINDOW,NOVERLAP,P)
-    if exist('psd') == 2
-        [Pxx,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
-            max(1024,pow2(ceil(log2(frames)))),srate,frames,0,0.05);
+    if exist('pwelch') == 2
+        [Pxx,F] = pwelch(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+            frames,0,max(1024,pow2(ceil(log2(frames)))),srate);
         % [Pxx,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),512,srate,winlength,0,0.05);
     else
         [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...

@@ -36,9 +36,8 @@
 
 function [DAT,S]=readbdf(DAT,Records,Mode)
     
-    disp('This function is outdated');
-    disp('Use the functions sopen() and sread() instead');
-    return;
+disp('This function is outdated');
+disp('Use the functions sopen() and sread() instead');
     
 if nargin<3 Mode=0; end
  
@@ -50,7 +49,7 @@ DAT.Record=zeros(length(Records)*RecLen,EDF.NS);
 DAT.Valid=uint8(zeros(1,length(Records)*RecLen));
 DAT.Idx=Records(:)';
         
-for nrec=1:length(Records),
+for nrec=1:length(Records)
 
 	NREC=(DAT.Idx(nrec)-1);
 	if NREC<0 fprintf(2,'Warning READEDF: invalid Record Number %i \n',NREC);end
@@ -58,9 +57,9 @@ for nrec=1:length(Records),
 	fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*3),'bof');
 	[s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit24');
 
-    try, 
+    try
         S(EDF.AS.IDX2)=s;
-    catch,
+    catch
         error('File is incomplete (try reading begining of file)');
     end
 
@@ -72,7 +71,7 @@ for nrec=1:length(Records),
 	%	invalid=[invalid; find(V==0)+l*k];
                              
 	if floor(Mode/2)==1
-		for k=1:EDF.NS,
+		for k=1:EDF.NS
 			DAT.Record(nrec*EDF.SPR(k)+(1-EDF.SPR(k):0),k)=S(1:EDF.SPR(k),k);
 		end
 	else
@@ -83,7 +82,7 @@ for nrec=1:length(Records),
 end
 if rem(Mode,2)==0	% Autocalib
 	DAT.Record=[ones(RecLen*length(Records),1) DAT.Record]*EDF.Calib;
-end;                   
+end
 
 DAT.Record=DAT.Record';
 return;         

@@ -337,7 +337,7 @@ for index = 1:length(g.latencyfields)
         EEG.event(end+1).epoch  = trials; 
         EEG.event(end).type     = g.latencyfields{index};
         EEG.event(end).latency  = (getfield(EEG.epoch(trials), g.latencyfields{index})*g.timeunit-EEG.xmin)*EEG.srate+1+(trials-1)*EEG.pnts;
-        if g.durationfields{index} ~= 0 && g.durationfields{index} ~= '0'
+        if ~isempty(g.durationfields{index}) && g.durationfields{index}(1) ~= 0 && g.durationfields{index}(1) ~= '0'
             EEG.event(end).duration = getfield(EEG.epoch(trials), g.durationfields{index})*g.timeunit*EEG.srate;
         else
             EEG.event(end).duration = 0;

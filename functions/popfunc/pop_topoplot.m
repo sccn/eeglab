@@ -203,7 +203,7 @@ nbgraph = size(arg2(:),1);
 if ~exist('topotitle')
     topotitle = '';
 end;    
-if ~exist('rowcols') || isempty(rowcols) || rowcols == 0
+if ~exist('rowcols') || isempty(rowcols) || rowcols(1) == 0
     rowcols(2) = ceil(sqrt(nbgraph));
     rowcols(1) = ceil(nbgraph/rowcols(2));
 end;    

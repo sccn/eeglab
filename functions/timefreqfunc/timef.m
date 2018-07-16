@@ -257,7 +257,7 @@ if isnan(frames) || isempty(frames)
     frames = length(X);
 end
 
-if nargin < 3 || isnan(tlimits) || isempty(tlimits)
+if nargin < 3 || isempty(tlimits) || isnan(tlimits(1)) 
 	tlimits = DEFAULT_TIMLIM;
 elseif (~isnumeric(tlimits) || sum(size(tlimits))~=3)
 	error('Value of tlimits must be a vector containing two numbers.');
@@ -273,7 +273,7 @@ elseif (Fs <= 0)
 	error('Value of srate must be positive.');
 end
 
-if isnan(tlimits) || isempty(tlimits)
+if isempty(tlimits) || isnan(tlimits(1))
    hlim = 1000*frames/Fs;  % fit default tlimits to srate and frames
    tlimits = [0 hlim];
 end
@@ -432,8 +432,10 @@ end
 if ~isnumeric(g.vert)
     error('vertical line(s) option must be a vector');
 else
-	if min(g.vert) < g.tlimits(1) || max(g.vert) > g.tlimits(2)
-        error('vertical line(s) time out-of-bound');
+	if ~isempty(g.vert)
+        if min(g.vert(:)) < g.tlimits(1) || max(g.vert(:)) > g.tlimits(2)
+            error('vertical line(s) time out-of-bound');
+        end
 	end
 end
 
@@ -803,7 +805,7 @@ else
   myprintf(g.verbose,'Using the input baseline spectrum\n');
   mbase = g.powbase;
 end
-if ~isnan( g.baseline ) && ~isnan( mbase )
+if ~isnan( g.baseline(1) ) && ~isnan( mbase(1) )
     P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 g.timesout])); % convert to (10log10) dB
 else
     P = 10 * log10(P);

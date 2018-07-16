@@ -99,9 +99,9 @@ if Hzlimits(2) <= Hzlimits(1)
 end
 
 for e=1:epochs
-  for r=1:rows,
-    [Pxx,freqs] = psd(data(r,(e-1)*frames+1:e*frames),fftlength,srate,...
-                          fftlength,fftlength/4);
+  for r=1:rows
+    [Pxx,freqs] = pwelch(data(r,(e-1)*frames+1:e*frames),fftlength,...
+                          fftlength/4,fftlength,srate);
     spectra(r,(e-1)*f2+1:e*f2) = Pxx(2:f2+1)'; % omit DC bin
   end
 end

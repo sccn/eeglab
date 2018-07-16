@@ -740,8 +740,10 @@ if ~isempty(g.timeStretchMarks) % timeStretch code by Jean Hauser
     end
 end 
 
-if min(g.vert) < g.tlimits(1) || max(g.vert) > g.tlimits(2)
-    error('vertical line (''vert'') latency outside of epoch boundaries');
+if ~isempty(g.vert)
+    if min(g.vert(:)) < g.tlimits(1) || max(g.vert(:)) > g.tlimits(2)
+        error('vertical line (''vert'') latency outside of epoch boundaries');
+    end
 end
 
 if strcmp(g.hzdir,'up') || strcmp(g.hzdir,'normal')

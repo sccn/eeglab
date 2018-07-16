@@ -174,7 +174,7 @@ if length(g.axsize) < 2
 else 
     axheight = g.axsize(2);
 end
-if isempty(g.chans) || g.chans == 0
+if isempty(g.chans) || g.chans(1) == 0
    g.chans = 1:size(data,1);
 elseif ~ischar(g.chans)
    g.chans = g.chans;

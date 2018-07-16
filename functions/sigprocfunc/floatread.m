@@ -58,7 +58,7 @@ if nargin<2
   return
 end
 
-if ~exist('fform') || isempty(fform)|fform==0
+if ~exist('fform') || isempty(fform) || fform(1)==0
 	fform = 'native';
 end
 

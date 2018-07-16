@@ -753,7 +753,7 @@ if ~isempty(g.freq) &&  strcmpi(g.plot, 'on')
             
 		else % plot all channels in g.plotchans 
 
-            if isempty(g.mapframes) || g.mapframes == 0
+            if isempty(g.mapframes) || g.mapframes(1) == 0
                 g.mapframes = 1:size(eegspecdB,1); % default to plotting all chans
             end
 			if ~isempty(varargin)
