@@ -132,7 +132,7 @@ end;
 
 % output file
 % -----------
-if nargin < 2 | isempty(htmlfile);
+if nargin < 2 || isempty(htmlfile);
 	indexdot = findstr( filename, '.');
 	if isempty(indexdot), indexdot = length(filename)+1; end
 	htmlfile = [ filename(1:indexdot(end)-1) '.html' ];
@@ -194,7 +194,7 @@ while (str(1) == '%')
 	  		case { 'usage:' 'authors:' 'author:' 'notes:' 'note:' 'input:' ...
 	  		'inputs:' 'outputs:' 'output:' 'example:' 'examples:' 'see also:' }, newtitle = 1;
 		 end
-		 if (i2d == length(str)) & (str(1) ~= '%'), newtitle = 1; end;	
+		 if (i2d == length(str)) && (str(1) ~= '%'), newtitle = 1; end;	
    	  end
       if newtitle
   			tilehtml = str(1:i2d); 
@@ -213,7 +213,7 @@ while (str(1) == '%')
          [tok1 strrm] = mystrtok( str );
          [tok2 strrm] = strtok( strrm );
 
-         if ~isempty(tok2) & ( tok2 == '-' | tok2 == '=') % new variable 
+         if ~isempty(tok2) && ( tok2 == '-' || tok2 == '=') % new variable 
             newvar = 1;
             oldvarname = varname;
             oldvartext = vartext;
@@ -274,7 +274,7 @@ while (str(1) == '%')
 
       % test if new input for an array
       % ------------------------------
-      if newvar | newtitle
+      if newvar || newtitle
          if maindescription
             if ~isempty(oldvartext) % FUNCTION TITLE
                maintext = oldvartext;
@@ -372,7 +372,7 @@ return;
 % final formating
 function str = finalformat(str); % bold text in bracket if just in the beginning
     tmploc = sort(union(find(str == '['), find(str == ']')));
-    if ~isempty(tmploc) & str(1) == '['
+    if ~isempty(tmploc) && str(1) == '['
         if mod(length(tmploc),2) ~= 0, str, error('Opening but no closing bracket'); end
         tmploc = tmploc(1:2);
         str = [ str(1:tmploc(1)) '<b>' str(tmploc(1)+1:tmploc(2)-1) '</b>' str(tmploc(2):end) ];
@@ -426,7 +426,7 @@ function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FU
 		testokin = realtokin;
 		testokin(findstr(testokin, '_')) = 'A';
 		testokin(findstr(testokin, '2')) = 'A';
-		if all(double(testokin) > 64) & all(double(testokin) < 91)
+		if all(double(testokin) > 64) && all(double(testokin) < 91)
 			test = 1;
 		end;				
 		realtokin = lower(realtokin);

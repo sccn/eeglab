@@ -60,7 +60,7 @@ geomvert = [];
 for index = 1:length(Prompt)
 	geomvert = [geomvert size(Prompt{index},1) 1];  % default is vertical geometry
 end
-if all(geomvert == 1) & length(Prompt) > 1
+if all(geomvert == 1) && length(Prompt) > 1
 	geomvert = []; % horizontal
 end
 

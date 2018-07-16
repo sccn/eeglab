@@ -131,7 +131,7 @@ ORIGIN      = pwd;
 
 % determine mode
 % --------------
-if iscell(directorylist{1}) & exist(directorylist{1}{1}) == 7
+if iscell(directorylist{1}) && exist(directorylist{1}{1}) == 7
 	fprintf('First cell array element is not a file\n');
 	fprintf('Scanning directories...\n');
 	mode = 'dir';

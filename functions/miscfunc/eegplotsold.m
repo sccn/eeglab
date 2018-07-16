@@ -220,7 +220,7 @@ for i = 1:chans
    F = F - mean(F) + i*spacing_var;  % add offset to y-values
    plot (xx,F,'clipping','off','Color',linecolor); % channel plot with x-values
 end 
-if xstart<0 & xstart+PLOT_TIME > 0
+if xstart<0 && xstart+PLOT_TIME > 0
    linetime = round(-xstart/srate);
    line ([linetime linetime],[1e10,-1e10]);
 end

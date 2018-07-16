@@ -142,7 +142,7 @@ while exchangeHappened
                 for j = 1:length(setId{set2})
                     chan(1) = setId{set1}(i);
                     chan(2) = setId{set2}(j);
-                    if cost_of_exchanging_channels(chan,[set1 set2], setId, dist) < 0 & ~ismember(chan, allMandatoryChannels)
+                    if cost_of_exchanging_channels(chan,[set1 set2], setId, dist) < 0 && ~ismember(chan, allMandatoryChannels)
                         setId{set1}(find(setId{set1} == chan(1))) = chan(2);
                         setId{set2}(find(setId{set2} == chan(2))) = chan(1);
                         sumDistances(counter) = 0;
@@ -188,7 +188,7 @@ if plotSubsets
     %set(th,'fontsize',14)
 end
 
-if length(r)>0 & (plotOptimization|plotSubsets)
+if length(r)>0 && (plotOptimization|plotSubsets)
     fprintf('The last subset returned contains the %d unused channels.\n',...
                    length(r));
 end

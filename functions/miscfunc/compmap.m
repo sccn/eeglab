@@ -171,12 +171,12 @@ end
 
 totalsources = length(compnos);
 if ~isempty(srclabels) 
-  if ~ischar(srclabels(1,1)) | srclabels(1,1)==' ' % if numbers
+  if ~ischar(srclabels(1,1)) || srclabels(1,1)==' ' % if numbers
     if size(srclabels,1) == 1
        srclabels = srclabels';
     end
   end
-  if size(srclabels,1)==1 & size(srclabels,2)==1 & srclabels==' ' 
+  if size(srclabels,1)==1 && size(srclabels,2)==1 && srclabels==' ' 
      srclabels = repmat(srclabels,totalsources,1);
   end
   if size(srclabels,1) ~= totalsources,

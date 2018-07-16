@@ -165,7 +165,7 @@ end
 
 % converting the geometry formats
 % -------------------------------
-if ~isempty(g.geomhoriz) & ~iscell( g.geomhoriz )
+if ~isempty(g.geomhoriz) && ~iscell( g.geomhoriz )
 	oldgeom = g.geomhoriz;
 	g.geomhoriz = {};
 	for row = 1:length(oldgeom)

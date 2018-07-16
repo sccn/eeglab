@@ -73,7 +73,7 @@ end
 [chans,framestot] = size(projdata);
 frames = fix(framestot/(ncomps+1));
 
-if ncomps < 1 | frames*(ncomps+1) ~= framestot,
+if ncomps < 1 || frames*(ncomps+1) ~= framestot,
     fprintf(...
   'chanproj(): data length (%d) not a multiple of ncomps (%d).\n',...
                                    framestot,ncomps);
@@ -117,7 +117,7 @@ else
   ymax = limits(4);
 end
 
-if xmin == 0 & xmax == 0,
+if xmin == 0 && xmax == 0,
   x = [0:frames-1];
   xmin = 0;
   xmax = frames-1;
@@ -126,7 +126,7 @@ else
   x=xmin*ones(1,frames)+dx*(0:frames-1);          % construct x-values
 end
 
-if ymax == 0 & ymin == 0,
+if ymax == 0 && ymin == 0,
   ymax=max(max(projdata(chan,:)));
   ymin=min(min(projdata(chan,:)));
 end
@@ -149,7 +149,7 @@ if size(framelist,2)==1,
      end
 end
   
-if framelist(1)<1 | framelist(length(framelist))>frames,
+if framelist(1)<1 || framelist(length(framelist))>frames,
     fprintf('chanproj(): framelist values must be between 1-%d.\n',frames);
     return
 else

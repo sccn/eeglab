@@ -67,7 +67,7 @@ end
 
 % test input variables
 % --------------------
-if ~isstruct(EEG) | ~isfield(EEG,'event')
+if ~isstruct(EEG) || ~isfield(EEG,'event')
    error('first argument must be an EEG structure')
 elseif EEG.trials > 1
    error('input dataset must be continuous data (1 epoch)');
@@ -88,7 +88,7 @@ g = finputcheck(options, { 'recurrence'    'real'  []  1;
                             'extractepochs' 'string' { 'on','off' } 'on' }, 'eeg_regepochs');
 if ischar(g), error(g); end
 
-if g.recurrence < 0 | g.recurrence > EEG.xmax
+if g.recurrence < 0 || g.recurrence > EEG.xmax
   error('recurrence_interval out of bounds');
 end
 
@@ -96,7 +96,7 @@ if nargin < 3
   g.limits = [0 g.recurrence];
 end
 
-if length(g.limits) ~= 2 | g.limits(2) <= g.limits(1) 
+if length(g.limits) ~= 2 || g.limits(2) <= g.limits(1) 
    error('epoch limits must be a 2-vector [minsec maxsec]')
 end
 
@@ -136,7 +136,7 @@ for k = 1:nu
    else
       fprintf('%d',k)
    end
-   if k==40 | ( k>40 & ~rem(k-40,70))
+   if k==40 || ( k>40 && ~rem(k-40,70))
      fprintf('\n');
    end
 

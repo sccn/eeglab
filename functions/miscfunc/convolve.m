@@ -43,7 +43,7 @@ for index = 1:length(A)
 	for indexB = 1:length(B)
         indexconvo = indexB-1-round(length(B)/2);
 		indexA = index + indexconvo+1;
-		if indexA > 0 & indexA <= length(A)
+		if indexA > 0 && indexA <= length(A)
             R(index) = R(index) + B(indexB)*A(indexA);
             sumconvo = sumconvo + B(indexB);
 		end

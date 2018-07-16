@@ -45,7 +45,7 @@ function [permx,indperm]= matperm(x,y,indx,indy,corr)
 oldm = m;
 
 errcode=0;
-if  ix ~= iy | p ~= iy,
+if  ix ~= iy || p ~= iy,
  fprintf('matperm: indx and indy must be column vectors, same height as y.\n');
  errcode=1
 end

@@ -12,7 +12,7 @@
 
 function outf = eeg_ms2f(EEG,ms)
         ms = ms/1000;
-        if ms < EEG.xmin | ms > EEG.xmax
+        if ms < EEG.xmin || ms > EEG.xmax
            error('time out of range');
         end
         outf = 1+round((EEG.pnts-1)*(ms-EEG.xmin)/(EEG.xmax-EEG.xmin));

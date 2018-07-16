@@ -15,7 +15,7 @@ if nargin < 2
   help gauss
   return
 end
-if sds <=0 | frames < 1
+if sds <=0 || frames < 1
   help gauss
   return
 end

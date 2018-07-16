@@ -14,7 +14,7 @@
 % Mathematical Software, 6(1):104-111, 1980.
 %
 % v1.0  96-06-14. Niclas Borlin, niclas@cs.umu.se.
-%                 Department of Computing Science, Umeå University,
+%                 Department of Computing Science, Ume University,
 %                 Sweden.
 %
 % NOTE: A substantial effort was put into this code. If you use it for a
@@ -65,7 +65,7 @@ while (U(n+1))
             
             % If there are more free zeros in row r and row r in not
             % yet marked as unexplored..
-            if (A(r,l)~=0 & RH(r)==0)
+            if (A(r,l)~=0 && RH(r)==0)
                 % Insert row r first in unexplored list.
                 RH(r)=RH(n+1);
                 RH(n+1)=r;

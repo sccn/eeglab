@@ -196,7 +196,7 @@ end
 %
 %%%%%%%%%%%%%%% Compute rejection threshold from percentile %%%%%%%%%%%%%%%
 %
-if rejthresh > 0 & rejthresh < 1.0,
+if rejthresh > 0 && rejthresh < 1.0,
 disp yes
     data = data - mean(data); % make data mean-zero
     fprintf('Sorting mean-zeroed data to compute rejection threshold...\n');
@@ -340,7 +340,7 @@ for I=1:epochstep:frames-subwindow ;  % for each epoch . . .
   elseif rej>0
      fprintf('\n')
   end
-  if k<= subepoch & subepoch-rej >= MINSUBEPOCHS
+  if k<= subepoch && subepoch-rej >= MINSUBEPOCHS
      Power(:,epoch)=[median(ptmp(1:nfreqs+1,k:subepoch)')]'; 
                                           % omit initial zero cols
   elseif epoch > 1
@@ -382,7 +382,7 @@ fprintf('First and last time points: %g and %g secs.\n',...
 %
 %%%%%%%%%%%%%%% Make surf() plot of time-frequency distribution %%%%%%
 %
-if nfreqs>1 & epoch>1 & SURFPLOT 
+if nfreqs>1 && epoch>1 && SURFPLOT 
   if min(min(Power))>0
     fprintf('Plot shows dB log(Power) - Power output is not log scaled.\n');
     off    = [50 -50 0 0];      % successive figure offset in pixels

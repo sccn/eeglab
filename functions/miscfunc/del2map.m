@@ -61,14 +61,14 @@ GRID_SCALE = 2*MAXCHANS+5;
 
 % Read the channel file
 % ---------------------
-if ischar( filename ) | isstruct( filename )
+if ischar( filename ) || isstruct( filename )
     [tmp lb Th Rd] = readlocs(filename);
 	Th = pi/180*Th;                               % convert degrees to rads
 	[x,y] = pol2cart(Th,Rd);
 else
 	x = real(filename);
 	y = imag(filename);		
-    if exist('draw') == 1 & draw ~= 0
+    if exist('draw') == 1 && draw ~= 0
         line( [(x-0.01)' (x+0.01)']', [(y-0.01)' (y+0.01)']');
         line( [(x+0.01)' (x-0.01)']', [(y-0.01)' (y+0.01)']');
     end
@@ -96,7 +96,7 @@ for i=1:size(map,2)
 
 	% Draw gradient
 	% -------------
-	if exist('draw') == 1 & draw ~= 0
+	if exist('draw') == 1 && draw ~= 0
 		if size(map,2) > 1
 			subplot(ceil(sqrt(size(map,2))), ceil(sqrt(size(map,2))), i);
 		end

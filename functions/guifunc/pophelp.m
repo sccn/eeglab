@@ -45,7 +45,7 @@ if exist('help2html')
         pathHelpHTML = fileparts(which('help2html'));
         if ~isempty(findstr('NFT', pathHelpHTML)), rmpath(pathHelpHTML); end
         text1 = help2html(funct);
-        if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
+        if length(funct) > 4 && strcmpi(funct(1:4), 'pop_')
             try,
                 text2 = help2html(funct(5:end));
                 text1 = [text1 '<br><pre>___________________________________________________________________' 10 ...
@@ -61,7 +61,7 @@ if exist('help2html')
 else
     if isempty(funct), return; end
     doc1 = readfunc(funct, nonmatlab);
-    if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
+    if length(funct) > 4 && strcmpi(funct(1:4), 'pop_')
         try,
             doc2 = readfunc(funct(5:end), nonmatlab);
             doc1 = { doc1{:} ' _________________________________________________________________ ' ...

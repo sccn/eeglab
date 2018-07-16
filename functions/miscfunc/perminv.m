@@ -27,7 +27,7 @@
 function [invvec]=perminv(vector)
 
 [n,c] = size(vector);
-if n>1 & c>1,
+if n>1 && c>1,
     fprintf('perminv(): input must be a vector.\n');
 	return
 end

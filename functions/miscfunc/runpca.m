@@ -68,7 +68,7 @@ if isempty(N)
 end
 
 
-if N == 0  | N == rows
+if N == 0  || N == rows
   N = rows;
   [U,S,V] = svd(data',0);   % performa SVD
   if norm == 0

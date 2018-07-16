@@ -225,7 +225,7 @@ if ~isempty(g.subwin)
     timesout1 = timesout1(ind1);
     timesout2 = timesout2(ind2);
 end
-if length(timesout1) ~= length(timesout2) | any( timesout1 ~= timesout2)
+if length(timesout1) ~= length(timesout2) || any( timesout1 ~= timesout2)
     disp('Warning: Time points are different for X and Y. Use ''timesout'' to specify common time points');
     disp('Searching for common points');
     [vals ind1 ind2 ] = intersect_bc(timesout1, timesout2);

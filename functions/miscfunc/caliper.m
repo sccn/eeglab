@@ -66,11 +66,11 @@ end
 nchans = size(newepoch,1);
 ntimes = size(newepoch,2);
 
-if compnums(1) == 0 | isempty(compnums(1)) 
+if compnums(1) == 0 || isempty(compnums(1)) 
    compnums = 1:nchans;
 end
 
-if min(compnums) < 1 | max(compnums) > size(weights,2)
+if min(compnums) < 1 || max(compnums) > size(weights,2)
    help caliper
    return
 end
@@ -88,7 +88,7 @@ else
   end
 end
 
-if nargin< 6  | isempty(times) | (length(times)==1 & times(1)==0)
+if nargin< 6  || isempty(times) || (length(times)==1 && times(1)==0)
   times = 0:ntimes-1;
 else
   if length(times) ~= ntimes
@@ -171,7 +171,7 @@ for c=compnums
     amps = [amps winvrms(c)*sum(refact(n,:).*newact(n,:))];
   end
   n = n+1;
-  if ~noplot & n <= 4  %%% only plot out at most the first 3 components
+  if ~noplot && n <= 4  %%% only plot out at most the first 3 components
      refproj = icaproj(refepoch,weights,c);
      refproj = env(refproj);
      windproj = winv(:,c)*(refact(n-1,:)*refnorm);

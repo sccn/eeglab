@@ -70,7 +70,7 @@ function dists = eucl(crds1,crds2)
     crds1 = crds1';                     % Transpose crds
     crds2 = crds2';
 
-    if (N1>1 & N2>1)                    % If two matrices provided,
+    if (N1>1 && N2>1)                    % If two matrices provided,
       dists = zeros(N1,N2);               % Calc all pairwise distances between them
       for i = 1:N1
         c1 = crds1(:,i) * ones(1,N2);
@@ -83,11 +83,11 @@ function dists = eucl(crds1,crds2)
       end
     end
 
-    if (N1==1 & N2==1)                  % If two vectors provided,
+    if (N1==1 && N2==1)                  % If two vectors provided,
       dists = sqrt(sum((crds1-crds2).^2));  % Calc scalar
     end
 
-    if (N1>1 & N2==1)                   % If matrix & reference point provided,
+    if (N1>1 && N2==1)                   % If matrix && reference point provided,
       crds1 = crds1 - (ones(N1,1)*crds2')'; % Center points on reference point
       if (P>1)                              % Calc euclidean distances in P-space
          dists = sqrt(sum(crds1.^2))';
@@ -96,7 +96,7 @@ function dists = eucl(crds1,crds2)
       end
     end;                                    % Return column vector
 
-    if (N1==1 & N2>1)                   % If reference point & matrix provided,
+    if (N1==1 && N2>1)                   % If reference point && matrix provided,
       crds2 = crds2 - (ones(N2,1)*crds1')'; % Center points on reference point
       if (P>1)                              % Calc euclidean distances in P-space
         dists = sqrt(sum(crds2.^2));

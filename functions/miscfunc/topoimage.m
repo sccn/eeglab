@@ -123,7 +123,7 @@ elseif size(axsize) == [1 1] & axsize(1) == 0
 elseif size(axsize) == [1 2]
   axwidth  = axsize(1);
   axheight = axsize(2);
-  if axwidth > 1 | axwidth < 0 | axheight > 1 | axwidth < 0
+  if axwidth > 1 || axwidth < 0 || axheight > 1 || axwidth < 0
     help topoimage
     return
   end
@@ -245,7 +245,7 @@ chans = length(channels);
      colors = [colors; colors];  % make > 64 available
   end
   for c=1:length(colors)   % make white traces black unless axis color is white
-    if colors(c,1)=='w' & axcolor~=[1 1 1]
+    if colors(c,1)=='w' && axcolor~=[1 1 1]
          colors(c,1)='k';
     end
   end
@@ -271,7 +271,7 @@ chans = length(channels);
     zmax = limits(6);
   end
 
-  if xmax == 0 & xmin == 0,
+  if xmax == 0 && xmin == 0,
     x = [0:1:times-1];
     xmin = min(x);
     xmax = max(x);
@@ -285,7 +285,7 @@ chans = length(channels);
       return
   end
 
-  if ymax == 0 & ymin == 0,
+  if ymax == 0 && ymin == 0,
       y=[1:1:freqs];
       ymax=freqs;
       ymin=1;
@@ -299,7 +299,7 @@ chans = length(channels);
       return
   end
 
-  if zmax == 0 & zmin == 0,
+  if zmax == 0 && zmin == 0,
       zmax=max(max(data));
       zmin=min(min(data));
       fprintf('Color axis limits [%g,%g]\n',zmin,zmax);
@@ -475,14 +475,14 @@ P=0;
       set(gca,'ydir','normal');
       caxis([zmin zmax]);
 
-        if exist('YVAL') & YVAL>=curax(3) & YVAL<=curax(4)
+        if exist('YVAL') && YVAL>=curax(3) && YVAL<=curax(4)
             hold on
             hp=plot([xmin xmax],[YVAL YVAL],'r-');%,'color',axislcolor);  
                                                        % draw horizontal axis 
             set(hp,'Linewidth',1.0)
         end
 
-        if xmin<0 & xmax>0 
+        if xmin<0 && xmax>0 
           hold on
           vl= plot([0 0],[curax(3) curax(4)],'color',axislcolor);  % draw vert axis 
           set(vl,'linewidth',2);
@@ -554,7 +554,7 @@ P=0;
           py=plot([xmin xmin],[curax(3) curax(4)],'color','k'); % vert axis at xmin
       end
       hold on
-      if exist('YVAL') & YVAL>=curax(3)
+      if exist('YVAL') && YVAL>=curax(3)
           px=plot([xmin xmax],[YVAL YVAL],'color',axislcolor); 
                                                       % draw horiz axis at YVAL
       else
@@ -632,7 +632,7 @@ P=0;
              end
           end
           maxlabel = num2str(zmax,3);
-          if zmin<0 & zmax>0
+          if zmin<0 && zmax>0
              maxlabel = ['+' maxlabel];
           end
           while (length(maxlabel)<length(minlabel))

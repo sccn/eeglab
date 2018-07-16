@@ -178,23 +178,23 @@ end
 if length(g.showchan) > 1
     error('tftopo(): showchan must be a single number');
 end
-if length(g.limits)<1 | isnan(g.limits(1))
+if length(g.limits)<1 || isnan(g.limits(1))
   g.limits(1) = times(1);
 end
-if length(g.limits)<2 | isnan(g.limits(2))
+if length(g.limits)<2 || isnan(g.limits(2))
   g.limits(2) = times(end);
 end
-if length(g.limits)<3 | isnan(g.limits(3))
+if length(g.limits)<3 || isnan(g.limits(3))
   g.limits(3) = freqs(1);
 end
-if length(g.limits)<4 | isnan(g.limits(4))
+if length(g.limits)<4 || isnan(g.limits(4))
   g.limits(4) = freqs(end);
 end
-if length(g.limits)<5 | isnan(g.limits(5)) % default caxis plotting limits
+if length(g.limits)<5 || isnan(g.limits(5)) % default caxis plotting limits
   g.limits(5) = -max(abs(tfdata(:)));
   mincax = g.limits(5); 
 end
-if length(g.limits)<6 | isnan(g.limits(6))
+if length(g.limits)<6 || isnan(g.limits(6))
     defaultlim = 1;
     if exist('mincax')
         g.limits(6) = -mincax; % avoid recalculation
@@ -214,11 +214,11 @@ if g.sigthresh(2) > size(tfdata,4)
     error('tftopo(): ''sigthresh'' second number must be less than or equal to the number of subjects');
 end
 if ~isempty(g.signifs)
-    if size(g.signifs,1) > 2 | size(g.signifs,2) ~= size(tfdata,1)| ...
+    if size(g.signifs,1) > 2 || size(g.signifs,2) ~= size(tfdata,1)| ...
             (size(g.signifs,3) ~= size(tfdata,3) & size(g.signifs,4) ~= size(tfdata,3))
         fprintf('tftopo(): error in ''signifs'' array size not compatible with data size, trying to transpose.\n');
         g.signifs = permute(g.signifs, [2 1 3 4]);
-        if size(g.signifs,1) > 2 | size(g.signifs,2) ~= size(tfdata,1)| ...
+        if size(g.signifs,1) > 2 || size(g.signifs,2) ~= size(tfdata,1)| ...
             (size(g.signifs,3) ~= size(tfdata,3) & size(g.signifs,4) ~= size(tfdata,3))
             fprintf('tftopo(): ''signifs'' still the wrong size.\n');
             return
@@ -603,7 +603,7 @@ if ~isempty(g.timefreqs)
         for n=1:tfpoints
             axes(topoaxes(n));
             caxis([-endcaxis endcaxis]);
-            if n==tfpoints & strcmpi(g.cbar, 'on') % & (mod(tfpoints,2)~=0) % image color bar by last map
+            if n==tfpoints && strcmpi(g.cbar, 'on') % && (mod(tfpoints,2)~=0) % image color bar by last map
                 cb=cbar;
                 pos = get(cb,'position');
                 set(cb,'position',[pos(1:2) 0.023 pos(4)]);
@@ -613,7 +613,7 @@ if ~isempty(g.timefreqs)
     end
 end
 
-if g.showchan>0 & ~isempty(g.chanlocs)
+if g.showchan>0 && ~isempty(g.chanlocs)
      sbplot(4,4,1,'ax',imgax);
      topoplot(g.showchan,g.chanlocs,'electrodes','off', ...
                   'style', 'blank', 'emarkersize1chan', 10 );

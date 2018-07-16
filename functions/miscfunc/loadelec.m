@@ -34,7 +34,7 @@ errorcode = 0;
 % Read the channel names 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if channamefile ~= 0 & channamefile ~= '0'	% read file of channel names
+if channamefile ~= 0 && channamefile ~= '0'	% read file of channel names
    chid = fopen(channamefile,'r');
    if chid <3,
       fprintf('cannot open file %s.\n',channamefile);
@@ -64,7 +64,7 @@ if channamefile ~= 0 & channamefile ~= '0'	% read file of channel names
 	 end
    end
 end
-if channamefile == 0 | channamefile == '0', % plot channel numbers
+if channamefile == 0 || channamefile == '0', % plot channel numbers
    channames = [];
    for c=1:chans
       if c<10,

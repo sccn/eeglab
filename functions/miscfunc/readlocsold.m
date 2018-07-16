@@ -68,7 +68,7 @@ if ~isempty(badchars)
 end
 
 for c=1:length(channums)
-  if labels(c,3)== ' ' & labels(c,4)== ' '
+  if labels(c,3)== ' ' && labels(c,4)== ' '
       labels(c,[2 3]) = labels(c,[1 2]);
       labels(c,1) = ' '; % move 1|2-letter labels to middle of string
   end

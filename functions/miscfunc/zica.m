@@ -72,7 +72,7 @@ if length(baseframes) < 3
   return
 end
 
-if min(baseframes) < 1 | max(baseframes) > frames
+if min(baseframes) < 1 || max(baseframes) > frames
   fprintf('\n  zica() - baseframes out of range.\n');
   help zica
   return

@@ -85,7 +85,7 @@ end
 if chanlist==0,
     chanlist = [1:chans];
 end
-if length(chanlist)~=chans & wrows<chans,  % if non-square weight matrix
+if length(chanlist)~=chans && wrows<chans,  % if non-square weight matrix
     fprintf('compsort(): chanlist not allowed with non-square weights.\n');
     return
 end
@@ -111,14 +111,14 @@ end
 epochs = framestot/frames;
 
 % activations = (wrows,wcols)x(srows,scols)x(chans,framestot)
-if chans ~= scols | srows ~= wcols,
+if chans ~= scols || srows ~= wcols,
    fprintf('compsort(): input data dimensions do not match.\n');
    fprintf(...
  ' i.e., Either chans %d ~= sphere cols %d or sphere rows %d ~= weights cols %d\n',...
                              chans,scols,srows,wcols);
    return
 end
-if wrows ~= chans & nlargest ~= 0 & nlargest ~= wrows,
+if wrows ~= chans && nlargest ~= 0 && nlargest ~= wrows,
    fprintf(...
  'compsort(): cannot project components back to order by size - nchans ~= ncomponents.\n');
    return
@@ -148,7 +148,7 @@ if datamean == 1,
     data = data - mean(data')'*ones(1,framestot); % remove channel means
 
 elseif datamean~=0,                               % remove given means
-    if size(datamean,2) ~= epochs | size(datamean,1) ~= chans,
+    if size(datamean,2) ~= epochs || size(datamean,1) ~= chans,
         fprintf('compsort(): datamean must be 0, 1, or (chans,epochs)\n');
         return
     end

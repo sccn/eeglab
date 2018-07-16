@@ -128,7 +128,7 @@ if (nargin < 2)
 	return
 end
 
-if (min(size(X))~=1 | length(X)<2)
+if (min(size(X))~=1 || length(X)<2)
 	fprintf('crossf(): xdata must be a row or column vector.\n');
     return
 elseif (min(size(Y))~=1 | length(Y)<2)
@@ -349,7 +349,7 @@ for t=1:trials,
            s = ceil(rand([1 2])*nwin); % random ints [1,nwin]
            tmpX = tmpsX(:,s(1));
            tmpY = tmpsY(:,s(2));
-           if ~any(isnan(tmpX)) & ~any(isnan(tmpY))
+           if ~any(isnan(tmpX)) && ~any(isnan(tmpY))
 		      RR = tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
 		      Rboot(:,j) = Rboot(:,j) + RR;
               j = j+1;

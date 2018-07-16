@@ -87,15 +87,15 @@ end
 [p,q] = size(y);
 m = min(m,p);
 
-if m~=n | p~=q
-   if nargin>5 & method~=2
+if m~=n || p~=q
+   if nargin>5 && method~=2
      fprintf('matcorr(): Matrices are not square: using max abs corr method (2).\n');
    end
    method = 2; % Can accept non-square matrices
 end 
 
 
-if nargin < 5 | isempty(rmmean)
+if nargin < 5 || isempty(rmmean)
   rmmean = 0;
 end
 
@@ -119,7 +119,7 @@ end
 
 
 
-if nargin > 6 & ~isempty(weighting) & norm(weighting) > 0,
+if nargin > 6 && ~isempty(weighting) && norm(weighting) > 0,
   if any(size(corrs) ~= size(weighting))
     fprintf('matcorr(): weighting matrix size must match that of corrs\n.')
     return
@@ -155,7 +155,7 @@ case 1                      % Implements the VAM assignment method
 		[syy iyy] = max(sy(end,:)-sy(end-1,:));
 
 		if sxx == syy
-			if sxx == 0 & syy == 0
+			if sxx == 0 && syy == 0
         	   [sxx ixx] = max((sx(end,:)-sx(end-1,:)) .* sx(end,:));
     	       [syy iyy] = max((sy(end,:)-sy(end-1,:)) .* sy(end,:));
 			else

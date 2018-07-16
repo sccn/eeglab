@@ -77,7 +77,7 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
   border  = mean(newfreqs(2:end)-newfreqs(1:end-1))/2; % automatically added to the borders in imagesc
   newfreqs = linspace(realborders(1)+border, realborders(2)-border, length(freqs));
   
-  if nargin == 4 & ~isempty(clim)
+  if nargin == 4 && ~isempty(clim)
       imagesc(newtimes,newfreqs,data,clim);
   else 
       imagesc(newtimes,newfreqs,data);

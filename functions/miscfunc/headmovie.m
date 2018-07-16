@@ -64,7 +64,7 @@ end
 if nargin<8
    minmax = 0;
 end
-if size(minmax)==[1 1] & minmax ~= 0
+if size(minmax)==[1 1] && minmax ~= 0
    minmax = [-minmax minmax]; 
 end
 if minmax ==0,
@@ -102,7 +102,7 @@ if nargin <2
 	eloc_file = 0;
 end
 
-if movieframes(1) < 1 | movieframes(length(movieframes))>frames
+if movieframes(1) < 1 || movieframes(length(movieframes))>frames
 	fprintf('headmovie(): specified movieframes not in data!\n');
 	return
 end
@@ -130,7 +130,7 @@ elseif size(camerapath,2) > 4
      help headmovie
      return
 end
-if size(camerapath,1) > 1 & size(camerapath,2)~=4
+if size(camerapath,1) > 1 && size(camerapath,2)~=4
      help headmovie
      return
 end

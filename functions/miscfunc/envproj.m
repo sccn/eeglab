@@ -146,7 +146,7 @@ if min(compnums)<1,
  return
 end
 
-if FILL>0 & numcomps == 1
+if FILL>0 && numcomps == 1
    FILL = 1;
 else
    FILL = 0;
@@ -164,14 +164,14 @@ end
  'envproj(): limits should be 0 or an array [xmin xmax ymin ymax].\n');
         return
       end
-        if limits(1,1) == 0 & limits(1,2) ==0,
+        if limits(1,1) == 0 && limits(1,2) ==0,
             xmin=0;
             xmax=0;
         else
             xmin = limits(1,1);
             xmax = limits(1,2);
         end
-         if limits(1,3) == 0 & limits(1,4) ==0,
+         if limits(1,3) == 0 && limits(1,4) ==0,
             ymin=0;
             ymax=0;
         else
@@ -180,7 +180,7 @@ end
         end
   end
 
-  if xmax == 0 & xmin == 0,
+  if xmax == 0 && xmin == 0,
     x = (0:1:frames-1);
     xmin = 0;
     xmax = frames-1;
@@ -189,7 +189,7 @@ end
     x=xmin*ones(1,frames)+dx*(0:frames-1); % construct x-values
   end
 
-  if ymax == 0 & ymin == 0,
+  if ymax == 0 && ymin == 0,
     ymax=max(max(data(chanlist,:)));
     ymin=min(min(data(chanlist,:)));
   end
@@ -310,7 +310,7 @@ set(l,'FontSize',14);
 l=ylabel('Potential (uV)'); % yaxis label
 set(l,'FontSize',14);
 
-if xmax > 0  & xmin < 0
+if xmax > 0  && xmin < 0
   plot([0 0],[ymin ymax],'k','linewidth',1.5); % plot vertical line at time 0
 end
 

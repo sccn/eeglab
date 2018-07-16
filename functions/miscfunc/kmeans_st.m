@@ -37,7 +37,7 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
   end
 
   [n,p] = size(X);
-  if (k<1 | k>n)
+  if (k<1 || k>n)
     error('KMEANS: k out of range 1-N');
   end
 

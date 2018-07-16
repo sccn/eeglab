@@ -88,7 +88,7 @@ end
 if nargin<4
   srate = 0; % from icadefs
 end
-if isempty(srate) | srate==0
+if isempty(srate) || srate==0
   srate = DEFAULT_SRATE; % from icadefs
 end
 if nargin<5
@@ -109,7 +109,7 @@ end
 if isempty(amps)
   amps = NaN;
 end
-if ~isnan(amps) & length(amps) ~= ncomps
+if ~isnan(amps) && length(amps) ~= ncomps
    error('Supplied amps does not match the number of unmixed components');
 end
 

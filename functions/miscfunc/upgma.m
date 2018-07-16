@@ -37,7 +37,7 @@ function [topology,support] = upgma(dist,labels,doplot,fontsize)
   if (isempty(doplot)) doplot = 1; end
 
   [n,p] = size(dist);
-  if (n~=p | any(diag(dist)>eps))
+  if (n~=p || any(diag(dist)>eps))
     dist
     error('  UPGMA: input matrix is not a distance matrix.');
   end
@@ -80,7 +80,7 @@ function [topology,support] = upgma(dist,labels,doplot,fontsize)
     clstsize(i) = new_clstsize;
 
     for k = 1:n                         % For all other clusters/OTUs,
-      if (k~=i & k~=j)                  %   adjust distances to new cluster
+      if (k~=i && k~=j)                  %   adjust distances to new cluster
         dist(k,i) = alpha_i * dist(k,i) + alpha_j * dist(k,j);
         dist(i,k) = alpha_i * dist(i,k) + alpha_j * dist(j,k);
         dist(k,j) = plug;

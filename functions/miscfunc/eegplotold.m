@@ -532,7 +532,7 @@ else
     spacing = str2num(get(ESpacing,'string')); % current spacing
     winlength = get(figh,'UserData');  
     
-    if isempty(spacing) | isempty(time)
+    if isempty(spacing) || isempty(time)
       return  % return if valid numbers are not in the edit boxes
     end
     

@@ -153,7 +153,7 @@ lowindex  = round(len*g.trim(1)/100)+1;
 highindex = round(len*g.trim(2)/100);
 sortvar = sortvar(lowindex:highindex);
 data    = data(:, lowindex:highindex);
-if lowindex ~=1 | highindex ~= length(sortorder)
+if lowindex ~=1 || highindex ~= length(sortorder)
     fprintf('Actual percentiles %1.2f-%1.2f (indices 1-%d -> %d-%d): event vals min %3.2f; max %3.2f\n', ...
              100*(lowindex-1)/len, 100*highindex/len, len, lowindex, highindex, min(sortvar), max(sortvar));
 end
@@ -309,7 +309,7 @@ data = reshape(data, 1, size(data,2)*size(data,1));
 
 % time frequency decomposition
 % ----------------------------
-if strcmpi(g.method, 'timefreq') & isempty(g.plotvals)
+if strcmpi(g.method, 'timefreq') && isempty(g.plotvals)
     data = reshape(data, length(data)/length(sortvar), length(sortvar));
     [tf, g.freqs, g.times] = timefreq(data, srate, 'freqs', g.freqs, 'timesout', g.times, ...
                                       'tlimits', [min(timevect) max(timevect)], 'wavelet', 3);
@@ -318,7 +318,7 @@ end
 
 % compute correlation
 % -------------------
-if strcmpi(g.mode, 'phase') & isempty(g.plotvals)    
+if strcmpi(g.mode, 'phase') && isempty(g.plotvals)    
     for freq = 1:length(g.freqs)
         fprintf('Computing correlation with phase %3.2f Hz ----------------------\n', g.freqs(freq));
         for time = 1:length(g.times)

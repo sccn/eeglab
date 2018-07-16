@@ -73,7 +73,7 @@ function setfont(fig, varargin);
             set(h(index), 'YTickLabelMode', 'manual', 'YTickMode', 'manual');
         end
         for tmpprop = 1:2:length(varargin)
-            if strcmpi(varargin{tmpprop}, 'color') & isaxis
+            if strcmpi(varargin{tmpprop}, 'color') && isaxis
                 set(h(index), 'xcolor', varargin{tmpprop+1}, ...
                               'ycolor', varargin{tmpprop+1}, ...
                               'zcolor', varargin{tmpprop+1});                

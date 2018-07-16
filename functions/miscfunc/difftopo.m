@@ -38,11 +38,11 @@ if nargin < 3
    help difftopo
    return
 end
-if eeg1 < 1 | eeg1 > length(ALLEEG)
+if eeg1 < 1 || eeg1 > length(ALLEEG)
    help difftopo
    return
 end
-if eeg2 < 1 | eeg2 > length(ALLEEG)
+if eeg2 < 1 || eeg2 > length(ALLEEG)
    help difftopo
    return
 end
@@ -50,7 +50,7 @@ if eeg1 == eeg2
    help difftopo
    return
 end
-if ndims(ALLEEG(eeg1).data) ~=3  | ndims(ALLEEG(eeg2).data) ~=3
+if ndims(ALLEEG(eeg1).data) ~=3  || ndims(ALLEEG(eeg2).data) ~=3
   error('EEG datasets must be epoched data');
 end
 

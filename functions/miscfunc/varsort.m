@@ -63,7 +63,7 @@ if nargin<3,
 end
 
 % activations = (wrows,wcols)X(srows,scols)X(chans,framestot)
-if chans ~= scols | srows ~= wcols,
+if chans ~= scols || srows ~= wcols,
    fprintf('varsort(): input data dimensions do not match.\n');
    fprintf('              i.e., Either %d ~= %d or %d ~= %d\n',...
                                      chans,scols,srows,wcols);

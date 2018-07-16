@@ -218,7 +218,7 @@ wts_passed = 0;                      % flag weights passed as argument
 %
 %%%%%%%%%% Collect keywords and values from argument list %%%%%%%%%%%%%%%
 %
-   if (nargin> 1 & rem(nargin,2) == 0)
+   if (nargin> 1 && rem(nargin,2) == 0)
       fprintf('runica(): Even number of input arguments???')
       return
    end
@@ -231,7 +231,7 @@ wts_passed = 0;                      % flag weights passed as argument
       end
       Keyword = lower(Keyword); % convert upper or mixed case to lower
 
-      if strcmp(Keyword,'weights') | strcmp(Keyword,'weight')
+      if strcmp(Keyword,'weights') || strcmp(Keyword,'weight')
          if ischar(Value)
             fprintf(...
       'runica(): weights value must be a weight matrix or sphere')
@@ -245,7 +245,7 @@ wts_passed = 0;                      % flag weights passed as argument
             fprintf('runica(): ncomps value must be an integer')
             return
          end
-         if ncomps < urchans & ncomps ~= Value
+         if ncomps < urchans && ncomps ~= Value
             fprintf('runica(): Use either PCA or ICA dimension reduction');
             return
          end
@@ -254,7 +254,7 @@ wts_passed = 0;                      % flag weights passed as argument
             ncomps = chans;
          end
       elseif strcmp(Keyword,'pca') 
-         if ncomps < urchans & ncomps ~= Value
+         if ncomps < urchans && ncomps ~= Value
             fprintf('runica(): Use either PCA or ICA dimension reduction');
             return
          end
@@ -265,7 +265,7 @@ wts_passed = 0;                      % flag weights passed as argument
          end
          pcaflag = 'on';
          ncomps = Value;
-         if ncomps >= chans | ncomps < 1,
+         if ncomps >= chans || ncomps < 1,
             fprintf('runica(): pca value must be in range [1,%d]\n',chans-1)
             return
          end
@@ -276,7 +276,7 @@ wts_passed = 0;                      % flag weights passed as argument
            return
          else 
            Value = lower(Value);
-           if ~strcmp(Value,'on') & ~strcmp(Value,'off'),
+           if ~strcmp(Value,'on') && ~strcmp(Value,'off'),
              fprintf('runica(): posact value must be on or off')
              return
            end
@@ -288,7 +288,7 @@ wts_passed = 0;                      % flag weights passed as argument
             return
          end
          lrate = Value;
-         if lrate>MAX_LRATE | lrate <0,
+         if lrate>MAX_LRATE || lrate <0,
            fprintf('runica(): lrate value is out of bounds'); 
            return
          end
@@ -330,7 +330,7 @@ wts_passed = 0;                      % flag weights passed as argument
             return
          end
          annealstep = Value;
-         if annealstep <=0 | annealstep > 1,
+         if annealstep <=0 || annealstep > 1,
             fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
             return
          end
@@ -354,7 +354,7 @@ wts_passed = 0;                      % flag weights passed as argument
             return
          end
          momentum = Value;
-         if momentum > 1.0 | momentum < 0
+         if momentum > 1.0 || momentum < 0
           fprintf('runica(): momentum value is out of bounds [0,1]')
           return
          end
@@ -365,7 +365,7 @@ wts_passed = 0;                      % flag weights passed as argument
            return
          else 
            Value = lower(Value);
-           if ~strcmp(Value,'on') & ~strcmp(Value,'off') & ~strcmp(Value,'none'),
+           if ~strcmp(Value,'on') && ~strcmp(Value,'off') && ~strcmp(Value,'none'),
              fprintf('runica(): sphering value must be on or off')
              return
            end
@@ -404,7 +404,7 @@ wts_passed = 0;                      % flag weights passed as argument
            end
          if length(Value)>1
            loHz = Value(2);
-           if (loHz < 0 | loHz > srate/2)
+           if (loHz < 0 || loHz > srate/2)
              fprintf('runica(): specgram loHz must be >=0 and <= srate/2 (%4.1f)',srate/2)
              return
            end
@@ -413,7 +413,7 @@ wts_passed = 0;                      % flag weights passed as argument
          end
          if length(Value)>2
            hiHz = Value(3);
-           if (hiHz < loHz | hiHz > srate/2)
+           if (hiHz < loHz || hiHz > srate/2)
              fprintf('runica(): specgram hiHz must be >=loHz (%4.1f) and <= srate/2 (%4.1f)',loHz,srate/2)
              return
            end
@@ -422,7 +422,7 @@ wts_passed = 0;                      % flag weights passed as argument
          end
          if length(Value)>3
            Hzframes = Value(5);
-           if (Hzframes<0 | Hzframes > size(data,2))
+           if (Hzframes<0 || Hzframes > size(data,2))
              fprintf('runica(): specgram frames must be >=0 and <= data length (%d)',size(data,2))
              return
            end
@@ -494,7 +494,7 @@ if ~annealdeg,
         annealdeg = 0;
     end
 end
-if ncomps >  chans | ncomps < 1
+if ncomps >  chans || ncomps < 1
     fprintf('runica(): number of components must be 1 to %d.\n',chans);
     return
 end
@@ -504,9 +504,9 @@ if weights ~= 0,                    % initialize weights
     if verbose,
        fprintf('Using starting weight matrix named in argument list ...\n')
     end
-    if  chans>ncomps & weights ~=0,
+    if  chans>ncomps && weights ~=0,
         [r,c]=size(weights);
-        if r~=ncomps | c~=chans,
+        if r~=ncomps || c~=chans,
      fprintf(...
       'runica(): weight matrix must have %d rows, %d columns.\n', ...
                               chans,ncomps);
@@ -724,7 +724,7 @@ end
   for k=1:nsub
       signs(k) = -1;
   end
-  if extended & extblocks < 0 & verbose,
+  if extended && extblocks < 0 && verbose,
     fprintf('Fixed extended-ICA sign assignments:  ');
     for k=1:ncomps
        fprintf('%d ',signs(k));	
@@ -757,7 +757,7 @@ end
 
     for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
       pause(0);
-      if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
+      if ~isempty(get(0, 'currentfigure')) && strcmp(get(gcf, 'tag'), 'stop')
           close; error('USER ABORT');
       end
       if biasflag                                                   
@@ -798,11 +798,11 @@ end
           wts_blowup = 1;
           change = nochange;
       end
-      if extended & ~wts_blowup
+      if extended && ~wts_blowup
        %
        %%%%%%%%%%% Extended-ICA kurtosis estimation %%%%%%%%%%%%%%%%%%%%%
        %
-       if extblocks > 0 & rem(blockno,extblocks) == 0, 
+       if extblocks > 0 && rem(blockno,extblocks) == 0, 
                                   % recompute signs vector using kurtosis
         if kurtsize < frames % 12-22-99 rand() size suggestion by M. Spratling
            rp = fix(rand(1,kurtsize)*datalength);  % pick random subset
@@ -857,7 +857,7 @@ end
     %
     %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
     %
-    if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
+    if wts_blowup || isnan(change)|isinf(change),  % if weights blow up,
         fprintf('');
         step = 0;                          % start again
         change = nochange;
@@ -944,7 +944,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%% Apply stopping rule %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-      if step >2 & change < nochange,      % apply stopping rule
+      if step >2 && change < nochange,      % apply stopping rule
         laststep=step;            
            step=maxsteps;                  % stop when weights stabilize
       elseif change > DEFAULT_BLOWUP,      % if weights blow up,
