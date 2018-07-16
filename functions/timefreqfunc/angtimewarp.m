@@ -48,7 +48,7 @@ function angdataw=angtimewarp(evLatency, newLatency, angdata)
     error('evlatency and newlatency must have the same length.');
     return;
   end
-  if length(evLatency) < 2 | length(newLatency) < 2
+  if length(evLatency) < 2 || length(newLatency) < 2
     error(['There should be at least two events in evlatency and ' ...
           'newlatency, that is "begin" and "end"' ]);
     return;

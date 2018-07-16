@@ -87,7 +87,7 @@ while (str(1) == '%')
 	  		case { 'usage:' 'authors:' 'author:' 'notes:' 'note:' 'input:' ...
 	  		'inputs:' 'outputs:' 'output' 'example:' 'examples:' 'see also:' }, newtitle = 1;
 		 end
-		 if (i2d == length(str)) & (str(1) ~= '%'), newtitle = 1; end;	
+		 if (i2d == length(str)) && (str(1) ~= '%'), newtitle = 1; end;	
    	  end
       if newtitle
   			tilehtml = str(1:i2d); 
@@ -107,7 +107,7 @@ while (str(1) == '%')
          [tok1 strrm] = strtok( str );
          [tok2 strrm] = strtok( strrm );
 
-         if ~isempty(tok2) & ( isequal(tok2,'-') | isequal(tok2,'=')) % new variable 
+         if ~isempty(tok2) && ( isequal(tok2,'-') || isequal(tok2,'=')) % new variable 
             newvar = 1;
             oldvarname = varname;
             oldvartext = vartext;
@@ -129,7 +129,7 @@ while (str(1) == '%')
                if ~isempty(varname) 
                	    vartext = [ vartext 10 str]; % espace if in array
                else 
-               		if length(vartext)>3 & all(vartext(	end-2:end) == '.')
+               		if length(vartext)>3 && all(vartext(	end-2:end) == '.')
                			vartext = [ deblank2(vartext(1:end-3)) 10 str]; % espace if '...'
                		else
                     	vartext = [ vartext 10 str];    % CR otherwise
@@ -166,7 +166,7 @@ while (str(1) == '%')
 
       % test if new input for an array
       % ------------------------------
-      if newvar | newtitle
+      if newvar || newtitle
          if maindescription
             if ~isempty(oldvartext) % FUNCTION TITLE
                maintext = oldvartext;
@@ -293,7 +293,7 @@ function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FU
 		testokin = realtokin;
 		testokin(findstr(testokin, '_')) = 'A';
 		testokin(findstr(testokin, '2')) = 'A';
-		if all(double(testokin) > 64) & all(double(testokin) < 91)
+		if all(double(testokin) > 64) && all(double(testokin) < 91)
 			test = 1;
 		end;				
 		realtokin = lower(realtokin);

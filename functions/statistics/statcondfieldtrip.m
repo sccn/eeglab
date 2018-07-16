@@ -152,7 +152,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
          fprintf('paired data, ');
     else fprintf('unpaired data, ');
     end
-    if size(data,1) == 1 & size(data,2) == 2
+    if size(data,1) == 1 && size(data,2) == 2
          fprintf('computing T values\n');
     else fprintf('computing F values\n');
     end
@@ -167,7 +167,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
     
     if size(data,1) == 1, % only one row
         
-        if size(data,2) == 2 & strcmpi(g.paired, 'on')
+        if size(data,2) == 2 && strcmpi(g.paired, 'on')
             
             % paired t-test (very fast)
             % -------------

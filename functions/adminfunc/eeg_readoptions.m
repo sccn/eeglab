@@ -92,7 +92,7 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
         if ~isempty(opt)
             for index = 1:length(opt_backup)
                 ind = strmatch(opt_backup(index).varname, { opt.varname }, 'exact');
-                if ~isempty(ind) & ~isempty(opt_backup(index).varname)
+                if ~isempty(ind) && ~isempty(opt_backup(index).varname)
                     opt_backup(index).value = opt(ind).value;
                 end
             end

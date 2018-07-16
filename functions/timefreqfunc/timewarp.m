@@ -46,7 +46,7 @@ function M=timewarp(evLatency, newLatency)
     error('evLatency and newLatency must have the same length.');
     return;
   end
-  if length(evLatency) < 2 | length(newLatency) < 2
+  if length(evLatency) < 2 || length(newLatency) < 2
     error(['There should be at least two events in evlatency and ' ...
           'newlatency (e.g., "begin" and "end")'] );
     return;

@@ -233,18 +233,18 @@ if (nargin < 1)
 	return
 end
 
-if ischar(X) & strcmp(X,'details')
+if ischar(X) && strcmp(X,'details')
    more on
    help timefdetails
    more off
    return
 end
 
-if (min(size(X))~=1 | length(X)<2)
+if (min(size(X))~=1 || length(X)<2)
 	error('Data must be a row or column vector.');
 end
 
-if nargin < 2 | isempty(frames) | isnan(frames) 
+if nargin < 2 || isempty(frames) || isnan(frames) 
 	frames = DEFAULT_EPOCH;
 elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
 	error('Value of frames must be an integer.');
@@ -253,11 +253,11 @@ elseif (frames <= 0)
 elseif (rem(length(X),frames) ~= 0)
 	error('Length of data vector must be divisible by frames.');
 end
-if isnan(frames) | isempty(frames)
+if isnan(frames) || isempty(frames)
     frames = length(X);
 end
 
-if nargin < 3 | isnan(tlimits) | isempty(tlimits)
+if nargin < 3 || isnan(tlimits) || isempty(tlimits)
 	tlimits = DEFAULT_TIMLIM;
 elseif (~isnumeric(tlimits) | sum(size(tlimits))~=3)
 	error('Value of tlimits must be a vector containing two numbers.');
@@ -273,7 +273,7 @@ elseif (Fs <= 0)
 	error('Value of srate must be positive.');
 end
 
-if isnan(tlimits) | isempty(tlimits)
+if isnan(tlimits) || isempty(tlimits)
    hlim = 1000*frames/Fs;  % fit default tlimits to srate and frames
    tlimits = [0 hlim];
 end
@@ -362,7 +362,7 @@ if (~ischar(g.title))
 	error('Title must be a string.');
 end
 
-if (~isnumeric(g.winsize) | length(g.winsize)~=1 | g.winsize~=round(g.winsize))
+if (~isnumeric(g.winsize) || length(g.winsize)~=1 || g.winsize~=round(g.winsize))
 	error('Value of winsize must be an integer number.');
 elseif (g.winsize <= 0)
 	error('Value of winsize must be positive.');
@@ -372,7 +372,7 @@ elseif (g.winsize > g.frames)
 	error('Value of winsize must be less than frames per epoch.');
 end
 
-if (~isnumeric(g.timesout) | length(g.timesout)~=1 | g.timesout~=round(g.timesout))
+if (~isnumeric(g.timesout) || length(g.timesout)~=1 || g.timesout~=round(g.timesout))
 	error('Value of timesout must be an integer number.');
 elseif (g.timesout <= 0)
 	error('Value of timesout must be positive.');
@@ -382,7 +382,7 @@ if (g.timesout > g.frames-g.winsize)
 	disp(['Value of timesout must be <= frames-winsize, timeout adjusted to ' int2str(g.timesout) ]);
 end
 
-if (~isnumeric(g.padratio) | length(g.padratio)~=1 | g.padratio~=round(g.padratio))
+if (~isnumeric(g.padratio) || length(g.padratio)~=1 || g.padratio~=round(g.padratio))
 	error('Value of padratio must be an integer.');
 elseif (g.padratio <= 0)
 	error('Value of padratio must be positive.');
@@ -390,7 +390,7 @@ elseif (pow2(nextpow2(g.padratio)) ~= g.padratio)
 	error('Value of padratio must be an integer power of two [1,2,4,8,16,...]');
 end
 
-if (~isnumeric(g.maxfreq) | length(g.maxfreq)~=1)
+if (~isnumeric(g.maxfreq) || length(g.maxfreq)~=1)
 	error('Value of maxfreq must be a number.');
 elseif (g.maxfreq <= 0)
 	error('Value of maxfreq must be positive.');
@@ -412,14 +412,14 @@ elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
 	error('Channel location file must be a valid text file.');
 end
 
-if (~isnumeric(g.alpha) | length(g.alpha)~=1)
+if (~isnumeric(g.alpha) || length(g.alpha)~=1)
 	error('timef(): Value of g.alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
 	myprintf(g.verbose,'Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
     g.naccu = round(2/g.alpha);
 	myprintf(g.verbose,'  Increasing the number of bootstrap iterations to %d\n',g.naccu);
 end
-if g.alpha>0.5 | g.alpha<=0
+if g.alpha>0.5 || g.alpha<=0
     error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
 if ~isnan(g.alpha)
@@ -432,7 +432,7 @@ end
 if ~isnumeric(g.vert)
     error('vertical line(s) option must be a vector');
 else
-	if min(g.vert) < g.tlimits(1) | max(g.vert) > g.tlimits(2)
+	if min(g.vert) < g.tlimits(1) || max(g.vert) > g.tlimits(2)
         error('vertical line(s) time out-of-bound');
 	end
 end
@@ -606,7 +606,7 @@ if ~isempty(find(times < g.baseline))
 else
    baseln = 1:length(times); % use all times as baseline
 end
-if ~isnan(g.alpha) & length(baseln)==0
+if ~isnan(g.alpha) && length(baseln)==0
   myprintf(g.verbose,'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
   return
 elseif ~isnan(g.alpha) & g.baseboot
@@ -803,7 +803,7 @@ else
   myprintf(g.verbose,'Using the input baseline spectrum\n');
   mbase = g.powbase;
 end
-if ~isnan( g.baseline ) & ~isnan( mbase )
+if ~isnan( g.baseline ) && ~isnan( mbase )
     P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 g.timesout])); % convert to (10log10) dB
 else
     P = 10 * log10(P);
@@ -982,7 +982,7 @@ switch lower(g.plotitc)
        coh_caxis = ITC_CAXIS_LIMIT*[-1 1];
     end
 
-	if exist('Rsign') & strcmp(g.plotphase, 'on')
+	if exist('Rsign') && strcmp(g.plotphase, 'on')
 		imagesc(times,freqs(dispf),Rsign(dispf,:).*RR(dispf,:),coh_caxis); % <---
 	else
 		imagesc(times,freqs(dispf),RR(dispf,:),coh_caxis); % <---

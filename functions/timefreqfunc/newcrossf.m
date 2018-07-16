@@ -297,7 +297,7 @@ end
 coherresout = [];
 
 if ~iscell(X)
-	if (min(size(X))~=1 | length(X)<2)
+	if (min(size(X))~=1 || length(X)<2)
 		fprintf('crossf(): x must be a row or column vector.\n');
 		return
 	elseif (min(size(Y))~=1 | length(Y)<2)
@@ -442,11 +442,11 @@ g.AXES_FONT  = 10;
 g.TITLE_FONT = 14;
 
 % change type if necessary
-if g.trials == 1 & ~strcmpi(g.type, 'crossspec')
+if g.trials == 1 && ~strcmpi(g.type, 'crossspec')
     disp('Continuous data: switching to crossspectrum');
     g.type = 'crossspec';
 end
-if strcmpi(g.freqscale, 'log') & g.freqs(1) == 0, g.freqs(1) = 3; end
+if strcmpi(g.freqscale, 'log') && g.freqs(1) == 0, g.freqs(1) = 3; end
 
 % reshape 3D inputs
 % -----------------
@@ -467,7 +467,7 @@ if strcmpi(g.title, DEFAULT_TITLE)
     end
 end
 
-if ~ischar(g.title) & ~iscell(g.title) 
+if ~ischar(g.title) && ~iscell(g.title) 
    error('Title must be a string or a cell array.');
 end
 
@@ -486,14 +486,14 @@ elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
    error('Channel location file must be a valid text file.');
 end
 
-if (~isnumeric(g.alpha) | length(g.alpha)~=1)
+if (~isnumeric(g.alpha) || length(g.alpha)~=1)
    error('timef(): Value of g.alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
    fprintf('Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
    g.naccu = round(2/g.alpha);
    fprintf('  Increasing the number of bootstrap iterations to %d\n',g.naccu);
 end
-if g.alpha>0.5 | g.alpha<=0
+if g.alpha>0.5 || g.alpha<=0
    error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
 switch lower(g.newfig)
@@ -512,14 +512,14 @@ switch g.boottype
 case { 'shuffle' 'shufftrials' 'rand' 'randall'},;
 otherwise error('Invalid boot type');
 end;    
-if ~isnumeric(g.shuffle) & ~iscell(g.shuffle)
+if ~isnumeric(g.shuffle) && ~iscell(g.shuffle)
    error('Shuffle argument type must be numeric');
 end
 switch g.compute
 case { 'matlab', 'c' },;
 otherwise error('compute must be either ''matlab'' or ''c''');
 end
-if ~strcmpi(g.condboot, 'abs') & ~strcmpi(g.condboot, 'angle') ...
+if ~strcmpi(g.condboot, 'abs') && ~strcmpi(g.condboot, 'angle') ...
 		& ~strcmpi(g.condboot, 'complex')
 	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
 end
@@ -530,7 +530,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if strcmpi(g.lowmem, 'on') & ~iscell(X) & length(X) ~= g.frame & (isempty(g.nfreqs) | g.nfreqs ~= 1)
+if strcmpi(g.lowmem, 'on') && ~iscell(X) && length(X) ~= g.frame && (isempty(g.nfreqs) || g.nfreqs ~= 1)
     
     % compute for first 2 trials to get freqsout
     XX = reshape(X, 1, frame, length(X)/g.frame);    
@@ -566,7 +566,7 @@ end;
 % compare 2 conditions part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 if iscell(X)
-	if length(X) ~= 2 | length(Y) ~= 2
+	if length(X) ~= 2 || length(Y) ~= 2
 		error('crossf: to compare conditions, X and Y input must be 2-elements cell arrays');
 	end
 
@@ -598,12 +598,12 @@ if iscell(X)
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
     
-	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+	if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
         if strcmpi(g.newfig, 'on'), figure; end; 
         subplot(1,3,1); 
 	end
 
-    if ~strcmp(g.type, 'coher') & nargout < 9
+    if ~strcmp(g.type, 'coher') && nargout < 9
 		[R1,mbase,timesout,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
                           'shuffle', g.shuffle{1}, 'subitc', g.subitc{1}, vararginori{:});
@@ -615,10 +615,10 @@ if iscell(X)
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
 	fprintf('\nRunning newcrossf on condition 2 *********************\n');
-	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+	if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
         subplot(1,3,2);
 	end
-    if ~strcmp(g.type, 'coher') & nargout < 9
+    if ~strcmp(g.type, 'coher') && nargout < 9
 		[R2,mbase,timesout,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
                             'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
@@ -631,7 +631,7 @@ if iscell(X)
 	%figure; imagesc(abs( R2 ) - abs( R1)  ); cbar; return;
 	R2 = R2.*exp(j*Rangle2/180*pi);
     
-    if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+    if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
         subplot(1,3,3);
 	end
     if isnan(g.alpha)
@@ -641,7 +641,7 @@ if iscell(X)
             case 'complex',  Rdiff = R1-R2;
         end
         g.title = g.title{3};
-        if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+        if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
             plotall(Rdiff, [], timesout, freqs, mbase, g);
         end
         Rbootout = [];
@@ -707,7 +707,7 @@ if iscell(X)
 		%Boot = bootcomppost(Boot, [], [], []);
 		g.title = g.title{3};
 		g.boottype = 'shufftrials';
-        if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+        if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
             plotall(Rdiff, coherimages, timesout, freqs, mbase, g);
         end
         
@@ -785,7 +785,7 @@ end
 spectraloptions = { tmioutopt{:}, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
             g.detrend, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
             'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
-if ~strcmpi(g.type, 'amp') & ~strcmpi(g.type, 'crossspec')
+if ~strcmpi(g.type, 'amp') && ~strcmpi(g.type, 'crossspec')
     spectraloptions = { spectraloptions{:} 'itctype' g.type };
 end
 
@@ -800,7 +800,7 @@ Y = reshape(Y, g.frame, g.trials);
 % compute coherences
 % ------------------
 tmpprod = alltfX .* conj(alltfY);
-if nargout > 6 | strcmpi(g.type, 'phasecoher2') |  strcmpi(g.type, 'phasecoher')
+if nargout > 6 || strcmpi(g.type, 'phasecoher2') ||  strcmpi(g.type, 'phasecoher')
     coherresout = alltfX .* conj(alltfY);
 end
 switch g.type
@@ -843,7 +843,7 @@ else
         baseln = 1:length(timesout); % use all times as baseline
     end
 end
-if ~isnan(g.alpha) & length(baseln)==0
+if ~isnan(g.alpha) && length(baseln)==0
     fprintf('timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
     return
 end
@@ -899,7 +899,7 @@ else
             fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
         end;        
 
-        if strcmpi(g.boottype, 'shuffle') | strcmpi(g.boottype, 'rand')
+        if strcmpi(g.boottype, 'shuffle') || strcmpi(g.boottype, 'rand')
             Rbootout = bootstat(inputdata, formula, 'boottype', g.boottype, 'label', 'coherence', ...
                     'bootside', 'upper', 'shuffledim', [2 3], 'dimaccu', 2, ...
                     'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselntmp);
@@ -923,7 +923,7 @@ end;
 
 % plot everything
 % ---------------
-if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
     if strcmpi(g.plottype, 'image')
         plotall  ( coherres, Rbootout, timesout, freqs, mbase, g);
     else    
@@ -1104,7 +1104,7 @@ case 'on'
    for i=1:length(g.marktimes)
        plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
    end
-   if ~isnan(g.alpha) & dims(Rboot) > 1
+   if ~isnan(g.alpha) && dims(Rboot) > 1
       % plot bootstrap significance limits (base mean +/-)
       switch dims(Rboot)
        case 2, plot(times,mean(Rboot(:,:),1),'g' ,'LineWidth',g.linewidth);
@@ -1245,7 +1245,7 @@ if g.plot
    %
    %%%%%%%%%%%%%%% plot topoplot() %%%%%%%%%%%%%%%%%%%%%%%
    %
-   if (~isempty(g.topovec)) & strcmpi(g.plotamp, 'on') & strcmpi(g.plotphase, 'on')
+   if (~isempty(g.topovec)) && strcmpi(g.plotamp, 'on') && strcmpi(g.plotphase, 'on')
       h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
       if size(g.topovec,2) <= 2
          topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
@@ -1302,7 +1302,7 @@ function plotallcurves(R, Rboot, times, freqs, mbase, g)
     % legend
     % ------
     alllegend = {};
-    if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
+    if strcmpi(g.plotmean, 'on') && freqs(1) ~= freqs(end)
       alllegend = { [ num2str(freqs(1)) '-' num2str(freqs(end)) 'Hz' ] };
     else
       for index = 1:length(freqs)
@@ -1334,7 +1334,7 @@ function plotallcurves(R, Rboot, times, freqs, mbase, g)
                 'linewidth', g.linewidth, 'highlightmode', g.highlightmode, 'plotmean', g.plotmean);
 	end
 	
-	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+	if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
        try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
        if (length(g.title) > 0) % plot title
           h(13) = textsc(g.title, 'title');

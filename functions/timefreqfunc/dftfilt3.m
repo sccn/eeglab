@@ -122,7 +122,7 @@ for n=1:2:numargin
         error(['What is ' keyword '? The only legal keywords are: type, cycleinc, winsize, or timesupport.'])
     end
 end
-if isempty(winsize) & cycles==0
+if isempty(winsize) && cycles==0
     error('If you are using a Hanning tapered FFT, please supply the winsize input-pair.')
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -131,7 +131,7 @@ end
 % compute number of cycles at each frequency
 % ------------------------------------------
 type='morlet';
-if length(cycles) == 1 & cycles(1)~=0
+if length(cycles) == 1 && cycles(1)~=0
     cycles = cycles*ones(size(freqs));
 elseif length(cycles) == 2
     if strcmpi(cycleinc, 'log') % cycleinc

@@ -131,7 +131,7 @@ end
 if iscell( opt.trialindices), opt.trialindices = opt.trialindices{1}; end
 if isempty(opt.trialindices), opt.trialindices = [1:EEG.trials]; end
 if iscell(opt.rmcomps     ), opt.rmcomps      = opt.rmcomps{1};      end
-if (~isempty(opt.rmcomps) | ~isempty(opt.component)) & isempty(EEG.icaweights)
+if (~isempty(opt.rmcomps) || ~isempty(opt.component)) && isempty(EEG.icaweights)
     error('No ICA weight in dataset');
 end
 
@@ -156,7 +156,7 @@ end
 % getting channel or component activation
 % ---------------------------------------
 filename = fullfile(EEG.filepath, [ EEG.filename(1:end-4) '.icaact' ] );
-if ~isempty(opt.component) & ~isempty(EEG.icaact)
+if ~isempty(opt.component) && ~isempty(EEG.icaact)
     
     data = EEG.icaact(opt.component,:,:);
     

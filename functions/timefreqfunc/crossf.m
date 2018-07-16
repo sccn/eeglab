@@ -230,7 +230,7 @@ if (nargin < 2)
 end
 
 if ~iscell(X)
-	if (min(size(X))~=1 | length(X)<2)
+	if (min(size(X))~=1 || length(X)<2)
 		fprintf('crossf(): X must be a row or column vector.\n');
 		return
 	elseif (min(size(Y))~=1 | length(Y)<2)
@@ -367,7 +367,7 @@ if (~ischar(g.title))
    error('Title must be a string.');
 end
 
-if (~isnumeric(g.winsize) | length(g.winsize)~=1 | g.winsize~=round(g.winsize))
+if (~isnumeric(g.winsize) || length(g.winsize)~=1 || g.winsize~=round(g.winsize))
    error('Value of winsize must be an integer number.');
 elseif (g.winsize <= 0)
    error('Value of winsize must be positive.');
@@ -377,7 +377,7 @@ elseif (g.winsize > g.frame)
    error('Value of winsize must be less than frame length.');
 end
 
-if (~isnumeric(g.timesout) | length(g.timesout)~=1 | g.timesout~=round(g.timesout))
+if (~isnumeric(g.timesout) || length(g.timesout)~=1 || g.timesout~=round(g.timesout))
    error('Value of timesout must be an integer number.');
 elseif (g.timesout <= 0)
    error('Value of timesout must be positive.');
@@ -387,7 +387,7 @@ if (g.timesout > g.frame-g.winsize)
    disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
 end
 
-if (~isnumeric(g.padratio) | length(g.padratio)~=1 | g.padratio~=round(g.padratio))
+if (~isnumeric(g.padratio) || length(g.padratio)~=1 || g.padratio~=round(g.padratio))
    error('Value of padratio must be an integer.');
 elseif (g.padratio <= 0)
    error('Value of padratio must be positive.');
@@ -395,7 +395,7 @@ elseif (pow2(nextpow2(g.padratio)) ~= g.padratio)
    error('Value of padratio must be an integer power of two [1,2,4,8,16,...]');
 end
 
-if (~isnumeric(g.maxfreq) | length(g.maxfreq)~=1)
+if (~isnumeric(g.maxfreq) || length(g.maxfreq)~=1)
    error('Value of g.maxfreq must be a number.');
 elseif (g.maxfreq <= 0)
    error('Value of g.maxfreq must be positive.');
@@ -418,14 +418,14 @@ elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
    error('Channel location file must be a valid text file.');
 end
 
-if (~isnumeric(g.alpha) | length(g.alpha)~=1)
+if (~isnumeric(g.alpha) || length(g.alpha)~=1)
    error('timef(): Value of g.alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
    fprintf('Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
    g.naccu = round(2/g.alpha);
    fprintf('  Increasing the number of bootstrap iterations to %d\n',g.naccu);
 end
-if g.alpha>0.5 | g.alpha<=0
+if g.alpha>0.5 || g.alpha<=0
    error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
 if ~isnan(g.alpha)
@@ -454,7 +454,7 @@ switch g.memory
    case { 'low', 'high' },;
    otherwise error('memory must be either ''low'' or ''high''');
 end
-if strcmp(g.memory, 'low') & ~strcmp(g.boottype, 'times')
+if strcmp(g.memory, 'low') && ~strcmp(g.boottype, 'times')
    error(['Bootstrap type ''' g.boottype ''' cannot be used in low memory mode']);
 end
 
@@ -467,7 +467,7 @@ end
 % Compare 2 conditions 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 if iscell(X)
-	if length(X) ~= 2 | length(Y) ~= 2
+	if length(X) ~= 2 || length(Y) ~= 2
 		error('crossf: to compare conditions, X and Y input must be 2-elements cell arrays');
 	end
 	if ~strcmp(g.boottype, 'times')
@@ -990,7 +990,7 @@ case 'on'
    for i=1:length(g.marktimes)
        plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
    end
-   if ~isnan(g.alpha) & strcmp(g.boottype, 'trials') 
+   if ~isnan(g.alpha) && strcmp(g.boottype, 'trials') 
        % plot bootstrap significance limits (base mean +/-)
       plot(times,mean(Rboot(dispf,:)),'g','LineWidth',g.linewidth); hold on;
       plot(times,mean(Rsignif(dispf,:)),'k:','LineWidth',g.linewidth);
@@ -1314,7 +1314,7 @@ Boot.rboot       = rboot;
 % function for bootstrap computation
 % ----------------------------------
 function Boot = bootcomp(Boot, Rn, tmpalltimesx, tmpalltimesy);
-if ~isnan(Boot.alpha) & isnan(Boot.rboot)
+if ~isnan(Boot.alpha) && isnan(Boot.rboot)
    if strcmp(Boot.boottype, 'times') % get g.naccu bootstrap estimates for each trial
       goodbasewins = find(Rn==1);
       if Boot.baseboot % use baseline windows only
@@ -1345,7 +1345,7 @@ function [Boot, Rbootout] = bootcomppost(Boot, allRn, alltmpsX, alltmpsY);
 trials    = size(alltmpsX, 1);
 times     = size(alltmpsX, 2);
 nb_points = size(alltmpsX, 3);
-if ~isnan(Boot.alpha) & isnan(Boot.rboot)
+if ~isnan(Boot.alpha) && isnan(Boot.rboot)
    if strcmp(Boot.boottype, 'trials') % get g.naccu bootstrap estimates for each trial
       fprintf('\nProcessing trial bootstrap (of %d):',times(end));
       tmpsX = zeros(size(alltmpsX,3), Boot.naccu);
@@ -1359,7 +1359,7 @@ if ~isnan(Boot.alpha) & isnan(Boot.rboot)
             j=1;
             while j<=Boot.naccu
                t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
-               if (allRn(t(1),index) == 1) & (allRn(t(2),index) == 1)
+               if (allRn(t(1),index) == 1) && (allRn(t(2),index) == 1)
                   tmpsX(:,j) = squeeze(alltmpsX(t(1),index,:));
                   tmpsY(:,j) = squeeze(alltmpsY(t(2),index,:));
                   j = j+1;
@@ -1393,7 +1393,7 @@ if ~isnan(Boot.alpha) & isnan(Boot.rboot)
                s = ceil(rand([1 2])*ngdbasewins); % random ints [1,g.timesout]
                s=goodbasewins(s);
                
-               if all(allRn(t(1),s(1)) == 1) & all(allRn(t(2),s(2)) == 1)
+               if all(allRn(t(1),s(1)) == 1) && all(allRn(t(2),s(2)) == 1)
                   tmpsX(:,j) = squeeze(alltmpsX(t(1),s(1),:));
                   tmpsY(:,j) = squeeze(alltmpsY(t(2),s(2),:));
                   j = j+1;
@@ -1409,7 +1409,7 @@ if ~isnan(Boot.alpha) & isnan(Boot.rboot)
 end
 
 % test if precomputed
-if ~isnan(Boot.alpha) & isnan(Boot.rboot) % if bootstrap analysis included . . .
+if ~isnan(Boot.alpha) && isnan(Boot.rboot) % if bootstrap analysis included . . .
    % 'boottype'='times' or 'timestrials', size(R)=nb_points*naccu
    % 'boottype'='trials',                 size(R)=nb_points*naccu*times
    Boot.Coherboot.R = abs (Boot.Coherboot.R);

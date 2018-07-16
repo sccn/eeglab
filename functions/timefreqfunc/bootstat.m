@@ -124,14 +124,14 @@ g = finputcheck(varargin, ...
 if ischar(g)
 	error(g);
 end
-if isempty(g.shuffledim) & strcmpi(g.boottype, 'rand')
+if isempty(g.shuffledim) && strcmpi(g.boottype, 'rand')
     g.shuffledim = []; 
 elseif isempty(g.shuffledim)
     g.shuffledim = 2;
 end; 
 unitname = '';
 if 2/g.alpha > g.naccu 
-    if strcmpi(g.distfit, 'off') | ~((size(oriarg1,1) == 1 | size(oriarg1,2) == 1) & size(oriarg1,3) == 1)
+    if strcmpi(g.distfit, 'off') || ~((size(oriarg1,1) == 1 || size(oriarg1,2) == 1) && size(oriarg1,3) == 1)
         g.naccu = 2/g.alpha; 
         fprintf('Adjusting naccu to compute alpha value');
     end
@@ -142,7 +142,7 @@ end
 
 % function for bootstrap computation
 % ----------------------------------
-if ~iscell(oriargs) | length(oriargs) == 1, 
+if ~iscell(oriargs) || length(oriargs) == 1, 
     oriarg1 = oriargs;
     oriarg2 = []; 
 else 
@@ -394,7 +394,7 @@ end
 if strcmpi(g.bootside, 'upper'); % only upper significance
     accarrayout = accarray1;
 else 
-    if size(accarray1,1) ~= 1 & size(accarray1,2) ~= 1
+    if size(accarray1,1) ~= 1 && size(accarray1,2) ~= 1
         accarrayout        = accarray2;
         accarrayout(:,:,2) = accarray1;
     else
@@ -402,7 +402,7 @@ else
     end
 end
 accarrayout = squeeze(accarrayout);
-if size(accarrayout,1) == 1 & size(accarrayout,3) == 1, accarrayout = accarrayout'; end
+if size(accarrayout,1) == 1 && size(accarrayout,3) == 1, accarrayout = accarrayout'; end
 
 % better but not backward compatible
 % ----------------------------------
@@ -440,7 +440,7 @@ return;
 % for cloumns and rows (assuming matrix size is multiple of 2
 % -----------------------------------------------------------
 function array = supershuffle(array, dim)
-    if size(array, 1) == 1 | size(array,2) == 1
+    if size(array, 1) == 1 || size(array,2) == 1
         array = shuffle(array);
         return;
     end
@@ -472,7 +472,7 @@ function array = supershuffle(array, dim)
 % shuffle one dimension, one row/colums at a time
 % -----------------------------------------------
 function array = shuffleonedim(array, dim)
-    if size(array, 1) == 1 | size(array,2) == 1
+    if size(array, 1) == 1 || size(array,2) == 1
         array = shuffle(array, dim);
     else
         if dim == 1

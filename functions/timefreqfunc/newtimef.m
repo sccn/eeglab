@@ -433,7 +433,7 @@ TITLE_FONT      =  8;
 
 if (nargin < 2)
     frames = floor((DEFAULT_TIMLIN(2)-DEFAULT_TIMLIM(1))/DEFAULT_SRATE);
-elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
+elseif (~isnumeric(frames) || length(frames)~=1 || frames~=round(frames))
     error('Value of frames must be an integer.');
 elseif (frames <= 0)
     error('Value of frames must be positive.');
@@ -467,7 +467,7 @@ end
 
 if (nargin < 3)
     tlimits = DEFAULT_TIMLIM;
-elseif (~isnumeric(tlimits) | sum(size(tlimits))~=3)
+elseif (~isnumeric(tlimits) || sum(size(tlimits))~=3)
     error('Value of tlimits must be a vector containing two numbers.');
 elseif (tlimits(1) >= tlimits(2))
     error('tlimits interval must be ascending.');
@@ -475,7 +475,7 @@ end
 
 if (nargin < 4)
     Fs = DEFAULT_SRATE;
-elseif (~isnumeric(Fs) | length(Fs)~=1)
+elseif (~isnumeric(Fs) || length(Fs)~=1)
     error('Value of srate must be a number.');
 elseif (Fs <= 0)
     error('Value of srate must be positive.');
@@ -646,11 +646,11 @@ if isfield(g,'timewarp') && ~isempty(g.timewarp)
           end
         end
 
-        if max(max(g.timeStretchMarks)) > frames-2 | min(min(g.timeStretchMarks)) < 3
+        if max(max(g.timeStretchMarks)) > frames-2 || min(min(g.timeStretchMarks)) < 3
             error('Time warping events must be inside the epochs.');
         end
         if ~isempty(g.timeStretchRefs)
-            if max(g.timeStretchRefs) > frames-2 | min(g.timeStretchRefs) < 3
+            if max(g.timeStretchRefs) > frames-2 || min(g.timeStretchRefs) < 3
                 error('Time warping reference latencies must be within the epochs.');
             end
         end
@@ -740,21 +740,21 @@ if ~isempty(g.timeStretchMarks) % timeStretch code by Jean Hauser
     end
 end 
 
-if min(g.vert) < g.tlimits(1) | max(g.vert) > g.tlimits(2)
+if min(g.vert) < g.tlimits(1) || max(g.vert) > g.tlimits(2)
     error('vertical line (''vert'') latency outside of epoch boundaries');
 end
 
-if strcmp(g.hzdir,'up')| strcmp(g.hzdir,'normal')
+if strcmp(g.hzdir,'up') || strcmp(g.hzdir,'normal')
     g.hzdir = 'normal'; % convert to Matlab graphics constants
-elseif strcmp(g.hzdir,'down') | strcmp(g.hzdir,'reverse')| g.hzdir==-1
+elseif strcmp(g.hzdir,'down') || strcmp(g.hzdir,'reverse') || g.hzdir==-1
     g.hzdir = 'reverse';
 else
     error('unknown ''hzdir'' argument'); 
 end
 
-if strcmp(g.ydir,'up')| strcmp(g.ydir,'normal')
+if strcmp(g.ydir,'up') || strcmp(g.ydir,'normal')
     g.ydir = 'normal'; % convert to Matlab graphics constants
-elseif strcmp(g.ydir,'down') | strcmp(g.ydir,'reverse')
+elseif strcmp(g.ydir,'down') || strcmp(g.ydir,'reverse')
     g.ydir = 'reverse';
 else
     error('unknown ''ydir'' argument'); 
@@ -897,8 +897,8 @@ if iscell(data)
             
             %  if      strcmp(vararginori{index}, 'title') | ... % Added by Jean Hauser
             %          strcmp(vararginori{index}, 'title2') | ...
-            if strcmp(vararginori{index}, 'timeStretchMarks') | ...
-                    strcmp(vararginori{index}, 'timeStretchRefs') | ...
+            if strcmp(vararginori{index}, 'timeStretchMarks') || ...
+                    strcmp(vararginori{index}, 'timeStretchRefs') || ...
                     strcmp(vararginori{index}, 'timeStretchPlots')
                 vararginori(index:index+1) = [];
             end
@@ -973,7 +973,7 @@ if iscell(data)
     
     % plotting
     % --------
-    if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+    if strcmpi(g.plotersp, 'on') || strcmpi(g.plotitc, 'on')
         g.titleall = g.title;
         if strcmpi(g.newfig, 'on'), figure; end; % declare a new figure
         
@@ -1005,7 +1005,7 @@ if iscell(data)
             case 'angle',  Rdiff = angle(R1)-angle(R2);
             case 'complex',  Rdiff = R1-R2;
         end
-        if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+        if strcmpi(g.plotersp, 'on') || strcmpi(g.plotitc, 'on')
             g.erspmax = []; g.itcmax  = []; % auto scale inserted for diff
             plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, meanmbase, [], [], g);
         end
@@ -1106,7 +1106,7 @@ if iscell(data)
         end
         
         % same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(data{1},2)-mean(data{2},2), freqs, times, mbase, g);
-        if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+        if strcmpi(g.plotersp, 'on') || strcmpi(g.plotitc, 'on')
             g.erspmax = []; % auto scale
             g.itcmax  = []; % auto scale
             plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
@@ -1228,7 +1228,7 @@ end
 % bootstrap
 % --------- % this ensures that if bootstrap limits provided that no
 % 'alpha' won't prevent application of the provided limits
-if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rboot)))% if bootstrap analysis requested . . .
+if ~isnan(g.alpha) || ~isempty(find(~isnan(g.pboot))) || ~isempty(find(~isnan(g.rboot)))% if bootstrap analysis requested . . .
     
     % ERSP bootstrap
     % --------------
@@ -1921,7 +1921,7 @@ else
     setylim = 0;
 end
 
-if strcmpi(g.plotitc, 'on') | strcmpi(g.plotersp, 'on')
+if strcmpi(g.plotitc, 'on') || strcmpi(g.plotersp, 'on')
     verboseprintf(g.verbose, '\nNow plotting...\n');
     pos = get(gca,'position');
     q = [pos(1) pos(2) 0 0];
@@ -1986,7 +1986,7 @@ if strcmpi(g.plotitc, 'on')
         'linewidth', g.linewidth, 'highlightmode', g.highlightmode, 'plotmean', g.plotmean);
 end
 
-if strcmpi(g.plotitc, 'on') | strcmpi(g.plotersp, 'on')
+if strcmpi(g.plotitc, 'on') || strcmpi(g.plotersp, 'on')
     %
     %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
     %
@@ -2080,7 +2080,7 @@ function pvals = compute_pvals(oridat, surrog, tail)
     end
     
     if myndims(oridat) > 1        
-        if size(oridat,2) ~= size(surrog, 2) | myndims(surrog) == 2
+        if size(oridat,2) ~= size(surrog, 2) || myndims(surrog) == 2
             if size(oridat,1) == size(surrog, 1)
                 surrog = repmat( reshape(surrog, [size(surrog,1) 1 size(surrog,2)]), [1 size(oridat,2) 1]);
             elseif size(oridat,2) == size(surrog, 1)

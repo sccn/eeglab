@@ -200,7 +200,7 @@ end
 
 % finding frequency limits
 % ------------------------
-if g.cycles(1) ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles(1)/g.winsize; end
+if g.cycles(1) ~= 0 && g.freqs(1) == 0, g.freqs(1) = srate*g.cycles(1)/g.winsize; end
 
 % finding frequencies
 % -------------------
@@ -208,7 +208,7 @@ if length(g.freqs) == 2
 
     % min and max
     % -----------
-    if g.freqs(1) == 0 & g.cycles(1) ~= 0
+    if g.freqs(1) == 0 && g.cycles(1) ~= 0
         g.freqs(1) = srate*g.cycles(1)/g.winsize;
     end
 
@@ -221,7 +221,7 @@ if length(g.freqs) == 2
         tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
 
         % adjust limits for FFT (only linear scale)
-        if g.cycles(1) == 0 & ~strcmpi(g.freqscale, 'log')
+        if g.cycles(1) == 0 && ~strcmpi(g.freqscale, 'log')
             if ~any(tmpfreqs == g.freqs(1))
                 [tmp minind] = min(abs(tmpfreqs-g.freqs(1)));
                 g.freqs(1)   = tmpfreqs(minind);
@@ -463,7 +463,7 @@ verboseprintf(g.verbose, '\n');
 if ~isempty(g.timestretch) && length(g.timestretch{1}) > 0
 
     timemarks = g.timestretch{1}';
-    if isempty(g.timestretch{2}) | length(g.timestretch{2}) == 0
+    if isempty(g.timestretch{2}) || length(g.timestretch{2}) == 0
         timerefs = median(g.timestretch{1}',2);
     else
         timerefs = g.timestretch{2};
@@ -563,7 +563,7 @@ if length(g.freqs) ~= length(freqs) || any(g.freqs ~= freqs)
          tmpall = tmpall(allindices,:,:);
     else tmpall = tmpall(:,allindices,:,:);
     end
-    if nargout > 3 | strcmpi(g.subitc, 'on')
+    if nargout > 3 || strcmpi(g.subitc, 'on')
         if ndims(tmpall) <= 3
              itcvals = itcvals(allindices,:,:);
         else itcvals = itcvals(:,allindices,:,:);

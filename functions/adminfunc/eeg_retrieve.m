@@ -52,7 +52,7 @@ end;
     catch, tmpsaved = 'no';
     end
 
-    if length(CURRENTSET) > 1 & option_storedisk
+    if length(CURRENTSET) > 1 && option_storedisk
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
         if length(CURRENTSET) ~= length(ALLEEG)
             [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);

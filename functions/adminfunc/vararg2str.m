@@ -177,16 +177,16 @@ function str = contarray( array )
         str =  num2str(array);
         return;
     end
-    if size(array,1) == 1 & size(array,2) == 2
+    if size(array,1) == 1 && size(array,2) == 2
         str =  [num2str(array(1)) ' ' num2str(array(2))];
         return;
     end
-    if isempty(tmpind) | all(isnan(array(tmpind)))
+    if isempty(tmpind) || all(isnan(array(tmpind)))
 		str = num2str(array(1));
 		skip = 0;
         indent = array(2) - array(1);
 		for index = 2:length(array)
-            if array(index) ~= array(index-1)+indent | indent == 0
+            if array(index) ~= array(index-1)+indent || indent == 0
 				if skip <= 1
 					if skip == 0
                         str = [str ' ' num2str(array(index))];

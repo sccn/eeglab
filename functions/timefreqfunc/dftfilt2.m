@@ -58,7 +58,7 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
     if length(cycles) == 1
         cycles = cycles*ones(size(freqs));
     elseif length(cycles) == 2
-        if nargin == 4 & strcmpi(cycleinc, 'log') % cycleinc
+        if nargin == 4 && strcmpi(cycleinc, 'log') % cycleinc
             cycles = linspace(log(cycles(1)), log(cycles(2)), length(freqs));
             cycles = exp(cycles);
         else

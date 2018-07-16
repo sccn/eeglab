@@ -66,7 +66,7 @@ if nargin < 1
          if mode == 0, txt = ALLCOM{ index }; fprintf('%d: ', index);
          else          txt = ALLCOM{ length(ALLCOM)-index+1 };
          end;   
-         if (length(txt) > 72) & (mode == 0)
+         if (length(txt) > 72) && (mode == 0)
 				fprintf('%s...\n', txt(1:70) );
 			else
 				fprintf('%s\n', txt );

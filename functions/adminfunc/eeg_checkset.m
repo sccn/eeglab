@@ -184,13 +184,13 @@ if length(EEG) > 1
                 % ----------------------
                 res = 'no';
                 datasettype = unique_bc( [ EEG.trials ] );
-                if datasettype(1) == 1 & length(datasettype) == 1, return; % continuous data
+                if datasettype(1) == 1 && length(datasettype) == 1, return; % continuous data
                 elseif datasettype(1) == 1,                        return; % continuous and epoch data
                 end
                 
                 allpnts = unique_bc( [ EEG.pnts ] );
                 allxmin = unique_bc( [ EEG.xmin ] );
-                if length(allpnts) == 1 & length(allxmin) == 1, res = 'yes'; end
+                if length(allpnts) == 1 && length(allxmin) == 1, res = 'yes'; end
                 return;
                 
             case 'chanconsist'  % test channel number and name consistency
@@ -198,7 +198,7 @@ if length(EEG) > 1
                 res = 'yes';
                 chanlen    = unique_bc( [ EEG.nbchan ] );
                 anyempty    = unique_bc( cellfun( 'isempty', { EEG.chanlocs }) );
-                if length(chanlen) == 1 & all(anyempty == 0)
+                if length(chanlen) == 1 && all(anyempty == 0)
                     tmpchanlocs = EEG(1).chanlocs;
                     channame1 = { tmpchanlocs.labels };
                     for i = 2:length(EEG)
@@ -219,7 +219,7 @@ if length(EEG) > 1
                 % ----------------------------------
                 res = 'yes';
                 anyempty    = unique_bc( cellfun( 'isempty', { EEG.icaweights }) );
-                if length(anyempty) == 1 & anyempty(1) == 0
+                if length(anyempty) == 1 && anyempty(1) == 0
                     ica1 = EEG(1).icawinv;
                     for i = 2:length(EEG)
                         if ~isequal(EEG(1).icawinv, EEG(i).icawinv)
@@ -327,7 +327,7 @@ for inddataset = 1:length(ALLEEG)
                     end
                 case 'checkur',
                     if ~isempty(EEG.event)
-                        if isfield(EEG.event, 'urevent') & ~isempty(EEG.urevent)
+                        if isfield(EEG.event, 'urevent') && ~isempty(EEG.urevent)
                             urlatencies = [ EEG.urevent.latency ];
                             [newlat tmpind] = sort(urlatencies);
                             if ~isequal(newlat, urlatencies)
@@ -381,7 +381,7 @@ for inddataset = 1:length(ALLEEG)
                     % ---------------------------------------------------
                     if isfield(EEG.event, 'latency')
                         if isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
-                            if strcmpi(EEG.event(1).type, 'boundary') & isfield(EEG.event, 'duration')
+                            if strcmpi(EEG.event(1).type, 'boundary') && isfield(EEG.event, 'duration')
                                 if EEG.event(1).duration < 1
                                     EEG.event(1) = [];
                                 elseif EEG.event(1).latency > 0 & EEG.event(1).latency < 1

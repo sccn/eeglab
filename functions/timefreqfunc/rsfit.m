@@ -105,7 +105,7 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
 
     % compute goodness of fit
     % -----------------------
-    if nargout > 3 | plotflag
+    if nargout > 3 || plotflag
 
         % histogram of value 12 bins
         % --------------------------

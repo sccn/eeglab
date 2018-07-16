@@ -304,7 +304,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 if strcmpi(g.method, 'param')
                     
                     % Check if exist tcd.m file from the Statistics Toolbox (Bug 1352 )
-                    if exist('tcdf','file') == 2  & license('test', 'Statistics_Toolbox')
+                    if exist('tcdf','file') == 2  && license('test', 'Statistics_Toolbox')
                         pvals = 2*tcdf(-abs(ori_vals), df);
                     else
                         pvals = 2*mytcdf(-abs(ori_vals), df);
