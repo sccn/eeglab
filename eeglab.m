@@ -2074,7 +2074,7 @@ function [name, vers] = parsepluginname(dirName);
         vers = '';
     else
         ind = length(dirName);
-        while ind > 0 && ((dirName(ind) >= '0' & dirName(ind) <= '9') || dirName(ind) == '.' || dirName(ind) == '_')
+        while ind > 0 && ((dirName(ind) >= '0' && dirName(ind) <= '9') || dirName(ind) == '.' || dirName(ind) == '_')
             ind = ind - 1;
         end
         name = dirName(1:ind);
