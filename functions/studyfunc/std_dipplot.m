@@ -92,7 +92,7 @@ for k = 3:2:nargin
                     cls = 2:length(STUDY.cluster);
                 end
             else
-                if ischar(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
+                if ischar(varargin{k-1}) && strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
                     error('std_dipplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
@@ -140,7 +140,7 @@ if isempty(cls)
     cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
     for k = 1: length(cls)
         % don't include 'Notclust' clusters
-        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
+        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) && ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
             tmp = [tmp cls(k)];
         end
     end
@@ -589,7 +589,7 @@ for ci = 1:length(comp_ind)
         warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
         return;
     end
-    if length(comp_ind) == 1 & isempty(ALLEEG(abset).dipfit.model(comp).posxyz)
+    if length(comp_ind) == 1 && isempty(ALLEEG(abset).dipfit.model(comp).posxyz)
         warndlg2(strvcat('There is no dipole information available in', ...
                        [ 'dataset ' num2str(abset) ' for this component, abort plotting']), 'Aborting plot dipoles');
         return;
@@ -673,7 +673,7 @@ function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
         centroid{clust}.dipole.posxyz =  tmppos/ndip;
         centroid{clust}.dipole.momxyz =  tmpmom/ndip;
         centroid{clust}.dipole.rv =  tmprv/ndip;
-        if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical') & (~isfield(ALLEEG(abset).dipfit, 'hdmfile')) %old dipfit
+        if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical') && (~isfield(ALLEEG(abset).dipfit, 'hdmfile')) %old dipfit
             centroid{clust}.dipole.maxr = max_r;
         end
         STUDY.cluster(clsind(clust)).dipole = centroid{clust}.dipole;

@@ -127,7 +127,7 @@ for iVar = 1 :  length(varnames)
             for iVal = 1:length(indvarvals) % programmed for speed - AD
                 hits(strmatch(indvarvals{iVal}, dattrials, 'exact'),iVar) = 1;
                 % older version not compatible with old Matlab
-                % hits(:,iVar) = hits(:,iVar) | strncmp(indvarvals{iVal}, dattrials, 100)';
+                % hits(:,iVar) = hits(:,iVar) || strncmp(indvarvals{iVal}, dattrials, 100)';
             end
         else
             if iscell(indvarvals)
@@ -139,7 +139,7 @@ for iVar = 1 :  length(varnames)
             end
             dattrials = [ dattrials{:} ];
             for iVal = 1:length(indvarvals) % programmed for speed - AD
-                hits(:,iVar) = hits(:,iVar) | [ dattrials == indvarvals(iVal) ]';
+                hits(:,iVar) = hits(:,iVar) || [ dattrials == indvarvals(iVal) ]';
             end
         end
     end

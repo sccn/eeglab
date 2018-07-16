@@ -53,7 +53,7 @@ while flag
         Oind = find(D(optionalO,k) >  ref_D*STD);
         outliers = [outliers optionalO(Oind)];
 	end
-    if isempty(outliers) | (loop == MAXiter)
+    if isempty(outliers) || (loop == MAXiter)
         flag = 0;
     end
     l = length(old_outliers);

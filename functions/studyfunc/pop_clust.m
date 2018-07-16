@@ -97,13 +97,13 @@ if isempty(varargin) %GUI call
         rmindex = [2:length(STUDY.cluster)];
     else
         for index = 2:length(STUDY.cluster)
-            if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
+            if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) && ~strncmpi('Notclust',STUDY.cluster(index).name,8)
                 rmindex = [ rmindex index ];
             end
         end;        
     end
     
-    if length(STUDY.cluster) > 2 & ~isempty(rmindex)
+    if length(STUDY.cluster) > 2 && ~isempty(rmindex)
         resp = questdlg2('Clustering again will delete the last clustering results', 'Warning', 'Cancel', 'Ok', 'Ok');
         if strcmpi(resp, 'cancel'), return; end
     end
@@ -154,7 +154,7 @@ if isempty(varargin) %GUI call
             fprintf('Removing child clusters of ''%s''...\n', nameclustbase);
             STUDY.cluster(rmindex)          = [];
             STUDY.cluster(clustlevel).child = [];
-            if clustlevel == 1 & length(STUDY.cluster) > 1
+            if clustlevel == 1 && length(STUDY.cluster) > 1
                 STUDY.cluster(1).child = { STUDY.cluster(2).name }; % "Notclust" cluster
             end
         end
@@ -222,7 +222,7 @@ if isempty(varargin) %GUI call
                 STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', [filename ext], 'filepath', filepath);
               else
                 command(end:end+1) = ');';
-                if (~isempty(STUDY.filename)) & (~isempty(STUDY.filepath))
+                if (~isempty(STUDY.filename)) && (~isempty(STUDY.filepath))
                     STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
                 else
                     STUDY = pop_savestudy(STUDY, ALLEEG);
@@ -248,7 +248,7 @@ else %command line call
         rmindex = [2:length(STUDY.cluster)];
     else
         for index = 2:length(STUDY.cluster)
-            if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
+            if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) && ~strncmpi('Notclust',STUDY.cluster(index).name,8)
                 rmindex = [ rmindex index ];
             end
         end;        
@@ -257,7 +257,7 @@ else %command line call
         fprintf('Removing child clusters of ''%s''...\n', nameclustbase);
         STUDY.cluster(rmindex)          = [];
         STUDY.cluster(clustlevel).child = [];
-        if clustlevel == 1 & length(STUDY.cluster) > 1
+        if clustlevel == 1 && length(STUDY.cluster) > 1
             STUDY.cluster(1).child = { STUDY.cluster(2).name }; % "Notclust" cluster
         end
     end
@@ -323,7 +323,7 @@ else %command line call
     end
             % If save updated STUDY to disk
     if strcmpi(save,'on')
-        if (~isempty(STUDY.filename)) & (~isempty(STUDY.filepath))
+        if (~isempty(STUDY.filename)) && (~isempty(STUDY.filepath))
             STUDY = pop_savestudy(STUDY, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
         else
             STUDY = pop_savestudy(STUDY);

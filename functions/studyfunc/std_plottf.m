@@ -116,7 +116,7 @@ datapresent = ~cellfun(@isempty, data);
 for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; opt.titles(c,:) = []; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end
 for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; opt.titles(:,g) = []; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end
 
-if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & strcmpi(opt.maskdata, 'on')
+if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && strcmpi(opt.maskdata, 'on')
     disp('Cannot use ''maskdata'' option with both condition stat. and group stat. on');
     disp('Disabling statistics');
     opt.groupstats = {}; opt.condstats = {}; opt.maskdata = 'off'; 
@@ -134,9 +134,9 @@ end
 
 % test log frequencies
 % --------------------
-if length(freqs) > 2 & strcmpi(opt.freqscale, 'auto')
+if length(freqs) > 2 && strcmpi(opt.freqscale, 'auto')
     midfreq = (freqs(3)+freqs(1))/2;
-    if midfreq*.9999 < freqs(2) & midfreq*1.0001 > freqs(2), opt.freqscale = 'linear';
+    if midfreq*.9999 < freqs(2) && midfreq*1.0001 > freqs(2), opt.freqscale = 'linear';
     else                                                     opt.freqscale = 'log';
     end
 end

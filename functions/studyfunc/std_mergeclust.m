@@ -40,7 +40,7 @@
 
 function STUDY = std_mergeclust(STUDY, ALLEEG, mrg_cls, varargin)
 
-if isempty(varargin) | strcmpi(varargin,'')
+if isempty(varargin) || strcmpi(varargin,'')
     name = 'Cls';
 else
     name = varargin{1}; 
@@ -51,7 +51,7 @@ end
 comps = [];
 sets = [];
 for k = 1:length(mrg_cls)
-    if strncmpi('Notclust',STUDY.cluster(mrg_cls(k)).name,8) | strncmpi('Outliers',STUDY.cluster(mrg_cls(k)).name,8) | ...
+    if strncmpi('Notclust',STUDY.cluster(mrg_cls(k)).name,8) || strncmpi('Outliers',STUDY.cluster(mrg_cls(k)).name,8) || ...
         ~isempty(STUDY.cluster(mrg_cls(k)).child)
         warndlg2([ 'std_mergeclust: cannot merge clusters if one of the clusters '...
         'is a ''Notclust'' or ''Outliers'' cluster, or if it has children clusters.']);

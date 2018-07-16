@@ -200,7 +200,7 @@ end
 
 % SPEC information found in datasets
 % ---------------------------------
-if exist(filename) & strcmpi(g.recompute, 'off')
+if exist(filename) && strcmpi(g.recompute, 'off')
 
     fprintf('File "%s" found on disk, no need to recompute\n', filename);
     setinfo.filebase = g.fileout;

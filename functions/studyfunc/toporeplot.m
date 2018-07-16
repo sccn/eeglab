@@ -160,7 +160,7 @@ nargs = nargin;
 if ~mod(nargs,2)
     error('Optional inputs must come in Key - Val pairs')
 end
-if ~isnumeric(grid) | size(grid,1) ~= size(grid,2)
+if ~isnumeric(grid) || size(grid,1) ~= size(grid,2)
     error('topoimage must be a square matrix');
 end
 for i = 2:2:nargs
@@ -183,7 +183,7 @@ for i = 2:2:nargs
               error('''interplimits'' value must be a string')
 		  end
 		  Value = lower(Value);
-		  if ~strcmp(Value,'electrodes') & ~strcmp(Value,'head')
+		  if ~strcmp(Value,'electrodes') && ~strcmp(Value,'head')
               error('Incorrect value for interplimits')
 		  end
 		  INTERPLIMITS = Value;
@@ -195,7 +195,7 @@ for i = 2:2:nargs
 		  MASKSURF = Value;
 		 case 'circgrid'
 		  CIRCGRID = Value;
-              if ischar(CIRCGRID) | CIRCGRID<100
+              if ischar(CIRCGRID) || CIRCGRID<100
                 error('''circgrid'' value must be an int > 100');
               end
 		 case 'style'
@@ -204,15 +204,15 @@ for i = 2:2:nargs
 		  CONTOURNUM = Value;
 		 case 'electrodes'
 		  ELECTRODES = lower(Value);
-             if strcmpi(ELECTRODES,'pointlabels') | strcmpi(ELECTRODES,'ptslabels') ...
-                  | strcmpi(ELECTRODES,'labelspts') | strcmpi(ELECTRODES,'ptlabels') ...
-                  | strcmpi(ELECTRODES,'labelpts') 
+             if strcmpi(ELECTRODES,'pointlabels') || strcmpi(ELECTRODES,'ptslabels') ...
+                  || strcmpi(ELECTRODES,'labelspts') || strcmpi(ELECTRODES,'ptlabels') ...
+                  || strcmpi(ELECTRODES,'labelpts') 
                  ELECTRODES = 'labelpoint'; % backwards compatability
              end
-             if strcmpi(ELECTRODES,'pointnumbers') | strcmpi(ELECTRODES,'ptsnumbers') ...
-                  | strcmpi(ELECTRODES,'numberspts') | strcmpi(ELECTRODES,'ptnumbers') ...
-                  | strcmpi(ELECTRODES,'numberpts')  | strcmpi(ELECTRODES,'ptsnums')  ...
-                  | strcmpi(ELECTRODES,'numspts') 
+             if strcmpi(ELECTRODES,'pointnumbers') || strcmpi(ELECTRODES,'ptsnumbers') ...
+                  || strcmpi(ELECTRODES,'numberspts') || strcmpi(ELECTRODES,'ptnumbers') ...
+                  || strcmpi(ELECTRODES,'numberpts')  || strcmpi(ELECTRODES,'ptsnums')  ...
+                  || strcmpi(ELECTRODES,'numspts') 
                  ELECTRODES = 'numpoint'; % backwards compatability
              end
              if strcmpi(ELECTRODES,'nums') 
@@ -222,11 +222,11 @@ for i = 2:2:nargs
                  ELECTRODES = 'on'; % backwards compatability
              end
              if ~strcmpi(ELECTRODES,'labelpoint') ...
-                & ~strcmpi(ELECTRODES,'numpoint') ...
-                & ~strcmp(ELECTRODES,'on') ...
-                & ~strcmp(ELECTRODES,'off') ...
-                & ~strcmp(ELECTRODES,'labels') ...
-                & ~strcmpi(ELECTRODES,'numbers') 
+                && ~strcmpi(ELECTRODES,'numpoint') ...
+                && ~strcmp(ELECTRODES,'on') ...
+                && ~strcmp(ELECTRODES,'off') ...
+                && ~strcmp(ELECTRODES,'labels') ...
+                && ~strcmpi(ELECTRODES,'numbers') 
                   error('Unknown value for keyword ''electrodes''');
              end
 		 case 'dipole'
@@ -247,24 +247,24 @@ for i = 2:2:nargs
 		  EMARKER = Value;
 		 case 'plotrad'
 		  plotrad = Value;
-              if ischar(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
+              if ischar(plotrad) || (plotrad < MINPLOTRAD || plotrad > 1)
 		     error('plotrad argument should be a number between 0.15 and 1.0');
 		  end
 		case 'intrad'
 		  intrad = Value;
-          if ischar(intrad) | (intrad < MINPLOTRAD | intrad > 1)
+          if ischar(intrad) || (intrad < MINPLOTRAD || intrad > 1)
               error('intrad argument should be a number between 0.15 and 1.0');
           end
         case 'headrad'
             headrad = Value;
-            if ischar(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
+            if ischar(headrad) && ( strcmpi(headrad,'off') || strcmpi(headrad,'none') )
                 headrad = 0;       % undocumented 'no head' alternatives
             end
             if isempty(headrad) % [] -> none also
                 headrad = 0;
             end
             if ~ischar(headrad) 
-                if ~(headrad==0) & (headrad < MINPLOTRAD | headrad>1)
+                if ~(headrad==0) && (headrad < MINPLOTRAD || headrad>1)
                     error('bad value for headrad');
                 end
             elseif  ~strcmpi(headrad,'rim')
@@ -272,12 +272,12 @@ for i = 2:2:nargs
             end
         case 'xsurface'
             Xi = Value;
-            if ~isnumeric(Xi) | size(Xi,1) ~= size(Xi,2) | size(Xi,1) ~= size(grid,1)
+            if ~isnumeric(Xi) || size(Xi,1) ~= size(Xi,2) || size(Xi,1) ~= size(grid,1)
                 error('xsurface must be a square matrix the size of grid');
             end
         case  'ysurface'
             Yi = Value;
-            if ~isnumeric(Yi) | size(Yi,1) ~= size(Yi,2) | size(Yi,1) ~= size(grid,1)
+            if ~isnumeric(Yi) || size(Yi,1) ~= size(Yi,2) || size(Yi,1) ~= size(grid,1)
                 error('ysurface must be a square matrix the size of grid');
             end  
         case {'headcolor','hcolor'}
@@ -317,7 +317,7 @@ if isempty(plotrad)
     error(' ''plotrad'' must be given')
 end
 if isempty(intrad)
-    if ~exist('Yi') | ~exist('Xi')
+    if ~exist('Yi') || ~exist('Xi')
         error('either ''intrad'' or the grid axes (Xi and Yi) must be given');
     end
 end
@@ -338,16 +338,16 @@ if exist('loc_file')
 	%
 	%%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
-	if isempty(plotrad) & isfield(tmpeloc, 'plotrad'), 
+	if isempty(plotrad) && isfield(tmpeloc, 'plotrad'), 
         plotrad = tmpeloc(1).plotrad; 
         if ischar(plotrad)                        % plotrad shouldn't be a string
             plotrad = str2num(plotrad)           % just checking
         end
-        if plotrad < MINPLOTRAD | plotrad > 1.0
+        if plotrad < MINPLOTRAD || plotrad > 1.0
            fprintf('Bad value (%g) for plotrad.\n',plotrad);
            error(' ');
         end
-        if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
+        if strcmpi(VERBOSE,'on') && ~isempty(plotrad)
            fprintf('Plotting radius plotrad (%g) set from EEG.chanlocs.\n',plotrad);
         end
 	end
@@ -356,11 +356,11 @@ if exist('loc_file')
       plotrad = max(plotrad,0.5);                 % default: plot out to the 0.5 head boundary
 	end                                           % don't plot channels with Rd > 1 (below head)
         
-	if ischar(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
+	if ischar(plotrad) || plotrad < MINPLOTRAD || plotrad > 1.0
        error('plotrad must be between 0.15 and 1.0');
 	end
 end
-if isempty(plotrad) & ~ exist('loc_file')
+if isempty(plotrad) && ~ exist('loc_file')
     plotrad = 1;                 % default: plot out to the 0.5 head bounda
 end             
 % plotrad now set
@@ -388,7 +388,7 @@ end
 %%%%%%%%%%%%%%%%% Issue warning if headrad ~= rmax  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 
-if headrad ~= 0.5 & strcmpi(VERBOSE, 'on')
+if headrad ~= 0.5 && strcmpi(VERBOSE, 'on')
    fprintf('     NB: Plotting map using ''plotrad'' %-4.3g,',plotrad);
    fprintf(    ' ''headrad'' %-4.3g\n',headrad);
    fprintf('Warning: The plotting radius of the cartoon head is NOT anatomically correct (0.5).\n')
@@ -441,7 +441,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
       xi = linspace(-intrad*squeezefac,intrad*squeezefac,GRID_SCALE);   % use the specified intrad value 
       yi = linspace(-intrad*squeezefac,intrad*squeezefac,GRID_SCALE);   
       [Xi,Yi] = meshgrid(yi',xi);
-  elseif ~exist('Xi') | ~exist('Yi')
+  elseif ~exist('Xi') || ~exist('Yi')
       error('toporeplot require either intrad input or both xsurface and ysurface')
   end
   Zi = grid;
@@ -457,9 +457,9 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
       chancoords = round(ceil(GRID_SCALE/2)+GRID_SCALE/2*2*chanrad*[cos(-chantheta),...
                                                       -sin(-chantheta)]);
       if chancoords(1)<1 ...
-         | chancoords(1) > GRID_SCALE ...
-            | chancoords(2)<1 ...
-               | chancoords(2)>GRID_SCALE
+         || chancoords(1) > GRID_SCALE ...
+            || chancoords(2)<1 ...
+               || chancoords(2)>GRID_SCALE
           error('designated ''noplot'' channel out of bounds')
       else
         chanval = Zi(chancoords(1),chancoords(2));
@@ -482,7 +482,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     if strcmp(MAPLIMITS,'absmax')
       amin = -max(max(abs(Zi)));
       amax = max(max(abs(Zi)));
-    elseif strcmp(MAPLIMITS,'maxmin') | strcmp(MAPLIMITS,'minmax')
+    elseif strcmp(MAPLIMITS,'maxmin') || strcmp(MAPLIMITS,'minmax')
       amin = min(min(Zi));
       amax = max(max(Zi));
     else
@@ -502,7 +502,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   h = gca; % uses current axes
 
                           % instead of default larger AXHEADFAC 
-  if squeezefac<0.92 & plotrad-headrad > 0.05  % (size of head in axes)
+  if squeezefac<0.92 && plotrad-headrad > 0.05  % (size of head in axes)
     AXHEADFAC = 1.05;     % do not leave room for external ears if head cartoon
                           % shrunk enough by the 'skirt' option
   end
@@ -579,7 +579,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
       if ~exist('tmpeloc')
           error('No electrode location information found');
       end
-      if strcmp(ELECTRODES,'labelpoint') | strcmp(ELECTRODES,'numpoint')
+      if strcmp(ELECTRODES,'labelpoint') || strcmp(ELECTRODES,'numpoint')
           text(-0.6,-0.6, [ int2str(length(Rd)) ' of ' int2str(length(tmpeloc)) ' electrode locations shown']);
           text(-0.6,-0.7, [ 'Click on electrodes to toggle name/number']);
           tl = title('Channel locations');

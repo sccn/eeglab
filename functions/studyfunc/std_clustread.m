@@ -79,7 +79,7 @@ clustinfo.comps      = STUDY.cluster(cluster).comps;
 clustinfo.condition  = condition;
 
 ncomps = length(STUDY.cluster(cluster).comps);
-for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel | component %%%%%%%%%%%%%%
+for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel || component %%%%%%%%%%%%%%
     
     for n = 1:length(condition) %%%%%%%%%%%%%%%%%%%%%%%% for each STUDY condition %%%%%%%%%%%%%%
 

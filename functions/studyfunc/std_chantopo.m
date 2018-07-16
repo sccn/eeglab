@@ -85,8 +85,8 @@ end
 
 % plotting paramters
 % ------------------
-if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end
-if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end
+if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end
+if nc > 1 && ~isempty(opt.condstats ), addr = 1; else addr = 0; end
 if ~isempty(opt.subplotpos), 
      if strcmpi(opt.transpose, 'on'), opt.subplotpos = opt.subplotpos([2 1 4 3]); end
      addr = opt.subplotpos(1);

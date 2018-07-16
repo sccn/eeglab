@@ -288,7 +288,7 @@ else
         case { 'setitc' 'setersp' }
             set_itc  = get(findobj('parent', hdl, 'tag', 'itc_on'), 'value'); 
             set_ersp = get(findobj('parent', hdl, 'tag', 'ersp_on'), 'value'); 
-            if  (~set_ersp & ~set_itc )
+            if  (~set_ersp && ~set_itc )
                 set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'off');
                 set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'off');
                 set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'off');                

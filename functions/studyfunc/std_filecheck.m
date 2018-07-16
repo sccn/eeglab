@@ -126,7 +126,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
                 res        = 'different';
                 txt{end+1} = tmptxt;
             elseif ~isequal(val1, val2)
-                if ~isnan(val1) & ~isnan(val2)
+                if ~isnan(val1) && ~isnan(val2)
                     res        = 'different';
                     txt{end+1} = tmptxt;
                 end
@@ -151,7 +151,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
         res     = 'recompute';
         disp(['Deleting and recomputing file: ' filename ]);
         return;
-    elseif strcmpi(res, 'same') & ( strcmpi(guiflag, 'guion') | strcmpi(guiflag, 'same') )
+    elseif strcmpi(res, 'same') && ( strcmpi(guiflag, 'guion') || strcmpi(guiflag, 'same') )
         disp(['Using file on disk: ' filename ]);
         return;
     end

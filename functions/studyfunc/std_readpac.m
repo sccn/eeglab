@@ -102,11 +102,11 @@ for ind1 = 1:len1 % usually only one channel/component
         % check if data is already here
         % -----------------------------
         dataread = 0;
-        if isfield(tmpstruct1, 'pacdata') & strcmpi(opt.forceread, 'off') & strcmpi(opt.recompute, 'off')
-            if ~isempty(tmpstruct1.pacdata) & iscell(tmpstruct1.pacdata) & length(tmpstruct1.pacdata) >= opt.indices2(ind2)
+        if isfield(tmpstruct1, 'pacdata') && strcmpi(opt.forceread, 'off') && strcmpi(opt.recompute, 'off')
+            if ~isempty(tmpstruct1.pacdata) && iscell(tmpstruct1.pacdata) && length(tmpstruct1.pacdata) >= opt.indices2(ind2)
                 if ~isempty(tmpstruct1.pacdata{opt.indices2(ind2)})
-                    %if isequal( STUDY.etc.pacparams.timerange, opt.timerange) & ...
-                    %        isequal( STUDY.etc.pacparams.freqrange, opt.freqrange) & ~isempty(tmpstruct.pacdata)
+                    %if isequal( STUDY.etc.pacparams.timerange, opt.timerange) && ...
+                    %        isequal( STUDY.etc.pacparams.freqrange, opt.freqrange) && ~isempty(tmpstruct.pacdata)
                     dataread = 1;
                 end
             end
@@ -144,7 +144,7 @@ for ind1 = 1:len1 % usually only one channel/component
                         if setinds1{c,g}(inds1) ~= setinds2{c,g}(inds2), error('Wrong subject index'); end
                         if ~strcmpi(ALLEEG(setinds1{c,g}(inds1)).subject, STUDY.subject(subj)), error('Wrong subject index'); end
                                                 
-                        if ~isempty(inds1) & ~isempty(inds2)
+                        if ~isempty(inds1) && ~isempty(inds2)
                             if ~isempty(opt.channels1)
                                  [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(setinds1{c,g}(subj)), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
                             else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(setinds1{c,g}(subj)), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});

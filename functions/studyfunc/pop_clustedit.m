@@ -189,7 +189,7 @@ if ~ischar(varargin{1})
         sameparent = 1;
         for k = 1: N
             % Assess the number of clustered components
-            if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8))  & (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
+            if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8))  && (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
                 clus_comps = clus_comps + length(STUDY.cluster(cls(k)).comps);
             end
             if k == 1
@@ -200,7 +200,7 @@ if ~ischar(varargin{1})
                 end
                 % For any other case verify that all clusters have the same parents
                 if ~(sum(strcmp(STUDY.cluster(cls(k)).parent, parent)) == length(parent)) % different parent
-                    if ~strcmp(STUDY.cluster(cls(k)).parent,'manual') & ~strcmp(parent, 'manual') 
+                    if ~strcmp(STUDY.cluster(cls(k)).parent,'manual') && ~strcmp(parent, 'manual') 
                         % if nither is an empty cluster (which was created manually)
                         sameparent = 0; % then the clusters have different parents
                     end
@@ -224,7 +224,7 @@ if ~ischar(varargin{1})
         num_cls = 0;
         for k = 1:N
             show_options{k+1} = [STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps))  ' ICs)'];
-            if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8)) & (~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8))  & ...
+            if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8)) && (~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8))  && ...
                     (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
                 num_cls = num_cls + 1;
             end
@@ -239,10 +239,10 @@ if ~ischar(varargin{1})
             if isempty(STUDY.cluster(k).child) 
                 if isempty(cls)
                     parent = STUDY.cluster(k).parent;
-                elseif ~isempty(STUDY.cluster(k).parent)  | ~isempty(parent) % if not both empty                          
+                elseif ~isempty(STUDY.cluster(k).parent)  || ~isempty(parent) % if not both empty                          
                     % Check if all parents are the same
                     if ~(sum(strcmp(STUDY.cluster(k).parent, parent)) == length(parent)) % different parent
-                        if ~strcmp(STUDY.cluster(k).parent,'manual') & ~strcmp(parent, 'manual') 
+                        if ~strcmp(STUDY.cluster(k).parent,'manual') && ~strcmp(parent, 'manual') 
                             sameparent = 0;
                         end
                     end
@@ -436,7 +436,7 @@ else
     
     clus     = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
     comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
-    if clus == 1 & length(cls) == 1
+    if clus == 1 && length(cls) == 1
         warndlg2('No cluster', 'No cluster');
         return;
     end
@@ -464,7 +464,7 @@ else
                        tmp = strfind(comp_name{ci},'''');
                        clust_name = comp_name{ci}(tmp(1)+1:tmp(end)-1);
                        for k = 1:length(cls)
-                           if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) & ...
+                           if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) && ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) && ...
                                 (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                                if strcmpi(STUDY.cluster(cls(k)).name, clust_name)
                                    cind = comp_ind(ci) - num_comps; % component index in the cluster
@@ -494,8 +494,8 @@ else
                     % All clusters does not include 'Notclust' 'ParentCluster' and 'Outliers' clusters. 
                     tmpcls = [];
                     for k = 1:length(cls) 
-                        if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) & ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) & ...
-                                (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) & ~isempty(STUDY.cluster(cls(k)).comps)
+                        if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) && ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) && ...
+                                (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) && ~isempty(STUDY.cluster(cls(k)).comps)
                             tmpcls = [ tmpcls cls(k)];
                         end
                     end
@@ -591,7 +591,7 @@ else
                 else % All clusters accept 'Notclust' and 'Outliers'
                     count = 1;
                     for k = 1: length(cls)
-                        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) & ...
+                        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) && ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) && ...
                                 (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                             for l = 1: length(STUDY.cluster(cls(k)).comps)
                                 if ~isnan(STUDY.cluster(cls(k)).sets(1,l))
@@ -617,7 +617,7 @@ else
                     % All clusters does not include 'Notclust' and 'Outliers' clusters. 
                     tmpcls = [];
                     for k = 1:length(cls) 
-                        if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) & ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) & ...
+                        if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) && ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) && ...
                                 (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                             tmpcls = [tmpcls cls(k)];
                         end
@@ -643,7 +643,7 @@ else
                     return;
                 end
                 % Don't rename 'Notclust' and 'Outliers'  clusters.
-                if strncmpi('Notclust',STUDY.cluster(cls(clus_num)).name,8) | strncmpi('Outliers',STUDY.cluster(cls(clus_num)).name,8) | ...
+                if strncmpi('Notclust',STUDY.cluster(cls(clus_num)).name,8) || strncmpi('Outliers',STUDY.cluster(cls(clus_num)).name,8) || ...
                         strncmpi('ParentCluster',STUDY.cluster(cls(clus_num)).name,13)
                     warndlg2('The ParentCluster, Outliers, and Notclust clusters cannot be renamed');
                     return;
@@ -689,7 +689,7 @@ else
                 ncomp = length(comp_ind); % number of selected components
                 optionalcls =[];
                 for k = 1:length(cls)
-                    if (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))  & (k~= old_clus)
+                    if (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))  && (k~= old_clus)
                         optionalcls = [optionalcls cls(k)];
                     end
                 end                    
@@ -736,7 +736,7 @@ else
                 if old_clus == 0 % 'all clusters' option 
                     return;
                 end
-                if strncmpi('Notclust',STUDY.cluster(cls(old_clus)).name,8) | strncmpi('ParentCluster',STUDY.cluster(cls(old_clus)).name,13)    % There are no outliers to 'Notclust'
+                if strncmpi('Notclust',STUDY.cluster(cls(old_clus)).name,8) || strncmpi('ParentCluster',STUDY.cluster(cls(old_clus)).name,13)    % There are no outliers to 'Notclust'
                     warndlg2('Cannot reassign components of ''Notclust'' or ''ParentCluster''.');
                     return;
                 end
@@ -783,7 +783,7 @@ else
                 if clus
                     std_name = STUDY.cluster(cls(clus)).name;
                     % Cannot reject outliers from 'Notclust', 'ParentCluster' and 'Outlier' clusters
-                    if strncmpi('Notclust',std_name,8) | strncmpi('ParentCluster', std_name,13) | ...
+                    if strncmpi('Notclust',std_name,8) || strncmpi('ParentCluster', std_name,13) || ...
                             strncmpi('Outliers',std_name,8)
                         warndlg2('Cannot reject outliers of ''Notclust'' or ''Outliers'' or ''ParentCluster'' clusters.');
                         return;
@@ -793,7 +793,7 @@ else
                     std_name = 'All clusters';
                     clusters = [];
                     for k = 1:length(cls)
-                         if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) & ...
+                         if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) && ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) && ...
                                  ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)  
                             clusters = [ clusters cls(k)];
                         end
@@ -872,7 +872,7 @@ else
                 clus_names = get(findobj('parent', hdl, 'tag', 'clus_list'), 'string') ;
                 optionalcls =[];
                 for k = 2:length(clus_names)
-                    if (~strncmpi('Notclust',clus_names{k},8)) & (~strncmpi('Outliers',clus_names{k},8)) & ...
+                    if (~strncmpi('Notclust',clus_names{k},8)) && (~strncmpi('Outliers',clus_names{k},8)) && ...
                             (~strncmpi('ParentCluster',clus_names{k},13))
                         optionalcls = [optionalcls k];
                     end

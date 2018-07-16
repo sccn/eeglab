@@ -109,7 +109,7 @@ if isempty(varargin)
     
     % decode inputs
     % -------------
-    %if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end
+    %if res.plotgroups && res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end
     if res.detachtag, res.detachtag = 'on'; else res.detachtag = 'off'; end; 
@@ -134,8 +134,8 @@ if isempty(varargin)
     if ~isequal(res.timerange  , STUDY.etc.erpparams.timerange)  , options = { options{:} 'timerange' res.timerange }; end
     if ~isequal(res.averagechan, STUDY.etc.erpparams.averagechan), options = { options{:} 'averagechan' res.averagechan }; end
     if (all(isnan(res.topotime)) && all(~isnan(STUDY.etc.erpparams.topotime))) || ...
-            (all(~isnan(res.topotime)) & all(isnan(STUDY.etc.erpparams.topotime))) || ...
-                (all(~isnan(res.topotime)) & ~isequal(res.topotime, STUDY.etc.erpparams.topotime))
+            (all(~isnan(res.topotime)) && all(isnan(STUDY.etc.erpparams.topotime))) || ...
+                (all(~isnan(res.topotime)) && ~isequal(res.topotime, STUDY.etc.erpparams.topotime))
             if ~isequal(res.topotime, STUDY.etc.erpparams.topotime)
                 options = { options{:} 'topotime' res.topotime }; 
             end

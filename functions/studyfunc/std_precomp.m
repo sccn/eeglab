@@ -405,7 +405,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         end
         
         % options
-        if strcmpi(g.ersp, 'on') & strcmpi(g.itc, 'on'), type = 'both';
+        if strcmpi(g.ersp, 'on') && strcmpi(g.itc, 'on'), type = 'both';
         elseif strcmpi(g.ersp, 'on')                   , type = 'ersp';
         else                                             type = 'itc';
         end

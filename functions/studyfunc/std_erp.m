@@ -160,7 +160,7 @@ end
 % else
 %     TMP = EEG;
 % end
-%    & isempty(TMP.icaact)
+%    && isempty(TMP.icaact)
 %    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
 %        reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
 %    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);

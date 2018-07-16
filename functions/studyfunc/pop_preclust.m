@@ -487,7 +487,7 @@ else
             set_itc =  get(findobj('parent', hdl, 'tag', 'itc_on'), 'value'); 
             set(findobj('parent', hdl,'tag', 'ersp_push'), 'enable', fastif(set_itc,'off','on'));
             set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', fastif(set_itc,'off','on'));
-             if  (set_itc & (~set_ersp) )
+             if  (set_itc && (~set_ersp) )
                 set(findobj('parent', hdl,'tag', 'itc_push'), 'enable', 'on');
                 set(findobj('parent', hdl,'tag', 'itc_params'), 'enable', 'on');
             end
@@ -503,7 +503,7 @@ else
             set_ersp = get(findobj('parent', hdl, 'tag', 'ersp_on'), 'value'); 
             set(findobj('parent', hdl,'tag', 'itc_push'), 'enable', fastif(set_ersp,'off','on'));
             set(findobj('parent', hdl,'tag', 'itc_params'), 'enable', fastif(set_ersp,'off','on'));
-            if  (set_ersp & (~set_itc) )
+            if  (set_ersp && (~set_itc) )
                 set(findobj('parent', hdl,'tag', 'ersp_push'), 'enable', 'on');
                 set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'on');
             end
@@ -543,17 +543,17 @@ else
        case 'preclustOK'
            set_PCA =  get(findobj('parent', hdl, 'tag', 'preclust_PCA'), 'value'); 
            set_ersp =  get(findobj('parent', hdl, 'tag', 'ersp_on'), 'value'); 
-           set(findobj('parent', hdl,'userdata', 'erspP'), 'enable', fastif(~set_PCA & set_ersp,'on','off'));
+           set(findobj('parent', hdl,'userdata', 'erspP'), 'enable', fastif(~set_PCA && set_ersp,'on','off'));
            set_itc =  get(findobj('parent', hdl, 'tag', 'itc_on'), 'value'); 
-           set(findobj('parent', hdl,'userdata', 'itcP'), 'enable', fastif(~set_PCA & set_itc,'on','off'));
+           set(findobj('parent', hdl,'userdata', 'itcP'), 'enable', fastif(~set_PCA && set_itc,'on','off'));
            set_erp =  get(findobj('parent', hdl, 'tag', 'erp_on'), 'value'); 
-           set(findobj('parent', hdl,'userdata', 'erpP'), 'enable', fastif(~set_PCA & set_erp,'on','off'));
+           set(findobj('parent', hdl,'userdata', 'erpP'), 'enable', fastif(~set_PCA && set_erp,'on','off'));
            set_spec =  get(findobj('parent', hdl, 'tag', 'spectra_on'), 'value'); 
-           set(findobj('parent', hdl,'userdata', 'specP'), 'enable', fastif(~set_PCA & set_spec,'on','off'));
+           set(findobj('parent', hdl,'userdata', 'specP'), 'enable', fastif(~set_PCA && set_spec,'on','off'));
            set_scalp =  get(findobj('parent', hdl, 'tag', 'scalp_on'), 'value'); 
-           set(findobj('parent', hdl,'userdata', 'scalpP'), 'enable', fastif(~set_PCA & set_scalp,'on','off'));
+           set(findobj('parent', hdl,'userdata', 'scalpP'), 'enable', fastif(~set_PCA && set_scalp,'on','off'));
            set_dipole =  get(findobj('parent', hdl, 'tag', 'dipole_on'), 'value'); 
-           set(findobj('parent', hdl,'userdata', 'dipoleP'), 'enable', fastif(~set_PCA & set_dipole,'on','off'));
+           set(findobj('parent', hdl,'userdata', 'dipoleP'), 'enable', fastif(~set_PCA && set_dipole,'on','off'));
            set(findobj('parent', hdl,'tag', 'chosen_component'), 'enable', fastif(~set_PCA,'on','off'));
            set(findobj('parent', hdl,'tag', 'dipole_rv'), 'enable', fastif(~set_PCA,'on','off'));
            set(findobj('parent', hdl,'tag', 'compstd_str'), 'enable', fastif(~set_PCA,'on','off'));

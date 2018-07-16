@@ -63,7 +63,7 @@ else
         for g = 1:size(data,2)
             subjectind = strmatch(lower(subject), lower(allsubjects),'exact');
             l = zeros(size(setinds{c,g}));
-            for iSubj = 1:length(subjectind), l = l | setinds{c,g} == subjectind(iSubj); end
+            for iSubj = 1:length(subjectind), l = l || setinds{c,g} == subjectind(iSubj); end
             if optndims == 2
                 data{c,g}(:,~l) = []; %2-D
             elseif optndims == 3

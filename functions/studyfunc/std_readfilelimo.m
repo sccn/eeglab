@@ -88,17 +88,17 @@ end
 
 % Identify type of analysis for limo stuff path
 %..........................................................................
-if strcmp(g.measure(1:3),'erp') & strcmp(chanoric,'Channels')
+if strcmp(g.measure(1:3),'erp') && strcmp(chanoric,'Channels')
     type = 'Channels_Time';
-elseif strcmp(g.measure(1:3),'erp') & strcmp(chanoric,'Components')
+elseif strcmp(g.measure(1:3),'erp') && strcmp(chanoric,'Components')
     type = 'Components_Time';
-elseif strcmp(g.measure(1:3),'spe') & strcmp(chanoric,'Channels')
+elseif strcmp(g.measure(1:3),'spe') && strcmp(chanoric,'Channels')
     type = 'Channels_Frequency';
-elseif strcmp(g.measure(1:3),'spe') & strcmp(chanoric,'Components')
+elseif strcmp(g.measure(1:3),'spe') && strcmp(chanoric,'Components')
     type = 'Components_Frequency';
-elseif strcmp(g.measure(1:3),'ers') & strcmp(chanoric,'Channels')
+elseif strcmp(g.measure(1:3),'ers') && strcmp(chanoric,'Channels')
     type = 'Channels_Time-Frequency';
-elseif strcmp(g.measure(1:3),'ers') & strcmp(chanoric,'Components')
+elseif strcmp(g.measure(1:3),'ers') && strcmp(chanoric,'Components')
     type = 'Components_Time-Frequency';
 end
 

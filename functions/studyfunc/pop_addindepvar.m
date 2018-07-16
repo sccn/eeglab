@@ -159,7 +159,7 @@ function cellout = encodevals(cellin)
             else
                 cellout{index} =  cellin{index}{1};
                 for indcell = 2:length(cellin{index})
-                    cellout{index} = [ cellout{index} ' & ' cellin{index}{indcell} ];
+                    cellout{index} = [ cellout{index} ' && ' cellin{index}{indcell} ];
                 end
             end
         end
@@ -170,7 +170,7 @@ function cellout = encodevals(cellin)
             else
                 cellout{index} =  num2str(cellin{index}(1));
                 for indcell = 2:length(cellin{index})
-                    cellout{index} = [ cellout{index} ' & ' num2str(cellin{index}(indcell)) ];
+                    cellout{index} = [ cellout{index} ' && ' num2str(cellin{index}(indcell)) ];
                 end
             end
         end

@@ -111,7 +111,7 @@ for k = 1:length(comps)
         tmp = del2(tmp); % Laplacian
     end
 
-    if length(comps) > 1 | strcmpi(mode, 'preclust')
+    if length(comps) > 1 || strcmpi(mode, 'preclust')
         tmp = tmp(find(~isnan(tmp))); % remove NaN for more than 1 component
     end
     if k == 1
@@ -129,7 +129,7 @@ return;
 
 function filename = correctfile(filename, datasetpath)
     comp = computer;
-    if filename(2) == ':' & ~strcmpi(comp(1:2), 'PC') 
+    if filename(2) == ':' && ~strcmpi(comp(1:2), 'PC') 
         filename = [filesep filename(4:end) ];
         filename(find(filename == '\')) = filesep;
     end

@@ -69,7 +69,7 @@ for clust = 1:length(clsind) %go over all requested clusters
         for k = 1:numitems % go through all components
             comp  = STUDY.cluster(clsind(clust)).comps(k);
             abset = STUDY.cluster(clsind(clust)).sets(cond,k);
-            if ~isnan(comp) & ~isnan(abset)
+            if ~isnan(comp) && ~isnan(abset)
                 [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
                 if ~isfield(centroid{clust}, 'topotmp') || isempty(centroid{clust}.topotmp)
                     centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);

@@ -168,7 +168,7 @@ function ALLEEG = std_loadalleeg(varargin)
     end
     ALLEEG = eeg_checkset(ALLEEG);
 
-    if strcmpi(warnfold, 'on') & ~strcmpi(pwd, genpath)
+    if strcmpi(warnfold, 'on') && ~strcmpi(pwd, genpath)
         disp('Changing current path to STUDY path...');
         cd(genpath);
     end

@@ -76,7 +76,7 @@ for c = 1:length(data(:))
 end
 % for c = 1:size(data,1)
 %     for ind = 1:length(compinds{1,grpind})
-%         if compinds{1,grpind}(ind) == comps & any(setinds{1,grpind}(ind) == sets)
+%         if compinds{1,grpind}(ind) == comps && any(setinds{1,grpind}(ind) == sets)
 %             if optndims == 2
 %                  data{c} = data{c}(:,ind);
 %             else data{c} = data{c}(:,:,ind);

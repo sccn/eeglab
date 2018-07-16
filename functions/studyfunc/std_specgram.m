@@ -148,7 +148,7 @@ end
 
 % SPEC information found in datasets
 % ----------------------------------
-if exist(filename) & strcmpi(opt.recompute, 'off')
+if exist(filename) && strcmpi(opt.recompute, 'off')
 
     if strcmpi(prefix, 'comp')
         [erspinterp, t, f] = std_readspecgram(EEG, 1, opt.components, opt.freqrange);
@@ -282,7 +282,7 @@ return;
 % --------------------------------------------
 function urlat = eeg_makeurarray(EEG, urpnts);
     
-    if isempty(EEG.event) | ~isfield(EEG.event, 'duration')
+    if isempty(EEG.event) || ~isfield(EEG.event, 'duration')
         urlat = 1:EEG.pnts;
         return;
     end
@@ -339,7 +339,7 @@ function savetofile(filename, t, f, X, prefix, comps, params, labels, interp);
 % --------------------------------------------
 function pntslat = eeg_urpnts(EEG);
     
-    if isempty(EEG.event) | ~isfield(EEG.event, 'duration')
+    if isempty(EEG.event) || ~isfield(EEG.event, 'duration')
         pntslat = EEG.pnts;
         return;
     end

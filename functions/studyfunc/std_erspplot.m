@@ -323,7 +323,7 @@ if ~isempty(opt.channels)
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                           'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
         else
-            if length(opt.channels) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
+            if length(opt.channels) > 1 && ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
             if length(locs) == 1 && size(allersp{1},3) > 1
                 % channels should be in 3rd dim; reshape data to put subjects in the 4th dim if number of channels is 1 
                 for index = 1:length(allersp(:))
@@ -354,7 +354,7 @@ if ~isempty(opt.channels)
     end
 else
     
-    if length(opt.clusters) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
+    if length(opt.clusters) > 1 && ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
     nc = ceil(sqrt(length(opt.clusters)));
     nr = ceil(length(opt.clusters)/nc);
     comp_names = {};
@@ -460,7 +460,7 @@ function ersp = removeerspbaseline(ersp, timevals, baseline)
     if size(baseline,2) == 2
         baseln = [];
         for index = 1:size(baseline,1)
-            tmptime   = find(timevals >= baseline(index,1) & timevals <= baseline(index,2));
+            tmptime   = find(timevals >= baseline(index,1) && timevals <= baseline(index,2));
             baseln = union_bc(baseln, tmptime);
         end
         if length(baseln)==0

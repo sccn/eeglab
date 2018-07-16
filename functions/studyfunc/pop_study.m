@@ -449,8 +449,8 @@ else % internal command
                 % find other subjects with the same session
                 % -----------------------------------------
                 for index = 1:length(datasetinfo)
-                    if realindex == index | (strcmpi(datasetinfo(index).subject, datasetinfo(realindex).subject) & ...
-                                ~isempty(datasetinfo(index).subject) & ...
+                    if realindex == index || (strcmpi(datasetinfo(index).subject, datasetinfo(realindex).subject) && ...
+                                ~isempty(datasetinfo(index).subject) && ...
                                 isequal( datasetinfo(index).session, datasetinfo(realindex).session ) )
                         datasetinfo(index).comps = tmps;
                         allcom = { allcom{:}, { 'index' index 'comps' tmps } };
@@ -579,7 +579,7 @@ end
 function allcom = simplifycom(allcom);
 
     for index = length(allcom)-1:-1:1
-        if strcmpi(allcom{index}{1}, 'index') & strcmpi(allcom{index+1}{1}, 'index')
+        if strcmpi(allcom{index}{1}, 'index') && strcmpi(allcom{index+1}{1}, 'index')
             if allcom{index}{2} == allcom{index+1}{2} % same dataset index
                 allcom{index}(end+1:end+length(allcom{index+1})-2) = allcom{index+1}(3:end);
                 allcom(index+1) = [];
@@ -597,7 +597,7 @@ function bool = test_wrong_parameters(hdl)
     bool = 0;
     for index = 1:length(datasetinfo)
         if ~isempty(datasetinfo(index).filename)
-            if isempty(datasetinfo(index).subject) & bool == 0
+            if isempty(datasetinfo(index).subject) && bool == 0
                 bool = 1; warndlg2('All datasets must have a subject name or code', 'Error');
             end
         end
@@ -613,16 +613,16 @@ function bool = test_wrong_parameters(hdl)
     anydipfit    = any(~cellfun('isempty', { datastrinfo(nonempty).dipfit}));
     alldipfit    = all(~cellfun('isempty', { datastrinfo(nonempty).dipfit}));
 
-    if anygroup & ~allgroup
+    if anygroup && ~allgroup
          bool = 1; warndlg2('If one dataset has a group label, they must all have one', 'Error');
     end
-    if anycondition & ~allcondition
+    if anycondition && ~allcondition
          bool = 1; warndlg2('If one dataset has a condition label, they must all have one', 'Error');
     end
-    if anysession & ~allsession
+    if anysession && ~allsession
          bool = 1; warndlg2('If one dataset has a session index, they must all have one', 'Error');
     end
-    if anydipfit & ~alldipfit
+    if anydipfit && ~alldipfit
          bool = 1; warndlg2('Dipole''s data across datasets is not uniform');
     end;    
 function strbut = formatbut(complist)
@@ -660,7 +660,7 @@ geomvert = [];
 for index = 1:length(Prompt)
 	geomvert = [geomvert size(Prompt{index},1) 1];  % default is vertical geometry
 end
-if all(geomvert == 1) & length(Prompt) > 1
+if all(geomvert == 1) && length(Prompt) > 1
 	geomvert = []; % horizontal
 end
 

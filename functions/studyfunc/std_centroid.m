@@ -126,38 +126,38 @@ for k = 1:length(clsind)
                 case 'scalp'
                     centroid{k}.scalp = 0; 
                     scalpC = 1;
-                    if (l ==1) & (k ==1)
+                    if (l ==1) && (k ==1)
                         fprintf('scalp ');
                     end
                 case 'erp'
                     centroid{k}.erp{l} = 0; 
                     erpC = 1;
-                    if (l ==1) & (k ==1)
+                    if (l ==1) && (k ==1)
                         fprintf('erp ');
                     end
                 case 'spec'
                     centroid{k}.spec{l} = 0; 
                     specC = 1;
-                    if (l ==1) & (k ==1)
+                    if (l ==1) && (k ==1)
                         fprintf('spectrum ');
                     end
                 case 'ersp'
                     centroid{k}.ersp{l} = 0; 
                     centroid{k}.ersp_limits{l} = 0;
                     erspC =1;
-                    if (l ==1) & (k ==1)
+                    if (l ==1) && (k ==1)
                         fprintf('ersp ');
                     end
                 case 'itc'
                     centroid{k}.itc{l} = 0; 
                     centroid{k}.itc_limits{l} = 0;
                     itcC = 1;
-                    if (l ==1) & (k ==1)
+                    if (l ==1) && (k ==1)
                         fprintf('itc ');
                     end                    
                 case 'dipole'
                     dipoleC =1;
-                    if (l ==1) & (k ==1)
+                    if (l ==1) && (k ==1)
                         fprintf('dipole ');
                     end
             end
@@ -165,13 +165,13 @@ for k = 1:length(clsind)
     end
 end   
 fprintf('centroid (only done once)\n');
-if itcC | erspC | specC | erpC | scalpC
+if itcC || erspC || specC || erpC || scalpC
     for clust = 1:length(clsind) %go over all requested clusters
         for cond = 1:Ncond %compute for all conditions
             for k = 1:length(STUDY.cluster(clsind(clust)).comps) % go through all components
                 comp  = STUDY.cluster(clsind(clust)).comps(k);
                 abset = STUDY.cluster(clsind(clust)).sets(cond,k);
-                if scalpC & cond == 1  %scalp centroid, does not depend on condition 
+                if scalpC && cond == 1  %scalp centroid, does not depend on condition 
                     grid = std_readtopo(ALLEEG, abset, comp);
                     if isempty(grid)
                         return;
@@ -184,7 +184,7 @@ if itcC | erspC | specC | erpC | scalpC
                     if isempty(erp)
                         return;
                     end
-                    if (cond==1) & (k==1)
+                    if (cond==1) && (k==1)
                         all_erp = zeros(length(erp),length(STUDY.cluster(clsind(clust)).comps));
                     end
                     all_erp(:,k) = erp';
@@ -274,7 +274,7 @@ if dipoleC %dipole centroid
         centroid{clust}.dipole.posxyz =  tmppos/ndip;
         centroid{clust}.dipole.momxyz =  tmpmom/ndip;
         centroid{clust}.dipole.rv =  tmprv/ndip;
-        if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical') & (~isfield(ALLEEG(abset).dipfit, 'hdmfile')) %old dipfit
+        if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical') && (~isfield(ALLEEG(abset).dipfit, 'hdmfile')) %old dipfit
             centroid{clust}.dipole.maxr = max_r;
         end
         STUDY.cluster(clsind(clust)).centroid.dipole = centroid{clust}.dipole;
@@ -285,7 +285,7 @@ end
 for clust =  1:length(clsind) %go over all requested clusters
     for cond  = 1:Ncond
         ncomp = length(STUDY.cluster(clsind(clust)).comps);
-        if scalpC & cond == 1%scalp centroid
+        if scalpC && cond == 1%scalp centroid
             centroid{clust}.scalp  = centroid{clust}.scalp/ncomp;
             STUDY.cluster(clsind(clust)).centroid.scalp = centroid{clust}.scalp ;
         end

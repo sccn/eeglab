@@ -41,18 +41,18 @@ function STUDY = std_movecomp(STUDY, ALLEEG, old_clus, new_clus, comps)
 icadefs;
 
 % Cannot move components if clusters have children clusters
-if ~isempty(STUDY.cluster(old_clus).child)  | ~isempty(STUDY.cluster(new_clus).child)  
+if ~isempty(STUDY.cluster(old_clus).child)  || ~isempty(STUDY.cluster(new_clus).child)  
     warndlg2('Cannot move components if clusters have children clusters!' , 'Aborting move components');
     return;
 end
-if isempty(STUDY.cluster(old_clus).parent)  | isempty(STUDY.cluster(new_clus).parent) % The Parent cluster
+if isempty(STUDY.cluster(old_clus).parent)  || isempty(STUDY.cluster(new_clus).parent) % The Parent cluster
     warndlg2('Cannot move components to or from the Parent cluster - off all components in STUDY!' , 'Aborting move components');
     return;
 end
 % Cannot move components if clusters have different parent
 % clusters (didn'y come from the same level of clustering), 
 % unless the cluster, components are moved to, is an empty new cluster. 
-if (length(STUDY.cluster(old_clus).parent) ~= length(STUDY.cluster(new_clus).parent)) & ~strcmp(STUDY.cluster(new_clus).parent, 'manual')
+if (length(STUDY.cluster(old_clus).parent) ~= length(STUDY.cluster(new_clus).parent)) && ~strcmp(STUDY.cluster(new_clus).parent, 'manual')
     warndlg2(strvcat('Cannot move components if clusters have different parent clusters!', ...
                      'This limitation will be fixed in the future'), 'Aborting move components');
     return;

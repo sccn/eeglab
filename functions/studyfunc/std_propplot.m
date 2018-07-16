@@ -110,7 +110,7 @@ if length(varargin) > 0
     if length(varargin) == 1, varargin{2} = varargin{1}; end; % backward compatibility
     if isnumeric(varargin{2})
         cls = varargin{2};
-    elseif ischar(varargin{2}) & strcmpi(varargin{2}, 'all')
+    elseif ischar(varargin{2}) && strcmpi(varargin{2}, 'all')
         cls = 1:length(STUDY.cluster);
     else
         error('cluster input should be either a vector of cluster indices or the keyword ''all''.');

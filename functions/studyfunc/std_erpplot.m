@@ -194,7 +194,7 @@ if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt
     end
 end
 
-if ~isnan(params.topotime) & length(opt.channels) < 5
+if ~isnan(params.topotime) && length(opt.channels) < 5
     warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
 end
@@ -249,7 +249,7 @@ if ~isempty(opt.channels)
 
     % select specific time    
     % --------------------
-    if ~isempty(params.topotime) & ~isnan(params.topotime)
+    if ~isempty(params.topotime) && ~isnan(params.topotime)
         [tmp, ti1] = min(abs(alltimes-params.topotime(1)));
         [tmp, ti2] = min(abs(alltimes-params.topotime(end)));
         for condind = 1:length(erpdata(:))

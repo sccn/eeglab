@@ -212,7 +212,7 @@ end
 % STUDY.cluster(clustind).preclust.preclustparams = [];
 % STUDY.cluster(clustind).preclust.preclustdata = [];
 % 
-% if (~isempty(opt.datasets) | ~isempty(opt.subjects)) & ~isempty(opt.components)
+% if (~isempty(opt.datasets) || ~isempty(opt.subjects)) && ~isempty(opt.components)
 %     
 %     % convert subjects to dataset indices
 %     % -----------------------------------

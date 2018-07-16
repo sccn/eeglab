@@ -191,7 +191,7 @@ if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
 
 % checking input parameters
 % -------------------------
-if isempty(g.components) & isempty(g.channels)
+if isempty(g.components) && isempty(g.channels)
     if isempty(EEG(1).icaweights)
         error('EEG.icaweights not found');
     end
@@ -233,7 +233,7 @@ elseif ~isempty(g.channels)
 end
 
 powbaseexist = 1; % used also later
-if isempty(g.powbase) | isnan(g.powbase)
+if isempty(g.powbase) || isnan(g.powbase)
     powbaseexist = 0;
     g.powbase = NaN*ones(length(g.indices),1);  % default for timef()
 end
@@ -243,7 +243,7 @@ end
 
 % Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
-if exist( filenameersp ) & strcmpi(g.recompute, 'off')
+if exist( filenameersp ) && strcmpi(g.recompute, 'off')
     fprintf('Use existing file for ERSP: %s; check the ''recompute checkbox'' to force recomputing.\n', filenameersp);
     return;
 end
@@ -262,7 +262,7 @@ parameters = { parameters{:} 'freqs' g.freqs };
 if strcmpi(g.plot, 'off')
     parameters = { parameters{:} 'plotersp', 'off', 'plotitc', 'off', 'plotphase', 'off' };
 end
-if powbaseexist & time_range(1) >= 0 
+if powbaseexist && time_range(1) >= 0 
     parameters{end+1} = 'baseboot';
     parameters{end+1} = 0;
     fprintf('No pre-0 baseline spectral estimates: Using whole epoch for timef() "baseboot"\n');
@@ -292,7 +292,7 @@ pointrange1 = round(max((g.timelimits(1)/1000-EEG(1).xmin)*EEG(1).srate, 1));
 pointrange2 = round(min(((g.timelimits(2)+1000/EEG(1).srate)/1000-EEG(1).xmin)*EEG(1).srate, EEG(1).pnts));
 pointrange = [pointrange1:pointrange2];
 
-% Compute ERSP & ITC
+% Compute ERSP && ITC
 % ------------------
 allTrialsTmp   = cell(1,length(g.indices));
 allTrialsTime  = cell(1,length(g.indices));

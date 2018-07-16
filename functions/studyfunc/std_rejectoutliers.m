@@ -55,7 +55,7 @@ if length(varargin) > 1
             cls = 2:length(STUDY.cluster);
         end
     else
-        if ischar(varargin{1}) & strcmpi(varargin{1}, 'all')
+        if ischar(varargin{1}) && strcmpi(varargin{1}, 'all')
             cls = 2:length(STUDY.cluster);
         else
             error('std_prejectoutliers: clusters input takes either specific clusters (numeric vector) or keyword ''all''.');
@@ -65,7 +65,7 @@ end
 tmp =[];
 for k = 1: length(cls)
     % don't include 'Notclust' clusters
-    if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
+    if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) && ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
         tmp = [tmp cls(k)];
     end
 end
@@ -83,7 +83,7 @@ end
 % Perform validity checks
 for k = 1:length(cls)
 	% Cannot reject outlier components if cluster is a 'Notclust' or 'Outlier' cluster
-	if strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) | strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) | ...
+	if strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) || strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) || ...
         strncmpi('ParentCluster', STUDY.cluster(cls(k)).name,13)
         warndlg2('Cannot reject outlier components from a Notclust or Outliers cluster');
         return;

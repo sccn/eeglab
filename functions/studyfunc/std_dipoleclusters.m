@@ -171,7 +171,7 @@ end
                     else
                         allbesa(1,end+1) = allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k)));
                         centr = [centr; allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz(1,:)];                       
-                        if size(allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz,1) > 1 & allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz(2,1) ~= 0 % actual values, not zero
+                        if size(allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz,1) > 1 && allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz(2,1) ~= 0 % actual values, not zero
                             if allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz(2,2) > 0 % on the wrong side, switch with centr1
                                 centr2 = [centr2; allbesa1{nx}(find(origlist{nx} == clustcps{clust}{nx}(k))).posxyz(2,:)];
                                 centr2(end,2) = centr2(end,2)*-1; centr1(end,2) = centr1(end,2)*-1;

@@ -41,7 +41,7 @@ function STUDY = std_moveoutlier(STUDY, ALLEEG, old_clus, comps)
 
 % Cannot move components if the cluster is either a 'Notclust' or
 % 'Outliers' cluster
-if strncmpi('Notclust',STUDY.cluster(old_clus).name,8) | strncmpi('Outliers',STUDY.cluster(old_clus).name,8)
+if strncmpi('Notclust',STUDY.cluster(old_clus).name,8) || strncmpi('Outliers',STUDY.cluster(old_clus).name,8)
     warndlg2('std_moveoutlier: cannot move components from Notclust or Outliers cluster');
     return;
 end

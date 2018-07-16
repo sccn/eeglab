@@ -105,7 +105,7 @@ if ischar(g), error(g); end
 
 % checking input parameters
 % -------------------------
-if isempty(g.components1) & isempty(g.channels1)
+if isempty(g.components1) && isempty(g.channels1)
     if isempty(EEG(1).icaweights)
         error('EEG.icaweights not found');
     end
@@ -144,7 +144,7 @@ if length(g.freqs)>0, parameters = { parameters{:} 'freqs' g.freqs }; end
 
 % Check if PAC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
-if exist( filenamepac ) & strcmpi(g.recompute, 'off')
+if exist( filenamepac ) && strcmpi(g.recompute, 'off')
     fprintf('Use existing file for PAC: %s\n', filenamepac);
     if ~isempty(g.components1)
          [X, times, freqs, parameters] = std_readpac(EEG, 1,  g.indices1,  g.indices2, g.timerange, g.freqrange);
@@ -226,7 +226,7 @@ end
 
 % multiple entry
 % --------------
-if length(comp1) > 1 | length(comp2) > 1
+if length(comp1) > 1 || length(comp2) > 1
     for index1 = 1:length(comp1)
         for index2 = 1:length(comp2)
             [tmppac, freqs, timevals, params] = std_readpac(ALLEEG, abset, comp1(index1), comp2(index2), timewindow, freqrange);
@@ -275,7 +275,7 @@ end
 % select plotting or clustering time/freq range
 % ---------------------------------------------
 if ~isempty(timewindow)
-    if timewindow(1) > tmppac.times(1) | timewindow(end) < tmppac.times(end)
+    if timewindow(1) > tmppac.times(1) || timewindow(end) < tmppac.times(end)
         maxind = max(find(tmppac.times <= timewindow(end)));
         minind = min(find(tmppac.times >= timewindow(1)));
     else
@@ -287,7 +287,7 @@ else
     maxind = tlen;
 end
 if ~isempty(freqrange)
-    if freqrange(1) > exp(1)^tmppac.freqs(1) | freqrange(end) < exp(1)^tmppac.freqs(end)
+    if freqrange(1) > exp(1)^tmppac.freqs(1) || freqrange(end) < exp(1)^tmppac.freqs(end)
         fmaxind = max(find(tmppac.freqs <= freqrange(end)));
         fminind = min(find(tmppac.freqs >= freqrange(1)));
     else

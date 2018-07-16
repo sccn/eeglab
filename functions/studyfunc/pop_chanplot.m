@@ -373,7 +373,7 @@ else
                 end
 
                 selected = 1;
-                if isfield(changrp, 'selected') & length(cind) == 1
+                if isfield(changrp, 'selected') && length(cind) == 1
                     if ~isempty(STUDY.changrp(cind).selected)
                         selected = min(STUDY.changrp(cind).selected, 1+length(chanid));
                         STUDY.changrp(cind).selected = selected;
@@ -482,7 +482,7 @@ else
                     return;
                 end
                 % Don't rename 'Notchan' and 'Outliers'  channels.
-                if strncmpi('Notchan',STUDY.channel(cls(chan_num)).name,8) | strncmpi('Outliers',STUDY.channel(cls(chan_num)).name,8) | ...
+                if strncmpi('Notchan',STUDY.channel(cls(chan_num)).name,8) || strncmpi('Outliers',STUDY.channel(cls(chan_num)).name,8) || ...
                         strncmpi('Parentchannel',STUDY.channel(cls(chan_num)).name,13)
                     warndlg2('The Parentchannel, Outliers, and Notchan channels cannot be renamed');
                     return;
