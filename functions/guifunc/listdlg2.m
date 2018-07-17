@@ -57,8 +57,8 @@ end
 geometry = {[1] [1 1]};
 geomvert = [min(length(g.liststring), 10) 1];
 if ~strcmpi(g.selectionmode, 'multiple') || ...
-        (iscell(g.liststring) & length(g.liststring) == 1) | ...
-        (isstr (g.liststring) & size  (g.liststring,1) == 1 & isempty(find(g.liststring == '|')))
+        (iscell(g.liststring) && length(g.liststring) == 1) || ...
+        (isstr (g.liststring) && size  (g.liststring,1) == 1 && isempty(find(g.liststring == '|')))
 	if isempty(g.initialvalue), g.initialvalue = 1; end
     minval = 1;
 	maxval = 1;
@@ -75,7 +75,7 @@ if ~isempty(g.promptstring)
 	geomvert = [2 geomvert];
 	listui = { { 'Style', 'text', 'string', g.promptstring } listui{:}};
 end
-[tmp tmp2 allobj] = supergui( fig, geometry, geomvert, listui{:} );
+[tmp, tmp2, allobj] = supergui( fig, geometry, geomvert, listui{:} );
 
 % assign value to listbox
 % must be done after creating it 
