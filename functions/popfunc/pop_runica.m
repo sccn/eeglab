@@ -27,6 +27,8 @@
 %                 on each dataset. Default is 'off'.
 %   'concatcond'  - ['on'|'off'] 'on' concatenate conditions for input datasets 
 %                 of the same sessions and the same subject. Default is 'off'.
+%   'reorder'   - ['on'|'off'] re-order components by variance if that's not
+%                 already the case. Default is 'on'.
 %   'key','val' - ICA algorithm options (see ICA routine help messages).
 % 
 % Adding a new algorithm:
@@ -154,12 +156,13 @@ if nargin < 2 || selectamica
                      { 'style' 'listbox'    'string' strvcat(allalgs{:}) 'callback', cb_ica } ...
                      { 'style' 'text'       'string' 'Commandline options (See help messages)' } ...
                      { 'style' 'edit'       'string' defaultopts 'tag' 'params' } ...
+                     { 'style'  'checkbox'  'string' 'Reorder components by variance (if that''s not already the case)' 'value' 1 } ...
                      { 'style' 'text'       'string' 'Channel type(s) or channel indices' } ...
                      { 'style' 'edit'       'string' '' 'tag' 'chantype' }  ...
                      { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
                      { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
-    geometry = { [2 1.5] [2 1.5] [2 1 1 1] };
-    geomvert = [ 1.5 1 1];
+    geometry = { [2 1.5] [2 1.5] [1] [2 1 1 1] };
+    geomvert = [ 1.5 1 1 1];
     if length(ALLEEG) > 1
         cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
         cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
@@ -204,15 +207,15 @@ if nargin < 2 || selectamica
                              'helpcom', 'pophelp(''pop_runica'')', ...
                              'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes } );
     if length(result) == 0 return; end;        
-    options = { 'icatype' allalgs{result{1}} 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) };
-    if ~isempty(result{3})
-        if ~isempty(str2num(result{3})), options = { options{:} 'chanind' str2num(result{3}) };
-        else                             options = { options{:} 'chanind' parsetxt(result{3}) }; 
+    options = { 'icatype' allalgs{result{1}} 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) 'reorder' fastif(result{3}, 'on', 'off') };
+    if ~isempty(result{4})
+        if ~isempty(str2num(result{4})), options = { options{:} 'chanind' str2num(result{4}) };
+        else                             options = { options{:} 'chanind' parsetxt(result{4}) }; 
         end
     end
-    if length(result) > 3
-        options = { options{:} 'concatenate' fastif(result{4}, 'on', 'off') };
-        options = { options{:} 'concatcond'  fastif(result{5}, 'on', 'off') };
+    if length(result) > 4
+        options = { options{:} 'concatenate' fastif(result{5}, 'on', 'off') };
+        options = { options{:} 'concatcond'  fastif(result{6}, 'on', 'off') };
     end
 else 
     if mod(length(varargin),2) == 1
@@ -229,6 +232,7 @@ end
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on','off' }   'off';
                             'concatcond'     'string'  { 'on','off' }   'off';
+                            'reorder'        'string'  { 'on','off' }   'on';
                             'chanind'        { 'cell','integer' } { [] [] }        [];}, ...
                             'pop_runica', 'ignore');
 if ischar(g), error(g); end
@@ -492,6 +496,18 @@ if isempty(EEG.icasphere)
 end
 if isempty(EEG.icawinv)
     EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
+end
+
+% Reorder components by variance
+% ------------------------------
+meanvar = sum(EEG.icawinv.^2).*sum(transpose((EEG.icaweights *  EEG.icasphere)*EEG.data(EEG.icachansind,:)).^2)/((length(EEG.icachansind)*EEG.pnts)-1);
+[~, windex] = sort(meanvar);
+windex = windex(end:-1:1); % order large to small
+meanvar = meanvar(windex);
+EEG.icaweights = EEG.icaweights(windex,:);
+EEG.icawinv    = pinv( EEG.icaweights *  EEG.icasphere );
+if ~isempty(EEG.icaact)
+    EEG.icaact = EEG.icaact(windex,:,:);
 end
 
 % copy back data to datasets if necessary
