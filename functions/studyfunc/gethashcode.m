@@ -29,9 +29,8 @@
 
 function res= gethashcode(str)
 
-import java.security.*;
-import java.math.*;
-md = MessageDigest.getInstance('MD5');
-hash = md.digest(double(str));
-bi = BigInteger(1, hash);
+md = javaMethod('getInstance', 'java.security.MessageDigest', 'MD5');
+javastr = javaObject('java.lang.String', str);
+hash = md.digest(javastr.getBytes("UTF-8"));
+bi = javaObject('java.math.BigInteger', 1, hash);
 res = char(bi.toString(16));
