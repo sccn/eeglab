@@ -17,6 +17,8 @@
 %                                Empty or [] input -> Use whole epoch as baseline
 %   pointrange - [min:max]       Baseline points vector (overwritten by timerange).
 %                                Empty or [] input -> Use whole epoch as baseline
+%   chanlist   - [cell]          List of channels. Default is all.
+%
 % Outputs:
 %   OUTEEG     - Output dataset
 %
@@ -46,7 +48,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_rmbase( EEG, timerange, pointrange);
+function [EEG, com] = pop_rmbase( EEG, timerange, pointrange, chanlist)
 
 com ='';
 if nargin < 1
@@ -55,54 +57,87 @@ if nargin < 1
 end
 if isempty(EEG(1).data)
     disp('pop_rmbase(): cannot remove baseline of an empty dataset'); return;
-end;    
+end    
 if nargin < 1
 	help pop_rmbase;
 	return;
-end;	
-if nargin < 2 && EEG(1).trials > 1
-	% popup window parameters
-	% -----------------------
+end
+if nargin < 4 || isempty(chanlist)
+    chanlist = 1:EEG.nbchan;
+end
+if nargin < 2 
+    % popup window parameters
+    % -----------------------
     defaultbase = [num2str(EEG(1).times(1)) ' 0'];
     if EEG(1).times(1) >= 0
         defaultbase = '[ ]';
     end
-    uilist = { { 'style' 'text' 'string' 'Baseline latency range ([min max] in ms) ([ ] = whole epoch):' } ...
-               { 'style' 'edit' 'string'  defaultbase } ...
-               { 'style' 'text' 'string' 'Or remove baseline points vector (ex:1:56):' } ...
-               { 'style' 'edit' 'string' '' } ...
-               { 'style' 'text' 'string' 'Note: press Cancel if you do not want to remove the baseline' } ...
-               };
-    uigeom = { [3 1] [3 1] [1] };
-    [result usrdat] = inputgui( 'uilist', uilist, 'geometry', uigeom, 'title', 'Baseline removal - pop_rmbase()', 'helpcom', 'pophelp(''pop_rmbase'');'); 
-    if isempty(result), return; end
-    if ~isempty(usrdat) && isnan(usrdat), return; end
-
-	% decode parameters
-	% -----------------
-    if numel(result) < 2 || ((isempty(result{1}) || strcmp(result{1},'[]') ) ...
-            && (isempty(result{2}) || strcmp(result{2},'[]')))
-        timerange = [ EEG(1).times(1) EEG(1).times(end) ]; % whole epoch latency range
-        pointrange = [];
-        fprintf('pop_rmbase(): using whole epoch as baseline.\n');
+    if EEG(1).trials > 1
+        uilist = { { 'style' 'text' 'string' 'Baseline latency range ([min max] in ms) ([ ] = whole epoch):' } ...
+            { 'style' 'edit' 'string'  defaultbase } ...
+            { 'style' 'text' 'string' 'Or remove baseline points vector (ex:1:56):' } ...
+            { 'style' 'edit' 'string' '' } ...
+            { 'style' 'text' 'string' 'Note: press Cancel if you do not want to remove the baseline' } };
+        uigeom = { [3 1] [3 1] [1] };
     else
-        timerange  = eval( [ '[' result{1} ']' ] );
-        pointrange = eval( [ '[' result{2} ']' ] );
+        uilist = { { 'style' 'text' 'string' 'Removing the mean of each data channel (press cancel to skip)' } };
+        uigeom = { [1] };
     end
-elseif nargin < 2 && EEG(1).trials == 1
-	% popup window parameters
-	% -----------------------
-    resp = questdlg2(strvcat('Remove mean of each data channel'), 'pop_rmbase', 'Cancel', 'Ok', 'Ok');
-    if strcmpi(resp, 'Cancel'), return; end
-    timerange = [];
-    pointrange = [1:EEG(1).pnts];
+    
+    % add channel selection
+    % --------------
+    if ~isempty(EEG(1).chanlocs)
+        tmpchanlocs = EEG(1).chanlocs;        
+    else
+        tmpchanlocs = [];
+        for index = 1:EEG(1).nbchan
+            tmpchanlocs(index).labels = int2str(index);
+            tmpchanlocs(index).type = '';
+        end
+    end
+    cb_type = 'pop_chansel(get(gcbf, ''userdata''), ''field'', ''type'',   ''handle'', findobj(''parent'', gcbf, ''tag'', ''chantypes''));';
+    cb_chan = 'pop_chansel(get(gcbf, ''userdata''), ''field'', ''labels'', ''handle'', findobj(''parent'', gcbf, ''tag'', ''channels''));';
+    uilist = { uilist{:} ...
+        { 'style' 'text'       'string' 'Channel type(s)' } ...
+        { 'style' 'edit'       'string' '' 'tag' 'chantypes'}  ...
+        { 'style' 'pushbutton' 'string' '...'  'callback' cb_type } ...
+        { 'style' 'text'       'string' 'OR channel(s) (default all)' } ...
+        { 'style' 'edit'       'string' '' 'tag' 'channels' }  ...
+        { 'style' 'pushbutton' 'string' '...' 'callback' cb_chan }
+        };
+    uigeom = { uigeom{:} [2 1.5 0.5] [2 1.5 0.5] };
+    [result, usrdat, sres2, sres] = inputgui( 'uilist', uilist, 'geometry', uigeom, 'title', 'Baseline removal - pop_rmbase()', 'helpcom', 'pophelp(''pop_rmbase'');', 'userdata', tmpchanlocs);
+    if isempty(result), return; end
+    
+    % decode parameters
+    % -----------------
+    if EEG(1).trials > 1
+        if numel(result) < 2 || ((isempty(result{1}) || strcmp(result{1},'[]') ) ...
+                && (isempty(result{2}) || strcmp(result{2},'[]')))
+            timerange = [ EEG(1).times(1) EEG(1).times(end) ]; % whole epoch latency range
+            pointrange = [];
+            fprintf('pop_rmbase(): using whole epoch as baseline.\n');
+        else
+            timerange  = eval( [ '[' result{1} ']' ] );
+            pointrange = eval( [ '[' result{2} ']' ] );
+        end
+    else
+        timerange = [];
+        pointrange = [1:EEG(1).pnts];
+    end
+    if ~isempty(sres.chantypes)
+        chanlist = eeg_decodechan(EEG.chanlocs, parsetxt(sres.chantype), 'type');
+    elseif ~isempty(sres.channels)
+        chanlist = eeg_decodechan(EEG(1).chanlocs, sres.channels);
+    end
+    
 end
 
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
     [ EEG com ] = eeg_eval( 'pop_rmbase', EEG, 'warning', 'on', 'params', ...
-                            { timerange pointrange } );
+                            { timerange pointrange chanlist } );
     return;
 end
 
@@ -138,17 +173,17 @@ if EEG.trials == 1 && ~isempty(EEG.event) ...
         for index=1:length(boundaries)-1
             tmprange = [boundaries(index)+1:boundaries(index+1)];
             if length(tmprange) > 1
-                EEG.data(:,tmprange) = rmbase( EEG.data(:,tmprange), length(tmprange), ...
+                EEG.data(chanlist,tmprange) = rmbase( EEG.data(:,tmprange), length(tmprange), ...
                                                    [1:length(tmprange)]);
             elseif length(tmprange) == 1
-                EEG.data(:,tmprange) = 0;
+                EEG.data(chanlist,tmprange) = 0;
             end
         end
     else
-        EEG.data = rmbase( EEG.data, EEG.pnts, pointrange );    
-    end;		
+        EEG.data(chanlist,:) = rmbase( EEG.data(chanlist,:), EEG.pnts, pointrange );    
+    end
 else
-    for indc = 1:EEG.nbchan
+    for indc = chanlist
         tmpmean  = mean(double(EEG.data(indc,pointrange,:)),2);
         EEG.data(indc,:,:) = EEG.data(indc,:,:) - repmat(tmpmean, [1 EEG.pnts 1]);
     end
@@ -158,9 +193,7 @@ end
 EEG.data = reshape( EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 EEG.icaact = [];
 
-if flag_timerange %~isempty(timerange)
-	com = sprintf('EEG = pop_rmbase( EEG, [%s]);',num2str(timerange));
-else
-	com = sprintf('EEG = pop_rmbase( EEG, [], %s);',vararg2str({pointrange}));
-end;			
+if isequal(chanlist, [1:EEG.nbchan]), chanlist = []; end
+if flag_timerange, pointrange = []; else, timerange = []; end
+com = sprintf('EEG = pop_rmbase( EEG, %s);',vararg2str({timerange pointrange chanlist}));
 return;
