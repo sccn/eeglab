@@ -1498,7 +1498,7 @@ if exist('phargs') == 1 % if phase-sort the data trials
     if length(phargs) >= 4 && phargs(3) ~= phargs(4) % find max frequency
         % in specified band
         if exist('pwelch') == 2 % requires Signal Processing Toolbox
-            fprintf('Computing data spectrum using psd().\n');
+            fprintf('Computing data spectrum using pwelch().\n');
             [pxx,freqs] = pwelch(data(:), frames, 0, max(1024, pow2(ceil(log2(frames)))), srate);
         else % EEGLAB native work-around
             fprintf('Computing data spectrum using spec().\n');
@@ -1617,7 +1617,7 @@ if exist('phargs') == 1 % if phase-sort the data trials
 elseif exist('ampargs') == 1 % if amplitude-sort
     if length(ampargs) == 4 % find max frequency in specified band
         if exist('pwelch') == 2
-            fprintf('Computing data spectrum using psd().\n');
+            fprintf('Computing data spectrum using pwelch().\n');
             [pxx,freqs] = pwelch(data(:),frames,0,max(1024, pow2(ceil(log2(frames)))),srate);
         else
             fprintf('Computing data spectrum using spec().\n');
