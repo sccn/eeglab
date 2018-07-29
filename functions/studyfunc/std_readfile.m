@@ -171,7 +171,7 @@ events         = {};
 % get output for parameters and measure ranges
 % --------------------------------------------
 fileFields = fieldnames(fileData);
-if any(strncmp('parameters', fileFields, 100))
+if ~isempty( strmatch('parameters', fileFields) ) 
     parameters = removedup(fileData.parameters);
     for index = 1:length(parameters), if iscell(parameters{index}), parameters{index} = { parameters{index} }; end; end
     parameters = struct(parameters{:});
@@ -351,7 +351,7 @@ function v6 = testv6(x)
 fid=fopen(x);
 txt=char(fread(fid,[1,140],'*char'));
 tmp = fclose(fid);
-txt=[txt,0];
+txt=[txt,char(0)];
 txt=txt(1:find(txt==0,1,'first')-1);
 if ~isempty(strfind(txt, 'MATLAB 5.0')), v6 = true; else v6 = false; end
 
