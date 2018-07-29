@@ -188,6 +188,7 @@ if nargin <= 3 || ischar(varargin{1})
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
 				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
 				  'nicamaps'      'integer'  []                       4 ;
+                  'blckhn'        'integer'  []                       2 ;
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
 				  'icachansind'   'integer'  []                       [1:size(data,1)] ; % deprecated
