@@ -448,7 +448,7 @@ for curfield = tmpfields'
                              end
                              warning off;
                              try,
-                                 testval = evalin('base', ['isglobal(' varname ')']);
+                                 testval = evalin('base', ['isglobal(''' varname ''')']);
                              catch, testval = 0; end
                              if ~testval
                                  commandrestore = [ ' tmpp = '  varname '; clear global ' varname ';'   varname '=tmpp;clear tmpp;' ]; 
