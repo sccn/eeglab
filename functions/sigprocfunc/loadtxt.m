@@ -96,7 +96,7 @@ end; % skip lines ---------
 inputline = fgetl(fid);
 linenb = 1;
 if strcmp(g.verbose, 'on'), fprintf('Reading file (lines): '); end
-while isempty(inputline) | inputline~=-1
+while isempty(inputline) || inputline(1)~=-1
      colnb = 1;
      if ~isempty(inputline)
          tabFirstpos = 1;
