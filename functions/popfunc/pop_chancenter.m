@@ -88,7 +88,7 @@ c = setdiff_bc([1:length(chanlocs)], union(omitchans, find(cellfun('isempty', { 
 
 % optimize center
 % ---------------
-[X Y Z newcenter]= chancenter( [ chanlocs(c).X ]', [ chanlocs(c).Y ]', [ chanlocs(c).Z ]', center);
+[X, Y, Z, newcenter]= chancenter( [ chanlocs(c).X ]', [ chanlocs(c).Y ]', [ chanlocs(c).Z ]', center);
 for index = 1:length(c)
     chanlocs(c(index)).X  = X(index);
     chanlocs(c(index)).Y  = Y(index);
