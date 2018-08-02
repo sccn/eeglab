@@ -302,8 +302,6 @@ if ~isdeployed
 
     % add path if toolboxes are missing
     % ---------------------------------
-    signalpath = fullfile(eeglabpath, 'functions', 'octavefunc', 'signal');
-    optimpath  = fullfile(eeglabpath, 'functions', 'octavefunc', 'optim');
     if option_donotusetoolboxes
         p1 = fileparts(mywhich('ttest'));
         p2 = fileparts(mywhich('filtfilt'));
@@ -313,22 +311,6 @@ if ~isdeployed
         if ~isempty(p2), rmpath(p2); end
         if ~isempty(p3), rmpath(p3); end
         if ~isempty(p4), rmpath(p4); end
-    end
-    if ~license('test','signal_toolbox') || exist('pwelch') ~= 2
-        warning('off', 'MATLAB:dispatcher:nameConflict');
-        addpath( signalpath );
-    else
-        warning('off', 'MATLAB:rmpath:DirNotFound');
-        rmpathifpresent( signalpath );
-        rmpathifpresent(optimpath);
-        warning('on', 'MATLAB:rmpath:DirNotFound');
-    end
-    if ~license('test','optim_toolbox') && ~ismatlab
-        addpath( optimpath );
-    else
-        warning('off', 'MATLAB:rmpath:DirNotFound');
-        rmpathifpresent( optimpath );
-        warning('on', 'MATLAB:rmpath:DirNotFound');
     end
 
     % remove BIOSIG path which are not needed and might cause conflicts
