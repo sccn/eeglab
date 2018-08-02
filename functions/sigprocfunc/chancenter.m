@@ -75,7 +75,7 @@ if ~isempty(wobble) && wobble/mean(radius) > 0.01 && optim==1
 	% ----------------------------------------------
 	fprintf('Optimizing center position...\n');
 	kk=0;
-	while wobble/mean(radius) > 0.01 & kk<5
+	while wobble/mean(radius) > 0.01 && kk<5
         try
     		newcenter = fminsearch('spherror',center,struct(options{:}),x,y,z);
         catch
