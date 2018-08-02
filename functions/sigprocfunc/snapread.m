@@ -139,7 +139,7 @@ if nargout>2
   events = zeros(EVENT_CHANNEL,nframes);
   for n=2:nframes
      if abs(data(EVENT_CHANNEL,n-1)) < EVENT_THRESH ...
-        & abs(data(EVENT_CHANNEL,n)) > EVENT_THRESH
+        && abs(data(EVENT_CHANNEL,n)) > EVENT_THRESH
              events(n) = 1;
      end
   end
