@@ -150,7 +150,7 @@ fieldlist = { 'locutoff'           'real'       []            [];
               'usefft'             'integer'    [0 1]         0;
               'minphase'           'integer'    [0 1]         0;
               'plotfreqz'          'integer'    [0 1]         0;
-              'channels'      {'cell' 'string'} []                {};
+              'channels'      {'cell' 'string' 'integer' } []                {};
               'chantype'      {'cell' 'string'} []                {}  };
 g = finputcheck( options, fieldlist, 'pop_eegfiltnew');
 if ischar(g), error(g); end
