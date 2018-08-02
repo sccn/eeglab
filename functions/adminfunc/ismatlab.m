@@ -1,7 +1,7 @@
-function res = ismatlab;
+function res = ismatlab
 
 v = version;
-if v(1) > '4'
+if v(1) > '6'
     res = 1;
 else
     res = 0;
