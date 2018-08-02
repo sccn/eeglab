@@ -336,7 +336,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         try
             newfactor = fminsearch('eventalign',initcond,[],newlat, oldlat, optimmeas);
         catch 
-            newfactor = fminsearch('eventalign',initcond,[],[],newlat, oldlat, optimmeas); % Octave
+            error('Missing function fminsearch.m - Octave users, run "pkg install -forge optim" to install missing package and try again');
         end
         if length(newfactor) == 1
             newfactor = [newfactor 0]; % add 0 offset
