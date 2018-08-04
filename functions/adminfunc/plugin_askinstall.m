@@ -2,7 +2,7 @@ function installRes = plugin_askinstall(pluginName, pluginFunc, forceInstall)
 
 if nargin < 3, forceInstall = false; end
 
-if nargin < 2 || ~exist(pluginFunc)
+if nargin < 2 || ~exist(char(pluginFunc))
     
     if ~forceInstall
         db = dbstack;

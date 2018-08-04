@@ -504,7 +504,7 @@ end
 
 % remove data from file if necessary
 % ----------------------------------
-if option_storedisk && ~isempty(ALLEEG) && OLDSET ~= 0
+if option_storedisk && ~isempty(ALLEEG) && OLDSET(1) ~= 0 && length(OLDSET) == 1
     if ~isfield(ALLEEG, 'datfile'), ALLEEG(OLDSET).datfile = ''; end
     ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
 end

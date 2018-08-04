@@ -160,13 +160,13 @@ maxtime = frames / samplerate;       %size of matrix in seconds
 	end
   end; % setting channames
 
-channames = str2mat(channames, ' ');	% add padding element to Y labels
+channames = char(channames, ' ');	% add padding element to Y labels
 
 
 Xlab = num2str(time);
 for j = 1:1:PLOT_TIME
    Q = num2str(time+j);
-   Xlab = str2mat(Xlab, Q);
+   Xlab = char(Xlab, Q);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

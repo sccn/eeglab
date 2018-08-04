@@ -592,7 +592,11 @@ else
     end
     set(p1,'DiffuseStrength',.6,'SpecularStrength',0,...
     'AmbientStrength',.3,'SpecularExponent',5)
-    lighting phong  % all this gives a matte reflectance
+    try
+        lighting phong  % all this gives a matte reflectance
+    catch
+        lighting gouraud % Octave
+    end
     material(g.material);
   end  
 
@@ -653,11 +657,15 @@ else
   % Turn on rotate3d, allowing rotation of the plot using the mouse
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  if strcmp(g.verbose,'on')
-    rotate3d on;   % Allow 3-D rotation of the plot by dragging the
-  else             % left mouse button while cursor is on the plot
-    rotate3d off
-  end              
+  if ismatlab
+      if strcmp(g.verbose,'on')
+          rotate3d on;   % Allow 3-D rotation of the plot by dragging the
+      else             % left mouse button while cursor is on the plot
+          rotate3d off
+      end
+  else
+      rotate3d
+  end
   % Make axis square
   if sqaxis
     axis image    % keep the head proportions human and as large as possible

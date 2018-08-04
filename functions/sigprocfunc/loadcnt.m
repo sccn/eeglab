@@ -690,7 +690,7 @@ f.ldnsamples = r.ldnsamples ;
 for i=1:h.nchannels
   plab=sprintf('%c',f.electloc(i).lab);
   if i>1 
-   lab=str2mat(lab,plab);
+   lab=char(lab,plab);
   else 
    lab=plab;  
   end  

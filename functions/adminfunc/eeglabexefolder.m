@@ -21,6 +21,10 @@
 
 function str = eeglabexefolder;
 
-str = ctfroot;
-inds = find(str == filesep);
-str = str(1:inds(end)-1);
+try
+    str = ctfroot;
+    inds = find(str == filesep);
+    str = str(1:inds(end)-1);
+catch
+    str = fileparts(which('eeglab'));
+end

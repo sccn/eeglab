@@ -534,7 +534,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
               handle = tmph;
           end
           [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
-          for h=chs, set(h,'color',CCOLOR); end
+          for h=chs, set(h,'linecolor',CCOLOR); end
       %
       %%%%%%%%%%%%%%%%%%%%%%%% Else plot map only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %

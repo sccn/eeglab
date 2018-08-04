@@ -443,7 +443,7 @@ for index = 1:size(arg2(:),1)
 		end
 		drawnow;
 		axis equal; 
-		rotate3d off;
+		try, rotate3d off; catch, end
     else
         axis off
     end
@@ -479,7 +479,7 @@ end
 com = sprintf('pop_headplot(EEG, %d, %s, ''%s'', [%s], %s);', typeplot, vararg2str(arg2), ...
               topotitle, int2str(rowcols), vararg2str( pop_options ) );
 if compute_file, com = [ 'EEG = ' com ]; end
-if nbgraph== 1,  com = [ 'figure; ' com ]; rotate3d(gcf); end
+if nbgraph== 1,  com = [ 'figure; ' com ]; try, rotate3d(gcf); catch, end; end
 
 return;
 

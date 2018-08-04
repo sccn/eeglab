@@ -98,7 +98,7 @@ if ~isempty(STUDY.design)
                 'you recompute the measure data files. For more information about' 10 ...
                 'the new STUDY design, see http://sccn.ucsd.edu/wiki/Eeglab15.' ];
         dbs = dbstack;
-        if length(dbs) == 1 % means that it was called from the command line or call back
+        if isempty(varargin) % means that it was called from a call back
             warndlg2(txt);
         else
             fprintf(2,[txt 10]);
@@ -117,7 +117,7 @@ if ~isempty(STUDY.design)
                 'different designs (to do so create a separate study). All' 10 ....
                 'designs have been changed to include the same subjects' 10 ...
                 'as design number 1.' ];
-        if length(dbs) == 1 % means that it was called from the command line or call back
+        if isempty(varargin) == 1 % means that it was called from a call back
             warndlg2(txt);
         else
             fprintf(2,[txt 10]);

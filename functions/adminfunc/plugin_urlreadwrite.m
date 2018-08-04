@@ -35,8 +35,10 @@ end
 try
     if isempty(handler)
         url = java.net.URL(urlChar);
+        % url = javaObject('java.net.URL', urlChar); % Octave
     else
         url = java.net.URL([],urlChar,handler);
+        % url = javaObject('java.net.URL', [],urlChar,handler); % Octave
     end
 catch exception %#ok
     errorid = ['MATLAB:' fcn ':InvalidUrl'];

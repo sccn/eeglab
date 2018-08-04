@@ -901,7 +901,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3-D settings
     if strcmpi(g.spheres, 'on')
-        lighting phong;
+        if ismatlab
+            lighting phong;
+        else
+            lighting flat;
+        end
         material shiny;
         camlight left;
         camlight right;
@@ -1073,29 +1077,38 @@ return;
 
 % electrode space to MRI space
 % ============================
-function [x,y,z] = transform(x, y, z, transmat);
+function [x,y,z] = transform(x, y, z, transmat)
     
-    if isempty(transmat), return; end;
+    if isempty(transmat), return; end
     for i = 1:size(x,1)
         for j = 1:size(x,2)
             tmparray = transmat * [ x(i,j) y(i,j) z(i,j) 1 ]';
             x(i,j) = tmparray(1);
             y(i,j) = tmparray(2);
             z(i,j) = tmparray(3);
-        end;
-    end;
-    
+        end
+    end
+
+function x = linearizespace(x, sx, sy)
+
+    if length(unique(x(:))) == 1
+        x = repmat(x(1), [sx sy]);
+    elseif x(1,1) == x(2,1)
+        x = repmat(linspace(x(1,1), x(1,2), sy), [sx 1]);
+    else
+        x = repmat(linspace(x(1,1), x(2,1), sx)', [1 sy]);
+    end
     
 % does not work any more
 % ----------------------
-function sc = plotellipse(sources, ind, nstd, TCPARAMS, coreg);
+function sc = plotellipse(sources, ind, nstd, TCPARAMS, coreg)
 
     for i = 1:length(ind)
         tmpval(1,i) = -sources(ind(i)).posxyz(1);    
         tmpval(2,i) = -sources(ind(i)).posxyz(2);    
         tmpval(3,i) = sources(ind(i)).posxyz(3);
-        [tmpval(1,i) tmpval(2,i) tmpval(3,i)] = transform(tmpval(1,i), tmpval(2,i), tmpval(3,i), TCPARAMS);
-    end;
+        [tmpval(1,i), tmpval(2,i), tmpval(3,i)] = transform(tmpval(1,i), tmpval(2,i), tmpval(3,i), TCPARAMS);
+    end
     
     % mean and covariance
     C = cov(tmpval');
@@ -1119,7 +1132,7 @@ function sc = plotellipse(sources, ind, nstd, TCPARAMS, coreg);
     sc = mesh(x,y,z);
     alpha(0.5)
     
-function newsrc = convertbesaoldformat(src);
+function newsrc = convertbesaoldformat(src)
     newsrc = [];
     count = 1;
     countdip = 1;
@@ -1304,9 +1317,23 @@ function plotimgs(dat, mricoord, transmat);
     
     % transform MRI coordinates to electrode space
     % --------------------------------------------
-    [ elecwx1 elecwy1 elecwz1 ] = transform( wx1, wy1, wz1, transmat);
-    [ elecwx2 elecwy2 elecwz2 ] = transform( wx2, wy2, wz2, transmat);
-    [ elecwx3 elecwy3 elecwz3 ] = transform( wx3, wy3, wz3, transmat);
+    [ elecwx1, elecwy1, elecwz1 ] = transform( wx1, wy1, wz1, transmat);
+    [ elecwx2, elecwy2, elecwz2 ] = transform( wx2, wy2, wz2, transmat);
+    [ elecwx3, elecwy3, elecwz3 ] = transform( wx3, wy3, wz3, transmat);
+    
+    if ~ismatlab
+        elecwx1 = linearizespace(elecwx1, size(img1,1), size(img1,2));
+        elecwy1 = linearizespace(elecwy1, size(img1,1), size(img1,2));
+        elecwz1 = linearizespace(elecwz1, size(img1,1), size(img1,2));
+
+        elecwx2 = linearizespace(elecwx2, size(img2,1), size(img2,2));
+        elecwy2 = linearizespace(elecwy2, size(img2,1), size(img2,2));
+        elecwz2 = linearizespace(elecwz2, size(img2,1), size(img2,2));
+
+        elecwx3 = linearizespace(elecwx3, size(img3,1), size(img3,2));
+        elecwy3 = linearizespace(elecwy3, size(img3,1), size(img3,2));
+        elecwz3 = linearizespace(elecwz3, size(img3,1), size(img3,2));
+    end
     
     % ploting surfaces
     % ----------------

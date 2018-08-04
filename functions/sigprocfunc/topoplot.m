@@ -1189,7 +1189,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         end
     end
     handle = tmph;                                   % surface handle
-    for h=chs, set(h,'color',CCOLOR); end
+    try, for h=chs, set(h,'color',CCOLOR); end, catch, end % the try clause is for Octave
     warning on;
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

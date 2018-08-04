@@ -143,10 +143,10 @@ for ri = compnum
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
         if plotelec
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
-                      'off', 'style' , 'fill', 'chaninfo', EEG.chaninfo, 'numcontour', 8);
+                      'off', 'chaninfo', EEG.chaninfo, 'numcontour', 8);
         else
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
-                      'off', 'style' , 'fill','electrodes','off', 'chaninfo', EEG.chaninfo, 'numcontour', 8);
+                      'off', 'electrodes','off', 'chaninfo', EEG.chaninfo, 'numcontour', 8);
         end
 		axis square;
 

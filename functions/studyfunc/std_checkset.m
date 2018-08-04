@@ -221,7 +221,8 @@ if ~studywasempty
         for indDes = 1:length(STUDY.design)
             for indVar = 1:length(STUDY.design(indDes).variable)
                 if isempty(strmatch( STUDY.design(indDes).variable(indVar).label, setFields)) && ...
-                    ~isempty(trialFields) && isempty(strmatch( STUDY.design(indDes).variable(indVar).label, trialFields))
+                    ~isempty(trialFields) && ~isempty(STUDY.design(indDes).variable(indVar).label) && ...
+                        isempty(strmatch( STUDY.design(indDes).variable(indVar).label, trialFields))
                         % Missing independent variable
                         
                         if isempty(rmInd)

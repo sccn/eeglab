@@ -463,15 +463,7 @@ elseif strcmpi(g.logfreq, 'native'),
     
     tmpval = get(gca,'yticklabel');
     if iscell(tmpval)
-        % MATLAB version >= 8.04
-        try
-            ft = str2num(cell2mat(tmpval));
-        catch
-            % To avoid bug in matlab cell2mat. i.e. when tmpval = {'0';'0.5'}
-            for i = 1:length(tmpval)
-                ft(i,1) = str2num(cell2mat(tmpval(i)));
-            end
-        end
+        ft = cellfun(@str2double, tmpval(:));
     else
         % MATLAB version <  8.04
         ft = str2num(tmpval);           
@@ -484,8 +476,7 @@ elseif strcmpi(g.logfreq, 'native'),
     ftick = unique_bc(round(ftick));
     ftick = log(ftick);
     inds = unique_bc(round(exp(linspace(log(1), log(length(ft))))));
-    set(gca,'ytick',ftick(inds(1:2:end)));
-    set(gca,'yticklabel', num2str(ft(inds(1:2:end))));
+    set(gca,'ytick',ftick(inds(1:2:end)),'yticklabel', num2str(ft(inds(1:2:end))));
 else
     imagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1:4)]);
