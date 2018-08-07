@@ -895,8 +895,8 @@ if ~isempty(EMARKER2CHANS)
     if strcmpi(STYLE,'blank')
        error('emarker2 not defined for style ''blank'' - use marking channel numbers in place of data');
     else % mark1chans and mark2chans are subsets of pltchans for markers 1 and 2
-       [tmp1 mark1chans tmp2] = setxor(pltchans,EMARKER2CHANS);
-       [tmp3 tmp4 mark2chans] = intersect_bc(EMARKER2CHANS,pltchans);
+       [tmp1, mark1chans, tmp2] = setxor(pltchans,EMARKER2CHANS);
+       [tmp3, tmp4, mark2chans] = intersect_bc(EMARKER2CHANS,pltchans);
     end
 end
 
@@ -994,8 +994,16 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
       [Xi,Yi,Zi] = griddata(inty,intx,double(intValues),yi',xi,'v4'); % interpolate data
       [Xi,Yi,ZiC] = griddata(inty,intx,double(intContourVals),yi',xi,'v4'); % interpolate data
   catch,
-      [Xi,Yi,Zi] = griddata(inty,intx,intValues',yi,xi'); % interpolate data (Octave)
-      [Xi,Yi,ZiC] = griddata(inty,intx,intContourVals',yi,xi'); % interpolate data
+      [Xi2,Yi2,Zi2]  = griddata(inty,intx,intValues',yi,xi','nearest'); % interpolate data (Octave)
+      [Xi2,Yi2,ZiC2] = griddata(inty,intx,intContourVals',yi,xi','nearest'); % interpolate data
+      
+      Xi2 = decimate(Xi2);
+      Yi2 = decimate(Yi2);
+      Zi2 = decimate(Zi2);
+      ZiC2 = decimate(ZiC2);
+      
+      [Xi,Yi,Zi]  = griddata([inty Yi2'],[intx Xi2'],[intValues' Zi2'],yi,xi','linear'); % interpolate data (Octave)
+      [Xi,Yi,ZiC] = griddata([inty Yi2'],[intx Xi2'],[intContourVals' Zi2'],yi,xi','linear'); % interpolate data
   end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%%%%%
@@ -1013,9 +1021,9 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
       chancoords = round(ceil(GRID_SCALE/2)+GRID_SCALE/2*2*chanrad*[cos(-chantheta),...
                                                       -sin(-chantheta)]);
       if chancoords(1)<1 ...
-         | chancoords(1) > GRID_SCALE ...
-            | chancoords(2)<1 ...
-               | chancoords(2)>GRID_SCALE
+         || chancoords(1) > GRID_SCALE ...
+            || chancoords(2)<1 ...
+               || chancoords(2)>GRID_SCALE
           error('designated ''noplot'' channel out of bounds')
       else
         chanval = Zi(chancoords(1),chancoords(2));
@@ -1672,6 +1680,16 @@ end;
 hold off
 axis off
 return
+
+%
+%%%%%%%%%%%%% decimate data for Octave %%%%%%%%%%%%%%%%%%%%%%%%
+%
+function X = decimate(X)
+  X(2:66,2:66) = NaN;
+  X(isnan(X(:))) = [];
+  X(1:2:end) = [];
+  X(1:2:end) = [];
+  X(1:2:end) = [];
 
 %
 %%%%%%%%%%%%% Draw circle %%%%%%%%%%%%%%%%%%%%%%%%
