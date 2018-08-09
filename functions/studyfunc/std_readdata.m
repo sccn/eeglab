@@ -129,6 +129,18 @@ if ~isempty(opt.freqrange), opts = { 'freqlimits', opt.freqrange }; end
 opts = { opts{:} 'singletrials' opt.singletrials };
 fprintf('Reading subjects'' data or looking up measure values in EEGLAB cache\n');
 
+% determining component polarity if necessary
+% -------------------------------------------
+componentPol = ones(1, length(STUDY.cluster(opt.clusters).comps)); % default is all 1
+if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && strcmpi(opt.componentpol, 'on')
+    disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
+    STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
+    componentPol = STUDY.cluster(opt.clusters).topopol;
+    if isempty(componentPol)
+        disp('Cluster topographies absent - cannot adjust single component ERP polarities');
+    end
+end
+
 for iSubj = 1:length(subjectList)
     fprintf('.');
     
@@ -153,10 +165,12 @@ for iSubj = 1:length(subjectList)
     if ~isempty(opt.clusters)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
+        polList     = [];
         for iDat = datasetInds(:)'
             indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject
             if ~isempty(indSet)
                 compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
+                polList  = [ polList  componentPol(indSet)' ];
             end
         end
     end
@@ -180,6 +194,11 @@ for iSubj = 1:length(subjectList)
         end
 
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') % ERP or spectrum
+            % inverting ERP polarity when relevant
+            if strcmpi(opt.datatype, 'erp')
+                polList = reshape(polList,[1 1 length(polList)]); % components are in the 3rd dim
+                dataTmp{iSubj} = cellfun(@(x)bsxfun(@times, x, fastif(isempty(x), [], polList)), dataTmp{iSubj}, 'uniformoutput', false);
+            end
             if strcmpi(opt.singletrials, 'off')
                 dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false);
             end
@@ -228,23 +247,6 @@ end
 
 datavals = reorganizedata(dataTmp, dim);
 events   = reorganizedata(eventsTmp, 2);
-
-% fix component polarity if necessary
-% -----------------------------------
-componentPol = [];
-if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && strcmpi(opt.componentpol, 'on')
-    disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
-    STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
-    componentPol = STUDY.cluster(opt.clusters).topopol;
-    if isempty(componentPol)
-        disp('Cluster topographies absent - cannot adjust single component ERP polarities');
-    end
-    for iItem = 1:length(datavals(:))
-        if ~isempty(datavals{iItem})
-            datavals{iItem} = bsxfun(@times, datavals{iItem}, componentPol);
-        end
-    end
-end
 
 % compute mean spectrum
 % ---------------------
