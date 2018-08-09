@@ -203,7 +203,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
           g = [ callfunc 'error: argument ''' fieldname ''' must be a string' ]; return;
       end
       if ~isempty(fieldval)
-          if isempty(tmpval) && isempty(strmatch(lower(tmpval), lower(fieldval), 'exact'))
+          if isempty(tmpval) && isempty(strmatch(char(lower(tmpval)), lower(fieldval), 'exact'))
               g = [ callfunc 'error: wrong value for argument ''' fieldname '''' ]; return;
           end
       end
