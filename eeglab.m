@@ -189,6 +189,17 @@ if ismatlab && vers < 7.06
 end 
 if ~ismatlab
     warning('off', 'Octave:abbreviated-property-match');
+    warning('off', 'backtrace');
+    try
+        pkg load statistics
+    catch
+        warning('Statistics module not found - type "pkg install -forge io" then "pkg install -forge statistics" to install it');
+    end
+    try
+        pkg load signal
+    catch
+        warning('Signal processing module not found - type "pkg install -forge control" then "pkg install -forge signal" to install it');
+    end
 end
 
 
@@ -1180,6 +1191,10 @@ catch
     end
 end
 
+if ~ismatlab
+    close(W_MAIN);
+end
+
 % REMOVED MENUS
 	%uimenu( tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
 	%uimenu( tools_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
@@ -1334,8 +1349,9 @@ alltexth = setdiff_bc(alltexth, titleh);
 set(gcf, 'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
 set(titleh, 'fontsize', TEXT_FONTSIZE_L, 'fontweight', 'bold');
 set(alltexth, 'fontname', FONTNAME, 'fontsize', FONTSIZE);
-set(W_MAIN, 'visible', 'on');
 
+set(W_MAIN, 'visible', 'on');
+    
 return;
 
 % eeglab(''redraw'')() - Update EEGLAB menus based on values of global variables.
@@ -2069,7 +2085,7 @@ function [name, vers] = parsepluginname(dirName);
 function res = ismatlab;
 
     v = version;
-    if v(1) > '4'
+    if v(1) > '5'
         res = 1;
     else
         res = 0;
