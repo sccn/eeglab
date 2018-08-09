@@ -182,7 +182,7 @@ if revfilt
     if strcmp(firtype, 'fir1')
         error('Cannot reverse filter using ''fir1'' option');
     else
-        m = ~m;
+        m = double(~m);
     end
 end
 
