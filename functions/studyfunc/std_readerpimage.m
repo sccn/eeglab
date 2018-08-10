@@ -27,4 +27,5 @@
 
 function [STUDY, erspdata, alltimes, allfreqs, events] = std_readerpimage(STUDY, ALLEEG, varargin);
 
-[STUDY, erspdata, alltimes, allfreqs, erspbase, events] = std_readersp(STUDY, ALLEEG, 'infotype','erpim', varargin{:});
+disp('This function is obsolete and only partially backward compatible use std_readdata instead');
+[STUDY, erspdata, alltimes, allfreqs, events] = std_readdata(STUDY, ALLEEG, 'datatype', 'erpim', varargin{:});

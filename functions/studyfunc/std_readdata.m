@@ -19,6 +19,8 @@
 %  'singletrials' - ['on'|'off'] load single trials spectral data (if 
 %                available). Default is 'off'.
 %  'subject'   - [string] select a specific subject {default:all}
+%  'datatype'  - ['erp'|'spec'|'ersp'|'itc'|'erpim'] select measure to load
+%                Default is 'erp'.
 %  'component' - [integer] select a specific component in a cluster.
 %                This is the index of the component in the cluster not the
 %                component number {default:all}
