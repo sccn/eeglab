@@ -190,6 +190,7 @@ end
 if ~ismatlab
     warning('off', 'Octave:abbreviated-property-match');
     warning('off', 'backtrace');
+    warning('off', 'Octave:divide-by-zero');
     try
         pkg load statistics
     catch
