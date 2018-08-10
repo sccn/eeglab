@@ -29,6 +29,8 @@
 % ------ EEGLAB DEFINITION - YOU MAY CHANGE THE TEXT BELOW -------------
 % ----------------------------------------------------------------------
 
+
+
 EEGOPTION_PATH = ''; % if empty, the home folder of the current user is used
                      % Note that this may create problems under Windows
                      % when unicode characters are part of the user name
@@ -83,11 +85,8 @@ elseif VERS >= 8.04
         %scale up fontsizes on higher resolution mac screens
         retinaDisplay = false;
         if tmpScreenSize(3) >= 1920 % bump fontsize only for the highest retina res settings
-          retinaDisplay = true; %comment this out if you don't want fontsizes increased at high display resolutions
-          W_MAIN = findobj('tag', 'EEGLAB');
-          if isempty(W_MAIN)
-            disp('Mac OSX retina display detected. If this is not desired comment out line 83 of icadefs.m');
-          end
+            retinaDisplay = true; %comment this out if you don't want fontsizes increased at high display resolutions
+            %disp('Mac OSX retina display detected. If this is not desired comment out line 83 of icadefs.m');
         end
         
         % AXES FONTSIZE
