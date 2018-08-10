@@ -31,6 +31,6 @@ function res= gethashcode(str)
 
 md = javaMethod('getInstance', 'java.security.MessageDigest', 'MD5');
 javastr = javaObject('java.lang.String', str);
-hash = md.digest(javastr.getBytes("UTF-8"));
+hash = md.digest(javastr.getBytes('UTF-8'));
 bi = javaObject('java.math.BigInteger', 1, hash);
 res = char(bi.toString(16));
