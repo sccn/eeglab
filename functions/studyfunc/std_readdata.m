@@ -133,8 +133,8 @@ fprintf('Reading subjects'' data or looking up measure values in EEGLAB cache\n'
 
 % determining component polarity if necessary
 % -------------------------------------------
-componentPol = ones(1, length(STUDY.cluster(opt.clusters).comps)); % default is all 1
-if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels) && strcmpi(opt.componentpol, 'on')
+if isempty(opt.channels) && strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
+    componentPol = ones(1, length(STUDY.cluster(opt.clusters).comps)); % default is all 1
     disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
     STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
     componentPol = STUDY.cluster(opt.clusters).topopol;
@@ -197,7 +197,7 @@ for iSubj = 1:length(subjectList)
 
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') % ERP or spectrum
             % inverting ERP polarity when relevant
-            if strcmpi(opt.datatype, 'erp')
+            if strcmpi(opt.datatype, 'erp') && ~isempty(opt.clusters)
                 polList = reshape(polList,[1 1 length(polList)]); % components are in the 3rd dim
                 dataTmp{iSubj} = cellfun(@(x)bsxfun(@times, x, fastif(isempty(x), [], polList)), dataTmp{iSubj}, 'uniformoutput', false);
             end
