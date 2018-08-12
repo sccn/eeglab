@@ -172,7 +172,9 @@ for iSubj = 1:length(subjectList)
             indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject
             if ~isempty(indSet)
                 compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
-                polList  = [ polList  componentPol(indSet)' ];
+                if strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
+                    polList  = [ polList  componentPol(indSet)' ];
+                end
             end
         end
     end
@@ -197,7 +199,7 @@ for iSubj = 1:length(subjectList)
 
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') % ERP or spectrum
             % inverting ERP polarity when relevant
-            if strcmpi(opt.datatype, 'erp') && ~isempty(opt.clusters)
+            if strcmpi(opt.datatype, 'erp') && ~isempty(opt.clusters) && strcmpi(opt.componentpol, 'on')
                 polList = reshape(polList,[1 1 length(polList)]); % components are in the 3rd dim
                 dataTmp{iSubj} = cellfun(@(x)bsxfun(@times, x, fastif(isempty(x), [], polList)), dataTmp{iSubj}, 'uniformoutput', false);
             end
