@@ -16,9 +16,7 @@
 %   EEG        - an EEG dataset structure. 
 %   components - [numeric vector] components in the EEG structure to compute topo maps
 %                      {default|[] -> all}      
-%   option     - ['gradient'|'laplacian'|'none'] compute gradient or laplacian of
-%                the scale topography. This does not acffect the saved file which is
-%                always 'none' {default is 'none' = the interpolated topo map}
+%
 % Optional inputs
 %   'recompute'  - ['on'|'off'] force recomputing topo file even if it is 
 %                  already on disk.
@@ -30,11 +28,11 @@
 %
 % File output: [dataset_name].icatopo
 %  
-% Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, January, 2005
+% Authors:  Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 %
 % See also  topoplot(), std_erp(), std_ersp(), std_spec(), std_preclust()
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -50,101 +48,66 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [X] = std_topo(EEG, comps, option, varargin)
+function [X] = std_topo(EEG, comps, varargin)
 
 if nargin < 1
     help std_topo;
     return;
 end
-if isfield(EEG,'icaweights')
-   numc = size(EEG.icaweights,1);
-else
-   error('EEG.icaweights not found');
-end
-if nargin < 2
-   comps = 1:numc;
-elseif isempty(comps)
-   comps = 1:numc;
+if nargin > 2 || strcmpi(varargin{1}, 'none') || strcmpi(varargin{1}, 'gradient') || strcmpi(varargin{1}, 'laplacian') 
+    fprintf('std_topo: option to return gradient or laplacian is deprecated and ignored\n');
+    varargin = varargin(2:end);
 end
 
-if nargin < 3
-    option = 'none';
-end
-
-g = finputcheck( varargin, { 'recompute'   'string'   { 'on','off' }   'off' ;...
-                             'fileout'     'string'   []                EEG.filepath},...
+g = finputcheck( varargin, { 'recompute'   'string'   { 'on','off' }   'off' ; ...
+                             'trialinfo'   'struct'   []                []; ...
+                             'fileout'     'string'   []                EEG(1).filepath},...
                              'std_topo');
-% if ischar(g), error(g); end
+if ischar(g), error(g); end
 
-% figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
-
-% Topo information found in dataset
-% ---------------------------------
-if exist(fullfile(g.fileout, [ EEG.filename(1:end-3) 'icatopo' ])) && strcmpi(g.recompute, 'off')
-    for k = 1:length(comps)
-        tmp = std_readtopo( EEG, 1, comps(k));
-        if strcmpi(option, 'gradient')
-            [tmpx, tmpy]  = gradient(tmp); %Gradient
-            tmp = [tmpx(:); tmpy(:)]';
-        elseif strcmpi(option, 'laplacian')
-            tmp = del2(tmp); %Laplacian
-            tmp = tmp(:)';
-        else
-            tmp = tmp(:)';
-        end
-        
-        tmp = tmp(find(~isnan(tmp)));
-        if k == 1
-            X = zeros(length(comps),length(tmp)) ;
-        end
-        X(k,:) =  tmp;
-    end
-    return
-end
- 
+% scan datasets
+% -------------
 all_topos = [];
-for k = 1:numc
+for ind1 = 1:length(EEG)
 
-    % compute topo map grid (topoimage)
-    % ---------------------------------
-    chanlocs = EEG.chanlocs(EEG.icachansind);
-    if isempty( [ chanlocs.theta ] )
-        error('Channel locations are required for computing scalp topographies');
+    indMatch = [];
+    for ind2 = 1:ind1-1
+        if isequal(EEG(ind1).icawinv, EEG(ind2).icawinv)
+            indMatch = ind2;
+        end
     end
-    [hfig grid plotrad Xi Yi] = topoplot( EEG.icawinv(:,k), chanlocs, ...
-                                          'verbose', 'off',...
-                                           'electrodes', 'on' ,'style','both',...
-                                           'plotrad',0.55,'intrad',0.55,...
-                                           'noplot', 'on', 'chaninfo', EEG.chaninfo);
-
-    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_grid' ], grid);
-    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_x' ]   , Xi(:,1));
-    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_y' ]   , Yi(:,1));
     
+    if isempty(comps)
+        compsToCompute = 1:size(EEG(ind1).icawinv,2);
+    else
+        compsToCompute = comps;
+    end
+    for k = compsToCompute
+        if isempty(indMatch)
+            % compute topo map grid (topoimage)
+            % ---------------------------------
+            chanlocs = EEG(ind1).chanlocs(EEG(ind1).icachansind);
+            if isempty( [ chanlocs.theta ] )
+                error('Channel locations are required for computing scalp topographies');
+            end
+            [~, grid, ~, Xi, Yi] = topoplot( EEG(ind1).icawinv(:,k), chanlocs, ...
+                                                  'verbose', 'off',...
+                                                   'electrodes', 'on' ,'style','both',...
+                                                   'plotrad',0.55,'intrad',0.55,...
+                                                   'noplot', 'on', 'chaninfo', EEG(ind1).chaninfo);
+            all_topos = setfield(all_topos, [ 'comp' int2str(k) '_grid' ], { ':' ':' ind1 }, grid);
+            all_topos = setfield(all_topos, [ 'comp' int2str(k) '_x' ]   , Xi(:,1));
+            all_topos = setfield(all_topos, [ 'comp' int2str(k) '_y' ]   , Yi(:,1));
+        else
+            grid      = getfield(all_topos, [ 'comp' int2str(k) '_grid' ], { ':' ':' indMatch });
+            all_topos = setfield(all_topos, [ 'comp' int2str(k) '_grid' ], { ':' ':' ind1 }, grid);
+        end
+    end
 end
 
 % Save topos in file
 % ------------------
-all_topos.datatype = 'TOPO';
+all_topos.datatype  = 'TOPO';
+all_topos.trialinfo = g.trialinfo;
 tmpfile = fullfile( g.fileout, [ EEG.filename(1:end-3) 'icatopo' ]); 
 std_savedat(tmpfile, all_topos);
-
-for k = 1:length(comps)
-    tmp =  getfield(all_topos, [ 'comp' int2str(comps(k)) '_grid' ]);
-    
-    if strcmpi(option, 'gradient')
-        [tmpx, tmpy]  = gradient(tmp); % Gradient
-        tmp = [tmpx(:); tmpy(:)]';
-    elseif strcmpi(option, 'laplacian')
-        tmp = del2(tmp); % Laplacian
-        tmp = tmp(:)';
-    else
-        tmp = tmp(:)';
-    end
-
-    tmp = tmp(find(~isnan(tmp)));
-    if k == 1
-        X = zeros(length(comps),length(tmp)) ;
-    end
-    X(k,:) =  tmp;
-end
