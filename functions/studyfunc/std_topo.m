@@ -54,7 +54,7 @@ if nargin < 1
     help std_topo;
     return;
 end
-if nargin > 2 || strcmpi(varargin{1}, 'none') || strcmpi(varargin{1}, 'gradient') || strcmpi(varargin{1}, 'laplacian') 
+if nargin > 2 && ( strcmpi(varargin{1}, 'none') || strcmpi(varargin{1}, 'gradient') || strcmpi(varargin{1}, 'laplacian') )
     fprintf('std_topo: option to return gradient or laplacian is deprecated and ignored\n');
     varargin = varargin(2:end);
 end
