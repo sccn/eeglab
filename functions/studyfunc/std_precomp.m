@@ -66,11 +66,11 @@
 %                  mode.
 %
 % Outputs:
+%   STUDY        - the input STUDY set with pre-clustering data added,
+%                  for use by pop_clust()
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified  
 %                  by adding preprocessing data as pointers to Matlab files that 
 %                  hold the pre-clustering component measures.
-%   STUDY        - the input STUDY set with pre-clustering data added,
-%                  for use by pop_clust()
 %   customRes    - cell array of custom results (one cell for each pair of
 %                  independent variables as defined in the STUDY design).
 %                  If a custom file extension is specified, this variable
@@ -353,35 +353,20 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     % ----------------------------
     if strcmpi(g.scalp, 'on') && ~strcmpi(computewhat, 'channels')
         for index = 1:length(STUDY.datasetinfo)
-            
             % find duplicate
-            % --------------
-            found = [];
-            ind1 = STUDY.datasetinfo(index).index;
-            inds = strmatch(STUDY.datasetinfo(index).subject, { STUDY.datasetinfo(1:index-1).subject });
-            for index2 = 1:length(inds)
-                ind2 = STUDY.datasetinfo(inds(index2)).index;
-                if isequal(ALLEEG(ind1).icawinv, ALLEEG(ind2).icawinv)
-                    found = ind2;
+            duplicate = false;
+            for index2 = 1:index-1
+                if isequal(ALLEEG(index).icawinv, ALLEEG(index2).icawinv)
+                    duplicate = true;
                 end
             end
             
-            % make link if duplicate
-            % ----------------------
-            if ~isempty(g.cell)
-                desset = STUDY.design(g.design).cell(g.cell);
-                [path,tmp] = fileparts(desset.filebase);
-            else path = ALLEEG(index).filepath;
-            end
-            
-            fprintf('Computing/checking topo file for dataset %d\n', ind1);
-            if ~isempty(found)
-                clear tmp;
-                tmpfile1 = fullfile( path, [ ALLEEG(index).filename(1:end-3) 'icatopo' ]); 
-                tmp.file = fullfile( ALLEEG(found).filepath, [ ALLEEG(found).filename(1:end-3) 'icatopo' ]); 
-                std_savedat(tmpfile1, tmp);
-            else
-                std_topo(ALLEEG(index), chanlist{index}, 'none', 'recompute', g.recompute,'fileout',path);
+            if ~duplicate
+                trialinfo.session   = STUDY.datasetinfo(index).session;
+                trialinfo.condition = STUDY.datasetinfo(index).condition;
+                trialinfo.group     = STUDY.datasetinfo(index).group;
+                fprintf('Computing/checking topo file for subject %s\n', STUDY.datasetinfo(index).subject);
+                std_topo(ALLEEG(index), chanlist{index}, 'recompute', g.recompute,'trialinfo', trialinfo, 'fileout', STUDY.datasetinfo(index).filepath);
             end
         end
         if isfield(curstruct, 'topo')
