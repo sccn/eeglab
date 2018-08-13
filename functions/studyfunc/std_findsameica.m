@@ -11,6 +11,7 @@
 %
 % Outputs:
 %   cluster - cell array of groups of datasets
+%   indices - cluster index for each dataset
 %
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, July 2009-
 % 2016 change: as of May 2016, the function now compares the product of the
@@ -35,7 +36,7 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-function cluster = std_findsameica(ALLEEG, varargin);
+function [cluster, inds] = std_findsameica(ALLEEG, varargin);
 
 % 6/2/2014 Ramon : Allow ica threshold as input.
 if nargin == 1
@@ -45,6 +46,7 @@ elseif nargin == 2;
 end
     
 cluster = { [1] };
+inds = [1];
 for index = 2:length(ALLEEG)
     
     found = 0;
@@ -55,6 +57,7 @@ for index = 2:length(ALLEEG)
             %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
             if sum(sum(abs(w1-w2))) < icathreshold
                 cluster{c}(end+1) = index;
+                inds(index) = c;
                 found = 1;
                 break;
             end
@@ -62,5 +65,6 @@ for index = 2:length(ALLEEG)
     end
     if ~found
         cluster{end+1} = index;
+        inds(index) = index;
     end
 end
