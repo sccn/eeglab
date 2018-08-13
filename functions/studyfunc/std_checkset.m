@@ -51,7 +51,6 @@ if ~isfield(STUDY, 'subject'),   STUDY.subject   = {}; modif = 1; end
 if ~isfield(STUDY, 'group'),     STUDY.group     = {}; modif = 1; end
 if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end
-if ~isfield(STUDY, 'setind'),    STUDY.setind    = {}; modif = 1; end
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end
 if ~isfield(STUDY, 'cache'),     STUDY.cache     = []; modif = 1; end
 if ~isfield(STUDY, 'etc.warnmemory'), STUDY.etc.warnmemory = 1; modif = 1; end
@@ -113,7 +112,6 @@ setind(find(setind == 0)) = NaN;
 if any(isnan(setind))
     warndlg('Warning: non-uniform set of dataset, some function might not work');
 end
-if ~isequal(setind, STUDY.setind), STUDY.setind = setind; modif = 1; end
 
 % check that dipfit is present in all datasets
 % --------------------------------------------
