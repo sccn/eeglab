@@ -86,13 +86,14 @@ limomeasures = {'itcbeta1' , 'itcbeta2' ,'itcr2r' ,'itcr2f' ,'itcr2p' ,...
 opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'getparamonly'     'string'   { 'on','off' }  'off';
                               'trialselect'      'cell'     {}                 {};
+                              'trialinfo'        'struct'   {}                 struct([]);
                               'designvar'        'struct'   []                 struct([]);
                               'singletrials'     'string'   { 'on','off' }  'off';
                               'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
                               'channels'         'cell'     []    {};
                               'cache'            'struct'   []    struct([]);
                               'function'         { 'function_handle' 'integer' } []  [];
-                              'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef'} 'erp';                                                 
+                              'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef' 'topo'} 'erp';                                                 
                               'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
                               'triallimits'      'real'     []    []; % ERPimage only
                               'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
@@ -107,7 +108,7 @@ if strcmpi(opt.concatenate, 'on'), opt.singletrials = 'on'; end
 if ~isempty(opt.channels) || (~isempty(opt.dataindices) && opt.dataindices(1) < 0) , dataType = 'chan';
 else                                                                                 dataType = 'comp';
 end
-[tmp1 tmp2 currentFileExt] = fileparts(fileBaseName);
+[~, ~, currentFileExt] = fileparts(fileBaseName);
 if length(currentFileExt) > 3 && (strcmpi(currentFileExt(2:4), 'dat') || strcmpi(currentFileExt(2:4), 'ica'))
     opt.measure = currentFileExt(5:end);
     if strcmpi(currentFileExt(2:4), 'dat'), dataType = 'chan';
@@ -127,7 +128,7 @@ end
 % get fields to read
 % ------------------
 v6Flag = testv6([ fileBaseName fileExt ]);
-if v6Flag
+if v6Flag || strmcpi(opt.measure, 'topo')
     if ~isempty(opt.channels)
         fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
     end
@@ -149,13 +150,14 @@ end
 
 if v6Flag
     for iChan = 1:length(opt.dataindices)
-        chanList{iChan} = [ dataType int2str(opt.dataindices(iChan)) ];
+        chanList{iChan} = [ dataType int2str(opt.dataindices(iChan)) fastif(strcmpi(opt.measure, 'topo'), '_grid', '') ];
     end
     warning('off', 'MATLAB:load:variableNotFound');
     if length(opt.dataindices) > 0
          fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
     else fileData = load('-mat', [ fileBaseName fileExt ], 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
     end
+    if strcmpi(opt.measure, 'topo') && ~isfield(fileData, 'trialinfo'), error('Compatibilty issue. Recompute ICA topographic maps'); end
     warning('on', 'MATLAB:load:variableNotFound');
 end
 
@@ -183,13 +185,13 @@ if ~isempty(strmatch('freqs', fileFields, 'exact')),  measureRange2 = fileData.f
 % ------------------------------------------------
 if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; opt.timelimits = opt.freqlimits; end
 if ~isempty(opt.timelimits)
-    [measureRange1 indBegin1 indEnd1 ] = indicesselect(measureRange1, opt.timelimits);
+    [measureRange1, indBegin1, indEnd1 ] = indicesselect(measureRange1, opt.timelimits);
 else
     indBegin1 = 1;
     indEnd1   = length(measureRange1);
 end
 if ~isempty(opt.freqlimits)
-    [measureRange2 indBegin2 indEnd2 ] = indicesselect(measureRange2, opt.freqlimits);
+    [measureRange2, indBegin2, indEnd2 ] = indicesselect(measureRange2, opt.freqlimits);
 else
     indBegin2 = 1;
     indEnd2   = length(measureRange2);
@@ -284,7 +286,9 @@ if ~isempty(trialselect)
 end
 
 for index = 1:length(chan)
-    fieldToRead = [ dataType int2str(chan(index)) ];
+    allfields   = fieldnames(fileData);
+    topoFlag    = ~isempty(findstr(allfields{1}, '_grid'));
+    fieldToRead = [ dataType int2str(chan(index)) fastif(topoFlag, '_grid', '') ];
 
     % find trials
     if isempty(trials), 
@@ -316,7 +320,10 @@ for index = 1:length(chan)
             if ~isempty(subTrials), events = events(subTrials); end
         end
     else
-        if ndims(fileData.(fieldToRead)) == 2
+        if topoFlag
+            tmpFieldData = fileData.(fieldToRead);
+            if isempty(trials), tmpFieldData = []; end
+        elseif ndims(fileData.(fieldToRead)) == 2
             tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
             if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
         else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
