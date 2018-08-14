@@ -194,7 +194,7 @@ if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt
     end
 end
 
-if ~isnan(params.topotime) && length(opt.channels) < 5
+if ~isempty(params.topotime) && ~isnan(params.topotime(1)) && length(opt.channels) < 5
     warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
 end
@@ -247,7 +247,7 @@ if ~isempty(opt.channels)
     end
     if isempty(erpdata), return; end
 
-    % select specific time    
+    % select specific time
     % --------------------
     if ~isempty(params.topotime) && ~isnan(params.topotime)
         [tmp, ti1] = min(abs(alltimes-params.topotime(1)));
@@ -257,6 +257,25 @@ if ~isempty(opt.channels)
                 erpdata{condind} = mean(erpdata{condind}(ti1:ti2,:,:),1);
             end
         end
+    end
+
+    % compute baseline for spectrum
+    % -----------------------------
+    if strcmpi(params.subtractsubjectmean, 'on') && strcmpi(opt.datatype, 'spec')
+        count    = 0;
+        for iSpec = 1:length(erpdata(:))
+            if ~isempty(erpdata{iSpec})
+                if count == 0, meanspec = zeros(size(erpdata{iSpec},1),1); end
+                if strcmpi(stats.singletrials, 'on')
+                    meanspec = meanspec + mean(erpdata{iSpec},2);
+                else
+                    meanspec = meanspec + erpdata{iSpec};
+                end
+                count = count+1;
+            end
+        end
+        meanspec = meanspec/count;
+        erpdata  = cellfun(@(x)bsxfun(@minus, x, meanspec), erpdata, 'uniformoutput', false);
     end
 
     % compute statistics
