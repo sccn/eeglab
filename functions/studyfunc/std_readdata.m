@@ -78,8 +78,6 @@ STUDY = pop_erspparams(STUDY, 'default');
     'timerange'     'real'    []             [];
     'freqrange'     'real'    []             [];
     'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' 'erpim' } 'erp';
-    'rmsubjmean'    'string'  { 'on','off' } 'off';
-    'subbaseline'   'string'  { 'on','off' } STUDY.etc.erspparams.subbaseline; % subtract common baseline (ERSP only)
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
@@ -155,7 +153,6 @@ for iSubj = 1:length(subjectList)
     bigstruct.singletrials = opt.singletrials;
     bigstruct.subject      = subjectList{iSubj};
     bigstruct.component    = opt.component;
-    bigstruct.subbaseline  = opt.subbaseline;
     bigstruct.options      = opts;
     if isnan(opt.design)
          bigstruct.design.variable = struct([]);
@@ -247,54 +244,12 @@ end
 % check that all ERPimages have the same number of lines
 if strcmpi(opt.datatype, 'erpim')
     [dataTmp,eventsTmp] = checkdataerpimage(dataTmp,eventsTmp);
+    events = reorganizedata(eventsTmp, 2);
+else
+    events = {};
 end
 
 datavals = reorganizedata(dataTmp, dim);
-events   = reorganizedata(eventsTmp, 2);
-
-% compute mean spectrum
-% ---------------------
-function meanpowbase = computemeanspectrum(spectrum, singletrials)
-
-    try
-        len = length(spectrum(:));
-        count = 0;
-        for index = 1:len
-            if ~isempty(spectrum{index})
-                if strcmpi(singletrials, 'on')
-                    if count == 0, meanpowbase = mean(spectrum{index},2);
-                    else           meanpowbase = meanpowbase + mean(spectrum{index},2);
-                    end
-                else
-                    if count == 0, meanpowbase = spectrum{index};
-                    else           meanpowbase = meanpowbase + spectrum{index};
-                    end
-                end
-                count = count+1;
-            end
-        end
-        meanpowbase = meanpowbase/count;
-    catch,
-        error([ 'Problem while subtracting mean spectrum.' 10 ...
-                'Common spectrum subtraction is performed based on' 10 ...
-                'pairing settings in your design. Most likelly, one' 10 ...
-                'independent variable should not have its data paired.' ]);
-    end
-        
-% remove mean spectrum 
-% --------------------
-function spectrum = removemeanspectrum(spectrum, meanpowbase)
-    for g = 1:size(spectrum,2)        % ng = number of groups
-        for c = 1:size(spectrum,1)
-            if ~isempty(spectrum{c,g}) && ~isempty(spectrum{c,g})
-                if size(spectrum{c,g},2) ~= size(meanpowbase, 2)
-                     tmpmeanpowbase = repmat(meanpowbase, [1 size(spectrum{c,g},2)]);
-                else tmpmeanpowbase = meanpowbase;
-                end
-                spectrum{c,g} = spectrum{c,g} - tmpmeanpowbase;
-            end
-        end
-    end
 
 % reorganize data
 % ---------------
@@ -378,12 +333,13 @@ function datavals = reorganizedata2(dataTmp, eventTmp)
     
 % call newtimef (duplicate function in std_erspplot)
 % --------------
-function dataout = processtf(dataSubject, xvals, datatype, singletrials, g)
+function [dataout,erspbase] = processtf(dataSubject, xvals, datatype, singletrials, g)
 
     % compute ITC or ERSP
     if strcmpi(datatype, 'ersp')
         P = dataSubject .* conj(dataSubject);
         dataout = newtimeftrialbaseln(P, xvals, g);
+        % common baseline is removed in std_erspplot
         if strcmpi(singletrials, 'off')
             dataout = squeeze(mean(dataout, 3));
         end
