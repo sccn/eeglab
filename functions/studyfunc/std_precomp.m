@@ -362,9 +362,14 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             end
             
             if ~duplicate
-                trialinfo.session   = STUDY.datasetinfo(index).session;
-                trialinfo.condition = STUDY.datasetinfo(index).condition;
+                trialinfo = [];
+                if isempty(STUDY.datasetinfo(index).condition) % weird bug 2018a
+                    trialinfo.condition = [];
+                else
+                    trialinfo.condition = STUDY.datasetinfo(index).condition;
+                end
                 trialinfo.group     = STUDY.datasetinfo(index).group;
+                trialinfo.session   = STUDY.datasetinfo(index).session;
                 fprintf('Computing/checking topo file for subject %s\n', STUDY.datasetinfo(index).subject);
                 std_topo(ALLEEG(index), chanlist{index}, 'recompute', g.recompute,'trialinfo', trialinfo, 'fileout', STUDY.datasetinfo(index).filepath);
             end
