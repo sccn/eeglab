@@ -51,7 +51,6 @@ end
     'basenorm'      'string'    {'on','off'} 'off';
     'baseline'      'real'      []          0;
     'commonbase'    'string'    {'on','off'} 'off';
-    'scale'         'string'    { 'log','abs'} 'log';
     'singletrials'  'string'    {'on','off'} 'on';
     'trialbase'     'string'    {'on','off','full'} 'off'; % 'on' skip the baseline
     'verbose'       'string'    {'on','off'} 'on';
