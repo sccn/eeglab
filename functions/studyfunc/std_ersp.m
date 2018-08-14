@@ -162,7 +162,7 @@ if length(varargin) > 1
     end
 end
 
-[g timefargs] = finputcheck(options, { ...
+[g, timefargs] = finputcheck(options, { ...
                         'components'    'integer'               []          [];
                         'channels'      { 'cell','integer' }    { [] [] }   {};
                         'powbase'       'real'                  []          [];
@@ -184,6 +184,7 @@ end
                         'interp'        'struct'                { }         struct([]);
                         'freqscale'     'string'                []         'log';
                         'alpha'         'real'                  []          NaN;
+                        'baseline'      'real'                  []          0;
                         'type'          'string'      { 'ersp','itc','both','ersp&itc' }  'both'}, 'std_ersp', 'ignore');
 if ischar(g), error(g); end
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
@@ -251,7 +252,7 @@ end
 % Compute ERSP parameters
 % -----------------------
 parameters = { 'cycles', g.cycles, 'padratio', g.padratio, ...
-               'alpha', g.alpha, 'freqscale', g.freqscale, timefargs{:} };
+               'alpha', g.alpha, 'freqscale', g.freqscale, 'baseline', NaN, timefargs{:} };
 defaultlowfreq = 3;
 [time_range] = compute_ersp_times(g.cycles,  EEG(1).srate, ...
                                  [EEG(1).xmin EEG(1).xmax]*1000 , defaultlowfreq, g.padratio); 
@@ -262,6 +263,8 @@ parameters = { parameters{:} 'freqs' g.freqs };
 if strcmpi(g.plot, 'off')
     parameters = { parameters{:} 'plotersp', 'off', 'plotitc', 'off', 'plotphase', 'off' };
 end
+parameters{end+1} = 'baseline';
+parameters{end+1} = g.baseline;
 if powbaseexist && time_range(1) >= 0 
     parameters{end+1} = 'baseboot';
     parameters{end+1} = 0;
