@@ -252,7 +252,7 @@ end
 % Compute ERSP parameters
 % -----------------------
 parameters = { 'cycles', g.cycles, 'padratio', g.padratio, ...
-               'alpha', g.alpha, 'freqscale', g.freqscale, 'baseline', NaN, timefargs{:} };
+               'alpha', g.alpha, 'freqscale', g.freqscale, timefargs{:} };
 defaultlowfreq = 3;
 [time_range] = compute_ersp_times(g.cycles,  EEG(1).srate, ...
                                  [EEG(1).xmin EEG(1).xmax]*1000 , defaultlowfreq, g.padratio); 
