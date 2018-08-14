@@ -129,7 +129,6 @@ statstruct = pop_statparams(statstruct, varargin{:});
 fields     = { 'freqrange'     [];
                'topofreq'      [];
                'topotrial'     [];
-               'singletrials'  'off' 
                'trialrange'    [] 
                'concatenate'   'off';
                'colorlimits'   [];
@@ -235,12 +234,12 @@ if ~isempty(opt.channels)
     unitPower = newtimefpowerunit(paramsersp);
     
     if strcmpi(opt.datatype, 'ersp') && strcmpi(params.subbaseline, 'off')
-        if  strcmpi(params.singletrials, 'off')
+        if  strcmpi(stats.singletrials, 'off')
             % rational for baseline
             % - no baseline calculation or log transformation at reading time (except single trial baseline if any)
             % - if not single trial and no common baseline, remove baseline and transform data here in each condition (before stats)
             % - otherwise, do so after baseline removal
-            paramsersp.singletrials = params.singletrials;
+            paramsersp.singletrials = stats.singletrials;
             paramsersp.commonbase   = params.subbaseline;
             [allersp,basesamples,basevals] = newtimefbaseln(allersp, alltimes, paramsersp);
         else
@@ -291,21 +290,21 @@ if ~isempty(opt.channels)
     % average single trials
     % ---------------------
     if strcmpi(opt.datatype, 'ersp')
-        if strcmpi(params.singletrials, 'on')
+        if strcmpi(stats.singletrials, 'on')
             if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
             if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
         end
         if  strcmpi(params.subbaseline, 'on')
             % see above for rational for baseline
-            paramsersp.singletrials = params.singletrials;
+            paramsersp.singletrials = stats.singletrials;
             paramsersp.commonbase   = params.subbaseline;
-            [allersp,basesamples,basevals] = newtimefbaseln(allersp, alltimes, paramsersp);
+            allersp = newtimefbaseln(allersp, alltimes, paramsersp);
+        else
+            allersp = cellfun(@(x)newtimefbaseln(x, alltimes, paramsersp), allersp, 'uniformoutput', false);
         end
         % transform to log
         if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
-            tmpsize = size(allersp);
-            allersp = cellfun(@(x)10*log10(x), allersp(:), 'uniformoutput', false);
-            allersp = reshape(allersp, tmpsize);
+            allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
         end
     end
     
@@ -365,10 +364,11 @@ else
     
     for index = 1:length(opt.clusters)
 
-        [STUDY allersp alltimes allfreqs tmp events unitPower] = std_readersp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'infotype', opt.datatype, ...
+        [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'datatype', opt.datatype, ...
             'component', opt.comps, 'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
         if length(opt.clusters) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end
-
+        unitPower = newtimefpowerunit(paramsersp);
+        
         % plot specific component
         % -----------------------
         if ~isempty(opt.comps)
@@ -390,6 +390,27 @@ else
             for index = 1:length(allersp(:))
                 allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2)'; % transposed because otherwise time/freq are inverted
                 allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
+            end
+        end
+        
+        % average single trials
+        % ---------------------
+        if strcmpi(opt.datatype, 'ersp')
+            if strcmpi(stats.singletrials, 'on')
+                if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
+                if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
+            end
+            if  strcmpi(params.subbaseline, 'on')
+                % see above for rational for baseline
+                paramsersp.singletrials = stats.singletrials;
+                paramsersp.commonbase   = params.subbaseline;
+                allersp = newtimefbaseln(allersp, alltimes, paramsersp);
+            else
+                allersp = cellfun(@(x)newtimefbaseln(x, alltimes, paramsersp), allersp, 'uniformoutput', false);
+            end
+            % transform to log
+            if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+                allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
             end
         end
 
