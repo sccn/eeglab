@@ -840,9 +840,6 @@ else
                             chaninfo.filename = res{2};
                             args{ curfield   } = 'lookup';
                             args{ curfield+1 } = res{2};
-                            args{ curfield+2 } = 'rplurchanloc';
-%                             args{ curfield+3 } = res{3};
-%                             flag_replurchan    = res{3};
                             com = args;
                         else
                             return;
