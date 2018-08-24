@@ -128,7 +128,7 @@ end
 % get fields to read
 % ------------------
 v6Flag = testv6([ fileBaseName fileExt ]);
-if v6Flag || strmcpi(opt.measure, 'topo')
+if v6Flag || strcmpi(opt.measure, 'topo')
     if ~isempty(opt.channels)
         fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
     end
