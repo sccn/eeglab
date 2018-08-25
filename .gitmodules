@@ -1,0 +1,3 @@
+[submodule "plugins/firfilt"]
+	path = plugins/firfilt
+	url = https://arnodelorme@github.com/widmann/firfilt.git
