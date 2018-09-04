@@ -124,10 +124,10 @@ if nargin < 2 || plotag ~= 0
                              'Confirmation', 'Cancel', 'Plot ERPs', 'Plot single trials', 'Accept', 'Accept');
         if strcmpi(ButtonName, 'Plot ERPs')
             if EEG.trials > 1
-                tracing  = [ squeeze(mean(EEG.data(EEG.icachansind,:,:),3)) squeeze(mean(compproj,3))];
+                tracing  = [ squeeze(mean(compproj,3)) squeeze(mean(EEG.data(EEG.icachansind,:,:),3))];
                 figure;   
                 plotdata(tracing, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], ...
-                    'Trial ERPs (red) with and (blue) without these components');
+                    'Trial ERPs (blue) with and (red) without these components');
             else
                 warndlg2('Cannot plot ERPs for continuous data');
             end
