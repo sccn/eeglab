@@ -133,7 +133,7 @@ else
                     disp('Warning: updating folder name for .dat|.fdt file');
                 end
                 if ~strcmp(EEG.filename(1:end-3), EEG.data(1:end-3))
-                    disp('Warning: the name of the dataset has changed on disk, updating .dat & .fdt data file to the new name');
+                    disp('Warning: the name of the dataset has changed on disk, updating EEG structure accordingly');
                     EEG.data = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
                     EEG.saved = 'no';
                 end
