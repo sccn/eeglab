@@ -210,7 +210,7 @@ elseif ischar(STUDY)
         % case 'selectdatatrialssel', % select in the GUI above
         % case 'selectdatatrialsadd', % add new selection in the GUI above
         
-        case 'selectsubj', 
+        case 'selectsubj'
             strSubj = get(findobj(fig, 'tag', 'subjects'), 'string');
             if ~isempty(strSubj)
                 res = str2cell(strSubj);
@@ -219,15 +219,18 @@ elseif ischar(STUDY)
                 selected = 1:length(subjects);
             end
             [inds, strSubj, cellSubj] = pop_chansel(struct('labels', subjects), 'select', selected);
-            if length(inds) == length(subjects)
-                strSubj = '';
-            end
-            set(findobj(fig, 'tag', 'subjects'), 'string', strSubj);
-            for iDes = 1:length(des)
-                des(iDes).cases.value = cellSubj;
+            if ~isempty(inds)
+                if length(inds) == length(subjects)
+                    strSubj = '';
+                end
+                set(findobj(fig, 'tag', 'subjects'), 'string', strSubj);
+                disp('Warning: setting subjects for all designs');
+                for iDes = 1:length(des)
+                    des(iDes).cases.value = cellSubj;
+                end
             end
             
-        case 'setsubj', 
+        case 'setsubj'
             strSubj = get(findobj(fig, 'tag', 'subjects'), 'string');
             res = str2cell(strSubj);
             if ~isempty(setdiff(res, subjects))
@@ -239,14 +242,14 @@ elseif ischar(STUDY)
                 des(iDes).cases.value = res;
             end
         
-        case 'add', % Add new study design
+        case 'add' % Add new study design
             des(end+1) = des(val);
             des(end).variable = [];
             des(end).limo     = [];
             des(end).name = sprintf('Design %d', length(des));
             set(findobj(fig, 'tag', 'listboxdesign'), 'string', { des.name }, 'value', length(des));
             
-        case 'del', % Delete study design
+        case 'del' % Delete study design
             val = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             if val == 1
                 warndlg2('The first STUDY design cannot be removed, only modified');
@@ -254,7 +257,7 @@ elseif ischar(STUDY)
             end
             des(val) = [];
             
-        case 'rename', % Rename study design
+        case 'rename' % Rename study design
             val        = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             strs       = get(findobj(fig, 'tag', 'listboxdesign'), 'string');
             result     = inputdlg2( { 'Study design name:                                                                    ' }, ...
@@ -262,16 +265,19 @@ elseif ischar(STUDY)
             if isempty(result), return; end
             des(val).name  = result{1};
                       
-        case 'updategui', % update the study information (whenever the user click on a button)
+        case 'updategui' % update the study information (whenever the user click on a button)
             val = min(val, length(des));
             set(findobj(fig, 'tag', 'listboxdesign'), 'string', { des.name }, 'value', val );
             set(findobj(fig, 'tag', 'edit_storedir'), 'string', des(val).filepath);
             set(findobj(fig, 'tag', 'edit_selectdattrials'),  'string', vararg2str( des(val).include ));
             
             % update subjects
-            cellSubj = get(findobj(fig, 'tag', 'lbsubj'), 'string');
-            [tmp valSubj] = intersect(cellSubj, des(val).cases.value);
-            set(findobj(fig, 'tag', 'lbsubj'), 'value', valSubj);
+            if length(des(val).cases.value) ~= length(subjects)
+                tmp = des(val).cases.value;
+                tmp = cellfun(@(x) [ x ' ' ], tmp, 'uniformoutput', false);
+                subjectStr = [tmp{:}];
+                set(findobj(fig, 'tag', 'subjects'), 'string', subjectStr);
+            end
             
             % categorical var
             curVal = {};
@@ -297,7 +303,7 @@ elseif ischar(STUDY)
             set(findobj(fig, 'tag', 'lbfact0'), 'string', curVal, 'value', valVar);
             return;
             
-        case 'selectdatatrials', % select specific dataset and trials
+        case 'selectdatatrials' % select specific dataset and trials
             usrdat.parent = fig;
             cb_sel = 'pop_studydesign(''selectdatatrialssel'',gcbf);';
             cb_add = 'pop_studydesign(''selectdatatrialsadd'',gcbf);';
@@ -314,7 +320,7 @@ elseif ischar(STUDY)
                 'helpcom', cb_add, 'userdata', usrdat, 'eval', cb_renamehelp);
             return;
             
-        case 'selectdatatrialssel', % select in the GUI above
+        case 'selectdatatrialssel' % select in the GUI above
             val1  = get(findobj(fig, 'tag', 'lbfact2'), 'value');
             valfact = [1:length(usrdat.factorvals{val1})];
             tmpval = get(findobj(fig, 'tag', 'lbval2'), 'value');
@@ -325,7 +331,7 @@ elseif ischar(STUDY)
             end
             return;
 
-        case 'selectdatatrialsadd', % Add button in the GUI above
+        case 'selectdatatrialsadd' % Add button in the GUI above
             val1    = get(findobj(fig, 'tag', 'lbfact2'), 'value');
             val2    = get(findobj(fig, 'tag', 'lbval2') , 'value');
             %close(fig);
@@ -333,14 +339,14 @@ elseif ischar(STUDY)
             val     = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             des(val).include{end+1} = { usrdat.factors{val1} usrdat.factorvals{val1}(val2) };
             
-        case 'updateinclude', % Add button in the GUI above
+        case 'updateinclude' % Add button in the GUI above
             try
                 des(val).include = eval( get(findobj(fig, 'tag', 'lbfact2'), 'string') );
             catch,
                 warndlg2('Syntax error');
             end
             
-        case 'selectfolder',
+        case 'selectfolder'
             res = uigetdir;
             if ~isempty(findstr(filepath, res)) && findstr(filepath, res) == 1 && ~isequal(filepath, res)
                 res = res(length(filepath)+2:end);
@@ -416,7 +422,7 @@ function res = str2cell(strSubj)
     end
     res = res';
 
-function res = strmatchmult(a, b);
+function res = strmatchmult(a, b)
     if isempty(b), res = []; return; end
     res = zeros(1,length(a));
     for index = 1:length(a)
@@ -433,7 +439,7 @@ function cellarray = mysort(cellarray)
         cellarray = sort(cellarray);
     end
 
-function [cellout inds ] = mysetdiff(cell1, cell2);
+function [cellout inds ] = mysetdiff(cell1, cell2)
     if (~isempty(cell1) && ischar(cell1{1})) || (~isempty(cell2) && ischar(cell2{1}))
          [ cellout inds ] = setdiff_bc(cell1, cell2);
     else [ cellout inds ] = setdiff_bc([ cell1{:} ], [ cell2{:} ]);
