@@ -101,9 +101,12 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
         warning off;
         if isfield(EEG.chanlocs, 'theta') && ~isempty(EEG.chanlocs(1).theta)
             tmpcfg = rmfield(tmpcfg, 'cfg');
+            tmpcfg2 = tmpcfg;
+            tmpcfg  = rmfield(tmpcfg, 'label'); % first input must not be data
+            tmpcfg2 = rmfield(tmpcfg2, 'method'); % second input must not be method
             % tmpcfg = rmfield(tmpcfg, 'label');
             % --> removing label seems to make ft_prepare_neighbours to crash
-            cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg);
+            cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg2);
             neighbors = cfg.neighbors;
         else
             neighbors = [];
