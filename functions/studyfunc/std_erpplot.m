@@ -249,7 +249,7 @@ if ~isempty(opt.channels)
 
     % select specific time
     % --------------------
-    if ~isempty(params.topotime) && ~isnan(params.topotime)
+    if ~isempty(params.topotime) && ~isnan(params.topotime(1))
         [tmp, ti1] = min(abs(alltimes-params.topotime(1)));
         [tmp, ti2] = min(abs(alltimes-params.topotime(end)));
         for condind = 1:length(erpdata(:))
