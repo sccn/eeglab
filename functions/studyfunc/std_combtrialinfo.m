@@ -90,7 +90,7 @@ end
 
 for iDat = 1:length(inds)
     % Checking if field do not exist or if exist and is empty
-    if ~isfield(trialinfo,'condition') || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).condition}))
+    if ~isfield(trialinfo,'condition') || length(trialinfo) < nvals(iDat+1)-1 || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).condition}))
         [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
     end
     
