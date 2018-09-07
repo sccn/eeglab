@@ -101,7 +101,7 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
       <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
       <file>${PROJECT_ROOT}/plugins/Fileio180627</file>
       <file>${PROJECT_ROOT}/plugins/dipfit2.4</file>
-      <file>${PROJECT_ROOT}/plugins/firfilt1.6.3</file>
+      <file>${PROJECT_ROOT}/plugins/firfilt</file>
       <file>${PROJECT_ROOT}/plugins/musemonitor2.0</file>
     </fileset.resources>
     <fileset.package>
