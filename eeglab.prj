@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration file="/data/matlab/eeglab/eeglab.prj" location="/data/matlab/eeglab" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration file="/Users/amon-ra/program_files/eeglab/eeglab.prj" location="/Users/amon-ra/program_files/eeglab" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
@@ -54,10 +54,6 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
     <param.windows.command.prompt>false</param.windows.command.prompt>
     <param.create.log>true</param.create.log>
     <param.log.file>eeglab_log.txt</param.log.file>
-    <param.native.matlab>false</param.native.matlab>
-    <param.checkbox>false</param.checkbox>
-    <param.example />
-    <param.help.text />
     <unset>
       <param.icon />
       <param.icons />
@@ -81,10 +77,6 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
       <param.package.mcr.name />
       <param.no.mcr.name />
       <param.windows.command.prompt />
-      <param.native.matlab />
-      <param.checkbox />
-      <param.example />
-      <param.help.text />
     </unset>
     <fileset.main>
       <file>${PROJECT_ROOT}/eeglab.m</file>
@@ -101,7 +93,7 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
       <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
       <file>${PROJECT_ROOT}/plugins/Fileio180627</file>
       <file>${PROJECT_ROOT}/plugins/dipfit2.4</file>
-      <file>${PROJECT_ROOT}/plugins/firfilt1.6.3</file>
+      <file>${PROJECT_ROOT}/plugins/firfilt</file>
       <file>${PROJECT_ROOT}/plugins/musemonitor2.0</file>
     </fileset.resources>
     <fileset.package>
@@ -114,21 +106,39 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
     </fileset.package>
     <fileset.depfun />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/data/matlab/eeglab/eeglab/for_testing/run_EEGLAB.sh</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/data/matlab/eeglab/eeglab/for_testing/EEGLAB.app</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglab/eeglab/for_testing/splash.png</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglab/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/Users/amon-ra/program_files/eeglab/eeglab/for_testing/run_EEGLAB.sh</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/Users/amon-ra/program_files/eeglab/eeglab/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/Users/amon-ra/program_files/eeglab/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/Users/amon-ra/program_files/eeglab/eeglab/for_testing/EEGLAB.app</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/Applications/MATLAB_R2018a.app</root>
+      <root>/Applications/MATLAB_R2017a.app</root>
       <toolboxes>
+        <toolbox name="fixedpoint" />
         <toolbox name="matlabcoder" />
+        <toolbox name="matlabhdlcoder" />
+        <toolbox name="embeddedcoder" />
       </toolboxes>
+      <toolbox>
+        <fixedpoint>
+          <enabled>true</enabled>
+        </fixedpoint>
+      </toolbox>
       <toolbox>
         <matlabcoder>
           <enabled>true</enabled>
         </matlabcoder>
+      </toolbox>
+      <toolbox>
+        <matlabhdlcoder>
+          <enabled>true</enabled>
+        </matlabhdlcoder>
+      </toolbox>
+      <toolbox>
+        <embeddedcoder>
+          <enabled>true</enabled>
+        </embeddedcoder>
       </toolbox>
     </matlab>
     <platform>
@@ -140,7 +150,7 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.13.6</osver>
+      <osver>10.12.6</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>
