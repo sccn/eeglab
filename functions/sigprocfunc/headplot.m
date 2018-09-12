@@ -703,15 +703,21 @@ EI = onemat - sqrt((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +...
 gx = zeros(length(x),length(Xe));
 m = 4;
 icadefs;
-hwb = waitbar(0,'Computing spline file (only done once)...', 'color', BACKEEGLABCOLOR);
-hwbend = 7;
+if ismatlab
+    hwb = waitbar(0,'Computing spline file (only done once)...', 'color', BACKEEGLABCOLOR);
+    hwbend = 7;
+end
 for n = 1:7
     L = legendre(n,EI);
     gx = gx + ((2*n+1)/(n^m*(n+1)^m))*squeeze(L(1,:,:));
-    waitbar(n/hwbend,hwb);
+    if ismatlab
+        waitbar(n/hwbend,hwb);
+    end
 end
 gx = gx/(4*pi);    
-close(hwb);
+if ismatlab
+    close(hwb);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  distance() - function used in 'setup'
