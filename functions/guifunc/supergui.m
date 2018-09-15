@@ -134,7 +134,7 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'horizontalalignment'  'string'   { 'left','right','center' } 'left';
                            'minwidth'  'real'   []      10;
                            'borders'   'real'   []      [0.05 0.04 0.07 0.06];
-                           'spacing'   'real'   []      [0.02 0.01];
+                           'spacing'   'real'   []      [0.02 0.005];
                            'inseth'    'real'   []      0.02; % x border absolute (5% of width)
                            'insetv'    'real'   []      0.02 }, 'supergui');
 if ischar(g), error(g); end
