@@ -214,7 +214,7 @@ rej = zeros( 1, EEG.trials);
 rej(Irej) = 1;
 
 if nargin < 3 || opt.eegplotplotallrej == 2
-	nbpnts = size(allspec,2);
+	nbpnts = EEG.pnts;
     if icacomp == 1 macrorej  = 'EEG.reject.rejfreq';
         			macrorejE = 'EEG.reject.rejfreqE';
     else			macrorej  = 'EEG.reject.icarejfreq';
@@ -229,14 +229,12 @@ if nargin < 3 || opt.eegplotplotallrej == 2
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
     
 	if icacomp == 1
-		eegplot(EEG.data(opt.elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], ...
-			'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
+		eegplot(EEG.data(opt.elecrange,:,:), 'srate', EEG.srate, 'winlength', 5, 'position', [100 550 800 500], ...
+			'limits', [EEG.xmin EEG.xmax]*1000, 'command', command, eegplotoptions{:}); 
 	else
-		eegplot(icaacttmp(opt.elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
-				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
+		eegplot(icaacttmp(opt.elecrange,:,:), 'srate', EEG.srate, 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
+				[EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	end;	
-	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2],'freqs', freqs,...
-                                     'command',command, 'children', findobj('tag', 'childEEG'), 'position', [100 50 800 500], eegplotoptions{3:end}); % excluding events
 end
 if ~isempty(rej)
 	if icacomp	== 1
