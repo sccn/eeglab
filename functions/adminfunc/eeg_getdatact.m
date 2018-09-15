@@ -47,7 +47,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [data boundaries] = eeg_getdatact( EEG, varargin);
+function [data, boundaries] = eeg_getdatact( EEG, varargin)
 
 data = [];
 if nargin < 1
@@ -79,14 +79,14 @@ if iscell(EEG) || (~ischar(EEG) && length(EEG) > 1)
     boundaries = [];
     for dat = 1:length(EEG)
         if iscell(EEG)
-             [tmpdata datboundaries] = eeg_getdatact(EEG{dat}, 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
-        else [tmpdata datboundaries] = eeg_getdatact(EEG(dat), 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
+             [tmpdata, datboundaries] = eeg_getdatact(EEG{dat}, 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
+        else [tmpdata, datboundaries] = eeg_getdatact(EEG(dat), 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
         end
-        if isempty(data), 
+        if isempty(data)
             data       = tmpdata;
             boundaries = datboundaries;
         else
-            if size(data,3) == 1 % continuous data
+            if all([EEG.trials] == 1) % continuous data
                 if size(data,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end
 
                 % adding boundaries
@@ -301,7 +301,7 @@ end
 if size(data,2)*size(data,3) ~= EEG.pnts*EEG.trials
     disp('WARNING: The file size on disk does not correspond to the dataset, file has been truncated');
 end
-try,
+try
     if EEG.trials == 1, EEG.pnts = size(data,2); end
     if  strcmpi(opt.reshape, '3d')
          data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
