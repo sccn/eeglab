@@ -135,9 +135,6 @@ if ~strcmpi(g.method, 'alldistance') && isempty(g.subjind)
 end
 if ~iscell(g.weight), g.weight = { g.weight }; end
 
-% Checking for Fieldtrip
-if exist('ft_electroderealign', 'file')~=2,error('dipoledensity: Fieldtrip toolbox is required'); end
-
 % plotting dipplot
 % ----------------
 if ~iscell(dipplotargs) % convert input
@@ -304,6 +301,9 @@ else
     filename = g.volmesh_fname; %
 end
 if ~exist(filename)
+    % Checking for Fieldtrip
+    if exist('ft_electroderealign', 'file')~=2,error('dipoledensity: Fieldtrip toolbox is required'); end
+    
     disp('Computing volume within head mesh...');
     [X Y Z]           = meshgrid(g.mri.xgrid(1:g.subsample:end)+g.subsample/2, ...
                                  g.mri.ygrid(1:g.subsample:end)+g.subsample/2, ...
