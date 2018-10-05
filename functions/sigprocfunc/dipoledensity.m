@@ -295,12 +295,7 @@ end
 dipfitdefs; % get the location of standard BEM volume file
 tmp = load('-mat',DIPOLEDENSITY_STDBEM); % load MNI mesh
 
-if isempty(g.volmesh_fname)  % default
-    filename = [ '/home/arno/matlab/MNI_VoxelTsearch' int2str(g.subsample) '.mat' ];
-else
-    filename = g.volmesh_fname; %
-end
-if ~exist(filename)
+if ~exist(g.volmesh_fname)
     % Checking for Fieldtrip
     if exist('ft_electroderealign', 'file')~=2,error('dipoledensity: Fieldtrip toolbox is required'); end
     
@@ -335,12 +330,12 @@ if ~exist(filename)
         disp('Done.');
     end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     try 
-        save('-mat', filename, 'allpoints', 'allinds', 'Inside', 'Outside');
+        save('-mat', g.volmesh_fname, 'allpoints', 'allinds', 'Inside', 'Outside');
         disp('Saving file containing inside/outide voxel indices...');
     catch, end
 else
     disp('Loading file containing inside/outide voxel indices...');
-    load('-mat',filename);
+    load('-mat',g.volmesh_fname);
 end
 InsidePoints  = allpoints(:, Inside);
 InsideIndices = allinds(:, Inside);
