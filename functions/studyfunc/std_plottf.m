@@ -269,6 +269,7 @@ for c = 1:nc
             if g == ng && ng > 1 && ~isempty(opt.groupstats) && ~isinf(pgroupplot{c}(1)) && ~statmask
                 if strcmpi(opt.effect, 'main') && nc>1, centerc = nc/2-0.5; else centerc = 0; end
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, c+centerc, ng + 1, opt.transpose);
+                pgroupplot{c}(pgroupplot{c}<0) = 0;
                 tftopo( pgroupplot{c}, timevals, freqs, 'title', opt.titles{c,g+1}, options{:});
                 caxis([-maxplot maxplot]);
             end
@@ -283,6 +284,7 @@ for g = 1:ng
         if ~isempty(opt.condstats) && ~isinf(pcondplot{g}(1)) && ~statmask && nc > 1
             if strcmpi(opt.effect, 'main') && ng>1, centerg = ng/2-0.5; else centerg = 0; end
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, nc+addr, g+centerg, opt.transpose);
+            pcondplot{g}(pcondplot{g}<0) = 0;
             tftopo( pcondplot{g}, timevals, freqs, 'title', opt.titles{nc+1,g}, options{:});
             caxis([-maxplot maxplot]);
         end
@@ -307,6 +309,7 @@ end
 % ---------------------------------------
 if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1 && ~isempty(pinterplot)
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, nc+addr, ng+1, opt.transpose);
+    pinterplot(pinterplot<0) = 0;
     tftopo( pinterplot,  timevals, freqs, 'title', opt.titles{nc+1,ng+1}, options{:});
     caxis([-maxplot maxplot]);
     ylabel('');
