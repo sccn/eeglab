@@ -524,7 +524,7 @@ if nargs > 2
                 end
             case 'plotrad'
                 plotrad = Value;
-                if ischar(plotrad) || (plotrad < MINPLOTRAD || plotrad > 1)
+                if ~isempty(plotrad) && (ischar(plotrad) || (plotrad < MINPLOTRAD || plotrad > 1))
                     error('plotrad argument should be a number between 0.15 and 1.0');
                 end
             case 'headrad'
