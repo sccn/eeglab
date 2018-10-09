@@ -68,10 +68,10 @@ elseif isfield(EEG.dipfit, 'hdmfile')
 else
     error('no head model in EEG.dipfit')
 end
-if isfield(EEG.dipfit, 'elecfile') & ~isempty(EEG.dipfit.elecfile)
+if isfield(EEG.dipfit, 'elecfile') && ~isempty(EEG.dipfit.elecfile)
     cfg.elecfile = EEG.dipfit.elecfile;
 end
-if isfield(EEG.dipfit, 'gradfile') & ~isempty(EEG.dipfit.gradfile)
+if isfield(EEG.dipfit, 'gradfile') && ~isempty(EEG.dipfit.gradfile)
     cfg.gradfile = EEG.dipfit.gradfile;
 end
 
