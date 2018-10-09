@@ -44,6 +44,10 @@ if nargin < 1
     return;
 end
 
+if nargin < 3
+    trials = ones(1, length(datasetinfo));
+end
+
 % Inds or subjectname
 if isnumeric(inds)
     if ~isempty(find(~ismember(inds(:), [datasetinfo.index]))) %#ok<EFIND>
