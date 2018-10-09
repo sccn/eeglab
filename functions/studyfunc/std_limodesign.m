@@ -86,9 +86,6 @@ end
 % ---------------------------------
 if length(alloptions) > 1
     alloptionsinter = inter(alloptions);
-    for iOpt = 1:length(alloptionsinter)
-        alloptionsinter{iOpt} = [ alloptionsinter{iOpt}{:} ];
-    end
     alloptionsinter = { alloptionsinter }; % 1 condition only
 else
     alloptionsinter = alloptions;
@@ -166,7 +163,7 @@ else
     c = inter(a(2:end));
     for iVal1 = 1:length(a{1})
         for iVal2 = 1:length(c)
-            b{(iVal1-1)*length(c)+iVal2} = { a{1}{iVal1} c{iVal2} };
+            b{(iVal1-1)*length(c)+iVal2} = { a{1}{iVal1}{:} c{iVal2}{:} };
         end
     end
 end
