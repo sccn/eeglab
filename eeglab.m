@@ -1002,12 +1002,12 @@ else
             else
                 pluginlist(plugincount).plugin     = pluginName;
                 pluginlist(plugincount).version    = pluginVersion;
-                vers   = pluginlist(plugincount).version; % version
                 vers2  = '';
                 status = 'ok';
                 try,
                     %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
                     vers2 = feval(funcname, gcf, trystrs, catchstrs);
+                    [~, vers2] = parsepluginname(vers2);
                 catch
                     try,
                         eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
@@ -1017,14 +1017,20 @@ else
                         status = 'error';
                     end
                 end
+                if isempty(pluginlist(plugincount).version)
+                    pluginlist(plugincount).version = vers2;
+                elseif ~isempty(vers2)
+                    if ~isequal(pluginlist(plugincount).version, vers2)
+                        fprintf('WARNING: for plugin "%s" vesion in the folder name "%s" and in the eegplugin_ file "%s" differ\n', pluginlist(plugincount).plugin, pluginlist(plugincount).version,vers2);
+                    end
+                end
                 pluginlist(plugincount).funcname   = funcname(10:end);
                 pluginlist(plugincount).foldername = dircontent{index};
-                [tmp pluginlist(plugincount).versionfunc] = parsepluginname(vers2);
                 if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
                     pluginlist(plugincount).funcname(1) = [];
                 end 
                 if strcmpi(status, 'ok')
-                    if isempty(vers), vers = pluginlist(plugincount).versionfunc; end
+                    vers   = pluginlist(plugincount).version; % version
                     if isempty(vers), vers = '?'; end
                     fprintf('EEGLAB: adding "%s" v%s (see >> help %s)', ...
                         pluginlist(plugincount).plugin, vers, funcname);

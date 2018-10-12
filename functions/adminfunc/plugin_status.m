@@ -15,7 +15,7 @@
 %       pluginstruct    - If the plugin(s) in 'pluginname' is installed, the function
 %                         provide here a cell (one cell per plugin in 'status') array 
 %                         of structures with the following fields:
-%                         {plugin, version, foldername, funcname, status, versionfunc} 
+%                         {plugin, version, foldername, funcname, status} 
 % 
 % Author: Ramon Martinez-Cancino SCCN, 2018
 %         
