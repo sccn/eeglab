@@ -102,7 +102,7 @@ if strcmpi(g.gui, 'on')
         end
     end
     for iCont = 1:length(des.continuous)
-        allLabels{count} = formatcond(des.continuous{iCont});
+        allLabels{count} = [ int2str(count) '. ' formatcond(des.continuous{iCont}) ];
         count = count+1;
     end
     
