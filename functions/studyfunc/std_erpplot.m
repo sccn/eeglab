@@ -311,11 +311,16 @@ if ~isempty(opt.channels)
 
     % plot
     % ----
+    if ~isreal(erpdata{1}(1)) % for spectrum FFT data
+        tmperpdata = cellfun(@(x)x.*conj(x), erpdata, 'uniformoutput', false);
+    else
+        tmperpdata = erpdata;
+    end
     if ~isempty(params.topotime) && all(~isnan(params.topotime))
-        std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', params.ylim, ...
+        std_chantopo(tmperpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', params.ylim, ...
                                       'chanlocs', locs, 'threshold', alpha, 'titles', alltitles, 'topoplotopt', opt.topoplotopt, 'effect', stats.effect);
     else
-        std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
+        std_plotcurve(alltimes, tmperpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'plotstderr', opt.plotstderr, ...
             'condnames', allconditions, 'groupnames', allgroups, plotcurveopt{:});
     end
