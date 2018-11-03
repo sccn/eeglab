@@ -106,8 +106,7 @@ design_index = opt.design;
 
 % Make sure paths are ok for LIMO (Consider to move this to eeglab.m in a future)
 % -------------------------------------------------------------------------
-local_path = which('limo_eeg');
-root = fileparts(local_path);
+root = fileparts(which('limo_eeg'));
 addpath([root filesep 'limo_cluster_functions']);
 addpath([root filesep 'external' filesep 'psom']);
 addpath([root filesep 'external']);
@@ -171,10 +170,10 @@ end
 
 % 1st level analysis
 % -------------------------------------------------------------------------
-model.cat_files = [];
+model.cat_files  = [];
 model.cont_files = [];
-unique_subjects = STUDY.design(1).cases.value'; % all designs have the same cases
-nb_subjects     = length(unique_subjects);
+unique_subjects  = STUDY.design(1).cases.value'; % all designs have the same cases
+nb_subjects      = length(unique_subjects);
 
 for s = 1:nb_subjects
     nb_sets(s) = numel(find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject})));
@@ -245,9 +244,9 @@ for s = 1:nb_subjects
     % EEGLIMO.icawinv
     % EEGLIMO.icaweights
     
-    filename = [ STUDY.datasetinfo(order{s}(1)).subject '_limo_file_tmp' num2str(design_index) '.set'];
-    index = [STUDY.datasetinfo(order{s}).index];
-    tmp   = {STUDY.datasetinfo(order{s}).subject};
+    filename = [STUDY.datasetinfo(order{s}(1)).subject '_limo_file_tmp' num2str(design_index) '.set'];
+    index    = [STUDY.datasetinfo(order{s}).index];
+    tmp      = {STUDY.datasetinfo(order{s}).subject};
     if length(unique(tmp)) ~= 1
         error('it seems that sets of different subjects are merged')
     else
@@ -261,7 +260,7 @@ for s = 1:nb_subjects
         ALLEEG = eeg_store(ALLEEG, EEGTMP, index(sets));
     end
     
-    file_fullpath = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
+    file_fullpath      = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
     model.set_files{s} = fullfile(file_fullpath , filename);
     
     OUTEEG = [];    
@@ -270,15 +269,15 @@ for s = 1:nb_subjects
     else OUTEEG.trials = sum([ALLEEG(index).trials]);
     end
     
-    filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
-    OUTEEG.filepath    = filepath_tmp;
-    OUTEEG.filename    = filename;
-    OUTEEG.srate       = ALLEEG(index(1)).srate;
-    OUTEEG.icaweights  = ALLEEG(index(1)).icaweights;
-    OUTEEG.icasphere   = ALLEEG(index(1)).icasphere;
-    OUTEEG.icachansind = ALLEEG(index(1)).icachansind;
-    OUTEEG.etc         = ALLEEG(index(1)).etc;
-    OUTEEG.times       = ALLEEG(index(1)).times;
+    filepath_tmp           = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
+    OUTEEG.filepath        = filepath_tmp;
+    OUTEEG.filename        = filename;
+    OUTEEG.srate           = ALLEEG(index(1)).srate;
+    OUTEEG.icaweights      = ALLEEG(index(1)).icaweights;
+    OUTEEG.icasphere       = ALLEEG(index(1)).icasphere;
+    OUTEEG.icachansind     = ALLEEG(index(1)).icachansind;
+    OUTEEG.etc             = ALLEEG(index(1)).etc;
+    OUTEEG.times           = ALLEEG(index(1)).times;
     if any(interpolated)
         OUTEEG.chanlocs    = mergedChanlocs;
         OUTEEG.etc.interpolatedchannels = setdiff([1:length(OUTEEG.chanlocs)], std_chaninds(OUTEEG, { ALLEEG(index(1)).chanlocs.labels }));
@@ -287,7 +286,7 @@ for s = 1:nb_subjects
     end
     
     % update EEG.etc
-    OUTEEG.etc.merged{1} = ALLEEG(index(1)).filename;
+    OUTEEG.etc.merged{1}   = ALLEEG(index(1)).filename;
     
     % Def fields
     OUTEEG.etc.datafiles.daterp   = [];
@@ -336,14 +335,12 @@ end
 factors = pop_listfactors(STUDY.design, 'gui', 'off');
 for s = 1:nb_subjects     
     % save continuous and categorical data files
-    % ************* PLURAL IMPORTANT IN FILE? continuous_variable.txt vs continuous_variables.txt
-    %filepath_tmp = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
     [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction); %, 'filepath', filepath_tmp); 
 
     % copy results
-    model.cat_files{s}  = catMat;
-    model.cont_files{s} = contMat;
+    model.cat_files{s}                 = catMat;
+    model.cont_files{s}                = contMat;
     STUDY.limo.categorical             = limodesign.categorical;
     STUDY.limo.continuous              = limodesign.continuous;
     STUDY.limo.subjects(s).subject     = unique_subjects{s};
@@ -352,8 +349,8 @@ for s = 1:nb_subjects
 end
     
 % transpose
-model.set_files = model.set_files';
-model.cat_files = model.cat_files';
+model.set_files  = model.set_files';
+model.cat_files  = model.cat_files';
 model.cont_files = model.cont_files';
 if all(cellfun(@isempty, model.cat_files )), model.cat_files  = []; end
 if all(cellfun(@isempty, model.cont_files)), model.cont_files = []; end
@@ -404,19 +401,19 @@ elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
     model.defaults.highf    = [];
 end
 
-model.defaults.fullfactorial = 0;                    % factorial only for single subject analyses - not included for studies
-model.defaults.zscore = 0;                           % done that already
-model.defaults.bootstrap = 0 ;                       % only for single subject analyses - not included for studies
-model.defaults.tfce = 0;                             % only for single subject analyses - not included for studies
-model.defaults.method = opt.method;                  % default is OLS - to be updated to 'WLS' once validated
-model.defaults.Level= 1;                             % 1st level analysis
-model.defaults.type_of_analysis = 'Mass-univariate'; % future version will allow other techniques
+model.defaults.fullfactorial    = 0;                 % factorial only for single subject analyses - not included for studies
+model.defaults.zscore           = 0;                 % done that already
+model.defaults.bootstrap        = 0 ;                % only for single subject analyses - not included for studies
+model.defaults.tfce             = 0;                 % only for single subject analyses - not included for studies
+model.defaults.method           = opt.method;        % default is OLS - to be updated to 'WLS' once validated
+model.defaults.Level            = 1;                 % 1st level analysis
+model.defaults.type_of_analysis = 'Mass-univariate'; % option can be multivariate (work in progress)
 
-limocontrast.mat = []; %{ [1 1 -1 -1] [ 1 -1] };
+limocontrast.mat         = []; %{ [1 1 -1 -1] [ 1 -1] };
 [LIMO_files, procstatus] = limo_batch('model specification',model,limocontrast,STUDY);
-STUDY.limo.model    = model;
-STUDY.limo.datatype = Analysis;
-STUDY.limo.chanloc  = limoChanlocs.expected_chanlocs;
+STUDY.limo.model         = model;
+STUDY.limo.datatype      = Analysis;
+STUDY.limo.chanloc       = limoChanlocs.expected_chanlocs;
 
 %LIMO_files.expected_chanlocs = limoChanlocs;
 %procOK = find(procstatus);
