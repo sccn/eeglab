@@ -20,8 +20,8 @@
 %                  factors. Default is 'off'.
 %   'interaction' - ['on'|'off'] compute interaction when using different
 %                  categorical variables. This allows computing interactions
-%                  between these variables at the second level. Default 
-%                  is 'on'.
+%                  between these variables (useful for single subject analyses).
+%                  Default is 'off'.
 %   'desconly'    - ['on'|'off'] only output description
 %
 %  Outputs:
@@ -60,7 +60,7 @@ end
 % -----------------------
 opt = finputcheck( varargin, ...
     { 'splitreg'       'string'  { 'on','off' }   'off';
-      'interaction'    'string'  { 'on','off' }   'on';
+      'interaction'    'string'  { 'on','off' }   'off';
       'desconly'       'string'  { 'on','off' }   'off';
       'filepath'       'string'  {            }   ''    }, 'std_limosavedesignfiles');
 if ischar(opt), error(opt); end

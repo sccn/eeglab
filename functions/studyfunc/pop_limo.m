@@ -29,18 +29,17 @@
 %  "Interaction model for categorical indep. var." - When using more than 
 %                   one categorical variable, clicking this option forces
 %                   to have factors which are the conjonction of the
-%                   different independent var. values. This is useful if
-%                   you want to calculate interactions at the group level
-%                   (even for simple ERP analysis, to compute interactions 
-%                   between conditions, you need to have the ERP for the 
-%                   conjunction of these values of the different 
-%                   conditions). This is the default.
+%                   different independent var. values. This is useful only 
+%                   if you want to calculate interactions at the subject.
+%                   The 'best' option is typically to have a design with
+%                   all conditions (no factors) and create factors at the
+%                   group level.
 %
 %  "Split regressions (continuous indep. var.)" - This options allows to
 %                   split continuous variables for the different
-%                   categorical variables. This is useful to compute ANCOVA
-%                   (interaction between continuous and categorical
-%                   variables) at the group level. 
+%                   categorical variables. This is useful to compute 
+%                   interaction between continuous and categorical
+%                   variables. 
 %
 %  "Input data to use for the GLM" - [pop up menu] measure to use as input
 %                   for the GLM. Currently, only "ERP" and "spectrum" are 
@@ -48,9 +47,8 @@
 %
 %  "Optimization method" - [pop up meny] may be Ordinary Least Square (OLS) 
 %                   or Weighted Least Square (WTS). WTS should be used as it 
-%                   is more robust. It is slower though. OLS is a standard
-%                   least square solution and WTS is a least square solution
-%                   that automatically exclude some outlier trials.
+%                   is more robust. OLS is a standard solution and WTS is a
+%                   solution that automatically exclude some outlier trials.
 %
 %  "Options"        - [edit box] additional options. These are given
 %                   directly as input to the std_limo.m function. They may
@@ -67,6 +65,7 @@
 %   STUDY       - an EEGLAB STUDY set of loaded EEG structures
 %
 % Author: Arnaud Delorme, SCCN, UCSD, 2015-
+%         Cyril Pernet, LIMO Team - edit info and defaults
 %
 % See also: std_limo()
 
@@ -122,7 +121,7 @@ if nargin < 4
     uilist = { ...
         {'style' 'text'       'string' 'LInear MOdeling of EEG data' 'fontweight' 'bold' 'fontsize', 12} ...
         {'style' 'pushbutton' 'string' 'See GLM factors' 'callback' cb_listfactors } ...
-        {'style' 'checkbox'   'string' 'Interaction model for categorical indep. var.' 'value' 1 'tag' 'interaction' } ...
+        {'style' 'checkbox'   'string' 'Interaction model for categorical indep. var.' 'value' 0 'tag' 'interaction' } ...
         {'style' 'checkbox'   'string' 'Split regressions (continuous indep. var.)' 'tag' 'splitreg' } {} ...
         {'style' 'text'       'string' 'Input data to use for the GLM' } ...
         {'style' 'popupmenu'  'string' dataMeasures 'tag' 'measure' 'callback' cb_measure} ...

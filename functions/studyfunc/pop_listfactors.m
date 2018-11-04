@@ -15,7 +15,7 @@
 %   'interaction' - ['on'|'off'] compute interaction when using different
 %                  categorical variables. This allows computing interactions
 %                  between these variables at the second level. Default 
-%                  is 'on'.
+%                  is 'off'.
 % 
 % Author: Arnaud Delorme, UCSD, 2018
 
@@ -43,7 +43,7 @@ end
 
 g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
                             'splitreg'    'string' { 'on','off' } 'off';
-                            'interaction' 'string' { 'on','off' } 'on' });
+                            'interaction' 'string' { 'on','off' } 'off' });
 if ischar(g)
     error(g);
 end
