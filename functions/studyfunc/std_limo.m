@@ -115,6 +115,10 @@ addpath([root filesep 'help']);
 % Checking fieldtrip paths
 if ~exist('ft_prepare_neighbours')
     error('std_limo error: Fieldtrip extension must be installed');
+    if ~exist('eeglab2fieldtrip')
+        root = fileparts(which('ft_prepare_neighbours'));
+        addpath([root filesep 'external' filesep 'eeglab']);
+    end
 end
 
 % Detecting type of analysis
@@ -162,8 +166,16 @@ else
     limoChanlocs.channeighbstructmat = opt.neighbormat;
     chanlocname = 'limo_chanlocs.mat';
 end
+
 if flag_ok
-    limoChanlocsFile = fullfile(STUDY.filepath, chanlocname);
+    if isempty(findstr(STUDY.filepath,'derivatives'))
+        if ~exist([STUDY.filepath filesep 'derivatives'],'dir')
+            mkdir([STUDY.filepath filesep 'derivatives']);
+        end
+        limoChanlocsFile = fullfile([STUDY.filepath filesep 'derivatives'], chanlocname);
+    else
+        limoChanlocsFile = fullfile(STUDY.filepath, chanlocname);
+    end
     save('-mat', limoChanlocsFile, '-struct', 'limoChanlocs');
     fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoChanlocsFile);
 end
