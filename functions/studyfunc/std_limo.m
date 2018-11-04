@@ -115,10 +115,11 @@ addpath([root filesep 'help']);
 % Checking fieldtrip paths
 if ~exist('ft_prepare_neighbours')
     error('std_limo error: Fieldtrip extension must be installed');
-    if ~exist('eeglab2fieldtrip')
-        root = fileparts(which('ft_prepare_neighbours'));
-        addpath([root filesep 'external' filesep 'eeglab']);
-    end
+end
+
+if ~exist('eeglab2fieldtrip')
+    root = fileparts(which('ft_prepare_neighbours'));
+    addpath([root filesep 'external' filesep 'eeglab']);
 end
 
 % Detecting type of analysis
