@@ -601,7 +601,11 @@ if strcmpi(whitebk, 'on')
 end
 
 if isempty(find(strcmp(varargin,'colormap')))
-    cmap = colormap(DEFAULT_COLORMAP);
+    if exist('DEFAULT_COLORMAP','var')
+        cmap = colormap(DEFAULT_COLORMAP);
+    else
+        cmap = parula;
+    end
 else
     cmap = colormap;
 end
