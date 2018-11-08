@@ -378,33 +378,39 @@ if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     model.defaults.end   = ALLEEG(index(1)).xmax*1000;
     if length(opt.timelim) == 2 && opt.timelim(1) < opt.timelim(end)
         % start value
-        if opt.timelim(1) > model.defaults.start && opt.timelim(1) < model.defaults.end
-            model.defaults.start = opt.timelim(1);
+        if opt.timelim(1) < model.defaults.start 
+            fprintf('std_limo: Invalid time lower limit, using default value instead');
         else
-            display('std_limo: Invalid time lower limit, using default value instead');
+            model.defaults.start = opt.timelim(1);
         end
         % end value
-        if opt.timelim(end) < model.defaults.end && opt.timelim(end) > model.defaults.start
-            model.defaults.end = opt.timelim(end);
+        if opt.timelim(end) > model.defaults.end 
+            fprintf('std_limo: Invalid time upper limit, using default value instead');
         else
-            display('std_limo: Invalid time upper limit, using default value instead');
+            model.defaults.end = opt.timelim(end);
         end
     end
+    
     model.defaults.lowf  = [];
     model.defaults.highf = [];
     
 elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     
     model.defaults.analysis= 'Frequency';
-    model.defaults.start   = -10;
-    model.defaults.end     = ALLEEG(index(1)).xmax*1000;
-    if length(opt.freqlim) == 2 && opt.freqlim(1) < opt.freqlim(end)
+    model.defaults.lowf     = ALLEEG(index(1)).freqspec(1);
+    model.defaults.highf    = ALLEEG(index(1)).freqspec(end);
+    if length(opt.freqlim) == 2 && opt.freqlim(1) > model.defaults.lowf
         model.defaults.lowf    = opt.freqlim(1);
+    else
+        fprintf('std_limo: Invalid lower frequency limit, using default value instead');
+    end
+    
+    if length(opt.freqlim) == 2 && opt.freqlim(end) < model.defaults.highf
         model.defaults.highf   = opt.freqlim(end);
     else
-        model.defaults.lowf    = [];
-        model.defaults.highf   = [];
+        fprintf('std_limo: Invalid upper frequency limit, using default value instead');
     end
+ 
     
 elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
