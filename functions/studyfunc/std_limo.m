@@ -350,6 +350,7 @@ for s = 1:nb_subjects
     % save continuous and categorical data files
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
     [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction); %, 'filepath', filepath_tmp); 
+    % [catMat,contMat,limodesign] = std_limodesign(STUDY.design.variable.value, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction); %, 'filepath', filepath_tmp); 
 
     % copy results
     model.cat_files{s}                 = catMat;
