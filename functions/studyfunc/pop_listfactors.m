@@ -109,7 +109,7 @@ if strcmpi(g.gui, 'on')
     % add constant (for GUI)
     allLabels{count} = [ int2str(count) '. Constant' ];
     
-    warndlg2(strvcat(allLabels), 'List of factors');
+    warndlg2(strvcat(allLabels), 'List of explanatory variables');
 end
 
 % convert nested values to linear sequence
