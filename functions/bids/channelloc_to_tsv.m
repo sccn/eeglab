@@ -16,7 +16,7 @@ for electrode = 1:size(EEG.chanlocs,2)
     if contains(EEG.chanlocs(electrode).labels,known_labels)
         type{electrode} = EEG.chanlocs(electrode).labels;
         if contains(EEG.chanlocs(electrode).labels,'EOG')
-            unit{electrode} = 'uV';
+            unit{electrode} = [num2str(char(181)) 'V'];
         elseif contains(EEG.chanlocs(electrode).labels,'ECG')
             unit{electrode} = 'mV';
         else
