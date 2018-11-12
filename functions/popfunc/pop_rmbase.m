@@ -2,7 +2,7 @@
 %                continuous EEG dataset. Calls rmbase().
 % Usage:
 %   >> OUTEEG = pop_rmbase( EEG ); % pop up an interactive arg entry window
-%   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange); % call rmbase()
+%   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange, chanlist); % call rmbase()
 %
 % Graphic interface:
 %    "Baseline latency range" - [edit box] Latency range for the baseline in ms.
