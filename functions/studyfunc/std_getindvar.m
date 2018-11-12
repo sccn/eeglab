@@ -144,7 +144,7 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                 alltmpvals = [];
                 for ind = 1:length(setinfo)
                     if isfield(setinfo(ind).trialinfo, ff{index}) && ~iscell( setinfo(ind).trialinfo(1).(ff{index}))
-                        eval( [ 'tmpvals = unique_bc([ setinfo(ind).trialinfo(1).' ff{index} ' ]);' ] );
+                        eval( [ 'tmpvals = unique_bc([ setinfo(ind).trialinfo.' ff{index} ' ]);' ] );
                     else tmpvals = [];
                     end
                     alltmpvals = [ alltmpvals tmpvals ];
