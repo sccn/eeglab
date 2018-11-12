@@ -104,7 +104,7 @@ else
 end
 
 if strcmpi(mode, 'script') % script mode
-    [STUDY ALLEEG] = std_editset(STUDY, ALLEEG, varargin{:});
+    [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, varargin{:});
     return;
 elseif strcmpi(mode, 'gui') % GUI mode
     % show warning if necessary
@@ -117,6 +117,9 @@ elseif strcmpi(mode, 'gui') % GUI mode
             if strcmpi(res, 'cancel'), return; end
         end
         ALLEEG = [];
+        alleegEmpty = 1;
+    else
+        alleegEmpty = 0;
     end
     
     % set initial datasetinfo
@@ -338,8 +341,12 @@ elseif strcmpi(mode, 'gui') % GUI mode
     
     % run command and create history
     % ------------------------------
-    com = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, ALLEEG, %s );\n[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);', vararg2str(options) );
-    [STUDY ALLEEG] = std_editset(STUDY, ALLEEG, options{:});
+    if alleegEmpty
+        com = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, [], %s );\n[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);', vararg2str(options) );
+    else
+        com = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, ALLEEG, %s );\n[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);', vararg2str(options) );
+    end
+    [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, options{:});
     
 else % internal command
     
