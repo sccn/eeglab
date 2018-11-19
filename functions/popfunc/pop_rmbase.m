@@ -195,5 +195,9 @@ EEG.icaact = [];
 
 if isequal(chanlist, [1:EEG.nbchan]), chanlist = []; end
 if flag_timerange, pointrange = []; else, timerange = []; end
-com = sprintf('EEG = pop_rmbase( EEG, %s);',vararg2str({timerange pointrange chanlist}));
+if isempty(chanlist)
+    com = sprintf('EEG = pop_rmbase( EEG, %s);',vararg2str({timerange pointrange}));
+else
+    com = sprintf('EEG = pop_rmbase( EEG, %s);',vararg2str({timerange pointrange chanlist}));
+end
 return;
