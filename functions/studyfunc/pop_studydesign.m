@@ -106,7 +106,7 @@ if nargin < 3 && ~ischar(STUDY)
                { 'style' 'pushbutton' 'string' 'Delete' 'callback' cb_delvar } ...
                { 'style' 'pushbutton' 'string' 'List factors' 'callback'  cb_list } ...
                { 'style' 'listbox'    'string' ''  'tag' 'lbfact0' 'value' 2 } ...
-               { 'style' 'checkbox'   'string' ' Re-save STUDY file' 'tag' 'chk_save' 'value' 1 }  };
+               { 'style' 'checkbox'   'string' ' Re-save STUDY file (if saved previously)' 'tag' 'chk_save' 'value' 1 }  };
 %               { 'style' 'checkbox'   'string' 'Delete all pre-computed datafiles' 'tag' 'chk_del' 'callback' cb_lbval } };
 %               { 'style' 'checkbox'  'string' 'Paired statistics' 'tag' 'lbpair0' 'callback' cb_lbval } ...
 %               { 'style' 'checkbox'  'string' 'Paired statistics' 'tag' 'lbpair1' 'callback' cb_lbval } ...
@@ -179,7 +179,7 @@ if nargin < 3 && ~ischar(STUDY)
         com = sprintf('STUDY = std_selectdesign(STUDY, ALLEEG, %d);', result.listboxdesign); eval(com);
         allcom = [ allcom 10 com ];
     end
-    if result.chk_save == 1
+    if result.chk_save == 1 && ~isempty(STUDY.filename)
         fprintf('Resaving STUDY\n');
         [STUDY ALLEEG com] = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
         allcom = [ allcom 10 com ];

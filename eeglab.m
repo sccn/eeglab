@@ -1062,6 +1062,17 @@ else
                    'eval(char(get(findobj(''label'', ''Import Philips .mff file''), ''callback'')));' ];
         uimenu( neuro_m, 'Label', 'Import Philips .mff file', 'CallBack', cb_mff, 'separator', 'on');
     end
+    if ~exist('eegplugin_firfilt', 'file')
+        neuro_m = findobj(W_MAIN, 'tag', 'filter');
+        cb_filter = [ 'if ~plugin_askinstall(''firfilt'', ''eegplugin_firfilt''), return; end;' ...
+                   'eval(char(get(findobj(''label'', ''Basic FIR filter (new, default)''), ''callback'')));' ];
+        uimenu( neuro_m, 'Label', 'Basic FIR filter (new, default)', 'CallBack', cb_filter, 'separator', 'on');
+    end
+    if ~exist('pop_dipfit_settings', 'file')
+        neuro_m = findobj(W_MAIN, 'tag', 'tools');
+        cb_dipfit = [ 'if ~plugin_askinstall(''dipfit'', ''pop_dipfit_settings''), return; end;'  ];
+        uimenu( neuro_m, 'Label', 'Locate dipoles using DIPFIT 2.x', 'CallBack', cb_dipfit, 'separator', 'on');
+    end
     if ~exist('pop_loadbva', 'file')
         neuro_m = findobj(W_MAIN, 'tag', 'import data');
         cb_bva1 = [ 'if ~plugin_askinstall(''bva-io'', ''pop_loadbva''), return; end;' ...

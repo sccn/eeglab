@@ -398,21 +398,13 @@ if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
 elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     
     model.defaults.analysis= 'Frequency';
-    model.defaults.lowf     = ALLEEG(index(1)).freqspec(1);
-    model.defaults.highf    = ALLEEG(index(1)).freqspec(end);
-    if length(opt.freqlim) == 2 && opt.freqlim(1) > model.defaults.lowf
+    if length(opt.freqlim) == 2
         model.defaults.lowf    = opt.freqlim(1);
+        model.defaults.highf   = opt.freqlim(2);
     else
-        fprintf('std_limo: Invalid lower frequency limit, using default value instead');
+        error('std_limo: Frequency limits need to be specified');
     end
-    
-    if length(opt.freqlim) == 2 && opt.freqlim(end) < model.defaults.highf
-        model.defaults.highf   = opt.freqlim(end);
-    else
-        fprintf('std_limo: Invalid upper frequency limit, using default value instead');
-    end
- 
-    
+        
 elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
     model.defaults.start    = [];
