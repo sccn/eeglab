@@ -30,7 +30,7 @@ for electrode = 1:size(EEG.chanlocs,2)
     reference{electrode} = EEG.ref;
 end
 
-t = table(ename',unit',type',sampling_frequency',reference','VariableNames',{'name','units','type','sampling_reference','reference'});
+t = table(ename',type',unit',sampling_frequency',reference','VariableNames',{'name','type','units','sampling_reference','reference'});
 channels_tsv_name = [EEG.filepath filesep EEG.filename(1:end-4) '_channels.tsv'];
 writetable(t,channels_tsv_name,'FileType','text','Delimiter','\t');
 
