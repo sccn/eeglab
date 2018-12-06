@@ -125,7 +125,7 @@ for subject =1:N
             end
             
             if exist([tmp.filepath filesep name '.daterpim'],'file')
-                if ~exist(subj_derivatives_dir,'dir')' mkdir(subj_derivatives_dir); end
+                if ~exist(subj_derivatives_dir,'dir'); mkdir(subj_derivatives_dir); end
                 if strcmpi(keep_files,'no')
                     movefile([tmp.filepath filesep name '.daterpim'],[subj_derivatives_dir filesep newname '_task-' task '_sess-1_run-' num2str(run) '_desc-erpimg_eeg.daterpim']);
                 elseif strcmpi(keep_files,'yes')
