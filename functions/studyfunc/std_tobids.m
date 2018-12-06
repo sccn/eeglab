@@ -135,7 +135,7 @@ for subject =1:N
             end
             
             if exist([tmp.filepath filesep name '.datspec'],'file')
-                if ~exist(subj_derivatives_dir,'dir')' mkdir(subj_derivatives_dir); end
+                if ~exist(subj_derivatives_dir,'dir'); mkdir(subj_derivatives_dir); end
                 if strcmpi(keep_files,'no')
                     movefile([tmp.filepath filesep name '.datspec'],[subj_derivatives_dir filesep newname '_task-' task '_sess-1_run-' num2str(run) '_desc-spectrum_eeg.datspec']);
                 elseif strcmpi(keep_files,'yes')
@@ -145,7 +145,7 @@ for subject =1:N
             end
             
             if exist([tmp.filepath filesep name '.dattimef'],'file')
-                if ~exist(subj_derivatives_dir,'dir')' mkdir(subj_derivatives_dir); end
+                if ~exist(subj_derivatives_dir,'dir'); mkdir(subj_derivatives_dir); end
                 if strcmpi(keep_files,'no')
                     movefile([tmp.filepath filesep name '.dattimef'],[subj_derivatives_dir filesep newname '_task-' task '_sess-1_run-' num2str(run) '_desc-timefrequency_eeg.dattimef']);
                 elseif strcmpi(keep_files,'yes')
