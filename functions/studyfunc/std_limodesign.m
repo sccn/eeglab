@@ -20,8 +20,7 @@
 %                  factors. Default is 'off'.
 %   'interaction' - ['on'|'off'] compute interaction when using different
 %                  categorical variables. This allows computing interactions
-%                  between all variables - NOT USED BY std_limo, if set using
-%                  the study GUI, 'full factorial' is used instead by LIMO EEG.
+%                  between all variables - NOT the same as 'full factorial'
 %                  Default is 'off'.
 %   'desconly'    - ['on'|'off'] only output description
 %
