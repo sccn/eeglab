@@ -20,7 +20,8 @@
 %                  factors. Default is 'off'.
 %   'interaction' - ['on'|'off'] compute interaction when using different
 %                  categorical variables. This allows computing interactions
-%                  between these variables (useful for single subject analyses).
+%                  between all variables - NOT USED BY std_limo, if set using
+%                  the study GUI, 'full factorial' is used instead by LIMO EEG.
 %                  Default is 'off'.
 %   'desconly'    - ['on'|'off'] only output description
 %
@@ -82,7 +83,7 @@ for iVar = 1:length(catVarLabel)
     alloptions{iVar} = cellfun(@(x){catVarLabel{iVar} x}, values, 'uniformoutput', false);
 end
 
-% compute interactions if necessary
+% compute all interactions if necessary
 % ---------------------------------
 if length(alloptions) > 1
     alloptionsinter = inter(alloptions);
