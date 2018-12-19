@@ -349,12 +349,11 @@ end
 % -------------------
 
 % by default we create a design matrix with all condition
-% then we add contrasts for conditions that were merged during design selection
 factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off');
 for s = 1:nb_subjects     
     % save continuous and categorical data files
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
-    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', 'off'); % never use interaction here
+    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction); 
 
     % copy results
     model.cat_files{s}                 = catMat;
@@ -366,6 +365,7 @@ for s = 1:nb_subjects
     STUDY.limo.subjects(s).cont_file   = contMat;
 end
 
+% then we add contrasts for conditions that were merged during design selection
 if length(STUDY.design(opt.design).variable.value) ~= length(factors)
     limocontrast = zeros(length(STUDY.design(opt.design).variable.value),length(factors)+1); % length(factors)+1 to add the contant
     for n=1:length(factors)
@@ -383,6 +383,7 @@ model.cat_files  = model.cat_files';
 model.cont_files = model.cont_files';
 if all(cellfun(@isempty, model.cat_files )), model.cat_files  = []; end
 if all(cellfun(@isempty, model.cont_files)), model.cont_files = []; end
+
 
 % set model.defaults - all conditions no bootstrap
 % -----------------------------------------------------------------
@@ -428,17 +429,14 @@ elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
     model.defaults.highf    = [];
 end
 
-if strcmp(opt.interaction,'on')
-    model.defaults.fullfactorial    = 1;                 % full factorial with interaction only for single subject analyses - not included for studies
-else
-    model.defaults.fullfactorial    = 0;                 % all variables 
-end
+model.defaults.fullfactorial    = 0;                 % all variables 
 model.defaults.zscore           = 0;                 % done that already
 model.defaults.bootstrap        = 0 ;                % only for single subject analyses - not included for studies
 model.defaults.tfce             = 0;                 % only for single subject analyses - not included for studies
 model.defaults.method           = opt.method;        % default is OLS - to be updated to 'WLS' once validated
 model.defaults.Level            = 1;                 % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % option can be multivariate (work in progress)
+
 
 if ~exist('limocontrast','var')
     [LIMO_files, procstatus] = limo_batch('model specification',model,[],STUDY);
