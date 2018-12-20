@@ -5,9 +5,9 @@ EEGLAB is an open source signal processing environment for electrophysiological 
 Matlab toolbox, all released under the Gnu public license (see eeglablicence.txt). See the EEGLAB tutorial and reference paper (URLs given below) for more information.
 
 # Instaling/cloning
-Make sure you clone including sub-modules
+Make sure you include sub-modules when you clone
 
-
+git clone --recurse-submodules https://github.com/eeglabdevelopers/eeglab.git
 
 # Sub-directories:
 
