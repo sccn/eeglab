@@ -1,7 +1,7 @@
 
 
 # What is EEGLAB?
-EEGLAB is an open source signal processing environment for electrophysiological signals running on Matlab. This folder contains original Matlab functions from the EEGLAB (formerly ICA/EEG) Matlab toolbox, all released under the Gnu public license (see eeglablicence.txt). See the EEGLAB tutorial and reference paper (URLs given below) for more information.
+EEGLAB is an open source signal processing environment for electrophysiological signals running on Matlab and Octave (command line only for Octave). This folder contains original Matlab functions from the EEGLAB (formerly ICA/EEG) Matlab toolbox, all released under the Gnu public license (see eeglablicence.txt). See the EEGLAB tutorial and reference paper (URLs given below) for more information.
 
 # Instaling/cloning
 Make sure you include sub-modules when you clone
