@@ -208,11 +208,10 @@ end
 if exist(filename) && strcmpi(g.recompute, 'off')
 
     fprintf('File "%s" found on disk, no need to recompute\n', filename);
-    setinfo.filebase = g.fileout;
     if strcmpi(prefix, 'comp')
-        [X tmp f] = std_readfile(setinfo, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
+        [X,tmp,f] = std_readfile(filename, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
     else
-        [X tmp f] = std_readfile(setinfo, 'channels', g.channels, 'freqlimits', g.freqrange, 'measure', 'spec');
+        [X,tmp,f] = std_readfile(filename, 'channels', g.channels, 'freqlimits', g.freqrange, 'measure', 'spec');
     end
     if ~isempty(X), return; end
 end
@@ -223,8 +222,8 @@ options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end
 if isempty(g.channels)
-     [X boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
-else [X boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
+     [X,boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
+else [X,boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end
 if ~isempty(boundaries) && boundaries(end) ~= size(X,2), boundaries = [boundaries size(X,2)]; end
  
