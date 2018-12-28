@@ -264,7 +264,9 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
             STUDY.datasetinfo(currentind).index     = currentind;    
-        otherwise, error(sprintf('Unknown command %s', g.commands{k}));
+        otherwise
+            % running custom command
+            STUDY.datasetinfo(currentind).(g.commands{k}) = g.commands{k+1};
     end
 end
 
