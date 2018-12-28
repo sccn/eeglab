@@ -170,7 +170,7 @@ else
             indelec = measure2 < opt.threshold(1) | measure1 > opt.threshold(end);
             disp('Selecting minimum and maximum power over the frequency range');
         else
-            indelec = measure > opt.threshold(1);
+            indelec = measure1 > opt.threshold(1);
             disp('Selecting maximum power over the frequency range');
         end
     end
