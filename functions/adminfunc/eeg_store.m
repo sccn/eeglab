@@ -50,7 +50,7 @@
 
 % store set
 % ------------------
-function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, varargin);
+function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, varargin)
 
 % check parameter consistency
 % ------------------------------
@@ -72,7 +72,7 @@ if length(EEG) > 1
             [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
             ALLEEG(storeSetIndex(index)).saved = tmpsaved;
             TMPEEG(index).saved                = tmpsaved;
-        end;        
+        end
     else
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
@@ -84,7 +84,7 @@ if length(EEG) > 1
         end
     end
     EEG = TMPEEG;
-	return;
+	return
 end
 
 if nargin < 3
@@ -97,11 +97,11 @@ if nargin < 3
 end
 
 if isempty(varargin) % no text output and no check (study loading)
-    [ EEG com ]  = eeg_checkset(EEG);
+    [ EEG, com ]  = eeg_checkset(EEG);
 else
     com = '';
 end
-if nargin > 2, 
+if nargin > 2 
     if storeSetIndex == 0 || strcmpi(EEG.saved, 'justloaded')
         EEG.saved = 'yes'; % just loaded
     else 
@@ -123,14 +123,14 @@ end
 
 if findindex
 	i = 1;
-	while (i<2000)
+	while (i<10000)
 		try
-			if isempty(ALLEEG(i).data);
-				storeSetIndex = i; i = 2000;
+			if isempty(ALLEEG(i).data)
+				storeSetIndex = i; i = 10000;
 			end
 			i = i+1;	
 		catch
-			storeSetIndex = i; i = 2000;
+			storeSetIndex = i; i = 10000;
 		end
    end
    if isempty(varargin) % no text output and no check
@@ -149,7 +149,7 @@ if ~isempty( ALLEEG )
 		allfields = fieldnames( EEG );
 		for i=1:length( allfields )
 			ALLEEG(storeSetIndex).(allfields{i}) = EEG.(allfields{i});
-		end;	
+        end
         if ~isfield(EEG, 'datfile') && isfield(ALLEEG, 'datfile')
             ALLEEG(storeSetIndex).datfile = '';
         end
@@ -161,6 +161,5 @@ else
 		ALLEEG(1) = ALLEEG(storeSetIndex); % empty
  		ALLEEG(storeSetIndex) = ALLEEG(storeSetIndex+1); 
  		ALLEEG = ALLEEG(1:storeSetIndex);
- 	end;	
-end;	
-return;
+    end	
+end	
