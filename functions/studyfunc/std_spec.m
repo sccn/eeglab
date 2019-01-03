@@ -45,6 +45,8 @@
 %   'interp'     - [struct] channel location structure containing electrode
 %                  to interpolate ((this entry is ignored when plotting 
 %                  components). Default is no interpolation.
+%   'output'     - ['power'|'fft'] compute power of keep single complex
+%                  'fft' estimate. Default is 'power'.
 %   'fileout'    - [string] name of the file to save on disk. The default
 %                  is the same name (with a different extension) as the 
 %                  dataset given as input.
@@ -73,7 +75,8 @@
 %                  period.
 %   'logtrials'  - ['on'|'off'] compute single-trial log transform before
 %                  averaging them. Default is 'off' for 'psd' specmode and
-%                  'on' for 'fft' specmode.
+%                  'on' for 'fft' specmode. Ignored when output is set to
+%                  'fft'.
 %   'continuous' - ['on'|'off'] force epoch data to be treated as
 %                  continuous so small data epochs can be extracted for the
 %                  'fft' specmode option. Default is 'off'.
@@ -161,6 +164,7 @@ end
                                       'savetrials' 'string'  { 'on','off' } 'off';
                                       'continuous' 'string'  { 'on','off' } 'off';
                                       'logtrials'  'string'  { 'on','off' 'notset' } 'notset';
+                                      'output'     'string'  { 'power','fft' } 'power';
                                       'savefile'   'string'  { 'on','off' } 'on';
                                       'epochlim'   'real'    []         [0 1];
                                       'trialindices' { 'integer','cell' } []         [];
@@ -176,6 +180,7 @@ end
 if ischar(g), error(g); end
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
+if ~strcmpi(g.specmode, 'fft') && strcmpi(g.output, 'ftt'), error('FFT option only valid when computing FFT'); end
 if isfield(EEG,'icaweights')
    numc = size(EEG(1).icaweights,1);
 else
@@ -203,11 +208,10 @@ end
 if exist(filename) && strcmpi(g.recompute, 'off')
 
     fprintf('File "%s" found on disk, no need to recompute\n', filename);
-    setinfo.filebase = g.fileout;
     if strcmpi(prefix, 'comp')
-        [X tmp f] = std_readfile(setinfo, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
+        [X,tmp,f] = std_readfile(filename, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
     else
-        [X tmp f] = std_readfile(setinfo, 'channels', g.channels, 'freqlimits', g.freqrange, 'measure', 'spec');
+        [X,tmp,f] = std_readfile(filename, 'channels', g.channels, 'freqlimits', g.freqrange, 'measure', 'spec');
     end
     if ~isempty(X), return; end
 end
@@ -218,8 +222,8 @@ options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end
 if isempty(g.channels)
-     [X boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
-else [X boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
+     [X,boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
+else [X,boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end
 if ~isempty(boundaries) && boundaries(end) ~= size(X,2), boundaries = [boundaries size(X,2)]; end
  
@@ -368,10 +372,15 @@ else % fft mode
     f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
     f     = f(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:floor(size(tmp,2)/2),:);
-    X     = tmp.*conj(tmp);
-    if strcmpi(g.logtrials, 'on'),  X = 10*log10(X); end
-    if strcmpi(g.savetrials, 'off'), X = mean(X,3); end
-    if strcmpi(g.logtrials, 'off'),  X = 10*log10(X); end
+    if strcmpi(g.output, 'power')
+        X     = tmp.*conj(tmp);
+        if strcmpi(g.logtrials, 'on'),  X = 10*log10(X); end
+        if strcmpi(g.savetrials, 'off'), X = mean(X,3); end
+        if strcmpi(g.logtrials, 'off'),  X = 10*log10(X); end
+    else
+        X = tmp;
+        datatype = 'SPECTRUMFFT';
+    end
 end
 eeglab_options;
 if option_single

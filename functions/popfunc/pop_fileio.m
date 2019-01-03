@@ -43,7 +43,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG, command] = pop_fileio(filename, varargin); 
+function [EEG, command] = pop_fileio(filename, varargin)
 EEG = [];
 command = '';
 
@@ -201,10 +201,14 @@ if isfield(dat, 'label') && ~isempty(dat.label)
     %If more formats, add them below
     try
         if isfield(dat,'elec')
-            eegchanindx = find(ft_chantype(dat, 'eeg'));
+            eegchanindx = find(ft_chantype(dat, 'eeg') | ft_chantype(dat, 'pns') );
             if ~isempty(eegchanindx)
                 for ichan = 1:length(eegchanindx)
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'EEG'});
+                    chanType = 'EEG';
+                    if isfield(dat, 'chantype') && ~isempty(dat.chantype)
+                        chanType = dat.chantype{ichan};
+                    end
+                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' chanType});
                 end
                 EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
                 EEG.urchanlocs = EEG.chanlocs;

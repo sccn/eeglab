@@ -2,7 +2,7 @@
 %                continuous EEG dataset. Calls rmbase().
 % Usage:
 %   >> OUTEEG = pop_rmbase( EEG ); % pop up an interactive arg entry window
-%   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange); % call rmbase()
+%   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange, chanlist); % call rmbase()
 %
 % Graphic interface:
 %    "Baseline latency range" - [edit box] Latency range for the baseline in ms.
@@ -195,5 +195,9 @@ EEG.icaact = [];
 
 if isequal(chanlist, [1:EEG.nbchan]), chanlist = []; end
 if flag_timerange, pointrange = []; else, timerange = []; end
-com = sprintf('EEG = pop_rmbase( EEG, %s);',vararg2str({timerange pointrange chanlist}));
+if isempty(chanlist)
+    com = sprintf('EEG = pop_rmbase( EEG, %s);',vararg2str({timerange pointrange}));
+else
+    com = sprintf('EEG = pop_rmbase( EEG, %s);',vararg2str({timerange pointrange chanlist}));
+end
 return;

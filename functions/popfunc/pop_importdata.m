@@ -62,8 +62,8 @@
 %
 % Optional inputs:
 %   'setname'    - Name of the EEG dataset
-%   'data'       - ['varname'|'filename'] Import data from a Matlab variable or file
-%                  into an EEG data structure 
+%   'data'       - ['varname'|'filename'|array] Import data from a Matlab variable 
+%                  or file into an EEG data structure.
 %   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data format.
 %                  'array' is a Matlab array in the global workspace.
 %                  'matlab' is a Matlab file (which must contain a single variable).

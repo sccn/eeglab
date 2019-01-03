@@ -20,8 +20,9 @@
 %                  factors. Default is 'off'.
 %   'interaction' - ['on'|'off'] compute interaction when using different
 %                  categorical variables. This allows computing interactions
-%                  between these variables at the second level. Default 
-%                  is 'on'.
+%                  between all variables - NOT USED BY std_limo, if set using
+%                  the study GUI, 'full factorial' is used instead by LIMO EEG.
+%                  Default is 'off'.
 %   'desconly'    - ['on'|'off'] only output description
 %
 %  Outputs:
@@ -60,7 +61,7 @@ end
 % -----------------------
 opt = finputcheck( varargin, ...
     { 'splitreg'       'string'  { 'on','off' }   'off';
-      'interaction'    'string'  { 'on','off' }   'on';
+      'interaction'    'string'  { 'on','off' }   'off';
       'desconly'       'string'  { 'on','off' }   'off';
       'filepath'       'string'  {            }   ''    }, 'std_limosavedesignfiles');
 if ischar(opt), error(opt); end
@@ -82,13 +83,10 @@ for iVar = 1:length(catVarLabel)
     alloptions{iVar} = cellfun(@(x){catVarLabel{iVar} x}, values, 'uniformoutput', false);
 end
 
-% compute interactions if necessary
+% compute all interactions if necessary
 % ---------------------------------
 if length(alloptions) > 1
     alloptionsinter = inter(alloptions);
-    for iOpt = 1:length(alloptionsinter)
-        alloptionsinter{iOpt} = [ alloptionsinter{iOpt}{:} ];
-    end
     alloptionsinter = { alloptionsinter }; % 1 condition only
 else
     alloptionsinter = alloptions;
@@ -166,7 +164,7 @@ else
     c = inter(a(2:end));
     for iVal1 = 1:length(a{1})
         for iVal2 = 1:length(c)
-            b{(iVal1-1)*length(c)+iVal2} = { a{1}{iVal1} c{iVal2} };
+            b{(iVal1-1)*length(c)+iVal2} = { a{1}{iVal1}{:} c{iVal2}{:} };
         end
     end
 end

@@ -94,6 +94,20 @@ if isfield(dat, 'Label') && ~isempty(dat.Label)
         EEG.chanlocs = struct('labels', dat.Label(dat.InChanSelect)); % sjo added 120907 to avoid error below % 5/8/2104 insert (dat.InChanSelect) Ramon
     end
     if length(EEG.chanlocs) > EEG.nbchan, EEG.chanlocs = EEG.chanlocs(1:EEG.nbchan); end
+    
+    % check BIOSEMI channel types
+    if strcmpi(dat.TYPE, 'BDF')
+        bdftype = { 'EXG1'  'EXG2'  'EXG3'  'EXG4'  'EXG5'  'EXG6'  'EXG7'  'EXG8'  'GSR1'  'GSR2'  'Erg1'  'Erg2'  'Resp'  'Plet'  'Temp';
+                    'MISC'  'MISC'  'MISC'  'MISC'  'MISC'  'MISC'  'MISC'  'MISC'  'GSR'   'GSR'   'MISC'  'MISC'  'RESP'  'PPG'   'TEMP' };
+        for iChan = 1:length(EEG.chanlocs)
+            matchChan = strmatch(EEG.chanlocs(iChan).labels, bdftype(1,:), 'exact');
+            if ~isempty(matchChan)
+                EEG.chanlocs(iChan).type = bdftype{2,matchChan};
+            else
+                EEG.chanlocs(iChan).type = 'EEG';
+            end
+        end
+    end
 end
 EEG = eeg_checkset(EEG);
 

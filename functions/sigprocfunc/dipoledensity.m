@@ -84,9 +84,9 @@
 % See also:
 %           EEGLAB: dipplot(), mri3dplot(), Fieldtrip: find_inside_vol() 
 %
-% Author: Arnaud Delorme & Scott Makeig, SCCN, INC, UCSD
-% 02/19/2013 'norm2JointProb' added by Makoto.
-
+% Authors: Arnaud Delorme & Scott Makeig SCCN, INC, UCSD
+% Modified by: Makoto Miyakoshi
+%              Ramon Martinez-Cancino
 % Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, 2003-
 %
 % This program is free software; you can redistribute it and/or modify
@@ -187,7 +187,7 @@ if 0 % deprecated
             count = count + 1;
         end
     end
-end;    
+end    
 
 % check weights
 % -------------
@@ -241,12 +241,12 @@ if isempty(g.mri) % default MRI file
     g.mri = mri;
 end
 if ischar(g.mri)
-    try, 
+    try
         mri = load('-mat', g.mri);
         mri = mri.mri;
-    catch,
+    catch
         disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
-        try,
+        try
             warning off;
             mri = read_fcdc_mri(g.mri);
             mri.anatomy = round(gammacorrection( mri.anatomy, 0.8));
@@ -256,7 +256,7 @@ if ischar(g.mri)
             % WARNING: the transform matrix is not 1, 1, 1 on the diagonal, some slices may be 
             % misplaced
             warning on;
-        catch,
+        catch
             error('Cannot load file using read_fcdc_mri');
         end
     end
@@ -295,12 +295,10 @@ end
 dipfitdefs; % get the location of standard BEM volume file
 tmp = load('-mat',DIPOLEDENSITY_STDBEM); % load MNI mesh
 
-if isempty(g.volmesh_fname)  % default
-    filename = [ '/home/arno/matlab/MNI_VoxelTsearch' int2str(g.subsample) '.mat' ];
-else
-    filename = g.volmesh_fname; %
-end
-if ~exist(filename)
+if ~exist(g.volmesh_fname)
+    % Checking for Fieldtrip
+    if exist('ft_electroderealign', 'file')~=2,error('dipoledensity: Fieldtrip toolbox is required'); end
+    
     disp('Computing volume within head mesh...');
     [X Y Z]           = meshgrid(g.mri.xgrid(1:g.subsample:end)+g.subsample/2, ...
                                  g.mri.ygrid(1:g.subsample:end)+g.subsample/2, ...
@@ -330,14 +328,14 @@ if ~exist(filename)
         Inside        = find(isnan(IO));
         Outside       = find(~isnan(IO));
         disp('Done.');
-    end; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    try, 
-        save('-mat', filename, 'allpoints', 'allinds', 'Inside', 'Outside');
+    end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    try 
+        save('-mat', g.volmesh_fname, 'allpoints', 'allinds', 'Inside', 'Outside');
         disp('Saving file containing inside/outide voxel indices...');
     catch, end
 else
     disp('Loading file containing inside/outide voxel indices...');
-    load('-mat',filename);
+    load('-mat',g.volmesh_fname);
 end
 InsidePoints  = allpoints(:, Inside);
 InsideIndices = allinds(:, Inside);
@@ -424,6 +422,7 @@ end
 fprintf('\n');
 
 % normalize for points inside and outside the volume
+% norm2JointProb is applied before plotting
 % --------------------------------------------------
 if strcmpi(g.method, 'alldistance') && strcmpi(g.normalization,'on')
     for i =1:length(g.weight)
@@ -432,16 +431,9 @@ if strcmpi(g.method, 'alldistance') && strcmpi(g.normalization,'on')
             fprintf('WARNING: Some probabilities are negative, this will likely cause problems when normalizing probabilities.\n');
             fprintf('It is highly recommended to turn normaliziation off by using ''normalization'' key to ''off''.\n');
         end
-        totval = sum(prob3d{i}(:));  % total values in the head
-        switch g.norm2JointProb
-            case 'off'
-                totdip = size(allx,2);   % number of dipoles
-                voxvol;                  % volume of a voxel in mm^3
-                prob3d{i} = prob3d{i}/totval*totdip/voxvol*1000; % time 1000 to get cubic centimeters
-                prob3d{i} = prob3d{i}/g.nsessions;
-            case 'on'
-                prob3d{i} = prob3d{i}/totval;
-        end
+        totval = sum(prob3d{i}(:));                                     % total values in the head
+        totdip = size(allx,2);                                          % number of dipoles
+        prob3d{i} = (prob3d{i}/totval*totdip/voxvol*1000)/g.nsessions;  % time 1000 to get cubic centimeters
     end
 end
 
@@ -456,7 +448,7 @@ if g.subsample ~= 1
         Z = ceil(g.mri.zgrid/g.subsample);
         for index = 1:size(newprob3d,3)
             newprob3d(:,:,index) = prob3d{i}(X,Y,Z(index));
-        end;    
+        end    
         prob3d{i} = newprob3d;
     end
 end
@@ -468,6 +460,11 @@ if g.smooth ~= 0
     for i =1:length(g.weight)
         prob3d{i} = smooth3d(prob3d{i}, g.smooth);
     end
+end
+
+% Perform normalization so that the total sum of joint prob == 1
+if strcmpi(g.norm2JointProb, 'on')
+    prob3d{i} = prob3d{i}/sum(prob3d{i}(:));
 end
 
 % plotting

@@ -15,7 +15,7 @@
 %   'interaction' - ['on'|'off'] compute interaction when using different
 %                  categorical variables. This allows computing interactions
 %                  between these variables at the second level. Default 
-%                  is 'on'.
+%                  is 'off'.
 % 
 % Author: Arnaud Delorme, UCSD, 2018
 
@@ -43,7 +43,7 @@ end
 
 g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
                             'splitreg'    'string' { 'on','off' } 'off';
-                            'interaction' 'string' { 'on','off' } 'on' });
+                            'interaction' 'string' { 'on','off' } 'off' });
 if ischar(g)
     error(g);
 end
@@ -102,14 +102,14 @@ if strcmpi(g.gui, 'on')
         end
     end
     for iCont = 1:length(des.continuous)
-        allLabels{count} = formatcond(des.continuous{iCont});
+        allLabels{count} = [ int2str(count) '. ' formatcond(des.continuous{iCont}) ];
         count = count+1;
     end
     
     % add constant (for GUI)
     allLabels{count} = [ int2str(count) '. Constant' ];
     
-    warndlg2(strvcat(allLabels), 'List of factors');
+    warndlg2(strvcat(allLabels), 'List of explanatory variables');
 end
 
 % convert nested values to linear sequence

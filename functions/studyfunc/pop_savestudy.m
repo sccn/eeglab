@@ -56,7 +56,7 @@ if nargin > 1
     end
 end
 
-if nargin < 3
+if nargin < 3 || isempty(STUDY.filename)
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.study', ...
