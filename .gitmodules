@@ -3,4 +3,4 @@
 	url = https://arnodelorme@github.com/widmann/firfilt.git
 [submodule "plugins/dipfit"]
 	path = plugins/dipfit
-	url = git@github.com:eeglabdevelopers/dipfit.git
+	url = https://github.com/eeglabdevelopers/dipfit.git
