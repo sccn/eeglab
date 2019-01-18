@@ -728,6 +728,7 @@ else
                      args{ curfield+1 } = fullfile(tmpp, tmpf);
                 end
                 tmpargs = args{ curfield+1 };
+                [tmp, tmp, filext] = fileparts(tmpargs);
                 if isempty(tmpargs), return; end
                 fid = fopen(tmpargs, 'w');
                 if fid ==-1, error('Cannot open file'); end
@@ -736,8 +737,11 @@ else
                 fields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' };
                 tmpdiff = setdiff(fields, allfields);
                 if ~isempty(tmpdiff), error(sprintf('Field "%s" missing in channel location structure', tmpdiff{1})); end
-                [tmp,ia,tmp] = intersect(allfields,fields,'stable');  %Getting the original order from file
-                origfield = allfields(ia);
+                if strcmpi(filext,'.ced')
+                    origfield = fields;  % Setting the order as expected in readlocs.m
+                else
+                    origfield = intersect(allfields,fields,'stable');  % Getting the original order from file
+                end
                 fprintf(fid, 'Number\t');
                 for field = 1:length(fields)
                     fprintf(fid, '%s\t', origfield{field});
