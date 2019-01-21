@@ -474,6 +474,7 @@ catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
 catchstrs.new_non_empty          = e_newset;
 catchstrs.update_study           = e_plot_study;
+catchstrs.load_study             = e_load_study;
 
 % create eeglab figure
 % --------------------
@@ -757,7 +758,7 @@ uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'userdata', 
 filter_m = uimenu( tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
 uimenu( filter_m, 'Label', 'Basic FIR filter (legacy)'            , 'userdata', ondatastudy, 'CallBack', cb_eegfilt);
 
-uimenu( tools_m, 'Label', 'Re-reference'                          , 'userdata', ondata, 'CallBack', cb_reref);
+uimenu( tools_m, 'Label', 'Re-reference'                          , 'userdata', ondata, 'CallBack', cb_reref, 'userdata', 'study:on');
 uimenu( tools_m, 'Label', 'Interpolate electrodes'                , 'userdata', ondata, 'CallBack', cb_interp);
 uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'userdata', ondata, 'CallBack', cb_eegplot);
 uimenu( tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on');
