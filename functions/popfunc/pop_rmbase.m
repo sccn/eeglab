@@ -63,7 +63,7 @@ if nargin < 1
 	return;
 end
 if nargin < 4 || isempty(chanlist)
-    chanlist = 1:EEG.nbchan;
+    chanlist = 1:EEG(1).nbchan;
 end
 if nargin < 2 
     % popup window parameters
@@ -123,7 +123,7 @@ if nargin < 2
         end
     else
         timerange = [];
-        pointrange = [1:EEG(1).pnts];
+        pointrange = [];
     end
     if ~isempty(sres.chantypes)
         chanlist = eeg_decodechan(EEG.chanlocs, parsetxt(sres.chantype), 'type');
@@ -136,8 +136,11 @@ end
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
-    [ EEG com ] = eeg_eval( 'pop_rmbase', EEG, 'warning', 'on', 'params', ...
-                            { timerange pointrange chanlist } );
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_rmbase', EEG, 'warning', 'on', 'params', { timerange pointrange chanlist } );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_rmbase', EEG, 'params', { timerange pointrange chanlist } );
+    end
     return;
 end
 
