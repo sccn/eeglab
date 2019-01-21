@@ -80,19 +80,17 @@ if nargin < 1
    help pop_reref;
    return;
 end;   
-if isempty(EEG.data)
+if isempty(EEG(1).data)
     error('Pop_reref: cannot process empty data');
 end
 
 % gui inputs
 % ----------
-orichanlocs = EEG.chanlocs;
-orinbchan   = EEG.nbchan;
 if nargin < 2
     
     % find initial reference
     % ----------------------
-    if length(EEG.chanlocs) == EEG.nbchan+1
+    if length(EEG(1).chanlocs) == EEG(1).nbchan+1
         includeref = 1;
     end
     
@@ -120,13 +118,13 @@ if nargin < 2
                     'else,' ...
                     '   tmpchaninfo = EEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.nodatchans.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval); clear tmpchanlocs tmp tmpval;' ...
                     'end;' ];
-    if isempty(EEG.chanlocs), cb_chansel1 = ''; cb_chansel2 = ''; cb_chansel3 = ''; end
+    if isempty(EEG(1).chanlocs), cb_chansel1 = ''; cb_chansel2 = ''; cb_chansel3 = ''; end
     
     % find current reference (= reference most used)
     % ----------------------------------------------
     if isfield(EEG(1).chanlocs, 'ref')
         tmpchanlocs = EEG(1).chanlocs;
-        [curref tmp allinds] = unique_bc( { tmpchanlocs.ref });
+        [curref,~,allinds] = unique_bc( { tmpchanlocs.ref });
         maxind = 1;
         for ind = unique_bc(allinds)
             if length(find(allinds == ind)) > length(find(allinds == maxind))
@@ -135,7 +133,8 @@ if nargin < 2
         end
         curref = curref{maxind};
         if isempty(curref), curref = 'unknown'; end
-    else curref = 'unknown';
+    else
+        curref = 'unknown';
     end
     
     uilist = { { 'style' 'text' 'string' [ 'Current data reference state is: ' curref] } ...
@@ -159,22 +158,22 @@ if nargin < 2
                { 'style' 'edit' 'tag' 'refloc' 'string' '' } ...
                { 'style' 'pushbutton' 'string' '...' 'callback' cb_chansel3 } };
     
-    [result tmp tmp2 restag] = inputgui(geometry, uilist, 'pophelp(''pop_reref'')', 'pop_reref - average reference or re-reference data');
+    [result,~,~,restag] = inputgui(geometry, uilist, 'pophelp(''pop_reref'')', 'pop_reref - average reference or re-reference data');
     if isempty(result), return; end
 
     % decode inputs
     % -------------
     options = {};
-    if ~isempty(restag.refloc),
+    if ~isempty(restag.refloc)
          try
-             tmpchaninfo = EEG.chaninfo;
+             tmpchaninfo = EEG(1).chaninfo;
              tmpallchans = lower({ tmpchaninfo.nodatchans.labels });
              allelecs = parsetxt(lower(restag.refloc));
              chanind  = [];
              for iElec = 1:length(allelecs)
                  chanind = [chanind strmatch( allelecs{iElec}, tmpallchans, 'exact') ];
              end
-             options = { options{:} 'refloc' EEG.chaninfo.nodatchans(chanind) }; 
+             options = { options{:} 'refloc' EEG(1).chaninfo.nodatchans(chanind) }; 
          catch, disp('Error with old reference: ignoring it');
          end
     end
@@ -194,6 +193,20 @@ else
     options = varargin;
 end
 if ischar(ref), ref = { ref }; end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_reref', EEG, 'warning', 'on', 'params', {ref options{:} } );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_reref', EEG, 'params', {ref options{:} } );
+    end
+    return;
+end
+
+orichanlocs = EEG.chanlocs;
+orinbchan   = EEG.nbchan;
 if iscell(ref), ref = eeg_chaninds(EEG, ref); end
 optionscall = options;
 
