@@ -997,19 +997,13 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
 
   try
+      dsaffsda
       [Xi,Yi,Zi] = griddata(inty,intx,double(intValues),yi',xi,'v4'); % interpolate data
       [Xi,Yi,ZiC] = griddata(inty,intx,double(intContourVals),yi',xi,'v4'); % interpolate data
   catch,
-      [Xi2,Yi2,Zi2]  = griddata(inty,intx,intValues',yi,xi','nearest'); % interpolate data (Octave)
-      [Xi2,Yi2,ZiC2] = griddata(inty,intx,intContourVals',yi,xi','nearest'); % interpolate data
-      
-      Xi2 = decimate(Xi2);
-      Yi2 = decimate(Yi2);
-      Zi2 = decimate(Zi2);
-      ZiC2 = decimate(ZiC2);
-      
-      [Xi,Yi,Zi]  = griddata([inty Yi2'],[intx Xi2'],[intValues' Zi2'],yi,xi','linear'); % interpolate data (Octave)
-      [Xi,Yi,ZiC] = griddata([inty Yi2'],[intx Xi2'],[intContourVals' Zi2'],yi,xi','linear'); % interpolate data
+      [Xi,Yi] = meshgrid(yi',xi);
+      Zi  = gdatav4(inty,intx,double(intValues), Xi, Yi);
+      ZiC = gdatav4(inty,intx,double(intContourVals), Xi, Yi);
   end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%%%%%
@@ -1687,15 +1681,47 @@ hold off
 axis off
 return
 
-%
-%%%%%%%%%%%%% decimate data for Octave %%%%%%%%%%%%%%%%%%%%%%%%
-%
-function X = decimate(X)
-  X(2:66,2:66) = NaN;
-  X(isnan(X(:))) = [];
-  X(1:2:end) = [];
-  X(1:2:end) = [];
-  X(1:2:end) = [];
+% 
+% X(2:size(X,1)-1,2:size(X,2)-1) = NaN;
+% X(isnan(X(:))) = [];
+% X(1:2:end) = [];
+% X(1:2:end) = [];
+% X(1:2:end) = [];
+
+function vq = gdatav4(x,y,v,xq,yq)
+%GDATAV4 MATLAB 4 GRIDDATA interpolation
+
+%   Reference:  David T. Sandwell, Biharmonic spline
+%   interpolation of GEOS-3 and SEASAT altimeter
+%   data, Geophysical Research Letters, 2, 139-142,
+%   1987.  Describes interpolation using value or
+%   gradient of value in any dimension.
+
+xy = x(:) + 1i*y(:);
+
+% Determine distances between points
+d = abs(xy - xy.');
+
+% Determine weights for interpolation
+g = (d.^2) .* (log(d)-1);   % Green's function.
+% Fixup value of Green's function along diagonal
+g(1:size(d,1)+1:end) = 0;
+weights = g \ v(:);
+
+[m,n] = size(xq);
+vq = zeros(size(xq));
+xy = xy.';
+
+% Evaluate at requested points (xq,yq).  Loop to save memory.
+for i=1:m
+    for j=1:n
+        d = abs(xq(i,j) + 1i*yq(i,j) - xy);
+        g = (d.^2) .* (log(d)-1);   % Green's function.
+        % Value of Green's function at zero
+        g(d==0) = 0;
+        vq(i,j) = g * weights;        
+    end
+end
 
 %
 %%%%%%%%%%%%% Draw circle %%%%%%%%%%%%%%%%%%%%%%%%
