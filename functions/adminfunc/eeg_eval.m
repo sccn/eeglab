@@ -103,7 +103,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     % history
     % -------
     if nargout > 1
-        com = sprintf('%s = %s( %s,%s);', funcname, inputname(2), funcname, inputname(2), vararg2str(g.params));
+        com = sprintf('%s = %s( %s,%s);', inputname(2), funcname, inputname(2), vararg2str(g.params));
     end
 
 function EEG = update_datafield(EEG);

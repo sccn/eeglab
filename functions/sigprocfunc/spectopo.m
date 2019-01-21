@@ -610,7 +610,7 @@ if ~isempty(g.weights)
         if strcmp(g.icamode, 'normal')
             % note: maxdatadb = eegspecdBtoplot (RMS power of data)
             resvar(index)  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-            myfprintf(g.verbose, 'Component %d percent relative variance:%6.2f\n', g.icacomps(index), resvar(index));
+            myfprintf(g.verbose, 'Component %d percent relative variance: %6.2f\n', g.icacomps(index), resvar(index));
         else
             if g.plotchan == 0
                 resvartmp = [];
@@ -619,11 +619,11 @@ if ~isempty(g.weights)
                 end
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
-                myfprintf(g.verbose, 'Component %d percent variance accounted for:%6.2f Â± %3.2f\n', ...
+                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f ± %3.2f\n', ...
                         g.icacomps(index), resvar(index), stdvar(index));
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-                myfprintf(g.verbose, 'Component %d percent variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
+                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f\n', g.icacomps(index), resvar(index));
             end
         end
     end
