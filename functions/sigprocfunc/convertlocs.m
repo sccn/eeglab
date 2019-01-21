@@ -1,7 +1,7 @@
 % convertlocs() - Convert electrode locations between coordinate systems
 %                 using the EEG.chanlocs structure.
 %
-% Usage: >> newchans = convertlocs( EEG, 'command');
+% Usage: >> newchans = convertlocs( chanlocs, 'command');
 %
 % Input:
 %   chanlocs  - An EEGLAB EEG dataset OR a EEG.chanlocs channel locations structure
