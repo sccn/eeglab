@@ -932,7 +932,7 @@ else
     dircontent  = { dircontent.name };
     
     pluginstats = [];
-	if option_checkversion
+	if option_checkversion && ismatlab
         disp('Retrieving plugin versions from server...');
         [stats, statusconnection] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_withversion.php');
         if statusconnection == 1
