@@ -414,5 +414,3 @@ data = filter(b, 1, double([startPad; data; endPad])); % Pad and filter with dou
 
 % Remove padded data
 data = data(2 * groupDelay + 1:end, :);
- 
-end
