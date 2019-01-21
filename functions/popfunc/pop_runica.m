@@ -250,11 +250,11 @@ elseif length(ALLEEG) > 1 && ~strcmpi(g.concatenate, 'on') && ~strcmpi(g.concatc
 elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
     allsubjects = { ALLEEG.subject };
     allsessions = { ALLEEG.session };
-    allgroups   = { ALLEEG.group };
     alltags     = zeros(1,length(allsubjects));
     if any(cellfun('isempty', allsubjects))
-        errordlg2( [ 'Aborting: Subject names missing from at least one dataset.' 10 ...
-                     'Use the STUDY > Edit STUDY Info menu and check the box' 10 ...
+        errordlg2( [ 'Aborting: Subject names missing from at least one dataset file.' 10 ...
+                     'Subject names must be stored within the datasets. To do so,' 10 ...
+                     'use the STUDY > Edit STUDY Info menu and check the box' 10 ...
                      '"Dataset info (condition, group, ...) differs from study info..."' ]);
     end
     dats = {};
@@ -265,7 +265,6 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
             % if we have different sessions they will not be concatenated
             for tmpi = setdiff_bc(allinds,index)'
                 if ~isequal(allsessions(index), allsessions(tmpi)), rmind = [rmind tmpi];
-                %elseif ~isequal(allgroups(index), allgroups(tmpi)), rmind = [rmind tmpi]; 
                 end
             end
             allinds = setdiff_bc(allinds, rmind);
