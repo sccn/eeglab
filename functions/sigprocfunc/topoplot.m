@@ -370,6 +370,8 @@ if nargs > 2
                     error('Colormap must be a n x 3 matrix')
                 end
                 colormap(Value)
+            case 'gridscale'
+                GRID_SCALE = Value;
             case 'plotdisk'
                 PLOTDISK = lower(Value);
                 if ~strcmp(PLOTDISK,'on') && ~strcmp(PLOTDISK,'off')
