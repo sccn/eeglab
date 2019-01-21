@@ -91,7 +91,11 @@ end
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
-    [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
+    if nargin < 2
+        [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
+    else
+        [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'params', { freq } );
+    end
     return;
 end
 
