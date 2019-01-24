@@ -140,6 +140,7 @@ g = finputcheck(varargin, { 'erp'         'string'  { 'on','off' }     'off';
     'erpim'       'string'  { 'on','off' }     'off';
     'scalp'       'string'  { 'on','off' }     'off';
     'allcomps'    'string'  { 'on','off' }     'off';
+    'bids'        'string'  { 'on','off' }     'off';
     'itc'         'string'  { 'on','off' }     'off';
     'savetrials'  'string'  { 'on'       }     'on'; % change for EEGLAB 15
     'rmicacomps'  'string'  { 'on','off','processica' }     'off';
@@ -158,7 +159,8 @@ g = finputcheck(varargin, { 'erp'         'string'  { 'on','off' }     'off';
 if ischar(g), error(g); end
 if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end
 if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end
-
+if strcmpi(g.bids, 'on'), fileSuffix = [ '_task-' STUDY.task ]; else fileSuffix = ''; end
+    
 % union of all channel structures
 % -------------------------------
 computewhat = 'channels';
@@ -182,8 +184,8 @@ if isempty(chanlist)
     chanlist = { alllocs.labels };
 elseif ~isnumeric(chanlist{1})
     alllocs = eeg_mergelocs(ALLEEG.chanlocs);
-    [tmp c1 c2] = intersect_bc( lower({ alllocs.labels }), lower(chanlist));
-    [tmp c2] = sort(c2);
+    [~, c1, c2] = intersect_bc( lower({ alllocs.labels }), lower(chanlist));
+    [~, c2] = sort(c2);
     alllocs = alllocs(c1(c2));
 end
 
@@ -205,7 +207,8 @@ end
 % ----------------------
 if strcmpi(computewhat, 'channels')
     curstruct = STUDY.changrp;
-else curstruct = STUDY.cluster;
+else
+    curstruct = STUDY.cluster;
 end
 
 % compute custom measure
@@ -216,14 +219,14 @@ if ~isempty(g.customfunc)
     for iSubj = 1:length(uniqueSubjects)
         inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
         inds2 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
-        inds = intersect(inds1, inds2)
+        inds = intersect(inds1, inds2);
         filepath = STUDY.datasetinfo(inds(1)).filepath;
         filebase = fullfile(filepath, uniqueSubjects{iSubj});
         trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
         
         addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo };
         if strcmpi(computewhat, 'channels')
-            [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+            [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
             tmpData = feval(g.customfunc, ALLEEG(inds),  'channels', tmpchanlist, opts{:}, addopts{:}, g.customparams{:});
         else
             if length(inds)>1 && ~isequal(chanlist{inds})
@@ -235,6 +238,14 @@ if ~isempty(g.customfunc)
     end
 end
 
+% get subjects and sessions
+allSubjects = { STUDY.datasetinfo.subject };
+allSessions = { STUDY.datasetinfo.session };
+uniqueSubjects = unique(allSubjects);
+allSessions(cellfun(@isempty, allSessions)) = { 1 };
+allSessions = cellfun(@num2str, allSessions, 'uniformoutput', false);
+uniqueSessions = unique(allSessions);
+    
 % compute ERPs
 % ------------
 if strcmpi(g.erp, 'on')
@@ -247,12 +258,6 @@ if strcmpi(g.erp, 'on')
         error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
     end
     
-    allSubjects = { STUDY.datasetinfo.subject };
-    allSessions = { STUDY.datasetinfo.session };
-    uniqueSubjects = unique(allSubjects);
-    allSessions(cellfun(@isempty, allSessions)) = { 1 };
-    allSessions = cellfun(@num2str, allSessions, 'uniformoutput', false);
-    uniqueSessions = unique(allSessions);
     for iSubj = 1:length(uniqueSubjects)
         
         for iSess = 1:length(uniqueSessions)
@@ -262,13 +267,8 @@ if strcmpi(g.erp, 'on')
             
             if ~isempty(inds)
                 filepath = STUDY.datasetinfo(inds(1)).filepath;
-                if length(uniqueSessions) == 1
-                    filebase = fullfile(filepath, [ uniqueSubjects{iSubj} '_task-' STUDY.task ] );
-                else
-                    sesStr   = [ '0' uniqueSessions{iSubj} ];
-                    filebase = fullfile(filepath, [ uniqueSubjects{iSubj} 'ses-' sesStr(end-1:end) '_task-' STUDY.task ] );
-                end
                 trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds, [ALLEEG.trials]);
+                filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
                 
                 addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo };
                 if strcmpi(computewhat, 'channels')
@@ -293,10 +293,6 @@ end
 % ----------------
 if strcmpi(g.spec, 'on')
     
-    allSubjects = { STUDY.datasetinfo.subject };
-    allSessions = { STUDY.datasetinfo.session };
-    uniqueSubjects = unique(allSubjects);
-    uniqueSessions = unique(allSessions);
     for iSubj = 1:length(uniqueSubjects)
         
         for iSess = 1:length(uniqueSessions)
@@ -306,17 +302,12 @@ if strcmpi(g.spec, 'on')
             
             if ~isempty(inds)
                 filepath = STUDY.datasetinfo(inds(1)).filepath;
-                if length(uniqueSessions) == 1
-                    filebase = fullfile(filepath, [ uniqueSubjects{iSubj} '_task-' STUDY.task ] );
-                else
-                    sesStr   = [ '0' uniqueSessions{iSess} ];
-                    filebase = fullfile(filepath, [ uniqueSubjects{iSubj} '_ses-' sesStr(end-1:end) '_task-' STUDY.task ] );
-                end
                 trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds, [ALLEEG.trials]);
+                filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
                 
                 addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', filebase, 'trialinfo', trialinfo };
                 if strcmpi(computewhat, 'channels')
-                    [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+                    [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
                     std_spec(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:}, g.specparams{:});
                 else
                     if length(inds)>1 && ~isequal(chanlist{inds})
@@ -344,27 +335,24 @@ if strcmpi(g.erpim, 'on')
         error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
     end
     
-    if isempty(g.erpimparams),
+    if isempty(g.erpimparams)
         tmpparams = {};
-    elseif iscell(g.erpimparams),
+    elseif iscell(g.erpimparams)
         tmpparams = g.erpimparams;
     else
         tmpparams      = fieldnames(g.erpimparams); tmpparams = tmpparams';
         tmpparams(2,:) = struct2cell(g.erpimparams);
     end
     
-    % loop accross subjects
-    allSubjects = { STUDY.datasetinfo.subject };
-    uniqueSubjects = unique(allSubjects);
     for iSubj = 1:length(uniqueSubjects)
         inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
         filepath = STUDY.datasetinfo(inds(1)).filepath;
-        filebase = fullfile(filepath, uniqueSubjects{iSubj});
         trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+        filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
         
         addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
         if strcmpi(computewhat, 'channels')
-            [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+            [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
             std_erpimage(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
         else
             if length(inds)>1 && ~isequal(chanlist{inds})
@@ -380,6 +368,63 @@ if strcmpi(g.erpim, 'on')
         curstruct = rmfield(curstruct, 'erpimtrials');
         curstruct = rmfield(curstruct, 'erpimevents');
     end
+end
+
+% compute ERSP and ITC
+% --------------------
+if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
+    
+    % check dataset consistency
+    allPnts = [ALLEEG(:).pnts];
+    if iscell(allPnts), allPnts = [ allPnts{:} ]; end
+    if length(unique(allPnts)) > 1
+        error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
+    end
+    
+    % options
+    if strcmpi(g.ersp, 'on') && strcmpi(g.itc, 'on'), type = 'both';
+    elseif strcmpi(g.ersp, 'on')                   , type = 'ersp';
+    else                                             type = 'itc';
+    end
+    if isempty(g.erspparams)
+        tmpparams = {};
+    elseif iscell(g.erspparams)
+        tmpparams = g.erspparams;
+    else
+        tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
+        tmpparams(2,:) = struct2cell(g.erspparams);
+    end
+    
+    for iSubj = 1:length(uniqueSubjects)
+        inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+        filepath = STUDY.datasetinfo(inds(1)).filepath;
+        trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+        filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
+        
+        addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
+        if strcmpi(computewhat, 'channels')
+            [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+            std_ersp(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
+        else
+            if length(inds)>1 && ~isequal(chanlist{inds})
+                error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
+            end
+            std_ersp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
+        end
+    end
+    
+    % remove saved data if any
+    if isfield(curstruct, 'erspdata')
+        curstruct = rmfield(curstruct, 'erspdata');
+        curstruct = rmfield(curstruct, 'ersptimes');
+        curstruct = rmfield(curstruct, 'erspfreqs');
+    end
+    if isfield(curstruct, 'itcdata')
+        curstruct = rmfield(curstruct, 'itcdata');
+        curstruct = rmfield(curstruct, 'itctimes');
+        curstruct = rmfield(curstruct, 'itcfreqs');
+    end
+    
 end
 
 % compute component scalp maps
@@ -414,66 +459,6 @@ if strcmpi(g.scalp, 'on') && ~strcmpi(computewhat, 'channels')
     end
 end
 
-% compute ERSP and ITC
-% --------------------
-if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
-    
-    % check dataset consistency
-    allPnts = [ALLEEG(:).pnts];
-    if iscell(allPnts), allPnts = [ allPnts{:} ]; end
-    if length(unique(allPnts)) > 1
-        error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
-    end
-    
-    % options
-    if strcmpi(g.ersp, 'on') && strcmpi(g.itc, 'on'), type = 'both';
-    elseif strcmpi(g.ersp, 'on')                   , type = 'ersp';
-    else                                             type = 'itc';
-    end
-    if isempty(g.erspparams),
-        tmpparams = {};
-    elseif iscell(g.erspparams),
-        tmpparams = g.erspparams;
-    else
-        tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
-        tmpparams(2,:) = struct2cell(g.erspparams);
-    end
-    
-    % loop accross subjects
-    allSubjects = { STUDY.datasetinfo.subject };
-    uniqueSubjects = unique(allSubjects);
-    for iSubj = 1:length(uniqueSubjects)
-        inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
-        filepath = STUDY.datasetinfo(inds(1)).filepath;
-        filebase = fullfile(filepath, uniqueSubjects{iSubj});
-        trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
-        
-        addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
-        if strcmpi(computewhat, 'channels')
-            [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
-            std_ersp(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
-        else
-            if length(inds)>1 && ~isequal(chanlist{inds})
-                error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
-            end
-            std_ersp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
-        end
-    end
-    
-    % remove saved data if any
-    if isfield(curstruct, 'erspdata')
-        curstruct = rmfield(curstruct, 'erspdata');
-        curstruct = rmfield(curstruct, 'ersptimes');
-        curstruct = rmfield(curstruct, 'erspfreqs');
-    end
-    if isfield(curstruct, 'itcdata')
-        curstruct = rmfield(curstruct, 'itcdata');
-        curstruct = rmfield(curstruct, 'itctimes');
-        curstruct = rmfield(curstruct, 'itcfreqs');
-    end
-    
-end
-
 % empty cache
 % -----------
 STUDY.cache = [];
@@ -487,6 +472,16 @@ end
 
 return;
 
+% get file base name
+% ------------------
+function filebase = getfilename(filepath, subj, sess, fileSuffix, onlyOneSession)
+if onlyOneSession
+    filebase = fullfile(filepath, [ subj fileSuffix ] );
+else
+    sesStr   = [ '0' sess ];
+    filebase = fullfile(filepath, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
+end
+        
 % find components in cluster for specific dataset
 % -----------------------------------------------
 function rmcomps = getclustcomps(STUDY, rmclust, settmpind)
