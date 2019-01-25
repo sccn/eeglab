@@ -345,20 +345,22 @@ if strcmpi(g.erpim, 'on')
     end
     
     for iSubj = 1:length(uniqueSubjects)
-        inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
-        filepath = STUDY.datasetinfo(inds(1)).filepath;
-        trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
-        filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
-        
-        addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
-        if strcmpi(computewhat, 'channels')
-            [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
-            std_erpimage(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
-        else
-            if length(inds)>1 && ~isequal(chanlist{inds})
-                error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
+        for iSess = 1:length(uniqueSessions)
+            inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            filepath = STUDY.datasetinfo(inds(1)).filepath;
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+            filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
+
+            addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
+            if strcmpi(computewhat, 'channels')
+                [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+                std_erpimage(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
+            else
+                if length(inds)>1 && ~isequal(chanlist{inds})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
+                end
+                std_erpimage(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
             end
-            std_erpimage(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
         end
     end
     
@@ -396,20 +398,22 @@ if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
     end
     
     for iSubj = 1:length(uniqueSubjects)
-        inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
-        filepath = STUDY.datasetinfo(inds(1)).filepath;
-        trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
-        filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
-        
-        addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
-        if strcmpi(computewhat, 'channels')
-            [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
-            std_ersp(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
-        else
-            if length(inds)>1 && ~isequal(chanlist{inds})
-                error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
+        for iSess = 1:length(uniqueSessions)
+            inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            filepath = STUDY.datasetinfo(inds(1)).filepath;
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+            filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
+
+            addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
+            if strcmpi(computewhat, 'channels')
+                [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+                std_ersp(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
+            else
+                if length(inds)>1 && ~isequal(chanlist{inds})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
+                end
+                std_ersp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
             end
-            std_ersp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
         end
     end
     
