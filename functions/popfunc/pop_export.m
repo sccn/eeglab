@@ -70,10 +70,12 @@ if nargin < 2
               { 'style' 'checkbox' 'string' '' }, { },{ },  ...
               { 'style' 'text' 'string' 'Export ERP average instead of trials:' }, ...
               { 'style' 'checkbox' 'string' '' }, { }, { }, ...
-              { 'style' 'text' 'string' 'Transpose matrix (elec -> rows):' }, ...
-              { 'style' 'checkbox' 'string' '' }, { }, { }, ...
+              { 'style' 'text' 'string' 'Transpose matrix (elec -> cols):' }, ...
+              { 'style' 'checkbox' 'string' '' 'value' 1}, { }, { }, ...
               { 'style' 'text' 'string' 'Export channel labels/component numbers:' }, ...
               { 'style' 'checkbox' 'string' '' 'value' 1 }, { }, { }, ...
+              { 'style' 'text' 'string' 'Use comma separator (csv) instead of tab:' }, ...
+              { 'style' 'checkbox' 'string' '' 'value' 0 }, { }, { }, ...
               { 'style' 'text' 'string' 'Export time values:' }, ...
               { 'style' 'checkbox' 'string' '' 'value' 1 }, ...
               { 'style' 'text' 'string' 'Unit (re. sec)' }, { 'style' 'edit' 'string' '1E-3' }, ...
@@ -82,23 +84,24 @@ if nargin < 2
               { 'style' 'text' 'string' 'Apply an expression to the output (see ''expr'' help):'} , ...
               { 'style' 'edit' 'string' '' } { } { } };
    bcheck = [1.7 0.25 0.7 0.6];
-   uigeom = { [1 2 0.5] bcheck bcheck bcheck bcheck bcheck [3 0.7 0.8 0.6] [3 2 0.05 0.05] };
+   uigeom = { [1 2 0.5] bcheck bcheck bcheck bcheck bcheck bcheck [3 0.7 0.8 0.6] [3 2 0.05 0.05] };
    result = inputgui( uigeom, uilist, 'pophelp(''pop_export'');', 'Export data - pop_export()' );
-   if length( result ) == 0 return; end
+   if isempty( result ), return; end
    
    % decode options
    % --------------
    if isempty(result{1}), error('File name required'); end
    filename = result{1};
-   options = {};
-   if result{2},  options = { options{:} 'ica' 'on' }; end; 
-   if result{3},  options = { options{:} 'erp' 'on' }; end; 
-   if result{4},  options = { options{:} 'transpose' 'on' }; end; 
+   options = {}; 
+   if result{2},  options = { options{:} 'ica' 'on' }; end
+   if result{3},  options = { options{:} 'erp' 'on' }; end
+   if result{4},  options = { options{:} 'transpose' 'on' }; end
    if ~result{5}, options = { options{:} 'elec' 'off' }; end
-   if ~result{6}, options = { options{:} 'time' 'off' }; end
-   if ~strcmpi(result{7}, '1E-3'), options = { options{:} 'timeunit' eval(result{7}) }; end
-   if ~strcmpi(result{8}, '7'),    options = { options{:} 'precision' eval(result{8}) }; end
-   if ~isempty(result{9}), options = { options{:} 'expr' result{9} }; end
+   if result{6},  options = { options{:} 'separator' ',' }; end
+   if ~result{7}, options = { options{:} 'time' 'off' }; end
+   if ~strcmpi(result{8}, '1E-3'), options = { options{:} 'timeunit' eval(result{8}) }; end
+   if ~strcmpi(result{9}, '7'),    options = { options{:} 'precision' eval(result{9}) }; end
+   if ~isempty(result{10}), options = { options{:} 'expr' result{10} }; end
 else
     options = varargin;
 end
@@ -113,12 +116,13 @@ g = finputcheck(options, { ...
     'transpose' 'string'    { 'on';'off' }     'off';
     'erp'       'string'    { 'on';'off' }     'off';
     'precision' 'integer'   [0 Inf]            7;
+    'separator' 'string'    []                 char(9);
     'expr'      'string'    []                 '' }, 'pop_export');
 if ischar(g), error(g); end
 
 % select data
 % ----------
-if strcmpi(g.ica, 'on');
+if strcmpi(g.ica, 'on')
     eeglab_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
 		x = EEG.icaact;
@@ -132,7 +136,7 @@ end
 
 % select erp
 % ----------
-if strcmpi(g.erp, 'on');
+if strcmpi(g.erp, 'on')
     x = mean(x, 3);
 else 
     x = reshape(x, size(x,1), size(x,2)*size(x,3));
@@ -146,7 +150,7 @@ end
 
 % add time axis
 % -------------
-if strcmpi(g.time, 'on');
+if strcmpi(g.time, 'on')
     timeind = repmat( linspace(EEG.xmin, EEG.xmax, EEG.pnts)/g.timeunit, ...
                       [ 1 fastif(strcmpi(g.erp,'on'), 1, EEG.trials) ]);    
     xx = zeros(size(x,1)+1, size(x,2));
@@ -158,29 +162,28 @@ end
 % transpose and write to disk
 % ---------------------------
 fid = fopen(filename, 'w');
-if strcmpi(g.transpose, 'on');
-    % writing electrodes
-    % ------------------
-    strprintf = '';
-    for index = 1:size(x,1)
-        if strcmpi(g.time, 'on'), tmpind = index-1;
-        else                      tmpind = index;
+strprintf = [ '%.' num2str(g.precision) 'f' g.separator ];
+if strcmpi(g.transpose, 'on')
+    % columns
+    % -------
+    if strcmpi(g.elec, 'on')
+        if strcmpi(g.time, 'on')
+            fprintf(fid, 'Time%c', g.separator);
         end
-        if strcmpi(g.elec, 'on') 
-            if tmpind > 0
-                if ~isempty(EEG.chanlocs) && ~strcmpi(g.ica, 'on')
-                    fprintf(fid, '%s\t', EEG.chanlocs(tmpind).labels);
-                else fprintf(fid, '%d\t', tmpind);
-                end
-            else 
-                fprintf(fid, ' \t');
+        for index = 1:length(EEG.chanlocs)
+            if ~isempty(EEG.chanlocs) && ~strcmpi(g.ica, 'on')
+                fprintf(fid, '%s%c', EEG.chanlocs(index).labels, g.separator);
+            else fprintf(fid, '%d%c', index, g.separator);
             end
         end
-        strprintf = [ strprintf '%.' num2str(g.precision) 'f\t' ];
+        fprintf(fid, '\n');
     end
-    strprintf(end) = 'n';
-    if strcmpi(g.elec, 'on'), fprintf(fid, '\n'); end
-    fprintf(fid, strprintf, x);    
+    for index = 1:size(x,2)
+        fprintf(fid, strprintf, x(:,index));
+        if index ~= size(x,2)
+            fprintf(fid, '\n');
+        end
+    end
 else 
     % writing electrodes
     % ------------------
@@ -191,14 +194,14 @@ else
         if strcmpi(g.elec, 'on') 
             if tmpind > 0
                 if ~isempty(EEG.chanlocs) && ~strcmpi(g.ica, 'on')
-                    fprintf(fid,'%s\t', EEG.chanlocs(tmpind).labels);
-                else fprintf(fid,'%d\t', tmpind);
+                    fprintf(fid,'%s%c', EEG.chanlocs(tmpind).labels, g.separator );
+                else fprintf(fid,'%d%c', tmpind, g.separator );
                 end
             else 
-                fprintf(fid, ' \t');
+                fprintf(fid, ' Time%c', g.separator);
             end
         end
-        fprintf(fid,[ '%.' num2str(g.precision) 'f\t' ], x(index, :));
+        fprintf(fid,[ '%.' num2str(g.precision) 'f' g.separator  ], x(index, :));
         fprintf(fid, '\n');
     end
 end

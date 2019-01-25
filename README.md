@@ -8,6 +8,10 @@ Make sure you include sub-modules when you clone
 
 git clone --recurse-submodules https://github.com/eeglabdevelopers/eeglab.git
 
+If you forgot to clone the submodule, go to the eeglab folder and type
+
+git submodule update --init --recursive
+
 # Sub-directories:
 
  - /functions - All distributed EEGLAB functions (admin, sigproc, pop, misc)

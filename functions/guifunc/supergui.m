@@ -257,7 +257,7 @@ for counter = 1:maxcount
                                           [posx posy+hf2*height 0.005 (hf1-hf2+0.1)*height].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers{counter} = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
                                           [posx posy+(hf1+hf2)/2*height width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
-            allhandlers{counter} = 0;
+            allhandlers{counter} = nan;
         else
             if strcmpi(currentelem{1}, 'width'),
                  curwidth = currentelem{2};
@@ -296,10 +296,10 @@ for counter = 1:maxcount
             elseif strcmpi(currentelem{1}, 'panel'),
                 % property grid argument
                 uipanel(currentelem{2:end},'FontSize',12,'Position',[posx posy+addvert width height*heightfactor].*s+q);
-                allhandlers{counter} = 0;
+                allhandlers{counter} = nan;
             elseif strcmpi(currentelem{1}, 'uitable'),
                 uitable(g.fig, currentelem{2:end}, 'unit', 'normalized', 'Position',[posx posy+addvert width height*heightfactor].*s+q);
-                allhandlers{counter} = 0;
+                allhandlers{counter} = nan;
             else
                 allhandlers{counter} = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
                     [posx posy+addvert width height*heightfactor].*s+q, currentelem{:}, addParamFont{:});
@@ -341,7 +341,7 @@ for counter = 1:maxcount
 
             % Uniformize button text aspect (first letter must be upercase)
             % -----------------------------
-            if strcmp(style, 'pushbutton') && ~isequal(allhandlers{counter},0)
+            if strcmp(style, 'pushbutton') && ishandle(allhandlers{counter})
                 tmptext = get(allhandlers{counter}, 'string');
                 if length(tmptext) > 1
                     if upper(tmptext(1)) ~= tmptext(1) || lower(tmptext(2)) ~= tmptext(2) && ~strcmpi(tmptext, 'STATS')
@@ -353,7 +353,7 @@ for counter = 1:maxcount
             end
         end
     else 
-        allhandlers{counter} = 0;
+        allhandlers{counter} = nan;
     end
 end
 
@@ -392,7 +392,7 @@ set(g.fig, 'position', pos);
 % vertical alignment to bottom for text (isnumeric by ishanlde was changed here)
 % ---------------------------------------
 for index = 1:length(allhandlers)
-	if allhandlers{index} ~= 0 && ishandle(allhandlers{index})
+	if ishandle(allhandlers{index})
 		if strcmp(get(allhandlers{index}, 'style'), 'text')
             set(allhandlers{index}, 'unit', 'pixel');
 			curpos = get(allhandlers{index}, 'position');
@@ -414,7 +414,7 @@ end
 
 numobjects = cellfun(@ishandle, allhandlers); % (isnumeric by ishanlde was changed here)
 allhandlersnum = [ allhandlers{numobjects} ];
-hh = findobj(allhandlersnum, 'parent', g.fig, 'style', 'text');
+hh = findobj(allhandlersnum,'flat', 'parent', g.fig, 'style', 'text');
 %set(hh, 'BackgroundColor', get(g.fig, 'color'), 'horizontalalignment', 'left');
 set(hh, 'Backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
@@ -424,25 +424,25 @@ catch
 end
 set(hh, 'horizontalalignment', g.horizontalalignment);
 
-hh = findobj(allhandlersnum, 'style', 'edit');
+hh = findobj(allhandlersnum,'flat', 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
 
-hh =findobj(allhandlersnum, 'parent', g.fig, 'style', 'pushbutton');
+hh =findobj(allhandlersnum,'flat', 'parent', g.fig, 'style', 'pushbutton');
 comp = computer;
 if length(comp) < 3 || ~strcmpi(comp(1:3), 'MAC') % this puts the wrong background on macs
     set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
     set(hh, 'foregroundcolor', GUITEXTCOLOR);
 end
-hh =findobj(allhandlersnum, 'parent', g.fig, 'style', 'popupmenu');
+hh =findobj(allhandlersnum,'flat', 'parent', g.fig, 'style', 'popupmenu');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-hh =findobj(allhandlersnum, 'parent', g.fig, 'style', 'checkbox');
+hh =findobj(allhandlersnum,'flat', 'parent', g.fig, 'style', 'checkbox');
 set(hh, 'backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-hh =findobj(allhandlersnum, 'parent', g.fig, 'style', 'listbox');
+hh =findobj(allhandlersnum,'flat', 'parent', g.fig, 'style', 'listbox');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-hh =findobj(allhandlersnum, 'parent', g.fig, 'style', 'radio');
+hh =findobj(allhandlersnum,'flat', 'parent', g.fig, 'style', 'radio');
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(g.fig, 'visible', 'on');
