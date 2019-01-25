@@ -450,7 +450,9 @@ end
 STUDY.limo.model         = model;
 STUDY.limo.datatype      = Analysis;
 STUDY.limo.chanloc       = limoChanlocs.expected_chanlocs;
+if exist('limocontrast','var')
 STUDY.limo.contrast      = limocontrast;
+end
 
 % Save STUDY
 if sum(procstatus) ~= 0
