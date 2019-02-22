@@ -8,9 +8,9 @@
 %
 % Optional inputs:
 %  't1'         - start at time t1, default 0. Warning, events latency
-%                 might be inacurate (this is an open issue).
+%                 might be innacurate (this is an open issue).
 %  'sample1'    - start at sample1, default 0, overrides t1. Warning, 
-%                 events latency might be inacurate.
+%                 events latency might be innacurate.
 %  'lddur'      - duration of segment to load, default = whole file
 %  'ldnsamples' - number of samples to load, default = whole file, 
 %                 overrides lddur
@@ -67,7 +67,7 @@ function [f,lab,ev2p] = loadcnt(filename,varargin)
 if ~isempty(varargin)
          r=struct(varargin{:});
 else r = []; 
-end
+end;
 
 try, r.t1;         catch, r.t1=0; end
 try, r.sample1;    catch, r.sample1=[]; end
@@ -375,18 +375,18 @@ if strcmpi(r.dataformat, 'auto')
             
             if (is32bit == 1)
                 r.dataformat = 'int32';
-            end
+            end;
             
             fseek(fid,begdata,'bof');       
-        end % if (h.nextfile)>0
+        end; % if (h.nextfile)>0
     end % try/catch
-end % if strcmpi ...
+end; % if strcmpi ...
 
 enddata = h.eventtablepos;   % after data
 if strcmpi(r.dataformat, 'int16')
      nums    = floor((enddata-begdata)/h.nchannels/2); % floor due to bug 1254
 else nums    = floor((enddata-begdata)/h.nchannels/4);
-end
+end;
 
 % number of sample to read
 % ------------------------
@@ -394,17 +394,17 @@ if ~isempty(r.sample1)
    r.t1      = r.sample1/h.rate;
 else 
    r.sample1 = r.t1*h.rate;
-end
+end;
 if strcmpi(r.dataformat, 'int16')
      startpos = r.t1*h.rate*2*h.nchannels;
 else startpos = r.t1*h.rate*4*h.nchannels;
-end
+end;
 if isempty(r.ldnsamples)
      if ~isempty(r.lddur)
           r.ldnsamples = round(r.lddur*h.rate); 
      else r.ldnsamples = nums; 
-     end
-end
+     end;
+end;
 
 %% CWB SAMPLE NUMBER CHECK
 %    Verifies that the number of samples we'll load later does not exceed
@@ -425,11 +425,11 @@ end % r.ldnsamples-r.sample1 ...
 % --------------
 if ~isempty(r.blockread)
     h.channeloffset = r.blockread;
-end
+end;
 if h.channeloffset > 1
     fprintf('WARNING: reading data in blocks of %d, if this fails, try using option "''blockread'', 1"\n', ...
             h.channeloffset);
-end
+end;
 
 % disp('Reading data .....')
 if type == 'cnt' 
@@ -475,7 +475,7 @@ if type == 'cnt'
               to_read = max_rows ;
               if (data_block > samples_left)
                   to_read = samples_left / h.nchannels ;                 
-              end        
+              end ;              
 
               % Read data in a relatively small chunk
               temp_dat = fread(fid, [h.nchannels to_read], r.dataformat) ;
@@ -502,9 +502,9 @@ if type == 'cnt'
                   samples_left = 0 ;
               else
                   samples_left = samples_left - written ;
-              end
+              end ;
 
-          end
+          end ;
 
           fclose (foutid) ;
           % Set the dat variable.  This gets used later by other 
@@ -549,7 +549,7 @@ if type == 'cnt'
 %                     r.ldnsamples = size(dat,2);
 %                 else
 %                     dat=single(dat(:,1:r.ldnsamples));
-%                 end
+%                 end;
           else           
               warning('CWB has not tested this section of code, so use with caution'); 
               h.channeloffset = h.channeloffset/2;
@@ -562,8 +562,8 @@ if type == 'cnt'
                   dat(:, counter*h.channeloffset+1:counter*h.channeloffset+h.channeloffset) = ...
                       fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
                   counter = counter + 1;
-              end
-          end
+              end;
+          end ;
           
           % ftell(fid)
           if strcmpi(r.scale, 'on')
@@ -574,8 +574,8 @@ if type == 'cnt'
                 mf=sen*(cal/204.8);
                 dat(i,:)=(dat(i,:)-bas).*mf;
             end % end for i=1:h.nchannels
-          end  % end if (strcmpi(r.scale, 'on')
-      end
+          end;  % end if (strcmpi(r.scale, 'on')
+      end ;
    
       ET_offset = (double(h.prevfile) * (2^32)) + double(h.eventtablepos);    % prevfile contains high order bits of event table offset, eventtablepos contains the low order bits
       fseek(fid, ET_offset, 'bof'); 
@@ -605,7 +605,7 @@ if type == 'cnt'
               end     
           else
               ev2 = [];
-          end
+          end;
       elseif eT.teeg==3  % type 3 is similar to type 2 except the offset field encodes the global sample frame
           nevents=eT.size/sizeEvent3;
           if nevents > 0
@@ -632,7 +632,7 @@ if type == 'cnt'
               end     
           else
               ev2 = [];
-          end
+          end;
       elseif eT.teeg==1
           nevents=eT.size/sizeEvent1;
           if nevents > 0
@@ -649,10 +649,10 @@ if type == 'cnt'
 % end modification
 
                   ev2(i).offset        = fread(fid,1,'long');
-              end
+              end;
           else
               ev2 = [];
-          end
+          end;
       else
           disp('Skipping event table (tag != 1,2,3 ; theoritically impossible)');
           ev2 = [];
@@ -690,7 +690,7 @@ f.ldnsamples = r.ldnsamples ;
 for i=1:h.nchannels
   plab=sprintf('%c',f.electloc(i).lab);
   if i>1 
-   lab=char(lab,plab);
+   lab=str2mat(lab,plab);
   else 
    lab=plab;  
   end  
@@ -699,21 +699,46 @@ end
 %%%% to change offest in bytes to points 
 if ~isempty(ev2)
     if r.sample1 ~= 0
-        warning('Events imported with a time shift might be inacurate'); 
-    end
+        warning('Events imported with a time shift might be innacurate'); 
+%         fprintf(2,'Warning: events imported with a time shift might be innacurate\n');
+    end;
     ev2p=ev2; 
     ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
+
+    %Begin modification by Ed Auer 2019/02/22
     if strcmpi(r.dataformat, 'int16')
-        for i=1:nevents 
-            ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
-        end     
+        if eT.teeg==3 % file larger than 1 gigabyte
+            for i=1:nevents 
+            	ev2p(i).offset=(ev2p(i).offset)/(2*h.nchannels) - r.sample1; %% 2 short int end 
+            end
+        else
+            for i=1:nevents
+                ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
+            end
+        end   
     else % 32 bits
-        for i=1:nevents 
-            ev2p(i).offset=(ev2p(i).offset-ioff)/(4*h.nchannels) - r.sample1; %% 4 short int end 
-        end     
+        if eT.teeg==3 % file larger than 1 gigabyte
+            for i=1:nevents 
+            	ev2p(i).offset=(ev2p(i).offset)/(4*h.nchannels) - r.sample1; %% 4 short int end 
+            end
+        else
+            for i=1:nevents
+                ev2p(i).offset=(ev2p(i).offset-ioff)/(4*h.nchannels) - r.sample1; %% 4 short int end 
+            end
+        end
     end
+        %END modification by Ed Auer 2019/02/22
+%         if strcmpi(r.dataformat, 'int16')
+%             for i=1:nevents
+%                 ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
+%             end
+%         else % 32 bits
+%             for i=1:nevents 
+%             	ev2p(i).offset=(ev2p(i).offset-ioff)/(4*h.nchannels) - r.sample1; %% 4 short int end 
+%             end
+%         end;
     f.event = ev2p;
-end
+end;
 
 frewind(fid);
 fclose(fid);
