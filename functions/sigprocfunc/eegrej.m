@@ -172,16 +172,17 @@ end
 % insert boundary events
 % ----------------------
 for iRegion1=1:length(boundevents)
-    if boundevents(iRegion1) > 1 && boundevents(iRegion1) < size(indata,2)
+    if boundevents(iRegion1) > 0 && boundevents(iRegion1) < size(indata,2)
         events(end+1).type = 'boundary';
         events(end).latency  = boundevents(iRegion1);
         events(end).duration = duration(iRegion1);
     end
 end
 if ~isempty(events) && isfield(events, 'latency')
-    events([ events.latency ] < 1) = [];
+%    events([ events.latency ] < 1) = [];
+    events([ events.latency ] < 0) = [];
     alllatencies = [ events.latency ];
-    [tmp, sortind] = sort(alllatencies);
+    [~, sortind] = sort(alllatencies);
     events = events(sortind);
 end
 
