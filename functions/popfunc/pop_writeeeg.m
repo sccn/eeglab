@@ -48,7 +48,7 @@ if nargin < 2
     
 	% ask user
 	[filename, filepath] = uiputfile('*.*', 'Enter a file name -- pop_writeeeg()'); 
-	if filename == 0 return; end
+	if filename == 0, return; end
 	filename = fullfile(filepath,filename);
     
     % file format
@@ -59,7 +59,7 @@ if nargin < 2
     geom = [1 1];
     result = inputgui( 'geometry', geom, 'uilist', uilist, 'helpcom', 'pophelp(''pop_writeeeg'')', ...
                      'title', 'Write data using BIOSIG -- pop_writeeeg()', 'geomvert', [1 2.5]);
-    if length(result) == 0 return; end
+    if isempty(result), return; end
 
     options = { 'TYPE' fileformats{result{1}} };
 else
