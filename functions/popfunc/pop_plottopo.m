@@ -49,11 +49,6 @@ if nargin < 1
 	return;
 end;	
 
-if isempty(EEG.chanlocs)
-	fprintf('Cannot plot without knowing channel locations. Use Edit/Dataset info\n');
-	return;
-end
-
 if nargin < 2
 	uilist    = { { 'style' 'text' 'string' 'Channels to plot' } ...
                   { 'style' 'edit' 'string' [ '1:' num2str( EEG.nbchan ) ] 'tag' 'chan' } ...
