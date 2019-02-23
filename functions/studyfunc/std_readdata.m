@@ -105,10 +105,6 @@ if ~isempty(opt.channels), fileExt = [ '.dat' tmpDataType ];
 else                       fileExt = [ '.ica' tmpDataType ];
 end
 
-% first subject data file
-% -----------------------
-testSubjectFile = fullfile(ALLEEG(1).filepath, [ ALLEEG(1).subject fileExt ]);
-
 % list of subjects
 % ----------------
 allSubjects = { STUDY.datasetinfo.subject };
