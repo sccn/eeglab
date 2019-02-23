@@ -159,7 +159,7 @@ g = finputcheck(varargin, { 'erp'         'string'  { 'on','off' }     'off';
 if ischar(g), error(g); end
 if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end
 if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end
-if strcmpi(g.bids, 'on'), fileSuffix = [ '_task-' STUDY.task ]; else fileSuffix = ''; end
+if strcmpi(g.bids, 'on'), fileSuffix = [ '_' STUDY.task ]; else fileSuffix = ''; end
     
 % union of all channel structures
 % -------------------------------
