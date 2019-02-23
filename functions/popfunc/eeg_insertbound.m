@@ -91,11 +91,11 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
         % ------------
         [tmpnest, addlength ]  = findnested(eventin, eventLatencies, regions(iRegion,:));
         rmEvent = [ rmEvent tmpnest ];
-        if regions(iRegion,1)>1
+        %if regions(iRegion,1) % do not remove first event
             eventin(end+1).type   = 'boundary';
             eventin(end).latency  = regions(iRegion,1)-sum(lengths(1:iRegion-1))-0.5;
             eventin(end).duration = lengths(iRegion,1)+addlength;
-        end
+        %end
     end
 
     % copy latencies
@@ -108,7 +108,8 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     % resort events
     % -------------
     if ~isempty(eventin) && isfield(eventin, 'latency')
-        eventin([ eventin.latency ] < 1) = [];
+%       eventin([ eventin.latency ] < 1) = [];
+        eventin([ eventin.latency ] < 0) = [];
         alllatencies = [ eventin.latency ];
         [tmp, sortind] = sort(alllatencies);
         eventin = eventin(sortind);
