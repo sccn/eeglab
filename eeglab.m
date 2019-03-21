@@ -454,6 +454,7 @@ e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp
 
 % study checking
 % --------------
+e_check_study = 'if length(EEG) > 1 && CURRENTSTUDY == 1, STUDY = std_checkset(STUDY, ALLEEG); eegh(''STUDY = std_checkset(STUDY, ALLEEG);''); end;';
 e_load_study = [e_catch 'if ~isempty(LASTCOM), STUDY = STUDYTMP; STUDY = eegh(LASTCOM, STUDY); ALLEEG = ALLEEGTMP; EEG = ALLEEG; CURRENTSET = [1:length(EEG)]; eegh(''CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = [1:length(EEG)];''); CURRENTSTUDY = 1; disp(''Done.''); end; clear ALLEEGTMP STUDYTMP; eeglab(''redraw'');'];
 e_plot_study = [e_catch 'if ~isempty(LASTCOM), STUDY = STUDYTMP; STUDY = eegh(LASTCOM, STUDY); disp(''Done.''); end; clear ALLEEGTMP STUDYTMP; eeglab(''redraw'');']; % ALLEEG not modified
 
@@ -565,7 +566,7 @@ cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
 cb_eegplot     = [ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);'   e_hist];
 cb_epoch       = [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_newset];
 cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_newset];
-cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store];
+cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store e_check_study];
 cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
 %cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
 cb_chanrej     = [ check      '[EEG tmp1 tmp2 LASTCOM] = pop_rejchan(EEG); clear tmp1 tmp2;'  e_hist];
