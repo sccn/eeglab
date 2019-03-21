@@ -162,11 +162,11 @@ for iSubj = 1:length(subjectList)
         compList    = [];
         polList     = [];
         for iDat = datasetInds(:)'
-            indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject
+            indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject so we many only consider the first row
             if ~isempty(indSet)
-                compList = [ compList STUDY.cluster(opt.clusters).comps(indSet)' ]; % so we many only consider the first row
+                compList = [ compList STUDY.cluster(opt.clusters).comps(indSet) ];
                 if strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
-                    polList  = [ polList  componentPol(indSet)' ];
+                    polList  = [ polList  componentPol(indSet) ];
                 end
             end
         end
