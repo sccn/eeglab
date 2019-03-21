@@ -332,12 +332,12 @@ if ~ischar(varargin{1})
     % enable buttons
     % --------------
     filename = fullfile(STUDY.datasetinfo(1).filepath, STUDY.datasetinfo(1).subject);
-    if exist([filename '.icaspec']) ,   spec_enable = 'on'; else spec_enable  = 'off'; end
-    if exist([filename '.icaerp'] )  ,   erp_enable = 'on'; else erp_enable   = 'off'; end
-    if exist([filename '.icaerpim'] ), erpim_enable = 'on'; else erpim_enable = 'off'; end
-    if exist([filename '.icatimef']) ,   ersp_enable = 'on'; else ersp_enable  = 'off'; end
+    if ~isempty(dir([filename '*.icaspec'])),   spec_enable = 'on'; else spec_enable  = 'off'; end
+    if ~isempty(dir([filename '*.icaerp'] )) ,   erp_enable = 'on'; else erp_enable   = 'off'; end
+    if ~isempty(dir([filename '*.icaerpim'] )), erpim_enable = 'on'; else erpim_enable = 'off'; end
+    if ~isempty(dir([filename '*.icatimef'])) ,   ersp_enable = 'on'; else ersp_enable  = 'off'; end
     filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-4));
-    if exist([filename '.icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end
+    if ~isempty(dir([filename '*.icatopo'])), scalp_enable = 'on'; else scalp_enable = 'off'; end
     
     if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end
     
