@@ -160,7 +160,7 @@ end
 % -------------------------
 if length(EEG) > 1
     [ EEG com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
-        { locutoff, hicutoff, filtorder, revfilt } );
+        { locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz, firtype, causal} );
     return;
 end
 
