@@ -184,7 +184,11 @@ for iSubj = 1:length(subjectList)
         params           = tmpstruct{5};
     else
         datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
-        fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
+        if isempty(STUDY.datasetinfo(datInds(1)).session)
+            fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
+        else
+            fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} sprintf('_ses-%2.2d', STUDY.datasetinfo(datInds(1)).session) fileExt ]);
+        end
         if ~isempty(opt.channels)
              [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
         else [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
