@@ -533,8 +533,7 @@ cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, 
 cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
 cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
                            'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
-cb_plugin1     = [ nocheck 'if plugin_extract(''import'', PLUGINLIST) , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
-cb_plugin2     = [ nocheck 'if plugin_extract(''process'', PLUGINLIST), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
+cb_plugin      = [ nocheck 'if plugin_menu(PLUGINLIST) , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
 
 cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
@@ -735,12 +734,8 @@ if ismatlab
     uimenu( hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
     uimenu( hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
 
-    plugin_m = uimenu( file_m,   'Label', 'Manage EEGLAB extensions'  , 'userdata', on);
     if ~isdeployed
-        uimenu( plugin_m, 'Label', 'Data import extensions'               , 'userdata', on         , 'CallBack', cb_plugin1);    
-        uimenu( plugin_m, 'Label', 'Data processing extensions'           , 'userdata', on         , 'CallBack', cb_plugin2);    
-    else
-        uimenu( plugin_m, 'Label', 'This menu is not active for the EEGLAB compiled version'       , 'enable', 'off');    
+        uimenu( file_m,   'Label', 'Manage EEGLAB extensions'  , 'userdata', on, 'CallBack', cb_plugin);
     end
     uimenu( file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
 
