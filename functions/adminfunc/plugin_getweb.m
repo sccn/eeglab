@@ -53,7 +53,7 @@ for iRow = 1:length(plugin)
         indMatch = strmatch(lower(plugin(iRow).name), lower(stats{1}), 'exact');
         if ~isempty(indMatch)
              plugin(iRow).downloads = stats{2}(indMatch(1));
-             if length(stats) > 2 && ~isempty(stats{3}{indMatch(1)})
+             if length(stats) > 2 && ~isempty(stats{4}{indMatch(1)})
                  plugin(iRow).version   = stats{3}{indMatch(1)};
                  plugin(iRow).zip       = stats{4}{indMatch(1)};
              end

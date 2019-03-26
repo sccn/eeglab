@@ -41,7 +41,11 @@ for iRow = 1:length(plugin)
             plugin(iRow).text = [ plugin(iRow).text '<b>' ];
         end
     end
-    plugin(iRow).text =  [ plugin(iRow).text plugin(iRow).name ' v'  plugin(iRow).version ' (' int2str(plugin(iRow).downloads) ' downloads' ];
+    plugin(iRow).text =  [ plugin(iRow).text plugin(iRow).name ' v'  plugin(iRow).version ];
+    if plugin(iRow).installed && plugin(iRow).installorupdate
+        plugin(iRow).text =  [ plugin(iRow).text ' update available ' ];
+    end
+    plugin(iRow).text =  [ plugin(iRow).text ' (' int2str(plugin(iRow).downloads) ' downloads' ];
     if plugin(iRow).numrating
         plugin(iRow).text =  [ plugin(iRow).text '; ' int2str(plugin(iRow).numrating) ' rating' ];
     end
@@ -71,13 +75,13 @@ uilist =  {
     { 'style', 'text', 'string', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' 'tag' 'tags' } ...
     { 'style', 'text', 'string', 'Status:' 'fontweight' 'bold' } ...
     { 'style', 'text', 'string', 'installed' 'tag' 'status'} ...
-    { 'style', 'text', 'string', 'Description:' 'fontweight' 'bold' } ...
+    { 'style', 'text', 'string', 'Description of the plugin:' 'fontweight' 'bold' } ...
     { 'style', 'text', 'string', [ 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' 10 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' 10 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' 10 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' ] 'tag' 'description' } ...
     {} ...
     {} ...
     { 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cc' 'callback', 'close gcbf' } ...
-    { 'Style', 'pushbutton', 'tag', 'remove', 'string', 'Remove', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } ...
-    { 'Style', 'pushbutton', 'tag', 'install', 'string', 'Install/Update', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } ...
+    { 'Style', 'pushbutton', 'tag', 'remove', 'string', 'Remove', 'callback', 'set(findobj(gcbf, ''tag'', ''install''), ''userdata'', ''remove'');' 'enable' 'off ' } ...
+    { 'Style', 'pushbutton', 'tag', 'install', 'string', 'Install/Update', 'callback', 'set(gcbo, ''userdata'', ''install'');' 'userdata' 'test' 'enable' 'off' } ...
     };
 
 usrDat.allplugins = plugin;
@@ -87,25 +91,60 @@ fig = figure('visible', 'off');
 supergui('fig', fig, 'uilist', uilist, 'geomhoriz', {[1 0.5] 1 [1 1] [0.2 1] [0.2 1] 1 1 1 [0.43 0.37 0.4 0.5]}, 'geomvert', [1 10 1 1 1 1 2.5 1 1], 'userdata', usrDat);
 pos = get(fig, 'position');
 set(fig, 'position', [pos(1) pos(2) pos(3)/841*200 pos(4) ]);
+
+% Remove text
+set(findobj(fig, 'tag', 'tags'), 'string', '');
+set(findobj(fig, 'tag', 'status'), 'string', '');
+set(findobj(fig, 'tag', 'description'), 'string', 'Click on a plugin to show its description');
+
 set(fig, 'visible', 'on');
 waitfor( findobj('parent', fig, 'tag', 'install'), 'userdata');
 
 % Cancel
 if ~(ishandle(fig)), return; end % Check if figure still exist
 
+% Check if install or remove
+removeOrInstall = get(findobj('parent', fig, 'tag', 'install'), 'userdata');
+if isempty(removeOrInstall)
+    removeOrInstall = 'remove';
+    ButtonName = questdlg2( [ 'Are you sure you want to remove the selected plugins?' 10 'All modification you might have made to the code will be lost.'], ...
+        'Removal confirmation',  'No', 'Yes', 'No' );
+    if strcmpi(ButtonName, 'No')
+        close(fig);
+        return
+    end
+end 
+    
 usrDat = get(fig, 'userdata');
 close(fig);
 
+% set flag in plugins
 plugin = usrDat.selectedplugins;
+plugin(1).install = [];
+plugin(1).remove  = [];
 for iSelect = 1:length(usrDat.selection)
-    plugin(iSelect).install = true;
+    pInd = usrDat.selection(iSelect);
+    if ~plugin(pInd).installed
+        plugin(pInd).install = true;
+    else
+        % install or update based on which button was pressed
+        if strcmpi(removeOrInstall, 'install')
+            if plugin(pInd).installorupdate
+                plugin(pInd).install = true;
+            else
+                fprintf('Skipping install for plugin %s as there is no update available\n', plugin(pInd).name);
+            end
+        else
+            plugin(pInd).remove = true;
+        end
+    end
 end
 
 % install plugins
 % ---------------
 firstPlugin = 1;
 for iRow = 1:length(plugin)
-    if plugin(iRow).install
+    if ~isempty(plugin(iRow).install) && plugin(iRow).install
         restartEeglabFlag = true;
         if ~firstPlugin, disp('---------------------------------'); end; firstPlugin = 0;
         
@@ -137,7 +176,7 @@ for iRow = 1:length(plugin)
                 plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
             end
         end
-    elseif plugin(iRow).remove
+    elseif ~isempty(plugin(iRow).remove) && plugin(iRow).remove
         if ~firstPlugin, disp('---------------------------------'); end; firstPlugin = 0; 
         restartEeglabFlag = true;
         
