@@ -997,7 +997,6 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
 
   try
-      dsaffsda
       [Xi,Yi,Zi] = griddata(inty,intx,double(intValues),yi',xi,'v4'); % interpolate data
       [Xi,Yi,ZiC] = griddata(inty,intx,double(intContourVals),yi',xi,'v4'); % interpolate data
   catch,
