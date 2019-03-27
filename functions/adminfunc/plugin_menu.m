@@ -1,15 +1,11 @@
+% Make compatible from command line
+% Add option to show installed/non-installed plugins
+% Remove de-activation
+
 function restartEeglabFlag = plugin_menu(pluginlist)
 
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
-pluginsPerPage    = 15;
-
-% check the presence of unzip
-%str = evalc('!unzip');
-%if length(str) < 200
-%    error([ '"unzip" could not be found. Instal unzip and make sure' 10 'it is accessible under Matlab by adding the program to' 10 'the path and typing "!unzip"' ]);
-%end
-
 plugin = plugin_getweb('', pluginlist, 'newlist');
 
 % sort plugins by download score
@@ -19,19 +15,10 @@ plugin = plugin(scoreOrder);
 % sort plugins by download score
 [~, scoreOrder] = sort([ plugin.downloads ], 2, 'descend');
 plugin = plugin(scoreOrder);
-
-uilist   = {};
-geom     = {};
-geomvert = [];
-pluginIndices = [];
-         
+        
 % ------------------
 % plugins to install
 % ------------------
-maxchar = 60;
-geom    = {};
-
-lsitboxtext = {};
 for iRow = 1:length(plugin)
     plugin(iRow).text = [ '<html><font size=+0> ' htmlrating(plugin(iRow).rating, plugin(iRow).numrating) ];
     if plugin(iRow).installed
@@ -53,7 +40,10 @@ for iRow = 1:length(plugin)
 end
 
 %cb_select = 'tmpobj = get(gcbf, ''userdata''); tmpstr = tmpobj(get(gcbo, ''value'')).longdescription; tmpstr = textwrap(findobj(gcbf, ''tag'', ''description''), {tmpstr}); set(findobj(gcbf, ''tag'', ''description''), ''string'', tmpstr); clear tmpobj tmpstr;';
-filterList = { 'No filter' ...
+filterList1 = { 'No install status filter' ...
+                'Show installed only' ...
+                'Show non installed only' };
+filterList2 = { 'No topic filter' ...
                'Filter by import' ...
                'Filter by export' ...
                'Filter by artifact' ...
@@ -64,10 +54,11 @@ filterList = { 'No filter' ...
                'Filter by study' ...
                'Filter by time-freq' ...
                'Filter by other' };
-
+           
 uilist =  {
     { 'style', 'text', 'string', 'List of plugins (bolded plugins are installed)' 'fontweight' 'bold' } ...
-    { 'style', 'popupmenu', 'string', filterList  'callback' 'pluguin_uifilter(gcbf);' 'tag' 'filter' } ...
+    { 'style', 'popupmenu', 'string', filterList1 'callback' 'pluguin_uifilter(gcbf);' 'tag' 'filter1' } ...
+    { 'style', 'popupmenu', 'string', filterList2 'callback' 'pluguin_uifilter(gcbf);' 'tag' 'filter2' } ...
     { 'style', 'listbox', 'string', { plugin.text } 'callback' 'pluguin_uiupdate(gcbf);' 'Min', 0, 'Max', 2, 'value' [] 'tag', 'pluginlist' 'fontsize', 16 } ...
     { 'style', 'pushbutton', 'string', [ 'Rate plugin' ] 'tag' 'rating' } ...
     { 'style', 'pushbutton', 'string', [ 'Web documentation' ] 'tag' 'documentation' } ...
@@ -88,7 +79,7 @@ usrDat.allplugins = plugin;
 usrDat.selectedplugins = plugin;
 usrDat.selection = [];
 fig = figure('visible', 'off');
-supergui('fig', fig, 'uilist', uilist, 'geomhoriz', {[1 0.5] 1 [1 1] [0.2 1] [0.2 1] 1 1 1 [0.43 0.37 0.4 0.5]}, 'geomvert', [1 10 1 1 1 1 2.5 1 1], 'userdata', usrDat);
+supergui('fig', fig, 'uilist', uilist, 'geomhoriz', {[1 0.5 0.5] 1 [1 1] [0.2 1] [0.2 1] 1 1 1 [0.43 0.37 0.4 0.5]}, 'geomvert', [1 10 1 1 1 1 2.5 1 1], 'userdata', usrDat);
 pos = get(fig, 'position');
 set(fig, 'position', [pos(1) pos(2) pos(3)/841*200 pos(4) ]);
 
@@ -148,45 +139,24 @@ for iRow = 1:length(plugin)
         restartEeglabFlag = true;
         if ~firstPlugin, disp('---------------------------------'); end; firstPlugin = 0;
         
-        if strcmpi(plugin(iRow).status, 'deactivated')
-            fprintf('Reactivating extension %s\n', plugin(iRow).name);
-            plugin_reactivate(plugin(iRow).foldername);
-            if plugin(iRow).installorupdate
-                res = questdlg2([ 'Extension ' plugin(iRow).foldername ' has been reactivated but' 10 'a new version is available. Do you want to install it?' ], 'Warning', 'No', 'Yes', 'Yes');
-                if strcmpi(res, 'yes')
-                    plugin_deactivate(plugin(iRow).foldername);
-                    if plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version) == -1
-                        plugin_reactivate(plugin(iRow).foldername);
-                    else
-                        plugin_remove(plugin(iRow).foldername);
-                    end
-                end
+        if plugin(iRow).installed
+            fprintf('Updating extension %s\n', plugin(iRow).name);
+            plugin_deactivate(plugin(iRow).foldername);
+            if plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version) == -1
+                plugin_reactivate(plugin(iRow).foldername);
+            else
+                plugin_remove(plugin(iRow).foldername);
             end
         else
-            if plugin(iRow).installed
-                fprintf('Updating extension %s\n', plugin(iRow).name);
-                plugin_deactivate(plugin(iRow).foldername);
-                if plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version) == -1
-                    plugin_reactivate(plugin(iRow).foldername);
-                else
-                    plugin_remove(plugin(iRow).foldername);
-                end
-            else
-                fprintf('Installing extension %s\n', plugin(iRow).name);
-                plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
-            end
+            fprintf('Installing extension %s\n', plugin(iRow).name);
+            plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
         end
     elseif ~isempty(plugin(iRow).remove) && plugin(iRow).remove
         if ~firstPlugin, disp('---------------------------------'); end; firstPlugin = 0; 
         restartEeglabFlag = true;
         
-        if strcmpi(plugin(iRow).status, 'deactivated')
-            fprintf('Removing extension %s\n', plugin(iRow).name);
-            plugin_remove(plugin(iRow).foldername);
-        else
-            fprintf('Deactivating extension %s\n', plugin(iRow).name);
-            plugin_deactivate(plugin(iRow).foldername);
-        end
+        fprintf('Removing extension %s\n', plugin(iRow).name);
+        plugin_remove(plugin(iRow).foldername);
     end
 end
 

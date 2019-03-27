@@ -42,6 +42,7 @@ else
 end
 
 % set buttons
+set(findobj(fig, 'tag', 'install'), 'enable', 'on');
 if selectedPlugins(lastSelect).installed
     set(findobj(fig, 'tag', 'remove'), 'enable', 'on');
 else

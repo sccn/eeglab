@@ -3,8 +3,10 @@ function pluguin_uifilter(fig)
 tmpobj = get(fig, 'userdata');
 allPlugins = tmpobj.allplugins;
 
-filterVal = get(findobj(fig, 'tag', 'filter'), 'value');
-filterStr = get(findobj(fig, 'tag', 'filter'), 'string');
+filterInstall = get(findobj(fig, 'tag', 'filter1'), 'value');
+
+filterVal = get(findobj(fig, 'tag', 'filter2'), 'value');
+filterStr = get(findobj(fig, 'tag', 'filter2'), 'string');
 filterStr = filterStr{filterVal};
 
 if filterVal == 1
@@ -21,6 +23,12 @@ else
         end
     end
     selectedPlugins = allPlugins(pluginList);
+end
+
+if filterInstall == 2
+    selectedPlugins( [selectedPlugins.installed] == 0) = [];
+elseif filterInstall == 3
+    selectedPlugins( [selectedPlugins.installed] == 1) = [];
 end
 
 % update GUI

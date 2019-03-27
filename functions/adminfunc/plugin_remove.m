@@ -2,9 +2,9 @@ function plugin_remove(foldername);
 
     % get plugin path
     % ---------------
-    fullpluginfolder = fullfile(fileparts(which('eeglab.m')), 'deactivatedplugins', foldername);
+    fullpluginfolder = fullfile(fileparts(which('eeglab.m')), 'plugins', foldername);
     if ~exist(fullpluginfolder)
-        error([ 'Could not find folder ' foldername ' in deactivatedplugins folder' ]);
+        error([ 'Could not find folder ' foldername ' in plugins folder' ]);
     end
 
     disp([ 'Removing plugin folder ' foldername ]);
