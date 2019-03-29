@@ -170,19 +170,21 @@ if strcmpi(g.transpose, 'on')
         if strcmpi(g.time, 'on')
             fprintf(fid, 'Time%c', g.separator);
         end
-        for index = 1:length(EEG.chanlocs)
+        for index = 1:EEG.nbchan
             if ~isempty(EEG.chanlocs) && ~strcmpi(g.ica, 'on')
-                fprintf(fid, '%s%c', EEG.chanlocs(index).labels, g.separator);
-            else fprintf(fid, '%d%c', index, g.separator);
+                fprintf(fid, '%s', EEG.chanlocs(index).labels);
+            else fprintf(fid, '%d', index);
+            end
+            if index ~= EEG.nbchan
+                fprintf(fid, '%c', g.separator);
+            else
+                fprintf(fid, '\n');
             end
         end
-        fprintf(fid, '\n');
     end
     for index = 1:size(x,2)
-        fprintf(fid, strprintf, x(:,index));
-        if index ~= size(x,2)
-            fprintf(fid, '\n');
-        end
+        str = sprintf(strprintf, x(:,index));
+        fprintf(fid, '%s\n', str(1:end-1));
     end
 else 
     % writing electrodes
@@ -201,8 +203,8 @@ else
                 fprintf(fid, ' Time%c', g.separator);
             end
         end
-        fprintf(fid,[ '%.' num2str(g.precision) 'f' g.separator  ], x(index, :));
-        fprintf(fid, '\n');
+        str = sprintf( [ '%.' num2str(g.precision) 'f' g.separator  ], x(index, :));
+        fprintf(fid, '%s\n', str(1:end-1));
     end
 end
 fclose(fid);
