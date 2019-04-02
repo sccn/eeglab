@@ -341,10 +341,12 @@ for counter = 1:maxcount
             end
 
             if ~strcmp(style, 'edit') && (~strcmp(style, 'pushbutton') || strcmpi(g.adjustbuttonwidth, 'on'))
-                %tmp = curext(3)/curpos(3);
-                %if tmp > 3*factmultx && factmultx > 0, adsfasd; end
-                factmultx = max(factmultx, curext(3)/curpos(3));
-                if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
+                if strcmpi( currentelem{3}, 'string') && (~iscell(currentelem{4}) || isempty(findstr('html', currentelem{4}{1})))
+                    %tmp = curext(3)/curpos(3);
+                    %if tmp > 3*factmultx && factmultx > 0, adsfasd; end
+                    factmultx = max(factmultx, curext(3)/curpos(3));
+                    if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
+                end
             end
             if  ~strcmp(style, 'listbox')
                 factmulty = max(factmulty, curext(4)/curpos(4));
