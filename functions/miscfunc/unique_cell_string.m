@@ -1,6 +1,7 @@
-function uniqueStrings = uniqe_cell_string(c)
 % uniqe string from a cell-array containing only strings, ignores all
 % non-strings.
+
+function uniqueStrings = unique_cell_string(c)
 
 nonStringCells = [];
 for i=1:length(c) % remove non-string cells

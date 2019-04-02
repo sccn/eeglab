@@ -1,3 +1,5 @@
+% support function for eegobj
+
 function varargout = subsref(this,s)
 
 if strcmpi(s(1).type, '()') && length(this) > 1

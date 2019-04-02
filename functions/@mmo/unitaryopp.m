@@ -1,3 +1,5 @@
+% support function for mmo object
+
 function obj2 = unitaryopp(f, obj1, varargin);
 
     % make new memory mapped data file (blank)

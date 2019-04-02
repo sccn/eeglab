@@ -1,6 +1,22 @@
-% Make compatible from command line
-% Add option to show installed/non-installed plugins
-% Remove de-activation
+% plugin_menu() - main function to install EEGLAB plugins
+%
+% Usage: plugin_menu(PLUGINLIST); pop up gui
+
+% Copyright (C) 2019 Arnaud Delorme
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function restartEeglabFlag = plugin_menu(pluginlist)
 
@@ -57,9 +73,9 @@ filterList2 = { 'No topic filter' ...
            
 uilist =  {
     { 'style', 'text', 'string', 'List of plugins (bolded plugins are installed)' 'fontweight' 'bold' } ...
-    { 'style', 'popupmenu', 'string', filterList1 'callback' 'pluguin_uifilter(gcbf);' 'tag' 'filter1' } ...
-    { 'style', 'popupmenu', 'string', filterList2 'callback' 'pluguin_uifilter(gcbf);' 'tag' 'filter2' } ...
-    { 'style', 'listbox', 'string', { plugin.text } 'callback' 'pluguin_uiupdate(gcbf);' 'Min', 0, 'Max', 2, 'value' [] 'tag', 'pluginlist' 'fontsize', 16 } ...
+    { 'style', 'popupmenu', 'string', filterList1 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter1' } ...
+    { 'style', 'popupmenu', 'string', filterList2 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter2' } ...
+    { 'style', 'listbox', 'string', { plugin.text } 'callback' 'plugin_uiupdate(gcbf);' 'Min', 0, 'Max', 2, 'value' [] 'tag', 'pluginlist' 'fontsize', 16 } ...
     { 'style', 'pushbutton', 'string', [ 'Rate this plugin' ] 'tag' 'rating' } ...
     { 'style', 'pushbutton', 'string', [ 'Web documentation' ] 'tag' 'documentation' } ...
     { 'style', 'pushbutton', 'string', [ 'Upload new plugin' ] 'tag' 'upload' 'callback' [ 'web(''http://sccn.ucsd.edu/eeglab/plugin_uploader/upload_form.php'', ''-browser'');' ]} ...

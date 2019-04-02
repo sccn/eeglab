@@ -100,7 +100,7 @@ im = double(zeros(imHeight, imWidth, 3));
 
 %% find latencies for events of interest in each epoch
 
-uniqueEventNames = uniqe_cell_string(eventNames);
+uniqueEventNames = unique_cell_string(eventNames);
 for epochNumber = 1:length(EEG.epoch)
     for eventNumber = 1:length(uniqueEventNames)
        ids = find(strcmp(EEG.epoch(epochNumber).eventtype,uniqueEventNames{eventNumber})); % index for events with this type in the current epoch
