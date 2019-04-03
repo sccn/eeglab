@@ -46,8 +46,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) from eeg_eventformat.m, 
-% Arnaud Delorme, CNL / Salk Institute, 12 Feb 2002, arno@salk.edu
+% Copyright (C) Arnaud Delorme, CNL / Salk Institute, 12 Feb 2002, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by

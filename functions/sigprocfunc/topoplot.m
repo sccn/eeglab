@@ -32,10 +32,6 @@
 %                       locations with points ('.') unless more than 64 channels, then 'off'}. 
 %   'plotchans'       - [vector] channel numbers (indices) to use in making the head plot. 
 %                       {default: [] -> plot all chans}
-%   'chantype'        - cell array of channel type(s) to plot. Will also accept a single quoted
-%                       string type. Channel type for channel k is field EEG.chanlocs(k).type. 
-%                       If present, overrides 'plotchans' and also 'chaninfo' with field 
-%                       'chantype'. Ex. 'EEG' or {'EEG','EOG'} {default: all, or 'plotchans' arg}
 %   'plotgrid'        - [channels] Plot channel data in one or more rectangular grids, as 
 %                       specified by [channels],  a position matrix of channel numbers defining 
 %                       the topographic locations of the channels in the
@@ -46,8 +42,8 @@
 %                       % Plot a (2,3) grid of data values from channels 11-15 with one empty 
 %                       grid cell (top right) {default: no grid plot} 
 %   'nosedir'         - ['+X'|'-X'|'+Y'|'-Y'] direction of nose {default: '+X'}
-%   'chaninfo'        - [struct] optional structure containing fields 'nosedir', 'plotrad' 
-%                       and/or 'chantype'. See these (separate) field definitions above, below.
+%   'chaninfo'        - [struct] optional structure containing fields 'nosedir', 'plotrad'. 
+%                       See these (separate) field definitions above, below.
 %                       {default: nosedir +X, plotrad 0.5, all channels}
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
@@ -74,6 +70,7 @@
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
 %   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
+%   'chantype'        - deprecated
 %
 % Plot detail options:
 %   'drawaxis'        - ['on'|'off'] draw axis on the top left corner.
@@ -261,7 +258,6 @@ MASKSURF = 'off';
 CONVHULL = 'off';       % dont mask outside the electrodes convex hull
 DRAWAXIS = 'off';
 PLOTDISK = 'off';
-CHOOSECHANTYPE = 0;
 ContourVals = Values;
 PMASKFLAG   = 0;
 COLORARRAY  = { [1 0 0] [0.5 0 0] [0 0 0] };
@@ -405,16 +401,7 @@ if nargs > 2
                 if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end
                 if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end
                 if isfield(CHANINFO, 'plotrad') && isempty(plotrad), plotrad = CHANINFO.plotrad; end
-                if isfield(CHANINFO, 'chantype')
-                    chantype = CHANINFO.chantype;
-                    if ischar(chantype), chantype = cellstr(chantype); end
-                    CHOOSECHANTYPE = 1;
-                end
             case 'chantype'
-                chantype = Value;
-                CHOOSECHANTYPE = 1;
-                if ischar(chantype), chantype = cellstr(chantype); end
-                if ~iscell(chantype), error('chantype must be cell array. e.g. {''EEG'', ''EOG''}'); end
             case 'drawaxis'
                 DRAWAXIS = Value;
             case 'maplimits'
@@ -699,15 +686,6 @@ if ~isempty(Values) && ~strcmpi( STYLE, 'blank') && isempty(plotchans)
 end
 if isempty(plotchans) && strcmpi( STYLE, 'blank')
     plotchans = indices;
-end
-
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%% filter for channel type(s), if specified %%%%%%%%%%%%%%%%%%%%% 
-%
-
-if CHOOSECHANTYPE, 
-    newplotchans = eeg_chantype(loc_file,chantype); 
-    plotchans = intersect_bc(newplotchans, plotchans);
 end
 
 %

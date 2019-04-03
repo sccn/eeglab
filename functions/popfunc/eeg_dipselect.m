@@ -25,10 +25,9 @@
 %  >> selctedComponents = eeg_dipselect(EEG, 20,'rv')   % select dipoles with rv less than 0.2
 %
 % Author: Nima Bigdely Shamlo, Copyright (C) September 2007
-% based on an script from Julie Onton and sourcedepth() function
-% provided by Robert Oostenveld.
+% based on an script from Julie Onton: calls ft_sourcedepth() from Fieldtrip
 %
-% See also: sourcedepth()
+% See also: ft_sourcedepth()
 
 function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthThreshold);
 

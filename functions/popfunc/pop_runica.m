@@ -227,7 +227,7 @@ end
 
 % decode input arguments
 % ----------------------
-[ g addoptions ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
+[ g, addoptions ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
                             'dataset'        'integer' []        [1:length(ALLEEG)];
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on','off' }   'off';
@@ -343,7 +343,14 @@ if isempty(g.chanind)
     g.chanind = 1:EEG.nbchan;
 end
 if iscell(g.chanind)
-    g.chanind = eeg_chantype(EEG.chanlocs, g.chanind);
+    datatype = {data.chanlocs.type};
+    tmpChanInd = [];
+    for iChan = 1:length(datatype)
+        if ~isempty(datatype{iChan}) && ~isempty(strmatch(datatype{iChan}, g.chanind))
+            tmpChanInd = [ tmpChanInd iChan ];
+        end
+    end
+    g.chanind = tmpChanInd;
 end
 EEG.icachansind = g.chanind;
 

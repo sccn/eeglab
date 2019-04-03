@@ -206,7 +206,8 @@ if isempty(varargin) %GUI call
              command = sprintf('%s %s %d %s', command, '''algorithm'', ''Neural Network'',''clus_num'', ', clus_num, ',');
              
          case 'Affinity Propagation'
-             command = sprintf('%s %s%s%s %d %s', command, '''algorithm'',''Affinity Propagation'',');            
+             command = sprintf('%s %s%s%s %d %s', command, '''algorithm'',''Affinity Propagation'',');
+             plugin_askinstall('limo_eeg', 'apcluster');
              [IDX,C,sumd] = std_apcluster(clustdata,'maxits',200);
              [STUDY]      = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Affinity Propagation',size(C,1)});
         end
