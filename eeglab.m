@@ -42,9 +42,6 @@
 % <a href="matlab:helpwin pop_epoch">pop_epoch</a>     - extract epochs from a continuous dataset (epoch())
 % <a href="matlab:helpwin pop_erpimage">pop_erpimage</a>  - plot single epochs as an image (erpimage())
 % <a href="matlab:helpwin pop_jointprob">pop_jointprob</a> - reject epochs using joint probability (jointprob())
-% <a href="matlab:helpwin pop_loaddat">pop_loaddat</a>   - load Neuroscan .DAT info file (loaddat())
-% <a href="matlab:helpwin pop_loadcnt">pop_loadcnt</a>   - load Neuroscan .CNT data (lndcnt())
-% <a href="matlab:helpwin pop_loadeeg">pop_loadeeg</a>   - load Neuroscan .EEG data (loadeeg())
 % <a href="matlab:helpwin pop_loadbva">pop_loadbva</a>   - load Brain Vision Analyser matlab files
 % <a href="matlab:helpwin pop_plotdata">pop_plotdata</a>  - plot data epochs in rectangular array (plotdata())
 % <a href="matlab:helpwin pop_readegi">pop_readegi</a>   - load binary EGI data file (readegi())
@@ -502,17 +499,13 @@ if ~isdeployed
 end
 
 cb_importdata  = [ nocheck '[EEG LASTCOM] = pop_importdata;'   e_newset ];
-cb_loadcnt     = [ nocheck '[EEG LASTCOM] = pop_loadcnt;'      e_newset ]; 
-cb_loadeeg     = [ nocheck '[EEG LASTCOM] = pop_loadeeg;'      e_newset ]; 
 cb_biosig      = [ nocheck '[EEG LASTCOM] = pop_biosig; '      e_newset ]; 
 cb_fileio      = [ nocheck '[EEG LASTCOM] = pop_fileio; '      e_newset ]; 
 
 cb_importepoch = [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);'   e_store ];
-cb_loaddat     = [ checkepoch   '[EEG LASTCOM]= pop_loaddat(EEG);'        e_store ]; 
 cb_importevent = [ check        '[EEG LASTCOM] = pop_importevent(EEG);'   e_store ];
 cb_chanevent   = [ check        '[EEG LASTCOM]= pop_chanevent(EEG);'      e_store ]; 
 cb_importpres  = [ check        '[EEG LASTCOM]= pop_importpres(EEG);'     e_store ]; 
-cb_importev2   = [ check        '[EEG LASTCOM]= pop_importev2(EEG);'      e_store ]; 
 cb_importerplab= [ check        '[EEG LASTCOM]= pop_importerplab(EEG);'   e_store ]; 
 cb_export      = [ check        'LASTCOM = pop_export(EEG);'              e_histdone ];
 cb_expica1     = [ check        'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]; 
@@ -689,8 +682,6 @@ if ismatlab
     uimenu( neuro_m, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
     uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata, 'separator', 'on');
     %uimenu( neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file'              , 'CallBack', cb_loadcnt,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file'              , 'CallBack', cb_loadeeg); 
 
     % BIOSIG MENUS
     % ------------
@@ -698,12 +689,10 @@ if ismatlab
     uimenu( neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
 
     uimenu( epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
-    uimenu( epoch_m, 'Label', 'From Neuroscan .DAT file'              , 'CallBack', cb_loaddat); 
     uimenu( event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
     uimenu( event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
     uimenu( event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
     uimenu( event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
-    uimenu( event_m, 'Label', 'From Neuroscan .ev2 file'              , 'CallBack', cb_importev2); ;
     uimenu( event_m, 'Label', 'From ERPLAB text files'                , 'CallBack', cb_importerplab); 
 
     uimenu( exportm, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
@@ -1026,6 +1015,14 @@ else
             cb_mff = [ 'if ~plugin_askinstall(''mffmatlabio'', ''mff_import''), return; end;' ...
                        'eval(char(get(findobj(''label'', ''Import Philips .mff file''), ''callback'')));' ];
             uimenu( neuro_m, 'Label', 'Import Philips .mff file', 'CallBack', cb_mff, 'separator', 'on');
+        end
+        if ~exist('eegplugin_neuroscanio', 'file')
+            neuro_m = findobj(W_MAIN, 'tag', 'import data');
+            neuroscan_check = 'if ~plugin_askinstall(''neuroscanio'', ''eegplugin_neuroscanio''), return; end;';
+            cb_neuroscan1 = [ neuroscan_check 'eval(char(get(findobj(''label'', ''From Neuroscan .CNT file''), ''callback'')));' ];
+            cb_neuroscan2 = [ neuroscan_check 'eval(char(get(findobj(''label'', ''From Neuroscan .EEG file''), ''callback'')));' ];
+            uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file', 'CallBack', cb_neuroscan1, 'Separator', 'on');
+            uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file', 'CallBack', cb_neuroscan2);
         end
         if ~exist('eegplugin_firfilt', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'filter');
