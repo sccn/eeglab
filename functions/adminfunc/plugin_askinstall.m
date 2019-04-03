@@ -63,14 +63,10 @@ if nargin < 2 || ~exist(char(pluginFunc))
     end
     
     if strcmpi(res, 'no'), return, end
-    plugins = plugin_getweb('import', []);
+    plugins = plugin_getweb('', []);
     indPlugin = strmatch(lower(pluginName), lower({ plugins.name }), 'exact');
-    if isempty(indPlugin), 
-        plugins = plugin_getweb('process', []);
-        indPlugin = strmatch(lower(pluginName), lower({ plugins.name }));
-        if isempty(indPlugin), 
-            error([ pluginName ' extension not found' ]); 
-        end
+    if isempty(indPlugin)
+        error([ pluginName ' extension not found' ]);
     end
     result = plugin_install(plugins(indPlugin(1)).zip, plugins(indPlugin(1)).name, plugins(indPlugin(1)).version, forceInstall);
     if result == 1, installRes = 1; end
