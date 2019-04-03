@@ -1,3 +1,5 @@
+% compare EEGLAB distributions
+
 function compareeeglabdistrib(folder1, folder2)
 
 fileList1 = getmfilelist(folder1);

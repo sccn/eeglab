@@ -1,15 +1,39 @@
+% plugin_getweb - support function to get plugin information from the web
+
+% Copyright (C) 2012- Arnaud Delorme
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 function plugin = plugin_getweb(type, pluginOri, mode)
 
 if nargin < 1, help plugin_getweb; return; end
 if nargin < 2, pluginOri = []; end
-if nargin < 3, mode = 'merge'; end; % 'merge' or 'newlist' or 'update'
+if nargin < 3, mode = 'merge'; end % 'merge' or 'newlist' or 'update'
 
 % convert plugin list format if necessary
 if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end
 
 try
-    disp( [ 'Retreiving URL with ' type ' extensions...' ] );
-	[webPage, status] = plugin_urlread('https://sccn.ucsd.edu/wiki/Plugin_list_all');
+    disp( [ 'Retreiving plugins with extensions...' ] );
+    if strcmpi(type, 'import')
+    	[webPage, status] = plugin_urlread('https://sccn.ucsd.edu/wiki/Plugin_list_import');
+    elseif strcmpi(type, 'process')
+    	[webPage, status] = plugin_urlread('https://sccn.ucsd.edu/wiki/Plugin_list_process');
+    else
+    	[webPage, status] = plugin_urlread('https://sccn.ucsd.edu/wiki/Plugin_list_all');
+    end
 catch
     error('Cannot connect to the Internet to retrieve extension list');
 end
@@ -202,3 +226,13 @@ function [txt link] = parsehttplink(currentRow)
         end
         txt = currentRow;
     end
+
+function plugin = plugin_convert(pluginOri)
+
+for iRow = 1:length(pluginOri)
+    plugin(iRow).currentversion = pluginOri(iRow).version;
+    plugin(iRow).foldername     = pluginOri(iRow).foldername;
+    plugin(iRow).status         = pluginOri(iRow).status;
+    plugin(iRow).name           = pluginOri(iRow).plugin;
+    plugin(iRow).installed      = 1;
+end

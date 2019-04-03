@@ -1,7 +1,7 @@
 % std_clustmaxelec() - function to find the electrode with maximum absolute projection
 %                  for each component of a cluster
 % Usage:    
-%     >> [STUDY, ALLEEG] = std_clustmaxelec(STUDY, ALLEEG, clustind); 
+%     >> [eleclist, setlist, complist] = std_clustmaxelec(STUDY, ALLEEG, clustind); 
 %
 % Inputs:
 %   STUDY        - STUDY set structure containing (loaded) EEG dataset structures

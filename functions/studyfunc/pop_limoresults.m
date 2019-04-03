@@ -1,3 +1,5 @@
+% function to show limo results - deprecated
+
 classdef pop_limoresults < handle
     
     %class properties - access is private so nothing else can access these

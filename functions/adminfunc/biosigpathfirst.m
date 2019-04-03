@@ -1,3 +1,5 @@
+% Add BIOSIG at the beggining of the path 
+
 function biosigpathfirst
 
 str2doublepath = fileparts( which('str2double') );

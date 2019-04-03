@@ -889,44 +889,7 @@ else
     p = mywhich('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
     if strcmpi(p, './') || strcmpi(p, '.\'), p = [ pwd filesep ]; end
-    
-    % scan deactivated plugin folder
-    % ------------------------------
-    dircontent  = dir(fullfile(p, 'deactivatedplugins'));
-    dircontent  = { dircontent.name };
-    for index = 1:length(dircontent)
-        funcname = '';
-        pluginVersion = '';
-        if exist([p 'deactivatedplugins' filesep dircontent{index}]) == 7
-            if ~strcmpi(dircontent{index}, '.') && ~strcmpi(dircontent{index}, '..')
-                tmpdir = dir([ p 'deactivatedplugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
-                [ pluginName pluginVersion ] = parsepluginname(dircontent{index});
-                if ~isempty(tmpdir)
-                    funcname = tmpdir(1).name(1:end-2);
-                end
-            end
-        else 
-            if ~isempty(findstr(dircontent{index}, 'eegplugin')) && dircontent{index}(end) == 'm'
-                funcname = dircontent{index}(1:end-2); % remove .m
-                [ pluginName pluginVersion ] = parsepluginname(dircontent{index}(10:end-2));
-            end
-        end
-        if ~isempty(pluginVersion)
-            pluginlist(plugincount).plugin     = pluginName;
-            pluginlist(plugincount).version    = pluginVersion;
-            pluginlist(plugincount).foldername = dircontent{index};
-            if ~isempty(funcname)
-                 pluginlist(plugincount).funcname   = funcname(10:end);
-            else pluginlist(plugincount).funcname   = '';
-            end
-            if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
-                pluginlist(plugincount).funcname(1) = [];
-            end 
-            pluginlist(plugincount).status = 'deactivated';
-            plugincount = plugincount+1;
-        end
-    end
-    
+        
     % scan plugin folder
     % ------------------
     dircontent  = dir(fullfile(p, 'plugins'));

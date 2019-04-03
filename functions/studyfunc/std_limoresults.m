@@ -1,4 +1,3 @@
-function std_limoresults(STUDY,varargin)
 %  STUDY        - studyset structure containing some or all files in ALLEEG
 %  measure      - Measure to display. One from: {'daterp','datspec','icaerp','icaspec'}
 %  dataflag     - [1|0] Flag for 'data' or 'limoresults' respectively
@@ -41,6 +40,7 @@ function std_limoresults(STUDY,varargin)
 % std_limoresults(STUDY,'plottype',3,'flagdata',0,'measure','daterp','level',1,'subjindx',1,'testindx',1,'regressor',{'[1 2]'},'chanindx',6); % (results single subj level)
 % std_limoresults(STUDY,'plottype',3,'flagdata',0,'measure','daterp','level',2,'testindx',1,'chanindx',6);     
 
+function std_limoresults(STUDY,varargin)
 
 if nargin < 1
     help std_limoresults;

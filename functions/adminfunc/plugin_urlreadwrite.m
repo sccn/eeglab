@@ -1,6 +1,7 @@
 function [urlConnection,errorid,errormsg] = plugin_urlreadwrite(fcn,urlChar)
 %URLREADWRITE A helper function for URLREAD and URLWRITE.
 
+%   Adapted by A. Delorme from 
 %   Matthew J. Simoneau, June 2005
 %   Copyright 1984-2011 The MathWorks, Inc.
 %   $Revision: 1.1.6.7 $ $Date: 2011/10/22 22:05:21 $

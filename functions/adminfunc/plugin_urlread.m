@@ -19,6 +19,7 @@ function [output,status] = plugin_urlread(urlChar,method,params)
 %
 %   See also URLWRITE.
 
+%   Adapted by A. Delorme from 
 %   Matthew J. Simoneau, 13-Nov-2001
 %   Copyright 1984-2011 The MathWorks, Inc.
 %   $Revision: 1.3.2.12 $ $Date: 2011/09/03 22:43:00 $

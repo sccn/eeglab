@@ -1,3 +1,5 @@
+% true if called from Matlab; false if called from Octave
+
 function res = ismatlab
 
 v = version;

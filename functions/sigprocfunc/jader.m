@@ -1,3 +1,4 @@
+function B =  jadeR(X,m)
 % jader() - blind separation of real signals using JADE (v1.5, Dec. 1997).
 %
 % Usage: 
@@ -44,8 +45,6 @@
 %    problem to cardoso@sig.enst.fr
 
 % Copyright : Jean-Francois Cardoso.  cardoso@sig.enst.fr
-
-function B =  jadeR(X,m)
 
 verbose	= 1 ;	% Set to 0 for quiet operation
 

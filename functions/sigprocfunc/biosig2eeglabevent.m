@@ -1,14 +1,12 @@
 % biosig2eeglabevent() - convert biosig events to EEGLAB event structure
 %
 % Usage:
-%   >> eeglabevent = biosig2eeglabevent( biosigevent, interval, mode)
+%   >> eeglabevent = biosig2eeglabevent( biosigevent, interval)
 %
 % Inputs:
 %   biosigevent    - BioSig event structure
 %   interval       - Period to extract events for, in frames.
 %                    Default [] is all.
-%   mode           - [], 0: old behavior: event(i).type contains numeric event type
-%                    1: new behavior: event(i).type may contain textual event annotation
 %
 % Outputs:
 %   eeglabevent    - EEGLAB event structure
@@ -32,13 +30,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function event = biosig2eeglabevent(EVENT, interval, mode)
+function event = biosig2eeglabevent(EVENT, interval, unused)
 
 if nargin < 2
     interval = [];
-end
-if (nargin < 3) || isempty(mode)
-    mode = 0;
 end
 
 event = [];
@@ -54,15 +49,7 @@ if isempty(interval)
     if isfield(EVENT, 'TYP')
         for index = 1:length( EVENT.TYP )
             typ = EVENT.TYP(index);
-            if (mode==0)
-                event(index).type = typ;
-            elseif (typ<256)
-                event(index).type = EVENT.CodeDesc{typ};
-            elseif isfield(EVT, 'Event') && isfield(EVT.Event,'CodeIndex') && isfield(EVT.Event,'CodeDesc')
-                event(index).type = EVENT.CodeDesc{EVENT.CodeIndex==typ};
-            else
-                event(index).type = typ;
-            end
+            event(index).type = typ;
         end
     end
     if isfield(EVENT, 'POS')
@@ -94,15 +81,7 @@ elseif isfield(EVENT,'POS')
             event(count).latency = pos_tmp;
             if isfield(EVENT, 'TYP')
                 typ = EVENT.TYP(index);
-                if (mode==0)
-                    event(count).type = typ;
-                elseif (typ<256)
-                    event(count).type = EVENT.CodeDesc{typ};
-                elseif isfield(EVT, 'Event') && isfield(EVT.Event,'CodeIndex') && isfield(EVT.Event,'CodeDesc')
-                    event(count).type = EVENT.CodeDesc{EVENT.CodeIndex==typ};
-                else
-                    event(count).type = typ;
-                end
+                event(count).type = typ;
             end
             if isfield(EVENT, 'CHN')
                 event(count).chanindex = EVENT.CHN(index);

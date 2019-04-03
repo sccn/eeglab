@@ -152,3 +152,9 @@ if dispTable || ~isempty(exportFile)  % Display overview or export to CSV file?
     end
 end
 
+function b = iscellnumeric(C)
+% Return 1 if all elements of cell array are numeric
+
+b = all(cellfun(@(x) isnumeric(x),C));
+
+

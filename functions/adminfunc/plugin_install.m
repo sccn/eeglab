@@ -1,4 +1,33 @@
-function result = plugin_install(zipfilelink, name, version, forceInstall);
+% plugin_install() - install EEGLAB plugin. Called by plugin_askinstall().
+%
+% Usage:
+%  plugin_install(zipfilelink, name, version, force);
+%
+% Inputs:
+%  zipfilelink - [string] web link to zip file
+%  name        - [string] name of the plugin
+%  version     - [string] version of the plugin
+%  force       - [boolean] force install (even if already installed)
+%
+% See also: plugin_askinstall()
+
+% Copyright (C) 2012- Arnaud Delorme
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+function result = plugin_install(zipfilelink, name, version, forceInstall)
 
     if nargin < 4, forceInstall = false; end
     result = 1;
@@ -25,7 +54,7 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
                                 'you want to download this extension?' ], 'Warning', 'No', 'Yes', 'Yes');
              if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); result = -1; return; end;               
         end
-    catch,
+    catch
         msg = [ 'Could not download extension. Host site might be' 10 ...
                 'unavailable, too slow or you do not have permission' 10 ...
                 'to write in the EEGLAB plugin folder. Try again' 10 ... 
@@ -46,7 +75,7 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
     try
         plugin_urlread(['http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_increment.php?plugin=' name '&version=' version ]);
         plugin_urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
-    catch,
+    catch
         msg = [ 'Could not download extension. Host site might be' 10 ...
                 'unavailable, too slow or you do not have permission' 10 ...
                 'to write in the EEGLAB plugin folder. Try again' 10 ... 

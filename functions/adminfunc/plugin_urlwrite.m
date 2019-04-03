@@ -1,5 +1,5 @@
-function [output,status] = urlwrite(urlChar,location,method,params)
-%URLWRITE Save the contents of a URL to a file.
+function [output,status] = plugin_urlwrite(urlChar,location,method,params)
+%   URLWRITE Save the contents of a URL to a file.
 %   URLWRITE(URL,FILENAME) saves the contents of a URL to a file.  FILENAME
 %   can specify the complete path to a file.  If it is just the name, it will
 %   be created in the current directory.
@@ -21,6 +21,7 @@ function [output,status] = urlwrite(urlChar,location,method,params)
 %
 %   See also URLREAD.
 
+%   Adapted by A. Delorme from 
 %   Matthew J. Simoneau, 13-Nov-2001
 %   Copyright 1984-2011 The MathWorks, Inc.
 %   $Revision: 1.4.4.14 $ $Date: 2011/09/03 22:43:01 $
