@@ -18,7 +18,7 @@
 % 
 % Author: Tim Mullen and Arnaud Delorme, SCCN/INC/UCSD
 
-% This function is part of the Source Information Flow Toolbox (SIFT)
+% Copyright: Tim Mullen and Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by

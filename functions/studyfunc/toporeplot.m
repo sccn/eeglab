@@ -92,10 +92,21 @@
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
 %                       'head'-> interpolate the whole disk {default: 'head'}.
 
-
-% toporeplot() - From topoplot.m, Revision 1.216  2004/12/05 12:00:00 hilit
-%[hfig grid] = topoplot( EEG.icawinv(:, 5), EEG.chanlocs, 'verbose', 'off','electrodes', 'off' ,'style','both');
-%figure; toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
+% Copyright (C) UCSD
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [handle,chanval] = toporeplot(grid,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 

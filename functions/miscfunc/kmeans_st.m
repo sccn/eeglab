@@ -1,3 +1,4 @@
+function [centr,clst,sse] = kmeans_st(X,k,restarts)
 % KMEANS: K-means clustering of n points into k clusters so that the
 %         within-cluster sum of squares is minimized.  Based on Algorithm
 %         AS136, which seeks a local optimum such that no movement of a
@@ -29,7 +30,6 @@
 %   10/14/00 - use means() rather than mean() to update cluster centers;
 %                remove references to TRUE and FALSE.
 
-function [centr,clst,sse] = kmeans_st(X,k,restarts)
   if (nargin<3) restarts = []; end
   
   if (isempty(restarts))

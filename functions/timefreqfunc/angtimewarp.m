@@ -1,3 +1,4 @@
+function angdataw=angtimewarp(evLatency, newLatency, angdata)
 % angtimewarp() - Given two event marker vectors, computes a
 %                 warping of the input angular time series so that its
 %                 evlatencies match newlatencies. Values of the warped
@@ -32,9 +33,6 @@
 % Authors: Jean Hausser, SCCN/INC/UCSD, 2006
 %
 % See also: timeWarp(), phasecoher(), erpimage(), newtimef()
-%
-
-function angdataw=angtimewarp(evLatency, newLatency, angdata)
   
   if min(sort(evLatency) == evLatency) == 0
     error('evlatency should be sorted');

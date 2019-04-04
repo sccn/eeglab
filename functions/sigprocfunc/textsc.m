@@ -1,3 +1,4 @@
+function H = textsc(x,y,txt);
 % textsc() - places text in screen coordinates and places
 %            a title at the top of the figure.
 %
@@ -24,8 +25,6 @@
 % Written by John L. Galenski III
 % All Rights Reserved  January 21, 1994
 % LDM031695jlg
-
-function H = textsc(x,y,txt);
 
 % Basic error checking
 if nargin < 2

@@ -1,3 +1,4 @@
+function [eyelikeres, S, P]= eyelike(E)
 % eyelike() - calculate a permutation matrix P and a scaling (diagonal) maxtrix S
 %             such that S*P*E is eyelike (so permutation acts on the rows of E).
 %             E must be a square matrix.
@@ -5,8 +6,6 @@
 %        >> [eyelike, S, P] = eyelike(E);
 %
 % Author: Benjamin Blankertz (blanker@first.gmd.de) 3/2/00
-
-function [eyelikeres, S, P]= eyelike(E)
 
 [N, M]= size(E);
 if N ~= M

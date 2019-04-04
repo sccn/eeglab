@@ -21,10 +21,25 @@
 % Example:
 % EEG = eeg_addnewevents(EEG, {[100 200] [300 400 500]}, {'type1' 'type2'}, {'field1' 'field2'}, {[1 2 3 4 5] [6 7 8 9]});
 %
-%  Author: Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
-function EEG = eeg_addnewevents(EEG, eventLatencyArrays, types, fieldNames, fieldValues);
+% Author: Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
 
+% Copyright (C) Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+function EEG = eeg_addnewevents(EEG, eventLatencyArrays, types, fieldNames, fieldValues)
 
 if ~isfield(EEG, 'event')
     EEG.event = [];

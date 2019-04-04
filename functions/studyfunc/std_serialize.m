@@ -1,3 +1,4 @@
+function m = std_serialize(v)
 % Convert a MATLAB data structure into a compact byte vector. This function
 % is identical to hlp_serialise (as of 2015). It bears a different name 
 % so as to avoid conflict.
@@ -45,7 +46,6 @@
 %                                adapted from serialize.m
 %                                (C) 2010 Tim Hutt
 
-function m = std_serialize(v)
 
     % dispatch according to type
     if isnumeric(v) 

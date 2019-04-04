@@ -19,6 +19,8 @@
 % See also: topoplot(), readlocs(), readelp(), 
 %           polhemus2topo(), pop_chanedit()
         
+% Copyright (C) 2002 UCSD
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
@@ -105,4 +107,4 @@ end
 axis([-lim lim -lim lim -lim*0.5 lim])
 axis equal;
 rotate3d on
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
+try icadefs; set(gcf, 'color', BACKCOLOR); catch, end

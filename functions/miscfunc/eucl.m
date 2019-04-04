@@ -1,3 +1,4 @@
+function dists = eucl(crds1,crds2)
 % EUCL: Calculates the euclidean distances among a set of points, or between a
 %       reference point and a set of points, or among all possible pairs of two 
 %       sets of points, in P dimensions.  Returns a single distance for two points.
@@ -31,7 +32,6 @@
 %    6/12/98 - allow for P=1.
 %   11/11/03 - initialize dists to NaN for error return.
 
-function dists = eucl(crds1,crds2)
   if nargin == 0, help eucl; return; end
   dists = NaN;
 

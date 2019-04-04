@@ -1,3 +1,4 @@
+function f=loglike(W, S)
 % loglike() - log likehood function to estimate dependence between components
 %
 % Usage: f = loglike(W, S);
@@ -17,8 +18,6 @@
 % M: number of components
 %
 % Author: Arnaud Delorme and Jorn Anemuller
-
-function f=loglike(W, S);
 
     W = double(W);
     S = double(S);

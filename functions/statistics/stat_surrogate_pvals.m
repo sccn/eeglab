@@ -1,5 +1,4 @@
-function pvals = stat_surrogate_pvals(distribution,observed,tail)
-% compute empirical p-vals under the null hypothesis that observed samples
+% Compute empirical p-vals under the null hypothesis that observed samples
 % come from a given surrogate distribution. P-values for Type I error in
 % rejecting the null hypothesis are obtained by finding the proportion of
 % samples in the distribution that
@@ -25,7 +24,7 @@ function pvals = stat_surrogate_pvals(distribution,observed,tail)
 % 
 % Author: Tim Mullen and Arnaud Delorme, SCCN/INC/UCSD
 
-% This function is part of the Source Information Flow Toolbox (SIFT)
+% Copyright: Tim Mullen and Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -40,6 +39,8 @@ function pvals = stat_surrogate_pvals(distribution,observed,tail)
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+function pvals = stat_surrogate_pvals(distribution,observed,tail)
 
 numDims = myndims(distribution);
 

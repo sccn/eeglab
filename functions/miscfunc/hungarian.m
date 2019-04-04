@@ -1,3 +1,4 @@
+function [C,T]=hungarian(A)
 % hungarian() - Solve the assignment problem using the Hungarian method.
 % 
 % Usage: >> [C,T]=hungarian(A)
@@ -20,8 +21,6 @@
 % NOTE: A substantial effort was put into this code. If you use it for a
 % publication or otherwise, please include an acknowledgement and notify
 % me by email. /Niclas
-
-function [C,T]=hungarian(A)
 
 [m,n]=size(A);
 

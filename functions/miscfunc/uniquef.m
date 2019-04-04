@@ -1,3 +1,4 @@
+function [value,freq,index] = uniquef(grp,sortflag)
 % UNIQUEF: Given a matrix containing group labels, returns a vector containing 
 %         a list of unique group labels, in the sequence found, and a 
 %         vector of corresponding frequencies of each group.  
@@ -24,7 +25,6 @@
 %   1/25/00 - changed name from unique to uniquef to avoid conflict with 
 %             Matlab v5 function.
 
-function [value,freq,index] = uniquef(grp,sortflag)
   if (nargin < 2) sortflag = []; end
 
   get_index = 0;

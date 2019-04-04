@@ -1,7 +1,7 @@
 %Several EEGLAB plugins (not included by default) are available to import 
 %specific data formats. To download these plugins use EEGLAB menu
 %
-%File > Manage Plugins > Manage data import plugins
+%File > Manage EEGLAB extensions
 %
 %The FILEIO and BIOSIG toolboxes interface also allow to import in EEGLAB a wide variety
 %of EEG/MEG data file formats -- including those imported using EEGLAB native menus

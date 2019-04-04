@@ -1,3 +1,4 @@
+function M=timewarp(evLatency, newLatency)
 % timewarp()   - Given two event marker vectors, computes a matrix
 %                that can be used to warp a time series so that its
 %                evlatencies match newlatencies. Values of the warped
@@ -31,8 +32,7 @@
 % Authors: Jean Hausser, SCCN/INC/UCSD, 2006
 %
 % See also: angtimewarp(), phasecoher(), erpimage()
-%
-function M=timewarp(evLatency, newLatency)
+
   M = [0];
   if min(sort(evLatency) == evLatency) == 0
     error('evLatency should be in ascending order');

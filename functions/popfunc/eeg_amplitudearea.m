@@ -1,3 +1,4 @@
+function [channels,overall_amplitude] = eeg_amplitudearea(EEG, channels, resrate, wstart, wend)
 % eeg_amplitudearea() - Resamples an ERP average using spline interpolation 
 %                       at a new sample rate (resrate) in Hz to get the exact limits 
 %                       of the window of integration. Finely samples the window 
@@ -27,8 +28,6 @@
 %         Combined with amplitudearea_msuV() by Darren Weber, UCSF 28/1/05
 %         Retested and debugged Tom Campbell 2/2/05
 %         Reconceived, factored somewhat, tested and debugged Tom Campbell 13:24 23.3.2005
-
-function [channels,overall_amplitude] = eeg_amplitudearea2(EEG, channels, resrate, wstart, wend)
 
 if wstart > wend
     error ('ERROR: wstart must be greater than wend')

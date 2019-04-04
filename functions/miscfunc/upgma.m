@@ -1,3 +1,4 @@
+function [topology,support] = upgma(dist,labels,doplot,fontsize)
 % UPGMA: Unweighted pair-group hierarchical cluster analysis of a distance
 %        matrix.  Produces plot of dendrogram.  To bootstrap cluster support,
 %        see cluster().
@@ -27,7 +28,6 @@
 %   9/24/01 - check diagonal elements against eps rather than zero.
 %   3/14/04 - changed 'suppress' flag to 'doplot'.
 
-function [topology,support] = upgma(dist,labels,doplot,fontsize)
   if (nargin < 2) labels = []; end
   if (nargin < 3) doplot = []; end
   if (nargin < 4) fontsize = []; end

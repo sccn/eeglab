@@ -1,3 +1,4 @@
+function [M,stderr,V,grpids] = means(X,grps)
 % MEANS:  Means, standard errors and variances.  For column vectors, means(x) 
 %         returns the mean value.  For matrices or row vectors, means(x) is a 
 %         row vector containing the mean value of each column.  The basic 
@@ -27,7 +28,6 @@
 %    2/24/02 - added estimation of variances.
 %   10/15/02 - corrected documentation.
 
-function [M,stderr,V,grpids] = means(X,grps)
   if nargin == 0, help means; return; end
 
   if (nargin < 2) grps = []; end

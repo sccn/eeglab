@@ -19,9 +19,9 @@
 %
 % Author: Scott Makeig & Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: ENVTOPO
+% See also: envtopo()
 
-% Scott Makeig & Arnaud Delorme - CNL / Salk Institute, La Jolla 8/8/97
+% Copyright (C) Scott Makeig & Arnaud Delorme - CNL / Salk Institute, La Jolla 8/8/97
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
