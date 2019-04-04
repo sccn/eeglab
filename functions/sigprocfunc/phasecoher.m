@@ -36,30 +36,19 @@
 
 % Copyright (C) 5-5-98 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
 %
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 %
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % 5-7-98 added frames, made input data format one-row -sm
 % 5-8-98 added MIN_AMP, times, PLOT_IT -sm
@@ -106,30 +95,19 @@ elseif length(times) ~= frames
 else
   PLOT_IT = 1;
 end
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
-%
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
-%
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+ 
+if nargin < 6
+    alpha = nan; % no alpha given
+end
+if nargout > 2 && isnan(alpha) % if still want cohsig
+  alpha = DEFAULT_ALPHA; 
+elseif nargout > 2
+  if alpha < 0 || alpha > 0.1
+    help phasecoher
+    fprintf('phasecoher(): alpha out of bounds.\n');
+    return
+  end
+  if alpha==0
     alpha = nan; % no bootstrap
   end
   if alpha*COHSIG_REPS < 5
@@ -299,60 +277,38 @@ if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
  % ix = 0:winlength-1;  % never called
  bootcoher = zeros(1,COHSIG_REPS);
  bootamp   = zeros(1,COHSIG_REPS);
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
-%
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
-%
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ bootallamps = zeros(COHSIG_REPS, trials); %Added -Jean
+ bootallphs = zeros(COHSIG_REPS, trials); %Added -Jean
+ 
+ fprintf('Computing %d bootstrap coherence values... ',COHSIG_REPS); 
+ for f = 1:COHSIG_REPS %%%%%%%%%%%%%%% Bootstrap replications %%%%%%%%%%%
+  if rem(f,50) == 0
+    fprintf('%d ',f);
+  end
+  randoff = floor(rand(1,trials)*(frames-winlength))+1; % random offsets
+  
+  %Create randomized time-stretched allamps and allphs arrays (see above)
+  for t = 1:trials
     bootallamps(f, t) = allamps(randoff(t), t);
     bootallphs(f, t) = allphs(randoff(t), t);
   end
  end
 
  [bootamp, bootcoher]=getAmpCoh(bootallamps, bootallphs, MIN_AMP);
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
-%
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
-%
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ fprintf('\n');
+
+ bootcoher = sort(bootcoher); % sort low to high
+ cohsig = bootcoher(round(COHSIG_REPS*(1.0-alpha)));
+
+ bootamp = sort(bootamp); % sort low to high
+ ampsig = [bootamp(round(COHSIG_REPS*(alpha))) ...
+           bootamp(round(COHSIG_REPS*(1.0-alpha)))];
+% keyboard
+
+end %%%%%%%%%%%%%%%%%%%%%%%%%%%% end cohsig %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 for f=1:halfwin                 % pad amps, cohers to front of input data
   amps(f) = amps(halfwin+1);
   cohers(f) = cohers(halfwin+1);

@@ -117,30 +117,19 @@
 
 % Copyright (C) 3-10-98 from timtopo.m Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
 %
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 %
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Edit History:
 % 3-18-98 fixed bug in LineStyle for fifth component, topoplot maxproj with 
@@ -381,30 +370,19 @@ else % if no 'timerange' given
          xunitframes     = 1; % mark frames as time unit instead of sec
     end
 end
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
-%
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
-%
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+ 
+if isempty(g.timerange)
+  xmin = g.limits(1); % (xmin, xmax) are data limits in sec
+  xmax = g.limits(2);
+else 
+  xmin = g.timerange(1); % (xmin, xmax) are data limits in sec
+  xmax = g.timerange(2);
+end
+
+pmin = g.limits(1); % plot min and max sec
+if pmin < xmin
+   pmin = xmin;     % don't allow plotting beyond the data limits
+end
 pmax = g.limits(2);
 if pmax > xmax
    pmax = xmax;
@@ -926,30 +904,19 @@ if strcmpi(g.sumenv,'on')  || strcmpi(g.sumenv,'fill') %%%%%%%% if 'sunvenv' %%%
     set(p,'linewidth',3);
     set(p,'color',g.fillcolor,'Tag','line_envelope_2');
  end
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
-%
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
-%
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ set(p,'Tag','patch_envelope');
+end
+
+if strcmpi(g.sortvar,'rp')
+	t = text(double(xmin+0.1*(xmax-xmin)), ...
+         double(ymin+0.1*(ymax-ymin)), ...
+         ['rp ' num2str(sumppaf,'%4.2f') '%']);
+elseif strcmpi(g.sortvar,'pv')
+    	t = text(double(xmin+0.1*(xmax-xmin)), ...
+         double(ymin+0.1*(ymax-ymin)), ...
+         ['pvaf ' num2str(sumppaf,'%4.2f') '%']);
+else
 	t = text(double(xmin+0.1*(xmax-xmin)), ...
          double(ymin+0.1*(ymax-ymin)), ...
          ['ppaf ' num2str(sumppaf,'%4.2f') '%']);
@@ -1024,30 +991,19 @@ set(t,'fontsize',FONTSIZESMALL,'fontweight','bold','Tag','text_inaxes')
                 vl=plot([0 0], [-1e10 1e10],'k');
                     set(vl,'linewidth',2,'Tag','line_vertatzero');
         end
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
-%
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
-%
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+ 
+        %
+        % plot the n-th component filled 
+        %
+        if g.fillcomp(1)>0 && find(g.fillcomp==c-1) 
+            fprintf('filling the envelope of component %d\n',c-1);
+            mins = matsel(envdata,frames,0,2,envx(c));
+            p=fill([times times(frames:-1:1)],...
+                   [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
+                   colors(mapcolors(c),1));
+            %
+            % Overplot the data envlope again so it is not covered by the fill()'d component
+            %
             p=plot(times,matsel(envdata,frames,0,1,envx(1)),colors(mapcolors(1),1));% plot the max
             set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
             p=plot(times,matsel(envdata,frames,0,2,envx(1)),colors(mapcolors(1),1));% plot the min
