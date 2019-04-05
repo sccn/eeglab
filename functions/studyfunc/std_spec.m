@@ -88,7 +88,7 @@
 %                  method. Default is 4.
 %   'burgorder'  - [integet] order for the Burg spectral method.
 %
-% Changes between EEGLAB 14 and EEGLAB 15:
+% Changes between EEGLAB 13 and later EEGLAB versions:
 % For the 'specmode' option 'fft', EEGLAB 14 and later version detrend the 
 % data and apply hamming taper to it. EEGLAB 13 and earlier remove the 
 % baseline from the data and apply a hamming taper but only for continuous data.
@@ -229,9 +229,6 @@ end
 
 % No SPEC information found
 % -------------------------
-options = {};
-if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end
-if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end
 if isempty(g.channels)
      [X,boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
 else [X,boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
@@ -376,7 +373,7 @@ else % fft mode
     catch
         X = bsxfun(@times, X, hamming2(size(X,2))');
     end
-    disp('Warning: std_spec function computation has changed since version 14 (see help message)');
+    disp('Warning: std_spec function computation has changed since version 13 (see help message)');
     %end
     if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
     tmp   = fft(X, g.nfft, 2);
@@ -386,8 +383,6 @@ else % fft mode
     if strcmpi(g.output, 'power')
         X     = tmp.*conj(tmp);
         if strcmpi(g.logtrials, 'on'),  X = 10*log10(X); end
-        if strcmpi(g.savetrials, 'off'), X = mean(X,3); end
-        if strcmpi(g.logtrials, 'off'),  X = 10*log10(X); end
     else
         X = tmp;
         datatype = 'SPECTRUMFFT';
