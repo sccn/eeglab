@@ -148,6 +148,13 @@ if isempty(opt.channels) && strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, '
     end
 end
 
+% get all sessions (same code as std_readdat)
+% -------------------------------------------
+allSessions = { STUDY.datasetinfo.session };
+allSessions(cellfun(@isempty, allSessions)) = { 1 };
+allSessions = cellfun(@num2str, allSessions, 'uniformoutput', false);
+uniqueSessions = unique(allSessions);
+
 for iSubj = 1:length(subjectList)
     fprintf('.');
     
@@ -195,11 +202,8 @@ for iSubj = 1:length(subjectList)
         params           = tmpstruct{5};
     else
         datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
-        if isempty(STUDY.datasetinfo(datInds(1)).session)
-            fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]);
-        else
-            fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} sprintf('_ses-%2.2d', STUDY.datasetinfo(datInds(1)).session) fileExt ]);
-        end
+        
+        fileName = getfilename({STUDY.datasetinfo(datInds).filepath}, STUDY.datasetinfo(datInds(1)).subject, { STUDY.datasetinfo(datInds).session }, fileExt, length(uniqueSessions) == 1);
         if ~isempty(opt.channels)
              [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
         else [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
@@ -213,6 +217,9 @@ for iSubj = 1:length(subjectList)
             end
             if strcmpi(opt.singletrials, 'off')
                 dataTmp{iSubj} = cellfun(@(x)squeeze(mean(x,2)), dataTmp{iSubj}, 'uniformoutput', false); % average
+            end
+            if strcmpi(opt.datatype, 'spec') && isfield(params, 'logtrials') && strcmpi(params.logtrials, 'off') % if log trial if off it means that single trials are raw power so we need to take the log of the mean
+                dataTmp{iSubj} = cellfun(@(x)squeeze(10*log10(x)), dataTmp{iSubj}, 'uniformoutput', false); % average
             end
         elseif strcmpi(opt.datatype, 'erpim')
             %dataTmp{iSubj} = cellfun(@(x)processerpim(x, xvals, params), dataTmp{iSubj}, 'uniformoutput', false);
@@ -260,6 +267,29 @@ else
     events = {};
 end
 
+if strcmpi(opt.singletrials, 'on')
+    % ICA components from the same subjects need to be made as if coming 
+    % from different subjects
+    dataTmp2 = {};
+    for iDat1 = 1:length(dataTmp)
+        compNumbers = cellfun(@(x)size(x, dim+1), dataTmp{iDat1});
+        if length(unique(compNumbers)) > 1
+            error('Cannot handle conditions with different number of components');
+        end
+        
+        for iComps = 1:compNumbers(1)
+            dataTmp2{end+1} = [];
+            for iDat2 = 1:length(dataTmp{iDat1})
+                % check dimensions of components
+                if dim == 3, dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
+                else         dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                end
+            end
+            dataTmp2{end} = reshape(dataTmp2{end}, size(dataTmp{iDat1}));
+        end
+    end
+    dataTmp = dataTmp2;
+end
 datavals = reorganizedata(dataTmp, dim);
 
 % reorganize data
@@ -406,9 +436,32 @@ function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
     nlines = (lastx-xwidth)/(nout-0.5)*i; % make it imaginary
     %nlines = ceil(lastx/((lastx-firstx+1-xwidth)/(nout-1)));
            
+    if ~isempty(params) && ischar(params{1}) && strcmpi(params{1}, 'components')
+        params(1:2) = [];
+    end
     [dataout, eventout] = erpimage(dataSubject, events, xvals, '', smoothing, nlines, 'noplot', 'on', params{:});
     if ~isempty(events)
         eventout = eventout'; % needs to be a column vector
     else
         eventout = [];
     end
+
+% get file base name: filepath and sess are cell array (in case 2 files per subject)
+% ----------------------------------------------------------------------------------
+function filebase = getfilename(filepath, subj, sess, fileSuffix, onlyOneSession)
+if onlyOneSession
+    filebase = fullfile(filepath{1}, [ subj fileSuffix ] );
+else
+    if isempty(sess)
+        sess = { '1' };
+    end
+    for iSess = 1:length(sess)
+        if isnumeric(sess{iSess})
+            sesStr   = [ '0' num2str(sess{iSess}) ];
+        else
+            sesStr   = [ '0' sess{iSess} ];
+        end
+        filebase{iSess} = fullfile(filepath{iSess}, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
+    end
+end    
+    
