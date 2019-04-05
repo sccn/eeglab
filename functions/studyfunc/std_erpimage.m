@@ -82,7 +82,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function allerpimage = std_erpimage( EEG, varargin);
+function allerpimage = std_erpimage( EEG, varargin)
 
 if nargin < 1
     help std_erpimage;
@@ -90,7 +90,7 @@ if nargin < 1
 end
 
 allerpimage = [];
-[opt moreopts] = finputcheck( varargin, { ...
+[opt, moreopts] = finputcheck( varargin, { ...
     'components'    'integer'     []                    [];
     'channels'      { 'cell','integer' }  { [] [] }     {};
     'trialindices' { 'integer','cell' }   []            [];
@@ -212,7 +212,7 @@ if strcmpi(opt.concatenate, 'off')
     
     clear tmperpimage eventvals;
     for index = 1:size(X,1)
-        [tmpX tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
+        [tmpX, tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
         if isempty(events), tmpevents = []; end
         eventvals{index}   = tmpevents;
         tmperpimage{index} = tmpX';
@@ -264,7 +264,7 @@ end
 
 % compute full file names
 % -----------------------
-function res = computeFullFileName(filePaths, fileNames);
+function res = computeFullFileName(filePaths, fileNames)
 for index = 1:length(fileNames)
     res{index} = fullfile(filePaths{index}, fileNames{index});
 end
