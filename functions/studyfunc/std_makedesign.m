@@ -345,6 +345,7 @@ end
 % -----------------------------------------
 STUDY.currentdesign     = designind;
 STUDY = std_selectdesign(STUDY, ALLEEG, designind); 
+STUDY.cache = [];
 
 % build output command
 % --------------------
