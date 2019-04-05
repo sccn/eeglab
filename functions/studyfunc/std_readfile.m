@@ -1,19 +1,19 @@
 % std_readfile() - Read data file containing STUDY measures.
 %
-% Usage:    
-%   >>  [data param range1 range2] = std_readfile(filename, 'key', val); 
+% Usage:
+%   >>  [data param range1 range2] = std_readfile(filename, 'key', val);
 %
 % Inputs:
 %   filename   - [string] read specific file, for instance 's1.daterp'
-%                containing ERP data for dataset "s1.set". It is also 
-%                possible to provide only the "base" file name "s1" and 
-%                function will load the appropriate file based on the 
+%                containing ERP data for dataset "s1.set". It is also
+%                possible to provide only the "base" file name "s1" and
+%                function will load the appropriate file based on the
 %                selected input measure (measure input).
 %
 % Optional inputs:
-%   'channels'       - [cell or integer] channel labels - for instance 
+%   'channels'       - [cell or integer] channel labels - for instance
 %                      { 'cz' 'pz' } of channels to load from the data file.
-%   'components'     - [integer] component index in the selected EEG dataset 
+%   'components'     - [integer] component index in the selected EEG dataset
 %                      for which to read the data
 %   'timelimits'     - [min max] ERSP/ERP time (latency in ms) range of interest
 %   'freqlimits'     - [min max] ERSP/Spectrum frequency range (in Hz) of interest
@@ -22,12 +22,12 @@
 %                      is provided, the data measure is selected automatically.
 %   'getparamsonly'  - ['on'|'off'] only read file parameters not data.
 %   'trialselect'    - Cell of cells defining the field and the values
-%                      of the field in the trialinfo structure to be used to pull out the trials. 
-%                      i.e. if values are string:  {'field1',{val1_fromfield1 val2_fromfield1}, 'field2'...} 
+%                      of the field in the trialinfo structure to be used to pull out the trials.
+%                      i.e. if values are string:  {'field1',{val1_fromfield1 val2_fromfield1}, 'field2'...}
 %                           if values are numeric: {'field1',[val1 val2], 'field2'...}
 %   'designvar'      - Structure of independent variables with fields 'label'
-%                      and 'value'. Each independent variable should have these 
-%                      two fields so the function can use these values to pull 
+%                      and 'value'. Each independent variable should have these
+%                      two fields so the function can use these values to pull
 %                      out the trials. If empty, all the trials are read.
 %   'singletrials'   - { 'on','off' } Extract single trials. Default 'off'
 %   'getparamonly'   - { 'on','off'} Get only parameters. Default 'off'
@@ -90,25 +90,52 @@ if nargin < 1
     return;
 end
 
+if iscell(fileBaseName)
+    % this is when the data of a subject is split accross sessions
+    % then we need to call std_readfile several times and combine
+    % the results
+    % ------------------------------------------------------------
+    if length(fileBaseName) > 1
+        for iFile = 1:length(fileBaseName)
+            [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
+        end
+        % combine arrays
+        measureData = measureDataTmp{1};
+        events = eventsTmp{1};
+        for iData = 2:length(measureDataTmp)
+            for iCell = 1:length(measureDataTmp{iData}(:))
+                if ~isempty(measureDataTmp{iData}{iCell})
+                    if ndims(measureDataTmp{iData}{iCell}) == 2, measureData{iCell} = [ measureData{iCell} measureDataTmp{iData}{iCell} ];
+                    elseif ndims(measureDataTmp{iData}{iCell}) == 2, measureData{iCell}(:, :, end+1:end+size(measureDataTmp{iData}{iCell},3)) = measureDataTmp{iData}{iCell};
+                    end
+                end
+            end
+        end
+        return
+    else
+        fileBaseName = fileBaseName{1};
+    end
+end
+
 limomeasures = {'itcbeta1' , 'itcbeta2' ,'itcr2r' ,'itcr2f' ,'itcr2p' ,...
-                'erpbeta1' , 'erpbeta2' ,'erpr2r' ,'erpr2f' ,'erpr2p' ,...
-                'erspbeta1', 'erspbeta2','erspr2r','erspr2f','erspr2p',...
-                'specbeta1', 'specbeta2','specr2r','specr2f','specr2p'};
+    'erpbeta1' , 'erpbeta2' ,'erpr2r' ,'erpr2f' ,'erpr2p' ,...
+    'erspbeta1', 'erspbeta2','erspr2r','erspr2f','erspr2p',...
+    'specbeta1', 'specbeta2','specr2r','specr2f','specr2p'};
 opt = finputcheck(varargin, { 'components'       'integer'  []    [];
-                              'getparamonly'     'string'   { 'on','off' }  'off';
-                              'trialselect'      'cell'     {}                 {};
-                              'trialinfo'        'struct'   {}                 struct([]);
-                              'designvar'        'struct'   []                 struct([]);
-                              'singletrials'     'string'   { 'on','off' }  'off';
-                              'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
-                              'channels'         'cell'     []    {};
-                              'cache'            'struct'   []    struct([]);
-                              'function'         { 'function_handle' 'integer' } []  [];
-                              'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef' 'topo'} 'erp';                                                 
-                              'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
-                              'triallimits'      'real'     []    []; % ERPimage only
-                              'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
-                              'dataindices'      'integer'  []    [] }, 'std_readdatafile');
+    'getparamonly'     'string'   { 'on','off' }  'off';
+    'trialselect'      'cell'     {}                 {};
+    'trialinfo'        'struct'   {}                 struct([]);
+    'designvar'        'struct'   []                 struct([]);
+    'singletrials'     'string'   { 'on','off' }  'off';
+    'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
+    'channels'         'cell'     []    {};
+    'cache'            'struct'   []    struct([]);
+    'function'         { 'function_handle' 'integer' } []  [];
+    'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef' 'topo'} 'erp';
+    'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
+    'triallimits'      'real'     []    []; % ERPimage only
+    'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
+    'dataindices'      'integer'  []    [] }, 'std_readdatafile');
 if ischar(opt), error(opt); end
 
 if ~isempty(opt.triallimits), opt.freqlimits = opt.triallimits; end
@@ -132,7 +159,7 @@ else
     end
 end
 if nargin > 5 && strcmpi(opt.singletrials, 'on')
-     indFlag = true;
+    indFlag = true;
 else indFlag = false;
 end
 
@@ -155,7 +182,7 @@ elseif ~isempty(opt.channels)
     chan.chanlocs = struct('labels', fileData.labels);
     opt.dataindices = std_chaninds(chan, opt.channels);
 elseif ~isempty(opt.components)
-     opt.dataindices = opt.components;
+    opt.dataindices = opt.components;
 else opt.dataindices = abs(opt.dataindices);
 end
 
@@ -165,7 +192,7 @@ if v6Flag
     end
     warning('off', 'MATLAB:load:variableNotFound');
     if length(opt.dataindices) > 0
-         fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
+        fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
     else fileData = load('-mat', [ fileBaseName fileExt ], 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
     end
     if strcmpi(opt.measure, 'topo') && ~isfield(fileData, 'trialinfo'), error('Compatibilty issue. Recompute ICA topographic maps'); end
@@ -184,7 +211,7 @@ events         = {};
 % get output for parameters and measure ranges
 % --------------------------------------------
 fileFields = fieldnames(fileData);
-if ~isempty( strmatch('parameters', fileFields) ) 
+if ~isempty( strmatch('parameters', fileFields) )
     parameters = removedup(fileData.parameters);
     for index = 1:length(parameters), if iscell(parameters{index}), parameters{index} = { parameters{index} }; end; end
     parameters = struct(parameters{:});
@@ -206,7 +233,7 @@ if ~isempty(opt.freqlimits)
 else
     indBegin2 = 1;
     indEnd2   = length(measureRange2);
-end    
+end
 
 if strcmpi(opt.getparamonly, 'on')
     return;
@@ -224,49 +251,49 @@ end
 % remove duplicates in the list of parameters
 % -------------------------------------------
 function cella = removedup(cella)
-    [tmp indices] = unique_bc(cella(1:2:end));
-    if length(tmp) ~= length(cella)/2
-        %fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
-    end
-    cella = cella(sort(union(indices*2-1, indices*2)));
-    
+[tmp indices] = unique_bc(cella(1:2:end));
+if length(tmp) ~= length(cella)/2
+    %fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
+end
+cella = cella(sort(union(indices*2-1, indices*2)));
+
 % find indices for selection of measure
 % -------------------------------------
 function [measureRange indBegin indEnd] = indicesselect(measureRange, measureLimits);
-    indBegin = 1;
-    indEnd   = length(measureRange);
-    if ~isempty(measureRange) && ~isempty(measureLimits) && (measureLimits(1) > measureRange(1) || measureLimits(end) < measureRange(end))
-        indBegin   = min(find(measureRange >= measureLimits(1)));
-        indEnd     = max(find(measureRange <= measureLimits(end)));
-        measureRange = measureRange(indBegin:indEnd);
-    end
+indBegin = 1;
+indEnd   = length(measureRange);
+if ~isempty(measureRange) && ~isempty(measureLimits) && (measureLimits(1) > measureRange(1) || measureLimits(end) < measureRange(end))
+    indBegin   = min(find(measureRange >= measureLimits(1)));
+    indEnd     = max(find(measureRange <= measureLimits(end)));
+    measureRange = measureRange(indBegin:indEnd);
+end
 
 % recursive function to load data
 % -------------------------------
 function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect);
 
-    if length(designvar) == 0
-        [ measureData eventVals ] = getfiledata(fileData, trialselect, options{:});
-        measureData = { measureData };
-        eventVals   = { eventVals   };
+if length(designvar) == 0
+    [ measureData eventVals ] = getfiledata(fileData, trialselect, options{:});
+    measureData = { measureData };
+    eventVals   = { eventVals   };
+else
+    % scan independent variable values
+    if isfield(designvar(1), 'vartype') && strcmpi('continuous', designvar(1).vartype)
+        if ~ischar(designvar(1).value), designvar(1).value = ''; end
+        trialselect = { trialselect{:} designvar(1).label designvar(1).value };
+        [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+        measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+        eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
     else
-        % scan independent variable values
-        if isfield(designvar(1), 'vartype') && strcmpi('continuous', designvar(1).vartype)
-            if ~ischar(designvar(1).value), designvar(1).value = ''; end
-            trialselect = { trialselect{:} designvar(1).label designvar(1).value };
+        for iField = 1:length(designvar(1).value)
+            trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
             [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
-            measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
-            eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
-        else
-            for iField = 1:length(designvar(1).value)
-                trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
-                [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
-                measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
-                eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
-            end
+            measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+            eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
         end
     end
-    
+end
+
 % load data from structure or file
 % --------------------------------
 function [ fieldData events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
@@ -275,7 +302,7 @@ persistent tmpcache;
 persistent hashcode;
 
 if length(chan) > 1
-%    error('This function can only read one channel at a time');
+    %    error('This function can only read one channel at a time');
 end
 
 % get trial indices
@@ -300,33 +327,33 @@ for index = 1:length(chan)
     allfields   = fieldnames(fileData);
     topoFlag    = ~isempty(findstr(allfields{1}, '_grid'));
     fieldToRead = [ dataType int2str(chan(index)) fastif(topoFlag, '_grid', '') ];
-
+    
     % find trials
-    if isempty(trials), 
+    if isempty(trials),
         return;
         % trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); % not sure what this does
     end
-
+    
     % load data
     warning('off', 'MATLAB:MatFile:OlderFormat');
     if ischar(fileData.(fieldToRead)) % special ERP-image
         try
             fileData.chanlocsforinterp; % isfield does not work becauce fileData is a MatFile
-        catch, error('Missing field in ERPimage STUDY file, try recomputing them'); 
+        catch, error('Missing field in ERPimage STUDY file, try recomputing them');
         end
         chanlocsforinterp = fileData.chanlocsforinterp;
         
         % caching for ERPimage only
-        if isequal(hashcode, fileData.(fieldToRead)) 
+        if isequal(hashcode, fileData.(fieldToRead))
             tmpFieldData = tmpcache;
-        else 
+        else
             tmpFieldData = eval( fileData.(fieldToRead) );
             tmpcache = tmpFieldData;
             hashcode = fileData.(fieldToRead);
         end
         tmpFieldData = tmpFieldData(indBegin1:indEnd1,trials);
         if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
-        if ~isempty(fileData.events), 
+        if ~isempty(fileData.events),
             events = fileData.events(trials);
             if ~isempty(subTrials), events = events(subTrials); end
         end
@@ -342,7 +369,7 @@ for index = 1:length(chan)
         end
     end
     warning('on', 'MATLAB:MatFile:OlderFormat');
-
+    
     % average single trials if necessary
     if ~isempty(func)
         tmpFieldData = func(tmpFieldData);
