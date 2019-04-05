@@ -85,8 +85,7 @@ if ~ischar(varargin{1}) %intial settings
     
     geomline = [0.35 6];
     if comps == true
-        str_name       = sprintf('Pre-compute component measures for STUDY ''%s'' - ''%s''', ...
-                         STUDY.name, STUDY.design(STUDY.currentdesign).name);
+        str_name       = sprintf('Pre-compute component measures for STUDY ''%s''', STUDY.name);
         if length(str_name) > 80, str_name = [ str_name(1:80) '...' ]; end
         guiadd1 = { {'style' 'checkbox'   'string' '' 'tag' 'compallersp' 'value' 1 }  ...
                     {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP only for components selected by RV (set) or for all components (unset)' } };
