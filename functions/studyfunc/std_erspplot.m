@@ -229,15 +229,19 @@ plottfopt = { ...
    'threshold',   alpha, ...
    'effect',      stats.effect, ...
    'maskdata',    params.maskdata };
-if ~isempty(params.plottf) && length(opt.channels) < 5
+if ~isempty(params.plottf) && length(opt.channels) < 5  && isempty(opt.clusters)
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     allersp = {}; alltimes = []; allfreqs = []; pgroup = []; pcond = []; pinter = []; events  = [];
     return;
 end    
 
+
 % plot single scalp map
 % ---------------------
 if ~isempty(opt.channels)
+    if isempty(params.plottf) && length(opt.channels) > 1 && strcmpi(stats.singletrials, 'on')
+        error('Cannot plot several channels on the same figure when using single trial statistics');
+    end
 
     [STUDY, allersp, alltimes, allfreqs, events, paramsersp] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', params.timerange, ...
         'freqrange', params.freqrange, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', opt.datatype, 'subbaseline', params.subbaseline);
@@ -323,10 +327,19 @@ if ~isempty(opt.channels)
     end
     
     if strcmpi(stats.singletrials, 'on')
-        if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
-        if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
-        if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
-            allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
+        % For ITC this is optional but it does not change anything
+        if strcmpi(opt.datatype, 'ersp')
+            if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
+            if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
+            if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log') && strcmpi(opt.datatype, 'ersp') && strcmpi(opt.datatype, 'ersp')
+                allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
+            end
+        elseif strcmpi(opt.datatype, 'itc')
+            if ~isfield(params, 'itctype'), params.itctype = 'phasecoher'; end
+            for iDat = 1:length(allersp(:))
+                allersp{iDat} = newtimefitc(allersp{iDat}, params.itctype);
+                allersp{iDat} = abs(allersp{iDat});
+            end
         end
     end
     
@@ -344,7 +357,7 @@ if ~isempty(opt.channels)
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                           'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
         else
-            if length(opt.channels) > 1 && ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
+            if length(opt.channels) > 1, figure; opt.plotmode = 'condensed'; end
             if length(locs) == 1 && size(allersp{1},3) > 1
                 % channels should be in 3rd dim; reshape data to put subjects in the 4th dim if number of channels is 1 
                 for index = 1:length(allersp(:))
@@ -374,6 +387,9 @@ if ~isempty(opt.channels)
         end
     end
 else
+    if length(opt.clusters) > 1 && strcmpi(stats.singletrials, 'on')
+        error('Cannot plot several components on the same figure when using single trial statistics');
+    end
     
     if length(opt.clusters) > 1 && ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end
     nc = ceil(sqrt(length(opt.clusters)));
@@ -431,10 +447,18 @@ else
         end % single subject STUDY                                
         
         if strcmpi(stats.singletrials, 'on')
-            if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
-            if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
-            if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
-                allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
+            if strcmpi(opt.datatype, 'ersp')
+                if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
+                if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
+                if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+                    allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
+                end
+            elseif strcmpi(opt.datatype, 'itc')
+                if ~isfield(params, 'itctype'), params.itctype = 'phasecoher'; end
+                for iDat = 1:length(allersp(:))
+                    allersp{iDat} = newtimefitc(allersp{iDat}, params.itctype);
+                    allersp{iDat} = abs(allersp{iDat});
+                end
             end
         end
 

@@ -205,7 +205,7 @@ if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt
     end
 end
 
-if ~isempty(params.topotime) && ~isnan(params.topotime(1)) && length(opt.channels) < 5
+if ~isempty(params.topotime) && ~isnan(params.topotime(1)) && length(opt.channels) < 5 && isempty(opt.clusters)
     warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
 end
@@ -241,6 +241,9 @@ plotcurveopt = { plotcurveopt{:} ...
 % ----------------
 axcopyflag = 1;
 if ~isempty(opt.channels)
+    if (isempty(params.topotime) || isnan(params.topotime(1))) && length(opt.channels) > 1 && strcmpi(stats.singletrials, 'on')
+        error('Cannot plot several channels on the same figure when using single trial statistics');
+    end
 
     chaninds = 1:length(opt.channels);
 
@@ -339,7 +342,11 @@ if ~isempty(opt.channels)
     set(gcf,'name',['Channel ' datatypestr ]);
     axcopy(gca);
 else 
-    % plot component
+    if length(opt.clusters) > 1 && strcmpi(stats.singletrials, 'on')
+        error('Cannot plot several components on the same figure when using single trial statistics');
+    end
+    
+   % plot component
     % --------------
     if length(opt.clusters) > 1, figure('color', 'w'); end
     nc = ceil(sqrt(length(opt.clusters)));
