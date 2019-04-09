@@ -175,8 +175,7 @@ if strcmpi(opt.plotmode, 'condensed')
     if ~isempty( opt.caxis )
         caxis( currentHangle, opt.caxis )
     end
-    colorbarHandle = cbar;
-    title(colorbarHandle,opt.unitcolor);
+    cbar_standard(opt.datatype, ng, opt.unitcolor); 
     axes(currentHangle); 
     return; 
 end
