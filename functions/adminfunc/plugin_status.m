@@ -1,5 +1,5 @@
 % plugin_status()- Given the name of a plugin(or part of it), returns 
-%                  the status (e.g. [0]not installed, [1]installed, [2]deactivaded)                                                               
+%                  the status (e.g. [0]not installed, [1]installed)                                                               
 %  Inputs:
 %         pluginname   - {string} Name (or part of it) of plugin of interest
 %
@@ -10,7 +10,7 @@
 %  Outputs:
 %        
 %        status         - [Vector 1xnumber of plugins]. 0 = Not installed,
-%                         1 = Installed, 2 = Deactivated.
+%                         1 = Installed
 %       pluginnameout   - Name of the plugins in 'status'.
 %       pluginstruct    - If the plugin(s) in 'pluginname' is installed, the function
 %                         provide here a cell (one cell per plugin in 'status') array 
