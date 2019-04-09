@@ -267,22 +267,25 @@ else
     events = {};
 end
 
-if strcmpi(opt.singletrials, 'on')
-    % ICA components from the same subjects need to be made as if coming 
-    % from different subjects
+if ~isempty(opt.clusters)
+    % Split ICA components from the same subjects need to be made 
+    % as if coming from different subjects
     dataTmp2 = {};
+    realDim  = dim;
+    if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
     for iDat1 = 1:length(dataTmp)
-        compNumbers = cellfun(@(x)size(x, dim+1), dataTmp{iDat1});
+        compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
         if length(unique(compNumbers)) > 1
             error('Cannot handle conditions with different number of components');
         end
         
         for iComps = 1:compNumbers(1)
             dataTmp2{end+1} = [];
-            for iDat2 = 1:length(dataTmp{iDat1})
+            for iDat2 = 1:length(dataTmp{iDat1}(:))
                 % check dimensions of components
-                if dim == 3, dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
-                else         dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                if strcmpi(opt.singletrials, 'on') && strcmpi(tmpDataType, 'timef'),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
+                elseif strcmpi(opt.singletrials, 'on') || strcmpi(tmpDataType, 'timef') dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                else                                                                    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
                 end
             end
             dataTmp2{end} = reshape(dataTmp2{end}, size(dataTmp{iDat1}));

@@ -266,17 +266,41 @@ if ~isempty(opt.channels)
     %   'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
     %toc
     
+    % average single trials
+    % ---------------------
+    if strcmpi(opt.datatype, 'ersp')
+        if  strcmpi(params.subbaseline, 'on')
+            disp('Computing common baseline has changed since EEGLAB 14: averaging baselines is now');
+            disp('performed before log-transformation of the baseline - in a similar way that baseline'); 
+            disp('is averaged accross trials (log transformation is only performed at the end for display)'); 
+            % see above for rational for baseline
+            paramsersp.singletrials = stats.singletrials;
+            paramsersp.commonbase   = params.subbaseline;
+            allersp = newtimefbaseln(allersp, alltimes, paramsersp);
+        else
+            paramsersp.singletrials = stats.singletrials;
+            allersp = cellfun(@(x)newtimefbaseln(x, alltimes, paramsersp), allersp, 'uniformoutput', false);
+        end
+        % transform to log (except single trials where the transformation
+        % is after taking the average - which is after doing stats
+        if strcmpi(stats.singletrials, 'off')
+            if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+                allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
+            end
+        end
+    end
+    
     % select specific time and freq
     % -----------------------------
     if ~isempty(params.plottf)
-        if length(params.plottf) < 3, 
+        if length(params.plottf) < 3
             params.plottf(3:4) = params.plottf(2);
             params.plottf(2)   = params.plottf(1);
         end
-        [tmp fi1] = min(abs(allfreqs-params.plottf(1)));
-        [tmp fi2] = min(abs(allfreqs-params.plottf(2)));
-        [tmp ti1] = min(abs(alltimes-params.plottf(3)));
-        [tmp ti2] = min(abs(alltimes-params.plottf(4)));
+        [~, fi1] = min(abs(allfreqs-params.plottf(1)));
+        [~, fi2] = min(abs(allfreqs-params.plottf(2)));
+        [~, ti1] = min(abs(alltimes-params.plottf(3)));
+        [~, ti2] = min(abs(alltimes-params.plottf(4)));
         for index = 1:length(allersp(:))
             allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2);
             allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
@@ -290,34 +314,17 @@ if ~isempty(opt.channels)
         [pcond pgroup pinter] = std_stat(allersp, stats);
         if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end % single subject STUDY                                
     else
-        [pcond pgroup pinter] = std_stat(allersp, stats);
+        [pcond, pgroup, pinter] = std_stat(allersp, stats);
         if (~isempty(pcond ) && (size( pcond{1},1) == 1 || size( pcond{1},2) == 1)) || ...
-           (~isempty(pgroup) && (size(pgroup{1},1) == 1 || size(pgroup{1},2) == 1)), 
+           (~isempty(pgroup) && (size(pgroup{1},1) == 1 || size(pgroup{1},2) == 1))
             pcond = {}; pgroup = {}; pinter = {}; 
             disp('No statistics possible for single subject STUDY');
         end % single subject STUDY                                
     end
-
-    % average single trials
-    % ---------------------
-    if strcmpi(opt.datatype, 'ersp')
-        if strcmpi(stats.singletrials, 'on')
-            if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
-            if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
-        end
-        if  strcmpi(params.subbaseline, 'on')
-            disp('Computing common baseline has changed since EEGLAB 14: averaging baselines is now');
-            disp('performed before log-transformation of the baseline - in a similar way that baseline'); 
-            disp('is averaged accross trials (log transformation is only performed at the end for display)'); 
-            % see above for rational for baseline
-            paramsersp.singletrials = stats.singletrials;
-            paramsersp.commonbase   = params.subbaseline;
-            allersp = newtimefbaseln(allersp, alltimes, paramsersp);
-        else
-            paramsersp.singletrials = stats.singletrials;
-            allersp = cellfun(@(x)newtimefbaseln(x, alltimes, paramsersp), allersp, 'uniformoutput', false);
-        end
-        % transform to log
+    
+    if strcmpi(stats.singletrials, 'on')
+        if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
+        if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
         if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
             allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
         end
@@ -390,24 +397,30 @@ else
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
         end
-
-        % select specific time and freq
-        % -----------------------------
-        if ~isempty(params.plottf)
-            if length(params.plottf) < 3, 
-                params.plottf(3:4) = params.plottf(2);
-                params.plottf(2) = params.plottf(1);
+        
+        % average single trials
+        % ---------------------
+        if strcmpi(opt.datatype, 'ersp')
+            if  strcmpi(params.subbaseline, 'on')
+                disp('Computing common baseline has changed since EEGLAB 14: averaging baselines is now');
+                disp('performed before log-transformation of the baseline - in a similar way that baseline');
+                disp('is averaged accross trials (log transformation is only performed at the end for display)');
+                % see above for rational for baseline
+                paramsersp.singletrials = stats.singletrials;
+                paramsersp.commonbase   = params.subbaseline;
+                allersp = newtimefbaseln(allersp, alltimes, paramsersp);
+            else
+                paramsersp.singletrials = stats.singletrials;
+                allersp = cellfun(@(x)newtimefbaseln(x, alltimes, paramsersp), allersp, 'uniformoutput', false);
             end
-            [~, fi1] = min(abs(allfreqs-params.plottf(1)));
-            [~, fi2] = min(abs(allfreqs-params.plottf(2)));
-            [~, ti1] = min(abs(alltimes-params.plottf(3)));
-            [~, ti2] = min(abs(alltimes-params.plottf(4)));
-            for index = 1:length(allersp(:))
-                allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2)'; % transposed because otherwise time/freq are inverted
-                allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
+            % transform to log (except single trials)
+            if strcmpi(stats.singletrials, 'off')
+                if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+                    allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
+                end
             end
         end
-        
+
         % statistics
         % ----------
         [pcond pgroup pinter] = std_stat(allersp, stats);
@@ -417,31 +430,13 @@ else
             disp('No statistics possible for single subject STUDY');
         end % single subject STUDY                                
         
-        % average single trials
-        % ---------------------
-        if strcmpi(opt.datatype, 'ersp')
-            if strcmpi(stats.singletrials, 'on')
-                if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
-                if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
-            end
-             if  strcmpi(params.subbaseline, 'on')
-                disp('Computing common baseline has changed since EEGLAB 14: averaging baselines is now');
-                disp('performed before log-transformation of the baseline - in a similar way that baseline');
-                disp('is averaged accross trials (log transformation is only performed at the end for display)');
-                  % see above for rational for baseline
-                paramsersp.singletrials = stats.singletrials;
-                paramsersp.commonbase   = params.subbaseline;
-                allersp = newtimefbaseln(allersp, alltimes, paramsersp);
-            else
-                paramsersp.singletrials = stats.singletrials;
-                allersp = cellfun(@(x)newtimefbaseln(x, alltimes, paramsersp), allersp, 'uniformoutput', false);
-            end
-            % transform to log
+        if strcmpi(stats.singletrials, 'on')
+            if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
+            if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
             if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
                 allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
             end
         end
-
 
         % plot specific component
         % -----------------------
