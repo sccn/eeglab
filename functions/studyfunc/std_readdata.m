@@ -179,12 +179,21 @@ for iSubj = 1:length(subjectList)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
         polList     = [];
-        for iDat = datasetInds(:)'
-            indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject so we many only consider the first row
-            if ~isempty(indSet)
-                compList = [ compList STUDY.cluster(opt.clusters).comps(indSet) ];
+        if isempty(opt.component)
+            for iDat = datasetInds(:)'
+                indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject so we many only consider the first row
+                if ~isempty(indSet)
+                    compList = [ compList STUDY.cluster(opt.clusters).comps(indSet) ];
+                    if strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
+                        polList  = [ polList  componentPol(indSet) ];
+                    end
+                end
+            end
+        else
+            if ~isempty(intersect(datasetInds, STUDY.cluster(opt.clusters).sets(:,opt.component)))
+                compList = [ compList STUDY.cluster(opt.clusters).comps(opt.component) ];
                 if strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
-                    polList  = [ polList  componentPol(indSet) ];
+                    polList  = [ polList  componentPol(opt.component) ];
                 end
             end
         end

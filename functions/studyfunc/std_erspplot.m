@@ -159,7 +159,7 @@ options = mystruct(varargin);
 options = myrmfield( options, myfieldnames(params));
 options = myrmfield( options, myfieldnames(statstruct.etc.statistics));
 options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward compatibility
-[ opt moreparams ] = finputcheck( options, { ...
+[ opt, moreparams ] = finputcheck( options, { ...
                                'design'      'integer' [] STUDY.currentdesign;
                                'caxis'       'real'    [] [];
                                'statmode'    'string'  [] ''; % deprecated
@@ -176,7 +176,7 @@ options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward com
                                   'std_erspstatplot', 'ignore');
 if ischar(opt), error(opt); end
 if strcmpi(opt.noplot, 'on'), opt.plotmode = 'none'; end
-if isempty(opt.caxis), 
+if isempty(opt.caxis)
     if strcmpi(opt.datatype, 'ersp')
          opt.caxis = params.ersplim;
     elseif strcmpi(opt.datatype, 'itc') && ~isempty(params.itclim)
