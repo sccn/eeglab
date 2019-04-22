@@ -169,10 +169,7 @@ for iRow = 1:length(plugin)
         
         if plugin(iRow).installed
             fprintf('Updating extension %s\n', plugin(iRow).name);
-            plugin_deactivate(plugin(iRow).foldername);
-            if plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version) == -1
-                plugin_reactivate(plugin(iRow).foldername);
-            else
+            if plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version) ~= -1
                 plugin_remove(plugin(iRow).foldername);
             end
         else
