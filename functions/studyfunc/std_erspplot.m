@@ -288,7 +288,7 @@ if ~isempty(opt.channels)
         % transform to log (except single trials where the transformation
         % is after taking the average - which is after doing stats
         if strcmpi(stats.singletrials, 'off')
-            if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+            if ~isfield(paramsersp, 'scale') || strcmpi(paramsersp.scale, 'log')
                 allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
             end
         end
@@ -331,7 +331,7 @@ if ~isempty(opt.channels)
         if strcmpi(opt.datatype, 'ersp')
             if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
             if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
-            if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log') && strcmpi(opt.datatype, 'ersp') && strcmpi(opt.datatype, 'ersp')
+            if strcmpi(opt.datatype, 'ersp') && (~isfield(paramsersp, 'scale') || strcmpi(paramsersp.scale, 'log'))
                 allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
             end
         elseif strcmpi(opt.datatype, 'itc')
@@ -431,7 +431,7 @@ else
             end
             % transform to log (except single trials)
             if strcmpi(stats.singletrials, 'off')
-                if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+                if ~isfield(paramsersp, 'scale') || strcmpi(paramsersp.scale, 'log')
                     allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
                 end
             end
@@ -450,7 +450,7 @@ else
             if strcmpi(opt.datatype, 'ersp')
                 if ndims(allersp{1}) == 4, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},4); end; end
                 if ndims(allersp{1}) == 3, for ind = 1:length(allersp(:)), allersp{ind} = mean(allersp{ind},3); end; end
-                if  isfield(paramsersp, 'freqscale') && strcmpi(paramsersp.freqscale, 'log')
+                if ~isfield(paramsersp, 'scale') || strcmpi(paramsersp.scale, 'log')
                     allersp = cellfun(@(x)10*log10(x), allersp, 'uniformoutput', false);
                 end
             elseif strcmpi(opt.datatype, 'itc')

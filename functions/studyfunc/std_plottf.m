@@ -49,8 +49,6 @@
 %                  will only change the ordinate not interpolate the data.
 %                  If you change this option blindly, your frequency scale
 %                  might be innacurate {default: 'auto'}
-%  'ylim'        - [min max] ordinate limits for ERP and spectrum plots
-%                  {default: all available data}
 %
 % ITC/ERSP image plotting options:
 %  'tftopoopt'   - [cell array] tftopo() plotting options (ERSP and ITC)
@@ -304,7 +302,11 @@ end
 % color scale
 % -----------
 if isempty(opt.caxis)
-    tmpc = [-max(abs(tmpc)) max(abs(tmpc))];
+    if opt.unitcolor(1) == '%'
+        tmpc = [1-(max(abs(tmpc))-1) max(abs(tmpc))];
+    else
+        tmpc = [-max(abs(tmpc)) max(abs(tmpc))];
+    end
     for c = 1:nc
         for g = 1:ng
             axes(hdl(c,g));
