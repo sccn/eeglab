@@ -1,4 +1,5 @@
-% eeg_getversion() - obtain EEGLAB version number
+% eeg_getversion() - obtain EEGLAB version number (version is embeded in
+%                    the script, edit the function to see the version).
 %
 % Usage:
 %     >> vers = eeg_getversion;
@@ -40,8 +41,8 @@
 
 function [vers, versnum, releaseDate] = eeg_getversion
 
-vers        = 'development head';
-releaseDate = 'not specified'; % unix date -> date +"%d-%b-%y %T"
+vers        = '2019.0';
+releaseDate = '30-Apr-19 14:55:42'; % unix date -> date +"%d-%b-%y %T"
 
 % get numerical version number
 tmpvers = vers;

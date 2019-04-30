@@ -1,5 +1,5 @@
 % EEGLAB Toolbox to process EEG data
-% Version 2019.0
+% Version - see eeg_getversion()
 %
 % eeglab() - Matlab graphic user interface environment for 
 %   electrophysiological data analysis incorporating the ICA/EEG toolbox 
