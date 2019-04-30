@@ -67,7 +67,7 @@ if nargin > 1
     end
 end
 
-if nargin < 3 || isempty(STUDY.filename)
+if nargin < 3
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.study', ...
@@ -89,6 +89,9 @@ g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
                             'filepath'   'string'   []     STUDY.filepath;
                             'savemode'   'string'   { 'standard','resave' } 'standard' });
 if ischar(g), error(g); end
+if isempty(STUDY.filename) && isempty(g.filename)
+    error('File name required to save the study');
+end
 
 % fields to remove
 % ----------------
