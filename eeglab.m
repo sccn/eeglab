@@ -311,7 +311,7 @@ if ~isdeployed
     myaddpath( eeglabpath, 'statcond.m',       [ 'functions' filesep 'statistics'       ]);
     myaddpath( eeglabpath, 'timefreq.m',       [ 'functions' filesep 'timefreqfunc'     ]);
     myaddpath( eeglabpath, 'icademo.m',        [ 'functions' filesep 'miscfunc'         ]);
-    myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'resources'        ]);
+    myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'supportfiles'     ]);
     myaddpath( eeglabpath, 'startpane.m',      [ 'functions' filesep 'javachatfunc' ]);
     addpathifnotinlist(fullfile(eeglabpath, 'plugins'));
     eeglab_options;
