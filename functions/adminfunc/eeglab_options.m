@@ -41,7 +41,7 @@ try
     
     eeg_optionsbackup;
     if iseeglabdeployed
-        fileName = fullfile( ctfroot, 'functions', 'adminfunc', 'eeg_options.txt');
+        fileName = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_options.txt');
         
         com2 = readtxtfile(fileName);
         eval( com2 );
