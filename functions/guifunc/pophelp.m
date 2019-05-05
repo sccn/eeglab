@@ -105,8 +105,7 @@ function [doc] = readfunc(funct, nonmatlab)
 
 doc = {};
 if iseeglabdeployed
-    if isempty(find(funct == '.')), funct = [ funct '.m' ]; end
-    funct = fullfile(eeglabexefolder, 'help', funct);
+    warndlg2([ 'Some help menus not available in compiled version.' 10 'Look up help online.' ] );
 end
 if nonmatlab	
 	fid = fopen( funct, 'r');
