@@ -165,7 +165,7 @@ if ~isdeployed
         clear tmpComputer
     end
 else
-    ICABINARY = fullfile(ctfroot, 'ica_linux');
+    ICABINARY = fullfile(ctfroot, 'EEGLAB', 'functions', 'supportfiles', 'ica_linux');
 end
 
 try

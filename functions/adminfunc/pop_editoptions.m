@@ -97,8 +97,8 @@ end
 % ----------------------------
 eeglab_options;
 if iseeglabdeployed
-    filename = fullfile( ctfroot, 'functions', 'adminfunc', 'eeg_options.txt');
-    eegoptionbackup = fullfile( ctfroot, 'functions', 'adminfunc', 'eeg_optionsbackup.txt');
+    filename = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_options.txt');
+    eegoptionbackup = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_optionsbackup.txt');
 else
     % folder for eeg_options file (also update the eeglab_options)
     if ~isempty(EEGOPTION_PATH)
