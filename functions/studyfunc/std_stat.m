@@ -198,33 +198,61 @@ else
     params = { params{:} 'method', opt.fieldtrip.method, 'naccu', opt.fieldtrip.naccu 'mcorrect' opt.fieldtrip.mcorrect 'alpha' opt.fieldtrip.alpha 'numrandomization' opt.fieldtrip.naccu };
     params = { params{:} 'structoutput' 'on' }; % before if ~isnan(opt.fieldtrip.alpha), end
     
+    pinter = cell(1,3);
+    statsinter = cell(1,3);
     if strcmpi(opt.condstats, 'on') && nc > 1
+        newdata = data(:,1);
         for g = 1:ng
+            % marginal effect
             [F, df, pval]  = statcondfieldtrip(data(:,g), 'paired', opt.paired{1}, params{:});
             pcond{g}     = applymask( F, opt.fieldtrip);
             statscond{g} = squeeze(F.stat);
+            
+            % concatenate data for main statistics
+            if g > 1
+                for c = 1:nc
+                    switch ndims(data{1,1})
+                        case 2, newdata{c,1}(:,end+1:end+size(data{c,g},2)) = data{c,g};
+                        case 3, newdata{c,1}(:,:,end+1:end+size(data{c,g},3)) = data{c,g};
+                        case 4, newdata{c,1}(:,:,:,end+1:end+size(data{c,g},4)) = data{c,g};
+                    end
+                end
+            end
         end
+        
+        % main statistics
+        [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
+        pinter{1}     = applymask(F, opt.fieldtrip);
+        statsinter{1} = squeeze(F.stat);
     else
         pcond = {};
     end
     if strcmpi(opt.groupstats, 'on') && ng > 1
+        newdata = data(1,:);
         for c = 1:nc
+            % marginal effect
             [F, df, pval]   = statcondfieldtrip(data(c,:), 'paired', opt.paired{2}, params{:});
             pgroup{c}     = applymask( F, opt.fieldtrip);
             statsgroup{c} = squeeze(F.stat);
+            
+            % concatenate data for main statistics
+            if c > 1
+                for g = 1:ng
+                    switch ndims(data{1,1})
+                        case 2, newdata{1,g}(:,end+1:end+size(data{c,g},2)) = data{c,g};
+                        case 3, newdata{1,g}(:,:,end+1:end+size(data{c,g},3)) = data{c,g};
+                        case 4, newdata{1,g}(:,:,:,end+1:end+size(data{c,g},4)) = data{c,g};
+                    end
+                end
+            end
         end
+        
+        % main statistics
+        [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
+        pinter{2}     = applymask(F, opt.fieldtrip);
+        statsinter{2} = squeeze(F.stat);
     else
         pgroup = {};
-    end
-    if ( strcmpi(opt.groupstats, 'on') && strcmpi(opt.condstats, 'on') ) && ng > 1 && nc > 1
-        opt.paired  = sort(opt.paired); % put 'off' first if present
-        [F, df, pval] = statcondfieldtrip(data, 'paired', opt.paired{1}, params{:});
-        for index = 1:length(pval)
-            pinter{index}     = applymask(F, opt.fieldtrip);
-            statsinter{index} = squeeze(F.stat);
-        end
-    else
-        pinter = {};
     end
 end
 
