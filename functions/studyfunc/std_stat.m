@@ -216,7 +216,7 @@ else
     else
         pgroup = {};
     end
-    if ( strcmpi(opt.groupstats, 'on') || strcmpi(opt.condstats, 'on') ) && (ng > 1 || nc > 1)
+    if ( strcmpi(opt.groupstats, 'on') && strcmpi(opt.condstats, 'on') ) && ng > 1 && nc > 1
         opt.paired  = sort(opt.paired); % put 'off' first if present
         [F, df, pval] = statcondfieldtrip(data, 'paired', opt.paired{1}, params{:});
         for index = 1:length(pval)
