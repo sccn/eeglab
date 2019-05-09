@@ -1,9 +1,9 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration file="/Users/eeglab/program_files/eeglab/eeglab.prj" location="/Users/eeglab/program_files/eeglab" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration file="/Users/arno/temp/eeglab/eeglab.prj" location="/Users/arno/temp/eeglab" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
-    <param.version>15.0</param.version>
+    <param.version>2019.0</param.version>
     <param.authnamewatermark>Arnaud Delorme and Scott Makeig</param.authnamewatermark>
     <param.email>eeglab@sccn.ucsd.edu</param.email>
     <param.company />
@@ -28,15 +28,15 @@ If it is defined, set it to the concatenation of these strings:
     MCR_ROOT/v92/runtime/maci64:
     MCR_ROOT/v92/sys/os/maci64:
     MCR_ROOT/v92/bin/maci64</param.install.notes>
-    <param.target.install.notes>In the following directions, replace MR/v94 by the directory on the target machine where MATLAB is installed, or MR by the directory where the MATLAB Runtime is installed.
+    <param.target.install.notes>In the following directions, replace MR/v95 by the directory on the target machine where MATLAB is installed, or MR by the directory where the MATLAB Runtime is installed.
 
 If the environment variable DYLD_LIBRARY_PATH is undefined, set it to the following string:
 
-MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci64
+MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci64
 
 If it is defined, set it to the following:
 
-${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci64</param.target.install.notes>
+${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci64</param.target.install.notes>
     <param.intermediate>${PROJECT_ROOT}/eeglab/for_testing</param.intermediate>
     <param.files.only>${PROJECT_ROOT}/eeglab/for_redistribution_files_only</param.files.only>
     <param.output>${PROJECT_ROOT}/eeglab/for_redistribution</param.output>
@@ -94,15 +94,24 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
       <file>${PROJECT_ROOT}/functions/guifunc</file>
       <file>${PROJECT_ROOT}/functions/miscfunc</file>
       <file>${PROJECT_ROOT}/functions/popfunc</file>
-      <file>${PROJECT_ROOT}/functions/supportfiles</file>
       <file>${PROJECT_ROOT}/functions/sigprocfunc</file>
       <file>${PROJECT_ROOT}/functions/statistics</file>
       <file>${PROJECT_ROOT}/functions/studyfunc</file>
+      <file>${PROJECT_ROOT}/functions/supportfiles</file>
       <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
-      <file>${PROJECT_ROOT}/plugins/Fileio180627</file>
+      <file>${PROJECT_ROOT}/plugins/Fileio20190329</file>
+      <file>${PROJECT_ROOT}/plugins/bva-io1.5.13</file>
       <file>${PROJECT_ROOT}/plugins/dipfit</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627/forward</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627/inverse</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627/preproc</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627/src</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627/statfun</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627/trialfun</file>
+      <file>${PROJECT_ROOT}/plugins/fieldtrip-20180627/utilities</file>
       <file>${PROJECT_ROOT}/plugins/firfilt</file>
-      <file>${PROJECT_ROOT}/plugins/musemonitor2.0</file>
+      <file>${PROJECT_ROOT}/plugins/musemonitor3.0</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/1ST_README.txt</file>
@@ -114,39 +123,27 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
     </fileset.package>
     <fileset.depfun />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/Users/eeglab/program_files/eeglab/eeglab/for_testing/run_EEGLAB.sh</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/Users/eeglab/program_files/eeglab/eeglab/for_testing/readme.txt</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/Users/eeglab/program_files/eeglab/eeglab/for_testing/splash.png</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/Users/eeglab/program_files/eeglab/eeglab/for_testing/EEGLAB.app</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/Users/arno/temp/eeglab/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/Users/arno/temp/eeglab/eeglab/for_testing/EEGLAB.app</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/Users/arno/temp/eeglab/eeglab/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/Users/arno/temp/eeglab/eeglab/for_testing/run_EEGLAB.sh</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/Applications/MATLAB_R2018a.app</root>
+      <root>/Applications/MATLAB_R2018b.app</root>
       <toolboxes>
-        <toolbox name="fixedpoint" />
         <toolbox name="matlabcoder" />
-        <toolbox name="matlabhdlcoder" />
-        <toolbox name="embeddedcoder" />
+        <toolbox name="neuralnetwork" />
       </toolboxes>
-      <toolbox>
-        <fixedpoint>
-          <enabled>true</enabled>
-        </fixedpoint>
-      </toolbox>
       <toolbox>
         <matlabcoder>
           <enabled>true</enabled>
         </matlabcoder>
       </toolbox>
       <toolbox>
-        <matlabhdlcoder>
+        <neuralnetwork>
           <enabled>true</enabled>
-        </matlabhdlcoder>
-      </toolbox>
-      <toolbox>
-        <embeddedcoder>
-          <enabled>true</enabled>
-        </embeddedcoder>
+        </neuralnetwork>
       </toolbox>
     </matlab>
     <platform>
@@ -158,7 +155,7 @@ ${DYLD_LIBRARY_PATH}:MR/v94/runtime/maci64:MR/v94/sys/os/maci64:MR/v94/bin/maci6
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.13.6</osver>
+      <osver>10.14.4</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>
