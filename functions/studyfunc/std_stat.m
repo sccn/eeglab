@@ -209,7 +209,7 @@ else
             statscond{g} = squeeze(F.stat);
             
             % concatenate data for main statistics
-            if g > 1
+            if g > 1 && ng > 1
                 for c = 1:nc
                     switch ndims(data{1,1})
                         case 2, newdata{c,1}(:,end+1:end+size(data{c,g},2)) = data{c,g};
@@ -221,9 +221,11 @@ else
         end
         
         % main statistics
-        [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
-        pinter{1}     = applymask(F, opt.fieldtrip);
-        statsinter{1} = squeeze(F.stat);
+        if ng > 1
+            [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
+            pinter{1}     = applymask(F, opt.fieldtrip);
+            statsinter{1} = squeeze(F.stat);
+        end
     else
         pcond = {};
     end
@@ -236,7 +238,7 @@ else
             statsgroup{c} = squeeze(F.stat);
             
             % concatenate data for main statistics
-            if c > 1
+            if c > 1 && nc > 1
                 for g = 1:ng
                     switch ndims(data{1,1})
                         case 2, newdata{1,g}(:,end+1:end+size(data{c,g},2)) = data{c,g};
@@ -248,9 +250,11 @@ else
         end
         
         % main statistics
-        [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
-        pinter{2}     = applymask(F, opt.fieldtrip);
-        statsinter{2} = squeeze(F.stat);
+        if nc > 1
+            [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
+            pinter{2}     = applymask(F, opt.fieldtrip);
+            statsinter{2} = squeeze(F.stat);
+        end
     else
         pgroup = {};
     end
