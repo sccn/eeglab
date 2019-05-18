@@ -1545,7 +1545,7 @@ try,
     if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
         for kk = 1:length(1:length(x))
             if abs(Values(kk))
-                if PLOTDISK
+                if strcmpi(PLOTDISK, 'off')
                     angleRatio = real(Values(kk))/(real(Values(kk))+imag(Values(kk)))*360;
                     radius     = real(Values(kk))+imag(Values(kk));
                     allradius  = [0.02 0.03 0.037 0.044 0.05];
@@ -1557,7 +1557,7 @@ try,
                 else
                     tmpcolor = COLORARRAY{max(1,min(Values(kk), length(COLORARRAY)))};
                     hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', tmpcolor, 'markersize', EMARKERSIZE1CHAN);
-                    hp2 = disk(y(kk),x(kk),0.04, tmpcolor, 0, 360, 10);
+                    hp2 = disk(y(kk),x(kk),real(Values(kk))+imag(Values(kk)), tmpcolor, 0, 360, 10);
                 end
             end
         end
