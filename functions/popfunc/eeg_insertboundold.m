@@ -70,6 +70,10 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
         lengths = zeros(size(regions));
     end
     
+    % resort events
+    [~,sortedEvents] = sort([eventin.latency]);
+    eventin = eventin(sortedEvents);
+    
     if length(regions)
         fprintf('eeg_insertbound(): %d boundary (break) events added.\n', size(regions, 1));
     else 
