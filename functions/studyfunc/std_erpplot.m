@@ -325,7 +325,8 @@ if ~isempty(opt.channels)
 
     % plot
     % ----
-    if ~isreal(erpdata{1}(1)) % for spectrum FFT data
+    indNonEmpty = find(~cellfun(@isempty, erpdata(:)));
+    if ~isreal(erpdata{indNonEmpty(1)}(1)) % for spectrum FFT data
         tmperpdata = cellfun(@(x)x.*conj(x), erpdata, 'uniformoutput', false);
     else
         tmperpdata = erpdata;
