@@ -31,6 +31,8 @@
 
 function restartEeglabFlag = plugin_menu(pluginlist)
 
+FONTSIZE = 0; % set to 4 for high-res screen
+
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
 plugin = plugin_getweb('', pluginlist, 'newlist');
@@ -47,7 +49,7 @@ plugin = plugin(scoreOrder);
 % plugins to install
 % ------------------
 for iRow = 1:length(plugin)
-    plugin(iRow).text = [ '<html><font size=+0> ' htmlrating(plugin(iRow).rating, plugin(iRow).numrating) ];
+    plugin(iRow).text = [ '<html><font size=+' int2str(FONTSIZE) '> ' htmlrating(plugin(iRow).rating, plugin(iRow).numrating) ];
     if plugin(iRow).installed
         if plugin(iRow).installorupdate
             plugin(iRow).text = [ plugin(iRow).text '<b><font color=red>' ];
@@ -86,7 +88,7 @@ uilist =  {
     { 'style', 'text', 'string', 'List of plugins (bolded plugins are installed)' 'fontweight' 'bold' } ...
     { 'style', 'popupmenu', 'string', filterList1 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter1' } ...
     { 'style', 'popupmenu', 'string', filterList2 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter2' } ...
-    { 'style', 'listbox', 'string', { plugin.text } 'callback' 'plugin_uiupdate(gcbf);' 'Min', 0, 'Max', 2, 'value' [] 'tag', 'pluginlist' 'fontsize', 16 } ...
+    { 'style', 'listbox', 'string', { plugin.text } 'callback' 'plugin_uiupdate(gcbf);' 'Min', 0, 'Max', 2, 'value' [] 'tag', 'pluginlist' 'fontsize', 16, 'tooltipstring', [ 'Bold plugins are installed.' 10 'Red plugins need updating.' 10 '(Wong font size? Change it in plugin_menu.m)' ] } ...
     { 'style', 'pushbutton', 'string', [ 'Rate this plugin' ] 'tag' 'rating' } ...
     { 'style', 'pushbutton', 'string', [ 'Web documentation' ] 'tag' 'documentation' } ...
     { 'style', 'pushbutton', 'string', [ 'Upload new plugin' ] 'tag' 'upload' 'callback' [ 'web(''http://sccn.ucsd.edu/eeglab/plugin_uploader/upload_form.php'', ''-browser'');' ]} ...
