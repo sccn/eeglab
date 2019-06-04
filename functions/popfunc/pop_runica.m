@@ -354,7 +354,7 @@ if isempty(g.chanind)
     g.chanind = 1:EEG.nbchan;
 end
 if iscell(g.chanind)
-    datatype = {data.chanlocs.type};
+    datatype = {EEG.chanlocs.type};
     tmpChanInd = [];
     for iChan = 1:length(datatype)
         if ~isempty(datatype{iChan}) && ~isempty(strmatch(datatype{iChan}, g.chanind))
