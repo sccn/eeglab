@@ -120,7 +120,7 @@ if nargin < 1
 end
 if isempty(EEG(1).data)
     disp('Pop_select error: cannot process empty dataset'); return;
-end;    
+end
     
 if nargin < 2
    geometry = { [1 1 1] [1 1 0.25 0.23 0.51] [1 1 0.25 0.23 0.51] [1 1 0.25 0.23 0.51] ...
@@ -144,7 +144,7 @@ if nargin < 2
          { 'Style', 'text', 'string', 'Channel range' }, ...
          { 'Style', 'edit', 'string', '', 'tag', 'chans' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' }, ...
-         { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(EEG.chanlocs), 'off', 'on') ...
+         { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(EEG(1).chanlocs), 'off', 'on') ...
            'callback' 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''chans''), ''string'',tmpval); clear tmp tmpchanlocs tmpval' }, ...
            { }, { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'enable', fastif(length(EEG)>1, 'off', 'on'), 'callback', ...
                           'eegplot(EEG.data, ''srate'', EEG.srate, ''winlength'', 5, ''limits'', [EEG.xmin EEG.xmax]*1000, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
@@ -171,7 +171,7 @@ if nargin < 2
    end
 
    if ~isempty( results{7} )
-       [ chaninds chanlist ] = eeg_decodechan(EEG.chanlocs, results{7});
+       [ chaninds chanlist ] = eeg_decodechan(EEG(1).chanlocs, results{7});
        if isempty(chanlist), chanlist = chaninds; end
        if ~results{8}, args = { args{:}, 'channel'  , chanlist };
        else            args = { args{:}, 'nochannel', chanlist }; end
@@ -179,6 +179,13 @@ if nargin < 2
 
 else
     args = varargin;
+end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    [ EEG com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
+    return;
 end
 
 %----------------------------AMICA---------------------------------
@@ -194,13 +201,6 @@ if isfield(EEG.etc,'amica') && isfield(EEG.etc.amica,'prob_added')
 end
 %--------------------------------------------------------------------
         
-% process multiple datasets
-% -------------------------
-if length(EEG) > 1
-    [ EEG com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
-    return;
-end
-
 if isempty(EEG.chanlocs), chanlist = [1:EEG.nbchan];
 else                      chanlocs = EEG.chanlocs; chanlist = { chanlocs.labels };
 end
