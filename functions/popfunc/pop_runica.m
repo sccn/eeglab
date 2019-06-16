@@ -372,6 +372,7 @@ for i = 1:length(g.options)
     if ischar(g.options{i})
         if strcmpi(g.options{i}, 'pca')
             pca_opt = 1;
+            pca_ind = i;
         end
     end
 end
@@ -453,7 +454,14 @@ switch lower(g.icatype)
             return;
         end
      case 'picard' 
+         if pca_opt
+             [tmpdata,eigvec] = runpca(tmpdata, g.options{pca_ind+1});
+             g.options(pca_ind:pca_ind+1) = [];
+         end
         [tmp, EEG.icaweights] = picard( tmpdata, 'verbose', true, g.options{:});
+         if pca_opt
+            EEG.icaweights = EEG.icaweights*pinv(eigvec);
+         end
      case 'pearson_ica' 
         if isempty(g.options)
             disp('Warning: EEGLAB default for pearson ICA is 1000 iterations and epsilon=0.0005');
