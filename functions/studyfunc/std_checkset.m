@@ -212,6 +212,9 @@ if ~studywasempty
             STUDY  = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
             % some other have it, remake it for everybody
         end
+    elseif ALLEEG(1).trials > 1
+        disp('Rebuilding trial information structure for STUDY');
+        STUDY  = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
     end
     if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'name')
         STUDY  = std_maketrialinfo(STUDY, ALLEEG);
