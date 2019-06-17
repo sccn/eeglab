@@ -455,7 +455,11 @@ switch lower(g.icatype)
         end
      case 'picard' 
          if pca_opt
-             [tmpdata,eigvec] = runpca(tmpdata, g.options{pca_ind+1});
+             if g.options{pca_ind+1} < 0
+                 [tmpdata,eigvec] = runpca(tmpdata, size(tmpdata,1)+g.options{pca_ind+1});
+             else
+                 [tmpdata,eigvec] = runpca(tmpdata, g.options{pca_ind+1});
+             end
              g.options(pca_ind:pca_ind+1) = [];
          end
         [tmp, EEG.icaweights] = picard( tmpdata, 'verbose', true, g.options{:});
