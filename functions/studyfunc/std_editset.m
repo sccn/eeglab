@@ -172,6 +172,7 @@ if ~isfield(STUDY, 'datasetinfo')
             STUDY.datasetinfo(realindex).filename  = [ tmpfile tmpext ];   
             STUDY.datasetinfo(realindex).subject   = ALLEEG(realindex).subject;
             STUDY.datasetinfo(realindex).session   = ALLEEG(realindex).session;
+            STUDY.datasetinfo(realindex).run       = ALLEEG(realindex).run;
             STUDY.datasetinfo(realindex).condition = ALLEEG(realindex).condition;
             STUDY.datasetinfo(realindex).group     = ALLEEG(realindex).group;                    
         end
@@ -197,8 +198,8 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).group   = g.commands{k+1};
         case 'session' 
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
-        case 'session' 
-            STUDY.datasetinfo(currentind).session = g.commands{k+1};
+        case 'run' 
+            STUDY.datasetinfo(currentind).run     = g.commands{k+1};
         case 'remove'
             % create empty structure
             allfields = fieldnames(ALLEEG);
@@ -272,6 +273,7 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).filename  = [ tmpfile tmpext ];   
             STUDY.datasetinfo(currentind).subject   = ALLEEG(currentind).subject;
             STUDY.datasetinfo(currentind).session   = ALLEEG(currentind).session;
+            STUDY.datasetinfo(currentind).run       = ALLEEG(currentind).run;
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
             STUDY.datasetinfo(currentind).index     = currentind;    
@@ -308,6 +310,10 @@ if strcmpi(g.updatedat, 'on')
         end
         if ~isequal(ALLEEG(currentind).session, STUDY.datasetinfo(currentind).session)
             ALLEEG(currentind).session          = STUDY.datasetinfo(currentind).session;
+            ALLEEG(currentind).saved            = 'no';
+        end
+        if ~isequal(ALLEEG(currentind).run, STUDY.datasetinfo(currentind).run)
+            ALLEEG(currentind).run              = STUDY.datasetinfo(currentind).run;
             ALLEEG(currentind).saved            = 'no';
         end
         if ~strcmpi(char(ALLEEG(currentind).group), char(STUDY.datasetinfo(currentind).group))

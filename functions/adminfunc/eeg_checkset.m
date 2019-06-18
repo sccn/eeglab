@@ -109,6 +109,7 @@
 %   EEG.subject     - studyset subject code
 %   EEG.group       - studyset group code
 %   EEG.condition   - studyset experimental condition code
+%   EEG.run         - studyset run number
 %   EEG.session     - studyset session number
 %
 % Variables used for manual and semi-automatic data rejection:
@@ -1257,6 +1258,7 @@ for inddataset = 1:length(ALLEEG)
     if ~isfield(EEG, 'subject')    EEG.subject    = ''; res = com; end
     if ~isfield(EEG, 'condition')  EEG.condition  = ''; res = com; end
     if ~isfield(EEG, 'group')      EEG.group      = ''; res = com; end
+    if ~isfield(EEG, 'run')        EEG.run        = []; res = com; end
     if ~isfield(EEG, 'session')    EEG.session    = []; res = com; end
     if ~isfield(EEG, 'urchanlocs') EEG.urchanlocs = []; res = com; end
     if ~isfield(EEG, 'specdata')   EEG.specdata   = []; res = com; end
