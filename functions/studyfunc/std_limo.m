@@ -124,13 +124,15 @@ addpath([root filesep 'external']);
 addpath([root filesep 'help']);
 
 % Checking fieldtrip paths
+skip_chanlocs = 0;
 if ~exist('ft_prepare_neighbours')
-    error('std_limo error: Fieldtrip extension must be installed');
-end
-
-if ~exist('eeglab2fieldtrip')
-    root = fileparts(which('ft_prepare_neighbours'));
-    addpath([root filesep 'external' filesep 'eeglab']);
+    warndlg('std_limo error: Fieldtrip extension should be installed - chanlocs NOT generated');
+    skip_chanlocs = 1;
+else
+    if ~exist('eeglab2fieldtrip')
+        root = fileparts(which('ft_prepare_neighbours'));
+        addpath([root filesep 'external' filesep 'eeglab']);
+    end
 end
 
 % Detecting type of analysis
@@ -158,33 +160,36 @@ end
 
 % computing channel neighbox matrix
 % ---------------------------------
-flag_ok = 1;
-if isempty(opt.chanloc) && isempty(opt.neighbormat)
-    if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
-        if  ~isfield(STUDY.etc,'statistic')
-            STUDY = pop_statparams(STUDY, 'default');
-        end
-        
-        try
-            [~,~,limoChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-            chanlocname = 'limo_gp_level_chanlocs.mat';
-        catch neighbors_error
-            errordlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created')
+if skip_chanlocs == 0
+    
+    flag_ok = 1;
+    if isempty(opt.chanloc) && isempty(opt.neighbormat)
+        if isfield(ALLEEG(1).chanlocs, 'theta') &&  ~strcmp(model.defaults.type,'Components')
+            if  ~isfield(STUDY.etc,'statistic')
+                STUDY = pop_statparams(STUDY, 'default');
+            end
+            
+            try
+                [~,~,limoChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
+                chanlocname = 'limo_gp_level_chanlocs.mat';
+            catch neighbors_error
+                warndlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created')
+            end
+        else
+            limoChanlocs = [];
+            flag_ok = 0;
+            if ~isempty(STUDY.cluster(1).child)
+                disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
+            end
         end
     else
-        limoChanlocs = [];
-        flag_ok = 0;
-        if ~isempty(STUDY.cluster(1).child)
-            disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
-        end
+        limoChanlocs.expected_chanlocs   = opt.chanloc;
+        limoChanlocs.channeighbstructmat = opt.neighbormat;
+        chanlocname = 'limo_chanlocs.mat';
     end
-else
-    limoChanlocs.expected_chanlocs   = opt.chanloc;
-    limoChanlocs.channeighbstructmat = opt.neighbormat;
-    chanlocname = 'limo_chanlocs.mat';
 end
 
-if flag_ok
+if flag_ok % chanloc created
     if isempty(findstr(STUDY.filepath,'derivatives'))
         if ~exist([STUDY.filepath filesep 'derivatives'],'dir')
             mkdir([STUDY.filepath filesep 'derivatives']);
