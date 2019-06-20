@@ -291,6 +291,9 @@ TMP.chaninfo                  = g.chaninfo1;
 TMP.nbchan = length(TMP.chanlocs);
 cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
 elec1 = cfg.elec;
+if isfield(elec1, 'elecpos')
+    elec1.pnt = elec1.elecpos;
+end
 
 % transform to arrays chanlocs2
 % -------------------------
