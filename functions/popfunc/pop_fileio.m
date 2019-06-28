@@ -204,6 +204,9 @@ EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin = -dat.nSamplesPre/EEG.srate; 
 EEG.trials          = dat.nTrials;
 EEG.pnts            = dat.nSamples;
+if isfield(dat,'startDateTime')
+    EEG.startDateTime = dat.startDateTime;
+end
 if isfield(dat, 'label') && ~isempty(dat.label)
     EEG.chanlocs = struct('labels', dat.label);
     
