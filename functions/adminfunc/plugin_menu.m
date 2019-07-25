@@ -36,7 +36,12 @@ FONTSIZE = 0; % set to 4 for high-res screen
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
 plugin = plugin_getweb('', pluginlist, 'newlist');
-
+if isempty(plugin)           
+           errordlg2(['The Java version that Matlab uses does not allow the EEGLAB plugin manager' char(10)...
+               'to function properly. We suggest you update the Java version that Matlab uses.' char(10)...
+               'For more information see: https://github.com/sccn/eeglab/issues/20']);
+    return;
+end
 % sort plugins by download score
 [~,scoreOrder] = sort([ plugin.downloads ], 2, 'descend');
 plugin = plugin(scoreOrder);
