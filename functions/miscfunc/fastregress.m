@@ -44,7 +44,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [ypred, alpha, rsq, B, intercept] = fastregress(x, y, ploting);
+function [ypred, alpha, rsq, B, intercept, h] = fastregress(x, y, ploting);
     
     if nargin < 1
         help fastregress; return;
@@ -76,6 +76,6 @@ function [ypred, alpha, rsq, B, intercept] = fastregress(x, y, ploting);
         hold on;
         [ynew tmp] = sort(ypred);
         xnew       = x(tmp);
-        plot(xnew, ynew, 'r');
+        h = plot(xnew, ynew, 'r');
         legend(sprintf('R^2=%f', rsq), sprintf('p  =%f', alpha));
     end
