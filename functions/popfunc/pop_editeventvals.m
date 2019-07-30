@@ -197,7 +197,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
       % update original
       % --------------- 
       tmpobj = findobj('parent', gcf, 'tag', 'original');
-      if isfield(EEG.event, 'urevent') && EEG.event(valnum).urevent ~= valnum
+      if isfield(EEG.event, 'urevent') && ~isempty(EEG.event(valnum).urevent) && EEG.event(valnum).urevent ~= valnum
            set(tmpobj, 'string', [ 'originally ' int2str(EEG.event(valnum).urevent)], ...
                        'horizontalalignment', 'center');
       else set(tmpobj, 'string', ' '); 
