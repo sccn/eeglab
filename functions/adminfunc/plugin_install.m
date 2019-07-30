@@ -1,12 +1,13 @@
 % plugin_install() - install EEGLAB plugin. Called by plugin_askinstall().
 %
 % Usage:
-%  plugin_install(zipfilelink, name, version, force);
+%  plugin_install(zipfilelink, name, version, force, size);
 %
 % Inputs:
 %  zipfilelink - [string] web link to zip file
 %  name        - [string] name of the plugin
 %  version     - [string] version of the plugin
+%  size        - [real] size of the plugin in Kb
 %  force       - [boolean] force install (even if already installed)
 %
 % See also: plugin_askinstall()
@@ -38,9 +39,12 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function result = plugin_install(zipfilelink, name, version, forceInstall)
+function result = plugin_install(zipfilelink, name, version, pluginsize, forceInstall)
 
-    if nargin < 4, forceInstall = false; end
+    if nargin < 5, forceInstall = false; end
+    if nargin == 4 && (pluginsize == 0 || pluginsize == 1)
+        forceInstall = pluginsize; % previous calling format where size was not present
+    end
     result = 1;
 
     % get plugin path
@@ -49,40 +53,18 @@ function result = plugin_install(zipfilelink, name, version, forceInstall)
     generalPluginPath = fullfile(fileparts(which('eeglab.m')), 'plugins');
     newPluginPath     = fullfile(generalPluginPath, [ name version ]);
 
-    % download plugin
-    % ---------------
+    % check plugin size
+    % -----------------
     zipfile = 'tmp.zip';
-%     [tmp zipfile ext] = fileparts(zipfilelink);
-%     zipfile = [ zipfile ext ];
-%     equalPos = find(zipfile == '=');
-%     if ~isempty(equalPos) zipfile  = zipfile(equalPos(end)+1:end); end
-    depth = length(dbstack);
-    try
-        pluginSize = plugin_urlsize(zipfilelink);
-        pluginSizeStr = num2str(round(pluginSize/100000)/10);
-        if pluginSize > 500000 && depth > 1 && ~forceInstall
-             res = questdlg2( [ 'Extension ' name ' size is ' pluginSizeStr 'MB. Are you sure' 10 ...
-                                'you want to download this extension?' ], 'Warning', 'No', 'Yes', 'Yes');
-             if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); result = -1; return; end;               
+    if pluginsize > 500000 && ~forceInstall
+        res = questdlg2( [ 'Extension ' name ' size is ' num2str(ceil(pluginsize/100)/10) 'MB. Are you sure' 10 ...
+            'you want to download this extension?' ], 'Warning', 'No', 'Yes', 'Yes');
+        if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); 
+            result = -1; 
+            return; 
         end
-    catch
-        msg = [ 'Could not download extension. Host site might be' 10 ...
-                'unavailable, too slow or you do not have permission' 10 ...
-                'to write in the EEGLAB plugin folder. Try again' 10 ... 
-                'just in case or use a faster connection.' 10 10 ...
-                'Alternatively install the plugin manually by downloading' 10 ...
-                'it at http://sccn.ucsd.edu/wiki/EEGLAB_Extensions_and_plug-ins' 10 ...
-                'unziping it in the eeglab/plugin folder and restarting eeglab'];
-        if ~forceInstall
-            warndlg2(msg);
-        else
-            disp(msg);
-        end
-        result = -1;
-        return;
     end
-    disp([ 'Downloading extension ' name '(' pluginSizeStr 'Mb)...' ]);
-    
+         
     try
         plugin_urlread(['http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_increment.php?plugin=' name '&version=' version ]);
         plugin_urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));

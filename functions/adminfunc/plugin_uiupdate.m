@@ -55,9 +55,11 @@ tmpstr = selectedPlugins(lastSelect).description;
 hDescription = findobj(fig, 'tag', 'description');
 hTags        = findobj(fig, 'tag', 'tags');
 hStatus      = findobj(fig, 'tag', 'status');
+hSize        = findobj(fig, 'tag', 'size');
 tmpstr = textwrap(hDescription, {tmpstr}); 
 set(hDescription, 'string', tmpstr);
 set(hTags       , 'string', selectedPlugins(lastSelect).rawtags );
+set(hSize       , 'string', [num2str(ceil(selectedPlugins(lastSelect).size/100)/10) ' MB'] );
 
 % installed status
 if selectedPlugins(lastSelect).installed
