@@ -172,4 +172,6 @@ end
 
 % print
 function verboseprintf(verbose, varargin)
-if strcmpi(verbose, 'on') fprintf(varargin{:}); end
+if strcmpi(verbose, 'on') 
+	fprintf(varargin{:}); 
+end
