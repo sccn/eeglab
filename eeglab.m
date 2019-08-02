@@ -715,9 +715,9 @@ if ismatlab
     uimenu( exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
     uimenu( exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
 
-    uimenu( file_m, 'Label', 'Load existing dataset'                  , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
-    uimenu( file_m, 'Label', 'Save current dataset(s)'                , 'userdata', ondatastudy, 'CallBack', cb_saveset);
-    uimenu( file_m, 'Label', 'Save current dataset as'                , 'userdata', ondata,      'CallBack', cb_savesetas);
+    uimenu( file_m, 'Label', 'Load existing dataset'               , 'Accelerator', 'o'   , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
+    uimenu( file_m, 'Label', 'Save current dataset(s)'             , 'Accelerator', 's'   , 'userdata', ondatastudy, 'CallBack', cb_saveset);
+    uimenu( file_m, 'Label', 'Save current dataset as'             , 'Accelerator', 'a'   , 'userdata', ondata,      'CallBack', cb_savesetas);
     uimenu( file_m, 'Label', 'Clear dataset(s)'                       , 'userdata', ondata,      'CallBack', cb_delset);
 
     std2_m = uimenu( file_m, 'Label', 'Create study'                  , 'userdata', on     , 'Separator', 'on'); 
@@ -728,7 +728,7 @@ if ismatlab
     uimenu( file_m, 'Label', 'Load existing study'                    , 'userdata', on     , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
     uimenu( file_m, 'Label', 'Save current study'                     , 'userdata', onstudy, 'CallBack', cb_savestudy1);
     uimenu( file_m, 'Label', 'Save current study as'                  , 'userdata', onstudy, 'CallBack', cb_savestudy2);
-    uimenu( file_m, 'Label', 'Clear study / Clear all'                , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
+    uimenu( file_m, 'Label', 'Clear study / Clear all'            , 'Accelerator', 'x'    , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
     uimenu( file_m, 'Label', 'Memory and other options'               , 'userdata', on     , 'CallBack', cb_editoptions, 'Separator', 'on');
 
     hist_m = uimenu( file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
@@ -745,7 +745,7 @@ if ismatlab
     uimenu( edit_m, 'Label', 'Event fields'                           , 'userdata', ondata, 'CallBack', cb_editeventf);
     uimenu( edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
     uimenu( edit_m, 'Label', 'Adjust event latencies'                 , 'userdata', ondata, 'CallBack', cb_adjustevents);
-    uimenu( edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
+    uimenu( edit_m, 'Label', 'About this dataset'                     , 'Accelerator', 'i', 'userdata', ondata, 'CallBack', cb_comments);
     uimenu( edit_m, 'Label', 'Channel locations'                      , 'userdata', ondata, 'CallBack', cb_chanedit);
     uimenu( edit_m, 'Label', 'Select data'                            , 'userdata', ondata, 'CallBack', cb_select, 'Separator', 'on');
     uimenu( edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
@@ -781,7 +781,7 @@ if ismatlab
     uimenu( rej_m1, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec1);
     uimenu( rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
     uimenu( rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
-    uimenu( rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
+    uimenu( rej_m2, 'Label', 'Reject components by map'           , 'Accelerator', 'r'    , 'userdata', ondata , 'CallBack', cb_selectcomps);
     uimenu( rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
     uimenu( rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
     uimenu( rej_m2, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh2);
@@ -794,7 +794,7 @@ if ismatlab
 
     uimenu( loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
     uimenu( loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
-    uimenu( plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
+    uimenu( plot_m, 'Label', 'Channel data (scroll)'                  , 'Accelerator', 'p', 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
     uimenu( plot_m, 'Label', 'Channel spectra and maps'               , 'userdata', ondata , 'CallBack', cb_spectopo1);
     uimenu( plot_m, 'Label', 'Channel properties'                     , 'userdata', ondata , 'CallBack', cb_prop1);
     uimenu( plot_m, 'Label', 'Channel ERP image'                      , 'userdata', onepoch, 'CallBack', cb_erpimage1);
@@ -829,7 +829,7 @@ if ismatlab
     uimenu( stat_m, 'Label', 'Event statistics'                       , 'CallBack', cb_eventstat);
 
     spec_m = uimenu( plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
-    uimenu( spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
+    uimenu( spec_m, 'Label', 'Channel time-frequency'             , 'Accelerator', 't'    , 'CallBack', cb_timef1);
     uimenu( spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
     uimenu( spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
     uimenu( spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
@@ -1222,7 +1222,7 @@ BORDEREXT       = 10;
 comp = computer;
 if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC') || strcmpi(comp(1:3), 'PCW')  
     FONTNAME        = 'courier';
-    FONTSIZE        = 8;
+    FONTSIZE        = 14;
     % Magnify figure under MATLAB 2012a
     vers = version;
     dotPos = find(vers == '.');
@@ -1230,8 +1230,8 @@ if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC') || strcmpi(comp(1:3), 
     subvernum = str2num(vers(dotPos(1)+1:dotPos(2)-1));
     if vernum > 7 || (vernum >= 7 && subvernum >= 14)
         FONTSIZE = FONTSIZE+2;
-        WINMAXX  = WINMAXX*1.3;
-        WINY     = WINY*1.3;
+        WINMAXX  = WINMAXX*2;
+        WINY     = WINY*2.2;
     end
 else
     FONTNAME        = '';
