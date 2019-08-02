@@ -59,8 +59,14 @@ end
     'trialbase'     'string'    {'on','off','full'} 'off';
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimeftrialbaseln', 'ignore');
-if ischar(g) error(g); return; end
-PP = PPori; if ~iscell(PP), PP = { PP }; end
+if ischar(g) 
+    error(g); 
+    return; 
+end
+PP = PPori; 
+if ~iscell(PP)
+    PP = { PP }; 
+end
 
 % ---------------
 % baseline length
@@ -80,7 +86,8 @@ if size(g.baseline,2) == 2
 else
     if ~isempty(find(timesout < g.baseline))
          baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
-    else baseln = 1:length(timesout); % use all times as baseline
+    else
+        baseln = 1:length(timesout); % use all times as baseline
     end
 end
 
@@ -91,8 +98,10 @@ for ind = 1:length(PP(:))
     % -----------------------------------------
     % remove baseline on a trial by trial basis
     % -----------------------------------------
-    if strcmpi(g.trialbase, 'on'), tmpbase = baseln;
-    else                           tmpbase = 1:size(P,2); % full baseline
+    if strcmpi(g.trialbase, 'on')
+        tmpbase = baseln;
+    else
+        tmpbase = 1:size(P,2); % full baseline
     end
     if ~strcmpi(g.trialbase, 'off')
         if ndims(P) == 4
@@ -100,7 +109,8 @@ for ind = 1:length(PP(:))
             if strcmpi(g.basenorm, 'on')
                 mstd = std(P(:,:,tmpbase,:),[],3);
                 P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
-            else P = bsxfun(@rdivide, P, mbase);
+            else
+                P = bsxfun(@rdivide, P, mbase);
             end
         else
             mbase = mean(P(:,tmpbase,:),2);
@@ -116,4 +126,6 @@ for ind = 1:length(PP(:))
     
     PP{ind} = P;
 end
-if ~iscell(PPori) PP = PP{1}; end
+if ~iscell(PPori)
+    PP = PP{1}; 
+end
