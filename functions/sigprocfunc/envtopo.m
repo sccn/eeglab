@@ -89,7 +89,7 @@
 %  'dispmaps'  = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
 %  'topoplotkey','val' = optional additional topoplot() arguments {default: none}
 %  'axisoff'   = [real] percent of the figure y-dimension to be covered by the axis
-%                 the envelopes. Values are restricted to the range [0.60 1]{default: 0.6}
+%                 for the envelopes. Values are restricted to the range [0.60 1]{default: 0.6}
 %
 % 'limcontribweight' = [real] lineweight of limonctrib vertical lines.{default: 1.2}
 % 'vertweight'       = [real] lineweight of specified vertical lines {default: 2}
