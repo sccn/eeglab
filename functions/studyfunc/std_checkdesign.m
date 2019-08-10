@@ -9,7 +9,7 @@
 %
 % Authors: Arnaud Delorme
 
-% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2017, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2017
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -44,9 +44,8 @@ if nargin < 2
 end
 
 retVal = 1;
-if length(STUDY.design(designind).variable) > 2 || ...
-        ( ~isempty(STUDY.design(designind).variable) && ...
-    any(strmatch('continuous', {STUDY.design(designind).variable.vartype })))
+if length(STUDY.design(designind).variable) > 2 && any(cellfun(@(x)length(x)>1, {STUDY.design(designind).variable(3:end).value} )) ... % it is OK to have more than 2 var if single value
+    || ( ~isempty(STUDY.design(designind).variable) && any(strmatch('continuous', {STUDY.design(designind).variable.vartype })))   % not OK to have continuous variables
     warndlg2( [ 'These plotting functions cannot process this design.' 10 ...
         'This design either has more than 2 categorical variables' 10 ...
         'or it uses one continuous variable. To process this' 10 ...
