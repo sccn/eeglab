@@ -186,7 +186,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
           % update interface
           % ----------------
           tmpobj = findobj('parent', gcf, 'tag', allfields{index});
-          if isnumeric(value)
+          if isnumeric(value) || islogical(value)
               set(tmpobj, 'string', num2str(value,5), 'enable', enable);
           else % for strings and cells
               set(tmpobj, 'string', value, 'enable', enable);
