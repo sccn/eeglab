@@ -104,13 +104,13 @@ tmpDataType = opt.datatype;
 if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc')
     tmpDataType = 'timef'; 
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end
-    if isempty(opt.freqrange), opt.timerange = STUDY.etc.erspparams.freqrange; end
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.erspparams.freqrange; end
 elseif strcmpi(opt.datatype, 'erpim')
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erpimparams.timerange;  end
 elseif strcmpi(opt.datatype, 'erp')    
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end
 elseif strcmpi(opt.datatype, 'spec')    
-    if isempty(opt.freqrange), opt.timerange = STUDY.etc.specparams.freqrange; end
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.specparams.freqrange; end
 end
 if ~isempty(opt.channels), fileExt = [ '.dat' tmpDataType ];
 else                       fileExt = [ '.ica' tmpDataType ];
