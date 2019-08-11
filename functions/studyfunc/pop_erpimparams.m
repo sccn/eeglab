@@ -54,30 +54,34 @@ TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
-    vis = fastif(isnan(STUDY.etc.erpimparams.topotime), 'off', 'on');
+    icaFlag = fastif(isnan(STUDY.etc.erpimparams.topotime), 1, 0);
+    
+    if strcmpi(STUDY.etc.erpimparams.averagechan,'off')
+        multipleChansVal   = 1; % scalp array
+    else
+        multipleChansVal   = 2; % average channels
+    end
+    
     uilist = { ...
         {'style' 'text'       'string' 'ERPimage plotting options' 'fontweight' 'bold' 'tag', 'erpim' } ...
         {'style' 'text'       'string' 'Time range in ms [Low High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Color limits [Low High]'} ...
-        {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.colorlimits) 'tag' 'colorlimits' } };
-%         {'style' 'text'       'string' 'Plot scalp map at time [ms]' 'visible' vis} ...
-%         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.topotime) 'tag' 'topotime' 'visible' vis } ...
-%         {'style' 'text'       'string' '' } ...
-%         {'style' 'text'       'string' '' } 
-%         {'style' 'text'       'string' 'Trial range [Low High]'} ...
-%         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.trialrange) 'tag' 'trialrange' } ...
-%         {'style' 'text'       'string' 'Plot scalp map at trial(s)' 'visible' vis} ...
-%         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.topotrial) 'tag' 'topotrial' 'visible' vis } ...
+        {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.colorlimits) 'tag' 'colorlimits' } ...
+        {} ...
+        {'style' 'text'       'string' 'Multiple channels selection' 'fontweight' 'bold' 'tag', 'spec' 'fontsize', 12} ...
+        {} {'style' 'popupmenu'  'string' { 'Plot channels individually' 'Average selected channels' } 'value' multipleChansVal 'tag' 'multiplechan' } };
     evalstr = 'set(findobj(gcf, ''tag'', ''erpim''), ''fontsize'', 12);';
     cbline = [0.07 1.1];
-%     otherline = [ 0.6 .4 0.6 .4];
-%     geometry = { 1 otherline otherline };
-    geometry = { 1 [0.6 .4] [0.6 .4] };    
-    if length(STUDY.design(STUDY.currentdesign).variable) > 0 && length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, enablecond  = 'on'; end
-    if length(STUDY.design(STUDY.currentdesign).variable) > 1 && length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, enablegroup = 'on'; end   
+    chanline  = [ 0.07 0.8];
+    geometry = { 1 [0.6 .4] [0.6 .4] 1 1 chanline };    
     
-    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
+    if icaFlag
+        uilist = uilist(1:end-5);
+        geometry = geometry(1:end-4);
+    end
+    
+    [~, ~, ~, res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                             'title', 'Set Erpimage plotting parameters -- pop_erpimparams()', 'eval', evalstr);
     if isempty(res), return; end
     
@@ -93,6 +97,13 @@ if isempty(varargin)
     if ~isequal(res.topotime  ,  STUDY.etc.erpimparams.topotime),    options = { options{:} 'topotime'    res.topotime    }; end
     if ~isequal(res.timerange ,  STUDY.etc.erpimparams.timerange),   options = { options{:} 'timerange'   res.timerange   }; end
     if ~isequal(res.colorlimits, STUDY.etc.erpimparams.colorlimits), options = { options{:} 'colorlimits' res.colorlimits }; end
+    if isfield(res, 'multiplechan') 
+        if res.multiplechan == 1 res.multiplechan = 'off'; else res.multiplechan = 'on'; end
+        if ~isequal(res.multiplechan, STUDY.etc.erpimparams.averagechan), options = { options{:} 'averagechan' res.multiplechan }; end
+    end
+    
+    % execute options
+    % ---------------
     if ~isempty(options)
         STUDY = pop_erpimparams(STUDY, options{:});
         com = sprintf('STUDY = pop_erpimparams(STUDY, %s);', vararg2str( options ));
@@ -150,3 +161,6 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpimparams, 'concatenate'),  STUDY.etc.erpimparams.concatenate = 'off'; end
     if ~isfield(STUDY.etc.erpimparams, 'nlines'),       STUDY.etc.erpimparams.nlines      = 20; end
     if ~isfield(STUDY.etc.erpimparams, 'smoothing'),    STUDY.etc.erpimparams.smoothing   = 10; end
+    
+    if ~isfield(STUDY.etc.erpimparams, 'averagemode' ), STUDY.etc.erpimparams.averagemode  = 'ave'; end
+    if ~isfield(STUDY.etc.erpimparams, 'averagechan' ), STUDY.etc.erpimparams.averagechan  = 'off'; end
