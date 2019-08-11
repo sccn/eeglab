@@ -191,9 +191,17 @@ if v6Flag
         chanList{iChan} = [ dataType int2str(opt.dataindices(iChan)) fastif(strcmpi(opt.measure, 'topo'), '_grid', '') ];
     end
     warning('off', 'MATLAB:load:variableNotFound');
-    if length(opt.dataindices) > 0
-        fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
-    else fileData = load('-mat', [ fileBaseName fileExt ], 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp');
+    if ~isempty(opt.dataindices)
+        fileData = load('-mat', [ fileBaseName fileExt ], chanList{:}, 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp', 'chanall');
+    else fileData = load('-mat', [ fileBaseName fileExt ], 'trialinfo', 'times', 'freqs', 'parameters', 'events', 'chanlocsforinterp', 'chanall');
+    end
+    % read all channels ERPimage only
+    if length(opt.channels) > 2 && isfield(fileData, 'chanall')
+        chanlocsforinterp = fileData.chanlocsforinterp;
+        tmpX = eval( fileData.chanall );
+        for iChan = 1:size(tmpX,1)
+            fileData.(sprintf('chan%d', iChan)) = squeeze(tmpX(iChan,:,:));
+        end
     end
     if strcmpi(opt.measure, 'topo') && ~isfield(fileData, 'trialinfo'), error('Compatibilty issue. Recompute ICA topographic maps'); end
     warning('on', 'MATLAB:load:variableNotFound');
@@ -241,17 +249,17 @@ end
 
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
 if isempty(opt.designvar)
-    [ measureData events ] = getfiledata(fileData, NaN, options{:}); % read all data
+    [ measureData, events ] = getfiledata(fileData, NaN, options{:}); % read all data
     measureData = { measureData };
     events      = { events };
 else
-    [ measureData events ] = globalgetfiledata(fileData, opt.designvar, options, {});
+    [ measureData, events ] = globalgetfiledata(fileData, opt.designvar, options, {});
 end
 
 % remove duplicates in the list of parameters
 % -------------------------------------------
 function cella = removedup(cella)
-[tmp indices] = unique_bc(cella(1:2:end));
+[tmp, indices] = unique_bc(cella(1:2:end));
 if length(tmp) ~= length(cella)/2
     %fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
 end
@@ -259,7 +267,7 @@ cella = cella(sort(union(indices*2-1, indices*2)));
 
 % find indices for selection of measure
 % -------------------------------------
-function [measureRange indBegin indEnd] = indicesselect(measureRange, measureLimits);
+function [measureRange, indBegin, indEnd] = indicesselect(measureRange, measureLimits);
 indBegin = 1;
 indEnd   = length(measureRange);
 if ~isempty(measureRange) && ~isempty(measureLimits) && (measureLimits(1) > measureRange(1) || measureLimits(end) < measureRange(end))
@@ -270,10 +278,10 @@ end
 
 % recursive function to load data
 % -------------------------------
-function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect);
+function [ measureData, eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect);
 
 if length(designvar) == 0
-    [ measureData eventVals ] = getfiledata(fileData, trialselect, options{:});
+    [ measureData, eventVals ] = getfiledata(fileData, trialselect, options{:});
     measureData = { measureData };
     eventVals   = { eventVals   };
 else
@@ -287,7 +295,7 @@ else
     else
         for iField = 1:length(designvar(1).value)
             trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
-            [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+            [ tmpMeasureData, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
             measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
             eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
         end
@@ -296,7 +304,7 @@ end
 
 % load data from structure or file
 % --------------------------------
-function [ fieldData events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
+function [ fieldData, events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
 
 persistent tmpcache;
 persistent hashcode;
@@ -314,7 +322,7 @@ if ~isempty(trialselect)
     if isnumeric(trialselect) && isnan(trialselect(1))
         trials = [1:length(fileData.trialinfo)]; % read all trials if NaN
     else
-        [trials events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
+        [trials, events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
         if length(unique(diff(trials))) > 1
             temptrials = [trials(1):trials(end)];
             subTrials  = trials-trials(1)+1;
@@ -329,7 +337,7 @@ for index = 1:length(chan)
     fieldToRead = [ dataType int2str(chan(index)) fastif(topoFlag, '_grid', '') ];
     
     % find trials
-    if isempty(trials),
+    if isempty(trials)
         return;
         % trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); % not sure what this does
     end
@@ -353,10 +361,6 @@ for index = 1:length(chan)
         end
         tmpFieldData = tmpFieldData(indBegin1:indEnd1,trials);
         if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
-        if ~isempty(fileData.events),
-            events = fileData.events(trials);
-            if ~isempty(subTrials), events = events(subTrials); end
-        end
     else
         if topoFlag
             tmpFieldData = fileData.(fieldToRead);
@@ -367,6 +371,10 @@ for index = 1:length(chan)
         else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
             if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, :, subTrials); end
         end
+    end
+    if isfield(fileData, 'events') && ~isempty(fileData.events)
+        events = fileData.events(trials);
+        if ~isempty(subTrials), events = events(subTrials); end
     end
     warning('on', 'MATLAB:MatFile:OlderFormat');
     
