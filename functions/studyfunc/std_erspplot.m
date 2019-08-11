@@ -193,7 +193,7 @@ if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(o
 
 % for backward compatibility
 % --------------------------
-if strcmpi(opt.datatype, 'erpim'), 
+if strcmpi(opt.datatype, 'erpim')
     params.topofreq = params.topotrial; 
     opt.caxis       = params.colorlimits; 
     valunit = 'trials'; 
@@ -228,13 +228,13 @@ plottfopt = { ...
    'ersplim',     opt.caxis, ...
    'threshold',   alpha, ...
    'effect',      stats.effect, ...
-   'maskdata',    params.maskdata };
+   'maskdata',    params.maskdata ...
+   'averagemode'  params.averagemode };
 if ~isempty(params.plottf) && length(opt.channels) < 5  && isempty(opt.clusters)
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     allersp = {}; alltimes = []; allfreqs = []; pgroup = []; pcond = []; pinter = []; events  = [];
     return;
 end    
-
 
 % plot single scalp map
 % ---------------------
@@ -343,13 +343,39 @@ if ~isempty(opt.channels)
         end
     end
     
+    % Average channels
+    if ~strcmpi(params.averagechan, 'off') && length(opt.channels) > 1
+        for index = 1:length(allersp(:))
+            if strcmpi(params.averagemode, 'ave')
+                allersp{index} = squeeze(mean(allersp{index},3));
+            else
+                disp('Computing RMS while preserving sign');
+                tfsign  = sign(squeeze(mean(allersp{index},3)));
+                allersp{index} = squeeze(sqrt(mean(allersp{index}.^2,3))).*tfsign;
+            end
+        end
+    end
+    
     % plot specific channel(s)
     % ------------------------
     if ~strcmpi(opt.plotmode, 'none')
-        locs = eeg_mergelocs(ALLEEG.chanlocs);
-        locs = locs(std_chaninds(STUDY, opt.channels));
+        locsOri = eeg_mergelocs(ALLEEG.chanlocs);
+        locs = locsOri(std_chaninds(STUDY, opt.channels));
         
-        if ~isempty(params.plottf)
+        % in case channels are being averaged
+        if ~strcmpi(params.averagechan, 'off') && length(opt.channels) > 1
+            if length(opt.channels) ~= length(locsOri)
+                chanlabels = { locs.labels };
+                chanlabels(2,:) = {','};
+                chanlabels(2,end) = {''};
+                locs(1).labels = [ chanlabels{:} ];
+            else
+                locs(1).labels = 'All channels';
+            end
+            locs(2:end) = [];
+        end
+        
+        if ~isempty(params.plottf) % incomtible with averagechan above
             alltitles = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                                      'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
                                      'subject', opt.subject, 'valsunit', { valunit 'ms' }, 'vals', params.plottf, 'datatype', upper(opt.datatype), ...
@@ -357,7 +383,7 @@ if ~isempty(opt.channels)
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                           'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
         else
-            if length(opt.channels) > 1, figure; opt.plotmode = 'condensed'; end
+            if length(locs) > 1, opt.plottopo = 'on'; else opt.plottopo = 'off'; end
             if length(locs) == 1 && size(allersp{1},3) > 1
                 % channels should be in 3rd dim; reshape data to put subjects in the 4th dim if number of channels is 1 
                 for index = 1:length(allersp(:))
@@ -365,25 +391,30 @@ if ~isempty(opt.channels)
                 end
             end
             
-            nc = ceil(sqrt(length(opt.channels)));
-            nr = ceil(length(opt.channels)/nc);
-            for index = 1:length(locs)
-                if length(opt.channels) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end
-                tmpersp = cell(size(allersp));
-                for ind = 1:length(allersp(:))
-                    if ~isempty(allersp{ind})
-                        tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:));
-                        tmpersp{ind} = permute(tmpersp{ind}, [2 1 3]); % somehow time/freq are swapped in ntimes = nfreqs
-                    end
-                end
+%             nc = ceil(sqrt(length(opt.channels)));
+%             nr = ceil(length(opt.channels)/nc);
+%             for index = 1:length(locs)
+%                 if length(opt.channels) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end
+%                 tmpersp = cell(size(allersp));
+%                 for ind = 1:length(allersp(:))
+%                     if ~isempty(allersp{ind})
+%                         tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:));
+%                         tmpersp{ind} = permute(tmpersp{ind}, [2 1 3]); % somehow time/freq are swapped in ntimes = nfreqs
+%                     end
+%                 end
+%                 for ind = 1:length(allersp(:))
+%                     if ~isempty(allersp{ind})
+%                         allersp{ind} = permute(allersp{ind}, [2 1 3 4]); % somehow time/freq are swapped for tftopo
+%                     end
+%                 end
                 alltitles = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
-                    'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs(index).labels }, ...
+                    'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, ...
                     'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode, ...
                     'effect', stats.effect, 'factor1', condname, 'factor2', groupname);
-                std_plottf(alltimes, allfreqs, tmpersp, 'datatype', opt.datatype, 'titles', alltitles, ...
-                    'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                    opt.plotmode, 'unitcolor', unitPower, 'chanlocs', ALLEEG(1).chanlocs, 'events', events, plottfopt{:});
-            end
+                std_plottf(alltimes, allfreqs, allersp, 'datatype', opt.datatype, 'titles', alltitles, ...
+                    'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plottopo', opt.plottopo, 'plotmode', ...
+                    opt.plotmode, 'unitcolor', unitPower, 'chanlocs', locs, 'events', events, plottfopt{:});
+%             end
         end
     end
 else
