@@ -348,7 +348,7 @@ if length(STUDY.design(designind).variable) > 2
     if all(cellfun(@(x)isequal(x, 'categorical'), { STUDY.design(designind).variable(3).vartype })) % only categorical
         varLen = cellfun(@(x)length(x), {STUDY.design(designind).variable.value});
         indLen1 = find(varLen == 1);
-        STUDY.design(designind).variable = [ STUDY.design(designind).variable(setdiff(1:length(varLen), indLen1)) STUDY.design.variable(indLen1) ];
+        STUDY.design(designind).variable = [ STUDY.design(designind).variable(setdiff(1:length(varLen), indLen1)) STUDY.design(designind).variable(indLen1) ];
     end
 end
 
