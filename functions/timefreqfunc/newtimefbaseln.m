@@ -66,8 +66,14 @@ end
     'trialbase'     'string'    {'on','off','full'} 'off'; % 'on' skip the baseline
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimefbaseln', 'ignore');
-if ischar(g) error(g); return; end
-PP = PPori; if ~iscell(PP), PP = { PP }; end
+if ischar(g)
+    error(g);
+    return;
+end
+PP = PPori;
+if ~iscell(PP)
+    PP = { PP };
+end
 
 % ---------------
 % baseline length
@@ -86,8 +92,9 @@ if size(g.baseline,2) == 2
     end
 else
     if ~isempty(find(timesout < g.baseline))
-         baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
-    else baseln = 1:length(timesout); % use all times as baseline
+        baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
+    else
+        baseln = 1:length(timesout); % use all times as baseline
     end
 end
 
@@ -166,12 +173,12 @@ for ind = 1:length(allMbase(:))
 end
 mbase = allMbase;
 if ~iscell(PPori)
-    PP = PP{1}; 
+    PP = PP{1};
     mbase = allMbase{1};
 end
 
 % print
 function verboseprintf(verbose, varargin)
-if strcmpi(verbose, 'on') 
-	fprintf(varargin{:}); 
+if strcmpi(verbose, 'on')
+    fprintf(varargin{:});
 end

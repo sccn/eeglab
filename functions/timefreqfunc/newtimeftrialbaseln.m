@@ -1,6 +1,6 @@
-% newtimeftrialbaseln() - Remove baseline power values for single trials in 
+% newtimeftrialbaseln() - Remove baseline power values for single trials in
 %        newtimef. This only remove single trial baseline (not the average
-%        baseline). 
+%        baseline).
 %
 % Usage:
 %   >>  tf = newtimefbaseln(tf, tvals, 'key', val);
@@ -11,7 +11,7 @@
 %           The function may also process cell arrays of such inputs.
 %   tvals    - [array] time values
 %
-% Optional inputs: 'baseline', 'basenorm' and 'trialbase'. Same definition 
+% Optional inputs: 'baseline', 'basenorm' and 'trialbase'. Same definition
 %  as for newtimef. If trialbase is 'off' this function does nothing.
 %
 % Outputs:
@@ -59,13 +59,13 @@ end
     'trialbase'     'string'    {'on','off','full'} 'off';
     'verbose'       'string'    {'on','off'} 'on';
     }, 'newtimeftrialbaseln', 'ignore');
-if ischar(g) 
-    error(g); 
-    return; 
+if ischar(g)
+    error(g);
+    return;
 end
-PP = PPori; 
+PP = PPori;
 if ~iscell(PP)
-    PP = { PP }; 
+    PP = { PP };
 end
 
 % ---------------
@@ -85,7 +85,7 @@ if size(g.baseline,2) == 2
     end
 else
     if ~isempty(find(timesout < g.baseline))
-         baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
+        baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
     else
         baseln = 1:length(timesout); % use all times as baseline
     end
@@ -127,5 +127,5 @@ for ind = 1:length(PP(:))
     PP{ind} = P;
 end
 if ~iscell(PPori)
-    PP = PP{1}; 
+    PP = PP{1};
 end

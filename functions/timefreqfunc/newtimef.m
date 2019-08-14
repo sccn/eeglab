@@ -37,32 +37,32 @@
 %                          % Note: version timef() also computes multitaper transforms
 %
 % Required inputs:    Value                                 {default}
-%       data        = Single-channel data vector (1,frames*ntrials), else 
+%       data        = Single-channel data vector (1,frames*ntrials), else
 %                     2-D array (frames,trials) or 3-D array (1,frames,trials).
-%                     To compare two conditions (data1 versus data2), in place of 
+%                     To compare two conditions (data1 versus data2), in place of
 %                     a single data matrix enter a cell array {data1 data2}
 %       frames      = Frames per trial. Ignored if data are 2-D or 3-D.  {750}
-%       tlimits     = [mintime maxtime] (ms).  Note that these are the time limits 
-%                     of the data epochs themselves, NOT A SUB-WINDOW TO EXTRACT 
+%       tlimits     = [mintime maxtime] (ms).  Note that these are the time limits
+%                     of the data epochs themselves, NOT A SUB-WINDOW TO EXTRACT
 %                     FROM THE EPOCHS as is the case for pop_newtimef(). {[-1000 2000]}
 %       Fs          = data sampling rate (Hz)  {default: read from icadefs.m or 250}
-%       varwin      = [real] indicates the number of cycles for the time-frequency 
+%       varwin      = [real] indicates the number of cycles for the time-frequency
 %                        decomposition {default: 0}
-%                     If 0, use FFTs and Hanning window tapering.  
-%                     If [real positive scalar], the number of cycles in each Morlet 
+%                     If 0, use FFTs and Hanning window tapering.
+%                     If [real positive scalar], the number of cycles in each Morlet
 %                        wavelet, held constant across frequencies.
-%                     If [cycles cycles(2)] wavelet cycles increase with 
-%                        frequency beginning at cycles(1) and, if cycles(2) > 1, 
+%                     If [cycles cycles(2)] wavelet cycles increase with
+%                        frequency beginning at cycles(1) and, if cycles(2) > 1,
 %                        increasing to cycles(2) at the upper frequency,
-%                      If cycles(2) = 0, use same window size for all frequencies 
+%                      If cycles(2) = 0, use same window size for all frequencies
 %                        (similar to FFT when cycles(1) = 1)
 %                      If cycles(2) = 1, cycles do not increase (same as giving
 %                         only one value for 'cycles'). This corresponds to a pure
 %                         wavelet decomposition, same number of cycles at each frequency.
 %                      If 0 < cycles(2) < 1, cycles increase linearly with frequency:
-%                         from 0 --> FFT (same window width at all frequencies) 
+%                         from 0 --> FFT (same window width at all frequencies)
 %                         to 1 --> wavelet (same number of cycles at all frequencies).
-%                     The exact number of cycles in the highest frequency window is 
+%                     The exact number of cycles in the highest frequency window is
 %                     indicated in the command line output. Typical value: 'cycles', [3 0.5]
 %
 %    Optional inter-trial coherence (ITC) Type:
@@ -77,7 +77,7 @@
 %    Optional FFT/DFT parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     If cycles >0: The *longest* window length to use. This
-%                     determines the lowest output frequency. Note: this parameter 
+%                     determines the lowest output frequency. Note: this parameter
 %                     is overwritten when the minimum frequency requires
 %                     a longer time window {default: ~frames/8}
 %       'timesout'  = Number of output times (int<frames-winframes). Enter a
@@ -106,92 +106,92 @@
 %       'verbose'   = ['on'|'off'] print text {'on'}
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
 %                     (ITC) from x and y. This computes an 'intrinsic' coherence
-%                     of x and y not arising directly from common phase locking 
+%                     of x and y not arising directly from common phase locking
 %                     to experimental events. See notes.    {default: 'off'}
 %       'wletmethod' = ['dftfilt'|'dftfilt2'|'dftfilt3'] Wavelet type to use.
 %                     'dftfilt2' -> Morlet-variant wavelets, or Hanning DFT.
-%                     'dftfilt3' -> Morlet wavelets.  See the timefreq() function 
+%                     'dftfilt3' -> Morlet wavelets.  See the timefreq() function
 %                     for more detials {default: 'dftfilt3'}
-%       'cycleinc'    ['linear'|'log'] mode of cycles increase when [min max] cycles 
-%                     are provided in 'cycle' parameter. Applies only to 
+%       'cycleinc'    ['linear'|'log'] mode of cycles increase when [min max] cycles
+%                     are provided in 'cycle' parameter. Applies only to
 %                     'wletmethod','dftfilt'  {default: 'linear'}
-%       
+%
 %   Optional baseline parameters:
-%       'baseline'  = Spectral baseline end-time (in ms). NaN --> no baseline is used. 
+%       'baseline'  = Spectral baseline end-time (in ms). NaN --> no baseline is used.
 %                     A [min max] range may also be entered
 %                     You may also enter one row per region for baseline
 %                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
-%                     300 to 400 ms This parameter validly defines all baseline types 
+%                     300 to 400 ms This parameter validly defines all baseline types
 %                     below. Again, [NaN] Prevent baseline subtraction.
-%                     {default: 0 -> all negative time values}. 
+%                     {default: 0 -> all negative time values}.
 %       'powbase'   = Baseline spectrum to log-subtract {default|NaN -> from data}
-%       'commonbase' = ['on'|'off'] use common baseline when comparing two 
+%       'commonbase' = ['on'|'off'] use common baseline when comparing two
 %                     conditions {default: 'on'}.
 %       'basenorm'  = ['on'|'off'] 'on' normalize baseline in the power spectral
-%                     average; else 'off', divide by the average power across 
+%                     average; else 'off', divide by the average power across
 %                     trials at each frequency (gain model). {default: 'off'}
-%       'trialbase' = ['on'|'off'|'full'] perform baseline (normalization or division 
+%       'trialbase' = ['on'|'off'|'full'] perform baseline (normalization or division
 %                     above in single trial instead of the trial average. Default
 %                     if 'off'. 'full' is an option that perform single
 %                     trial normalization (or simple division based on the
 %                     'basenorm' input over the full trial length) before
 %                     performing standard baseline removal. It has been
-%                     shown to be less sensitive to noisy trials in Grandchamp R, 
-%                     Delorme A. (2011) Single-trial normalization for event-related 
-%                     spectral decomposition reduces sensitivity to noisy trials. 
+%                     shown to be less sensitive to noisy trials in Grandchamp R,
+%                     Delorme A. (2011) Single-trial normalization for event-related
+%                     spectral decomposition reduces sensitivity to noisy trials.
 %                     Front Psychol. 2:236.
 %
-%    Optional time warping parameter: 
+%    Optional time warping parameter:
 %       'timewarp'  = [eventms matrix] Time-warp amplitude and phase time-
-%                     courses(following time/freq transform but before 
-%                     smoothing across trials). 'eventms' is a matrix 
+%                     courses(following time/freq transform but before
+%                     smoothing across trials). 'eventms' is a matrix
 %                     of size (all_trials,epoch_events) whose columns
-%                     specify the epoch times (latencies) (in ms) at which 
-%                     the same series of successive events occur in each 
-%                     trial. If two data conditions, eventms should be 
+%                     specify the epoch times (latencies) (in ms) at which
+%                     the same series of successive events occur in each
+%                     trial. If two data conditions, eventms should be
 %                     [eventms1;eventms2] --> all trials stacked vertically.
-%      'timewarpms' = [warpms] optional vector of event times (latencies) (in ms) 
+%      'timewarpms' = [warpms] optional vector of event times (latencies) (in ms)
 %                     to which the series of events should be warped.
 %                     (Note: Epoch start and end should not be declared
-%                     as eventms or warpms}. If 'warpms' is absent or [], 
+%                     as eventms or warpms}. If 'warpms' is absent or [],
 %                     the median of each 'eventms' column will be used;
 %                     If two datasets, the grand medians of the two are used.
-%     'timewarpidx' = [plotidx] is an vector of indices telling which of 
-%                     the time-warped 'eventms' columns (above) to show with 
-%                     vertical lines. If undefined, all columns are plotted. 
+%     'timewarpidx' = [plotidx] is an vector of indices telling which of
+%                     the time-warped 'eventms' columns (above) to show with
+%                     vertical lines. If undefined, all columns are plotted.
 %                     Overwrites the 'vert' argument (below) if any.
 %
 %    Optional permutation parameters:
-%       'alpha'     = If non-0, compute two-tailed permutation significance 
-%                      probability level. Show non-signif. output values 
+%       'alpha'     = If non-0, compute two-tailed permutation significance
+%                      probability level. Show non-signif. output values
 %                      as green.                              {default: 0}
 %       'mcorrect'  = ['none'|'fdr'] correction for multiple comparison
 %                     'fdr' uses false detection rate (see function fdr()).
-%                     Not available for condition comparisons. {default:'none'} 
+%                     Not available for condition comparisons. {default:'none'}
 %       'pcontour'  = ['on'|'off'] draw contour around significant regions
-%                     instead of masking them. Not available for condition 
-%                     comparisons. {default:'off'} 
+%                     instead of masking them. Not available for condition
+%                     comparisons. {default:'off'}
 %       'naccu'     = Number of permutation replications to accumulate {200}
 %       'baseboot'  = permutation baseline subtract (1 -> use 'baseline';
 %                                                    0 -> use whole trial
-%                                            [min max] -> use time range) 
+%                                            [min max] -> use time range)
 %                     You may also enter one row per region for baseline,
-%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms 
+%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms
 %                     and 300 to 400 ms. {default: 1}
-%       'boottype'  = ['shuffle'|'rand'|'randall'] 'shuffle' -> shuffle times 
-%                     and trials; 'rand' -> invert polarity of spectral data 
-%                     (for ERSP) or randomize phase (for ITC); 'randall' -> 
-%                     compute significances by accumulating random-polarity 
+%       'boottype'  = ['shuffle'|'rand'|'randall'] 'shuffle' -> shuffle times
+%                     and trials; 'rand' -> invert polarity of spectral data
+%                     (for ERSP) or randomize phase (for ITC); 'randall' ->
+%                     compute significances by accumulating random-polarity
 %                     inversions for each time/frequency point (slow!). Note
 %                     that in the previous revision of this function, this
-%                     method was called 'bootstrap' though it is actually 
+%                     method was called 'bootstrap' though it is actually
 %                     permutation {default: 'shuffle'}
 %       'condboot'  = ['abs'|'angle'|'complex'] to compare two conditions,
 %                     either subtract ITC absolute values ('abs'), angles
 %                     ('angles'), or complex values ('complex'). {default: 'abs'}
 %       'pboot'     = permutation power limits (e.g., from newtimef()) {def: from data}
-%       'rboot'     = permutation ITC limits (e.g., from newtimef()). 
-%                     Note: Both 'pboot' and 'rboot' must be provided to avoid 
+%       'rboot'     = permutation ITC limits (e.g., from newtimef()).
+%                     Note: Both 'pboot' and 'rboot' must be provided to avoid
 %                     recomputing the surrogate data! {default: from data}
 %
 %    Optional Scalp Map:
@@ -201,8 +201,8 @@
 %                     and name of the file.  For file format, see
 %                         >> topoplot example
 %       'chaninfo'    Passed to topoplot, if called.
-%                     [struct] optional structure containing fields 
-%                     'nosedir', 'plotrad', and/or 'chantype'. See these 
+%                     [struct] optional structure containing fields
+%                     'nosedir', 'plotrad', and/or 'chantype'. See these
 %                     field definitions above, below.
 %                     {default: nosedir +X, plotrad 0.5, all channels}
 %
@@ -240,7 +240,7 @@
 %                     in ms. {default: none}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
 %       'caption'   = Caption of the figure {none}
-%       'outputformat' = ['old'|'plot'] for compatibility with script that used the 
+%       'outputformat' = ['old'|'plot'] for compatibility with script that used the
 %                        old output format, set to 'old' (mbase in absolute amplitude (not
 %                        dB) and real itc instead of complex itc). 'plot' returns
 %                        the plotted result {default: 'plot'}
@@ -251,7 +251,7 @@
 %            itc    = (nfreqs,timesout) matrix of complex inter-trial coherencies.
 %                     itc is complex -- ITC magnitude is abs(itc); ITC phase in radians
 %                     is angle(itc), or in deg phase(itc)*180/pi.
-%          powbase  = baseline power spectrum. Note that even, when selecting the 
+%          powbase  = baseline power spectrum. Note that even, when selecting the
 %                     the 'trialbase' option, the average power spectrum is
 %                     returned (not trial based). To obtain the baseline of
 %                     each trial, recompute it manually using the tfdata
@@ -260,25 +260,25 @@
 %            freqs  = vector of frequency bin centers (in Hz).
 %         erspboot  = (nfreqs,2) matrix of [lower upper] ERSP significance.
 %          itcboot  = (nfreqs) matrix of [upper] abs(itc) threshold.
-%           tfdata  = optional (nfreqs,timesout,trials) time/frequency decomposition 
+%           tfdata  = optional (nfreqs,timesout,trials) time/frequency decomposition
 %                      of the single data trials. Values are complex.
 %
 % Plot description:
-%   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). 
-%   The upper panel presents the data ERSP (Event-Related Spectral Perturbation) 
-%   in dB, with mean baseline spectral activity (in dB) subtracted. Use 
-%   "'baseline', NaN" to prevent timef() from removing the baseline. 
-%   The lower panel presents the data ITC (Inter-Trial Coherence). 
+%   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default).
+%   The upper panel presents the data ERSP (Event-Related Spectral Perturbation)
+%   in dB, with mean baseline spectral activity (in dB) subtracted. Use
+%   "'baseline', NaN" to prevent timef() from removing the baseline.
+%   The lower panel presents the data ITC (Inter-Trial Coherence).
 %   Click on any plot axes to pop up a new window (using 'axcopy()')
-%   -- Upper left marginal panel presents the mean spectrum during the baseline 
-%      period (blue), and when significance is set, the significance threshold 
+%   -- Upper left marginal panel presents the mean spectrum during the baseline
+%      period (blue), and when significance is set, the significance threshold
 %      at each frequency (dotted green-black trace).
-%   -- The marginal panel under the ERSP image shows the maximum (green) and 
+%   -- The marginal panel under the ERSP image shows the maximum (green) and
 %      minimum (blue) ERSP values relative to baseline power at each frequency.
-%   -- The lower left marginal panel shows mean ITC across the imaged time range 
-%      (blue), and when significance is set, the significance threshold (dotted 
-%      green-black).  
-%   -- The marginal panel under the ITC image shows the ERP (which is produced by 
+%   -- The lower left marginal panel shows mean ITC across the imaged time range
+%      (blue), and when significance is set, the significance threshold (dotted
+%      green-black).
+%   -- The marginal panel under the ITC image shows the ERP (which is produced by
 %      ITC across the data spectral pass band).
 %
 % Authors: Arnaud Delorme, Jean Hausser from timef() by Sigurd Enghoff, Scott Makeig
@@ -406,7 +406,7 @@ icadefs % read local EEGLAB constants: HZDIR, YDIR, DEFAULT_SRATE, DEFAULT_TIMLI
 if ~exist('HZDIR'), HZDIR = 'up'; end; % ascending freqs
 if ~exist('YDIR'), YDIR = 'up'; end;   % positive up
 
-if YDIR == 1, YDIR = 'up'; end;        % convert from [-1|1] as set in icadefs.m  
+if YDIR == 1, YDIR = 'up'; end;        % convert from [-1|1] as set in icadefs.m
 if YDIR == -1, YDIR = 'down'; end;     % and read by other plotting functions
 
 if ~exist('DEFAULT_SRATE'), DEFAULT_SRATE = 250; end;            % 250 Hz
@@ -552,7 +552,7 @@ end
     'plotphaseonly' 'string'    {'on','off'} 'off'; ...
     'plotphasesign' 'string'    {'on','off'} 'on'; ...
     'plotphase'     'string'    {'on','off'} 'on'; ... % same as above for backward compatibility
-    'pcontour'      'string'    {'on','off'} 'off'; ... 
+    'pcontour'      'string'    {'on','off'} 'off'; ...
     'precomputed'   'struct'    []           struct([]); ...
     'itcmax'        'real'      []           []; ...
     'erspmax'       'real'      []           []; ...
@@ -578,17 +578,25 @@ end
     'timeStretchMarks'  'real'  []           []; ...
     'timeStretchRefs'   'real'  []           []; ...
     'timeStretchPlot'   'real'  []           []; ...
-    'trialbase'     'string'    {'on','off','full'} 'off'; 
+    'trialbase'     'string'    {'on','off','full'} 'off';
     'caption'       'string'    []           ''; ...
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
     'cycleinc'      'string'    {'linear','log'}        'linear'
     'colormap'      'string'    []            DEFAULT_COLORMAP;...
     }, 'newtimef', 'ignore');
-if ischar(g), error(g); end
-if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
-if strcmpi(g.basenorm, 'on'), g.scale = 'abs'; end
-if ~strcmpi(g.itctype , 'phasecoher'), g.type = g.itctype; end
+if ischar(g)
+    error(g);
+end
+if strcmpi(g.plotamp, 'off')
+    g.plotersp = 'off'; 
+end
+if strcmpi(g.basenorm, 'on')
+    g.scale = 'abs'; 
+end
+if ~strcmpi(g.itctype , 'phasecoher')
+    g.type = g.itctype;
+end
 
 g.tlimits = tlimits;
 g.frames  = frames;
@@ -600,7 +608,9 @@ g.AXES_FONT        = AXES_FONT;      % axes text FontSize
 g.TITLE_FONT       = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
-if ~strcmpi(g.plotphase, 'on'), g.plotphasesign = g.plotphase; end
+if ~strcmpi(g.plotphase, 'on')
+    g.plotphasesign = g.plotphase; 
+end
 
 % unpack 'timewarp' (and undocumented 'timewarpfr') arguments
 %------------------------------------------------------------
@@ -624,22 +634,22 @@ if isfield(g,'timewarp') && ~isempty(g.timewarp)
     if ~isempty(g.timewarp) % convert timewarp ms to timewarpfr frames -sm
         fprintf('\n')
         if iscell(g.timewarp)
-           error('timewarp argument must be a (total_trials,epoch_events) matrix');
+            error('timewarp argument must be a (total_trials,epoch_events) matrix');
         end
         evntms = g.timewarp;
         warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
         g.timewarpfr{1} = warpfr';
-
+        
         if isfield(g,'timewarpms')
-           refms = g.timewarpms;
-           reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
-           g.timewarpfr{2} = reffr';
+            refms = g.timewarpms;
+            reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
+            g.timewarpfr{2} = reffr';
         end
         if isfield(g,'timewarpidx')
-           g.timewarpfr{3} = g.timewarpidx;
+            g.timewarpfr{3} = g.timewarpidx;
         end
     end
-
+    
     % convert again to timeStretch parameters
     % ---------------------------------------
     if ~isempty(g.timewarpfr)
@@ -647,16 +657,16 @@ if isfield(g,'timewarp') && ~isempty(g.timewarp)
         if length(g.timewarpfr) > 1
             g.timeStretchRefs = g.timewarpfr{2};
         end
-
+        
         if length(g.timewarpfr) > 2
-          if isempty(g.timewarpfr{3})
-            stretchevents = size(g.timeStretchMarks,1);
-            g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
-          else
-            g.timeStretchPlot = g.timewarpfr{3};
-          end
+            if isempty(g.timewarpfr{3})
+                stretchevents = size(g.timeStretchMarks,1);
+                g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
+            else
+                g.timeStretchPlot = g.timewarpfr{3};
+            end
         end
-
+        
         if max(max(g.timeStretchMarks)) > frames-2 || min(min(g.timeStretchMarks)) < 3
             error('Time warping events must be inside the epochs.');
         end
@@ -668,12 +678,12 @@ if isfield(g,'timewarp') && ~isempty(g.timewarp)
     end
 end
 
-% Determining source of the call 
-% --------------------------------------% 'guicall'= 1 if newtimef is called 
+% Determining source of the call
+% --------------------------------------% 'guicall'= 1 if newtimef is called
 callerstr = dbstack(1);                 % from EEGLAB GUI, otherwise 'guicall'= 0
 if isempty(callerstr)                   % 7/3/2014, Ramon
     guicall = 0;
-elseif strcmp(callerstr(end).name,'pop_newtimef')     
+elseif strcmp(callerstr(end).name,'pop_newtimef')
     guicall = 1;
 else
     guicall = 0;
@@ -735,8 +745,8 @@ end
 if ~isempty(g.timeStretchMarks) % timeStretch code by Jean Hauser
     if isempty(g.timeStretchRefs)
         verboseprintf(g.verbose, ['Using median event latencies as reference event times for time warping.\n']);
-        g.timeStretchRefs = median(g.timeStretchMarks,2); 
-                                          % Note: Uses (grand) median latencies for two conditions
+        g.timeStretchRefs = median(g.timeStretchMarks,2);
+        % Note: Uses (grand) median latencies for two conditions
     else
         verboseprintf(g.verbose, ['Using supplied latencies as reference event times for time warping.\n']);
     end
@@ -746,10 +756,10 @@ if ~isempty(g.timeStretchMarks) % timeStretch code by Jean Hauser
         g.vert = ((g.timeStretchRefs(g.timeStretchPlot)-1) ...
             /g.srate+g.tlimits(1)/1000)*1000;
         fprintf('Plotting timewarp markers at ')
-           for li = 1:length(g.vert), fprintf('%d ',g.vert(li)); end
+        for li = 1:length(g.vert), fprintf('%d ',g.vert(li)); end
         fprintf(' ms.\n')
     end
-end 
+end
 
 if ~isempty(g.vert)
     if min(g.vert(:)) < g.tlimits(1) || max(g.vert(:)) > g.tlimits(2)
@@ -762,7 +772,7 @@ if strcmp(g.hzdir,'up') || strcmp(g.hzdir,'normal')
 elseif strcmp(g.hzdir,'down') || strcmp(g.hzdir,'reverse') || g.hzdir==-1
     g.hzdir = 'reverse';
 else
-    error('unknown ''hzdir'' argument'); 
+    error('unknown ''hzdir'' argument');
 end
 
 if strcmp(g.ydir,'up') || strcmp(g.ydir,'normal')
@@ -770,7 +780,7 @@ if strcmp(g.ydir,'up') || strcmp(g.ydir,'normal')
 elseif strcmp(g.ydir,'down') || strcmp(g.ydir,'reverse')
     g.ydir = 'reverse';
 else
-    error('unknown ''ydir'' argument'); 
+    error('unknown ''ydir'' argument');
 end
 
 % -----------------
@@ -799,7 +809,7 @@ end
 if ~isempty(g.mtaper) % multitaper, inspired from a Bijan Pesaran matlab function
     if length(g.mtaper) < 3
         %error('mtaper arguement must be [N W] or [N W K]');
-
+        
         if g.mtaper(1) * g.mtaper(2) < 1
             error('mtaper 2 first arguments'' product must be larger than 1');
         end
@@ -825,11 +835,11 @@ if ~isempty(g.mtaper) % multitaper, inspired from a Bijan Pesaran matlab functio
     g.pad = max(pow2(nextpow2(g.winsize)),256); % pad*nextpow
     nfk = floor([0 g.maxfreq]./g.srate.*g.pad);
     g.padratio = 2*nfk(2)/g.winsize;
-
+    
     %compute number of frequencies
     %nf = max(256, g.pad*2^nextpow2(g.winsize+1));
     %nfk = floor([0 g.maxfreq]./g.srate.*nf);
-
+    
     %freqs = linspace( 0, g.maxfreq, diff(nfk)); % this also works in the case of a FFT
 end
 
@@ -847,15 +857,15 @@ if strcmpi(g.lowmem, 'on') && numel(data) ~= g.frames && isempty(g.nfreqs) && ~i
     % compute for first 2 trials to get freqsout
     XX = reshape(data, 1, frames, prod(size(data))/g.frames);
     [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frames, tlimits, Fs, g.cycles, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
-
+    
     % scan all frequencies
     for index = 1:length(freqsout)
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboottmp,Rboottmp] = ...
                 newtimef(data, frames, tlimits, Fs, g.cycles, ...
-                          'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                             'plotamp', 'off', 'plotitc', 'off', 'plotphasesign', 'off',varargin{:}, ...
-                                  'lowmem', 'off', 'timesout', timesout);
+                'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                'plotamp', 'off', 'plotitc', 'off', 'plotphasesign', 'off',varargin{:}, ...
+                'lowmem', 'off', 'timesout', timesout);
             if ~isempty(Pboottmp)
                 Pboot(index,:) = Pboottmp;
                 Rboot(index,:) = Rboottmp;
@@ -867,26 +877,26 @@ if strcmpi(g.lowmem, 'on') && numel(data) ~= g.frames && isempty(g.nfreqs) && ~i
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
                 alltfX(index,:,:)] = ...
                 newtimef(data, frames, tlimits, Fs, g.cycles, ...
-                            'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                                  'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, ...
-                                          'lowmem', 'off', 'timesout', timesout);
+                'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, ...
+                'lowmem', 'off', 'timesout', timesout);
         end
     end
-
-    % compute trial-average ERP 
+    
+    % compute trial-average ERP
     % -------------------------
     ERP = mean(data,2);
-
-    % plot results 
+    
+    % plot results
     %-------------
     plottimef(P, R, Pboot, Rboot, ERP, freqsout, timesout, mbase, [], [], g);
-
+    
     return; % finished
 end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%
-% compare 2 conditions 
+% compare 2 conditions
 %%%%%%%%%%%%%%%%%%%%%%%
 if iscell(data)
     if ~guicall && (strcmp(g.basenorm, 'on') || strcmp(g.trialbase, 'on'))  % ------------------------------------- Temporary fix for error when using
@@ -978,7 +988,7 @@ if iscell(data)
         mbase = { mbase mbase };
     elseif strcmpi(g.commonbase, 'on')
         mbase = { NaN NaN };
-        meanmbase = mbase{1}; %Ramon :for bug 1657 
+        meanmbase = mbase{1}; %Ramon :for bug 1657
     else
         meanmbase = (mbase1 + mbase2)/2;
         mbase = { mbase1 mbase2 };
@@ -1014,9 +1024,12 @@ if iscell(data)
     
     if isnan(g.alpha)
         switch(g.condboot)
-            case 'abs',  Rdiff = abs(R1)-abs(R2);
-            case 'angle',  Rdiff = angle(R1)-angle(R2);
-            case 'complex',  Rdiff = R1-R2;
+            case 'abs'
+                Rdiff = abs(R1)-abs(R2);
+            case 'angle'
+                Rdiff = angle(R1)-angle(R2);
+            case 'complex'
+                Rdiff = R1-R2;
         end
         if strcmpi(g.plotersp, 'on') || strcmpi(g.plotitc, 'on')
             g.erspmax = []; g.itcmax  = []; % auto scale inserted for diff
@@ -1144,9 +1157,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%
 verboseprintf(g.verbose, 'Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
-    case 'phasecoher',  verboseprintf(g.verbose, '  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',trials);
-    case 'phasecoher2', verboseprintf(g.verbose, '  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',trials);
-    case 'coher',       verboseprintf(g.verbose, '  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',trials);
+    case 'phasecoher'
+        verboseprintf(g.verbose, '  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',trials);
+    case 'phasecoher2'
+        verboseprintf(g.verbose, '  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',trials);
+    case 'coher'
+        verboseprintf(g.verbose, '  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',trials);
 end
 verboseprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frames,g.srate);
 verboseprintf(g.verbose, 'Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
@@ -1163,19 +1179,23 @@ if isempty(g.precomputed)
     % -----------------------------------------
     if strcmpi(g.rmerp, 'on')
         if ndims(data) == 2
-             data = data - mean(data,2)*ones(1, length(data(:))/g.frames);
-        else data = data - repmat(mean(data,3), [1 1 trials]);
+            data = data - mean(data,2)*ones(1, length(data(:))/g.frames);
+        else
+            data = data - repmat(mean(data,3), [1 1 trials]);
         end
     end
-
+    
     % ----------------------------------------------------
     % compute time frequency decompositions, power and ITC
     % ----------------------------------------------------
-    if length(g.timesout) > 1,   tmioutopt = { 'timesout' , g.timesout };
-    elseif ~isempty(g.ntimesout) tmioutopt = { 'ntimesout', g.ntimesout };
-    else                         tmioutopt = { 'ntimesout', g.timesout };
+    if length(g.timesout) > 1
+        tmioutopt = { 'timesout' , g.timesout };
+    elseif ~isempty(g.ntimesout)
+        tmioutopt = { 'ntimesout', g.ntimesout };
+    else
+        tmioutopt = { 'ntimesout', g.timesout };
     end
-
+    
     [alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
         'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
         'itctype', g.type, 'wavelet', g.cycles, 'verbose', g.verbose, ...
@@ -1188,35 +1208,42 @@ else
     R = [];
     if ~isfield(g.precomputed, 'recompute') || strcmpi(g.precomputed.recompute, 'itc')
         switch g.itctype
-            case 'coher',       R = alltfX ./ repmat(sqrt(sum(alltfX .* conj(alltfX),3) * size(alltfX,3)), [1 1 size(alltfX,3)]);
-            case 'phasecoher2', R = alltfX ./ repmat(sum(sqrt(alltfX .* conj(alltfX)),3), [1 1 size(alltfX,3)]);
-            case 'phasecoher',  R = alltfX ./ sqrt(alltfX .* conj(alltfX));
+            case 'coher'
+                R = alltfX ./ repmat(sqrt(sum(alltfX .* conj(alltfX),3) * size(alltfX,3)), [1 1 size(alltfX,3)]);
+            case 'phasecoher2'
+                R = alltfX ./ repmat(sum(sqrt(alltfX .* conj(alltfX)),3), [1 1 size(alltfX,3)]);
+            case 'phasecoher'
+                R = alltfX ./ sqrt(alltfX .* conj(alltfX));
         end
         R = mean(R,3);
         if isfield(g.precomputed, 'recompute') && strcmpi(g.precomputed.recompute, 'itc')
-            P = []; mbase = []; return;
+            P = [];
+            mbase = [];
+            return;
         end
     end
 end
 
 if g.cycles(1) == 0
     alltfX = 2/0.375*alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
-    P  = alltfX.*conj(alltfX); % power    
+    P  = alltfX.*conj(alltfX); % power
     % TF and MC (12/14/2006): multiply by 2 account for negative frequencies,
-    % and ounteract the reduction by a factor 0.375 that occurs as a result of 
+    % and ounteract the reduction by a factor 0.375 that occurs as a result of
     % cosine (Hann) tapering. Refer to Bug 446
     % Modified again 04/29/2011 due to comment in bug 1032
-else 
+else
     P  = alltfX.*conj(alltfX); % power for wavelets
 end
 
 % ----------------
 % remove baseline
 % ----------------
-if strcmpi(g.scale, 'log') && ~any(isnan(g.powbase)), g.powbase = 10.^(g.powbase/10); end; 
+if strcmpi(g.scale, 'log') && ~any(isnan(g.powbase))
+    g.powbase = 10.^(g.powbase/10); 
+end
 P = newtimeftrialbaseln(P, timesout, 'baseline', g.baseline, 'basenorm', g.basenorm, 'trialbase', g.trialbase);
 [P, baseln, mbase] = newtimefbaseln(P, timesout, 'baseline', g.baseline, 'basenorm', g.basenorm, ...
-                                   'verbose', g.verbose, 'powbase', g.powbase, 'trialbase', g.trialbase, 'singletrials','on');
+    'verbose', g.verbose, 'powbase', g.powbase, 'trialbase', g.trialbase, 'singletrials','on');
 % ----------------
 % phase amp option
 % ----------------
@@ -1230,7 +1257,7 @@ if strcmpi(g.phsamp, 'on')
     %PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * ((P(:,j)))';
     % x-product: unit phase column
     % times amplitude row
-
+    
     %tmpcx(1,:,:) = cumulX; % allow ./ below
     %for jj=1:g.timesout
     %    PA(:,:,jj) = PA(:,:,jj) ./ repmat(P(:,jj)', [size(P,1) 1]);
@@ -1249,10 +1276,12 @@ if ~isnan(g.alpha) || ~isempty(find(~isnan(g.pboot))) || ~isempty(find(~isnan(g.
         Pboot = g.pboot(:);
     else
         if size(g.baseboot,2) == 1
-            if g.baseboot == 0, baselntmp = [];
+            if g.baseboot == 0
+                baselntmp = [];
             elseif ~isnan(g.baseline(1))
                 baselntmp = baseln;
-            else baselntmp = find(timesout <= 0); % if it is empty use whole epoch
+            else
+                baselntmp = find(timesout <= 0); % if it is empty use whole epoch
             end
         else
             baselntmp = [];
@@ -1303,10 +1332,12 @@ if ~isnan(g.alpha) || ~isempty(find(~isnan(g.pboot))) || ~isempty(find(~isnan(g.
     else
         if ~isempty(find(~isnan(g.pboot))) % if ERSP limits were provided (but ITC not)
             if size(g.baseboot,2) == 1
-                if g.baseboot == 0, baselntmp = [];
+                if g.baseboot == 0
+                    baselntmp = [];
                 elseif ~isnan(g.baseline(1))
                     baselntmp = baseln;
-                else baselntmp = find(timesout <= 0); % if it is empty use whole epoch
+                else
+                    baselntmp = find(timesout <= 0); % if it is empty use whole epoch
                 end
             else
                 baselntmp = [];
@@ -1325,23 +1356,29 @@ if ~isnan(g.alpha) || ~isempty(find(~isnan(g.pboot))) || ~isempty(find(~isnan(g.
             elseif g.baseboot
                 fprintf('   %d permutation statistics windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
             end
-        end;        
+        end;
         % ITC significance
         % ----------------
         inputdata = alltfX;
         switch g.type
-            case 'coher',       formula = [ 'sum(arg1,3)./sqrt(sum(arg1.*conj(arg1),3))/ sqrt(' int2str(size(alltfX,3)) ');' ];
-            case 'phasecoher',  formula = [ 'mean(arg1,3);' ]; inputdata = alltfX./sqrt(alltfX.*conj(alltfX));
-            case 'phasecoher2', formula = [ 'sum(arg1,3)./sum(sqrt(arg1.*conj(arg1)),3);' ];
+            case 'coher'
+                formula = [ 'sum(arg1,3)./sqrt(sum(arg1.*conj(arg1),3))/ sqrt(' int2str(size(alltfX,3)) ');' ];
+            case 'phasecoher'
+                formula = [ 'mean(arg1,3);' ]; inputdata = alltfX./sqrt(alltfX.*conj(alltfX));
+            case 'phasecoher2'
+                formula = [ 'sum(arg1,3)./sum(sqrt(arg1.*conj(arg1)),3);' ];
         end
-        if strcmpi(g.boottype, 'randall'), dimaccu = []; g.boottype = 'rand';
-        else										 dimaccu = 2;
+        if strcmpi(g.boottype, 'randall')
+            dimaccu = [];
+            g.boottype = 'rand';
+        else
+            dimaccu = 2;
         end
         [Rboot Rboottmp Rboottrials] = bootstat(inputdata, formula, 'boottype', g.boottype, ...
             'label', 'ITC', 'bootside', 'upper', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
         fprintf('\n');
-        clear Rboottmp;        
+        clear Rboottmp;
     end
 else
     Pboot = []; Rboot = [];
@@ -1350,14 +1387,16 @@ end
 % average the power
 % -----------------
 PA = P;
-if ndims(P) == 4,     P = mean(P, 4);
-elseif ndims(P) == 3, P = mean(P, 3);
+if ndims(P) == 4
+    P = mean(P, 4);
+elseif ndims(P) == 3
+    P = mean(P, 3);
 end
 
 % correction for multiple comparisons
 % -----------------------------------
 maskersp = [];
-maskitc  = []; 
+maskitc  = [];
 if ~isnan(g.alpha)
     if isempty(find(~isnan(g.pboot))) % if ERSP lims not provided
         if ndims(Pboottrials) < 3, Pboottrials = Pboottrials'; end
@@ -1366,20 +1405,22 @@ if ~isnan(g.alpha)
             alphafdr = fdr(exactp_ersp, g.alpha);
             if alphafdr ~= 0
                 fprintf('ERSP correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
-            else fprintf('ERSP correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
+            else
+                fprintf('ERSP correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
             end
             maskersp = exactp_ersp <= alphafdr;
         else
             maskersp = exactp_ersp <= g.alpha;
         end
-    end;    
+    end;
     if isempty(find(~isnan(g.rboot))) % if ITC lims not provided
-        exactp_itc  = compute_pvals(abs(R), abs(Rboottrials'));        
+        exactp_itc  = compute_pvals(abs(R), abs(Rboottrials'));
         if strcmpi(g.mcorrect, 'fdr')
             alphafdr = fdr(exactp_itc, g.alpha);
             if alphafdr ~= 0
                 fprintf('ITC  correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
-            else fprintf('ITC  correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
+            else
+                fprintf('ITC  correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
             end
             maskitc = exactp_itc <= alphafdr;
         else
@@ -1408,9 +1449,10 @@ if isempty(g.erspmax)
     if strcmpi(g.scale, 'abs') && strcmpi(g.basenorm, 'off') % % of baseline
         g.erspmax = [max(max(abs(P)))];
         if g.erspmax > 1
-             g.erspmax = [1-(g.erspmax-1) g.erspmax];
-        else g.erspmax = [g.erspmax 1+(1-g.erspmax)];
-     	end
+            g.erspmax = [1-(g.erspmax-1) g.erspmax];
+        else
+            g.erspmax = [g.erspmax 1+(1-g.erspmax)];
+        end
     end
     %g.erspmax = [-g.erspmax g.erspmax]+1;
 end
@@ -1424,7 +1466,7 @@ if strcmpi(g.plotersp, 'on') || strcmpi(g.plotitc, 'on')
         R = squeeze(R(2,:,:,:));
         mbase = squeeze(mbase(2,:));
         ERP = mean(squeeze(data(1,:,:)),2);
-    else      
+    else
         ERP = mean(data,2);
     end
     if strcmpi(g.plottype, 'image')
@@ -1463,10 +1505,10 @@ persistent showwarning;
 
 if isempty(showwarning)
     warning( [ 'Some versions of Matlab crash on this function. If this is' 10 ...
-               'the case, simply comment the code line 1655-1673 in newtimef.m' 10 ...
-               'which aims at "ploting marginal ERSP mean below ERSP image"' ]);
+        'the case, simply comment the code line 1655-1673 in newtimef.m' 10 ...
+        'which aims at "ploting marginal ERSP mean below ERSP image"' ]);
     showwarning = 1;
-end;    
+end;
 
 %
 % compute ERP
@@ -1492,13 +1534,25 @@ end
 switch lower(g.plotitc)
     case 'on',
         switch lower(g.plotersp),
-            case 'on', ordinate1 = 0.67; ordinate2 = 0.1; height = 0.33; g.plot = 1;
-            case 'off', ordinate2 = 0.1; height = 0.9; g.plot = 1;
+            case 'on'
+                ordinate1 = 0.67;
+                ordinate2 = 0.1;
+                height = 0.33;
+                g.plot = 1;
+            case 'off'
+                ordinate2 = 0.1;
+                height = 0.9;
+                g.plot = 1;
         end
-    case 'off', ordinate1 = 0.1; height = 0.9;
+    case 'off'
+        ordinate1 = 0.1; height = 0.9;
         switch lower(g.plotersp),
-            case 'on', ordinate1 = 0.1; height = 0.9;  g.plot = 1;
-            case 'off', g.plot = 0;
+            case 'on'
+                ordinate1 = 0.1;
+                height = 0.9;
+                g.plot = 1;
+            case 'off'
+                g.plot = 0;
         end
 end
 
@@ -1517,14 +1571,15 @@ switch lower(g.plotersp)
         %
         %%%%%%% image the ERSP %%%%%%%%%%%%%%%%%%%%%%%%%%
         %
-
+        
         h(1) = axes('Position',[.1 ordinate1 .9 height].*s+q);
         set(h(1), 'tag', 'ersp');
-
+        
         PP = P;
         if strcmpi(g.scale, 'abs') && strcmpi(g.basenorm, 'off')
-             baseval = 1;
-        else baseval = 0;
+            baseval = 1;
+        else
+            baseval = 0;
         end
         if ~isnan(g.alpha)
             if strcmpi(g.pcontour, 'off') && ~isempty(maskersp) % zero out nonsignif. power differences
@@ -1534,14 +1589,16 @@ switch lower(g.plotersp)
                 if size(PP,1) == size(Pboot,1) && size(PP,2) == size(Pboot,2)
                     PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = baseval;
                     Pboot = squeeze(mean(Pboot,2));
-                    if size(Pboot,2) == 1, Pboot = Pboot'; end
+                    if
+                        size(Pboot,2) == 1, Pboot = Pboot';
+                    end
                 else
                     PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
                         & (PP < repmat(Pboot(:,2),[1 length(times)])))) = baseval;
                 end
             end
         end
- 
+        
         % find color limits
         % -----------------
         if isempty(g.erspmax)
@@ -1556,7 +1613,7 @@ switch lower(g.plotersp)
         if isnan( g.baseline(1) ) && g.erspmax(1) < 0
             g.erspmax = [ min(min(P(:,:))) max(max(P(:,:)))];
         end
-
+        
         % plot image
         % ----------
         if ~strcmpi(g.freqscale, 'log')
@@ -1565,7 +1622,7 @@ switch lower(g.plotersp)
             imagesclogy(times,freqs,PP(:,:),g.erspmax);
         end
         set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
-
+        
         % put contour for multiple comparison masking
         if ~isempty(maskersp) && strcmpi(g.pcontour, 'on')
             hold on; [tmpc tmph] = contour(times, freqs, maskersp);
@@ -1587,61 +1644,61 @@ switch lower(g.plotersp)
                 line([g.vert(index), g.vert(index)], [min(freqs) max(freqs)], 'linewidth', 1, 'color', 'm');
             end
         end
-
+        
         h(2) = gca;
         h(3) = cbar('vert'); % ERSP colorbar axes
         set(h(2),'Position',[.1 ordinate1 .8 height].*s+q)
         set(h(3),'Position',[.95 ordinate1 .05 height].*s+q)
         title([ 'ERSP(' g.unitpower ')' ])
-
+        
         %
         %%%%% plot marginal ERSP mean below ERSP image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
-
+        
         h(4) = axes('Position',[.1 ordinate1-0.1 .8 .1].*s+q);
-
+        
         E = [min(P(:,:),[],1);max(P(:,:),[],1)];
-
+        
         % plotting limits
         if isempty(g.erspmarglim)
             g.erspmarglim = [min(E(1,:))-max(max(abs(E)))/3 max(E(2,:))+max(max(abs(E)))/3];
         end
-
+        
         plot(times,E,[0 0],g.erspmarglim, '--m','LineWidth',g.linewidth)
         xlim([min(times) max(times)])
         ylim(g.erspmarglim)
-
+        
         tick = get(h(4),'YTick');
         set(h(4),'YTick',[tick(1) ; tick(end)])
         set(h(4),'YAxisLocation','right')
         set(h(4),'TickLength',[0.020 0.025]);
         xlabel('Time (ms)')
         ylabel(g.unitpower)
-
+        
         %
         %%%%% plot mean spectrum to left of ERSP image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
-
+        
         h(5) = axes('Position',[0 ordinate1 .1 height].*s+q);
-
+        
         if isnan(g.baseline)              % Ramon :for bug 1657
             E = zeros(size(freqs));
         else
             E = mbase;
         end
-
+        
         if ~isnan(E(1))
-
+            
             % plotting limits
             if isempty(g.speclim)
-               % g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
-               if all(~isnan(mbase))
-                   g.speclim = [min(mbase)-max(abs(mbase))/3 max(mbase)+max(abs(mbase))/3]; % RMC: Just for plotting
-               else
-                   g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
-               end
+                % g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
+                if all(~isnan(mbase))
+                    g.speclim = [min(mbase)-max(abs(mbase))/3 max(mbase)+max(abs(mbase))/3]; % RMC: Just for plotting
+                else
+                    g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
+                end
             end
-
+            
             % plot curves
             if ~strcmpi(g.freqscale, 'log')
                 plot(freqs,E,'LineWidth',g.linewidth); hold on;
@@ -1655,8 +1712,8 @@ switch lower(g.plotersp)
                     end
                 end
                 if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end
-                if g.speclim(1) ~= g.speclim(2), ylim(g.speclim); end; % Ramon :for bug 1657 
-
+                if g.speclim(1) ~= g.speclim(2), ylim(g.speclim); end; % Ramon :for bug 1657
+                
             else % 'log'
                 semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
                 if ~isnan(g.alpha)
@@ -1699,7 +1756,7 @@ switch lower(g.plotitc)
         %
         h(6) = axes('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
         if ishandle(h(1));set(h(1), 'tag', 'itc');end
-
+        
         if abs(R(1,1)-1) < 0.0001, g.plotphaseonly = 'on'; end
         if strcmpi(g.plotphaseonly, 'on')
             RR = Rangle/pi*180;
@@ -1712,8 +1769,10 @@ switch lower(g.plotitc)
             elseif isempty(maskitc)
                 if size(RR,1) == size(Rboot,1) && size(RR,2) == size(Rboot,2)
                     tmp = gcf;
-                    if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
-                    else                   RR(find(RR < Rboot)) = 0;
+                    if size(Rboot,3) == 2
+                        RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
+                    else
+                        RR(find(RR < Rboot)) = 0;
                     end
                     Rboot = mean(Rboot(:,:,end),2);
                 else
@@ -1721,13 +1780,13 @@ switch lower(g.plotitc)
                 end
             end
         end
-
+        
         if g.ITC_CAXIS_LIMIT == 0
             coh_caxis = min(max(max(R(:,:))),1)*[-1 1]; % 1 WAS 0.4 !
         else
             coh_caxis = g.ITC_CAXIS_LIMIT*[-1 1];
         end
-
+        
         if strcmpi(g.plotphaseonly, 'on')
             if ~strcmpi(g.freqscale, 'log')
                 imagesc(times,freqs,RR(:,:)); % <---
@@ -1755,20 +1814,20 @@ switch lower(g.plotitc)
             end
         end
         set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
-
+        
         % plot contour if necessary
         if ~isempty(maskitc) && strcmpi(g.pcontour, 'on')
             hold on; [tmpc tmph] = contour(times, freqs, maskitc);
             set(tmph, 'linecolor', 'k', 'linewidth', 0.25)
         end
-
+        
         if isempty(g.itcmax)
             g.itcmax = caxis;
         elseif length(g.itcmax) == 1
             g.itcmax = [ -g.itcmax g.itcmax ];
         end
         caxis(g.itcmax);
-
+        
         hold on
         plot([0 0],[0 freqs(end)],'--m','LineWidth',g.linewidth);
         if ~isnan(g.marktimes)
@@ -1784,7 +1843,7 @@ switch lower(g.plotitc)
                 line([g.vert(index), g.vert(index)], [min(freqs) max(freqs)], 'linewidth', 1, 'color', 'm');
             end
         end
-
+        
         h(7) = gca;
         h(8) = cbar('vert');
         %h(9) = get(h(8),'Children'); % make the function crash
@@ -1798,26 +1857,26 @@ switch lower(g.plotitc)
         else
             title('ITC')
         end
-
+        
         %
         %%%%% plot the ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
-
+        
         h(10) = axes('Position',[.1 ordinate2-0.1 .8 .1].*s+q); % ERP
-
+        
         if isempty(g.erplim)
             ERPmax = max(ERP);
             ERPmin = min(ERP);
             g.erplim = [ ERPmin - 0.1*(ERPmax-ERPmin) ERPmax + 0.1*(ERPmax-ERPmin) ];
         end
-
+        
         plot(ERPtimes,ERP, [0 0],g.erplim,'--m','LineWidth',g.linewidth);
         hold on;
         plot([times(1) times(length(times))],[0 0], 'k');
         xlim([min(ERPtimes) max(ERPtimes)]);
         ylim(g.erplim)
         set(gca,'ydir',g.ydir);
-
+        
         tick = get(h(10),'YTick');
         set(h(10),'YTick',[tick(1) ; tick(end)])
         set(h(10),'TickLength',[0.02 0.025]);
@@ -1828,11 +1887,11 @@ switch lower(g.plotitc)
             if length(g.topovec) ~= 1, ylabel(''); end; % ICA component
         end
         E = nan_mean(R(:,:)'); % don't let a few NaN's crash this
-
+        
         %
         %%%%% plot the marginal mean left of the ITC image %%%%%%%%%%%%%%%%%%%%%
         %
-
+        
         h(11) = axes('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
         % ITC left of the ITC image
         % set plotting limits
@@ -1868,8 +1927,8 @@ switch lower(g.plotitc)
             set(gca, 'xtickmode', 'manual');
             divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
             set(gca, 'xtick', divs);
-         end
-
+        end
+        
         % ITC plot details
         tick = get(h(11),'YTick');
         if length(tick) > 1
@@ -1884,7 +1943,7 @@ switch lower(g.plotitc)
             set(gca,'xdir','normal');
         end
         ylabel('ERP')
-
+        
 end; %switch
 
 %
@@ -1899,7 +1958,7 @@ if (~isempty(g.topovec)) && strcmpi(g.plotitc, 'on') && strcmpi(g.plotersp, 'on'
     end
     if length(g.topovec) == 1
         topoplot(g.topovec,g.elocs,'electrodes','off', ...
-                 'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
+            'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
     else
         topoplot(g.topovec,g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
     end
@@ -1915,7 +1974,7 @@ if g.plot
         set(h(13),'HorizontalAlignment','left')
         set(h(13),'FontSize',g.TITLE_FONT);
     end
-
+    
     try, axcopy(gcf); catch, end
 end
 
@@ -1957,7 +2016,7 @@ if strcmpi(g.plotersp, 'on')
     if strcmpi(g.plotitc, 'on'), subplot(2,1,1); end
     set(gca, 'tag', 'ersp');
     alllegend = {};
-
+    
     for index = 1:length(freqs)
         alllegend{index} = [ num2str(freqs(index)) 'Hz baseline ' num2str(mbase(index)) ' dB' ];
     end
@@ -1975,14 +2034,19 @@ if strcmpi(g.plotitc, 'on')
     %
     %%%%%%%%%%%% Image the ITC %%%%%%%%%%%%%%%%%%
     %
-    if strcmpi(g.plotersp, 'on'), subplot(2,1,2); end
+    if strcmpi(g.plotersp, 'on')
+        subplot(2,1,2);
+    end
     set(gca, 'tag', 'itc');
-    if abs(R(1,1)-1) < 0.0001, g.plotphaseonly = 'on'; end
+    if abs(R(1,1)-1) < 0.0001
+        g.plotphaseonly = 'on';
+    end
     if strcmpi(g.plotphaseonly, 'on') % plot ITC phase instead of amplitude (e.g. for continuous data)
         RR = Rangle/pi*180;
-    else RR = R;
+    else
+        RR = R;
     end
-
+    
     % find regions of significance
     % ----------------------------
     alllegend = {};
@@ -2013,7 +2077,7 @@ if strcmpi(g.plotitc, 'on') || strcmpi(g.plotersp, 'on')
         end
         axis('square')
     end
-
+    
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
     if (length(g.title) > 0) && ~iscell(g.title)
         axes('Position',pos,'Visible','Off');
@@ -2022,7 +2086,7 @@ if strcmpi(g.plotitc, 'on') || strcmpi(g.plotersp, 'on')
         set(h(13),'HorizontalAlignment','left')
         set(h(13),'FontSize',g.TITLE_FONT);
     end
-
+    
     try, axcopy(gcf); catch, end
 end
 
@@ -2087,56 +2151,56 @@ end
 % reshaping data
 % -----------
 function pvals = compute_pvals(oridat, surrog, tail)
-    
-    if nargin < 3
-        tail = 'both';
-    end
-    
-    if myndims(oridat) > 1        
-        if size(oridat,2) ~= size(surrog, 2) || myndims(surrog) == 2
-            if size(oridat,1) == size(surrog, 1)
-                surrog = repmat( reshape(surrog, [size(surrog,1) 1 size(surrog,2)]), [1 size(oridat,2) 1]);
-            elseif size(oridat,2) == size(surrog, 1)
-                surrog = repmat( reshape(surrog, [1 size(surrog,1) size(surrog,2)]), [size(oridat,1) 1 1]);
-            else
-                error('Permutation statistics array size error');
-            end
-        end
-    end
 
-    surrog = sort(surrog, myndims(surrog)); % sort last dimension
-    
-    if myndims(surrog) == 1    
-        surrog(end+1) = oridat;        
-    elseif myndims(surrog) == 2
-        surrog(:,end+1) = oridat;        
-    elseif myndims(surrog) == 3
-        surrog(:,:,end+1) = oridat;
-    else
-        surrog(:,:,:,end+1) = oridat;
-    end
+if nargin < 3
+    tail = 'both';
+end
 
-    [tmp idx] = sort( surrog, myndims(surrog) );
-    [tmp mx]  = max( idx,[], myndims(surrog));        
-                
-    len = size(surrog,  myndims(surrog) );
-    pvals = 1-(mx-0.5)/len;
-    if strcmpi(tail, 'both')
-        pvals = min(pvals, 1-pvals);
-        pvals = 2*pvals;
-    end;    
-    
-function val = myndims(a)
-    if ndims(a) > 2
-        val = ndims(a);
-    else
-        if size(a,1) == 1,
-            val = 2;
-        elseif size(a,2) == 1,
-            val = 1;
+if myndims(oridat) > 1
+    if size(oridat,2) ~= size(surrog, 2) || myndims(surrog) == 2
+        if size(oridat,1) == size(surrog, 1)
+            surrog = repmat( reshape(surrog, [size(surrog,1) 1 size(surrog,2)]), [1 size(oridat,2) 1]);
+        elseif size(oridat,2) == size(surrog, 1)
+            surrog = repmat( reshape(surrog, [1 size(surrog,1) size(surrog,2)]), [size(oridat,1) 1 1]);
         else
-            val = 2;
+            error('Permutation statistics array size error');
         end
-    end; 
+    end
+end
+
+surrog = sort(surrog, myndims(surrog)); % sort last dimension
+
+if myndims(surrog) == 1
+    surrog(end+1) = oridat;
+elseif myndims(surrog) == 2
+    surrog(:,end+1) = oridat;
+elseif myndims(surrog) == 3
+    surrog(:,:,end+1) = oridat;
+else
+    surrog(:,:,:,end+1) = oridat;
+end
+
+[tmp idx] = sort( surrog, myndims(surrog) );
+[tmp mx]  = max( idx,[], myndims(surrog));
+
+len = size(surrog,  myndims(surrog) );
+pvals = 1-(mx-0.5)/len;
+if strcmpi(tail, 'both')
+    pvals = min(pvals, 1-pvals);
+    pvals = 2*pvals;
+end;
+
+function val = myndims(a)
+if ndims(a) > 2
+    val = ndims(a);
+else
+    if size(a,1) == 1,
+        val = 2;
+    elseif size(a,2) == 1,
+        val = 1;
+    else
+        val = 2;
+    end
+end;
 
 
