@@ -42,19 +42,19 @@
 %                 affect the result. With the 'corr' method, make sure you
 %                 have a large window size because each window is filtered
 %                 independently.
-%   'filterphase' = @f_handle. Function handle to filter the data for the 
+%   'filterphase' = @f_handle. Function handle to filter the data for the
 %                 phase information. For example, @(x)iirfilt(x, 1000, 2,
 %                 20). Note that 'freqphase' is ignore in this case.
-%   'filteramp' = @f_handle. Function handle to filter the data for the 
-%                 amplitude information. Note that 'freqamp' is ignore in 
+%   'filteramp' = @f_handle. Function handle to filter the data for the
+%                 amplitude information. Note that 'freqamp' is ignore in
 %                 this case.
 %
 % Inputs for statistics:
 %   'alpha'     = [float] p-value threshold. Default is none (no statistics).
 %   'mcorrect'  = ['none'|'fdr'] method to correct for multiple comparison.
 %                 Default is 'none'.
-%   'baseline'  = [min max] baseline period for the Null distribution. Default 
-%                 is the whole data range. Note that this option is ignored 
+%   'baseline'  = [min max] baseline period for the Null distribution. Default
+%                 is the whole data range. Note that this option is ignored
 %                 for instanstaneous statistics.
 %   'instantstat' = ['on'|'off'] performs statistics for each time window
 %                 independently. Default is 'off'.
@@ -73,7 +73,7 @@
 %  pac      = Phase-amplitude coupling values.
 %  timesout = vector of time indices
 %  pvals    = Associated p-values
-%   
+%
 % Author: Arnaud Delorme and Makoto Miyakoshi, SCCN/INC, UCSD 2012-
 %
 % References:
@@ -82,7 +82,7 @@
 % J Neuro Methods. 174:50-61
 %
 % Modulation Index is defined in:
-% Canolty, Edwards, Dalal, Soltani, Nagarajan, Kirsch, et al. (2006). Modulation index is defined in High Gamma Power Is Phase-Locked to Theta 
+% Canolty, Edwards, Dalal, Soltani, Nagarajan, Kirsch, et al. (2006). Modulation index is defined in High Gamma Power Is Phase-Locked to Theta
 % Oscillations in Human Neocortex. Science. 313:1626-8.
 %
 % PLV (Phase locking value) is defined in:
@@ -94,7 +94,7 @@
 % low-frequency signals among visual cortical areas in human subdural
 % recordings. Int J Psychophysiol. 51:97-116.
 %
-% glm (general linear model) is defined in 
+% glm (general linear model) is defined in
 % Penny, Duzel, Miller, Ojemann. (20089). Testing for Nested Oscilations.
 % J Neuro Methods. 174:50-61
 
@@ -134,10 +134,18 @@ end
 
 % deal with 3-D inputs
 % --------------------
-if ndims(X) == 3 || ndims(Y) == 3, error('Cannot process 3-D input'); end
-if size(X,1) > 1, X = X'; end
-if size(Y,1) > 1, Y = Y'; end
-if size(X,1) ~= 1 || size(Y,1) ~= 1, error('Cannot only process vector input'); end
+if ndims(X) == 3 || ndims(Y) == 3
+    error('Cannot process 3-D input');
+end
+if size(X,1) > 1
+    X = X';
+end
+if size(Y,1) > 1
+    Y = Y';
+end
+if size(X,1) ~= 1 || size(Y,1) ~= 1
+    error('Cannot only process vector input');
+end
 frame = size(X,2);
 pvals = [];
 
@@ -164,15 +172,19 @@ g = finputcheck(varargin, ...
     'vert'          'real'     []                    [];
     'winsize'       'integer'  [0 Inf]                   max(pow2(nextpow2(frame)-3),4) }, 'pac');
 
-if ischar(g), error(g); end
+if ischar(g)
+    error(g);
+end
 
 if ~isempty(g.filterphase)
-     x_freqphase = feval(g.filterphase, X(:)');
-else x_freqphase = feval(g.filterfunc, X(:)', srate, g.freqphase(1), g.freqphase(end));
+    x_freqphase = feval(g.filterphase, X(:)');
+else
+    x_freqphase = feval(g.filterfunc, X(:)', srate, g.freqphase(1), g.freqphase(end));
 end
 if ~isempty(g.filteramp)
-     x_freqamp   = feval(g.filteramp, Y(:)');
-else x_freqamp   = feval(g.filterfunc, Y(:)', srate, g.freqamp(  1), g.freqamp( end));
+    x_freqamp   = feval(g.filteramp, Y(:)');
+else
+    x_freqamp   = feval(g.filterfunc, Y(:)', srate, g.freqamp(  1), g.freqamp( end));
 end
 z_phasedata = hilbert(x_freqphase);
 z_ampdata   = hilbert(x_freqamp);
@@ -214,13 +226,14 @@ for iWin = 1:length(indexout)
     elseif strcmpi(g.method, 'plv')
         
         if iWin == 145
-            %dsfsd; 
+            %dsfsd;
         end
         
         %amplitude_filt = sgolayfilt(amplitude, 3, 101);
         if ~isempty(g.filterphase)
-             amplitude_filt = feval(g.filterphase, z_ampEpoch);
-        else amplitude_filt = feval(g.filterfunc , z_ampEpoch, srate, g.freqphase(1), g.freqphase(end));
+            amplitude_filt = feval(g.filterphase, z_ampEpoch);
+        else
+            amplitude_filt = feval(g.filterfunc , z_ampEpoch, srate, g.freqphase(1), g.freqphase(end));
         end
         z_amplitude_filt = hilbert(amplitude_filt);
         
@@ -274,7 +287,7 @@ for iWin = 1:length(indexout)
         if strcmpi(g.statlim, 'surrogate')
             pvals(iWin) = stat_surrogate_pvals(surrogate_m, m_raw(iWin), 'upper');
             %fprintf('Raw PAC is %3.2f (p-value=%1.3f)\n', m_raw(iWin), pvals(iWin));
-        
+            
         else
             % Canolty method below
             
@@ -334,7 +347,8 @@ if strcmpi(g.newfig, 'on')
 end
 if ~isempty(g.alpha)
     plotcurve(timesout1, m_raw, 'maskarray', pvals < g.alpha);
-else plotcurve(timesout1, m_raw);
+else
+    plotcurve(timesout1, m_raw);
 end
 xlabel('Time (ms)');
 ylabel('PAC (0 to 1)');
@@ -372,8 +386,9 @@ if isempty(timevar) % no pre-defined time points
         npoints = ntimevar(1);
         wintime = 500*winsize/srate;
         if strcmpi(causal, 'on')
-             timevals = linspace(tlimits(1)+2*wintime, tlimits(2), npoints);
-        else timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
+            timevals = linspace(tlimits(1)+2*wintime, tlimits(2), npoints);
+        else
+            timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
         end
         verboseprintf(verbose, 'Generating %d time points (%1.1f to %1.1f ms)\n', npoints, min(timevals), max(timevals));
     else
@@ -382,7 +397,8 @@ if isempty(timevar) % no pre-defined time points
         nsub     = -ntimevar(1);
         if strcmpi(causal, 'on')
             timeindices = [ceil(winsize+nsub):nsub:length(timevect)];
-        else timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
+        else
+            timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
         end
         timevals    = timevect( timeindices ); % the conversion at line 741 leaves timeindices unchanged
         verboseprintf(verbose, 'Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
@@ -393,8 +409,9 @@ else
     % ----------------
     wintime = 500*winsize/srate;
     if strcmpi(causal, 'on')
-         tmpind  = find( (timevals >= tlimits(1)+2*wintime-0.0001) & (timevals <= tlimits(2)) );
-    else tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) );
+        tmpind  = find( (timevals >= tlimits(1)+2*wintime-0.0001) & (timevals <= tlimits(2)) );
+    else
+        tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) );
     end
     % 0.0001 account for numerical innacuracies on opteron computers
     if isempty(tmpind)
