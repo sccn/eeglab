@@ -1278,7 +1278,8 @@ else
         end
     end
     if strcmpi(g.plotdata2, 'off')
-        axes(ax1)
+        cur_fig = gcf;
+        cur_fig.CurrentAxes = ax1;
         cla
     end
     
@@ -1288,7 +1289,8 @@ else
     end
     % plot data
     % ---------
-    axes(ax1)
+    cur_fig = gcf;
+    cur_fig.CurrentAxes = ax1;
     hold on
     
      % plot channels whose "badchan" field is set to 1.
@@ -1389,7 +1391,9 @@ else
     g = get(gcf,'UserData');  % Data (Note: this could also be global)
 
     % Plot data and update axes
-    axes(ax0);
+    %axes(ax0);
+    cur_fig = gcf;               
+    cur_fig.CurrentAxes = ax0;
 	cla;
 	hold on;
 	% plot rejected windows
@@ -1601,7 +1605,7 @@ else
 		'Xlim',[0 g.winlength*multiplier],...
 		'XTick',[], 'YTick',[], 'tag','backeeg');
 
-		axes(ax1);
+        cur_fig.CurrentAxes = ax1;   
         if g.isfreq
             set(ax1, 'XTickLabel', num2str((g.freqs(1):DEFAULT_GRID_SPACING:g.freqs(end))'),...
                      'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
@@ -1617,7 +1621,7 @@ else
     % ordinates: even if all elec are plotted, some may be hidden
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
     
-    axes(ax1)	
+    cur_fig.CurrentAxes = ax1;   
 
   case 'draws'
     % Redraw EEG and change scale
@@ -1788,7 +1792,11 @@ else
 	ESpacing = findobj('tag','ESpacing','parent',figh);
 	g.spacing= str2num(get(ESpacing,'string'));
 	
-	axes(eyeaxes); cla; axis off;
+    cur_fig = gcf;           
+    cur_fig.CurrentAxes = eyeaxes;
+    cla;
+    axis off;
+    
     set(eyeaxes, 'ylim', YLim);
     
 	Xl = double([.35 .65; .5 .5; .35 .65]);
