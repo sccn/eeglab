@@ -25,6 +25,8 @@
 %                   'savetrials', 'on' option.
 %  'mode'         - ['eeglab'|'fieldtrip'] use either EEGLAB or Fieldtrip
 %                   statistics.
+%  'effect'       - ['main'|'marginal'] compute main effect or marginal
+%                   effects.
 %
 % EEGLAB statistics:
 %  'method'      - ['param'|'perm'|'bootstrap'] statistical 
