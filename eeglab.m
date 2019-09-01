@@ -900,11 +900,10 @@ else
     pluginstats = [];
 	if option_checkversion && ismatlab
         disp('Retrieving plugin versions from server...');
-        [stats, statusconnection] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_withversion.php');
-        if statusconnection == 1
-            stats = textscan(stats, '%s%d%s%s');
-            pluginstats.name    = stats{1};
-            pluginstats.version = stats{3};
+        pluginTmp = plugin_getweb('', pluginlist, 'newlist');
+        if ~isempty(pluginTmp) && isfield(pluginTmp, 'name') && isfield(pluginTmp, 'version')
+            pluginstats.name    = { pluginTmp.name };
+            pluginstats.version = { pluginTmp.version };
         end
     end
     
@@ -951,7 +950,7 @@ else
         else 
             if ~isempty(findstr(dircontent{index}, 'eegplugin')) && dircontent{index}(end) == 'm'
                 funcname = dircontent{index}(1:end-2); % remove .m
-                [ pluginName pluginVersion ] = parsepluginname(dircontent{index}(10:end-2));
+                [ pluginName, pluginVersion ] = parsepluginname(dircontent{index}(10:end-2));
             end
         end
 
@@ -970,12 +969,12 @@ else
                 pluginlist(plugincount).version    = pluginVersion;
                 vers2  = '';
                 status = 'ok';
-                try,
+                try
                     %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
                     vers2 = feval(funcname, gcf, trystrs, catchstrs);
                     [~, vers2] = parsepluginname(vers2);
                 catch
-                    try,
+                    try
                         eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
                     catch
                         disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
