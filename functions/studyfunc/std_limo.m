@@ -97,7 +97,7 @@ if ischar(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1
     opt.method   = 'OSL';
 else
     opt = finputcheck( varargin, ...
-        { 'measure'        'string'  { 'daterp' 'datspec' 'icaerp' 'icaspec'} 'daterp'; ...
+        { 'measure'        'string'  { 'daterp' 'datspec' 'icaerp' 'icaspec' 'datersp' } 'daterp'; ...
           'method'         'string'  { 'OLS' 'WLS' } 'OLS';
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
@@ -110,6 +110,10 @@ else
           'neighbormat'    'real'    []               [] },...
           'std_limo');
     if ischar(opt), error(opt); end
+end
+opt.measureori = opt.measure;
+if strcmpi(opt.measure, 'datersp')
+    opt.measure = 'dattimef';
 end
 
 Analysis     = opt.measure;
@@ -137,6 +141,7 @@ end
 
 % Detecting type of analysis
 % -------------------------------------------------------------------------
+model.defaults.datatype = opt.measureori(4:end);
 if strfind(Analysis,'dat')
     model.defaults.type = 'Channels';
 elseif strfind(Analysis,'ica')    
@@ -267,7 +272,7 @@ measureflags = struct('daterp','off',...
                      'icaersp','off',...
                      'icaitc','off');
                  
-measureflags.(lower(Analysis))= 'on';
+measureflags.(lower(opt.measureori))= 'on';
 STUDY.etc.measureflags = measureflags;
 
 % generate temporary merged datasets needed by LIMO
@@ -341,30 +346,34 @@ for s = 1:nb_subjects
     OUTEEG.etc.datafiles.icaitc   = [];
     
     % Filling fields
-    if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
-        OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
+    if isfield(ALLEEG(index(1)).etc, 'datafiles')
+        if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
+            OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
+        end
+        if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
+            OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
+        end
+        if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
+            OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
+        end
+        if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
+            OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
+        end
+        if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
+            OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
+        end
+        if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
+            OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
+        end
+        if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
+            OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
+        end
+        if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
+            OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
+        end
     end
-    if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
-        OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
-    end
-    if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
-        OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
-    end
-    if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
-        OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
-    end
-    if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
-        OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
-    end
-    if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
-        OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
-    end
-    if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
-        OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
-    end
-    if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
-        OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
-    end
+    
+%     OUTEEG.etc.freqsersp = 
     
     % Save info
     EEG = OUTEEG;
@@ -393,16 +402,16 @@ for s = 1:nb_subjects
 end
 
 % then we add contrasts for conditions that were merged during design selection
-if length(STUDY.design(opt.design).variable.value) ~= length(factors)
-    limocontrast = zeros(length(STUDY.design(opt.design).variable.value),length(factors)+1); % length(factors)+1 to add the contant
-    for n=1:length(factors)
-        factor_names{n} = factors(n).value;
-    end
-    
-    for c=1:length(STUDY.design(opt.design).variable.value)
-        limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
-    end
-end
+% if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
+%     limocontrast = zeros(length(STUDY.design(opt.design).variable.value),length(factors)+1); % length(factors)+1 to add the contant
+%     for n=1:length(factors)
+%         factor_names{n} = factors(n).value;
+%     end
+%     
+%     for c=1:length(STUDY.design(opt.design).variable.value)
+%         limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
+%     end
+% end
 
 % transpose
 model.set_files  = model.set_files';
@@ -448,12 +457,21 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
         error('std_limo: Frequency limits need to be specified');
     end
         
-elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
+elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
     model.defaults.start    = [];
     model.defaults.end      = [];
     model.defaults.lowf     = [];
     model.defaults.highf    = [];
+    
+    if length(opt.timelim) == 2
+        model.defaults.start    = opt.timelim(1);
+        model.defaults.end      = opt.timelim(2);
+    end
+    if length(opt.freqlim) == 2
+        model.defaults.lowf     = opt.freqlim(1);
+        model.defaults.highf    = opt.freqlim(2);
+    end
 end
 
 model.defaults.fullfactorial    = 0;                 % all variables 
