@@ -207,7 +207,11 @@ end
 %if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end %deprecated
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
-stats.paired = { STUDY.design(opt.design).variable(:).pairing };
+if isempty(STUDY.design(opt.design).variable)
+    stats.paired = { };
+else
+    stats.paired = { STUDY.design(opt.design).variable(:).pairing };
+end
 if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt.comps)))
     if strcmpi(stats.condstats, 'on') || strcmpi(stats.groupstats, 'on')
         stats.groupstats = 'off';
