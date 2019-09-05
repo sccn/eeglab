@@ -95,7 +95,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
         % current event
         % -------------
         objevent  = findobj('parent', gcf, 'tag', 'numval');
-        valnum    = str2num(get(objevent, 'string'));
+        valnum    = str2double(get(objevent, 'string'));
         shift     = 0;
     
     else % command line    
@@ -197,7 +197,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
       % update original
       % --------------- 
       tmpobj = findobj('parent', gcf, 'tag', 'original');
-      if isfield(EEG.event, 'urevent') && EEG.event(valnum).urevent ~= valnum
+      if isfield(EEG.event, 'urevent') && ~isempty(EEG.event(valnum).urevent) && EEG.event(valnum).urevent ~= valnum
            set(tmpobj, 'string', [ 'originally ' int2str(EEG.event(valnum).urevent)], ...
                        'horizontalalignment', 'center');
       else set(tmpobj, 'string', ' '); 
@@ -311,7 +311,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
           field    = tmparg;
           objfield = findobj('parent', gcf, 'tag', field);
           editval     = get(objfield, 'string');
-          if ~isempty(editval) && ~isempty(str2num(editval)), editval = str2num(editval); end
+          if ~isempty(editval) && ~isnan(str2double(editval)), editval = str2double(editval); end
           
           % update history
           % --------------
@@ -653,7 +653,7 @@ function eventtmp = checkconsistency(eventtmp, valnum, field)
     otherval = mod(valnum+1, length(eventtmp))+1;
     
     if ischar(getfield(eventtmp(valnum), field)) && ~ischar(getfield(eventtmp(otherval), field))
-        eventtmp(valnum) = setfield(eventtmp(valnum), field, str2num(getfield(eventtmp(valnum), field)));
+        eventtmp(valnum) = setfield(eventtmp(valnum), field, str2double(getfield(eventtmp(valnum), field)));
     end
     if ~ischar(getfield(eventtmp(valnum), field)) && ischar(getfield(eventtmp(otherval), field))
         eventtmp(valnum) = setfield(eventtmp(valnum), field, num2str(getfield(eventtmp(valnum), field)));

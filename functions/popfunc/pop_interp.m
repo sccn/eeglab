@@ -55,6 +55,9 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         help pop_interp;
         return;
     end
+    if nargin > 1 && nargin < 3
+        method = 'spherical';
+    end
     
     if nargin < 2
         disp('Warning: interpolation can be done on the fly in studies'); 

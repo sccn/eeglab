@@ -340,6 +340,7 @@ function [newdata, design1, design2, design3] = makefieldtripdata(data, chandim,
     for i = 1:length(data(:))
     
         newdata{i}.dimord    = 'rpt_chan_freq_time';
+        newdata{i}.powspctrmdimord = 'rpt_chan_freq_time';
         switch myndims(data{1})
           case 1, 
             newdata{i}.powspctrm = data{i};
@@ -382,6 +383,7 @@ function [newdata, design1, design2, design3] = makefieldtripdata(data, chandim,
         end
         if isempty(chanlocs) && size(newdata{i}.powspctrm,2) ~= 1
             newdata{i}.dimord    = 'rpt_freq_time';
+            newdata{i}.powspctrmdimord = 'rpt_freq_time';
         end
     end
     

@@ -97,7 +97,11 @@ end;
 com = '';
 indices = [];
 
-if isempty(EEG.event)
+if length(EEG) > 1 && isempty(EEG(1).event)
+    error('Cannot process empty event structure for the first dataset');
+end
+
+if isempty(EEG(1).event)
     if EEG.trials > 1 && EEG.xmin <= 0 && EEG.xmax >=0
         disp('No EEG.event structure found: creating events of type ''TLE'' (Time-Locking Event) at time 0');
         EEG.event(EEG.trials).epoch = EEG.trials; 
@@ -111,11 +115,10 @@ if isempty(EEG.event)
         return;
     end
 end
-if ~isfield(EEG.event, 'latency'),
-    disp( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
-     beep; return;
+if ~isfield(EEG(1).event, 'latency'),
+    error( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
 end
-if size(EEG.data,3) > 1
+if size(EEG(1).data,3) > 1
     epochlim = [num2str( round(EEG.xmin)) '  '  num2str(round(EEG.xmax))]; % Units in seconds as in GUI
 %   epochlim = [num2str( round(EEG.xmin*1000)) '  '  num2str(round(EEG.xmax*1000))]; % Units in miliseconds
 else
@@ -132,11 +135,11 @@ if nargin < 3
                     'Name for the new dataset:', ... 
 					'Out-of-bounds EEG rejection limits ([min max], []=none):'  };
 
-   cbevent = ['if ~isfield(EEG.event, ''type'')' ...
+   cbevent = ['if ~isfield(EEG(1).event, ''type'')' ...
 				   '   errordlg2(''No type field'');' ...
 				   'else' ...
-                   '   tmpevent = EEG.event;' ...
-                   '   if isnumeric(EEG.event(1).type),' ...
+                   '   tmpevent = EEG(1).event;' ...
+                   '   if isnumeric(EEG(1).event(1).type),' ...
 				   '        [tmps,tmpstr] = pop_chansel(unique([ tmpevent.type ]));' ...
 				   '   else,' ...
                    '        [tmps,tmpstr] = pop_chansel(unique({ tmpevent.type }));' ...
@@ -155,7 +158,7 @@ if nargin < 3
               { 'style' 'edit'       'string' epochlim } ...
               { } ...
               { 'style' 'text'       'string' 'Name for the new dataset' } ...
-              { 'style' 'edit'       'string'  fastif(isempty(EEG.setname), '', [ EEG.setname ' epochs' ]) } ...
+              { 'style' 'edit'       'string'  fastif(length(EEG) > 1 || isempty(EEG(1).setname), '', [ EEG(1).setname ' epochs' ]) 'enable' fastif(length(EEG) == 1, 'on', 'off') } ...
               { 'style' 'text'       'string' 'Out-of-bounds EEG limits if any [min max]' } ...
               { 'style' 'edit'       'string' '' } { } };
               
@@ -181,6 +184,17 @@ if nargin < 3
  
 else % no interactive inputs
     args = varargin;
+end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_epoch', EEG, 'warning', 'on', 'params', { events lim args{:} } );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_epoch', EEG, 'params', { events lim args{:} } );
+    end
+    return;
 end
 
 % create structure

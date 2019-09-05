@@ -104,13 +104,13 @@ tmpDataType = opt.datatype;
 if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc')
     tmpDataType = 'timef'; 
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end
-    if isempty(opt.freqrange), opt.timerange = STUDY.etc.erspparams.freqrange; end
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.erspparams.freqrange; end
 elseif strcmpi(opt.datatype, 'erpim')
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erpimparams.timerange;  end
 elseif strcmpi(opt.datatype, 'erp')    
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange;  end
 elseif strcmpi(opt.datatype, 'spec')    
-    if isempty(opt.freqrange), opt.timerange = STUDY.etc.specparams.freqrange; end
+    if isempty(opt.freqrange), opt.freqrange = STUDY.etc.specparams.freqrange; end
 end
 if ~isempty(opt.channels), fileExt = [ '.dat' tmpDataType ];
 else                       fileExt = [ '.ica' tmpDataType ];
@@ -236,7 +236,7 @@ for iSubj = 1:length(subjectList)
                 if all(isnan(eventsTmp{iSubj}{iCond})), eventsTmp{iSubj}{iCond} = []; end
                 [dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}] = processerpim(dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}, xvals, params);
             end
-            yvals = 1:size(dataTmp{iSubj}{1},2);
+            yvals = 1:size(dataTmp{iSubj}{1},1);
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
         end
@@ -415,6 +415,7 @@ function [dataout,erspbase] = processtf(dataSubject, xvals, datatype, singletria
 % -------------
 function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
 
+    if isempty(dataSubject), dataout = []; eventout = []; return; end
     if ~isfield(g, 'nlines'), finallines = 10; else finallines = g.nlines; end
     if ~isfield(g, 'smoothing'), smoothing = 10; else smoothing = g.smoothing; end
     
@@ -451,7 +452,10 @@ function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
     if ~isempty(params) && ischar(params{1}) && strcmpi(params{1}, 'components')
         params(1:2) = [];
     end
-    [dataout, eventout] = erpimage(dataSubject, events, xvals, '', smoothing, nlines, 'noplot', 'on', params{:});
+    for iChan = 1:size(dataSubject,3)
+        [dataout(:,:,iChan), eventout] = erpimage(dataSubject(:,:,iChan), events, xvals, '', smoothing, nlines, 'noplot', 'on', params{:});
+    end
+    dataout = permute(dataout, [2 1 3]); % for tftopo
     if ~isempty(events)
         eventout = eventout'; % needs to be a column vector
     else

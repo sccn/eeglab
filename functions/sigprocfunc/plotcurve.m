@@ -96,12 +96,16 @@ function plotcurve( times, R, varargin);
    if strcmpi(g.plotindiv, 'off'), g.plotmean = 'on'; end
    
    if ~any(length(times) == size(R))
-       try,
+       try
            R = reshape(R, length(times), length(R)/length(times))';
        catch, error('Size of time input and array input does not match');
        end
+   else
+       if size(R,3) > 1 && size(R,1) == 1
+           R = permute(R, [3 2 1]);
+       end
    end
-
+   
    % regions of significance
    % -----------------------
    if ~isempty(g.maskarray)

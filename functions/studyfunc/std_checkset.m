@@ -61,6 +61,7 @@ if ~isfield(STUDY, 'history'),   STUDY.history   = ''; modif = 1; end
 if ~isfield(STUDY, 'subject'),   STUDY.subject   = {}; modif = 1; end
 if ~isfield(STUDY, 'group'),     STUDY.group     = {}; modif = 1; end
 if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end
+if ~isfield(STUDY, 'run'),       STUDY.run       = {}; modif = 1; end
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end
 if ~isfield(STUDY, 'cache'),     STUDY.cache     = []; modif = 1; end
@@ -74,6 +75,7 @@ if ~isfield(STUDY.preclust, 'erspclustfreqs' ), STUDY.preclust.erspclustfreqs = 
 if ~isfield(STUDY.preclust, 'erspclusttimes' ), STUDY.preclust.erspclusttimes = []; modif = 1; end
 if ~isfield(STUDY.datasetinfo, 'comps') && ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).comps = []; modif = 1; end
 if ~isfield(STUDY.datasetinfo, 'index') && ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).index = []; modif = 1; end
+if ~isfield(STUDY.datasetinfo, 'run') && ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).run = []; modif = 1; end
 
 % all summary fields
 % ------------------
@@ -97,10 +99,16 @@ catch,
     session = '';
     % disp('Important warning: some datasets do not have session numbers; some functions may crash!');
 end
+try, run = unique_bc([STUDY.datasetinfo.run]);
+catch,
+    run = '';
+    % disp('Important warning: some datasets do not have session numbers; some functions may crash!');
+end
 if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modif = 1; end
 if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1; end
 if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modif = 1; end
 if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1; end
+if ~isequal(STUDY.run,       run      ), STUDY.run       = run;       modif = 1; end
 
 % check dataset info consistency
 % ------------------------------
@@ -212,6 +220,9 @@ if ~studywasempty
             STUDY  = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
             % some other have it, remake it for everybody
         end
+    elseif ALLEEG(1).trials > 1
+        disp('Rebuilding trial information structure for STUDY');
+        STUDY  = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
     end
     if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'name')
         STUDY  = std_maketrialinfo(STUDY, ALLEEG);

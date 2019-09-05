@@ -108,9 +108,9 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function tfave = tftopo(tfdata,times,freqs,varargin);
+function tfave = tftopo(tfdata,times,freqs,varargin)
     %timefreqs,showchan,chanlocs,limits,signifs,selchans)
-
+    
 LINECOLOR= 'k';
 LINEWIDTH = 2;
 ZEROLINEWIDTH = 2.8;
@@ -176,7 +176,7 @@ fieldlist = { 'chanlocs'      { 'string','struct' }       []       '' ;
               'denseLogTicks' 'string'   {'on','off'}               'off'              
               };
 
-[g varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');
+[g, varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');
 if ischar(g), error(g); end
 
 % setting more defaults
@@ -225,18 +225,18 @@ if g.sigthresh(2) > size(tfdata,4)
     error('tftopo(): ''sigthresh'' second number must be less than or equal to the number of subjects');
 end
 if ~isempty(g.signifs)
-    if size(g.signifs,1) > 2 || size(g.signifs,2) ~= size(tfdata,1)| ...
-            (size(g.signifs,3) ~= size(tfdata,3) & size(g.signifs,4) ~= size(tfdata,3))
+    if size(g.signifs,1) > 2 || size(g.signifs,2) ~= size(tfdata,1)|| ...
+            (size(g.signifs,3) ~= size(tfdata,3) && size(g.signifs,4) ~= size(tfdata,3))
         fprintf('tftopo(): error in ''signifs'' array size not compatible with data size, trying to transpose.\n');
         g.signifs = permute(g.signifs, [2 1 3 4]);
-        if size(g.signifs,1) > 2 || size(g.signifs,2) ~= size(tfdata,1)| ...
-            (size(g.signifs,3) ~= size(tfdata,3) & size(g.signifs,4) ~= size(tfdata,3))
+        if size(g.signifs,1) > 2 || size(g.signifs,2) ~= size(tfdata,1)|| ...
+            (size(g.signifs,3) ~= size(tfdata,3) && size(g.signifs,4) ~= size(tfdata,3))
             fprintf('tftopo(): ''signifs'' still the wrong size.\n');
             return
         end
     end
 end
-if length(g.selchans) ~= nchans, 
+if length(g.selchans) ~= nchans
      selchans_opt = { 'plotchans' g.selchans };
 else selchans_opt = { };
 end
@@ -284,13 +284,13 @@ if ~isempty(g.timefreqs)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     tfpoints = size(g.timefreqs,1);
     for f=1:tfpoints
-        [tmp fi1] = min(abs(freqs-g.timefreqs(f,3)));
-        [tmp fi2] = min(abs(freqs-g.timefreqs(f,4)));
+        [~, fi1] = min(abs(freqs-g.timefreqs(f,3)));
+        [~, fi2] = min(abs(freqs-g.timefreqs(f,4)));
         freqidx{f}=[fi1:fi2];
     end
     for f=1:tfpoints
-        [tmp fi1] = min(abs(times-g.timefreqs(f,1)));
-        [tmp fi2] = min(abs(times-g.timefreqs(f,2)));
+        [~, fi1] = min(abs(times-g.timefreqs(f,1)));
+        [~, fi2] = min(abs(times-g.timefreqs(f,2)));
         timeidx{f}=[fi1:fi2];
     end
 else 
@@ -300,8 +300,8 @@ end
 % only plot one scalp map
 % -----------------------
 if ~isempty(g.plotscalponly)
-    [tmp fi] = min(abs(freqs-g.plotscalponly(2)));
-    [tmp ti] = min(abs(times-g.plotscalponly(1)));
+    [~, fi] = min(abs(freqs-g.plotscalponly(2)));
+    [~, ti] = min(abs(times-g.plotscalponly(1)));
     scalpmap = squeeze(tfdataori(fi, ti, :));   
 
     if ~isempty(varargin)
@@ -312,7 +312,7 @@ if ~isempty(g.plotscalponly)
     % 'interlimits','electrodes')
     axis square;
     hold on
-    tl=title([int2str(g.plotscalponly(2)),' ms, ',int2str(g.plotscalponly(1)),' Hz']);
+    tl=title([int2str(g.plotscalponly(2)),' ms, ',int2str(g.plotscalponly(1)),' Hz'],'interpreter','none');
     set(tl,'fontsize',AXES_FONTSIZE+3); % 13
     return;
 end
@@ -343,7 +343,7 @@ if ~isempty(g.signifs)
                 else
                     tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
                 end
-            end;                
+            end        
             tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
         end
     end
@@ -353,11 +353,11 @@ end
 % magnify inputs
 %%%%%%%%%%%%%%%%
 if g.smooth ~= 1
-    if strcmpi(g.verbose, 'on'), 
+    if strcmpi(g.verbose, 'on')
         fprintf('Smoothing...\n');
     end    
     for index = 1:round(log2(g.smooth))
-        [tfdata times freqs] = magnifytwice(tfdata, times, freqs);
+        [tfdata, times, freqs] = magnifytwice(tfdata, times, freqs);
     end
 end
 
@@ -368,7 +368,7 @@ if ~isempty(g.shiftimgs)
     timestep = times(2) - times(1);
     for S = 1:size(tfdata,4)
         nbsteps = round(g.shiftimgs(S)/timestep);
-        if strcmpi(g.verbose, 'on'), 
+        if strcmpi(g.verbose, 'on')
             fprintf('Shifing images of subect %d by %3.3f ms or %d time steps\n', S, g.shiftimgs(S), nbsteps);
         end        
         if nbsteps < 0,  tfdata(:,-nbsteps+1:end,:,S) = tfdata(:,1:end+nbsteps,:,S);
@@ -380,14 +380,14 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Adjust plotting limits
 %%%%%%%%%%%%%%%%%%%%%%%%%
-[tmp minfreqidx] = min(abs(g.limits(3)-freqs)); % adjust min frequency
+[~, minfreqidx] = min(abs(g.limits(3)-freqs)); % adjust min frequency
  g.limits(3) = freqs(minfreqidx);
-[tmp maxfreqidx] = min(abs(g.limits(4)-freqs)); % adjust max frequency
+[~, maxfreqidx] = min(abs(g.limits(4)-freqs)); % adjust max frequency
  g.limits(4) = freqs(maxfreqidx);
 
-[tmp mintimeidx] = min(abs(g.limits(1)-times)); % adjust min time
+[~, mintimeidx] = min(abs(g.limits(1)-times)); % adjust min time
  g.limits(1) = times(mintimeidx);
-[tmp maxtimeidx] = min(abs(g.limits(2)-times)); % adjust max time
+[~, maxtimeidx] = min(abs(g.limits(2)-times)); % adjust max time
  g.limits(2) = times(maxtimeidx);
 
 mmidx = [mintimeidx maxtimeidx minfreqidx maxfreqidx];
@@ -438,15 +438,23 @@ else % g.showchan==0 -> image std() of selchans
     tfdat   = tfdata(tffreqs,tftimes,g.selchans,:);
 
     % average across electrodes
-    if strcmpi(g.verbose, 'on'), 
-        fprintf('Applying RMS across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(1));
+    if strcmpi(g.verbose, 'on')
+        if strcmpi( g.mode, 'rms')
+            fprintf('Applying RMS across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(1));
+        else
+            fprintf('Computing average across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(1));
+        end
     end    
     tfdat = avedata(tfdat, 3, g.sigthresh(1), g.mode);
 
     % if several subject, first (RMS) averaging across subjects
     if size(tfdata,4) > 1
-        if strcmpi(g.verbose, 'on'), 
-            fprintf('Applying RMS across subjects (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(2));
+        if strcmpi(g.verbose, 'on')
+            if strcmpi( g.mode, 'rms')
+                fprintf('Applying RMS across subjects (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(2));
+            else
+                fprintf('Computing average across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(2));
+            end
         end        
         tfdat = avedata(tfdat, 4, g.sigthresh(2), g.mode);
     end
@@ -459,10 +467,10 @@ else % g.showchan==0 -> image std() of selchans
 end
 
 if ~isreal(tfave(1)), tfave = abs(tfave); end
-if strcmpi(g.logfreq, 'on'), 
+if strcmpi(g.logfreq, 'on')
     logimagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1) g.limits(2) log(g.limits(3)), log(g.limits(4))]);
-elseif strcmpi(g.logfreq, 'native'), 
+elseif strcmpi(g.logfreq, 'native')
     imagesc(times(tftimes),log(freqs(tffreqs)),tfave);
     axis([g.limits(1:2) log(g.limits(3:4))]);
     
@@ -513,7 +521,7 @@ else
             tl=title(['Signed channel average']);
         end
     else
-        tl = title(g.title);
+        tl = title(g.title,'interpreter','none');
     end
   set(tl,'fontsize',AXES_FONTSIZE + 2); %12
   set(tl,'fontweigh','normal');
@@ -524,6 +532,7 @@ set(yl,'fontsize',AXES_FONTSIZE + 2);  %12
 
 set(gca,'fontsize',AXES_FONTSIZE + 2); %12
 set(gca,'ydir','normal');
+set(gca, 'userdata', { 'Time (ms)' g.ylabel });
 
 for indtime = g.vert
     tmpy = ylim;
@@ -592,10 +601,10 @@ if ~isempty(g.timefreqs)
         axis square;
         hold on
         if g.timefreqs(n,1) == g.timefreqs(n,2)
-            tl=title([int2str(g.timefreqs(n,1)),' ms, ',int2str(g.timefreqs(n,3)),' Hz']);
+            tl=title([int2str(g.timefreqs(n,1)),' ms, ',int2str(g.timefreqs(n,3)),' Hz'],'interpreter','none');
         else
             tl=title([int2str(g.timefreqs(n,1)) '-' int2str(g.timefreqs(n,2)) 'ms, ' ...
-                int2str(g.timefreqs(n,3)) '-' int2str(g.timefreqs(n,4)) ' Hz']);
+                int2str(g.timefreqs(n,3)) '-' int2str(g.timefreqs(n,4)) ' Hz'],'interpreter','none');
         end
         set(tl,'fontsize',AXES_FONTSIZE + 3); %13
         endcaxis = max(endcaxis,max(abs(caxis)));
@@ -622,21 +631,21 @@ if g.showchan>0 && ~isempty(g.chanlocs)
      axis('square');
 end
 if strcmpi(g.axcopy, 'on')
-    if strcmpi(g.logfreq, 'native'), 
-        com = [ 'lb = get(gca,''''yticklabel'''');' ... 
-                'if iscell(lb) lb = strvcat(lb); end;' ...
-                'ft = str2num(lb);' ...
-                'ft = exp(1).^ft;' ...
-                'ft = unique_bc(round(ft));' ...
-                'ftick = get(gca,''''ytick'''');' ...
-                'ftick = exp(1).^ftick;' ...
-                'ftick = unique_bc(round(ftick));' ...
-                'ftick = log(ftick);' ...
-                'set(gca,''''ytick'''',ftick);' ...
-                'set(gca,''''yticklabel'''', num2str(ft));' ];
+    com = 'set(gcf, ''''units'''', ''''pixels''''); tmppos = get(gcf, ''''position''''); set(gcf, ''''position'''', [tmppos(1) tmppos(2) 560 440]); clear tmppos; axis on;';
+    if strcmpi(g.logfreq, 'native')
+%         com = [ 'lb = get(gca,''''yticklabel'''');' ... 
+%                 'if iscell(lb) lb = strvcat(lb); end;' ...
+%                 'ft = str2num(lb);' ...
+%                 'ft = exp(1).^ft;' ...
+%                 'ft = unique_bc(round(ft));' ...
+%                 'ftick = get(gca,''''ytick'''');' ...
+%                 'ftick = exp(1).^ftick;' ...
+%                 'ftick = unique_bc(round(log(ftick)));' ...
+%                 'set(gca,''''ytick'''',ftick);' ...
+%                 'set(gca,''''yticklabel'''', num2str(ft)); axis on;' ];
         axcopy(gcf, com); % turn on axis copying on mouse click 
     else
-        axcopy; % turn on axis copying on mouse click 
+        axcopy(gca, com); % turn on axis copying on mouse click 
     end
 end
 

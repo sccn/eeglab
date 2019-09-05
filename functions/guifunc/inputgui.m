@@ -261,8 +261,8 @@ resultout    = {};
 resstructout = [];
 
 for index=1:length(allobj)
-    if isnumeric(allobj), currentobj = allobj(index);
-    else                  currentobj = allobj{index};
+    if iscell(allobj), currentobj = allobj{index};
+    else               currentobj = allobj(index);
     end
     if isnumeric(currentobj) || ~isprop(currentobj,'GetPropertySpecification') % To allow new object handles
         try

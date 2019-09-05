@@ -30,6 +30,9 @@
 %                  line equivalent is 'subject'.
 %   "Task Condition" - [Edit box] task condition. For example, 'Targets'. 
 %                    The command line equivalent 'condition'.
+%   "Run number"    - [Edit box] run number (from the same subject). 
+%                   Runs correspond to data acquired on the same day with
+%                   the same montage. They may be fused to run ICA.
 %   "Session number" - [Edit box] session number (from the same subject). 
 %                   All datasets from the same subject and session will be 
 %                   assumed to use the same ICA decomposition. The command 
@@ -77,6 +80,9 @@
 %                   {default: none -> all datasets from one condition}
 %   'group'      - [string] subject group. For example 'Patients' or 'Control'.
 %                   {default: none -> all subjects in one group}
+%   'run'        - [integer] run number (from the same subject). 
+%                   Runs correspond to data acquired on the same day with
+%                   the same montage. They may be fused to run ICA.
 %   'session'    - [integer] session number (from the same subject). All datasets
 %                   from the same subject and session will be assumed to use the
 %                   same ICA decomposition {default: none -> each dataset from
@@ -148,7 +154,7 @@
 % 03-31-02 changed interface, reprogrammed all function -ad
 % 04-02-02 recompute event latencies when modifying xmin -ad
 
-function [EEGOUT, com] = pop_editset(EEG, varargin);
+function [EEGOUT, com] = pop_editset(EEG, varargin)
    
 com = '';
 if nargin < 1
@@ -209,16 +215,16 @@ if nargin < 2                 % if several arguments, assign values
 		   },   { 'Style', 'edit', 'string', EEG.condition }, ...
          { 'Style', 'text', 'string', 'Start time (sec) (only for data epochs)', 'horizontalalignment', 'right', ...
 		   }, { 'Style', 'edit', 'string', num2str(EEGOUT.xmin) }, ...
-         { 'Style', 'text', 'string', 'Session number', 'horizontalalignment', 'right', ...
-		   },   { 'Style', 'edit', 'string', EEG.session }, ...
-         { 'Style', 'text', 'string', 'Number of channels (0->set from data)', 'horizontalalignment', 'right', ...
-		    },   { 'Style', 'edit', 'string', EEG.nbchan 'enable' 'off' }, ...
          { 'Style', 'text', 'string', 'Subject group', 'horizontalalignment', 'right', ...
 		   },   { 'Style', 'edit', 'string', EEG.group }, ...
+         { 'Style', 'text', 'string', 'Number of channels (0->set from data)', 'horizontalalignment', 'right', ...
+		    },   { 'Style', 'edit', 'string', EEG.nbchan 'enable' 'off' }, ...
+         { 'Style', 'text', 'string', 'Run number', 'horizontalalignment', 'right', ...
+           },   { 'Style', 'edit', 'string', EEG.run }, ...
          { 'Style', 'text', 'string', 'Ref. channel indices or mode (see help)', 'horizontalalignment', 'right', ...
 		   }, { 'Style', 'edit', 'string', curref 'enable' 'off' }, ...
-         { 'Style', 'text', 'string', 'About this dataset', 'horizontalalignment', 'right', ...
-		   },   { 'Style', 'pushbutton', 'string', 'Enter comments' 'callback' editcomments }, ...
+         { 'Style', 'text', 'string', 'Session number', 'horizontalalignment', 'right', ...
+		   },   { 'Style', 'edit', 'string', EEG.session }, ...
          { } ...
          { 'Style', 'text', 'string', 'Channel location file or info', 'horizontalalignment', 'right', 'fontweight', ...
 		   'bold' }, {'Style', 'pushbutton', 'string', 'From other dataset', 'callback', commandselchan }, ...
@@ -243,6 +249,8 @@ if nargin < 2                 % if several arguments, assign values
          { 'Style', 'pushbutton' 'string' 'from other dataset' 'callback' commandselica }, ...
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'icainds' } ...
          { } };
+%          { 'Style', 'text', 'string', 'About this dataset', 'horizontalalignment', 'right', ...
+% 		   },   { 'Style', 'pushbutton', 'string', 'Enter comments' 'callback' editcomments }, ...
 
     [ results newcomments ] = inputgui( geometry, uilist, 'pophelp(''pop_editset'');', 'Edit dataset information - pop_editset()', ...
                                          EEG.comments);
@@ -256,13 +264,15 @@ if nargin < 2                 % if several arguments, assign values
 	if ~strcmp( results{i+3}, num2str(EEG.pnts)     ) , args = { args{:}, 'pnts',      str2num(results{i+3}) }; end
 	if ~strcmp( results{i+4},         EEG.condition ) , args = { args{:}, 'condition',         results{i+4}  }; end
     if ~strcmp( results{i+5}, num2str(EEG.xmin)     ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end
-    if ~strcmp( results{i+6}, num2str(EEG.session)  ) , args = { args{:}, 'session',   str2num(results{i+6}) }; end
+    if ~strcmp( results{i+6},        EEG.group      ) , args = { args{:}, 'group',             results{i+6}  }; end
 	if ~strcmp( results{i+7}, num2str(EEG.nbchan)   ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end
-    if ~strcmp( results{i+8},        EEG.group      ) , args = { args{:}, 'group',             results{i+8}  }; end
+    if ~strcmp( results{i+8},        EEG.run        ) , args = { args{:}, 'run',       str2num(results{i+8}) }; end
     if ~strcmp( results{i+9}, num2str(EEG.ref)      ) , args = { args{:}, 'ref',               results{i+9}  }; end
-    if ~strcmp(EEG.comments, newcomments)             , args = { args{:}, 'comments' , newcomments }; end
+    if ~strcmp( results{i+10},num2str(EEG.session)  ) , args = { args{:}, 'session',   str2num(results{i+10})}; end
+
+    %if ~strcmp(EEG.comments, newcomments)             , args = { args{:}, 'comments' , newcomments }; end
     
-    if abs(str2num(results{i+5})) > 10,
+    if abs(str2num(results{i+5})) > 10
         fprintf('WARNING: are you sure the epoch start time (%3.2f) is in seconds\n', str2num(results{i+5}));
     end
     
@@ -305,9 +315,8 @@ for curfield = tmpfields'
         case 'subject'   , EEGOUT.subject   = getfield(g, {1}, curfield{1});
         case 'condition' , EEGOUT.condition = getfield(g, {1}, curfield{1});
         case 'group'     , EEGOUT.group     = getfield(g, {1}, curfield{1});
+        case 'run'       , EEGOUT.run       = getfield(g, {1}, curfield{1});
         case 'session'   , EEGOUT.session   = getfield(g, {1}, curfield{1});
-        case 'setname'   , EEGOUT.setname   = getfield(g, {1}, curfield{1});
-        case 'setname'   , EEGOUT.setname   = getfield(g, {1}, curfield{1});
         case 'pnts'      , EEGOUT.pnts      = getfield(g, {1}, curfield{1});
         case 'comments'  , EEGOUT.comments  = getfield(g, {1}, curfield{1});
         case 'nbchan'    , tmp              = getfield(g, {1}, curfield{1});

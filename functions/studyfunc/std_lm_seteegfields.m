@@ -128,15 +128,15 @@ if strcmpi(opt.datatype,'channels')
     end
     % DATERSP    
     if strcmp(opt.ersp,'on')
-        disp('reading single trials ersp, be patient ..')
-        data = load('-mat',[name '.dattimef']);
+        data = load('-mat',[name '.dattimef'],'times','freqs');
         EEG.etc.timeersp = data.times;
         EEG.etc.freqersp = data.freqs;
         if strcmp(opt.format,'matrix')
+            disp('reading single trials ersp, be patient ...')
+            data = load('-mat',[name '.dattimef']);
             data = limo_struct2mat(data);
             save([name '_datersp.mat'],'data'); clear data
             EEG.etc.datafiles.datersp = [name '_datersp.mat'];
-            delete([name '.dattimef']);
         else
             EEG.etc.datafiles.datersp = [name '.dattimef'];
         end

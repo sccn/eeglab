@@ -32,6 +32,9 @@
 %  "subject"             - [edit box] subject code associated with the dataset. If no 
 %                          subject code is provided, each dataset will assumed to be from 
 %                          a different subject {default: 'S1', 'S2', ..., 'Sn'}
+%  "run"                 - [edit box] dataset run. If no run information is
+%                          provided, all datasets that belong to one subject are assumed to
+%                          have been recorded within one run {default: []}
 %  "session"             - [edit box] dataset session. If no session information is
 %                          provided, all datasets that belong to one subject are assumed to
 %                          have been recorded within one session {default: []}
@@ -142,8 +145,9 @@ elseif strcmpi(mode, 'gui') % GUI mode
             if ~strcmpi(datasetinfo(k).filename, ALLEEG(k).filename), different = 1; break; end
             if ~strcmpi(datasetinfo(k).subject,   ALLEEG(k).subject),   different = 1; break; end
             if ~strcmpi(datasetinfo(k).condition, ALLEEG(k).condition), different = 1; break; end
-            if ~strcmpi(char(datasetinfo(k).group), char(ALLEEG(k).group)),     different = 1; break; end;              
-            if datasetinfo(k).session ~= ALLEEG(k).session,             different = 1; break; end
+            if ~strcmpi(char(datasetinfo(k).group), char(ALLEEG(k).group)),     different = 1; break; end       
+            if ~isequal(datasetinfo(k).session, ALLEEG(k).session),             different = 1; break; end
+            if ~isequal(datasetinfo(k).run, ALLEEG(k).run),                     different = 1; break; end
         end
         if different
             info = 'from_STUDY_different_from_ALLEEG';
@@ -160,6 +164,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
             datasetinfo(length(ALLEEG)).filepath  = [];
             datasetinfo(length(ALLEEG)).subject   = [];
             datasetinfo(length(ALLEEG)).session   = [];
+            datasetinfo(length(ALLEEG)).run       = [];
             datasetinfo(length(ALLEEG)).condition = [];
             datasetinfo(length(ALLEEG)).group     = [];     
             for k = 1:length(ALLEEG)
@@ -167,6 +172,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 datasetinfo(k).filepath  = ALLEEG(k).filepath;   
                 datasetinfo(k).subject   = ALLEEG(k).subject;
                 datasetinfo(k).session   = ALLEEG(k).session;
+                datasetinfo(k).run       = ALLEEG(k).run;
                 datasetinfo(k).condition = ALLEEG(k).condition;
                 datasetinfo(k).group     = ALLEEG(k).group;                    
             end
@@ -185,6 +191,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     loadsetedit = [ 'guiind = gcbo;' loadset ];
     subcom      = 'pop_study(''subject''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     sescom      = 'pop_study(''session''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+    runcom      = 'pop_study(''run''      , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     condcom     = 'pop_study(''condition'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     grpcom      = 'pop_study(''group''    , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     compcom     = 'pop_study(''component'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
@@ -209,17 +216,20 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {} ...
         {'style' 'text' 'string' 'dataset filename' 'userdata' 'addt'} {'style' 'text' 'string' 'browse' 'userdata' 'addt'} ...
         {'style' 'text' 'string' 'subject'    'userdata' 'addt'} ...
+        {'style' 'text' 'string' 'run'        'userdata' 'addt'} ...
         {'style' 'text' 'string' 'session'    'userdata' 'addt'} ...
         {'style' 'text' 'string' 'condition'  'userdata' 'addt'} ...
         {'style' 'text' 'string' 'group'      'userdata' 'addt'} ...
         {'style' 'pushbutton' 'string' 'Select by r.v.' 'userdata' 'addt' 'callback' cb_dipole } ...
         {} };
-	guigeom = { [1] [0.2 1 3.5] [0.2 1 3.5] [0.2 1 3.5] [1] [0.2 1.05 0.35 0.4 0.35 0.6 0.4 0.6 0.3]};
+    geomUnit  = [0.2 1 3.5];
+    geomUnit2 = [0.2 1.05 0.35 0.4 0.25 0.35 0.6 0.4 0.6 0.3];
+	guigeom = { [1] geomUnit geomUnit geomUnit [1] geomUnit2 };
 	
     % create edit boxes
     % -----------------
     for index = 1:10
-        guigeom = { guigeom{:} [0.2 1 0.2 0.5 0.2 0.5 0.5 0.5 0.3] };
+        guigeom = { guigeom{:} geomUnit2 };
         select_com = ['[inputname, inputpath] = uigetfile2(''*.set;*.SET'', ''Choose dataset to add to STUDY -- pop_study()'');'...
                       'if inputname ~= 0,' ...
                       '   guiind = findobj(''parent'', gcbf, ''tag'', ''set' int2str(index) ''');' ...
@@ -232,6 +242,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'edit'       'string' ''      'tag' [ 'set'   int2str(index) ] 'userdata' index 'callback' loadsetedit}, ...
         {'style' 'pushbutton' 'string' '...'   'tag' [ 'brw'   int2str(index) ] 'userdata' index 'Callback' select_com}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'sub'   int2str(index) ] 'userdata' index 'Callback' subcom}, ...
+        {'style' 'edit'       'string' ''      'tag' [ 'run'   int2str(index) ] 'userdata' index 'Callback' runcom}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'sess'  int2str(index) ] 'userdata' index 'Callback' sescom}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'cond'  int2str(index) ] 'userdata' index 'Callback' condcom}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'group' int2str(index) ] 'userdata' index 'Callback' grpcom}, ...
@@ -389,6 +400,19 @@ else % internal command
             userdat{4} = allcom;
             set(hdl, 'userdata', userdat);            
 
+        case 'run'
+            guiindex  = varargin{1};
+            realindex = guiindex+(page-1)*10;
+            datasetinfo(realindex).run = str2num(varargin{2});
+            if get(findobj(hdl, 'tag', 'copy_to_dataset'), 'value')
+                ALLEEG(realindex).run  = str2num(varargin{2});
+            end
+            allcom = { allcom{:}, { 'index' realindex 'run' str2num(varargin{2}) } };
+            userdat{1} = ALLEEG;
+            userdat{2} = datasetinfo;
+            userdat{4} = allcom;
+            set(hdl, 'userdata', userdat);            
+
         case 'session'
             guiindex  = varargin{1};
             realindex = guiindex+(page-1)*10;
@@ -400,8 +424,8 @@ else % internal command
             userdat{1} = ALLEEG;
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
-            set(hdl, 'userdata', userdat);            
-
+            set(hdl, 'userdata', userdat);   
+            
         case 'group'
             guiindex  = varargin{1};
             realindex = guiindex+(page-1)*10;
@@ -469,7 +493,8 @@ else % internal command
                 for index = 1:length(datasetinfo)
                     if realindex == index || (strcmpi(datasetinfo(index).subject, datasetinfo(realindex).subject) && ...
                                 ~isempty(datasetinfo(index).subject) && ...
-                                isequal( datasetinfo(index).session, datasetinfo(realindex).session ) )
+                                isequal( datasetinfo(index).session, datasetinfo(realindex).session ) && ...
+                                isequal( datasetinfo(index).run, datasetinfo(realindex).run ) )
                         datasetinfo(index).comps = tmps;
                         allcom = { allcom{:}, { 'index' index 'comps' tmps } };
                         set(findobj('tag', [ 'comps' int2str(index) ]), ...
@@ -491,6 +516,7 @@ else % internal command
             datasetinfo(realindex).filepath  = '';   
             datasetinfo(realindex).subject   = '';
             datasetinfo(realindex).session   = [];
+            datasetinfo(realindex).run       = [];
             datasetinfo(realindex).condition = '';
             datasetinfo(realindex).group     = '';                    
             datasetinfo(realindex).comps     = [];                    
@@ -528,6 +554,7 @@ else % internal command
             datasetinfo(realindex).filepath  = ALLEEG(realindex).filepath;   
             datasetinfo(realindex).subject   = ALLEEG(realindex).subject;
             datasetinfo(realindex).session   = ALLEEG(realindex).session;
+            datasetinfo(realindex).run       = ALLEEG(realindex).run;
             datasetinfo(realindex).condition = ALLEEG(realindex).condition;
             datasetinfo(realindex).group     = ALLEEG(realindex).group;                    
             datasetinfo(realindex).comps     = [];                    
@@ -571,6 +598,7 @@ else % internal command
                     set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', '');
                     set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string','');
                     set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string','');
+                    set(findobj('parent', hdl, 'tag',['run'  num2str(k)]), 'string','');
                     set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string','');
                     set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string','');
                     set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string','');
@@ -579,6 +607,7 @@ else % internal command
                     set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', fullfile(char(datasetinfo(kk).filepath), char(datasetinfo(kk).filename)));
                     set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string', datasetinfo(kk).subject);
                     set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string', int2str(datasetinfo(kk).session));
+                    set(findobj('parent', hdl, 'tag',['run' num2str(k)]),  'string', int2str(datasetinfo(kk).run));
                     set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string', datasetinfo(kk).condition);
                     set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string', formatbut(datasetinfo(kk).comps));
                     set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string', datasetinfo(kk).group);
@@ -624,6 +653,8 @@ function bool = test_wrong_parameters(hdl)
     nonempty     = cellfun('isempty', { datasetinfo.filename });
     anysession   = any(~cellfun('isempty', { datasetinfo(nonempty).session }));
     allsession   = all(~cellfun('isempty', { datasetinfo(nonempty).session }));
+    anyrun       = any(~cellfun('isempty', { datastrinfo(nonempty).run}));
+    allrun       = all(~cellfun('isempty', { datastrinfo(nonempty).run}));
     anycondition = any(~cellfun('isempty', { datasetinfo(nonempty).condition }));
     allcondition = all(~cellfun('isempty', { datasetinfo(nonempty).condition }));
     anygroup     = any(~cellfun('isempty', { datasetinfo(nonempty).group }));
@@ -640,9 +671,12 @@ function bool = test_wrong_parameters(hdl)
     if anysession && ~allsession
          bool = 1; warndlg2('If one dataset has a session index, they must all have one', 'Error');
     end
+    if anyrun && ~allrun
+         bool = 1; warndlg2('If one dataset has a session index, they must all have one', 'Error');
+    end
     if anydipfit && ~alldipfit
          bool = 1; warndlg2('Dipole''s data across datasets is not uniform');
-    end;    
+    end
 function strbut = formatbut(complist)
     if isempty(complist)
         strbut = 'All comp.';

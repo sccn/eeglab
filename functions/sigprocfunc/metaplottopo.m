@@ -22,6 +22,8 @@
 %  'plotargs'  = [cell] plotting function arguments. 
 %  'datapos'   = [integer] position of data array in the function call. 
 %                Default is 1.
+%  'squeeze'   = ['on'|'off'] squeeze data array after selecting channel.
+%                Default is 'off'.
 %
 % Output:
 %  Axes        = [real] array of axes handles of the same length as the
@@ -103,6 +105,8 @@ g = finputcheck(varargin, { 'chanlocs'  ''    []          '';
     'datapos'   'integer'               []          1;
     'calbar'    'real'                  []          [];
     'axcopycom' 'string'                []          '';
+    'squeeze'   'string'                {'on' 'off'} 'off';
+    'axcopycom' 'string'                {}          'off';
     'axsize'    'float'                 [0 1]       [nan nan]}, 'metaplottopo' );
 if ischar(g), error(g); end
 if length(g.chans) == 1 && g.chans(1) ~= 0, error('can not plot a single ERP'); end
@@ -154,17 +158,17 @@ horicolor = vertcolor;
 
 if ~isempty(data)
     if iscell(data)
-        data{1} = data{1}(g.chans,:);
-        data{2} = data{2}(g.chans,:);
+        data{1} = data{1}(g.chans,:,:,:);
+        data{2} = data{2}(g.chans,:,:,:);
     else
-        data = data(g.chans,:);
+        data = data(g.chans,:,:,:);
     end
 end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%% Print plot info %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-figure(curfig); h=gca;title(g.title); % title plot
+figure(curfig); h=gca;title(g.title, 'interpreter', 'none'); % title plot
 hold on
 axis('off')
 
@@ -281,14 +285,15 @@ for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%
     if ~isempty( g.plotfunc )
         %figure(curfig);
         eval( [ 'func = @' g.plotfunc ';' ] );
-        if iscell(data), tmp = { g.plotargs{1:g.datapos(1)-1} data{1}(c,:) g.plotargs{g.datapos(1):g.datapos(2)-1} data{2}(c,:) g.plotargs{g.datapos(2):end}};
-        else             tmp = { g.plotargs{1:g.datapos-1}    data(c,:)    g.plotargs{g.datapos:end} };
+        if iscell(data), tmp = { g.plotargs{1:g.datapos(1)-1} data{1}(c,:,:,:,:) g.plotargs{g.datapos(1):g.datapos(2)-1} data{2}(c,:) g.plotargs{g.datapos(2):end}};
+        else             tmp = { g.plotargs{1:g.datapos-1}    data(c,:,:,:,:)    g.plotargs{g.datapos:end} };
         end
+        if strcmpi(g.squeeze, 'on') tmp{g.datapos} = squeeze(tmp{g.datapos}); end
         tmp = { tmp{:} 'title' channames(c,:) 'plotmode' 'topo'};
         feval(func, tmp{:});
     end
     outchannames{c} = deblank(channames(c,:));
-end; % c, chans / subplot
+end % c, chans / subplot
 
 fprintf('\n');
 
@@ -349,11 +354,16 @@ end
 %        'tmp2 = get(0, ''''screensize'''');' ...
 %        'if tmp(2)+500 > tmp2(4), tmp(2) = tmp2(4)-500; end;' ...
 %        'set(gcbf, ''''position'''', [ tmp(1) tmp(2) 560   420]);' ...
-g.axcopycom = [ 'axis on;' ...
-        'tmp = get(gca, ''''userdata'''');' ...
-        'if ~isempty(tmp), xlabel(tmp{1});' ...
-        'ylabel(tmp{2});' ...
-        'legend(tmp{3}{:}); end; clear tmp tmp2;' ];
-axcopy(gcf, g.axcopycom); % turn on popup feature
+if ~strcmpi(g.axcopycom, 'off')
+    if strcmpi(g.axcopycom, 'on')
+        g.axcopycom = [ 'axis on;' ...
+                'tmp = get(gca, ''''userdata'''');' ...
+                'if ~isempty(tmp), xlabel(tmp{1});' ...
+                'ylabel(tmp{2});' ...
+                'if length(tmp) == 3 && ~isempty(tmp{3}), legend(tmp{3}{:}); end;' ...
+                'end; clear tmp tmp2;' ];
+    end
+    axcopy(gcf, g.axcopycom); % turn on popup feature
+end
 icadefs;
 set(gca,'Color',BACKCOLOR);               % set the background color

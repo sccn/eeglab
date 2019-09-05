@@ -254,9 +254,13 @@ if ~isempty(opt.channels)
         [STUDY, erpdata, alltimes] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype], 'rmsubjmean', params.subtractsubjectmean);
     end
-    if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
+    if ~strcmpi(params.averagechan, 'off') && length(chaninds) > 1
         for index = 1:length(erpdata(:))
-            erpdata{index} = squeeze(mean(erpdata{index},2));
+            if strcmpi(params.averagechan, 'on')
+                erpdata{index} = squeeze(mean(erpdata{index},2));
+            else
+                erpdata{index} = squeeze(sqrt(mean(erpdata{index}.^2,2)));
+            end
         end
     end
     if isempty(erpdata), return; end
@@ -309,14 +313,18 @@ if ~isempty(opt.channels)
     % get titles (not included in std_erspplot because it is not possible
     % to merge channels for that function
     % -----------------------------------
-    locs = eeg_mergelocs(ALLEEG.chanlocs);
-    locs = locs(std_chaninds(STUDY, opt.channels(chaninds)));
-    if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
-        chanlabels = { locs.labels };
-        chanlabels(2,:) = {','};
-        chanlabels(2,end) = {''};
-        locs(1).labels = [ chanlabels{:} ];
-        locs(2:end) = [];
+    locsOri = eeg_mergelocs(ALLEEG.chanlocs);
+    locs = locsOri(std_chaninds(STUDY, opt.channels(chaninds)));
+    if ~strcmpi(params.averagechan, 'off') && length(chaninds) > 1
+        if length(chaninds) ~= length(locsOri)
+            chanlabels = { locs.labels };
+            chanlabels(2,:) = {','};
+            chanlabels(2,end) = {''};
+            locs(1).labels = [ chanlabels{:} ];
+        else
+            locs(1).labels = 'All channels';
+        end
+        locs(2:end) = [];    
     end
     [alltitles, alllegends ] = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                              'statistics', method, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
