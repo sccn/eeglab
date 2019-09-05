@@ -12,9 +12,10 @@
 %  'measure'      - ['daterp'|'icaerp'|'datspec'|'icaspec'|'datersp'|'icaersp']
 %                   measure to compute. Currently, only 'daterp' and
 %                   'datspec' are supported. Default is 'daterp'.
-%  'method'       - ['OLS'|'WTS'] Ordinary Least Square (OLS) or Weighted Least
-%                   Square (WTS). WTS should be used as it is more robust. It is
-%                   slower though.
+%  'method'       - ['OLS'|'WTS'|'IRLS'] Ordinary Least Squares (OLS) or Weighted 
+%                   Least Squares (WTS) or Iterative Reweighted Least Squares'IRLS'. 
+%                   WTS should be used as it is more robust. IRLS is much slower 
+%                   and better across subjects than across trials.
 %  'design'       - [integer] design index to process. Default is the current
 %                   design stored in STUDY.currentdesign.
 %  'erase'        - ['on'|'off'] erase previous files. Default is 'on'.
@@ -498,6 +499,9 @@ for s = 1:nb_subjects
     delete(model.set_files{s});
 end
 
+%% start 2nd level
+
+
 % -------------------------------------------------------------------------
 % Return full path if 'filepath' is a relative path. The output format will
 % fit the one of 'filepath'. That means that if 'filepath' is a cell array,
@@ -516,7 +520,7 @@ for i = 1:nit
             file_fullpath = fullfile(studypath,pathtmp(1:end));
         end
     else
-        if iscell(filepath),
+        if iscell(filepath)
             file_fullpath{i} = pathtmp;
         else
             file_fullpath = pathtmp;
