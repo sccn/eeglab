@@ -59,12 +59,17 @@
 %                 the reference montage.
 %   'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
 %                 {default: 'off'}
+%   'showlabels1' - ['on'|'off'] show channel labels for first montage. 
+%                 Default is 'off'.
+%   'showlabels2' - ['on'|'off'] show channel labels for second montage. 
+%                 Default is 'off'.
 %
 % Optional 'keywords' for MANUAL MODE (default):
-%   'manual'    - ['on'|'off'] Pops up the coregister() gui window to 
+%   'manual'    - ['on'|'off'|'show'] Pops up the coregister() gui window to 
 %                 allow viewing the current alignment, performing 'alignfid' or 
 %                 'warp' mode co-registration,  and making manual
-%                 adjustments. Default if 'on'.
+%                 adjustments. Default if 'on'. 'off' does not pop up any 
+%                 window and 'show' does not allow to change coregistration.
 %
 % Optional 'keywords' for ALIGN MODE:
 %    'alignfid' - {cell array of strings} = labels of (fiducial) channels to use 
@@ -167,9 +172,9 @@ end
     % manually for s1:  transf = [4 0 -50 -0.3 0 -1.53 1.05 1.1 1.1]
     % manually for s2:  transf = [-4 -6 -50 -0.37 0 -1.35 1.1 1.15 1.1]
 
-if isempty(chanlocs2)
-    dipfitdefs; chanlocs2 = template_models(1).chanfile; 
-end
+% if isempty(chanlocs2)
+%     dipfitdefs; chanlocs2 = template_models(1).chanfile; 
+% end
 
 % undocumented commands run from GUI
 % ----------------------------------
@@ -188,15 +193,15 @@ if ischar(chanlocs1)
         % ----------------------------------
         dat = get(fid, 'userdata');
         if strcmpi(com, 'fiducials')
-            [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-            try,
-                [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
+            [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
+            try
+                [ ~, transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
                 if ~isempty(transform), dat.transform = transform; end
-            catch,
+            catch
                 warndlg2(strvcat('Transformation failed', lasterr));
             end
         elseif strcmpi(com, 'warp')
-            [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
+            [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
 
             % copy electrode names
             if ~isempty(clist1)
@@ -205,7 +210,7 @@ if ischar(chanlocs1)
                     tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
                 end
                 %try,
-                    [ tmp dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
+                    [ ~, dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
                 %catch,
                 %    warndlg2(strvcat('Transformation failed', lasterr));
                 %end
@@ -227,7 +232,10 @@ g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
                             'transform'  'real'   []      [];
-                            'manual'     'string' { 'on','off' } 'on'; % -> pop up window
+                            'manual'     'string' { 'on','off','show' } 'on'; % -> pop up window
+                            'showlabels1'  'string' { 'on','off' } 'off';
+                            'showlabels2'  'string' { 'on','off' } 'off';
+                            'title'        'string' { } '';
                             'autoscale'  'string' { 'on','off' } 'on';
                             'helpmsg'    'string' { 'on','off' } 'off';
                             'mesh'       ''      []   defaultmesh });
@@ -238,6 +246,7 @@ if ischar(g), error(g); end
 if ~isempty(g.mesh)
     if ischar(g.mesh)
         try
+            g.orimesh = g.mesh;
             g.mesh  = load(g.mesh);
         catch, g.mesh = [];
         end
@@ -249,9 +258,18 @@ if ~isempty(g.mesh)
     end
     if ~isempty(g.mesh)
         if isstruct(g.mesh)
+            if isfield(g.mesh, 'SurfaceFile') % Brainstrom leadfield
+                p = fileparts(fileparts(fileparts(g.orimesh)));
+                try
+                    g.mesh = load('-mat', fullfile(p, 'anat', g.mesh.SurfaceFile));
+                catch
+                    error('Cannot find Brainstorm mesh file')
+                end
+            end
+                
             if isfield(g.mesh, 'vol')
                 if isfield(g.mesh.vol, 'r')
-                    [X Y Z] = sphere(50);
+                    [X, Y, Z] = sphere(50);
                     dat.meshpnt = { X*max(g.mesh.vol.r) Y*max(g.mesh.vol.r) Z*max(g.mesh.vol.r) };
                     dat.meshtri = [];
                 else
@@ -267,6 +285,9 @@ if ~isempty(g.mesh)
             elseif isfield(g.mesh, 'vertices')
                 dat.meshpnt = g.mesh.vertices;
                 dat.meshtri = g.mesh.faces;
+            elseif isfield(g.mesh, 'Vertices')
+                dat.meshpnt = g.mesh.Vertices;
+                dat.meshtri = g.mesh.Faces;
             else
                 error('Unknown Matlab mesh file');
             end
@@ -285,9 +306,9 @@ end
 
 % transform to arrays chanlocs1
 % -------------------------
-TMP                           = eeg_emptyset;
-[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chanlocs1);
-TMP.chaninfo                  = g.chaninfo1;
+TMP          = eeg_emptyset;
+TMP.chanlocs = readlocs(chanlocs1);
+TMP.chaninfo = g.chaninfo1;
 TMP.nbchan = length(TMP.chanlocs);
 cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
 elec1 = cfg.elec;
@@ -313,7 +334,7 @@ end
 % --------------------------------
 if ~isempty(g.transform)
     dat.transform = g.transform;
-else
+elseif ~isempty(elec2)
 
     % perfrom alignment
     % -----------------
@@ -342,14 +363,14 @@ else
                 for index = 1:length(clist2)
                     tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
                 end
-                try,
-                    [ electransf dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
-                catch,
+                try
+                    [ ~, dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
+                catch
                     warndlg2(strvcat('Transformation failed', lasterr));
                 end
             end
         else
-            [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
+            [ ~, dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
         end
     else
         dat.transform = [0 0 0 0 0 0 ratio ratio ratio];
@@ -359,7 +380,7 @@ end
 
 % manual mode off
 % ---------------
-if strcmpi(g.manual, 'off'), 
+if strcmpi(g.manual, 'off') 
     transformmat = dat.transform;
     dat.elec1    = elec1;
     if size(dat.transform,1) > 1
@@ -378,17 +399,21 @@ end
 dat.elec1      = elec1;
 dat.elec2      = elec2;
 dat.elecshow1  = 1:length(elec1.label);
-dat.elecshow2  = 1:length(elec2.label);
+if ~isempty(elec2)
+    dat.elecshow2  = 1:length(elec2.label);
+else
+    dat.elecshow2  = [];
+end
 dat.color1     = [0 1 0];
 dat.color2     = [1 .75 .65]*.8;
 %dat.color2     = [1 0 0];
-dat.label1     = 0;
-dat.label2     = 0;
+dat.label1     = strcmpi(g.showlabels1, 'on');
+dat.label2     = strcmpi(g.showlabels2, 'on');
 dat.meshon     = 1;
 fid = figure('userdata', dat, 'name', 'coregister()', 'numbertitle', 'off');
-try, icadefs; catch, end
+try icadefs; catch, end
 
-if 1
+if strcmpi(g.manual, 'on') 
     header    = 'dattmp = get(gcbf, ''userdata'');';
     footer    = 'set(gcbf, ''userdata'', dattmp); clear dattmp; coregister(''redraw'', gcbf);';
     cbright   = [ header 'dattmp.transform(1) = str2num(get(gcbo, ''string''));' footer ];
@@ -472,7 +497,6 @@ if 1
 
     % help message
     % ------------
-    
     cb_helpme = [ 'warndlg2(strvcat( ''User channels (sometimes hidden in the 3-D mesh) are in green, reference channels in brown.'',' ...
             '''Press "Warp" to automatically warp user channels to corresponding reference channels.'',' ...
             '''Then, if desired, further edit the transformation manually using the coregister gui buttons.'',' ...
@@ -483,12 +507,12 @@ if 1
             '''in the EEGLAB menu and select the "No coreg" option.'',' ];
     if ~isstruct(chanlocs2)
         if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) || ...
-                ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
+                ~isempty(findstr(lower(chanlocs2), 'standard_1005'))
             cb_helpme = [ cb_helpme '''Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
                           '''in the EEGLAB menu and select the "No coreg" option.''), ''Warning'');' ];
         else
             cb_helpme = [ cb_helpme '''Then re-open the graphic interface function you were using.''), ''Warning'');' ];
-        end;    
+        end
     end
     h = uicontrol( opt{:}, [0.87 0.95 .13 .05], 'style', 'pushbutton', 'string', 'Help me', 'callback',  cb_helpme);
     h = uicontrol( opt{:}, [0.87 0.90 .13 .05], 'style', 'pushbutton', 'string', 'Funct. help', 'callback', 'pophelp(''coregister'');' );
@@ -514,7 +538,7 @@ if 1
 end
 
 coregister('redraw', fid);
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
+try icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 
 % wait until button press and return values
 % -----------------------------------------
@@ -526,11 +550,14 @@ catch, transformmat = []; chanlocs1 = []; return; end
 dat = get(fid, 'userdata');
 transformmat = dat.transform;
 chanlocs1    = dat.electransf;
-close(fid);
+title(g.title);
+if ~strcmpi(g.manual, 'show')
+    close(fid);
+end
 
 % plot electrodes
 % ---------------
-function plotelec(elec, elecshow, color, tag);
+function plotelec(elec, elecshow, color, tag)
     
     X1 = elec.pnt(elecshow,1);
     Y1 = elec.pnt(elecshow,2);
@@ -540,14 +567,14 @@ function plotelec(elec, elecshow, color, tag);
     YL = ylim;
     ZL = zlim;
     
-    lim=max(1.05*max([X1;Y1;Z1]), max([XL YL ZL]));
+    lim=max(1.05*max([X1;Y1;Z1])); %, max([XL YL ZL]));
     eps=lim/20;
     delete(findobj(gcf, 'tag', tag));
     
     % make bigger if fiducial
     % ------------------------
     fidlist = { 'nz' 'lpa' 'rpa' 'nazion' 'left' 'right' 'nasion' 'fidnz' 'fidt9' 'fidt10'};
-    [tmp fids ] = intersect_bc(lower(elec.label(elecshow)), fidlist);
+    [~, fids ] = intersect_bc(lower(elec.label(elecshow)), fidlist);
     nonfids     = setdiff_bc(1:length(elec.label(elecshow)), fids);
     h1 = plot3(X1(nonfids),Y1(nonfids),Z1(nonfids), 'o', 'color', color); hold on;
     set(h1, 'tag', tag, 'marker', '.', 'markersize', 20);
