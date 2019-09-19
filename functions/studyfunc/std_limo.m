@@ -99,7 +99,7 @@ if ischar(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1
 else
     opt = finputcheck( varargin, ...
         { 'measure'        'string'  { 'daterp' 'datspec' 'icaerp' 'icaspec' 'datersp' } 'daterp'; ...
-          'method'         'string'  { 'OLS' 'WLS' } 'OLS';
+          'method'         'string'  { 'OLS' 'WLS' 'IRLS' } 'OLS';
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
           'splitreg'       'string'  { 'on','off' }   'off';
