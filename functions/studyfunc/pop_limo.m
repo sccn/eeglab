@@ -120,8 +120,8 @@ else
 end
     
 if nargin < 4
-    dataMeasures = { 'ERP' 'Spectrum' };
-    fileMeasures = { 'daterp' 'datspec'; 'icaerp' 'icaspec' };
+    dataMeasures = { 'ERP' 'Spectrum' 'ERSP'};
+    fileMeasures = { 'daterp' 'datspec' 'dattimef'; 'icaerp' 'icaspec' 'icatimef'};
     methods      = { 'WLS' 'OLS' 'IRLS'};
     cb_measure   = [ 'if get(gcbo, ''value'') == 1,' ...
                      '   set(findobj(gcbf, ''tag'', ''options''), ''string'', '''');' ...
@@ -161,7 +161,7 @@ if nargin < 4
                 'splitreg'    fastif(res.splitreg, 'on', 'off') ...
                 'interaction' fastif(res.interaction, 'on', 'off') };
 else
-    options = varargin;
+    options = varargin; 
 end
 
 [STUDY tmp] = std_limo(STUDY, ALLEEG, options{:});
