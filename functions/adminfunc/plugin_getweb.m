@@ -46,7 +46,9 @@ catch
 end
 
 if status == 0
-    error('Cannot connect to the Internet to retrieve extension list');
+    disp('Cannot connect to the Internet to retrieve extension list');
+    plugin = [];
+    return
 end
 
 % decode stats into plugins
