@@ -145,7 +145,8 @@ else
                 end
                 if ~strcmp(EEG.filename(1:end-3), EEG.data(1:end-3))
                     disp('Warning: the name of the dataset has changed on disk, updating EEG structure accordingly');
-                    EEG.data = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
+                    EEG.data    = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
+                    EEG.datfile = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
                     EEG.saved = 'no';
                 end
 
