@@ -379,6 +379,7 @@ if nargin < 1 || exist('EEG') ~= 1
     end
 end
 
+versL = ~option_allmenus;
 if nargin == 1
 	if strcmp(onearg, 'versions')
         disp( [ 'EEGLAB v' eeg_getversion ] );
@@ -399,6 +400,8 @@ if nargin == 1
         close(W_MAIN);
         eeglab redraw;
         return;
+    elseif strcmp(onearg, 'full')
+        versL = false;
     else
         fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
         eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
@@ -408,6 +411,9 @@ else
 end
 ALLCOM = ALLCOM;
 try, colordef('white'); catch end
+if versL
+    disp('Some menus items hidden. Use Preference menu to show them all.');
+end
 
 % default option folder
 % ---------------------
@@ -678,196 +684,198 @@ if ismatlab
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
-    file_m   = uimenu( W_MAIN,   'Label', 'File'                                    , 'userdata', on);
-    import_m = uimenu( file_m,   'Label', 'Import data'                             , 'userdata', onnostudy); 
-    neuro_m  = uimenu( import_m, 'Label', 'Using EEGLAB functions and plugins'      , 'tag', 'import data' , 'userdata', onnostudy); 
-    epoch_m  = uimenu( file_m,   'Label', 'Import epoch info', 'tag', 'import epoch', 'userdata', onepoch); 
-    event_m  = uimenu( file_m,   'Label', 'Import event info', 'tag', 'import event', 'userdata', ondata); 
-    exportm  = uimenu( file_m,   'Label', 'Export'           , 'tag', 'export'      , 'userdata', ondata); 
-    edit_m   = uimenu( W_MAIN,   'Label', 'Edit'                                    , 'userdata', ondatastudy);
-    tools_m  = uimenu( W_MAIN,   'Label', 'Tools',             'tag', 'tools'       , 'userdata', ondatastudy);
-    plot_m   = uimenu( W_MAIN,   'Label', 'Plot',              'tag', 'plot'        , 'userdata', ondata);
-    loc_m    = uimenu( plot_m,   'Label', 'Channel locations'                       , 'userdata', onchannel);
-    std_m    = uimenu( W_MAIN,   'Label', 'Study', 'tag', 'study'                   , 'userdata', onstudy);
-    set_m    = uimenu( W_MAIN,   'Label', 'Datasets'                                , 'userdata', ondatastudy);
-    help_m   = uimenu( W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
+    file_m   = eegmenu( false,  W_MAIN,   'Label', 'File'                                    , 'userdata', on);
+    import_m = eegmenu( false,  file_m,   'Label', 'Import data'                             , 'userdata', onnostudy); 
+    neuro_m  = eegmenu( false,  import_m, 'Label', 'Using EEGLAB functions and plugins'      , 'tag', 'import data' , 'userdata', onnostudy); 
+    epoch_m  = eegmenu( false,  file_m,   'Label', 'Import epoch info', 'tag', 'import epoch', 'userdata', onepoch); 
+    event_m  = eegmenu( false,  file_m,   'Label', 'Import event info', 'tag', 'import event', 'userdata', ondata); 
+    exportm  = eegmenu( false,  file_m,   'Label', 'Export'           , 'tag', 'export'      , 'userdata', ondata); 
+    edit_m   = eegmenu( false,  W_MAIN,   'Label', 'Edit'                                    , 'userdata', ondatastudy);
+    tools_m  = eegmenu( false,  W_MAIN,   'Label', 'Tools',             'tag', 'tools'       , 'userdata', ondatastudy);
+    plot_m   = eegmenu( false,  W_MAIN,   'Label', 'Plot',              'tag', 'plot'        , 'userdata', ondata);
+    loc_m    = eegmenu( false,  plot_m,   'Label', 'Channel locations'                       , 'userdata', onchannel);
+    std_m    = eegmenu( false,  W_MAIN,   'Label', 'Study', 'tag', 'study'                   , 'userdata', onstudy);
+    set_m    = eegmenu( false,  W_MAIN,   'Label', 'Datasets'                                , 'userdata', ondatastudy);
+    help_m   = eegmenu( false,  W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
 
-    uimenu( neuro_m, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
-    uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata, 'separator', 'on');
-    %uimenu( neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
+    eegmenu( false,  neuro_m, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
+    eegmenu( false,  neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata, 'separator', 'on');
+    %eegmenu( false,  neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
 
     % BIOSIG MENUS
     % ------------
-    uimenu( neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
+    eegmenu( false,  neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
+    eegmenu( false,  neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
 
-    uimenu( epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
-    uimenu( event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
-    uimenu( event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
-    uimenu( event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
-    uimenu( event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
-    uimenu( event_m, 'Label', 'From ERPLAB text files'                , 'CallBack', cb_importerplab); 
+    eegmenu( false,  epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
+    eegmenu( false,  event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
+    eegmenu( false,  event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
+    eegmenu( false,  event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
+    eegmenu( false,  event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
+    eegmenu( false,  event_m, 'Label', 'From ERPLAB text files'                , 'CallBack', cb_importerplab); 
 
-    uimenu( exportm, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
-    uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export, 'separator', 'on');
-    uimenu( exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
-    uimenu( exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2);
-    uimenu( exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
-    uimenu( exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
+    eegmenu( false,  exportm, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
+    eegmenu( false,  exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export, 'separator', 'on');
+    eegmenu( false,  exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
+    eegmenu( false,  exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2);
+    eegmenu( false,  exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
+    eegmenu( false,  exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
 
-    uimenu( file_m, 'Label', 'Load existing dataset'                  , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
-    uimenu( file_m, 'Label', 'Save current dataset(s)'                , 'userdata', ondatastudy, 'CallBack', cb_saveset);
-    uimenu( file_m, 'Label', 'Save current dataset as'                , 'userdata', ondata,      'CallBack', cb_savesetas);
-    uimenu( file_m, 'Label', 'Clear dataset(s)'                       , 'userdata', ondata,      'CallBack', cb_delset);
+    eegmenu( false,  file_m, 'Label', 'Load existing dataset'                  , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
+    eegmenu( false,  file_m, 'Label', 'Save current dataset(s)'                , 'userdata', ondatastudy, 'CallBack', cb_saveset);
+    eegmenu( false,  file_m, 'Label', 'Save current dataset as'                , 'userdata', ondata,      'CallBack', cb_savesetas);
+    eegmenu( false,  file_m, 'Label', 'Clear dataset(s)'                       , 'userdata', ondata,      'CallBack', cb_delset);
 
-    std2_m = uimenu( file_m, 'Label', 'Create study'                  , 'userdata', on     , 'Separator', 'on'); 
-    uimenu( std2_m,  'Label', 'Using all loaded datasets'             , 'userdata', ondata , 'Callback', cb_study1); 
-    uimenu( std2_m,  'Label', 'Browse for datasets'                   , 'userdata', on     , 'Callback', cb_study2); 
-    uimenu( std2_m,  'Label', 'Simple ERP STUDY'                      , 'userdata', on     , 'Callback', cb_studyerp); 
+    std2_m = eegmenu( false,  file_m, 'Label', 'Create study'                  , 'userdata', on     , 'Separator', 'on'); 
+    eegmenu( false,  std2_m,  'Label', 'Using all loaded datasets'             , 'userdata', ondata , 'Callback', cb_study1); 
+    eegmenu( false,  std2_m,  'Label', 'Browse for datasets'                   , 'userdata', on     , 'Callback', cb_study2); 
+    eegmenu( false,  std2_m,  'Label', 'Simple ERP STUDY'                      , 'userdata', on     , 'Callback', cb_studyerp); 
 
-    uimenu( file_m, 'Label', 'Load existing study'                    , 'userdata', on     , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
-    uimenu( file_m, 'Label', 'Save current study'                     , 'userdata', onstudy, 'CallBack', cb_savestudy1);
-    uimenu( file_m, 'Label', 'Save current study as'                  , 'userdata', onstudy, 'CallBack', cb_savestudy2);
-    uimenu( file_m, 'Label', 'Clear study / Clear all'                , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
-    uimenu( file_m, 'Label', 'Memory and other options'               , 'userdata', on     , 'CallBack', cb_editoptions, 'Separator', 'on');
+    eegmenu( false,  file_m, 'Label', 'Load existing study'                    , 'userdata', on     , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
+    eegmenu( false,  file_m, 'Label', 'Save current study'                     , 'userdata', onstudy, 'CallBack', cb_savestudy1);
+    eegmenu( false,  file_m, 'Label', 'Save current study as'                  , 'userdata', onstudy, 'CallBack', cb_savestudy2);
+    eegmenu( false,  file_m, 'Label', 'Clear study / Clear all'                , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
+    eegmenu( false,  file_m, 'Label', 'Preferences'                            , 'userdata', on     , 'CallBack', cb_editoptions, 'Separator', 'on');
 
-    hist_m = uimenu( file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
-    uimenu( hist_m, 'Label', 'Save dataset history script'            , 'userdata', ondata     , 'CallBack', cb_saveh1);
-    uimenu( hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
-    uimenu( hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
+    hist_m = eegmenu( false,  file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
+    eegmenu( false,  hist_m, 'Label', 'Save dataset history script'            , 'userdata', ondata     , 'CallBack', cb_saveh1);
+    eegmenu( false,  hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
+    eegmenu( false,  hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
 
     if ~isdeployed
-        uimenu( file_m,   'Label', 'Manage EEGLAB extensions'  , 'userdata', on, 'CallBack', cb_plugin);
+        eegmenu( false,  file_m,   'Label', 'Manage EEGLAB extensions'  , 'userdata', on, 'CallBack', cb_plugin);
     end
-    uimenu( file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
+    eegmenu( false,  file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
 
-    uimenu( edit_m, 'Label', 'Dataset info'                           , 'userdata', ondata, 'CallBack', cb_editset);
-    uimenu( edit_m, 'Label', 'Event fields'                           , 'userdata', ondata, 'CallBack', cb_editeventf);
-    uimenu( edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
-    uimenu( edit_m, 'Label', 'Adjust event latencies'                 , 'userdata', ondata, 'CallBack', cb_adjustevents);
-    uimenu( edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
-    uimenu( edit_m, 'Label', 'Channel locations'                      , 'userdata', ondata, 'CallBack', cb_chanedit);
-    uimenu( edit_m, 'Label', 'Select data'                            , 'userdata', ondata, 'CallBack', cb_select, 'Separator', 'on', 'userdata', 'study:on');
-    uimenu( edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
-    uimenu( edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
-    uimenu( edit_m, 'Label', 'Copy current dataset'                   , 'userdata', ondata, 'CallBack', cb_copyset, 'Separator', 'on');
-    uimenu( edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
-    uimenu( edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
+    eegmenu( false,  edit_m, 'Label', 'Dataset info'                           , 'userdata', ondata, 'CallBack', cb_editset);
+    eegmenu( versL,  edit_m, 'Label', 'Event fields'                           , 'userdata', ondata, 'CallBack', cb_editeventf);
+    eegmenu( false,  edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
+    eegmenu( versL,  edit_m, 'Label', 'Adjust event latencies'                 , 'userdata', ondata, 'CallBack', cb_adjustevents);
+    eegmenu( false,  edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
+    eegmenu( false,  edit_m, 'Label', 'Channel locations'                      , 'userdata', ondata, 'CallBack', cb_chanedit);
+    eegmenu( false,  edit_m, 'Label', 'Select data'                            , 'userdata', ondata, 'CallBack', cb_select, 'Separator', 'on', 'userdata', 'study:on');
+    eegmenu( false,  edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
+    eegmenu( false,  edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
+    eegmenu( false,  edit_m, 'Label', 'Copy current dataset'                   , 'userdata', ondata, 'CallBack', cb_copyset, 'Separator', 'on');
+    eegmenu( false,  edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
+    eegmenu( false,  edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
 
-    uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample);
+    eegmenu(~versL,  tools_m, 'Label', '(Change Preferences for all menus)'    , 'userdata', 'enable:off');
+    eegmenu( false,  tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample, 'Separator', 'on');
 
-    filter_m = uimenu( tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
-    uimenu( filter_m, 'Label', 'Basic FIR filter (legacy)'            , 'userdata', ondatastudy, 'CallBack', cb_eegfilt);
+    filter_m = eegmenu( false,  tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
+    eegmenu( false,  filter_m, 'Label', 'Basic FIR filter (legacy)'            , 'userdata', ondatastudy, 'CallBack', cb_eegfilt);
 
-    uimenu( tools_m, 'Label', 'Re-reference'                          , 'userdata', ondata, 'CallBack', cb_reref, 'userdata', 'study:on');
-    uimenu( tools_m, 'Label', 'Interpolate electrodes'                , 'userdata', ondata, 'CallBack', cb_interp);
-    uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'userdata', ondata, 'CallBack', cb_eegplot);
-    uimenu( tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on', 'userdata', 'study:on');
-    uimenu( tools_m, 'Label', 'Remove baseline'                       , 'userdata', ondatastudy, 'CallBack', cb_rmbase);
-    uimenu( tools_m, 'Label', 'Run ICA'                               , 'userdata', ondatastudy, 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
-    uimenu( tools_m, 'Label', 'Remove components'                     , 'userdata', ondata, 'CallBack', cb_subcomp);
-    uimenu( tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej, 'Separator', 'on');
-    uimenu( tools_m, 'Label', 'Automatic continuous rejection'        , 'userdata', ondata, 'CallBack', cb_rejcont);
-    uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'userdata', onepoch, 'CallBack', cb_autorej);
-    rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs'           , 'userdata', onepoch);
-    rej_m2 = uimenu( tools_m, 'Label', 'Reject data using ICA'        , 'userdata', ondata );
+    eegmenu( false,  tools_m, 'Label', 'Re-reference'                          , 'userdata', ondata, 'CallBack', cb_reref, 'userdata', 'study:on');
+    eegmenu( false,  tools_m, 'Label', 'Interpolate electrodes'                , 'userdata', ondata, 'CallBack', cb_interp);
+    eegmenu( false,  tools_m, 'Label', 'Reject continuous data by eye'         , 'userdata', ondata, 'CallBack', cb_eegplot);
+    eegmenu( false,  tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on', 'userdata', 'study:on');
+    eegmenu( false,  tools_m, 'Label', 'Remove baseline'                       , 'userdata', ondatastudy, 'CallBack', cb_rmbase);
+    eegmenu( false,  tools_m, 'Label', 'Run ICA'                               , 'userdata', ondatastudy, 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
+    eegmenu( false,  tools_m, 'Label', 'Remove components'                     , 'userdata', ondata, 'CallBack', cb_subcomp);
+    eegmenu( versL,  tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej, 'Separator', 'on');
+    eegmenu( versL,  tools_m, 'Label', 'Automatic continuous rejection'        , 'userdata', ondata, 'CallBack', cb_rejcont);
+    eegmenu( versL,  tools_m, 'Label', 'Automatic epoch rejection'             , 'userdata', onepoch, 'CallBack', cb_autorej);
+    rej_m1 = eegmenu( versL,  tools_m, 'Label', 'Reject data epochs'           , 'userdata', onepoch);
+    rej_m2 = eegmenu( versL,  tools_m, 'Label', 'Reject data using ICA'        , 'userdata', ondata );
 
-    uimenu( rej_m1, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu1);
-    uimenu( rej_m1, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej1);
-    uimenu( rej_m1, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh1);
-    uimenu( rej_m1, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend1);
-    uimenu( rej_m1, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob1);
-    uimenu( rej_m1, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt1);
-    uimenu( rej_m1, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec1);
-    uimenu( rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
-    uimenu( rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
-    uimenu( rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
-    uimenu( rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
-    uimenu( rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
-    uimenu( rej_m2, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh2);
-    uimenu( rej_m2, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend2);
-    uimenu( rej_m2, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob2);
-    uimenu( rej_m2, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt2);
-    uimenu( rej_m2, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec2);
-    uimenu( rej_m2, 'Label', 'Export marks to data reject'            , 'userdata', onepoch, 'CallBack', cb_rejsup3, 'separator', 'on');
-    uimenu( rej_m2, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
+    eegmenu( versL,  rej_m1, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec1);
+    eegmenu( versL,  rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
+    eegmenu( versL,  rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
+    eegmenu( false,  tools_m,'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec2);
+    eegmenu( versL,  rej_m2, 'Label', 'Export marks to data reject'            , 'userdata', onepoch, 'CallBack', cb_rejsup3, 'separator', 'on');
+    eegmenu( versL,  rej_m2, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
 
-    uimenu( loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
-    uimenu( loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
-    uimenu( plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
-    uimenu( plot_m, 'Label', 'Channel spectra and maps'               , 'userdata', ondata , 'CallBack', cb_spectopo1);
-    uimenu( plot_m, 'Label', 'Channel properties'                     , 'userdata', ondata , 'CallBack', cb_prop1);
-    uimenu( plot_m, 'Label', 'Channel ERP image'                      , 'userdata', onepoch, 'CallBack', cb_erpimage1);
+    eegmenu( false,  loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
+    eegmenu( false,  loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
+    eegmenu( false,  plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
+    eegmenu( false,  plot_m, 'Label', 'Channel spectra and maps'               , 'userdata', ondata , 'CallBack', cb_spectopo1);
+    eegmenu( false,  plot_m, 'Label', 'Channel properties'                     , 'userdata', ondata , 'CallBack', cb_prop1);
+    eegmenu( false,  plot_m, 'Label', 'Channel ERP image'                      , 'userdata', onepoch, 'CallBack', cb_erpimage1);
 
-    ERP_m = uimenu( plot_m, 'Label', 'Channel ERPs'                   , 'userdata', onepoch);
-    uimenu( ERP_m,  'Label', 'With scalp maps'                        , 'CallBack', cb_timtopo);
-    uimenu( ERP_m,  'Label', 'In scalp/rect. array'                   , 'CallBack', cb_plottopo);
+    ERP_m = eegmenu( false,  plot_m, 'Label', 'Channel ERPs'                   , 'userdata', onepoch);
+    eegmenu( false,  ERP_m,  'Label', 'With scalp maps'                        , 'CallBack', cb_timtopo);
+    eegmenu( false,  ERP_m,  'Label', 'In scalp/rect. array'                   , 'CallBack', cb_plottopo);
 
-    topo_m = uimenu( plot_m, 'Label', 'ERP map series'                , 'userdata', onepochchan);
-    uimenu( topo_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot1);
-    uimenu( topo_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot1);
-    uimenu( plot_m, 'Label', 'Sum/Compare ERPs'                       , 'userdata', onepoch, 'CallBack', cb_comperp1);
+    topo_m = eegmenu( false,  plot_m, 'Label', 'ERP map series'                , 'userdata', onepochchan);
+    eegmenu( false,  topo_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot1);
+    eegmenu( false,  topo_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot1);
+    eegmenu( versL,  plot_m, 'Label', 'Sum/Compare ERPs'                       , 'userdata', onepoch, 'CallBack', cb_comperp1);
 
-    uimenu( plot_m, 'Label', 'Component activations (scroll)'         , 'userdata', ondata , 'CallBack', cb_eegplot2,'Separator', 'on');
-    uimenu( plot_m, 'Label', 'Component spectra and maps'             , 'userdata', ondata , 'CallBack', cb_spectopo2);
+    eegmenu( false,  plot_m, 'Label', 'Component activations (scroll)'         , 'userdata', ondata , 'CallBack', cb_eegplot2,'Separator', 'on');
+    eegmenu( false,  plot_m, 'Label', 'Component spectra and maps'             , 'userdata', ondata , 'CallBack', cb_spectopo2);
 
-    tica_m = uimenu( plot_m, 'Label', 'Component maps'                , 'userdata', onchannel);
-    uimenu( tica_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot2);
-    uimenu( tica_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot2);
-    uimenu( plot_m, 'Label', 'Component properties'                   , 'userdata', ondata , 'CallBack', cb_prop2);
-    uimenu( plot_m, 'Label', 'Component ERP image'                    , 'userdata', onepoch, 'CallBack', cb_erpimage2);
+    tica_m = eegmenu( false,  plot_m, 'Label', 'Component maps'                , 'userdata', onchannel);
+    eegmenu( false,  tica_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot2);
+    eegmenu( false,  tica_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot2);
+    eegmenu( false,  plot_m, 'Label', 'Component properties'                   , 'userdata', ondata , 'CallBack', cb_prop2);
+    eegmenu( false,  plot_m, 'Label', 'Component ERP image'                    , 'userdata', onepoch, 'CallBack', cb_erpimage2);
 
-    ERPC_m = uimenu( plot_m, 'Label', 'Component ERPs'                , 'userdata', onepoch);
-    uimenu( ERPC_m, 'Label', 'With component maps'                    , 'CallBack', cb_envtopo1);
-    uimenu( ERPC_m, 'Label', 'With comp. maps (compare)'              , 'CallBack', cb_envtopo2);
-    uimenu( ERPC_m, 'Label', 'In rectangular array'                   , 'CallBack', cb_plotdata2);
-    uimenu( plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'userdata', onepoch, 'CallBack', cb_comperp2);
+    ERPC_m = eegmenu( false,  plot_m, 'Label', 'Component ERPs'                , 'userdata', onepoch);
+    eegmenu( false,  ERPC_m, 'Label', 'With component maps'                    , 'CallBack', cb_envtopo1);
+    eegmenu( false,  ERPC_m, 'Label', 'With comp. maps (compare)'              , 'CallBack', cb_envtopo2);
+    eegmenu( false,  ERPC_m, 'Label', 'In rectangular array'                   , 'CallBack', cb_plotdata2);
+    eegmenu( false,  plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'userdata', onepoch, 'CallBack', cb_comperp2);
 
-    stat_m = uimenu( plot_m, 'Label', 'Data statistics', 'Separator', 'on', 'userdata', ondata );
-    uimenu( stat_m, 'Label', 'Channel statistics'                     , 'CallBack', cb_signalstat1);
-    uimenu( stat_m, 'Label', 'Component statistics'                   , 'CallBack', cb_signalstat2);
-    uimenu( stat_m, 'Label', 'Event statistics'                       , 'CallBack', cb_eventstat);
+    stat_m = eegmenu( versL,  plot_m, 'Label', 'Data statistics', 'Separator', 'on', 'userdata', ondata );
+    eegmenu( versL,  stat_m, 'Label', 'Channel statistics'                     , 'CallBack', cb_signalstat1);
+    eegmenu( versL,  stat_m, 'Label', 'Component statistics'                   , 'CallBack', cb_signalstat2);
+    eegmenu( versL,  stat_m, 'Label', 'Event statistics'                       , 'CallBack', cb_eventstat);
 
-    spec_m = uimenu( plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
-    uimenu( spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
-    uimenu( spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
-    uimenu( spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
-    uimenu( spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
+    spec_m = eegmenu( false,  plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
+    eegmenu( false,  spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
+    eegmenu( false,  spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
+    eegmenu( false,  spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
+    eegmenu( false,  spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
 
-    uimenu( std_m,  'Label', 'Edit study info'                        , 'userdata', onstudy, 'CallBack', cb_study3);
-    uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
-    uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
-    uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
-    uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
-    clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
-    uimenu( clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
-    uimenu( clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
-    uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
+    eegmenu( false,  std_m,  'Label', 'Edit study info'                        , 'userdata', onstudy, 'CallBack', cb_study3);
+    eegmenu( false,  std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
+    eegmenu( false,  std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
+    eegmenu( false,  std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
+    eegmenu( false,  std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
+    clust_m = eegmenu( false,  std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
+    eegmenu( false,  clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
+    eegmenu( false,  clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
+    eegmenu( false,  std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
     if ~isdeployed
-        %newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
-        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
-        uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
-        uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
+        %newerVersionMenu = eegmenu( false,  help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
+        eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
+        eegmenu( false,  help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
 
-        help_1 = uimenu( help_m, 'Label', 'EEGLAB functions', 'userdata', on);
-        uimenu( help_1, 'Label', 'Admin. functions'                          , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
-        uimenu( help_1, 'Label', 'Interactive pop_ functions'                , 'userdata', on, 'Callback', 'pophelp(''eeg_helppop'');');	
-        uimenu( help_1, 'Label', 'Signal processing functions'               , 'userdata', on, 'Callback', 'pophelp(''eeg_helpsigproc'');');	
-        uimenu( help_1, 'Label', 'Group data (STUDY) functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstudy'');');	
-        uimenu( help_1, 'Label', 'Time-frequency functions'                  , 'userdata', on, 'Callback', 'pophelp(''eeg_helptimefreq'');');	
-        uimenu( help_1, 'Label', 'Statistical functions'                     , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstatistics'');');	
-        uimenu( help_1, 'Label', 'Graphic interface builder functions'       , 'userdata', on, 'Callback', 'pophelp(''eeg_helpgui'');');	
-        uimenu( help_1, 'Label', 'Misc. command line functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
+        help_1 = eegmenu( false,  help_m, 'Label', 'EEGLAB functions', 'userdata', on);
+        eegmenu( false,  help_1, 'Label', 'Admin. functions'                          , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
+        eegmenu( false,  help_1, 'Label', 'Interactive pop_ functions'                , 'userdata', on, 'Callback', 'pophelp(''eeg_helppop'');');	
+        eegmenu( false,  help_1, 'Label', 'Signal processing functions'               , 'userdata', on, 'Callback', 'pophelp(''eeg_helpsigproc'');');	
+        eegmenu( false,  help_1, 'Label', 'Group data (STUDY) functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstudy'');');	
+        eegmenu( false,  help_1, 'Label', 'Time-frequency functions'                  , 'userdata', on, 'Callback', 'pophelp(''eeg_helptimefreq'');');	
+        eegmenu( false,  help_1, 'Label', 'Statistical functions'                     , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstatistics'');');	
+        eegmenu( false,  help_1, 'Label', 'Graphic interface builder functions'       , 'userdata', on, 'Callback', 'pophelp(''eeg_helpgui'');');	
+        eegmenu( false,  help_1, 'Label', 'Misc. command line functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
 
-        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     else
-        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'abouteeglab;');
-        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+        eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'abouteeglab;');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     end
 
-    uimenu( help_m, 'Label', 'EEGLAB tutorial'                               , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
-    uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+    eegmenu( false,  help_m, 'Label', 'EEGLAB tutorial'                               , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+    eegmenu( false,  help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end
 
 statusconnection = 1;
@@ -1026,26 +1034,26 @@ else
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
             cb_mff = [ 'if ~plugin_askinstall(''mffmatlabio'', ''mff_import''), return; end;' ...
                        'eval(char(get(findobj(''label'', ''Import Philips .mff file''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'Import Philips .mff file', 'CallBack', cb_mff, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'Import Philips .mff file', 'CallBack', cb_mff, 'separator', 'on');
         end
         if ~exist('eegplugin_neuroscanio', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
             neuroscan_check = 'if ~plugin_askinstall(''neuroscanio'', ''eegplugin_neuroscanio''), return; end;';
             cb_neuroscan1 = [ neuroscan_check 'eval(char(get(findobj(''label'', ''From Neuroscan .CNT file''), ''callback'')));' ];
             cb_neuroscan2 = [ neuroscan_check 'eval(char(get(findobj(''label'', ''From Neuroscan .EEG file''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file', 'CallBack', cb_neuroscan1, 'Separator', 'on');
-            uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file', 'CallBack', cb_neuroscan2);
+            eegmenu( false,  neuro_m, 'Label', 'From Neuroscan .CNT file', 'CallBack', cb_neuroscan1, 'Separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'From Neuroscan .EEG file', 'CallBack', cb_neuroscan2);
         end
         if ~exist('eegplugin_firfilt', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'filter');
             cb_filter = [ 'if ~plugin_askinstall(''firfilt'', ''eegplugin_firfilt''), return; end;' ...
                        'eval(char(get(findobj(''label'', ''Basic FIR filter (new, default)''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'Basic FIR filter (new, default)', 'CallBack', cb_filter, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'Basic FIR filter (new, default)', 'CallBack', cb_filter, 'separator', 'on');
         end
         if ~exist('pop_dipfit_settings', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'tools');
             cb_dipfit = [ 'if ~plugin_askinstall(''dipfit'', ''pop_dipfit_settings''), return; end;'  ];
-            uimenu( neuro_m, 'Label', 'Locate dipoles using DIPFIT 2.x', 'CallBack', cb_dipfit, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'Locate dipoles using DIPFIT 2.x', 'CallBack', cb_dipfit, 'separator', 'on');
         end
         if ~exist('pop_loadbva', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
@@ -1053,8 +1061,8 @@ else
                        'eval(char(get(findobj(''label'', ''From Brain Vis. Rec. .vhdr file''), ''callback'')));' ];
             cb_bva2 = [ 'if ~plugin_askinstall(''bva-io'', ''pop_loadbva''), return; end;' ...
                        'eval(char(get(findobj(''label'', ''From Brain Vis. Anal. Matlab file''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'From Brain Vis. Rec. .vhdr file', 'CallBack', cb_bva1, 'separator', 'on');
-            uimenu( neuro_m, 'Label', 'From Brain Vis. Anal. Matlab file', 'CallBack', cb_bva2);
+            eegmenu( false,  neuro_m, 'Label', 'From Brain Vis. Rec. .vhdr file', 'CallBack', cb_bva1, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'From Brain Vis. Anal. Matlab file', 'CallBack', cb_bva2);
         end
     end
 end
@@ -1069,9 +1077,9 @@ biosigpathlast; % fix str2double issue
 % add other import ...
 % --------------------
 cb_others = [ 'pophelp(''troubleshooting_data_formats'');' ];
-uimenu( import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
-uimenu( import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
-uimenu( import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
+eegmenu( false,  import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
+eegmenu( false,  import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
+eegmenu( false,  import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
 
 % changing plugin menu color
 % --------------------------
@@ -1094,7 +1102,7 @@ if length(exportsub_m) > 4 , set(exportsub_m(1:end-4 ), 'foregroundcolor', PLUGI
 if length(editsub_m)   > 10, set(editsub_m(  1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(filter_m)    > 3 , set(filter_m   (1:end-1 ), 'foregroundcolor', PLUGINMENUCOLOR); end
 
-EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
+EEGMENU = eegmenu( false,  set_m, 'Label', '------', 'Enable', 'off');
 eval('set(W_MAIN, ''userdat'', { EEGUSERDAT{1} EEGMENU });');
 eeglab('redraw');
 if nargout < 1
@@ -1110,7 +1118,7 @@ try
     eeglabUpdater = up.updater(eeglabVersionNumber, 'http://sccn.ucsd.edu/eeglab/updater/latest_version.php', 'EEGLAB', currentReleaseDateString);
         
     % create a new GUI item (e.g. under Help)
-    %newerVersionMenu = uimenu(help_m, 'Label', 'Upgrade to the Latest Version', 'visible', 'off', 'userdata', 'startup:on;study:on');
+    %newerVersionMenu = eegmenu( false, help_m, 'Label', 'Upgrade to the Latest Version', 'visible', 'off', 'userdata', 'startup:on;study:on');
     
     % set the callback to bring up the updater GUI
     eeglabFolder = fileparts(mywhich('eeglab.m'));
@@ -1193,8 +1201,8 @@ if ~ismatlab
 end
 
 % REMOVED MENUS
-	%uimenu( tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
-	%uimenu( tools_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
+	%eegmenu( false,  tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
+	%eegmenu( false,  tools_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
 
      function command_on_update_menu_click(callerHandle, tmp, eeglabUpdater, installDirectory, goOneFolderLevelIn, backGroundColor)
          postInstallCallbackString = 'clear all function functions; eeglab';
@@ -1428,13 +1436,13 @@ while( index <= MAX_SET)
             tag = [ 'More (' int2str(index/30) ') ->' ];
             tmp_m = findobj('label', tag);
             if isempty(tmp_m)
-                 set_m = uimenu( set_m, 'Label', tag, 'userdata', 'study:on'); 
+                 set_m = eegmenu( false,  set_m, 'Label', tag, 'userdata', 'study:on'); 
             else set_m = tmp_m;
             end	
         end
         try
             set( EEGMENU(index), 'Label', '------', 'checked', 'off');
-        catch, EEGMENU(index) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end	
+        catch, EEGMENU(index) = eegmenu( false,  set_m, 'Label', '------', 'Enable', 'on'); end	
     end        
 	set( EEGMENU(index), 'Enable', 'on', 'separator', 'off' );
 	try, ALLEEG(index).data;
@@ -1467,7 +1475,7 @@ if index ~= 0
                   '    eeglab(''redraw'');' ...
                   'end;' ...
                   'clear tmpind nonempty;' ];
-    if MAX_SET == length(EEGMENU), EEGMENU(end+1) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end
+    if MAX_SET == length(EEGMENU), EEGMENU(end+1) = eegmenu( false,  set_m, 'Label', '------', 'Enable', 'on'); end
     
     set(EEGMENU(end), 'enable', 'on', 'Label', 'Select multiple datasets', ...
                       'callback', cb_select, 'separator', 'on', 'userdata', 'study:on');
@@ -1519,7 +1527,7 @@ if exist_study
                   'eeglab(''redraw'');' ];
     tmp_m = findobj('label', 'Select the study set');
     delete(tmp_m); % in case it is not at the end
-    tmp_m = uimenu( set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
+    tmp_m = eegmenu( false,  set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
     set(tmp_m, 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
 else 
     delete( findobj('label', 'Select the study set') );
@@ -2095,3 +2103,9 @@ catch
     fprintf('Warning: permission error accesssing %s\n', varargin{1});
 end
    
+function h = eegmenu( versL, varargin)
+    h = [];
+    if ~versL
+        h = uimenu(varargin{:});
+    end
+    
