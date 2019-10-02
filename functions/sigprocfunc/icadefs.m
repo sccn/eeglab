@@ -54,6 +54,7 @@ HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down'
                             % (e.g., timef/newtimef frequency direction)
                             
 % Checking MATLAB version
+clear version
 tmpvers = version;
 indp = find(tmpvers == '.');
 if str2num(tmpvers(indp(1)+1)) >= 1, tmpvers = [ tmpvers(1:indp(1)) '0' tmpvers(indp(1)+1:end) ]; end
