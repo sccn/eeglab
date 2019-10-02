@@ -411,7 +411,7 @@ dat.label1     = strcmpi(g.showlabels1, 'on');
 dat.label2     = strcmpi(g.showlabels2, 'on');
 dat.meshon     = 1;
 fid = figure('userdata', dat, 'name', 'coregister()', 'numbertitle', 'off');
-try icadefs; catch, end
+try, icadefs; catch, end
 
 if strcmpi(g.manual, 'on') 
     header    = 'dattmp = get(gcbf, ''userdata'');';
