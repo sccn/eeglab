@@ -760,7 +760,7 @@ if ismatlab
     eegmenu( false,  edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
     eegmenu( false,  edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
 
-    eegmenu(~versL,  tools_m, 'Label', '(Change Preferences for all menus)'    , 'userdata', 'enable:off');
+    eegmenu(~versL,  tools_m, 'Label', '(Change Preferences to see all menus)'    , 'userdata', 'enable:off');
     eegmenu( false,  tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample, 'Separator', 'on');
 
     filter_m = eegmenu( false,  tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
@@ -788,7 +788,7 @@ if ismatlab
     eegmenu( versL,  rej_m1, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec1);
     eegmenu( versL,  rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
     eegmenu( versL,  rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
-    eegmenu( false,  tools_m,'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
+    eegmenu(~versL,  tools_m,'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
     eegmenu( versL,  rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
     eegmenu( versL,  rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
     eegmenu( versL,  rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
