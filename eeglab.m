@@ -1051,6 +1051,12 @@ else
                        'eval(char(get(findobj(''label'', ''Basic FIR filter (new, default)''), ''callback'')));' ];
             eegmenu( false,  neuro_m, 'Label', 'Basic FIR filter (new, default)', 'CallBack', cb_filter, 'separator', 'on');
         end
+        if ~exist('eegplugin_iclabel', 'file')
+            fprintf(2, 'Warning: ICLabel default plugin missing (probably due to downloading zip file from Github). Install manually.\n');
+        end
+        if ~exist('eegplugin_clean_rawdata', 'file')
+            fprintf(2, 'Warning: Clean Rawdata  plugin missing (probably due to downloading zip file from Github). Install manually.\n');
+        end
         if ~exist('pop_dipfit_settings', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'tools');
             cb_dipfit = [ 'if ~plugin_askinstall(''dipfit'', ''pop_dipfit_settings''), return; end;'  ];
