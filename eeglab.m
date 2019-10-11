@@ -760,22 +760,19 @@ if ismatlab
     eegmenu( false,  edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
     eegmenu( false,  edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
 
-    eegmenu(~versL,  tools_m, 'Label', '(Change Preferences to see all menus)'    , 'userdata', 'enable:off');
+    eegmenu(~versL,  tools_m, 'Label', '(Expand tool choices via "File > Preferences")'    , 'userdata', 'enable:off');
     eegmenu( false,  tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample, 'Separator', 'on');
 
     filter_m = eegmenu( false,  tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
     eegmenu( false,  filter_m, 'Label', 'Basic FIR filter (legacy)'            , 'userdata', ondatastudy, 'CallBack', cb_eegfilt);
 
-    eegmenu( false,  tools_m, 'Label', 'Re-reference'                          , 'userdata', ondata, 'CallBack', cb_reref, 'userdata', 'study:on');
+    eegmenu( false,  tools_m, 'Label', 'Re-reference the data'                 , 'userdata', ondata, 'CallBack', cb_reref, 'userdata', 'startup:off;study:on');
     eegmenu( false,  tools_m, 'Label', 'Interpolate electrodes'                , 'userdata', ondata, 'CallBack', cb_interp);
-    eegmenu( false,  tools_m, 'Label', 'Reject continuous data by eye'         , 'userdata', ondata, 'CallBack', cb_eegplot);
-    eegmenu( false,  tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on', 'userdata', 'study:on');
-    eegmenu( false,  tools_m, 'Label', 'Remove baseline'                       , 'userdata', ondatastudy, 'CallBack', cb_rmbase);
-    eegmenu( false,  tools_m, 'Label', 'Run ICA'                               , 'userdata', ondatastudy, 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
-    eegmenu( false,  tools_m, 'Label', 'Remove components'                     , 'userdata', ondata, 'CallBack', cb_subcomp);
-    eegmenu( versL,  tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej, 'Separator', 'on');
+    eegmenu( false,  tools_m, 'Label', 'Inspect/reject data by eye'            , 'userdata', ondata, 'CallBack', cb_eegplot, 'Separator', 'on');
+    eegmenu( versL,  tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej);
     eegmenu( versL,  tools_m, 'Label', 'Automatic continuous rejection'        , 'userdata', ondata, 'CallBack', cb_rejcont);
     eegmenu( versL,  tools_m, 'Label', 'Automatic epoch rejection'             , 'userdata', onepoch, 'CallBack', cb_autorej);
+    eegmenu( false,  tools_m, 'Label', 'Decompose data by ICA'                 , 'userdata', ondatastudy, 'CallBack', cb_runica, 'Separator', 'on');
     rej_m1 = eegmenu( versL,  tools_m, 'Label', 'Reject data epochs'           , 'userdata', onepoch);
     rej_m2 = eegmenu( versL,  tools_m, 'Label', 'Reject data using ICA'        , 'userdata', ondata );
 
@@ -788,7 +785,7 @@ if ismatlab
     eegmenu( versL,  rej_m1, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec1);
     eegmenu( versL,  rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
     eegmenu( versL,  rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
-    eegmenu(~versL,  tools_m,'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
+    eegmenu(~versL,  tools_m,'Label', 'Inspect/label components by map'        , 'userdata', ondata , 'CallBack', cb_selectcomps);
     eegmenu( versL,  rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
     eegmenu( versL,  rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
     eegmenu( versL,  rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
@@ -799,6 +796,10 @@ if ismatlab
     eegmenu( versL,  rej_m2, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec2);
     eegmenu( versL,  rej_m2, 'Label', 'Export marks to data reject'            , 'userdata', onepoch, 'CallBack', cb_rejsup3, 'separator', 'on');
     eegmenu( versL,  rej_m2, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
+
+    eegmenu( false,  tools_m, 'Label', 'Remove components from data'           , 'userdata', ondata, 'CallBack', cb_subcomp);
+    eegmenu( false,  tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on', 'userdata', 'startup:off;study:on');
+    eegmenu( false,  tools_m, 'Label', 'Remove epoch baseline'                 , 'userdata', ondatastudy, 'CallBack', cb_rmbase);
 
     eegmenu( false,  loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
     eegmenu( false,  loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
@@ -1093,7 +1094,8 @@ exportsub_m = findobj('parent', exportm);
 filter_m    = findobj('parent', filter_m);
 
 icadefs; % containing PLUGINMENUCOLOR
-if length(fourthsub_m) > 11, set(fourthsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end
+if versL, tm = 14; else tm = 16; end
+if length(fourthsub_m) > tm, set(fourthsub_m(1:end-tm), 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(importsub_m) > 4,  set(importsub_m(1:end-4) , 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(epochsub_m ) > 3 , set(epochsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end

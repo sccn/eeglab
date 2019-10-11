@@ -19,7 +19,7 @@ option_rememberfolder = 1 ;  % If set, when browsing to open a new dataset assum
 % Toolbox options
 option_donotusetoolboxes = 0 ;  % If set, do not use Matlab additional toolboxes functions even if they are present (need to restart EEGLAB).
 % EEGLAB connectivity and support
-option_allmenus          = 0 ;  % If set, show all menus from previous EEGLAB versions. You must restart EEGLAB for this to take effect.
+option_allmenus          = 0 ;  % If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.
 option_checkversion      = 1 ;  % If set, check for new version of EEGLAB and EEGLAB extensions at startup.
 option_chat              = 0 ;  % If set, enable EEGLAB chat - currently UCSD only - restart EEGLAB after changing that option.
 option_cachesize         = 100 ;  % Size of cache in Mbytes for EEGLAB STUDY cache in RAM.

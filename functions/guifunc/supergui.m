@@ -384,7 +384,7 @@ end
 
 % adjustments
 % -----------
-factmultx = factmultx*1.02;% because some text was still hidden
+factmultx = factmultx*1.1;% because some text was still hidden
 if factmultx < 0.1
 	factmultx = 0.1;
 end
