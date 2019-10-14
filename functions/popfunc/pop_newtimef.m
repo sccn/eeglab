@@ -161,7 +161,7 @@ if popup
     g = [1 0.3 0.6 0.4];
 	geometry = { g g g g g g g g [0.975 1.27] [1] [1.2 1 1.2]};
     uilist = { ...
-               { 'Style', 'text', 'string', fastif(typeproc, 'Channel number', 'Component number'), 'fontweight', 'bold'  } ...
+               { 'Style', 'text', 'string', fastif(typeproc, 'Channel number or label', 'Component number'), 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') 'tag' 'chan'} {} {} ...
                ...
 			   { 'Style', 'text', 'string', 'Sub epoch time limits [min max] (msec)', 'fontweight', 'bold' } ...
@@ -222,7 +222,11 @@ if popup
 	if result.fft,      result.cycle = '0'; end
 	if result.nobase,   result.baseline = 'NaN'; end
     
-	num	     = eval( [ '[' result.chan    ']' ] ); 
+	try
+        num	     = eval( [ '[' result.chan    ']' ] ); 
+    catch
+        num = find(strcmpi(result.chan, {EEG.chanlocs.labels})>0);
+    end
 	tlimits	 = eval( [ '[' result.tlimits ']' ] ); 
 	cycles	 = eval( [ '[' result.cycle   ']' ] );
     freqs    = eval( [ '[' result.freqs   ']' ] );
