@@ -220,9 +220,9 @@ model.cont_files = [];
 unique_subjects  = STUDY.design(STUDY.currentdesign).cases.value'; % all designs have the same cases
 nb_subjects      = length(unique_subjects);
 
+% also could split per group
 % useful for multiple sessions
-% nb_sets          = NaN(1,nb_subjects);
-% for s = 1:nb_subjects
+% for s = nb_subjects:-1:1
 %     nb_sets(s) = numel(find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject})));
 % end
 
@@ -272,13 +272,15 @@ clear study_fullpath pathtmp;
 measureflags = struct('daterp','off',...
                      'datspec','off',...
                      'datersp','off',...
+                     'dattimef','off',...
                      'datitc' ,'off',...
                      'icaerp' ,'off',...
                      'icaspec','off',...
+                     'icatimef','off',...
                      'icaersp','off',...
                      'icaitc','off');
-
-measureflags.(lower(opt.measureori))= 'on';
+FN = fieldnames(measureflags);
+measureflags.(lower(opt.measureori))= 'on'; 
 STUDY.etc.measureflags = measureflags;
 
 % generate temporary merged datasets needed by LIMO
@@ -344,42 +346,38 @@ for s = 1:nb_subjects
     % Def fields
     OUTEEG.etc.datafiles.daterp   = [];
     OUTEEG.etc.datafiles.datspec  = [];
+    OUTEEG.etc.datafiles.datersp  = [];
     OUTEEG.etc.datafiles.dattimef = [];
     OUTEEG.etc.datafiles.datitc   = [];
     OUTEEG.etc.datafiles.icaerp   = [];
     OUTEEG.etc.datafiles.icaspec  = [];
+    OUTEEG.etc.datafiles.icaersp  = [];
     OUTEEG.etc.datafiles.icatimef = [];
     OUTEEG.etc.datafiles.icaitc   = [];
 
     % Filling fields
-    if isfield(ALLEEG(index(1)).etc, 'datafiles')
-        if isfield(ALLEEG(index(1)).etc.datafiles,'daterp')
-            OUTEEG.etc.datafiles.daterp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.daterp);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'datspec')
-            OUTEEG.etc.datafiles.datspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datspec);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'dattimef')
-            OUTEEG.etc.datafiles.datersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.dattimef);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'datitc')
-            OUTEEG.etc.datafiles.datitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.datitc);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icaerp')
-            OUTEEG.etc.datafiles.icaerp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaerp);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icaspec')
-            OUTEEG.etc.datafiles.icaspec{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaspec);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icatimef')
-            OUTEEG.etc.datafiles.icaersp{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icatimef);
-        end
-        if isfield(ALLEEG(index(1)).etc.datafiles,'icaitc')
-            OUTEEG.etc.datafiles.icaitc{1} = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).etc.datafiles.icaitc);
+    single_trials_filename = fullfile(STUDY.datasetinfo(index(1)).filepath,  [STUDY.datasetinfo(index(1)).subject '.' FN{find(contains(FN,opt.measureori))}]);
+    if exist('single_trials_filename') % note exist('single_trials_filename','file') doesn't work ??
+        if strcmpi(measureflags.daterp,'on')
+            OUTEEG.etc.datafiles.daterp = single_trials_filename;
+        elseif strcmpi(measureflags.datspec,'on')
+            OUTEEG.etc.datafiles.datspec = single_trials_filename;
+        elseif strcmpi(measureflags.datersp,'on')
+            OUTEEG.etc.datafiles.datersp = single_trials_filename;
+        elseif strcmpi(measureflags.datitc,'on')
+            OUTEEG.etc.datafiles.datitc = single_trials_filename;
+        elseif strcmpi(measureflags.icaerp,'on')
+            OUTEEG.etc.datafiles.icaerp = single_trials_filename;
+        elseif strcmpi(measureflags.icaspec,'on')
+            OUTEEG.etc.datafiles.icaspec = single_trials_filename;
+        elseif strcmpi(measureflags.icaersp,'on')
+            OUTEEG.etc.datafiles.icaersp = single_trials_filename;
+        elseif strcmpi(measureflags.icaitc,'on')
+            OUTEEG.etc.datafiles.icaitc = single_trials_filename;
+        elseif strcmpi(measureflags.dattimef,'on')
+            OUTEEG.etc.datafiles.dattimef = single_trials_filename;        
         end
     end
-
-%     OUTEEG.etc.freqsersp =
 
     % Save info
     EEG = OUTEEG;
@@ -408,16 +406,17 @@ for s = 1:nb_subjects
 end
 
 % then we add contrasts for conditions that were merged during design selection
-% if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
-%     limocontrast = zeros(length(STUDY.design(opt.design).variable.value),length(factors)+1); % length(factors)+1 to add the contant
-%     for n=1:length(factors)
-%         factor_names{n} = factors(n).value;
-%     end
-%
-%     for c=1:length(STUDY.design(opt.design).variable.value)
-%         limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
-%     end
-% end
+if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
+    limocontrast = zeros(length(STUDY.design(opt.design).variable.value),length(factors)+1); % length(factors)+1 to add the contant
+    for n=1:length(factors)
+        factor_names{n} = factors(n).value;
+    end
+
+    for c=1:length(STUDY.design(opt.design).variable.value)
+        limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
+        limocontrast(c,1:length(factors)) = limocontrast(c,1:length(factors)) ./ sum(limocontrast(c,1:length(factors))); % scale by the number of variables
+    end
+end
 
 % transpose
 model.set_files  = model.set_files';
@@ -463,10 +462,10 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
         error('std_limo: Frequency limits need to be specified');
     end
 
-elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
+elseif strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
-    model.defaults.start    = [];
-    model.defaults.end      = [];
+    model.defaults.start    = ALLEEG(index(1)).times(1);
+    model.defaults.end      = ALLEEG(index(1)).times(end);
     model.defaults.lowf     = [];
     model.defaults.highf    = [];
 
@@ -477,6 +476,8 @@ elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'dattimef') || strcmp(Analy
     if length(opt.freqlim) == 2
         model.defaults.lowf     = opt.freqlim(1);
         model.defaults.highf    = opt.freqlim(2);
+    else
+        error('std_limo: Frequency limits need to be specified');
     end
 end
 
@@ -521,8 +522,6 @@ end
 for s = 1:nb_subjects
     delete(model.set_files{s});
 end
-
-%% start 2nd level
 
 
 % -------------------------------------------------------------------------
