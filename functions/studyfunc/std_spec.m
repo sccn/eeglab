@@ -306,7 +306,7 @@ if strcmpi(g.specmode, 'psd')
         fprintf('Computing spectopo accross trials: ');
         for iTrial = 1:size(X,3)
             [XX(:,:,iTrial), f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, 'verbose', 'off', spec_opt{:});
-            if iTrial == 1, XX(:,:,size(X,3)) = 0; end
+            if iTrial == 1 && size(X,3) > 1, XX(:,:,size(X,3)) = 0; end
             if mod(iTrial,10) == 0, fprintf('%d ', iTrial); end
         end
         fprintf('\n');
