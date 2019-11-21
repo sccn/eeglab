@@ -82,7 +82,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
+function [newprob3dori, mriplanes] = mri3dplot(prob3d, mri, varargin)
 
     % REDUCEPATCH  Reduce number of patch faces.
 
@@ -110,7 +110,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'rotate'    'integer'  { 0,90,180,270 }          90;
                         'kernel'    'float'    []                        0; 
                         'addrow'    'integer'  []                        0;
-                        'fighandle' 'integer'  []                        []});
+                        'fighandle' ''         []                        []});
     if ischar(g), error(g); end
     if ischar(g.mriview) == 1, g.plotintersect = 'off'; end
     if strcmpi(g.mriview,'sagittal'),    g.mriview = 'side'; 
@@ -121,12 +121,12 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         g.cbar = 'off';
     end
     if ischar(mri)
-         try, 
+         try
             mri = load('-mat', mri);
             mri = mri.mri;
-        catch,
+         catch
             disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
-            try,
+            try
                 warning off;
                 mri = read_fcdc_mri(mri);
                 mri.anatomy = round(gammacorrection( mri.anatomy, 0.8));
@@ -136,7 +136,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                 % WARNING: the transform matrix is not 1, 1, 1 on the diagonal, some slices may be 
                 % misplaced
                 warning on;
-            catch,
+            catch
                 error('Cannot load file using read_fcdc_mri');
             end
          end
@@ -151,8 +151,8 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         [newprob3d{2}] = prepare_dens(prob3d{2}, g, 'abscolor');
     else
         if isempty(g.cmax), g.cmax = max(prob3d{1}(:)); end
-        [newprob3d{1} maxdens1] = prepare_dens(prob3d{1}, g, 'usecmap');
-    end;    
+        [newprob3d{1}, maxdens1] = prepare_dens(prob3d{1}, g, 'usecmap');
+    end
     fprintf('Brightest color denotes a density of: %1.6f (presumed unit: dipoles/cc)\n', g.cmax);
     
     % plot MRI slices
@@ -162,7 +162,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     end
     
     if strcmpi(g.cbar, 'on'), add1 = 1; else add1 = 0; end
-    if isempty(g.geom), 
+    if isempty(g.geom)
         g.geom = ceil(sqrt(length(g.mrislices)+add1)); 
         g.geom(2) = ceil((length(g.mrislices)+add1)/g.geom)+g.addrow;
     end
