@@ -688,7 +688,20 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     cfg.method   = warpmethod;
     %cfg.feedback = 'yes';
     cfg.channel  = chanlist;
-    elec3 = electroderealign(cfg);
+    if length(cfg.channel) > length(elec1.label)
+        [ind] = intersect_bc(elec1.label, cfg.channel);
+        elec1tmp.label   = elec1.label(ind);
+        elec1tmp.elecpos = elec1.elecpos(ind,:);
+        elec1tmp.pnt     = elec1.pnt(ind,:);
+        cfg.elec         = elec1tmp;
+    end
+    try
+        elec3 = electroderealign(cfg);
+    catch
+        error( [ 'You need to select more pairs or the correspondance you selectd' 10 ...
+                 'leads to a failure in initial objective function evaluation' 10 ...
+                 'which means that the correspondance is wrong.' ]);
+    end
     [tmp ind1 ] = intersect_bc( lower(elec1.label), lower(chanlist) );
     [tmp ind2 ] = intersect_bc( lower(elec2.label), lower(chanlist) );
     
