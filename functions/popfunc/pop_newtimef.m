@@ -297,7 +297,7 @@ if isempty(tlimits)
 	tlimits = [EEG.xmin, EEG.xmax]*1000;
 end;	
 pointrange1 = round(max((tlimits(1)/1000-EEG.xmin)*EEG.srate, 1));
-pointrange2 = round(min((tlimits(2)/1000-EEG.xmin)*EEG.srate, EEG.pnts));
+pointrange2 = round(min((tlimits(2)/1000-EEG.xmin)*EEG.srate+1, EEG.pnts));
 pointrange = [pointrange1:pointrange2];
 
 % call function sample either on raw data or ICA data
