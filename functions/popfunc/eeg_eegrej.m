@@ -219,11 +219,19 @@ function res = issameevent(evt1, evt2)
 res = true;
 if isequal(evt1,evt2)
     return;
-elseif isfield(evt1, 'duration') && isnan(evt1.duration) && isfield(evt2, 'duration') && isnan(evt2.duration)
-    evt1.duration = 1;
-    evt2.duration = 1;
-    if isequal(evt1,evt2)
-        return;
+else
+    if isfield(evt1, 'type') && isnumeric(evt2.type) && ~isnumeric(evt1.type) 
+        evt2.type = num2str(evt2.type);
+        if isequal(evt1,evt2)
+            return;
+        end
+    end
+    if isfield(evt1, 'duration') && isnan(evt1.duration) && isfield(evt2, 'duration') && isnan(evt2.duration)
+        evt1.duration = 1;
+        evt2.duration = 1;
+        if isequal(evt1,evt2)
+            return;
+        end
     end
 end
 res = false;
