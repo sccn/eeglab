@@ -535,7 +535,7 @@ else
 		projchan = [];
 	end
 	if nargin < 5
-		titleplot = ' ';
+		titleplot = '';
 	end
 	if nargin < 6
 		smooth = 5;
