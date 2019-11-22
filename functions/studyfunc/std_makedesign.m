@@ -165,7 +165,10 @@ if length(defdes.variable) == 0, defdes.variable(1).label = 'continuous'; defdes
 if length(defdes.variable) == 1, defdes.variable(2).label = 'continuous'; defdes.variable(2).vartype = 'categorical'; defdes.variable(2).value = {}; end
 if length(defdes.variable) == 2, defdes.variable(3).label = 'continuous'; defdes.variable(3).vartype = 'categorical'; defdes.variable(3).value = {}; end
 if length(defdes.variable) == 3, defdes.variable(4).label = 'continuous'; defdes.variable(4).vartype = 'categorical'; defdes.variable(4).value = {}; end
-for iVar = 1:4, if isempty(defdes.variable(iVar).vartype), defdes.variable(iVar).vartype = 'continuous'; end; end
+for iVar = 1:4
+    if isempty(defdes.variable(iVar).vartype), defdes.variable(iVar).vartype = 'continuous'; end
+    if isempty(defdes.variable(iVar).label)  , defdes.variable(iVar).label = ''; end
+end
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
                               'variable3'     'string'    []     defdes.variable(3).label;
