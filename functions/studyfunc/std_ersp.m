@@ -245,7 +245,7 @@ elseif ~isempty(g.channels)
 end
 
 powbaseexist = 1; % used also later
-if isempty(g.powbase) || isnan(g.powbase)
+if isempty(g.powbase) || any(isnan(g.powbase))
     powbaseexist = 0;
     g.powbase = NaN*ones(length(g.indices),1);  % default for timef()
 end
@@ -317,13 +317,19 @@ usesingle = option_single;
 % CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
 disp('Computing time/frequency decomposition...');
 numWorkers = 0;
-if strcmpi(g.parallel, 'yes') && ~exist('parpool')
-    poolobj = gcp('nocreate')
+if strcmpi(g.parallel, 'on') && ~exist('parpool')
+    poolobj = gcp('nocreate');
     if ~isempty(poolobj)
         numWorkers = poolobj.NumWorkers;
     end
+elseif strcmpi(g.parallel, 'on')
+    try
+        myCluster = parcluster('local');
+        numWorkers = myCluster.NumWorkers;
+    catch, disp('Cound not start parallel job'); end
 end
 parfor (k = 1:length(g.indices),numWorkers)  % for each (specified) component/channel
+%for k = 1:length(g.indices)
     %if k>size(X,1), break; end; % happens for components
     if powbaseexist
         tmpparams = parameters;
