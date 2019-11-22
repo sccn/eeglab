@@ -236,7 +236,7 @@ if ~isempty(indx_tmp)
     flag_replurchan = varargin{indx_tmp+1};
 end
 
-if nargin < 3
+if nargin < 3 && isstruct(chans)
 
     totaluserdat = {};
     % lookup channel locations if necessary
