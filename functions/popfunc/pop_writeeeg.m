@@ -72,6 +72,10 @@ if nargin < 2
                      'title', 'Write data using BIOSIG -- pop_writeeeg()', 'geomvert', [1 2.5]);
     if isempty(result), return; end
 
+    if result{1} == 3
+        disp('WARNING: there is a potential issue BDF file header, see https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1020');
+    end
+    
     options = { 'TYPE' fileformats{result{1}} };
 else
     options = varargin;

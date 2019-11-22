@@ -97,7 +97,7 @@ for i=1:2:length( varargin )
 end
 
 HDR.FileName = filename;
-HDR.FLAG.UCAL = 0;
+HDR.FLAG.UCAL = 0; % see also https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1020
 
 % select file format 
 if ~isfield(HDR, 'EVENT'),                     HDR.EVENT = []; end
@@ -131,7 +131,7 @@ if ~isfield(HDR.Patient.Impairment, 'Visual')  HDR.Patient.Impairment.Visual = 0
 if ~isfield(HDR.Patient,'Smoking')             HDR.Patient.Smoking = 0; end;           %	0: unknown 1: NO 2: YES 
 if ~isfield(HDR.Patient,'AlcoholAbuse')        HDR.Patient.AlcoholAbuse = 0; end; 	   %	0: unknown 1: NO 2: YES 
 if ~isfield(HDR.Patient,'DrugAbuse')           HDR.Patient.DrugAbuse = 0; end;  	   %	0: unknown 1: NO 2: YES 
-    
+
 % recording time [YYYY MM DD hh mm ss.ccc]
 if ~isfield(HDR,'T0')                          HDR.T0 = clock; end
 if ~isfield(HDR,'SPR')                         HDR.SPR = size(x,2); end
@@ -204,6 +204,17 @@ end
 
 % number of channels
 HDR.NS = size(x,1);
+    
+% fix for BDF precision see https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1020
+% However, likely BIOSIG takes care of that now because there is no
+% difference when the code below is added
+if strcmpi(HDR.TYPE, 'BDF')
+    HDR.PhysMax = max(x',[],1);
+    HDR.PhysMin = min(x',[],1);
+    % BDF uses 24 bit signed integers 
+    HDR.DigMax = repmat(2^23-1,1,HDR.NS);	
+    HDR.DigMin = repmat(-2^23,1,HDR.NS);
+end
 
 if ~isfield(HDR,'Transducer')
     HDR.Transducer = cell(1,HDR.NS);
