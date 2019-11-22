@@ -224,7 +224,9 @@ fprintf('%d/%d trials marked for rejection\n', length(Irej), EEG.trials);
 rej = zeros( 1, EEG.trials);
 rej(Irej) = 1;
 
+calldisp = 0;
 if nargin < 3 || opt.eegplotplotallrej == 2
+    calldisp = 1;
 	nbpnts = EEG.pnts;
     if icacomp == 1 macrorej  = 'EEG.reject.rejfreq';
         			macrorejE = 'EEG.reject.rejfreqE';
@@ -245,7 +247,11 @@ if nargin < 3 || opt.eegplotplotallrej == 2
 	else
 		eegplot(icaacttmp(opt.elecrange,:,:), 'srate', EEG.srate, 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
 				[EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
-	end;	
+    end
+else
+    if opt.eegplotreject
+        EEG = pop_rejepoch(EEG, rej, 0);
+    end
 end
 if ~isempty(rej)
 	if icacomp	== 1
@@ -255,9 +261,6 @@ if ~isempty(rej)
 		EEG.reject.icarejfreq = rej;
 		EEG.reject.icarejfreqE = rejE;
 	end
-    if opt.eegplotreject
-        EEG = pop_rejepoch(EEG, rej, 0);
-    end
     Irej = find(rej);
 end
 
@@ -269,7 +272,7 @@ end
     
 com = [com sprintf('EEG = pop_rejspec( EEG, %s);', ...
    vararg2str({icacomp, 'elecrange', opt.elecrange,'method', opt.method, 'threshold', opt.threshold, 'freqlimits', opt.freqlimits, ...
-     'eegplotcom', opt.eegplotcom, 'eegplotplotallrej' opt.eegplotplotallrej 'eegplotreject' opt.eegplotreject })) ]; 
+     'eegplotcom', opt.eegplotcom, 'eegplotplotallrej' opt.eegplotplotallrej 'eegplotreject' opt.eegplotreject & ~calldisp })) ]; 
 
 return;
 
@@ -290,14 +293,14 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
             if ~exist('pmtm')
                 error('The signal processing toolbox needs to be installed');
             end
-            [tmp freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
+            [tmp, freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
 
             fprintf('Computing spectrum (using slepian tapers; done only once):\n');
 
             for index = 1:size(data,1)
                 fprintf('%d ', index);    
                 for indextrials = 1:size(data,3)
-                    [ tmpspec(index,:,indextrials) freqs] = pmtm( data(index,:,indextrials) , [],[],srate);
+                    [ tmpspec(index,:,indextrials), freqs] = pmtm( data(index,:,indextrials) , [],[],srate);
                 end
             end
             tmpspec  = 10*log(tmpspec);
@@ -309,13 +312,13 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
             sizewin = size(data,2);
             freqs = srate*[1, sizewin]/sizewin/2;
         else
-            [tmp freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
+            [tmp, freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
         end
     end
     
 	% perform the rejection
 	% ---------------------	
-	[I1 Irej NS Erej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
+	[I1, Irej, NS, Erej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
 										 [freqs(1) freqs(end)], startfreq, min(freqs(end), endfreq));
 	fprintf('\n');    
 	
