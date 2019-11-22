@@ -330,9 +330,11 @@ if ~isempty(refchan)
     else
         allf = fieldnames(refchan);
         n    = length(EEG.chaninfo.nodatchans);
-        for ind = 1:length(allf)
-            EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n }, ...
-                allf{ind}, getfield(refchan, allf{ind}));
+        for iRef = 1:length(refchan)
+            for ind = 1:length(allf)
+                EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n+iRef }, ...
+                    allf{ind}, getfield(refchan(iRef), allf{ind}));
+            end
         end
     end
 end
