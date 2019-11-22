@@ -132,7 +132,7 @@ if nargin < 2
                { 'style' 'checkbox' 'string' '' 'value' 1 } ...
                   };
     geom = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] };
-    result = inputgui('uilist', uilist, 'geometry', geom);
+    result = inputgui('uilist', uilist, 'geometry', geom, 'title', 'Reject continuous portions of data - pop_rejcont()');
     if length( result ) == 0 return; end
     
     options = { 'elecrange'     str2num(result{1}) ...
@@ -309,9 +309,8 @@ if ~isempty(winrej)
             disp('Light blue is ORIGINAL rejection');
             disp('Yellow is AUTOMATIC rejection');
         else
-            NEWEEG = pop_select(EEG, 'nopoint', round(selectedregions));
+            EEG = pop_select(EEG, 'nopoint', round(selectedregions));
         end
-        EEG = NEWEEG;
     else
         EEG = [];
     end
