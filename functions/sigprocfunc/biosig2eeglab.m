@@ -48,7 +48,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = biosig2eeglab(dat, DAT, interval, channels, importevent);
+function EEG = biosig2eeglab(dat, DAT, interval, channels, importevent, importannot)
 
 if nargin < 2
     help biosig2eeglab;
@@ -62,6 +62,9 @@ if nargin < 4
 end
 if nargin < 5
     importevent = 0;
+end
+if nargin < 6
+    importannot = 0;
 end
 
 % import data
@@ -211,7 +214,7 @@ if importevent
                 dat.EVENT = dat.out.EVENT;
             end
         end
-        EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
+        EEG.event = biosig2eeglabevent(dat.EVENT, interval, importannot); % Toby's fix
 
         % recreate the epoch field if necessary
         % -------------------------------------

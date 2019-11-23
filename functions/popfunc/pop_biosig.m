@@ -168,7 +168,7 @@ if strcmpi(g.blockepoch, 'off')
     dat.NRec = 1;
 end
     
-EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'));
+EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'), strcmpi(g.importannot, 'on'));
 
 if strcmpi(g.rmeventchan, 'on') && strcmpi(dat.TYPE, 'BDF') && isfield(dat, 'BDF')
     if size(EEG.data,1) >= dat.BDF.Status.Channel, 
