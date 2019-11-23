@@ -197,13 +197,22 @@ end
 % convert to seconds for sread
 % ----------------------------
 EEG.srate           = dat.Fs;
-EEG.nbchan          = dat.nChans;
+EEG.nbchan          = size(alldata,1);
 EEG.data            = alldata;
 EEG.setname 		= '';
 EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin = -dat.nSamplesPre/EEG.srate; 
-EEG.trials          = dat.nTrials;
-EEG.pnts            = dat.nSamples;
+EEG.trials = dat.nTrials;
+if size(alldata,3) > 1
+    EEG.trials = size(alldata,3);
+    EEG.pnts   = size(alldata,2);
+else
+    if dat.nTrials == 1
+        EEG.pnts        = size(alldata,2);
+    else
+        EEG.pnts        = dat.nSamples;
+    end
+end
 if isfield(dat, 'label') && ~isempty(dat.label)
     EEG.chanlocs = struct('labels', dat.label);
     
