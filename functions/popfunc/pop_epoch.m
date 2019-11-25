@@ -229,13 +229,13 @@ if ~isempty( events )
     % ------------------------------
     Ieventtmp = [];
     tmpevent = EEG.event;
-    tmpeventtype  = { tmpevent.type };
+    tmpeventtype  = deblank({ tmpevent.type });
     if iscell(events)
 		if ischar(EEG.event(1).type)
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
 				if ~ischar( tmpevent ), tmpevent = num2str( tmpevent ); end
-				Ieventtmp = [ Ieventtmp ; strmatch(tmpevent, tmpeventtype, 'exact') ];
+				Ieventtmp = [ Ieventtmp ; strmatch(deblank(tmpevent), tmpeventtype, 'exact') ];
 			end
 		else
 			for index2 = 1:length( events )
@@ -410,8 +410,8 @@ end
 % generate text command
 % ---------------------
 com = sprintf('EEG = pop_epoch( EEG, { ');
-for j=1:length(events);
-    if ischar( events{j} )   com = sprintf('%s ''%s'' ', com, events{j} );
+for j=1:length(events)
+    if ischar( events{j} )  com = sprintf('%s ''%s'' ', com, events{j} );
     else                    com = sprintf('%s [%s] ',   com, num2str(events{j}) );
     end
 end
