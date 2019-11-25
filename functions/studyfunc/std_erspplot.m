@@ -319,7 +319,7 @@ if ~isempty(opt.channels)
         stats.fieldtrip.channelneighbor = statstruct.etc.statistics.fieldtrip.channelneighbor;
         
         params.plottf = { params.plottf(1:2) params.plottf(3:4) };
-        [pcond pgroup pinter] = std_stat(allersp, stats);
+        [pcond, pgroup, pinter] = std_stat(allersp, stats);
         if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end % single subject STUDY                                
     else
         [pcond, pgroup, pinter] = std_stat(allersp, stats);

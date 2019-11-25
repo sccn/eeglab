@@ -111,7 +111,7 @@ end
 opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'filter'        'real'   []              [];
                                'threshold'     'real'   []              NaN;
-                               'unitx'         'string' []              'ms';
+                               'unitx'         'string' { 'ms','hz','rmsms','rmshz','hzpsd','rmshzpsd' }   'ms';
                                'chanlocs'      'struct' []              struct('labels', {});
                                'plotsubjects'  'string' { 'on','off' }  'off';
                                'condnames'     'cell'   []              {}; % just for legends
@@ -301,8 +301,12 @@ end
 
 % labels
 % ------
-if strcmpi(opt.unitx, 'ms'), xlab = 'Time (ms)';      ylab = 'Potential (\muV)';
-else                         xlab = 'Frequency (Hz)'; ylab = 'Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)'; % ylab = 'Power (10*log_{10}(\muV^{2}))'; 
+if strcmpi(opt.unitx, 'ms'),        xlab = 'Time (ms)';      ylab = 'Potential (\muV)';
+elseif strcmpi(opt.unitx, 'rmsms'), xlab = 'Time (ms)';      ylab = 'Potential (RMS \muV)';
+elseif strcmpi(opt.unitx, 'hz'),    xlab = 'Frequency (Hz)'; ylab = 'Log Power 10*log_{10}(\muV^{2})'; % ylab = 'Power (10*log_{10}(\muV^{2}))'; 
+elseif strcmpi(opt.unitx, 'rmshz'), xlab = 'Frequency (Hz)'; ylab = 'Log Power 10*log_{10}(RMS \muV^{2})'; % ylab = 'Power (10*log_{10}(\muV^{2}))'; 
+elseif strcmpi(opt.unitx, 'hzpsd'),    xlab = 'Frequency (Hz)'; ylab = 'Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)'; % ylab = 'Power (10*log_{10}(\muV^{2}))'; 
+elseif strcmpi(opt.unitx, 'rmshzpsd'), xlab = 'Frequency (Hz)'; ylab = 'Log Power Spectral Density 10*log_{10}(RMS \muV^{2}/Hz)'; % ylab = 'Power (10*log_{10}(\muV^{2}))'; 
 end
 if ~isnan(opt.threshold), statopt = {  'xlabel' xlab };
 else                      statopt = { 'logpval' 'on' 'xlabel' xlab 'ylabel' '-log10(p)' 'ylim' [0 maxplot] };
