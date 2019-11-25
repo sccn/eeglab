@@ -108,7 +108,7 @@ opt = finputcheck( varargin, { 'titles'         'cell'   []              cellfun
                                'unitx'          'string' []              'ms'; % just for titles
                                'unitcolor'      'string' {}              'dB';
                                'chanlocs'       'struct' []              struct('labels', {});
-                               'freqscale'      'string' { 'log','linear','auto' }  'auto';
+                               'freqscale'      'string' { 'log','linear','auto' }  'auto'; % note that paramsersp in std_erspplot contains the information as well
                                'effect'         'string' { 'main','marginal' }   'marginal';
                                'averagemode'    'string' { 'rms','ave' }   'rms';
                                'events'         'cell'   []              {};
@@ -146,9 +146,9 @@ end
 % test log frequencies
 % --------------------
 if length(freqs) > 2 && strcmpi(opt.freqscale, 'auto')
-    midfreq = (freqs(3)+freqs(1))/2;
-    if midfreq*.9999 < freqs(2) && midfreq*1.0001 > freqs(2), opt.freqscale = 'linear';
-    else                                                     opt.freqscale = 'log';
+    midind  = floor(length(freqs)/2);
+    if abs(freqs(midind)/freqs(end) - 1/2) < 0.1, opt.freqscale = 'linear';
+    else                                          opt.freqscale = 'log';
     end
 end
 
