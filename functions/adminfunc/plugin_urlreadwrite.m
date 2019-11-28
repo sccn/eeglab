@@ -58,14 +58,14 @@ try
         proxyPort = s.matlab.web.ProxyPort.ActiveValue;
         switch protocol
             case 'http'
-                java.lang.System.setProperty('http.proxyHost',proxyHost)
-                java.lang.System.setProperty('http.proxyPort',proxyPort)
+                java.lang.System.setProperty('http.proxyHost',proxyHost);
+                java.lang.System.setProperty('http.proxyPort',proxyPort);
             case 'https'
                 s = settings;
                 proxyHost = s.matlab.web.ProxyHost.ActiveValue;
                 proxyPort = s.matlab.web.ProxyPort.ActiveValue;
-                java.lang.System.setProperty('https.proxyHost',proxyHost)
-                java.lang.System.setProperty('https.proxyPort',proxyPort)
+                java.lang.System.setProperty('https.proxyHost',proxyHost);
+                java.lang.System.setProperty('https.proxyPort',proxyPort);
             otherwise
                 warning('Unknown web protocol');
         end
