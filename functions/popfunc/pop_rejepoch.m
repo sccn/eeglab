@@ -90,8 +90,8 @@ end
 
 % create a new set if set_out is non nul 
 % --------------------------------------
-if format0_1
-    tmprej = find(tmprej > 0);
+if format0_1 || length(tmprej) == EEG.trials
+    tmprej = find(tmprej);
 end
 EEG = pop_select( EEG, 'notrial', tmprej);
 
