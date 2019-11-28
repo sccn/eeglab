@@ -574,7 +574,11 @@ EEG.pnts      = size(EEG.data,2);
 EEG.nbchan    = length(g.channel);
 if ~isempty(EEG.chanlocs)
     EEG.chanlocs = EEG.chanlocs(g.channel);
-end;    
+    if ~isfield(EEG.chaninfo, 'removedchans')
+        EEG.chaninfo.removedchans = [];
+    end
+    try EEG.chaninfo.removedchans = [ EEG.chaninfo.removedchans EEG.chanlocs(diff1) ]; catch, end;
+end
 if ~isempty(EEG.epoch)
    EEG.epoch = EEG.epoch( g.trial );
 end
