@@ -850,7 +850,7 @@ if ismatlab
     clust_m = eegmenu( false,  std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
     eegmenu( false,  clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
     eegmenu( false,  clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
-    eegmenu( false,  std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
+    eegmenu( false,  std_m,  'Label', 'Edit/plot component clusters'           , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
     if ~isdeployed
         %newerVersionMenu = eegmenu( false,  help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
@@ -1081,6 +1081,13 @@ end
 
 % Path exception for BIOSIG (sending BIOSIG down into the path)
 biosigpathlast; % fix str2double issue
+
+% push SIFT path last for dipplot
+dipplotpath = fileparts( which('dipplot') );
+dipfitpath  = fileparts( which('dipfit_1_to_2') );
+if ~strcmp(dipplotpath,dipfitpath)
+    addpath(dipfitpath,'-begin');
+end
 
 % add other import ...
 % --------------------
