@@ -1,6 +1,6 @@
 % plugin_menu() - main function to install EEGLAB plugins
 %
-% Usage: plugin_menu(PLUGINLIST); pop up gui
+% Usage: plugin_menu(PLUGINLIST); % pop up gui
 
 % Copyright (C) 2019 Arnaud Delorme
 %
@@ -71,6 +71,7 @@ for iRow = 1:length(plugin)
         plugin(iRow).text =  [ plugin(iRow).text '; ' int2str(plugin(iRow).numrating) ' rating' ];
     end
     plugin(iRow).text =  [ plugin(iRow).text ')</b></font></font></html>' ];
+    plugin(iRow).strsearch = lower([ plugin(iRow).name plugin(iRow).rawtags plugin(iRow).description ]);  
 end
 
 %cb_select = 'tmpobj = get(gcbf, ''userdata''); tmpstr = tmpobj(get(gcbo, ''value'')).longdescription; tmpstr = textwrap(findobj(gcbf, ''tag'', ''description''), {tmpstr}); set(findobj(gcbf, ''tag'', ''description''), ''string'', tmpstr); clear tmpobj tmpstr;';
@@ -90,9 +91,10 @@ filterList2 = { 'No topic filter' ...
                'Filter by other' };
            
 uilist =  {
-    { 'style', 'text', 'string', 'List of plugins (bolded plugins are installed)' 'fontweight' 'bold' } ...
+    { 'style', 'text', 'string', 'List of plugins (bolded means installed)' 'fontweight' 'bold' } ...
     { 'style', 'popupmenu', 'string', filterList1 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter1' } ...
     { 'style', 'popupmenu', 'string', filterList2 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter2' } ...
+    { 'style', 'edit'     , 'string', '' 'callback' 'plugin_search(gcbf);' 'tag' 'search' 'tooltipstring' 'Enter search term' } ...
     { 'style', 'listbox', 'string', { plugin.text } 'callback' 'plugin_uiupdate(gcbf);' 'Min', 0, 'Max', 2, 'value' [] 'tag', 'pluginlist' 'fontsize', 16, 'tooltipstring', [ 'Bold plugins are installed.' 10 'Red plugins need updating.' 10 '(Wong font size? Change it in plugin_menu.m)' ] } ...
     { 'style', 'pushbutton', 'string', [ 'Rate this plugin' ] 'tag' 'rating' } ...
     { 'style', 'pushbutton', 'string', [ 'Web documentation' ] 'tag' 'documentation' } ...
@@ -116,7 +118,7 @@ usrDat.allplugins = plugin;
 usrDat.selectedplugins = plugin;
 usrDat.selection = [];
 fig = figure('visible', 'off');
-supergui('fig', fig, 'uilist', uilist, 'geomhoriz', {[1 0.5 0.5] 1 [1 1 1] [0.2 1] [0.2 1] [0.2 1] 1 1 1 [0.43 0.37 0.4 0.5]}, 'geomvert', [1 10 1 1 1 1 1 2.5 1 1], 'userdata', usrDat);
+supergui('fig', fig, 'uilist', uilist, 'geomhoriz', {[0.8 0.5 0.5 0.5] 1 [1 1 1] [0.2 1] [0.2 1] [0.2 1] 1 1 1 [0.43 0.37 0.4 0.5]}, 'geomvert', [1 10 1 1 1 1 1 2.5 1 1], 'userdata', usrDat);
 %pos = get(fig, 'position');
 %set(fig, 'position', [pos(1) pos(2) pos(3)/841*200 pos(4) ]);
 
