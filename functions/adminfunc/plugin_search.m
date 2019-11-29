@@ -32,7 +32,14 @@ function plugin_search(fig)
 tmpobj = get(fig, 'userdata');
 allPlugins = tmpobj.allplugins;
 
+uistyle      = get(findobj(fig, 'tag', 'search'), 'style');
+if strcmpi(uistyle, 'pushbutton')
+    set(findobj(fig, 'tag', 'search'), 'style', 'edit', 'string', '');
+    return;
+end
+
 searchString = lower(get(findobj(fig, 'tag', 'search'), 'string'));
+if isempty(searchString), return; end
 searchString = textscan(searchString, '%s');
 searchString = searchString{1};
 
