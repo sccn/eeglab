@@ -73,8 +73,12 @@ function chanlocs = readeetraklocs( filename )
     % get positions
     %----------------
     positions = locs(indpos + 1:indlabels-1,:);
-    labels    = locs(end,:);
-    labels(strcmp(labels, 'Labels')) = [];     
+    
+    % get labels
+    %----------------
+    labels      = locs(indlabels:end,:);
+    labels(strcmp(labels, 'Labels')) = [];  
+    labels      =  labels(~cellfun('isempty',labels));
     
     % remove all non-numbers from positions 
     %----------------
