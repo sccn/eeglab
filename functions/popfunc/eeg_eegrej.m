@@ -116,6 +116,17 @@ end
 if size(regions,2) > 2, regions = regions(:, 3:4); end
 regions = combineregions(regions);
 
+% remove events within regions
+% ----------------------------
+allEventLatencies = [ EEG.event.latency];
+allEventFlag      = zeros(1,length(allEventLatencies));
+for iRegion = 1:size(regions,1)
+    allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
+end
+EEG.event(allEventFlag) = [];
+
+% reject data
+% -----------
 [EEG.data, EEG.xmax, event2, boundevents] = eegrej( EEG.data, regions, EEG.xmax-EEG.xmin, EEG.event);
 oldEEGpnts = EEG.pnts;
 oldEEGevents = EEG.event;
@@ -124,6 +135,7 @@ EEG.xmax   = EEG.xmax+EEG.xmin;
 if length(event2) > 1 && event2(1).latency == 0, event2(1) = []; end
 if length(event2) > 1 && event2(end).latency == EEG.pnts, event2(end) = []; end
 if length(event2) > 2 && event2(end).latency == event2(end-1).latency, event2(end) = []; end
+
 
 % add boundary events
 % -------------------
