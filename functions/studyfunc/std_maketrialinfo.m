@@ -41,7 +41,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function STUDY = std_maketrialinfo(STUDY, ALLEEG);
+function STUDY = std_maketrialinfo(STUDY, ALLEEG)
 
 %% test if .epoch field exist in ALLEEG structure
 epochfield = cellfun(@isempty, { ALLEEG.epoch });
@@ -50,14 +50,16 @@ if any(epochfield)
     return;
 end
 
+for iEEG = 1:length(ALLEEG)
+    % fill in empty field values and fill in with values in the same epoch
+    ALLEEG(iEEG) = eeg_uniformepochinfo(ALLEEG(iEEG));
+end    
+
 %% check if conversion of event is necessary
 ff = {};
 flagConvert = true;
 for index = 1:length(ALLEEG), ff = union(ff, fieldnames(ALLEEG(index).event)); end
 for iField = 1:length(ff)
-    
-    % fill in empty field values and fill in with values in the same epoch
-    ALLEEG(index) = eeg_copyfields(ALLEEG(index));
     
     fieldChar = zeros(1,length(ALLEEG))*NaN;
     for index = 1:length(ALLEEG)
@@ -145,41 +147,4 @@ for index = 1:length(ALLEEG)
 %     end
 end
 
-% copy field content within epochs so the time-locking event has more information
-% -------------------------------------------------------------------------------
-function EEG = eeg_copyfields(EEG)
-
-tmpevent  = EEG.event;
-allepochs = [ tmpevent.epoch ];
-
-% uniformize fields content for the different epochs
-% --------------------------------------------------
-difffield = fieldnames(EEG.event);
-difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')|strcmp(difffield,'mffkeys')|strcmp(difffield,'mffkeysbackup')|strcmp(difffield,'begintime')));
-for index = 1:length(difffield)
-    tmpevent  = EEG.event;
-    allvalues = { tmpevent.(difffield{index}) };
-    try
-        valempt = cellfun('isempty', allvalues);
-    catch
-        valempt = mycellfun('isempty', allvalues);
-    end
-    arraytmpinfo = cell(1,EEG.trials);
-    
-    % get the field content
-    % ---------------------
-    indexevent = find(~valempt);
-    arraytmpinfo(allepochs(indexevent)) = allvalues(indexevent);
-
-    % uniformize content for all epochs
-    % ---------------------------------
-    indexevent = find(valempt);
-    tmpevent   = EEG.event;
-    [tmpevent(indexevent).(difffield{index})] = arraytmpinfo{allepochs(indexevent)};
-    EEG.event  = tmpevent;
-    if any(valempt)
-        fprintf(['eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
-        fprintf(['              filling with values of other events in the same epochs\n']);
-    end
-end
     
