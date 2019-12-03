@@ -114,9 +114,7 @@ if nargin < 3
     if ~isempty(result{5}),   options = [ options '''subcomps'',[' result{5} '],' ]; end
     if ~isempty(result{6}),   options = [ options '''title'', ''' result{6} ''',' ]; end
 	options      =  [ options result{7} ];
-	fig = figure('Units', 'normalized','PaperPositionMode','auto','InvertHardcopy','off');
-    if ~isnumeric(fig), fig = fig.Number; end
-    optionsplot = [ options ', ''figure'',' int2str(fig) ];
+    optionsplot = options;
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 else
     if isempty(timerange)
@@ -125,7 +123,13 @@ else
     options = [options vararg2str( varargin ) ];
     optionsplot = options;
 end
-    
+
+if ~contains(optionsplot,'figure')
+	fig = figure('Units', 'normalized','PaperPositionMode','auto','InvertHardcopy','off');
+    if ~isnumeric(fig), fig = fig.Number; end
+    optionsplot = [ options ', ''figure'',' int2str(fig) ];
+end
+
 if length(EEG) > 2
     error('Cannot process more than two datasets');
 end
@@ -159,18 +163,18 @@ end
 % ------------------------
 if length( options ) < 2, options = ''; end
 if length(EEG) == 1
-    varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(EEG, [%s], %s);', ...
+    varargout{1} = sprintf('pop_envtopo(EEG, [%s] %s);', ...
                                    num2str(timerange), options);
 else
     if exist('subindices')
-        varargout{1} = sprintf('figure(''Units'', ''normalized'',''PaperPositionMode'',''auto'',''InvertHardcopy'',''off''); pop_envtopo(EEG([%s]), [%s] %s);', ...
+        varargout{1} = sprintf('pop_envtopo(EEG([%s]), [%s] %s);', ...
                                    int2str(subindices), num2str(timerange), options);
     end
 end
-options = optionsplot;
 
 % plot the data
 % --------------
+options = optionsplot;
 options = [ options ', ''verbose'', ''off''' ];
 if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end
 if any(isnan(sigtmp(:)))
@@ -195,7 +199,7 @@ else
         com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
                         '''chanlocs'', EEG.chanlocs(EEG.chaninfo.icachansind), ''chaninfo'', EEG.chaninfo, ''icawinv'', EEG.icawinv,' ...
                         '''timerange'', [timerange(1) timerange(2)] %s);' ] , outstr, options);
-    end;    
+    end
 end
 
 % fprintf(['\npop_envtopo(): Issuing command: ' com '\n\n']); % type the evntopo() call
