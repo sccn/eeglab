@@ -127,7 +127,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
+function [ STUDY, ALLEEG, customRes ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
 
 if nargin < 2
     help std_precomp;

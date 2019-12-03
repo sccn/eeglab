@@ -269,8 +269,8 @@ if ~ischar(varargin{1}) %intial settings
         warndlg2('No measure selected: aborting.'); 
         return; 
     end
-    [STUDY ALLEEG] = std_precomp(options{:});
-    com = sprintf('[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
+    [STUDY, ALLEEG] = std_precomp(options{:});
+    com = sprintf('[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
     
 else
     hdl = varargin{2}; %figure handle

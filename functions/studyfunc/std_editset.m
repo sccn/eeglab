@@ -370,19 +370,16 @@ end
 if ~isempty(g.commands)
     STUDY.changrp = [];
     STUDY.cluster = [];
-%    if ~isempty(STUDY.design)
-%        [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
-%    end
 end
-[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
-if ~isempty(g.filename),
-    [STUDY.filepath STUDY.filename ext] = fileparts(fullfile( g.filepath, g.filename ));
+[STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);
+if ~isempty(g.filename)
+    [STUDY.filepath, STUDY.filename, ext] = fileparts(fullfile( g.filepath, g.filename ));
     STUDY.filename = [ STUDY.filename ext ];
     g.resave = 'on';
 end
 if strcmpi(g.resave, 'on')
     STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
-end;    
+end
 
 % ---------------------
 % remove empty elements
