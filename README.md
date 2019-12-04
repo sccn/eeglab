@@ -12,7 +12,7 @@ git clone --recurse-submodules https://github.com/eeglabdevelopers/eeglab.git
 
 If you forgot to clone the submodule, go to the eeglab folder and type
 
-git submodule update --init --recursive —-remote
+git submodule update --init --recursive --remote
 
 # Sub-directories:
 
