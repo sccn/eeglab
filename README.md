@@ -8,7 +8,7 @@ EEGLAB is an open source signal processing environment for electrophysiological 
 
 **Do not download a ZIP file directly from GIT as it will not contain EEGLAB submodules**. Instead clone the reposity while pulling EEGLAB sub-modules.
 
-git clone --recurse-submodules https://github.com/eeglabdevelopers/eeglab.git
+git clone --recurse-submodules https://github.com/sccn/eeglab.git
 
 If you forgot to clone the submodule, go to the eeglab folder and type
 
