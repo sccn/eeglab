@@ -855,6 +855,7 @@ if ismatlab
     if ~isdeployed
         %newerVersionMenu = eegmenu( false,  help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
+        eegmenu( false,  help_m, 'Label', 'Check for EEGLAB update'                , 'userdata', on, 'CallBack', 'eeglab_update(''feedback'');');
         eegmenu( false,  help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
         eegmenu( false,  help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
 

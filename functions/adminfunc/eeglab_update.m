@@ -33,12 +33,12 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function eeglab_update
+function eeglab_update(varargin)
 
 % return at once if users said not to check version
 % -------------------------------------------------
 eeglab_options;
-if ~option_checkversion
+if ~option_checkversion && nargin == 0
     return
 end
 
@@ -68,8 +68,10 @@ try
     eeglabv = [ eeglabv(1:posperiod+1) '.' eeglabv(posperiod+2) ]; %'.' eeglabv(posperiod+3) ];
     if strcmpi(eeglabv(end-1:end), '.0'), eeglabv(end-1:end) = []; end
     
+    msg = '';
     if ~isempty(eeglabUpdater.newMajorRevision)
-        fprintf('\nA new major version of EEGLAB (EEGLAB%s - beta) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.\n', eeglabUpdater.newMajorRevision);
+        msg = sprintf('A new major version of EEGLAB (EEGLAB%s - beta) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.', eeglabUpdater.newMajorRevision);
+        fprintf('\n%s\n', msg);
         newMajorRevision = 1;
     end
     if eeglabUpdater.newerVersionIsAvailable
@@ -78,38 +80,46 @@ try
         warning('off', 'backtrace');
         if newMajorRevision
             fprintf('\n');
-            warning( sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
+            msg = sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
                 eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
                 'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
-                floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl));
+                floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
+            if nargin == 0, warning( msg ); end
         else
-            warning( sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
+            msg =  sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
                 eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
                 'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
-                eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl));
+                eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
+            if nargin == 0, warning( msg ); end
         end
         warning(stateWarning.state, 'backtrace');
         
     elseif isempty(eeglabUpdater.lastTimeChecked)
-        fprintf('Could not check for the latest EEGLAB version (internet may be disconnected).\n');
-        fprintf('To prevent long startup time, disable checking for new EEGLAB version (FIle > Memory and other options).\n');
+        msg = [ 'Could not check for the latest EEGLAB version (internet may be disconnected).' 10 ...
+                'To prevent long startup time, disable checking for new EEGLAB version (FIle > Memory and other options).' ];
+        fprintf('%s\n', msg);
     else
         if ~newMajorRevision
-            fprintf('You are using the latest version of EEGLAB.\n');
+            msg = 'You are using the latest version of EEGLAB.';
+            fprintf('%s\n', msg);
         else
-            fprintf('You are currently using the latest revision of EEGLAB%d (no critical update available).\n', floor(eeglabVersionNumber));
+            msg = sprintf('You are currently using the latest revision of EEGLAB%d (no critical update available).', floor(eeglabVersionNumber));
+            fprintf('%s\n', msg);
         end
     end
 catch
-    fprintf('Updater could not be initialized.\n');
-    return
+    msg = 'Updater could not be initialized';
+    fprintf('%s\n', msg);
 end
 
 % return at once if users said to not show this interface again or no new version available
 % -----------------------------------------------------------------------------------------
 eeglab_options;
 option_updateeeglab = 1;
-if ~option_updateeeglab || ~eeglabUpdater.newerVersionIsAvailable
+if ~option_updateeeglab || ~exist('eeglabUpdater', 'var') || isempty(eeglabUpdater.newerVersionIsAvailable) || ~eeglabUpdater.newerVersionIsAvailable
+    if nargin > 0
+        warndlg2(msg);
+    end
     return
 end
 
