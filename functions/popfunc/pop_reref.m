@@ -159,13 +159,13 @@ if nargin < 2
                ...
                {} ...
                ...
-               { 'style' 'checkbox' 'value' 0 'enable' 'off' 'tag' 'keepref' 'string' 'Retain old reference channels in data' } ...
+               { 'style' 'checkbox' 'value' 0 'enable' 'off' 'tag' 'keepref' 'string' 'Retain ref. channel(s) in data (will be flat for single-channel ref.)' } ...
                ...
                { 'style' 'text' 'string' 'Exclude channel indices (EMG, EOG)' } ...
                { 'style' 'edit' 'tag' 'exclude' 'string' '' } ...
                { 'style' 'pushbutton' 'string' '...' 'callback' cb_chansel2 } ...
                ...
-               { 'style' 'text' 'tag' 'reflocstr' 'string' 'Add current reference channel back to the data' } ...
+               { 'style' 'text' 'tag' 'reflocstr' 'string' 'Add old ref. channel back to the data' } ...
                { 'style' 'edit' 'tag' 'refloc' 'string' '' } ...
                { 'style' 'pushbutton' 'string' '...' 'callback' cb_chansel3 } };
     
@@ -338,16 +338,20 @@ if ~isempty(refchan)
         end
     end
 end
-if ~isempty(g.refloc)
-    allinds = [];
-    tmpchaninfo = EEG.chaninfo;
-    for iElec = 1:length(g.refloc)
-        if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
-            error('There is no such reference channel');
+if ~isempty(g.refloc) 
+    if isfield(EEG.chaninfo, 'nodatchans') && ~isempty(EEG.chaninfo.nodatchans)
+        allinds = [];
+        tmpchaninfo = EEG.chaninfo;
+        for iElec = 1:length(g.refloc)
+            if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
+                error('Missing reference channel information. Edit channels and add reference first.');
+            end
+            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
         end
-        allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
+        EEG.chaninfo.nodatchans(allinds) = [];
+    else
+        error('Missing reference channel information. Edit channels and add reference first.');
     end
-    EEG.chaninfo.nodatchans(allinds) = [];
 end
     
 % legacy EEG.ref field
