@@ -291,7 +291,8 @@ for inddataset = 1:length(ALLEEG)
                 case 'event',
                     if isempty(EEG.event)
                         errordlg2(strvcat('Requires events. You need to add events first.', ...
-                            'Use "File > Import event info" or "File > Import epoch info"'), 'Error');
+                            'Use "File > Import event info" or "File > Import epoch info"', ...
+                            'Install plugin VidEd to manually add events as you scroll the data.' ), 'Error');
                         return;
                     end
                 case 'chanloc',
