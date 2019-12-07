@@ -118,12 +118,14 @@ regions = combineregions(regions);
 
 % remove events within regions
 % ----------------------------
-allEventLatencies = [ EEG.event.latency];
-allEventFlag      = zeros(1,length(allEventLatencies));
-for iRegion = 1:size(regions,1)
-    allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
+if ~isempty(EEG.event)
+    allEventLatencies = [ EEG.event.latency];
+    allEventFlag      = zeros(1,length(allEventLatencies));
+    for iRegion = 1:size(regions,1)
+        allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
+    end
+    EEG.event(allEventFlag) = [];
 end
-EEG.event(allEventFlag) = [];
 
 % reject data
 % -----------
