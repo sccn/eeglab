@@ -168,6 +168,18 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
             end
         end
     end
+    if ~isempty(eventtmp) && eventtmp(end).latency > EEG.pnts
+        eventtmp(end) = [];
+    end
+    % add initial event to eventtmp when missing
+    if ~isempty(eventtmp) && ~isempty(EEG.event) && ...
+            strcmpi(EEG.event(1).type, 'boundary') && EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
+        eventtmp = [ eventtmp(1) eventtmp(1:end) ];
+        eventtmp(1).type = 'boundary';
+        eventtmp(1).latency = 0.5;
+        eventtmp(1).duration = EEG.event(1).duration;
+    end
+        
     differs = 0;
     for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
         if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
@@ -240,9 +252,24 @@ else
             return;
         end
     end
-    if isfield(evt1, 'duration') && isnan(evt1.duration) && isfield(evt2, 'duration') && isnan(evt2.duration)
-        evt1.duration = 1;
-        evt2.duration = 1;
+    if isfield(evt1, 'duration') && isfield(evt2, 'duration')
+        if isnan(evt1.duration) && isnan(evt2.duration)
+            evt1.duration = 1;
+            evt2.duration = 1;
+        end
+        if abs( evt1.duration - evt2.duration) < 1e-10
+            evt1.duration = 1;
+            evt2.duration = 1;
+        end
+        if isequal(evt1,evt2)
+            return;
+        end
+    end
+    if isfield(evt1, 'latency') && isfield(evt2, 'latency')
+        if abs( evt1.latency - evt2.latency) < 1e-10
+            evt1.latency = 1;
+            evt2.latency = 1;
+        end
         if isequal(evt1,evt2)
             return;
         end
