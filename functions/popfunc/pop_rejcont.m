@@ -17,6 +17,11 @@
 %  'overlap'     - [float] epoch overlap in seconds {Default: 0.25 s}
 %  'freqlimit'   - [min max] frequency range too consider for thresholding
 %                  Default is [35 128] Hz.
+%  'mode'        - ['max'|'mean'] average power or take the max in the 
+%                  selected frequency range. Default is 'max'.
+%  'correct'     - ['remove'|'blank'] type of correction. Default is to
+%                  'remove' the bad portion. 'Blank' put to 0 the selected
+%                   electrodes.
 %  'threshold'   - [float] frequency upper threshold in dB {Default: 10}
 %  'contiguous'  - [integer] number of contiguous epochs necessary to 
 %                  label a region as artifactual {Default: 4 }
@@ -37,7 +42,7 @@
 %                    recommended.
 %
 % Outputs:
-%   OUTEEG          - output dataset with updated joint probability array
+%   OUTEEG          - output dataset with region removed
 %   selectedregions - frames indices of rejected electrodes. Array of n x 2
 %                     n being the number of regions and 2 for the beginning
 %                     and end of each region.
@@ -148,6 +153,8 @@ end
 
 opt = finputcheck(options, { 'threshold'     { 'real';'cell' }  []    10;
                              'freqlimit'     { 'real';'cell' }  []    [35 128];
+                             'mode'          'string' { 'mean';'max' } 'max';
+                             'correct'       'string' { 'remove';'blank' } 'remove';
                              'elecrange'     'real'   []    [1:EEG.nbchan];
                              'rejectori'     'real'   []    [];
                              'contiguous'    'real'   []    4;
@@ -228,7 +235,27 @@ for iReject = 1:length(opt.threshold)
     threshold = opt.threshold{iReject};
     freqLim   = opt.freqlimit{iReject};
     if length(threshold) == 1, threshold = [ -100 threshold ]; end
-    [I1 tmpRejEpoch NS Erej] = eegthresh( meanspectrum, size(meanspectrum,2), 1, threshold(1), threshold(2), [freqspectrum(1) freqspectrum(end)], freqLim(1), freqLim(2));
+    if strcmpi(opt.mode, 'max')
+        [I1, tmpRejEpoch, NS, Erej] = eegthresh( meanspectrum, size(meanspectrum,2), 1, threshold(1), threshold(2), [freqspectrum(1) freqspectrum(end)], freqLim(1), freqLim(2));
+    else
+        tmpRejEpoch = zeros(size(meanspectrum,3),1);
+        [~,indb] = min(abs(freqLim(1) - freqspectrum));
+        [~,inde] = min(abs(freqLim(2) - freqspectrum));
+        for indexe = 1:size(meanspectrum,1)
+            sigtmp = meanspectrum(indexe,indb:inde,:);
+            if strcmpi(opt.mode, 'mean')
+                sigmax = mean(sigtmp,2);
+                sigmin = sigmax;
+            else
+                sigmax = max(sigtmp,2);
+                sigmin = min(sigtmp,2);
+            end
+            sigmin = squeeze(sigmin); % 1 dim at this point
+            sigmax = squeeze(sigmax); % 1 dim at this point
+            tmpRejEpoch = tmpRejEpoch | ( sigmin < threshold(1) ) | ( sigmax > threshold(2) );
+        end
+        tmpRejEpoch = find(tmpRejEpoch);
+    end
     rejepoch = union_bc(rejepoch, tmpRejEpoch);
     if strcmpi(opt.verbose, 'on')
         fprintf('%d regions selected for rejection, threshold %3.2f-%3.2f dB, frequency limits %3.1f-%3.1f\n', length(tmpRejEpoch), threshold(1), threshold(2), freqLim(1), freqLim(2));
@@ -261,18 +288,28 @@ end
 % ----------------------------------------
 merged = 0;
 isolated = 0;
-for index = size(winrej,1):-1:1
-    if size(winrej,1) >= index && winrej(index,2) - winrej(index,1) > grouplen, winrej(index,:) = []; isolated = isolated + 1;
-    elseif index == 1 && size(winrej,1) > 1 && winrej(index+1,1) - winrej(index,2) > grouplen, winrej(index,:) = []; isolated = isolated + 1;
-    elseif index == size(winrej,1) && size(winrej,1) > 1 && winrej(index,1) - winrej(index-1,2) > grouplen, winrej(index,:) = []; isolated = isolated + 1;
-    elseif index > 1 && size(winrej,1) > 1 && index < size(winrej,1) && winrej(index+1,1) - winrej(index,2) > grouplen && ...
-            winrej(index,1) - winrej(index-1,2) > grouplen
-        winrej(index,:) = [];
-        isolated = isolated + 1;
-    elseif index < size(winrej,1) && size(winrej,1) > 1 && winrej(index+1,1) - winrej(index,2) <= grouplen
-        winrej(index,2) = winrej(index+1,2);
-        winrej(index+1,:) = [];
-        merged = merged + 1;
+if opt.contiguous < 2
+    for index = size(winrej,1):-1:1
+        if index < size(winrej,1) && size(winrej,1) > 1 && winrej(index+1,1) - winrej(index,2) <= grouplen
+            winrej(index,2) = winrej(index+1,2);
+            winrej(index+1,:) = [];
+            merged = merged + 1;
+        end
+    end
+else
+    for index = size(winrej,1):-1:1
+        if size(winrej,1) >= index && winrej(index,2) - winrej(index,1) > grouplen, winrej(index,:) = []; isolated = isolated + 1;
+        elseif index == 1 && size(winrej,1) > 1 && winrej(index+1,1) - winrej(index,2) > grouplen, winrej(index,:) = []; isolated = isolated + 1;
+        elseif index == size(winrej,1) && size(winrej,1) > 1 && winrej(index,1) - winrej(index-1,2) > grouplen, winrej(index,:) = []; isolated = isolated + 1;
+        elseif index > 1 && size(winrej,1) > 1 && index < size(winrej,1) && winrej(index+1,1) - winrej(index,2) > grouplen && ...
+                winrej(index,1) - winrej(index-1,2) > grouplen
+            winrej(index,:) = [];
+            isolated = isolated + 1;
+        elseif index < size(winrej,1) && size(winrej,1) > 1 && winrej(index+1,1) - winrej(index,2) <= grouplen
+            winrej(index,2) = winrej(index+1,2);
+            winrej(index+1,:) = [];
+            merged = merged + 1;
+        end
     end
 end
 if strcmpi(opt.verbose, 'on')
@@ -309,7 +346,14 @@ if ~isempty(winrej)
             disp('Light blue is ORIGINAL rejection');
             disp('Yellow is AUTOMATIC rejection');
         else
-            EEG = pop_select(EEG, 'nopoint', round(selectedregions));
+            if strcmpi(opt.correct, 'remove')
+                EEG = pop_select(EEG, 'nopoint', round(selectedregions));
+            else
+                tmpRegions = round(selectedregions);
+                for iRegion = 1:size(tmpRegions,1)
+                    EEG.data(opt.elecrange, tmpRegions(iRegion,1):tmpRegions(iRegion,2)) = 0;
+                end
+            end
         end
     else
         EEG = [];
