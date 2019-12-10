@@ -1,4 +1,4 @@
-% pop_expevents() - export events to CSV file
+% pop_expevents() - export events to tab separated text file
 %
 % Usage:
 %   >> pop_expevents(EEG);
@@ -65,7 +65,7 @@ if nargin < 1
 end
 
 if nargin < 2
-	[filename, filepath] = uiputfile('*.csv', 'File name -- pop_expevents()'); 
+	[filename, filepath] = uiputfile('*.txt', 'File name -- pop_expevents()'); 
     drawnow;
 	if filename == 0
         return;  end
