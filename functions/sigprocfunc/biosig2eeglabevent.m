@@ -111,15 +111,19 @@ elseif isfield(EVENT,'POS')
             if isfield(EVENT, 'TYP')
                 eType = EVENT.TYP(index);
 
-                if eType < 256 && importEDFplus && eType < length(EVENT.CodeDesc)
-                    event(index).type = EVENT.CodeDesc{eType};
-                    event(index).edftype = eType;
-                elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
-                    event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
-                    event(index).edftype = eType;
-                    if eType == 32766 || eType == 32767
-                        event(index).edfplustype = event(index).type;
-                        event(index).type = 'boundary';
+                if isfield(EVENT, 'CodeDesc')
+                    if eType < 256 && importEDFplus && eType < length(EVENT.CodeDesc)
+                        event(index).type = EVENT.CodeDesc{eType};
+                        event(index).edftype = eType;
+                    elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
+                        event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
+                        event(index).edftype = eType;
+                        if eType == 32766 || eType == 32767
+                            event(index).edfplustype = event(index).type;
+                            event(index).type = 'boundary';
+                        end
+                    else
+                        event(index).type = eType;
                     end
                 else
                     event(index).type = eType;
