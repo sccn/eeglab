@@ -553,39 +553,3 @@ if isfield(v, 'fieldtrip')
     end
     s = { s{:} s3{:} };
 end
-        
-% remove ERSP baseline
-% ---------------------
-function ersp = removeerspbaseline(ersp, timevals, baseline)
-
-    if length(baseline(1)) == 1, baseline = [ timevals(1) baseline ]; end
-    if size(baseline,2) == 2
-        baseln = [];
-        for index = 1:size(baseline,1)
-            tmptime   = find(timevals >= baseline(index,1) && timevals <= baseline(index,2));
-            baseln = union_bc(baseln, tmptime);
-        end
-        if length(baseln)==0
-            disp( [ 'Probable error: There are no sample points found in the default baseline.' ] );
-        end
-    end
-
-    try
-        len = length(ersp(:));
-        for index = 1:len
-            if ~isempty(ersp{index})
-                if index == 1, meanpowbase = abs(mean(ersp{index}(:,baseln,:),2));
-                else           meanpowbase = meanpowbase + abs(mean(ersp{index}(:,baseln,:),2));
-                end
-            end
-        end
-    catch,
-        error([ 'Problem while subtracting common ERSP baseline.' 10 ...
-                'Common baseline subtraction is performed based on' 10 ...
-                'pairing settings in your design. Most likelly, one' 10 ...
-                'independent variable should not have its data paired.' ]);
-    end
-
-    for g = 1:length(ersp(:))
-        ersp{g} = bsxfun(@minus, ersp{g}, meanpowbase);
-    end
