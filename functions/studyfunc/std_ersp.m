@@ -81,10 +81,8 @@
 %   'alpha'      - If in (0, 1), compute two-tailed permutation-based 
 %                  probability thresholds and use these to mask the output 
 %                  ERSP/ITC images {default: NaN}
-%   'powbase'    - [ncomps,nfreqs] optional input matrix giving baseline power 
-%                  spectra (not dB power, see >> help timef). 
-%                  For use in repeated calls to timef() using the same baseine
-%                  {default|[] -> none; data windows centered before 0 latency}
+%   'powbase'    - Deprecated. Note that baseline can be readjusted after 
+%                  computation as single trial spectral decompositions are stored.
 %
 % Other optional inputs:
 %   This function will take any of the newtimef() optional inputs (for instance
@@ -200,6 +198,7 @@ end
 if ischar(g), error(g); end
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
+if ~isempty(g.powbase), disp('''powbase'' parameter is no longer supported at computation time'); end
 
 % checking input parameters
 % -------------------------
@@ -244,15 +243,6 @@ elseif ~isempty(g.channels)
     filenametrials = [ g.fileout '.dattimef' ];    
 end
 
-powbaseexist = 1; % used also later
-if isempty(g.powbase) || any(isnan(g.powbase))
-    powbaseexist = 0;
-    g.powbase = NaN*ones(length(g.indices),1);  % default for timef()
-end
-if size(g.powbase,1) ~= length(g.indices)
-    error('powbase should be of size (ncomps,nfreqs)');
-end
-
 % Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
 if exist( filenameersp ) && strcmpi(g.recompute, 'off')
@@ -276,11 +266,6 @@ if strcmpi(g.plot, 'off')
 end
 parameters{end+1} = 'baseline';
 parameters{end+1} = g.baseline;
-if powbaseexist && time_range(1) >= 0 
-    parameters{end+1} = 'baseboot';
-    parameters{end+1} = 0;
-    fprintf('No pre-0 baseline spectral estimates: Using whole epoch for timef() "baseboot"\n');
-end
 
 % return parameters
 % -----------------
@@ -328,16 +313,9 @@ elseif strcmpi(g.parallel, 'on')
         numWorkers = myCluster.NumWorkers;
     catch, disp('Cound not start parallel job'); end
 end
-parfor (k = 1:length(g.indices),numWorkers)  % for each (specified) component/channel
-%for k = 1:length(g.indices)
-    %if k>size(X,1), break; end; % happens for components
-    if powbaseexist
-        tmpparams = parameters;
-        tmpparams{end+1} = 'powbase';
-        tmpparams{end+1} = g.powbase(k,:);
-    else
-        tmpparams = parameters;
-    end
+%parfor (k = 1:length(g.indices),numWorkers)  % for each (specified) component/channel
+for k = 1:length(g.indices)
+    tmpparams = parameters;
     if length(g.indices) > 1
         tmpparams{end+1} = 'verbose';
         tmpparams{end+1} = 'off';
@@ -381,11 +359,7 @@ all_trials.datatype   = 'TIMEF';
 all_trials.datafiles  = computeFullFileName( { EEG.filepath }, { EEG.filename });
 all_trials.datatrials = g.trialindices;
 
-if powbaseexist
-    all_trials.parameters = { parameters{:}, 'baseline', g.powbase };
-else
-    all_trials.parameters = parameters;
-end
+all_trials.parameters = parameters;
 if ~isempty(g.channels)
     if ~isempty(g.interp)
         all_trials.labels = { g.interp(g.indices).labels };
