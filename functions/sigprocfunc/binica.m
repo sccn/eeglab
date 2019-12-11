@@ -3,6 +3,10 @@
 %            to runica().  If stored in a float file, data are not 
 %            read into Matlab, and so may be larger than Matlab
 %            can handle owing to memory limitations.
+%
+% Download the binary version for your system at
+% https://sccn.ucsd.edu/wiki/Binica
+%
 % Usage:
 %  >> [wts,sph] = binica( datavar,  'key1', arg1, 'key2', arg2 ...);
 % else
