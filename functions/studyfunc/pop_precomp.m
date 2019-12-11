@@ -79,7 +79,7 @@ if ~ischar(varargin{1}) %intial settings
     chanlist       = ['pop_precomp(''chanlist'',gcf);']; 
     chanlist       = 'warndlg2([ ''You need to compute measures on all data channels.'' 10 ''This functionality is under construction.'']);';
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
-    warninterp     = ''; %['warndlg2(''EEGLAB will crash when plotting a given channel if it is missing in one dataset'');' ];
+    warninterp     = 'warndlg2(''Not interpolating channels may sometimes lead to unexpected errors when ploting results'');';
     cb_ica1        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica2_on''), ''value'', 0); end;' ];
     cb_ica2        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica1_on''), ''value'', 0); end;' ];
     
