@@ -175,7 +175,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         g = finputcheck( varargin, { 'naccu'      'integer'   [1 Inf]             200;
                                      'method'     'string'    { 'param','parametric','perm','permutation','bootstrap' }  'param';
                                      'mode'       'string'    { }                 '';
-                                     'paired'     'string'    { 'on','off' }      'on'; 
+                                     'paired'     'string'    { 'on','off','auto' }      'auto'; 
                                      'surrog'     { 'real','cell' }      []       []; 
                                      'stats'      { 'real','cell' }      []       []; 
                                      'structoutput' 'string'  { 'on','off' }      'off'; 
@@ -192,7 +192,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         g = struct(varargin{:});
         if ~isfield(g, 'naccu'),     g.naccu = 200; end
         if ~isfield(g, 'method'),    g.method  = 'param'; end
-        if ~isfield(g, 'paired'),    g.paired = 'on'; end
+        if ~isfield(g, 'paired'),    g.paired = 'auto'; end
         if ~isfield(g, 'surrog'),    g.surrog = []; end
         if ~isfield(g, 'orivals'),   g.orivals = []; end
         if ~isfield(g, 'arraycomp'), g.arraycomp = 'on'; end
@@ -203,7 +203,10 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         if ~isfield(g, 'returnresamplingarray'),   g.returnresamplingarray = 'off'; end
     end
     if ~isempty(g.mode), g.method = g.mode; end
+    if size(data,2) == 1, data  = transpose(data); end % cell array transpose
     
+    % other settings
+    % --------------
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end
     if strcmpi(g.method, 'permutation'), g.method = 'perm'; end
     if strcmpi(g.verbose, 'on'), verb = 1; else verb = 0; end
@@ -213,16 +216,50 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                '            Running nonparametric permutation tests\n.']);
       g.method = 'perm';
     end
-    if size(data,2) == 1, data  = transpose(data); end; % cell array transpose
     g.naccu = round(g.naccu);
     
+    % pairing
+    % -------
+    paired{1} = 'on';
+    if size(data,1) == 1 && length(unique(cellfun('size', data, ndims(data{1}) ))) > 1
+        paired{1} = 'off';
+    else
+        paired{1} = 'on';
+        for iCol = 1:size(data,2)
+            if length(unique(cellfun('size', data(:,iCol), ndims(data{1}) ))) > 1
+                paired{1} = 'off';
+            end
+        end
+        paired{2} = 'on';
+        for iRow = 1:size(data,1)
+            if length(unique(cellfun('size', data(iRow,:), ndims(data{1}) ))) > 1
+                paired{2} = 'off';
+            end
+        end
+    end
+    if length(paired) > 1
+        if (strcmpi(paired{1}, 'off') && strcmpi(paired{2}, 'on')) || ...
+                (strcmpi(paired{1}, 'on') && strcmpi(paired{2}, 'off'))
+            myfprintf(g.verbose, 'Possible mixed paired and unpaired independent variables, using balanced Anova (which assumes all unpaired)\n');
+            paired{1} = 'off';
+        end
+    end
+    if strcmpi(g.paired, 'auto')
+        g.paired = paired{1};
+    else
+        if strcmpi(g.paired, 'on') && strcmpi(paired{1}, 'off')
+            myfprintf(g.verbose, 'You set to use paired statistics but the number of cases differs\n');
+            g.paired = 'off';
+        end
+    end
+            
     % reshape matrices
     % ----------------
     nd = size(data{1});
     nd = nd(1:end-1);
     for index = 1:prod(size(data))
         data{index} = reshape(data{index}, [prod(nd) size(data{index},myndims(data{index}))]);
-    end;    
+    end
     
     if ~strcmpi(g.method, 'param') && isempty(g.surrog)
          tmpsize   = size(data{1});
@@ -246,20 +283,10 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     end
     
     if isempty(g.surrog)
-        % test if data can be paired
-        % --------------------------
-        if length(unique(cellfun('size', data, ndims(data{1}) ))) > 1
-            g.paired = 'off'; 
-        end
-        if strcmpi(g.paired, 'on')
-             pairflag = 1;
-        else pairflag = 0;
-        end
-
+        
         % return resampling array
         % -----------------------
         if strcmpi(g.returnresamplingarray, 'on')
-            [ datavals datalen datadims ] = concatdata( data );
             if strcmpi(g.arraycomp, 'on')
                 ori_vals = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
             else
@@ -304,13 +331,13 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     
     tail = g.tail;
     if isempty(g.surrog)
-        if size(data,1) == 1, % only one row
+        if size(data,1) == 1 % only one row
 
             if size(data,2) == 2 && strcmpi(g.forceanova, 'off')
 
                 % paired t-test (very fast)
                 % -------------
-                [ori_vals df] = ttest_cell_select(data, g.paired, g.variance);
+                [ori_vals, df] = ttest_cell_select(data, g.paired, g.variance);
 
                 if strcmpi(g.method, 'param')
                     
@@ -328,14 +355,14 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                             myfprintf(verb,'...');
                             res = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
                             surrogval = ttest_cell_select( res, g.paired, g.variance);
-                        catch,
+                        catch
                            lasterr
-                           myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computation');
+                           myfprintf(verb,'\nFast computation failed because of memory limitation, reverting to standard computation');
                            g.arraycomp = 'off';
                         end
                     end
                     if strcmpi(g.arraycomp, 'off')
-                        [res precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
+                        [res, precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
                         for index = 1:g.naccu
                             res = surrogdistrib( {}, 'precomp', precomp);
                             if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end
@@ -351,7 +378,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 % one-way ANOVA (paired) this is equivalent to unpaired t-test
                 % -------------
                 tail = 'one';
-                [ori_vals df] = anova1_cell_select( data, g.paired );
+                [ori_vals, df] = anova1_cell_select( data, g.paired );
                 if strcmpi(g.method, 'param')
                     pvals = 1-fcdf(ori_vals, df(1), df(2));
                 else
@@ -361,12 +388,12 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                             res = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
                             surrogval = anova1_cell_select( res, g.paired );
                         catch,
-                            myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computing');
+                            myfprintf(verb,'\nFast computation failed because of memory limitation, reverting to standard computing');
                             g.arraycomp = 'off';
                         end
                     end
                     if strcmpi(g.arraycomp, 'off')
-                        [res precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
+                        [res, precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
                         for index = 1:g.naccu
                             if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end
                             if mod(index, 100) == 0, myfprintf(verb,'\n'); end
@@ -384,7 +411,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             % two-way ANOVA (paired or unpaired)
             % ----------------------------------
             tail = 'one';
-            [ ori_vals{1} ori_vals{2} ori_vals{3} df{1} df{2} df{3} ] = anova2_cell_select( data, g.paired );
+            [ ori_vals{1}, ori_vals{2}, ori_vals{3}, df{1}, df{2}, df{3} ] = anova2_cell_select( data, g.paired );
             if strcmpi(g.method, 'param')
                 pvals{1} = 1-fcdf(ori_vals{1}, df{1}(1), df{1}(2));
                 pvals{2} = 1-fcdf(ori_vals{2}, df{2}(1), df{2}(2));
@@ -396,22 +423,22 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                     try
                         myfprintf(verb,'...');
                         res = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
-                        [ surrogval{1} surrogval{2} surrogval{3} ] = anova2_cell_select( res, g.paired );
-                    catch,
-                        myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computing');
+                        [ surrogval{1}, surrogval{2}, surrogval{3} ] = anova2_cell_select( res, g.paired );
+                    catch
+                        myfprintf(verb,'\nFast computation failed because of memory limitation, reverting to standard computing');
                         g.arraycomp = 'off';
                     end
                 end
                 if strcmpi(g.arraycomp, 'off')
-                    [res precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
+                    [res, precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
                     for index = 1:g.naccu
                         if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end
                         if mod(index, 100) == 0, myfprintf(verb,'\n'); end
 
                         res = surrogdistrib( {}, 'precomp', precomp);
                         if myndims(data{1}) == 1
-                         	 [ surrogval{1}(index)     surrogval{2}(index)     surrogval{3}(index)     ] = anova2_cell_select( res, g.paired );
-                        else [ surrogval{1}(:,index)   surrogval{2}(:,index)   surrogval{3}(:,index)   ] = anova2_cell_select( res, g.paired );
+                         	 [ surrogval{1}(index),     surrogval{2}(index),     surrogval{3}(index)     ] = anova2_cell_select( res, g.paired );
+                        else [ surrogval{1}(:,index),   surrogval{2}(:,index),   surrogval{3}(:,index)   ] = anova2_cell_select( res, g.paired );
                         end
                     end
                 end
@@ -517,29 +544,29 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
        
 % compute ANOVA 2-way
 % -------------------
-function [f1 f2 f3 df1 df2 df3] = anova2_cell_select( res, paired);
+function [f1, f2, f3, df1, df2, df3] = anova2_cell_select( res, paired)
     if strcmpi(paired,'on')
-        [f1 f2 f3 df1 df2 df3] = anova2rm_cell( res );
+        [f1, f2, f3, df1, df2, df3] = anova2rm_cell( res );
     else
-        [f1 f2 f3 df1 df2 df3] = anova2_cell( res );
+        [f1, f2, f3, df1, df2, df3] = anova2_cell( res );
     end
     
 % compute ANOVA 1-way
 % -------------------
-function [f df] = anova1_cell_select( res, paired);
+function [f, df] = anova1_cell_select( res, paired)
     if strcmpi(paired,'on')
-        [f df] = anova1rm_cell( res );
+        [f, df] = anova1rm_cell( res );
     else
-        [f df] = anova1_cell( res );
+        [f, df] = anova1_cell( res );
     end
 
 % compute t-test
 % -------------------
-function [t df] = ttest_cell_select( res, paired, homogenous);
+function [t, df] = ttest_cell_select( res, paired, homogenous)
     if strcmpi(paired,'on')
-        [t df] = ttest_cell( res{1}, res{2});
+        [t, df] = ttest_cell( res{1}, res{2});
     else
-        [t df] = ttest2_cell( res{1}, res{2}, homogenous);
+        [t, df] = ttest2_cell( res{1}, res{2}, homogenous);
     end
 
 % function to compute the number of dimensions
@@ -548,14 +575,14 @@ function val = myndims(a)
     if ndims(a) > 2
         val = ndims(a);
     else
-        if size(a,1) == 1,
+        if size(a,1) == 1
             val = 2;
-        elseif size(a,2) == 1,
+        elseif size(a,2) == 1
             val = 1;
         else
             val = 2;
         end
-    end; 
+    end
 
 % function for verbose messages
 % -----------------------------
@@ -568,7 +595,7 @@ function myfprintf(verb, varargin)
 % ------------------------
 function p = mytcdf(x,v)
 
-if length(v) == 1,
+if length(v) == 1
     v = repmat(v, size(x));
 end
 
@@ -611,4 +638,4 @@ function varargout = reshape_results(nd, varargin)
             varargout{1} = reshape(varargin{1}, nd);
         else varargout{1} = [];
         end
-    end;    
+    end
