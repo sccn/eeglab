@@ -239,21 +239,8 @@ if strcmpi(opt.transpose, 'off'), set(gcf, 'position', [ pos(1) pos(2) pos(4) po
 else                              set(gcf, 'position', pos);
 end
 
-% color axis
-% ----------
-if isempty(opt.caxis)
-    % default tftopo is RMS
-    if strcmpi(opt.averagemode, 'rms')
-        tmpx = cellfun(@(x)reshape(sqrt(mean(x.^2,4)), size(x,1)*size(x,2)*size(x,3),1), data(:), 'uniformoutput', false);
-    else
-        tmpx = cellfun(@(x)reshape(mean(x,4), size(x,1)*size(x,2)*size(x,3),1), data(:), 'uniformoutput', false);
-    end
-    opt.caxis = max(cellfun(@max, tmpx));
-    opt.caxis = [-opt.caxis opt.caxis];
-    if strcmpi(opt.datatype, 'itc')
-        opt.caxis = [ 0 opt.caxis(2) ];
-    end
-end
+% options
+% -------
 options = { 'limits' [NaN NaN NaN NaN opt.caxis] 'verbose' 'off' 'mode' opt.averagemode options{:} };
 
 for c = 1:nc
