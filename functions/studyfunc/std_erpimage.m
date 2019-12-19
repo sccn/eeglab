@@ -34,7 +34,7 @@
 %                  statistics (the 'on' options does not allow statistics).
 %   'smoothing'  - Smoothing parameter (number of trials). {Default: 10}
 %                  erpimage() equivalent: 'avewidth'
-%   'nlines'     - Number of lines for ERPimage. erpaimge() equivalent is 
+%   'nlines'     - Number of lines for ERPimage. erpimage() equivalent is 
 %                  'decimate'. Note that this parameter must be larger than
 %                  the minimum number of trials in each design cell 
 %                  {Default: 10}

@@ -35,52 +35,36 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 function varargout = uigetfile2(varargin);
-    
-    if nargin < 1
-        help uigetfile2;
-        return;
-    end
-    
-    % remember old folder
-    %% search for the (mat) file which contains the latest used directory 
-    % -------------------
-    olddir = pwd;
-    try,
-        eeglab_options;
-        if option_rememberfolder
-            tmp_fld = getenv('TEMP');
-            if isempty(tmp_fld) && isunix
-                if exist('/tmp') == 7
-                    tmp_fld = '/tmp';
-                end
-            end
-            if exist(fullfile(tmp_fld,'eeglab.cfg'))
-                load(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
-                s = ['cd([''' Path '''])'];
-                if exist(Path) == 7, eval(s); end
-            end
-        end
-    catch, end
+mlock
+persistent tmp_fld
 
-    %% Show the open dialog and save the latest directory to the file
-    % ---------------------------------------------------------------
-    [varargout{1} varargout{2}] = uigetfile(varargin{:});
-    try,
-        if option_rememberfolder
-            if varargout{1} ~= 0
-                Path = varargout{2};
-                try, save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat','-V6'); % Matlab 7
-                catch, 
-                    try,  save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
-                    catch, error('uigetfile2: save error, out of space or file permission problem');
-                    end
-                end
-                if isunix
-                    eval(['cd ' tmp_fld]);
-                    system('chmod 777 eeglab.cfg');
-                end
-            end
+if nargin < 1
+    help uigetfile2;
+    return;
+end;
+
+% remember old folder
+olddir = pwd;
+try
+    eeglab_options;
+    if option_rememberfolder
+        if isempty(tmp_fld)
+            tmp_fld = getpref('eeglab','lastdir',olddir);
         end
-    catch, end
-    cd(olddir) 
-     
+        cd(tmp_fld);
+    end
+end
+
+%% Show the open dialog and save the latest directory to the file
+% ---------------------------------------------------------------
+[varargout{1} varargout{2}] = uigetfile(varargin{:});
+try
+    if option_rememberfolder
+        if ischar(varargout{1})
+            tmp_fld = varargout{2};
+            setpref('eeglab','lastdir',tmp_fld);
+        end
+    end
+end
+cd(olddir)
+
