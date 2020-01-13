@@ -1481,7 +1481,7 @@ else
         if ~isempty(g.eventlatencyend)            
             event2plot2 = find ( g.eventlatencyend >= lowlim & g.eventlatencyend <= highlim );
             event2plot3 = find ( g.eventlatencies  <  lowlim & g.eventlatencyend >  highlim );
-            event2plot  = union_bc(union(event2plot, event2plot2), event2plot3);
+            event2plot  = setdiff(union(event2plot, event2plot2), event2plot3);
         end
         for index = 1:length(event2plot)
             %Just repeat for the first one
