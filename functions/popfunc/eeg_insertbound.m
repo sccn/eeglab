@@ -128,7 +128,7 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     end
     
     if ~isempty(rmEvent)
-        fprintf('eeg_insertbound(): event latencies recomputed and %d events removed.\n', length(rmEvent));
+        fprintf('eeg_insertbound(): boundary events inserted and %d events removed.\n', length(rmEvent));
     end
 
     
