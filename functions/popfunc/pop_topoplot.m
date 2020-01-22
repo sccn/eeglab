@@ -29,6 +29,10 @@
 %
 % Optional Key-Value Pair Inputs
 %   'colorbar' - ['on' or 'off'] Switch to turn colorbar on or off. {Default: 'on'}
+%   'iclabel'  - ['on' or 'off'] Activate the display of ICLabel
+%                classification of the IC maps. Option is functional only
+%                when plotting IC maps and ICLabel has been computed for
+%                the EEG set provided
 %   options   - optional topoplot() arguments. Separate using commas. 
 %               Example 'style', 'straight'. See >> help topoplot
 %               for further details. {default: none}
@@ -369,6 +373,21 @@ for index = 1:size(arg2(:),1)
 			else             texttitle = ['IC ' int2str(arg2(index))];
 			end
             if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end
+            
+            % Adding ICLabel results
+            optpos = find(strcmpi('iclabel', options(1:2:end))); % Under the assumption that there is always default options
+            if ~isempty(optpos)
+                iclabelopt = options{optpos+1};
+                if strcmp(iclabelopt, 'on') && isfield(EEG.etc, 'ic_classification')
+                    try
+                        [maxval,indmax]=max(EEG.etc.ic_classification.ICLabel.classifications(arg2(index),:));
+                        iclabel_label = [EEG.etc.ic_classification.ICLabel.classes{indmax} ' : ' num2str(round(maxval*100,1)) ' %' ];
+                        texttitle = {texttitle;iclabel_label};
+                    catch
+                        disp('pop_topoplot: Something went wrong while plotting ICLabel labels');
+                    end
+                end
+            end
             figure(curfig);  if nbgraph > 1, axes(curax); end; htmp = title(texttitle);
             try, icadefs; set(htmp,'FontSize',AXES_FONTSIZE_L); catch, end; clear htmp;
 		end
@@ -417,5 +436,3 @@ axcopy(curfig, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''p
 com = [com sprintf('pop_topoplot(EEG, %d, %s);', ...
                    typeplot, vararg2str({arg2 topotitle rowcols plotdip outoptions{:} }))];
 return;
-
-		
