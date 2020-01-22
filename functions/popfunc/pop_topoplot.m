@@ -375,7 +375,7 @@ for index = 1:size(arg2(:),1)
             if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end
             
             % Adding ICLabel results
-            optpos = find(strcmp('iclabel', options));
+            optpos = find(strcmpi('iclabel', options(1:2:end))); % Under the assumption that there is always default options
             if ~isempty(optpos)
                 iclabelopt = options{optpos+1};
                 if strcmp(iclabelopt, 'on') && isfield(EEG.etc, 'ic_classification')
