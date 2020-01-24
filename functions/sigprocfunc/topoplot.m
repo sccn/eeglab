@@ -590,6 +590,7 @@ if nargs > 2
                 % if max(abs(plotchans))>max(Values) | max(abs(plotchans))>length(Values) -sm ???
             case {'whitebk','whiteback','forprint'}
                 whitebk = Value;
+            case {'iclabel'} % list of options to ignore
             otherwise
                 error(['Unknown input parameter ''' Param ''' ???'])
         end

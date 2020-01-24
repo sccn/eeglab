@@ -77,8 +77,8 @@ if isempty(varargin)
     geometry = { 1 [0.6 .4] [0.6 .4] 1 1 chanline };    
     
     if icaFlag
-        uilist = uilist(1:end-5);
-        geometry = geometry(1:end-4);
+        uilist = uilist(1:end-4);
+        geometry = geometry(1:end-3);
     end
     
     [~, ~, ~, res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...

@@ -28,6 +28,7 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 function plugin = plugin_getweb(type, pluginOri, varargin)
+plugin = [];
 
 if nargin < 1, help plugin_getweb; return; end
 if nargin < 2, pluginOri = []; end
@@ -41,19 +42,17 @@ try
     [stats, status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki.php');
     stats = textscan(stats, '%s%d%s%s%f%d%s%s%s%s%s%f', 'delimiter', char(9));
 catch
-    stats = {};
     disp('Cannot connect to the Internet to retrieve statistics for extensions');
+    return
 end
 
 if status == 0
     disp('Cannot connect to the Internet to retrieve extension list');
-    plugin = [];
     return
 end
 
 % decode stats into plugins
 % -------------------------
-plugin = [];
 if ~isempty(pluginOri)
      currentNames = lower({ pluginOri.name });
 else currentNames = {};
