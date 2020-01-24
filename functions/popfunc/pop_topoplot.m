@@ -377,7 +377,7 @@ for index = 1:size(arg2(:),1)
             % Adding ICLabel results
             optpos = find(strcmpi('iclabel', options(1:2:end))); % Under the assumption that there is always default options
             if ~isempty(optpos)
-                iclabelopt = options{optpos+1};
+                iclabelopt = options{2*optpos};
                 if strcmp(iclabelopt, 'on') && isfield(EEG.etc, 'ic_classification')
                     try
                         [maxval,indmax]=max(EEG.etc.ic_classification.ICLabel.classifications(arg2(index),:));
