@@ -1178,7 +1178,7 @@ u(22) = uicontrol('Parent',figh, ...
 	  eegplot('scaleeye', 'off', gcf);
   end
   
-  eegplot('drawp', 0);
+  % eegplot('drawp', 0);
   eegplot('drawp', 0);
   if g.dispchans ~= g.chans
   	   eegplot('zoom', gcf);
@@ -2079,7 +2079,7 @@ else
                     end
                 end
                 set(fig,'UserData', g);
-                eegplot('drawp', 0);  % redraw background
+                % eegplot('drawp', 0);  % redraw background
             end
         end
     elseif strcmp(get(fig, 'SelectionType'),'normal');
