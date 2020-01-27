@@ -802,7 +802,7 @@ if ismatlab
 
     eegmenu( false,  loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
     eegmenu( false,  loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
-    eegmenu( false,  plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
+    eegmenu( versL,  plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
     eegmenu( false,  plot_m, 'Label', 'Channel spectra and maps'               , 'userdata', ondata , 'CallBack', cb_spectopo1);
     eegmenu( false,  plot_m, 'Label', 'Channel properties'                     , 'userdata', ondata , 'CallBack', cb_prop1);
     eegmenu( false,  plot_m, 'Label', 'Channel ERP image'                      , 'userdata', onepoch, 'CallBack', cb_erpimage1);
