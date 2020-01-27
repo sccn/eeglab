@@ -276,10 +276,10 @@ if nargin < 2                 % if several arguments, assign values
         fprintf('WARNING: are you sure the epoch start time (%3.2f) is in seconds\n', str2num(results{i+5}));
     end
     
-	if ~isempty( results{i+12} ) , args = { args{:}, 'icachansind',  results{i+13} }; end
-	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end
-	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end
-	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end
+	if ~isempty( results{i+11} ) , args = { args{:}, 'chanlocs' ,  results{i+11} }; end
+	if ~isempty( results{i+12} ),  args = { args{:}, 'icaweights', results{i+12} }; end
+	if ~isempty( results{i+13} ) , args = { args{:}, 'icasphere',  results{i+13} }; end
+	if ~isempty( results{i+14} ) , args = { args{:}, 'icachansind',results{i+14} }; end
     
 else % no interactive inputs
     args = varargin;
