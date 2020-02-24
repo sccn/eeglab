@@ -66,12 +66,16 @@ if isempty(interval)
             % use file in
             % https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1387 to test
             % for boundary events
-            if eType < 256 && importEDFplus && eType < length(EVENT.CodeDesc)
+            if eType < 256 && importEDFplus && isfield(EVENT,'CodeDesc') && eType < length(EVENT.CodeDesc)
                 event(index).type = EVENT.CodeDesc{eType};
                 event(index).edftype = eType;
             elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
-                event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
-                event(index).edftype = eType;
+                try
+                    event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
+                    event(index).edftype = eType;
+                catch
+                    event(index).type = eType;
+                end
                 if eType == 32766 || eType == 32767
                     event(index).edfplustype = event(index).type;
                     event(index).type = 'boundary';
