@@ -76,7 +76,7 @@ else
             options = { options{:} 'filepath' inputpath }; 
         end
         if nargin > 2
-            options = { options{:} 'loadmode' varargin{2} }; 
+            options = { options{:} 'loadmode' varargin{1} }; 
         end
     else
         options = { inputname inputpath varargin{:} };
