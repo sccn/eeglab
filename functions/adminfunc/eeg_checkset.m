@@ -430,7 +430,7 @@ for inddataset = 1:length(ALLEEG)
                         try
                             tmpevent = EEG.event; 
                             allepochs = [ tmpevent.epoch ];
-                            removeevent = find( allepochs < 1 || allepochs > EEG.trials);
+                            removeevent = find( allepochs < 1 | allepochs > EEG.trials);
                             if ~isempty(removeevent)
                                 disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch numbers and were removed']);
                             end
