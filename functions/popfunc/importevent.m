@@ -122,7 +122,7 @@ g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
                          'optimalign'  'string'  { 'on';'off' }         'on';
                          'optimoffset' 'string'  { 'on';'off' }         'off';
                          'optimmeas'   'string'  { 'median';'mean' }    'mean';
-                         'delim'       {'integer';'string'}   []        char([9 44])}, 'importevent');
+                         'delim'       {'integer';'string'}   []        char([9 ' ' 44])}, 'importevent');
 if ischar(g), error(g); end
 if ~isempty(g.indices), g.append = 'yes'; end
 g.delim = char(g.delim);    
