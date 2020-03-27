@@ -302,16 +302,20 @@ usesingle = option_single;
 % CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
 disp('Computing time/frequency decomposition...');
 numWorkers = 0;
-if strcmpi(g.parallel, 'on') && ~exist('parpool')
-    poolobj = gcp('nocreate');
-    if ~isempty(poolobj)
-        numWorkers = poolobj.NumWorkers;
+try
+    if strcmpi(g.parallel, 'on') && ~exist('parpool') && exist('gcp')
+        poolobj = gcp('nocreate');
+        if ~isempty(poolobj)
+            numWorkers = poolobj.NumWorkers;
+        end
+    elseif strcmpi(g.parallel, 'on')
+        try
+            myCluster = parcluster('local');
+            numWorkers = myCluster.NumWorkers;
+        catch, disp('Cound not start parallel job'); end
     end
-elseif strcmpi(g.parallel, 'on')
-    try
-        myCluster = parcluster('local');
-        numWorkers = myCluster.NumWorkers;
-    catch, disp('Cound not start parallel job'); end
+catch
+    g.parallel = 'off';
 end
 %parfor (k = 1:length(g.indices),numWorkers)  % for each (specified) component/channel
 for k = 1:length(g.indices)
