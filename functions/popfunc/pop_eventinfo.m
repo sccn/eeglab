@@ -166,7 +166,7 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
                 c.Callback = {@bidsFieldSelected, obj.Source, row, col};
             else % any other column selected
                 if strcmp(columnName, 'Levels')
-                    createLevelUI('','',field);
+                    createLevelUI('','',obj,field);
                 elseif strcmp(columnName, 'Description')
                     uicontrol(f, 'Style', 'text', 'String', sprintf('%s (%s):',columnName, columnDefinition.(columnName)), 'Units', 'normalized', 'Position',[0.01 0.44 0.98 0.05], 'HorizontalAlignment', 'left','FontAngle','italic','ForegroundColor', fg,'BackgroundColor', bg, 'Tag', 'cellContentHeader');
                     uicontrol(f, 'Style', 'edit', 'String', obj.Source.Data{row,col}, 'Units', 'normalized', 'Max',2,'Min',0,'Position',[0.01 0.24 0.7 0.2], 'HorizontalAlignment', 'left', 'Callback', {@descriptionCB, obj,field}, 'Tag', 'cellContentMsg');
@@ -216,9 +216,9 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
         eventBIDS.(field).Description = src.String;
     end
 
-    function createLevelUI(src,event,field)
+    function createLevelUI(src,event,table,field)
         removeLevelUI();
-        
+        levelCellText = table.Source.Data{find(strcmp(table.Source.RowName, field)), find(strcmp(table.Source.ColumnName, 'Levels'))}; % text (fieldName-Levels) cell. if 'n/a' then no action, 'Click to..' then conditional action, '<value>,...' then get levels
         if strcmp(field, 'usertags')
             uicontrol(f, 'Style', 'text', 'String', 'Levels editing not applied for HED. Use ''pop_tageeg(EEG)'' of HEDTools plug-in to edit event HED tags', 'Units', 'normalized', 'Position', [0.01 0.45 1 0.05],'ForegroundColor', fg,'BackgroundColor', bg, 'Tag', 'levelEditMsg');
         elseif strcmp(field, 'latency')
@@ -232,12 +232,12 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
             else
                 levels = unique({ALLEEG(1).event.(field)})';
             end
-            if length(levels) > levelThreshold 
+            if strcmp(levelCellText,'Click to specify below') && length(levels) > levelThreshold 
                 msg = sprintf('\tThere are more than %d unique levels for field %s.\nAre you sure you want to specify levels for it?', levelThreshold, field);
                 c4 = uicontrol(f, 'Style', 'text', 'String', msg, 'Units', 'normalized', 'FontWeight', 'bold', 'ForegroundColor', fg,'BackgroundColor', bg, 'Tag', 'confirmMsg');
                 c4.Position = [0 0.38 1 0.1];
-                c5 = uicontrol(f, 'Style', 'pushbutton', 'String', 'Yes', 'Units', 'normalized','Tag', 'confirmBtn', 'Callback', {@createLevelUI,field,levels});
-                c5.Position = [(1-c5.Extent(3))/2 0.33 0.1 0.05];
+                c5 = uicontrol(f, 'Style', 'pushbutton', 'String', 'Yes', 'Units', 'normalized','Tag', 'confirmBtn', 'Callback', {@ignoreThresholdCB,table,field});
+                c5.Position = [0.5-c5.Extent(3)/2 0.33 0.1 0.05];
             else
                 % build table data
                 t = cell(length(levels),2);
@@ -257,10 +257,17 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
             end
         end
     end
-
+    
+    function ignoreThresholdCB(src,event,table, field)
+        table.Source.Data{find(strcmp(table.Source.RowName, field)), find(strcmp(table.Source.ColumnName, 'Levels'))} = 'Click to specify below (ignore max number of levels threshold)';
+        createLevelUI('','',table,field);
+    end
+    
+    % Event handler for level edit
     function levelEditCB(arg1, obj, field)
         level = checkFormat(obj.Source.RowName{obj.Indices(1)});
         description = obj.EditData;
+        % update eventBIDS structure
         eventBIDS.(field).Levels.(level) = description;
         specified_levels = fieldnames(eventBIDS.(field).Levels);
         % Update main table
@@ -280,7 +287,7 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
         if ~isempty(str2num(str))
             formatted = ['x' str];
         else
-            formatted = str;
+            formatted = strrep(str,' ','_'); %replace space with _
         end
     end
     function removeLevelUI()
@@ -298,6 +305,10 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
             delete(h);
         end
         h = findobj('Tag', 'confirmBtn');
+        if ~isempty(h)
+            delete(h);
+        end
+        h = findobj('Tag', 'noLevelBtn');
         if ~isempty(h)
             delete(h);
         end
