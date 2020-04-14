@@ -2,14 +2,14 @@
 %                   fields of EEG.event
 %
 % Usage:
-%   >> [EEG, eInfoDesc, eInfo] = pop_eventinfo( EEG );
+%   >> [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo( ALLEEG );
 %                                              
 % Inputs:
-%   EEG        - EEG dataset structure. May only contain one dataset.
+%   ALLEEG        - ALLEEG dataset structure. May only contain one dataset.
 %
 % Outputs:
-%  'EEG'       - [struct] Updated EEG structure containing event BIDS information
-%                in EEG.BIDS.eInfoDesc and EEG.BIDS.eInfo
+%  'ALLEEG'       - [struct] Updated ALLEEG structure containing event BIDS information
+%                in each EEG structure at EEG.BIDS.eInfoDesc and EEG.BIDS.eInfo
 %
 %  'eInfoDesc' - [struct] structure describing BIDS event fields as you specified.
 %                See BIDS specification for all suggested fields.
@@ -27,7 +27,10 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
        eventFields = fieldnames([ALLEEG.event]);
     catch ME
         if (strcmp(ME.identifier, 'MATLAB:catenate:structFieldBad'))
-           error('There is mismatch in number of fields of EEG.event structures. Check to make sure all EEG.event has the same fields'); 
+            numFields = cellfun(@(x) numel(fieldnames(x)), {ALLEEG.event});
+            [num, idx] = max(numFields);
+            eventFields = fieldnames(ALLEEG(idx).event);
+            warning('There is mismatch in number of fields in EEG.event structures. Using fields of ALLEEG(%d) which has the highest number of fields (%d).', idx, num);
         end
     end
     % default settings
@@ -337,16 +340,20 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
             delete(h);
         end
     end
-    function event = newEventBIDS()
+
+    % generate 
+    function event = newEventBIDS(eegIdx)
         event = [];
         bidsEEG = [];
         if isfield(ALLEEG,'BIDS') 
             bidsIdx = find(~cellfun(@isempty,{ALLEEG.BIDS}));
-            bidsEEG = ALLEEG(bidsIdx);
-            if (numel(bidsEEG) > 1 && numel(bidsEEG) < numel(ALLEEG))
-                warning(['BIDS structure is found in few but not all EEG structure.\nUsing BIDS info of ALLEEG(' bidsIdx(1) ').']);
+            if ~isempty(bidsIdx)
+                if numel(ALLEEG) ~= numel(bidsIdx)
+                    fprintf(['EEG.BIDS is found in ' num2str(numel(bidsIdx)) ' out of ' num2str(numel(ALLEEG)) ' EEG structure(s). ']);
+                end
+                fprintf(['Using BIDS info of ALLEEG(' num2str(bidsIdx(1)) ')...']);
+                bidsEEG = ALLEEG(bidsIdx(1));
             end
-            bidsEEG = ALLEEG(bidsIdx(1));
         end
         
         % if resume editing
