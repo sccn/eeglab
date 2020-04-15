@@ -140,9 +140,15 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
                 end
             end
         end
+        if numel(ALLEEG) == 1
+            command = '[EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG);';
+        else
+            command = '[ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG);';
+        end
         for e=1:numel(ALLEEG)
             ALLEEG(e).BIDS.eInfoDesc = eInfoDesc;
             ALLEEG(e).BIDS.eInfo = eInfo;
+            ALLEEG(e).history = [ALLEEG(e).history command];
         end
         clear('eventBIDS');
         close(f);
@@ -345,7 +351,7 @@ function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
     function event = newEventBIDS(eegIdx)
         event = [];
         bidsEEG = [];
-        if isfield(ALLEEG,'BIDS') 
+        if isfield(ALLEEG,'BIDS') % return true if any of EEG structure has BIDS
             bidsIdx = find(~cellfun(@isempty,{ALLEEG.BIDS}));
             if ~isempty(bidsIdx)
                 if numel(ALLEEG) ~= numel(bidsIdx)
