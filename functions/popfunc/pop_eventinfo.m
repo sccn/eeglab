@@ -2,14 +2,14 @@
 %                   fields of EEG.event
 %
 % Usage:
-%   >> [EEG, eInfoDesc, eInfo] = pop_eventinfo( EEG );
+%   >> [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo( ALLEEG );
 %                                              
 % Inputs:
-%   EEG        - EEG dataset structure. May only contain one dataset.
+%   ALLEEG        - ALLEEG dataset structure. May only contain one dataset.
 %
 % Outputs:
-%  'EEG'       - [struct] Updated EEG structure containing event BIDS information
-%                in EEG.BIDS.eInfoDesc and EEG.BIDS.eInfo
+%  'ALLEEG'       - [struct] Updated ALLEEG structure containing event BIDS information
+%                in each EEG structure at EEG.BIDS.eInfoDesc and EEG.BIDS.eInfo
 %
 %  'eInfoDesc' - [struct] structure describing BIDS event fields as you specified.
 %                See BIDS specification for all suggested fields.
@@ -21,7 +21,18 @@
 %                (duration in sec), "value" (EEGLAB event type)
 %
 % Author: Dung Truong, Arnaud Delorme
-function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
+function [ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG)
+    % perform check to make sure EEG.event is consistent across ALLEEG
+    try
+       eventFields = fieldnames([ALLEEG.event]);
+    catch ME
+        if (strcmp(ME.identifier, 'MATLAB:catenate:structFieldBad'))
+            numFields = cellfun(@(x) numel(fieldnames(x)), {ALLEEG.event});
+            [num, idx] = max(numFields);
+            eventFields = fieldnames(ALLEEG(idx).event);
+            warning('There is mismatch in number of fields in EEG.event structures. Using fields of ALLEEG(%d) which has the highest number of fields (%d).', idx, num);
+        end
+    end
     % default settings
     appWidth = 800;
     appHeight = 500;
@@ -40,7 +51,7 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
     eInfoDesc = [];
     
     % create UI
-    eventFields = fieldnames(EEG.event);
+    
     f = figure('MenuBar', 'None', 'ToolBar', 'None', 'Name', 'Edit BIDS event info - pop_eventinfo', 'Color', bg);
     f.Position(3) = appWidth;
     f.Position(4) = appHeight;
@@ -129,9 +140,16 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
                 end
             end
         end
-        
-        EEG.BIDS.eInfoDesc = eInfoDesc;
-        EEG.BIDS.eInfo = eInfo;
+        if numel(ALLEEG) == 1
+            command = '[EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG);';
+        else
+            command = '[ALLEEG, eInfoDesc, eInfo] = pop_eventinfo(ALLEEG);';
+        end
+        for e=1:numel(ALLEEG)
+            ALLEEG(e).BIDS.eInfoDesc = eInfoDesc;
+            ALLEEG(e).BIDS.eInfo = eInfo;
+            ALLEEG(e).history = [ALLEEG(e).history command];
+        end
         clear('eventBIDS');
         close(f);
     end
@@ -157,7 +175,7 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
                 c.Callback = {@bidsFieldSelected, obj.Source, row, col};
             else % any other column selected
                 if strcmp(columnName, 'Levels')
-                    createLevelUI('','',field);
+                    createLevelUI('','',obj,field);
                 elseif strcmp(columnName, 'Description')
                     uicontrol(f, 'Style', 'text', 'String', sprintf('%s (%s):',columnName, columnDefinition.(columnName)), 'Units', 'normalized', 'Position',[0.01 0.44 0.98 0.05], 'HorizontalAlignment', 'left','FontAngle','italic','ForegroundColor', fg,'BackgroundColor', bg, 'Tag', 'cellContentHeader');
                     uicontrol(f, 'Style', 'edit', 'String', obj.Source.Data{row,col}, 'Units', 'normalized', 'Max',2,'Min',0,'Position',[0.01 0.24 0.7 0.2], 'HorizontalAlignment', 'left', 'Callback', {@descriptionCB, obj,field}, 'Tag', 'cellContentMsg');
@@ -207,27 +225,28 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
         eventBIDS.(field).Description = src.String;
     end
 
-    function createLevelUI(src,event,field)
+    function createLevelUI(src,event,table,field)
         removeLevelUI();
-        
+        levelCellText = table.Source.Data{find(strcmp(table.Source.RowName, field)), find(strcmp(table.Source.ColumnName, 'Levels'))}; % text (fieldName-Levels) cell. if 'n/a' then no action, 'Click to..' then conditional action, '<value>,...' then get levels
         if strcmp(field, 'usertags')
             uicontrol(f, 'Style', 'text', 'String', 'Levels editing not applied for HED. Use ''pop_tageeg(EEG)'' of HEDTools plug-in to edit event HED tags', 'Units', 'normalized', 'Position', [0.01 0.45 1 0.05],'ForegroundColor', fg,'BackgroundColor', bg, 'Tag', 'levelEditMsg');
         elseif strcmp(field, 'latency')
             uicontrol(f, 'Style', 'text', 'String', 'Levels editing not applied for EEG.event.latency field.', 'Units', 'normalized', 'Position', [0.01 0.45 1 0.05],'ForegroundColor', fg,'BackgroundColor', bg, 'Tag', 'levelEditMsg');
         else
-            % retrieve all unique values from EEG.event.(field)
-            if isnumeric(EEG.event(1).(field))
-                values = arrayfun(@(x) num2str(x), [EEG.event.(field)], 'UniformOutput', false);
+            % retrieve all unique values from EEG.event.(field). 
+            % Use ALLEEG(1) as representative EEG
+            if isnumeric(ALLEEG(1).event(1).(field))
+                values = arrayfun(@(x) num2str(x), [ALLEEG(1).event.(field)], 'UniformOutput', false);
                 levels = unique(values)';
             else
-                levels = unique({EEG.event.(field)})';
+                levels = unique({ALLEEG(1).event.(field)})';
             end
-            if length(levels) > levelThreshold 
+            if strcmp(levelCellText,'Click to specify below') && length(levels) > levelThreshold 
                 msg = sprintf('\tThere are more than %d unique levels for field %s.\nAre you sure you want to specify levels for it?', levelThreshold, field);
                 c4 = uicontrol(f, 'Style', 'text', 'String', msg, 'Units', 'normalized', 'FontWeight', 'bold', 'ForegroundColor', fg,'BackgroundColor', bg, 'Tag', 'confirmMsg');
                 c4.Position = [0 0.38 1 0.1];
-                c5 = uicontrol(f, 'Style', 'pushbutton', 'String', 'Yes', 'Units', 'normalized','Tag', 'confirmBtn', 'Callback', {@createLevelUI,field,levels});
-                c5.Position = [(1-c5.Extent(3))/2 0.33 0.1 0.05];
+                c5 = uicontrol(f, 'Style', 'pushbutton', 'String', 'Yes', 'Units', 'normalized','Tag', 'confirmBtn', 'Callback', {@ignoreThresholdCB,table,field});
+                c5.Position = [0.5-c5.Extent(3)/2 0.33 0.1 0.05];
             else
                 % build table data
                 t = cell(length(levels),2);
@@ -247,10 +266,17 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
             end
         end
     end
-
+    
+    function ignoreThresholdCB(src,event,table, field)
+        table.Source.Data{find(strcmp(table.Source.RowName, field)), find(strcmp(table.Source.ColumnName, 'Levels'))} = 'Click to specify below (ignore max number of levels threshold)';
+        createLevelUI('','',table,field);
+    end
+    
+    % Event handler for level edit
     function levelEditCB(arg1, obj, field)
         level = checkFormat(obj.Source.RowName{obj.Indices(1)});
         description = obj.EditData;
+        % update eventBIDS structure
         eventBIDS.(field).Levels.(level) = description;
         specified_levels = fieldnames(eventBIDS.(field).Levels);
         % Update main table
@@ -270,7 +296,7 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
         if ~isempty(str2num(str))
             formatted = ['x' str];
         else
-            formatted = str;
+            formatted = strrep(str,' ','_'); %replace space with _
         end
     end
     function removeLevelUI()
@@ -288,6 +314,10 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
             delete(h);
         end
         h = findobj('Tag', 'confirmBtn');
+        if ~isempty(h)
+            delete(h);
+        end
+        h = findobj('Tag', 'noLevelBtn');
         if ~isempty(h)
             delete(h);
         end
@@ -316,41 +346,56 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
             delete(h);
         end
     end
-    function event = newEventBIDS()
+
+    % generate 
+    function event = newEventBIDS(eegIdx)
         event = [];
+        bidsEEG = [];
+        if isfield(ALLEEG,'BIDS') % return true if any of EEG structure has BIDS
+            bidsIdx = find(~cellfun(@isempty,{ALLEEG.BIDS}));
+            if ~isempty(bidsIdx)
+                if numel(ALLEEG) ~= numel(bidsIdx)
+                    fprintf(['EEG.BIDS is found in ' num2str(numel(bidsIdx)) ' out of ' num2str(numel(ALLEEG)) ' EEG structure(s). ']);
+                end
+                fprintf(['Using BIDS info of ALLEEG(' num2str(bidsIdx(1)) ')...']);
+                bidsEEG = ALLEEG(bidsIdx(1));
+            end
+        end
+        
         % if resume editing
-        if isfield(EEG,'BIDS') && isfield(EEG.BIDS,'eInfoDesc') && isfield(EEG.BIDS,'eInfo')
-            for idx=1:size(EEG.BIDS.eInfo,1)
-                field = EEG.BIDS.eInfo{idx,2}; 
-                bids_field = EEG.BIDS.eInfo{idx,1};
+        if ~isempty(bidsEEG) && isfield(bidsEEG.BIDS,'eInfoDesc') && isfield(bidsEEG.BIDS,'eInfo')
+
+            for idx=1:size(bidsEEG.BIDS.eInfo,1)
+                field = bidsEEG.BIDS.eInfo{idx,2}; 
+                bids_field = bidsEEG.BIDS.eInfo{idx,1};
                 event.(field).BIDSField = bids_field;
-                if isfield(EEG.BIDS.eInfoDesc.(bids_field), 'LongName')
-                    event.(field).LongName = EEG.BIDS.eInfoDesc.(bids_field).LongName;
+                if isfield(bidsEEG.BIDS.eInfoDesc,bids_field) && isfield(bidsEEG.BIDS.eInfoDesc.(bids_field), 'LongName')
+                    event.(field).LongName = bidsEEG.BIDS.eInfoDesc.(bids_field).LongName;
                 else
                     event.(field).LongName = '';
                 end
-                if isfield(EEG.BIDS.eInfoDesc.(bids_field), 'Description')
-                    event.(field).Description = EEG.BIDS.eInfoDesc.(bids_field).Description;
+                if isfield(bidsEEG.BIDS.eInfoDesc,bids_field) && isfield(bidsEEG.BIDS.eInfoDesc.(bids_field), 'Description')
+                    event.(field).Description = bidsEEG.BIDS.eInfoDesc.(bids_field).Description;
                 else
                     event.(field).Description = '';
                 end
-                if isfield(EEG.BIDS.eInfoDesc.(bids_field), 'Units')
-                    event.(field).Units = EEG.BIDS.eInfoDesc.(bids_field).Units;
+                if isfield(bidsEEG.BIDS.eInfoDesc,bids_field) && isfield(bidsEEG.BIDS.eInfoDesc.(bids_field), 'Units')
+                    event.(field).Units = bidsEEG.BIDS.eInfoDesc.(bids_field).Units;
                 else
                     event.(field).Units = '';
                 end
-                if isfield(EEG.BIDS.eInfoDesc.(bids_field), 'Levels')
-                    event.(field).Levels = EEG.BIDS.eInfoDesc.(bids_field).Levels;
+                if isfield(bidsEEG.BIDS.eInfoDesc,bids_field) && isfield(bidsEEG.BIDS.eInfoDesc.(bids_field), 'Levels')
+                    event.(field).Levels = bidsEEG.BIDS.eInfoDesc.(bids_field).Levels;
                 else
                     event.(field).Levels = [];
                 end
-                if isfield(EEG.BIDS.eInfoDesc.(bids_field), 'TermURL')
-                    event.(field).TermURL = EEG.BIDS.eInfoDesc.(bids_field).TermURL;
+                if isfield(bidsEEG.BIDS.eInfoDesc,bids_field) && isfield(bidsEEG.BIDS.eInfoDesc.(bids_field), 'TermURL')
+                    event.(field).TermURL = bidsEEG.BIDS.eInfoDesc.(bids_field).TermURL;
                 else
                     event.(field).TermURL = '';
                 end
             end
-            fields = setdiff(fieldnames(EEG.event), {EEG.BIDS.eInfo{:,2}}); % unset fields
+            fields = setdiff(eventFields, {bidsEEG.BIDS.eInfo{:,2}}); % unset fields
             for idx=1:length(fields)
                 event.(fields{idx}).BIDSField = '';
                 event.(fields{idx}).LongName = '';
@@ -359,8 +404,10 @@ function [EEG, eInfoDesc, eInfo] = pop_eventinfo(EEG)
                 event.(fields{idx}).Levels = [];
                 event.(fields{idx}).TermURL = '';
             end
+
+            clear('EEG');
         else % start fresh
-            fields = fieldnames(EEG.event);
+            fields = eventFields; 
             for idx=1:length(fields)
                 if strcmp(fields{idx}, 'type')
                     event.type.BIDSField = 'value';
