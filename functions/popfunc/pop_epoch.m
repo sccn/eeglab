@@ -88,12 +88,12 @@
 % 03-18-02 interface and debugging -ad
 % 03-27-02 interface and debugging -ad & sm
 
-function [EEG, indices, com] = pop_epoch( EEG, events, lim, varargin );
+function [EEG, indices, com] = pop_epoch( EEG, events, lim, varargin )
 
 if nargin < 1
    help pop_epoch;
 	return;
-end;	
+end
 com = '';
 indices = [];
 
@@ -229,7 +229,8 @@ if ~isempty( events )
     % ------------------------------
     Ieventtmp = [];
     tmpevent = EEG.event;
-    tmpeventtype  = deblank({ tmpevent.type });
+    tmpeventtype = { tmpevent.type };
+    if ischar(tmpeventtype{1}), tmpeventtype  = deblank(tmpeventtype); end
     if iscell(events)
 		if ischar(EEG.event(1).type)
 			for index2 = 1:length( events )
