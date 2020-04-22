@@ -210,7 +210,7 @@ if flag_ok % chanloc created
         limoChanlocsFile = fullfile(STUDY.filepath, chanlocname);
     end
     save('-mat', limoChanlocsFile, '-struct', 'limoChanlocs');
-    fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoChanlocsFile);
+    fprintf('Saving channel neighbors for correction for multiple comparisons in \n%s\n', limoChanlocsFile);
 end
 
 % 1st level analysis
