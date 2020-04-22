@@ -129,7 +129,7 @@ function ALLEEG = std_loadalleeg(varargin)
                     indCommon = indCommon+1;
                 end
                 indCommon = indCommon-1;
-                if indCommon > 1 % do not change path if nothing in common between the two paths
+                if indCommon > 1 && indCommon < length(genpath) % do not change path if nothing in common between the two paths
                     genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
                 end
             end
@@ -160,6 +160,8 @@ function ALLEEG = std_loadalleeg(varargin)
             warnfold = 'on';
         elseif exist(lower(fullfile(char(paths{dset}), datasets{dset}))) == 2   
             EEG = pop_loadset('filename', lower(datasets{dset}), 'filepath',lower(char(paths{dset})), 'loadmode', 'info', 'check', 'off');
+        elseif exist(fullfile(pwd, datasets{dset})) == 2
+            EEG = pop_loadset('filename', lower(datasets{dset}), 'filepath',pwd, 'loadmode', 'info', 'check', 'off');
         else
             txt = [ sprintf('The dataset %s is missing\n', datasets{dset}) 10 ...
                           'Is it possible that it might have been deleted?' 10 ...
