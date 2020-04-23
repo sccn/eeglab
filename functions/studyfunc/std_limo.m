@@ -390,7 +390,6 @@ end
 
 % by default we create a design matrix with all condition
 factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
-factors = [];
 for s = 1:nb_subjects
     % save continuous and categorical data files
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
@@ -413,15 +412,17 @@ for s = 1:nb_subjects
 end
 
 % then we add contrasts for conditions that were merged during design selection
-if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
-    limocontrast = zeros(length(STUDY.design(opt.design).variable.value),length(factors)+1); % length(factors)+1 to add the contant
-    for n=1:length(factors)
-        factor_names{n} = factors(n).value;
-    end
-
-    for c=1:length(STUDY.design(opt.design).variable.value)
-        limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
-        limocontrast(c,1:length(factors)) = limocontrast(c,1:length(factors)) ./ sum(limocontrast(c,1:length(factors))); % scale by the number of variables
+if ~isempty(factors)
+    if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
+        limocontrast = zeros(length(STUDY.design(opt.design).variable.value),length(factors)+1); % length(factors)+1 to add the contant
+        for n=1:length(factors)
+            factor_names{n} = factors(n).value;
+        end
+        
+        for c=1:length(STUDY.design(opt.design).variable.value)
+            limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
+            limocontrast(c,1:length(factors)) = limocontrast(c,1:length(factors)) ./ sum(limocontrast(c,1:length(factors))); % scale by the number of variables
+        end
     end
 end
 

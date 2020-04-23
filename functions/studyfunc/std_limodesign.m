@@ -80,9 +80,15 @@ if ischar(opt), error(opt); end
 % ----------------------------------------
 catMat  = [];
 contMat = [];
-catVar  = sort(find(cellfun(@(x)strcmpi(x, 'categorical' ), { factors.vartype })));
-contVar = find(cellfun(@(x)strcmpi(x, 'continuous' ), { factors.vartype }));
-catVarLabel = unique({ factors(catVar).label });
+if ~isempty(factors)
+    catVar      = sort(find(cellfun(@(x)strcmpi(x, 'categorical' ), { factors.vartype })));
+    contVar     = find(cellfun(@(x)strcmpi(x, 'continuous' ), { factors.vartype }));
+    catVarLabel = unique({ factors(catVar).label });
+else
+    catVar      = [];
+    contVar     = [];
+    catVarLabel = [];
+end
 
 % find all values for each cat. indep. var.
 % -----------------------------------------
