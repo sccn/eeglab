@@ -93,6 +93,7 @@ end
 % find all values for each cat. indep. var.
 % -----------------------------------------
 alloptions = {};
+limodesign.categorical = {};
 if ~isempty(catVar)
     for iVar = 1:length(catVarLabel)
         indVals = find(cellfun(@(x)strcmpi(x, catVarLabel{iVar} ), { factors.label }));
