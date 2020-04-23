@@ -389,7 +389,8 @@ end
 % -------------------
 
 % by default we create a design matrix with all condition
-factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off');
+factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
+factors = [];
 for s = 1:nb_subjects
     % save continuous and categorical data files
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
@@ -398,8 +399,14 @@ for s = 1:nb_subjects
     % copy results
     model.cat_files{s}                 = catMat;
     model.cont_files{s}                = contMat;
-    STUDY.limo.categorical             = limodesign.categorical;
-    STUDY.limo.continuous              = limodesign.continuous;
+    if isfield(limodesign, 'categorical')
+         STUDY.limo.categorical = limodesign.categorical;
+    else STUDY.limo.categorical = {};
+    end
+    if isfield(limodesign, 'continuous')
+         STUDY.limo.continuous = limodesign.continuous;
+    else STUDY.limo.continuous = {};
+    end
     STUDY.limo.subjects(s).subject     = unique_subjects{s};
     STUDY.limo.subjects(s).cat_file    = catMat;
     STUDY.limo.subjects(s).cont_file   = contMat;

@@ -335,6 +335,8 @@ else
     STUDY.design(designind) = des;  % fill STUDY.design
 end
 
+STUDY = std_addvarlevel(STUDY, designind);
+
 % remove empty variables
 if designind <= length(STUDY.design)
     for iVar = length(STUDY.design(designind).variable):-1:1

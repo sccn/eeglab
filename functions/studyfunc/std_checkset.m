@@ -331,6 +331,13 @@ if ~studywasempty
         end
     end
     
+    % check for level field and add it if it not present
+    if length(STUDY.design) > 0 && isfield(STUDY.design, 'variable')
+        if ~isfield(STUDY.design(1).variable, 'level')
+            STUDY = std_addvarlevel(STUDY);
+        end
+    end
+    
     % check that ICA is present and if it is update STUDY.datasetinfo
     allcompsSTUDY  = { STUDY.datasetinfo.comps };
     allcompsALLEEG = { ALLEEG.icaweights };

@@ -16,6 +16,8 @@
 %                  categorical variables. This allows computing interactions
 %                  between these variables at the second level. Default 
 %                  is 'off'.
+%   'level'       - ['one'|'two'|'both'] get only first level or second
+%                  level factors. Default is 'both'.
 % 
 % Author: Arnaud Delorme, UCSD, 2018
 
@@ -54,6 +56,7 @@ end
 
 g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
                             'splitreg'    'string' { 'on','off' } 'off';
+                            'level'       'string' { 'one','two','both'} 'both';
                             'interaction' 'string' { 'on','off' } 'off' });
 if ischar(g)
     error(g);
@@ -78,6 +81,7 @@ for iDes = 1:length(des)
             for iSubVal = 1:length(strVals)
                 allFactorsStruct(count).vartype = 'categorical';
                 allFactorsStruct(count).label = des(iDes).variable(iVar).label;
+                allFactorsStruct(count).level = des(iDes).variable(iVar).level;
                 allFactorsStruct(count).value = strVals{iSubVal};
                 if isnumeric(strVals{iSubVal})
                     allFactors{count} = sprintf('%s - %d', des(iDes).variable(iVar).label, strVals{iSubVal});
@@ -98,11 +102,23 @@ if length(allFactors) ~= length(unique(allFactors))
     allFactorsStruct = allFactorsStruct(inds);
 end
 
-% redorders factors so that all variables are grouped
+% filter first or second level
+if ~strcmpi(g.level, 'both')
+    rmInd = [];
+    for ind = 1:length(allFactorsStruct)
+        if ~strcmpi(allFactorsStruct(ind).level,g.level)
+            rmInd = [ rmInd ind ];
+        end
+    end
+    allFactorsStruct(rmInd) = [];
+end
 
+% redorders factors so that all variables are grouped
 if strcmpi(g.gui, 'on')
     [~,~,des] = std_limodesign(allFactorsStruct,[], 'desconly', 'on', 'splitreg', g.splitreg, 'interaction', g.interaction);
-
+    if ~isfield(des, 'categorical'), des.categorical = {}; end
+    if ~isfield(des, 'continuous'),  des.continuous  = {}; end
+    
     % generate categorical labels
     allLabels = {};
     count     = 1;
@@ -121,6 +137,37 @@ if strcmpi(g.gui, 'on')
     allLabels{count} = [ int2str(count) '. Constant' ];
     
     warndlg2(strvcat(allLabels), 'List of explanatory variables');
+    
+%     Prompt = strvcat(allLabels);
+%     listui = {};
+%     geometry = {};
+%     for index = 1:size(Prompt,1)
+%         geometry{index} = [1];
+%         listui{index} = { 'Style', 'text', 'string' Prompt(index,:) };
+%     end
+%     listui{end+1} = {};
+%     
+%     geometry = { geometry{:} 1 ones(1,length(varargin)-1) };
+%     for index = 1:length(varargin)-1 % ignoring default val
+%         listui = {listui{:} { 'width',80,'align','center','Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
+%         if strcmp(varargin{index}, varargin{end})
+%             listui{end}{end+1} = 'fontweight';
+%             listui{end}{end+1} = 'bold';
+%         end
+%     end
+%     
+%     fig = figure('visible', 'off');
+%     [~, ~, allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
+%             'borders', [0.05 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'off' );
+%     
+%     waitfor( fig, 'userdata');
+%     
+%     try,
+%         result = get(fig, 'userdata');
+%         close(fig);
+%         drawnow;
+%     end
+    
 end
 
 % convert nested values to linear sequence
