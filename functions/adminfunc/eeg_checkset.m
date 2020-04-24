@@ -1030,7 +1030,15 @@ for inddataset = 1:length(ALLEEG)
         
         % reference (use EEG structure)
         % ---------
-        if ~isfield(EEG, 'ref'), EEG.ref = ''; end
+        if isfield(EEG, 'ref')
+            EEG.ref = '';
+        end
+        if isfield(EEG.chanlocs, 'ref') && ~isempty(EEG.chanlocs(1).ref)
+            if ~isequal(EEG.chanlocs(1).ref, EEG.ref)
+                EEG.ref = EEG.chanlocs(1).ref; 
+                res = com;
+            end
+        end
         if strcmpi(EEG.ref, 'averef')
             ref = 'average';
         else ref = '';
