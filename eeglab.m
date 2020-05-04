@@ -24,6 +24,7 @@
 %
 % Usage: 1) To (re)start EEGLAB, type
 %            >> eeglab           % Ignores any loaded datasets
+%            >> eeglab nogui     % Do not pop up GUI
 %        2) To redaw and update the EEGLAB interface, type
 %            >> eeglab redraw    % Scans for non-empty datasets
 %            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
@@ -1011,7 +1012,7 @@ else
                     fprintf('EEGLAB: adding "%s" v%s (see >> help %s)', ...
                         pluginlist(plugincount).plugin, vers, funcname);
                     if ~isempty(pluginstats)
-                        indPlugin = strmatch(pluginlist(plugincount).plugin, pluginstats.name, 'exact');
+                        indPlugin = strmatch(lower(pluginlist(plugincount).plugin), lower(pluginstats.name), 'exact');
                         if length(indPlugin) == 1
                             if ~strcmpi(vers, pluginstats.version{indPlugin})
                                 fprintf(2, ' - new version %s available\n', pluginstats.version{indPlugin});
