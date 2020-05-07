@@ -184,7 +184,11 @@ end
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
-    [ EEG com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
+    else
+        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'off', 'params', args);
+    end
     return;
 end
 
