@@ -13,6 +13,8 @@
 %   'filepath' - [string] path of the STUDY file {default: STUDY.filepath}
 %   'savemode' - ['resave'|'standard'] in resave mode, the file name in
 %                the study is being used to resave it.
+%   'resavedatasets' - ['on'|'off'] resave STUDY datasets if necessary.
+%                Default is 'off'.
 %
 % Note: the parameter EEG is currenlty not being used. In the future, this function
 %       will check if any of the datasets of the study have been modified and
@@ -68,6 +70,7 @@ if nargin > 1
 end
 
 if nargin < 3
+
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.study', ...
@@ -80,17 +83,41 @@ if nargin < 3
             filename = [filename(1:strfind(filename,'.')-1) '.study'];
         end
     end
-    options = { 'filename' filename 'filepath' filepath };
+        
+    options = { options{:} 'filename' filename 'filepath' filepath };
+end
+
+% check if datasets have been modified and need to be saved
+% ---------------------------------------------------------
+EEG = eeg_checkset(EEG);
+if any(cellfun(@(x)isequal(x, 'no'), { EEG.saved }))
+    if nargin < 3 || (length(options) == 2 && strcmpi(options{2}, 'resavegui'))
+        res = questdlg2('Some datasets have been modified, do you want to resave them?', ...
+            'Saving datasets', ...
+            'No', 'Yes', 'Yes');
+        if strcmpi(res, 'yes')
+            options = { options{:} 'resavedatasets' 'on' };
+        end
+    else
+        disp('Some datasets have been modified, use option ''resavedatasets'' to resave them');
+    end
 end
 
 % decoding parameters
 % -------------------
 g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
                             'filepath'   'string'   []     STUDY.filepath;
-                            'savemode'   'string'   { 'standard','resave' } 'standard' });
+                            'resavedatasets'   'string'   { 'on' 'off' } 'off';
+                            'savemode'   'string'   { 'standard','resave','resavegui' } 'standard' });
 if ischar(g), error(g); end
 if isempty(STUDY.filename) && isempty(g.filename)
     error('File name required to save the study');
+end
+
+% resave datasets
+% ---------------
+if strcmpi(g.resavedatasets, 'on')
+    EEG = pop_saveset(EEG, 'savemode', 'resave');
 end
 
 % fields to remove
