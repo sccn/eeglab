@@ -104,7 +104,7 @@ else
 end
 
 fields = fieldnames(datasetinfo);
-fields = setdiff( fields, { 'filepath'  'filename' 'subject' 'index' 'comps' });
+fields = setdiff( fields, { 'filepath'  'filename' 'subject' 'index' 'comps' 'trialinfo' });
 for iDat = 1:length(inds)
     
     for iField = 1:length(fields)
