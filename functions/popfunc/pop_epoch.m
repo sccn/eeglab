@@ -385,6 +385,7 @@ for index=1:EEG.trials
 end
 EEG.event = newevent;
 EEG.epoch = [];
+EEG.saved = 'no';
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % check for boundary events
