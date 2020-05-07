@@ -89,17 +89,19 @@ end
 
 % check if datasets have been modified and need to be saved
 % ---------------------------------------------------------
-EEG = eeg_checkset(EEG);
-if any(cellfun(@(x)isequal(x, 'no'), { EEG.saved }))
-    if nargin < 3 || (length(options) == 2 && strcmpi(options{2}, 'resavegui'))
-        res = questdlg2('Some datasets have been modified, do you want to resave them?', ...
-            'Saving datasets', ...
-            'No', 'Yes', 'Yes');
-        if strcmpi(res, 'yes')
-            options = { options{:} 'resavedatasets' 'on' };
+if ~isempty(EEG)
+    EEG = eeg_checkset(EEG);
+    if any(cellfun(@(x)isequal(x, 'no'), { EEG.saved }))
+        if nargin < 3 || (length(options) == 2 && strcmpi(options{2}, 'resavegui'))
+            res = questdlg2('Some datasets have been modified, do you want to resave them?', ...
+                'Saving datasets', ...
+                'No', 'Yes', 'Yes');
+            if strcmpi(res, 'yes')
+                options = { options{:} 'resavedatasets' 'on' };
+            end
+        else
+            disp('Some datasets have been modified, use option ''resavedatasets'' to resave them');
         end
-    else
-        disp('Some datasets have been modified, use option ''resavedatasets'' to resave them');
     end
 end
 
