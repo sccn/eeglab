@@ -912,7 +912,11 @@ else
     pluginstats = [];
 	if option_checkversion && ismatlab
         disp('Retrieving plugin versions from server...');
-        pluginTmp = plugin_getweb('', pluginlist, 'newlist');
+        try
+            pluginTmp = plugin_getweb('', pluginlist, 'newlist');
+        catch
+            disp('Issue with retrieving statistics for extensions');
+        end
         if ~isempty(pluginTmp) && isfield(pluginTmp, 'name') && isfield(pluginTmp, 'version')
             pluginstats.name    = { pluginTmp.name };
             pluginstats.version = { pluginTmp.version };
