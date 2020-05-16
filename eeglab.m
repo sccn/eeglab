@@ -1829,7 +1829,7 @@ else
 	set( g.mainwin6, 'String', '  "Edit > Channel locations" (look up locations)');
 	set( g.mainwin7, 'String', '  "File > Import event info" (for continuous data)');
 	set( g.mainwin8, 'String', '- Filter data: "Tools > Filter data"');
-	set( g.mainwin9, 'String', '- Reject data: "Tools > Reject continuous data"');
+	set( g.mainwin9, 'String', '- Reject data: "Tools > Reject data by eye"');
 	set( g.mainwin10,'String', '- Run ICA: "Tools > Run ICA" (can take time)');
 	set( g.mainwin11,'String', '- Reject by ICA: "Tools > Reject data using ICA"');
 	set( g.mainwin12,'String', '- Epoch data: "Tools > Extract epochs"');
