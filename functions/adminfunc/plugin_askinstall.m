@@ -74,7 +74,14 @@ if nargin < 2 || ~exist(char(pluginFunc))
     end
     
     if strcmpi(res, 'no'), return, end
-    plugins = plugin_getweb('', []);
+    try
+        plugins = plugin_getweb('', []);
+    catch
+        error('Issue with retrieving statistics for extensions, maybe check your connection');
+    end
+    if isempty(plugins)
+        error('Cannot download the extension. Please check your internet connection');
+    end
     indPlugin = strmatch(lower(pluginName), lower({ plugins.name }), 'exact');
     if isempty(indPlugin)
         error([ pluginName ' extension not found' ]);
