@@ -41,6 +41,10 @@ try
     disp( [ 'Retreiving download statistics...' ] );
     [stats, status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki.php');
     stats = textscan(stats, '%s%d%s%s%f%d%s%s%s%s%s%f', 'delimiter', char(9));
+    if length(unique(cellfun(@length, stats))) > 1
+        disp('Issue with retrieving statistics for extensions');
+        return;
+    end
 catch
     disp('Cannot connect to the Internet to retrieve statistics for extensions');
     return

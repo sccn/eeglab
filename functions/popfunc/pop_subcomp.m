@@ -166,6 +166,16 @@ EEG.specicaact  = [];
 EEG.specdata    = [];
 EEG.reject      = [];
 
+if isfield(EEG.etc, 'ic_classification')
+    if isfield(EEG.etc.ic_classification, 'ICLabel') 
+        if isfield(EEG.etc.ic_classification.ICLabel, 'classifications')
+            if ~isempty(EEG.etc.ic_classification.ICLabel.classifications)
+                EEG.etc.ic_classification.ICLabel.classifications = EEG.etc.ic_classification.ICLabel.classifications(goodinds,:);
+            end
+        end
+    end
+end
+
 try,
     EEG.dipfit.model = EEG.dipfit.model(goodinds);
 catch, end
