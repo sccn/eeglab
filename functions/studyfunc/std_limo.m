@@ -184,6 +184,8 @@ if skip_chanlocs == 0
                 [~,~,limoChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
                 chanlocname = 'limo_gp_level_chanlocs.mat';
             catch neighbors_error
+                limoChanlocs = [];
+                flag_ok = 0;
                 warndlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created')
             end
         else
@@ -515,22 +517,30 @@ if exist('limocontrast','var')
 end
 
 % Save STUDY
-if sum(procstatus) ~= 0
-    if sum(procstatus) == nb_subjects
-        STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
-        cd(STUDY.filepath);
+cd(STUDY.filepath);
+STUDY      = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
+keep_files = 'no';
+if sum(procstatus) == nb_subjects
+    disp('All subjects have been successfully processed.')
+else
+    if sum(procstatus)==0
+        errordlg2('all subjects failed to process, check batch report')
     else
         warndlg2('some subjects failed to process, check batch report')
     end
+    % cleanup temp files - except for subjects with errors?
+    keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
+end
+
+if isempty(keep_files) || strcmpi(keep_files,'no')
+    for s = 1:nb_subjects
+        delete(model.set_files{s});
+    end
 else
-    errordlg2('all subjects failed to process, check batch report')
+    for s = find(procstatus)
+        delete(model.set_files{s});
+    end
 end
-
-% cleanup temp files
-for s = 1:nb_subjects
-    delete(model.set_files{s});
-end
-
 
 % -------------------------------------------------------------------------
 % Return full path if 'filepath' is a relative path. The output format will
