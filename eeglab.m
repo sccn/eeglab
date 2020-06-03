@@ -385,7 +385,6 @@ if nargin == 1
         disp( [ 'EEGLAB v' eeg_getversion ] );
 	elseif strcmp(onearg, 'nogui')
         if nargout < 1, clear ALLEEG; end % do not return output var
-        return;
 	elseif strcmp(onearg, 'redraw')
 		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
@@ -495,7 +494,7 @@ catchstrs.load_study             = e_load_study;
 
 % create eeglab figure
 % --------------------
-if ismatlab
+if ismatlab && ~strcmpi(onearg, 'nogui')
     eeg_mainfig(onearg);
 end
 
@@ -680,7 +679,7 @@ onchannel   = 'startup:off;chanloc:on';
 onepochchan = 'startup:off;continuous:off;chanloc:on';
 onstudy     = 'startup:off;epoch:off;continuous:off;study:on';
 
-if ismatlab
+if ismatlab && ~strcmpi(onearg, 'nogui')
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
@@ -985,17 +984,19 @@ else
                 pluginlist(plugincount).version    = pluginVersion;
                 vers2  = '';
                 status = 'ok';
-                try
-                    %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
-                    vers2 = feval(funcname, gcf, trystrs, catchstrs);
-                    [~, vers2] = parsepluginname(vers2);
-                catch
+                if ~strcmpi(onearg, 'nogui')
                     try
-                        eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                        %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
+                        vers2 = feval(funcname, gcf, trystrs, catchstrs);
+                        [~, vers2] = parsepluginname(vers2);
                     catch
-                        disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
-                        disp([ '   ' lasterr] );
-                        status = 'error';
+                        try
+                            eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                        catch
+                            disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
+                            disp([ '   ' lasterr] );
+                            status = 'error';
+                        end
                     end
                 end
                 if isempty(pluginlist(plugincount).version)
@@ -1037,7 +1038,7 @@ else
     
     % add menus for plugins to install
     % --------------------------------
-    if ismatlab
+    if ismatlab && ~strcmpi(onearg, 'nogui')
         if ~exist('mff_import', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
             cb_mff = [ 'if ~plugin_askinstall(''mffmatlabio'', ''mff_import''), return; end;' ...
@@ -1081,10 +1082,6 @@ else
     end
 end
 
-if ~ismatlab
-    return;
-end
-
 % Path exception for BIOSIG (sending BIOSIG down into the path)
 biosigpathlast; % fix str2double issue
 
@@ -1093,6 +1090,10 @@ dipplotpath = fileparts( which('dipplot') );
 dipfitpath  = fileparts( which('dipfit_1_to_2') );
 if ~strcmp(dipplotpath,dipfitpath)
     addpath(dipfitpath,'-begin');
+end
+
+if ~ismatlab || strcmpi(onearg, 'nogui')
+    return;
 end
 
 % add other import ...
@@ -1160,7 +1161,6 @@ WINMAXX         = 260;
 WINYDEC			= 13;
 NBLINES         = 16;
 WINY		    = WINYDEC*NBLINES;
-javaChatFlag    = 1;
 
 BORDERINT       = 4;
 BORDEREXT       = 10;

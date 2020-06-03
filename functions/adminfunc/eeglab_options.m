@@ -72,6 +72,9 @@ try
     end
     option_savematlab = ~option_savetwofiles;
     
+    if option_donotusetoolboxes
+        disp('Not using signal processing toolbox, if you experience problem, reset your Matlab path to default')
+    end
 catch 
     lasterr
     disp('Warning: could not access the local eeg_options file');

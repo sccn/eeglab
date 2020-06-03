@@ -284,8 +284,11 @@ if ~isempty(opt.clusters)
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
     for iDat1 = 1:length(dataTmp)
         compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
-        if length(unique(compNumbers)) > 1
-            error('Cannot handle conditions with different number of components');
+        uniqComps = unique(compNumbers);
+        if length(uniqComps) > 1 
+            if ~(uniqComps(1) == 0 && length(uniqComps) == 2)
+                error('Cannot handle conditions with different number of components for a given subject');
+            end
         end
         
         for iComps = 1:compNumbers(1)
