@@ -485,6 +485,7 @@ trystrs.check_epoch_ica          = checkepochica;
 trystrs.check_chanlocs           = checkplot;
 trystrs.check_epoch_chanlocs     = checkepochplot;
 trystrs.check_epoch_ica_chanlocs = checkepochicaplot;
+trystrs.check_ica_chanlocs       = checkicaplot;
 catchstrs.add_to_hist            = e_hist;
 catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
