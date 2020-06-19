@@ -1,0 +1,97 @@
+#!/bin/bash
+#
+# Kevin Murphy
+# kevin@murp.us
+
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+    cat <<USAGE >&2
+usage: $0 <plugin-name>
+
+    Install a plugin called <plugin-name> from the sccn.ucsd.edu website.
+
+USAGE
+    exit 1
+fi
+
+# Go to the root of this repository so that matlab imports work correctly.
+cd "$(git rev-parse --show-toplevel)"
+
+PLUGIN_BASE_URL="https://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_list_all.php"
+PLUGIN_NAME="$1"
+
+# Use python to query the sccn.ucsd.edu plugin website for the <version> and
+# <link> for a given plugin <name> (if it exists).  If we find a match, we'll
+# write it to a temporary files and read it back afterwards.
+VERSION_FILE="/tmp/plugin-version-$(uuidgen)"
+LINK_FILE="/tmp/plugin-link-$(uuidgen)"
+(
+python3 - <<PYTHON_SCRIPT
+
+import bs4
+import requests
+import sys
+
+res = requests.get("$PLUGIN_BASE_URL")
+res.raise_for_status()
+html = bs4.BeautifulSoup(res.text, features="html.parser")
+
+for table_row in html.findAll("tr"):
+    table_row_cells = table_row.findAll("td")
+    if len(table_row_cells) != 9:
+        # This is not a cell in the main table, so we can ignore it
+        continue
+
+    # This is a cell in the main table, so see if we care about it
+    name_cell = table_row_cells[0]
+    name = name_cell.text
+    # Compare case-insensitive :^)
+    if name.lower() != "$PLUGIN_NAME".lower():
+        # Not a match, so ignore it
+        continue
+
+    version_cell = table_row_cells[1]
+    version = version_cell.text
+
+    link_cell = table_row_cells[3]
+    link = link_cell.find("a")["href"]
+
+    # Write the info we found to files
+    with open("$VERSION_FILE", "w") as fp:
+        fp.write(version)
+    with open("$LINK_FILE", "w") as fp:
+        fp.write(link)
+    exit(0)
+
+# We scanned everything and didn't find a match
+print("Couldn't find a plugin with name '$PLUGIN_NAME'", file=sys.stderr)
+exit(1)
+
+PYTHON_SCRIPT
+)
+
+# Read the link and version we just wrote
+PLUGIN_VERSION="$(cat "$VERSION_FILE")"
+PLUGIN_LINK="$(cat "$LINK_FILE")"
+
+# Confirm that we're downloading the right thing!
+while true; do
+    read -p "Are you sure you want to download $PLUGIN_NAME (version $PLUGIN_VERSION)? [y/n] " response
+    if [[ "$response" =~ [yY](es)? ]]; then
+        break
+    elif [[ "$response" =~ [nN](o)? ]]; then
+        echo "ok, quitting!"
+        exit
+    fi
+    echo "invalid response '$response', expected 'y' or 'n'"
+done
+
+# Do the import and then quit :^)
+matlab <<MATLAB_SCRIPT
+
+eeglab
+plugin_install('$PLUGIN_LINK', '$PLUGIN_NAME', '$PLUGIN_VERSION', false)
+quit
+
+MATLAB_SCRIPT
