@@ -375,11 +375,16 @@ else % fft mode
     end
     disp('Warning: std_spec function computation has changed since version 13 (see help message)');
     %end
-    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
+    % if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
     f     = f(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:floor(size(tmp,2)/2),:);
+
+    % To compute spectral density (but still need FFT correction
+    %     dens  = f(3)-f(2)
+    %     tmp   = tmp(:,2:floor(size(tmp,2)/2),:)/dens;
+    
     if strcmpi(g.output, 'power')
         X     = tmp.*conj(tmp);
         if strcmpi(g.logtrials, 'on'),  X = 10*log10(X); end
