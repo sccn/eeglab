@@ -214,6 +214,13 @@ if ~ismatlab
     end
 end
 
+% check potential issues with strjoin
+% -----------------------------------
+strjoinPath = fileparts(which('strjoin'));
+[~,strjoinPath2] = fileparts(strjoinPath);
+if ~strcmpi(strjoinPath2, 'strfun')
+    warning(sprintf('Potential function conflict for strjoin.m located in "%s" \nWe suggest removing the path from Matlab to avoid problems.', strjoinPath));
+end
 
 % check for duplicate versions of EEGLAB
 % --------------------------------------
