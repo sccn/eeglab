@@ -284,6 +284,9 @@ if isempty(g.channels)
      X = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices );
 else X = eeg_getdatact(EEG, 'channel'  , g.indices, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end
+if size(X, 3) == 1
+    error('The data is continuous for one of the dataset. ERSP can only be computed when data trials are present');
+end
 
 % frame range
 % -----------
