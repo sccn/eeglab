@@ -216,6 +216,7 @@ else
 	end
 end
 
+opt = [];
 if popup
 	% get contextual help
 	% -------------------

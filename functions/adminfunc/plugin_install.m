@@ -10,6 +10,10 @@
 %  size        - [real] size of the plugin in Kb
 %  force       - [boolean] force install (even if already installed)
 %
+% Note: To install plugins from the command line, type in
+%
+% plugin_askinstall('xxxxxx', [], true); % with xxxx being the name of the plugin
+%
 % See also: plugin_askinstall()
 
 % Copyright (C) 2012- Arnaud Delorme

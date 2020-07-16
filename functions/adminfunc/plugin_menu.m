@@ -1,5 +1,9 @@
 % plugin_menu() - main function to install EEGLAB plugins
 %
+% To install plugins from the command line, type in
+%
+% plugin_askinstall('xxxxxx', [], true); % with xxxx being the name of the plugin
+%
 % Usage: plugin_menu(PLUGINLIST); % pop up gui
 
 % Copyright (C) 2019 Arnaud Delorme

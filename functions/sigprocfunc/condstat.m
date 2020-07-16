@@ -83,16 +83,16 @@ if ischar(bootside)
 	bootside = { bootside };
 end
 for index = 1:length(bootside)
-	if ~strcmpi(bootside, 'both') && ~strcmpi(bootside, 'upper')
+	if ~strcmpi(bootside{index}, 'both') && ~strcmpi(bootside{index}, 'upper')
 		error('Bootside must be either ''both'' or ''upper''');
 	end
-end;	
+end
 if ischar(condboot)
 	condboot = { condboot };
 end
 for index = 1:length(condboot)
 	if isempty(condboot{index}), condboot{index} = 'complex'; end
-end;	
+end
 		
 for index = 1:length(varargin)
 	if ~iscell(varargin) || length(varargin{index}) ~=2

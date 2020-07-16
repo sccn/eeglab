@@ -214,6 +214,13 @@ if ~ismatlab
     end
 end
 
+% check potential issues with strjoin
+% -----------------------------------
+strjoinPath = fileparts(which('strjoin'));
+[~,strjoinPath2] = fileparts(strjoinPath);
+if ~strcmpi(strjoinPath2, 'strfun')
+    warning(sprintf('Potential function conflict for strjoin.m located in "%s" \nWe suggest removing the path from Matlab to avoid problems.', strjoinPath));
+end
 
 % check for duplicate versions of EEGLAB
 % --------------------------------------
@@ -485,6 +492,7 @@ trystrs.check_epoch_ica          = checkepochica;
 trystrs.check_chanlocs           = checkplot;
 trystrs.check_epoch_chanlocs     = checkepochplot;
 trystrs.check_epoch_ica_chanlocs = checkepochicaplot;
+trystrs.check_ica_chanlocs       = checkicaplot;
 catchstrs.add_to_hist            = e_hist;
 catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
@@ -881,11 +889,17 @@ end
 
 statusconnection = 1;
 if isdeployed
-    funcname = {  'eegplugin_dipfit' ...
+    funcname = {  'eegplugin_eepimport' ...
+                  'eegplugin_bva_io' ...
+                  'eegplugin_clean_rawdata' ...                  
+                  'eegplugin_dipfit' ...
+                  'eegplugin_egilegacy' ...
                   'eegplugin_firfilt' ...
                   'eegplugin_iclabel' ...
-                  'eegplugin_clean_rawdata' ...
-                  'eegplugin_musemonitor' };
+                  'eegplugin_mffmatlabio' ...
+                  'eegplugin_musemonitor' ...
+                  'eegplugin_neuroscanio' ...
+                    };
     for indf = 1:length(funcname)
         try 
             vers = feval(funcname{indf}, gcf, trystrs, catchstrs);

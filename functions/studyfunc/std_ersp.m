@@ -181,7 +181,7 @@ end
                         'recompute'     'string'      { 'on','off' }        'off';
                         'getparams'     'string'      { 'on','off' }        'off';
                         'savefile'      'string'      { 'on','off' }        'on';
-                        'parallel'      'string'      { 'on','off' }        'on';
+                        'parallel'      'string'      { 'on','off' }        'off';
                         'timewindow'    'real'                  []          [];    % ignored, deprecated
                         'fileout'       'string'                []          '';
                         'timelimits'    'real'                  []          [EEG(1).xmin EEG(1).xmax]*1000;
@@ -284,6 +284,9 @@ if isempty(g.channels)
      X = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices );
 else X = eeg_getdatact(EEG, 'channel'  , g.indices, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end
+if size(X, 3) == 1
+    error('The data is continuous for one of the dataset. ERSP can only be computed when data trials are present');
+end
 
 % frame range
 % -----------
@@ -299,24 +302,25 @@ allTrialsFreqs = cell(1,length(g.indices));
 eeglab_options;
 usesingle = option_single;
 
-% CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
 disp('Computing time/frequency decomposition...');
-numWorkers = 0;
-try
-    if strcmpi(g.parallel, 'on') && ~exist('parpool') && exist('gcp')
-        poolobj = gcp('nocreate');
-        if ~isempty(poolobj)
-            numWorkers = poolobj.NumWorkers;
-        end
-    elseif strcmpi(g.parallel, 'on')
-        try
-            myCluster = parcluster('local');
-            numWorkers = myCluster.NumWorkers;
-        catch, disp('Cound not start parallel job'); end
-    end
-catch
-    g.parallel = 'off';
-end
+
+% CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
+% numWorkers = 0;
+% try
+%     if strcmpi(g.parallel, 'on') && ~exist('parpool') && exist('gcp')
+%         poolobj = gcp('nocreate');
+%         if ~isempty(poolobj)
+%             numWorkers = poolobj.NumWorkers;
+%         end
+%     elseif strcmpi(g.parallel, 'on')
+%         try
+%             myCluster = parcluster('local');
+%             numWorkers = myCluster.NumWorkers;
+%         catch, disp('Cound not start parallel job; ERSP will still be computed'); end
+%     end
+% catch
+%     g.parallel = 'off';
+% end
 %parfor (k = 1:length(g.indices),numWorkers)  % for each (specified) component/channel
 for k = 1:length(g.indices)
     tmpparams = parameters;
