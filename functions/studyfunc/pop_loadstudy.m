@@ -155,15 +155,28 @@ end
 
 TMP = STUDY.datasetinfo;
 STUDYTMP = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
-if ~isfield(STUDYTMP.datasetinfo, 'trialinfo')
+sameTrialInfo = true;
+if isfield(STUDY.datasetinfo, 'trialinfo') ~= isfield(STUDYTMP.datasetinfo, 'trialinfo')
     sameTrialInfo = false;
-else
-    sameTrialInfo = isequal( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
+elseif isfield(STUDY.datasetinfo, 'trialinfo') && isfield(STUDYTMP.datasetinfo, 'trialinfo')
+    if exist('isequaln', 'builtin')
+        sameTrialInfo = isequaln( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
+    else
+        sameTrialInfo = true;
+    end
+end
+if ~sameTrialInfo
+    if isempty(varargin)
+        res = questdlg2([ 'Warning: trial information contained in datasets not consistent' 10 'with STUDY information. Should EEGLAB fix the problem?' ], 'STUDY Warning', 'No', 'Yes', 'Yes');
+        if isequal(res, 'Yes')
+            STUDY = STUDYTMP;
+        end
+    else
+        disp('Warning: trial information contained in datasets not consistent with STUDY information.');
+        disp('         In rare cases, this could be intentional. Use "STUDY = std_maketrialinfo(STUDY, ALLEEG);" to fix.');
+    end
 end
 clear STUDYTMP;
-if ~sameTrialInfo
-    disp('STUDY Warning: the trial information collected from datasets has changed; use STUDY menu to reconcile if necessary');
-end
 std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 STUDY = std_selectdesign(STUDY, ALLEEG, STUDY.currentdesign);
