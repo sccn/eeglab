@@ -23,9 +23,11 @@ git submodule update --init --recursive --remote
 
 # To use EEGLAB: 
 
-1. Use Matlab to navigate to the folder containing EEGLAB you have just downloaded
+1. Start Matlab
 
-2. Then start Matlab and type >> eeglab
+2. Use Matlab to navigate to the folder containing EEGLAB you have just downloaded
+
+3. Type "eeglab" at the Matlab command prompt ">>" and press enter
 
 3. Open the main EEGLAB tutorial page (http://sccn.ucsd.edu/wiki/EEGLAB_Wiki)
 
