@@ -80,7 +80,6 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
       <param.web.mcr.name />
       <param.package.mcr.name />
       <param.no.mcr.name />
-      <param.windows.command.prompt />
       <param.native.matlab />
       <param.checkbox />
       <param.example />
