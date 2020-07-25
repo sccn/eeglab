@@ -23,16 +23,13 @@ git submodule update --init --recursive --remote
 
 # To use EEGLAB: 
 
-1. Place the Matlab functions in a directory ($DIR) and add $DIR/eeglabxx to (Unix) your matlabpath environment variable. 
-   Else, within Matlab >> addpath('full_path_here')
+1. Use Matlab to navigate to the folder containing EEGLAB you have just downloaded
 
 2. Then start Matlab and type >> eeglab
 
 3. Open the main EEGLAB tutorial page (http://sccn.ucsd.edu/wiki/EEGLAB_Wiki)
 
 4. Please send feedback and suggestions to: eeglab@sccn.ucsd.edu
-
-5. Optional: Edit file "icadefs.m" which specifies various limits and constants used in EEGLAB functions.
 
 # In publications, please reference:
 
