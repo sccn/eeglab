@@ -557,6 +557,7 @@ cb_plugin      = [ nocheck 'if plugin_menu(PLUGINLIST) , close(findobj(''tag'', 
 cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
 cb_runsc       = [ nocheck 'LASTCOM = pop_runscript;'          e_hist   ];
+cb_testc       = 'test_compiled_version;';
 cb_quit        = [ 'close(gcf); disp(''To save the EEGLAB command history  >> pop_saveh(ALLCOM);'');' ...
                    'clear global EEG ALLEEG LASTCOM CURRENTSET;'];
 
@@ -747,7 +748,10 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     hist_m = eegmenu( false,  file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
     eegmenu( false,  hist_m, 'Label', 'Save dataset history script'            , 'userdata', ondata     , 'CallBack', cb_saveh1);
     eegmenu( false,  hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
-    eegmenu( false,  hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
+    eegmenu( false,  hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);
+    if isdeployed
+        eegmenu( false,  hist_m, 'Label', 'Test compiled version'              , 'userdata', on         , 'CallBack', cb_testc);
+    end
 
     if ~isdeployed
         eegmenu( false,  file_m,   'Label', 'Manage EEGLAB extensions'  , 'userdata', on, 'CallBack', cb_plugin);
