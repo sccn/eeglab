@@ -113,6 +113,7 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
       <file>${PROJECT_ROOT}/plugins/Fileio20200703</file>
       <file>${PROJECT_ROOT}/plugins/firfilt</file>
       <file>${PROJECT_ROOT}/plugins/ICLabel</file>
+      <file>${PROJECT_ROOT}/plugins/PICARD1.0</file>
       <file>${PROJECT_ROOT}/plugins/musemonitor3.2</file>
       <file>${PROJECT_ROOT}/plugins/neuroscanio1.3</file>
     </fileset.resources>
