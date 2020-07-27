@@ -76,8 +76,8 @@ end
 if nargin < 4 || isempty(chanlist)
     chanlist = 1:EEG(1).nbchan;
 end
-timerange = [];
-pointrange = [];
+if nargin < 2, timerange = [];  end
+if nargin < 3, pointrange = []; end
 if nargin < 2 
     % popup window parameters
     % -----------------------
