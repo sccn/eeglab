@@ -37,8 +37,6 @@ function eeglab_update(varargin)
 
 % return at once if users said not to check version
 % -------------------------------------------------
-disp('EEGLAB update menu disabled');
-return;
 eeglab_options;
 if ~option_checkversion && nargin == 0
     return
@@ -98,7 +96,7 @@ try
         
     elseif isempty(eeglabUpdater.lastTimeChecked)
         msg = [ 'Could not check for the latest EEGLAB version (internet may be disconnected).' 10 ...
-                'To prevent long startup time, disable checking for new EEGLAB version (FIle>Preferences).' ];
+-               'To prevent long startup time, disable checking for new EEGLAB version (File>Preferences).' ];
         fprintf('%s\n', msg);
     else
         if ~newMajorRevision
@@ -118,10 +116,9 @@ end
 % -----------------------------------------------------------------------------------------
 eeglab_options;
 if ~option_updateeeglab || ~exist('eeglabUpdater', 'var') || isempty(eeglabUpdater.newerVersionIsAvailable) || ~eeglabUpdater.newerVersionIsAvailable
-    if nargin > 0
-        warndlg2(msg);
+    if nargin == 0
+        return
     end
-    return
 end
 
 % try saving path
@@ -142,24 +139,27 @@ uilist   = { ...
     {} { 'style' 'pushbutton' 'String' 'Ignore for now'    'callback' cb_ignore  } {} ...
     {} ...
     { 'style' 'text' 'String' [ 'Note: requires 120MB of free space plus the space ' 10 'for copying plugins from the current version' ] } ...
-    { 'style' 'checkbox' 'String' 'Do not show this message again' 'tag' 'hidemsg' } ...
+    { 'style' 'checkbox' 'String' 'Do not show this message at startup' 'tag' 'hidemsg' 'value' ~option_updateeeglab } ...
     };
 geom     = { [1.3 1] [1] [0.5 1 0.5] [0.5 1 0.5] [0.5 1 0.5] [1] [1] [1] };
 geomvert = [ 1     1   1           1           1           1     1.5 1   ];
 res = supergui( 'geomhoriz', geom, 'geomvert', geomvert, 'uilist', uilist, 'title', 'Update EEGLAB -- eeglab_update()');
 set(gcf, 'userdata', 'wait');
 waitfor( gcf, 'userdata');
+response = get(gcf, 'userdata');
+if iscell(response) % closed figure
+    return;
+end
 
 % hide interface next time
 % ------------------------
 doNotShow = get(findobj(gcf, 'tag', 'hidemsg'), 'value');
-if doNotShow
-    pop_editoptions( 'option_updateeeglab', 0);
+if doNotShow == option_updateeeglab
+    pop_editoptions( 'option_updateeeglab', ~doNotShow);
 end
 
 % process GUI output
 % ------------------
-response = get(gcf, 'userdata');
 close(gcf);
 if strcmpi(response, 'ignore'), return; end
 
