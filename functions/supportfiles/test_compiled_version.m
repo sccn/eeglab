@@ -85,6 +85,7 @@ try
     
 catch
     % show error on command line
+    lasterr
     l = lasterror
     for iL = 1:length(l.stack)
         l.stack(iL)
