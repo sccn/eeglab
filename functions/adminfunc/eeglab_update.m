@@ -37,6 +37,8 @@ function eeglab_update(varargin)
 
 % return at once if users said not to check version
 % -------------------------------------------------
+disp('EEGLAB update menu disabled');
+return;
 eeglab_options;
 if ~option_checkversion && nargin == 0
     return
@@ -70,7 +72,7 @@ try
     
     msg = '';
     if ~isempty(eeglabUpdater.newMajorRevision)
-        msg = sprintf('A new major version of EEGLAB (EEGLAB%s - beta) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.', eeglabUpdater.newMajorRevision);
+        msg = sprintf('A new major version of EEGLAB (EEGLAB%s) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.', eeglabUpdater.newMajorRevision);
         fprintf('\n%s\n', msg);
         newMajorRevision = 1;
     end
@@ -81,14 +83,14 @@ try
         if newMajorRevision
             fprintf('\n');
             msg = sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
-                eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
-                'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
+                eeglabUpdater.releaseNotes ' See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
+                'You may disable this message in the File>Preferences menu but will miss critical updates.\n' ], ...
                 floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
             if nargin == 0, warning( msg ); end
         else
             msg =  sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
-                eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
-                'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
+                eeglabUpdater.releaseNotes ' See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
+                'You may disable this message in the File>Preferences menu but will miss critical updates.\n' ], ...
                 eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
             if nargin == 0, warning( msg ); end
         end
@@ -96,7 +98,7 @@ try
         
     elseif isempty(eeglabUpdater.lastTimeChecked)
         msg = [ 'Could not check for the latest EEGLAB version (internet may be disconnected).' 10 ...
-                'To prevent long startup time, disable checking for new EEGLAB version (FIle > Memory and other options).' ];
+                'To prevent long startup time, disable checking for new EEGLAB version (FIle>Preferences).' ];
         fprintf('%s\n', msg);
     else
         if ~newMajorRevision
@@ -115,7 +117,6 @@ end
 % return at once if users said to not show this interface again or no new version available
 % -----------------------------------------------------------------------------------------
 eeglab_options;
-option_updateeeglab = 1;
 if ~option_updateeeglab || ~exist('eeglabUpdater', 'var') || isempty(eeglabUpdater.newerVersionIsAvailable) || ~eeglabUpdater.newerVersionIsAvailable
     if nargin > 0
         warndlg2(msg);
