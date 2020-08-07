@@ -366,9 +366,12 @@ elseif ischar(STUDY)
             des(val).filepath = res;
             
         case 'list'
-            val1   = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
-            val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
-            pop_listfactors(des(val1));
+            val1   = get(findobj(fig, 'tag', 'listboxdesign'), 'value')
+            val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value')
+            STD.datasetinfo = datinfo;
+            STD.design = des(val1);
+            STD = std_addvarlevel(STD, 1)
+            pop_listfactors(STD.design);
 
         case 'delvar'
             val1   = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
