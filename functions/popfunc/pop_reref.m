@@ -234,53 +234,56 @@ if ~isequal('off', g.interpchan )
     
     % Case no channel provided, infering them from urchanlocs field
     if isempty(g.interpchan) 
-        try
-            urchantype  = {EEG.urchanlocs.type};
-            chanloctype = {EEG.chanlocs.type};
-            if  any(cellfun(@isempty,urchantype)) || any(cellfun(@isempty,chanloctype))
-                eegtypeindx0 = [1:length(EEG.urchanlocs)]';
-                eegtypeindx1 = [1:length(EEG.chanlocs)]';
-                % Excluding fiducials if exist
-                try
-                    indxfid_urch = find(strcmpi({'fid'},urchantype));
-                    indxfid_ch   = find(strcmpi({'fid'},chanloctype));
-                    if ~isempty(indxfid_urch), eegtypeindx0(indxfid_urch) = []; end
-                    if ~isempty(indxfid_ch),   eegtypeindx1(indxfid_ch)   = []; end
-                catch
-                    fprintf('pop_reref message: Unable to find fiducials...\n');
-                end
-            else   
-                eegtypeindx0 = strmatch('EEG',urchantype);
-                eegtypeindx1 = strmatch('EEG',chanloctype);    
-            end     
-        catch
-            fprintf(2,'pop_reref error: Unable to check for deleted channels. Missing field ''type'' in channel location \n');
-            return;
-        end
-        
-        if isempty(eegtypeindx0) || isempty(eegtypeindx1)
-            fprintf(2,'pop_reref error: Unable to get channel type from this data. Check field ''type'' on EEG.urchanlocs or EEG.chanlocs. \n');
-            return;
-        end
-        
-        chan2interp = setdiff_bc({EEG.urchanlocs(eegtypeindx0).labels}, {EEG.chanlocs(eegtypeindx1).labels});       
-        if isempty(chan2interp)
-            fprintf('pop_reref message: No removed channel found. Halting interpolation and moving forward...\n');
+        if isfield(EEG.chaninfo, 'removedchans')
+            chanlocs2interp = EEG.chaninfo.removedchans;
         else
-           chan2interpindx = find(cell2mat(cellfun(@(x) ismember(x, chan2interp), {EEG.urchanlocs.labels}, 'UniformOutput', 0)));  
-           
-           % Checking validity of channels selected for interpolation by assessing X ccordinate
-           for ichan = 1:length(chan2interpindx)
-               validchan(ichan) = ~isempty(EEG.urchanlocs(chan2interpindx(ichan)).X);
-           end
-           if all(validchan == 0)
-               fprintf('pop_reref message: Invalid channel(s) for interpolation. Halting interpolation and moving forward...\n');
-           else
-               chanlocs2interp =  EEG.urchanlocs(chan2interpindx(find(validchan)));
-               interpflag = 1;
-           end
+            try
+                urchantype  = {EEG.urchanlocs.type};
+                chanloctype = {EEG.chanlocs.type};
+                if  any(cellfun(@isempty,urchantype)) || any(cellfun(@isempty,chanloctype))
+                    eegtypeindx0 = [1:length(EEG.urchanlocs)]';
+                    eegtypeindx1 = [1:length(EEG.chanlocs)]';
+                    % Excluding fiducials if exist
+                    try
+                        indxfid_urch = find(strcmpi({'fid'},urchantype));
+                        indxfid_ch   = find(strcmpi({'fid'},chanloctype));
+                        if ~isempty(indxfid_urch), eegtypeindx0(indxfid_urch) = []; end
+                        if ~isempty(indxfid_ch),   eegtypeindx1(indxfid_ch)   = []; end
+                    catch
+                        fprintf('pop_reref message: Unable to find fiducials...\n');
+                    end
+                else   
+                    eegtypeindx0 = strmatch('EEG',urchantype);
+                    eegtypeindx1 = strmatch('EEG',chanloctype);    
+                end     
+            catch
+                fprintf(2,'pop_reref error: Unable to check for deleted channels. Missing field ''type'' in channel location \n');
+                return;
+            end
+
+            if isempty(eegtypeindx0) || isempty(eegtypeindx1)
+                fprintf(2,'pop_reref error: Unable to get channel type from this data. Check field ''type'' on EEG.urchanlocs or EEG.chanlocs. \n');
+                return;
+            end
+
+            chan2interp = setdiff_bc({EEG.urchanlocs(eegtypeindx0).labels}, {EEG.chanlocs(eegtypeindx1).labels});       
+            if isempty(chan2interp)
+                fprintf('pop_reref message: No removed channel found. Halting interpolation and moving forward...\n');
+            else
+               chan2interpindx = find(cell2mat(cellfun(@(x) ismember(x, chan2interp), {EEG.urchanlocs.labels}, 'UniformOutput', 0)));  
+
+               % Checking validity of channels selected for interpolation by assessing X ccordinate
+               for ichan = 1:length(chan2interpindx)
+                   validchan(ichan) = ~isempty(EEG.urchanlocs(chan2interpindx(ichan)).X);
+               end
+               if all(validchan == 0)
+                   fprintf('pop_reref message: Invalid channel(s) for interpolation. Halting interpolation and moving forward...\n');
+               else
+                   chanlocs2interp =  EEG.urchanlocs(chan2interpindx(find(validchan)));
+                   interpflag = 1;
+               end
+            end
         end
-    
     % Case where channel loc structure is provided    
     elseif isstruct(g.interpchan) 
         chanlocs2interp = g.interpchan;
