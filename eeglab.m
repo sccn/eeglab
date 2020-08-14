@@ -566,12 +566,13 @@ cb_editeventf  = [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG);' e_store
 cb_editeventv  = [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);'  e_store];
 cb_adjustevents= [ checkevent '[EEG LASTCOM] = pop_adjustevents(EEG);'   e_store];
 cb_comments    = [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store];
-cb_chanedit    = [ 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
+cb_chanedit    = [ check 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
                    'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
                    'disp(''TIP: Call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
                    'disp(''     to convert between channel location file formats'');' ...
-                   '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize'');' ...
-                   'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
+                   '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); clear TMPINFO TMP; if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
+                   e_store ];
+                   %'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
 cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'                     e_newset];
 cb_rmdat       = [ checkevent '[EEG LASTCOM] = pop_rmdat(EEG);'                      e_newset];
 cb_selectevent = [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ];
@@ -763,7 +764,7 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     eegmenu( false,  edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
     eegmenu( versL,  edit_m, 'Label', 'Adjust event latencies'                 , 'userdata', ondata, 'CallBack', cb_adjustevents);
     eegmenu( false,  edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
-    eegmenu( false,  edit_m, 'Label', 'Channel locations'                      , 'userdata', ondata, 'CallBack', cb_chanedit);
+    eegmenu( false,  edit_m, 'Label', 'Channel locations'                      , 'userdata', ondatastudy, 'CallBack', cb_chanedit);
     eegmenu( false,  edit_m, 'Label', 'Select data'                            , 'userdata', ondata, 'CallBack', cb_select, 'Separator', 'on', 'userdata', 'study:on');
     eegmenu( false,  edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
     eegmenu( false,  edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
