@@ -177,6 +177,29 @@ if isempty(chans) || all(~ishandle(chans))
     % in case an EEG structure was given as input
     % -------------------------------------------
     if isfield(chans, 'chanlocs')
+        
+        % process multiple datasets
+        if length(chans) > 1
+            sameAsFirst = arrayfun(@(x)isequaln(chans(1).chanlocs, x.chanlocs), chans(2:end));
+            if ~all(sameAsFirst)
+                error( [ 'All datasets need to have the exact same channel structure.' 10 'If you want to look up channel location for all datasets,' 10 'do so for the first one and write a loop' ] );
+            end
+            
+            % pop up GUI for first dataset
+            EEG = chans(1);
+            [chansout, chaninfo, urchans, com] = pop_chanedit(EEG, orichaninfo, varargin{:});
+            chans(1) = chansout;
+            
+            % pop up GUI for first dataset
+            for iDat = 2:length(chans)
+                EEG = chans(iDat);
+                eval(com);
+                chans(iDat) = EEG;
+            end
+            chansout = chans;
+            return;
+        end
+            
         dataset_input = 1;
         EEG           = chans;
         chans         = EEG(1).chanlocs;
