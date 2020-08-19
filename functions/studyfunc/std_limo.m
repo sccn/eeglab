@@ -190,7 +190,7 @@ if strcmp(model.defaults.type,'Components')
     end
 end
 
-% computing channel neighbox matrix
+% computing channel neighbour matrix
 % ---------------------------------
 if skip_chanlocs == 0
     chanloc_created = 1;
@@ -432,7 +432,7 @@ for s = 1:nb_subjects
     STUDY.limo.subjects(s).cat_file    = catMat;
     STUDY.limo.subjects(s).cont_file   = contMat;
 end
-
+ 
 % then we add contrasts for conditions that were merged during design selection
 if ~isempty(factors)
     if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
@@ -564,8 +564,8 @@ else
     end
 end
 
-% split txt files
-if ~isempty(STUDY.group{1}) 
+% split txt files if more than 1 group
+if length(STUDY.group) > 1
     glm_name = [STUDY.design(STUDY.currentdesign).name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
     for g= 1:length(STUDY.group)
         subset = arrayfun(@(x)(strcmpi(x.group,STUDY.group{g})), STUDY.datasetinfo);
