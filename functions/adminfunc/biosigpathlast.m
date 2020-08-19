@@ -1,12 +1,9 @@
 function biosigpathlast
 % Add BIOSIG at the end of the path to avoid overloading Matlab functions
 
-str2doublepath = fileparts( which('str2double') );
-sopenpath      = fileparts( which('sopen') );
-if strcmp(str2doublepath,sopenpath)
-    rmpath(str2doublepath);
-    str2doublepat2 = fileparts( which('str2double') );
-    addpath(str2doublepath,'-begin');
-    addpath(str2doublepat2,'-begin');
+str2doublepath  = fileparts( which('str2double') );
+str2numpath     = fileparts( which('str2num') );
+if ~strcmp(str2doublepath,str2numpath)
+    addpath(str2numpath,'-begin');
 end
 

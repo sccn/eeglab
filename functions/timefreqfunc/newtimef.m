@@ -715,9 +715,11 @@ if isempty(g.topovec)
     end
 end
 
-if (round(g.naccu*g.alpha) < 2)
-    verboseprintf(g.verbose, 'Value of alpha is outside its normal range [%g,0.5]\n',2/g.naccu);
-    g.naccu = round(2/g.alpha);
+% naccu adjustment for FDR
+% ------------------------
+if (round(g.naccu*g.alpha) < 10)
+    verboseprintf(g.verbose, 'Value of alpha is outside its normal range [%g,0.5]\n',10/g.naccu);
+    g.naccu = round(10/g.alpha);
     verboseprintf(g.verbose, '  Increasing the number of iterations to %d\n',g.naccu);
 end
 

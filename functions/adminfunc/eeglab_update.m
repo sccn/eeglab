@@ -70,7 +70,7 @@ try
     
     msg = '';
     if ~isempty(eeglabUpdater.newMajorRevision)
-        msg = sprintf('A new major version of EEGLAB (EEGLAB%s - beta) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.', eeglabUpdater.newMajorRevision);
+        msg = sprintf('A new major version of EEGLAB (EEGLAB%s) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.', eeglabUpdater.newMajorRevision);
         fprintf('\n%s\n', msg);
         newMajorRevision = 1;
     end
@@ -81,14 +81,14 @@ try
         if newMajorRevision
             fprintf('\n');
             msg = sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
-                eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
-                'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
+                eeglabUpdater.releaseNotes ' See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
+                'You may disable this message in the File>Preferences menu but will miss critical updates.\n' ], ...
                 floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
             if nargin == 0, warning( msg ); end
         else
             msg =  sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
-                eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
-                'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
+                eeglabUpdater.releaseNotes ' See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
+                'You may disable this message in the File>Preferences menu but will miss critical updates.\n' ], ...
                 eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
             if nargin == 0, warning( msg ); end
         end
@@ -96,7 +96,7 @@ try
         
     elseif isempty(eeglabUpdater.lastTimeChecked)
         msg = [ 'Could not check for the latest EEGLAB version (internet may be disconnected).' 10 ...
-                'To prevent long startup time, disable checking for new EEGLAB version (FIle > Memory and other options).' ];
+            -               'To prevent long startup time, disable checking for new EEGLAB version (File>Preferences).' ];
         fprintf('%s\n', msg);
     else
         if ~newMajorRevision
@@ -110,17 +110,24 @@ try
 catch
     msg = 'Updater could not be initialized';
     fprintf('%s\n', msg);
+    return
 end
 
 % return at once if users said to not show this interface again or no new version available
 % -----------------------------------------------------------------------------------------
 eeglab_options;
-option_updateeeglab = 1;
-if ~option_updateeeglab || ~exist('eeglabUpdater', 'var') || isempty(eeglabUpdater.newerVersionIsAvailable) || ~eeglabUpdater.newerVersionIsAvailable
-    if nargin > 0
-        warndlg2(msg);
-    end
+if ~option_updateeeglab && nargin == 0
     return
+end    
+if ~exist('eeglabUpdater', 'var') || isempty(eeglabUpdater.newerVersionIsAvailable) || ~eeglabUpdater.newerVersionIsAvailable
+    return
+end
+if ~isempty(strfind(eeglabUpdater.releaseDate, '00:00:00'))
+    % kill switch to disable GUI update if releaseNotes contains the text EEGLAB
+    if nargin > 0
+        disp('Functionality currently disabled');
+    end; 
+    return;
 end
 
 % try saving path
@@ -141,32 +148,38 @@ uilist   = { ...
     {} { 'style' 'pushbutton' 'String' 'Ignore for now'    'callback' cb_ignore  } {} ...
     {} ...
     { 'style' 'text' 'String' [ 'Note: requires 120MB of free space plus the space ' 10 'for copying plugins from the current version' ] } ...
-    { 'style' 'checkbox' 'String' 'Do not show this message again' 'tag' 'hidemsg' } ...
+    { 'style' 'checkbox' 'String' 'Do not show this message at startup' 'tag' 'hidemsg' 'value' ~option_updateeeglab } ...
     };
 geom     = { [1.3 1] [1] [0.5 1 0.5] [0.5 1 0.5] [0.5 1 0.5] [1] [1] [1] };
 geomvert = [ 1     1   1           1           1           1     1.5 1   ];
 res = supergui( 'geomhoriz', geom, 'geomvert', geomvert, 'uilist', uilist, 'title', 'Update EEGLAB -- eeglab_update()');
 set(gcf, 'userdata', 'wait');
 waitfor( gcf, 'userdata');
+response = get(gcf, 'userdata');
+if iscell(response) % closed figure
+    return;
+end
 
 % hide interface next time
 % ------------------------
 doNotShow = get(findobj(gcf, 'tag', 'hidemsg'), 'value');
-if doNotShow
-    pop_editoptions( 'option_updateeeglab', 0);
+if doNotShow == option_updateeeglab
+    pop_editoptions( 'option_updateeeglab', ~doNotShow);
 end
 
 % process GUI output
 % ------------------
-response = get(gcf, 'userdata');
 close(gcf);
 if strcmpi(response, 'ignore'), return; end
 
 % try saving path
 % ---------------
 try
-    savepath;
+    res = savepath;
 catch
+    res = 1;
+end
+if res
     questdlg2( [ 'EEGLAB cannot modify and save the Matlab path file.' 10 ...
         'Although EEGLAB could still be updated, EEGLAB will not' 10 ...
         'be able to set paths in a way that is persistent after' 10 ...
@@ -175,11 +188,11 @@ catch
         'online, uncompress it on your computer and modify and save' 10 ...
         'the Matlab paths manually.' ], 'Install warning message', 'Continue', 'Abord', 'Abord');
 end
+clear res;
 
 % check for duplicate versions of EEGLAB (code copied from eeglab.m)
 % --------------------------------------
-eeglabpath = mywhich('eeglab.m');
-eeglabpath = eeglabpath(1:end-length('eeglab.m'));
+eeglabpath = fileparts(mywhich('eeglab.m'));
 if nargin < 1
     eeglabpath2 = '';
     if strcmpi(eeglabpath, pwd) || strcmpi(eeglabpath(1:end-1), pwd)
@@ -201,13 +214,13 @@ if nargin < 1
         warndlg2( [ 'There are at least two versions of EEGLAB in your path' 10 ...
             sprintf('One is at %s', eeglabpath) 10 ...
             sprintf('The other one is at %s', eeglabpath2) 10 ...
-            'You must at least removeone version from the Matlab path' 10 ...
+            'You must at least remove one version from the Matlab path' 10 ...
             'before you can install a new version of EEGLAB. Abording instalation.' ] );
         return
     end
 end
 
-zipfilelink = 'https://sccn.ucsd.edu/eeglab/currentversion/eeglab_current.zip';
+zipfilelink = 'http://sccn.ucsd.edu/eeglab/plugins/eeglab_current.zip';
 [~,zipfile,zipext] = fileparts(eeglabUpdater.downloadUrl);
 zipfile = [ zipfile zipext ];
 
@@ -224,9 +237,7 @@ if strcmpi(response, 'custom')
         { 'style' 'pushbutton' 'string' '...' 'callback' cb_folder } ...
         {} ...
         { 'style' 'text' 'String' 'What to do with current version main EEGLAB folder?' } ...
-        {} { 'style' 'checkbox' 'String' 'Leave it as is (do nothing)' 'tag' 'oldnothing'  'userdata' 'radio' 'callback' cbradio } ...
-        {} { 'style' 'checkbox' 'String' 'Rename with postfix _old (recommended)' 'value' 1 'tag' 'oldmove' 'userdata' 'radio' 'callback' cbradio  } ...
-        {} { 'style' 'checkbox' 'String' 'Delete it and delete all files it contains' 'tag' 'olddelete' 'userdata' 'radio' 'callback' cbradio } ...
+        {} { 'style' 'popupmenu' 'String' { 'Leave it as is (do nothing)' 'Rename with postfix _old (recommended)' 'Delete it and delete all files it contains' } 'value' 2 'tag' 'popmenuchoice' } ...
         {} ...
         { 'style' 'text' 'String' 'Other options' } ...
         {} { 'style' 'checkbox' 'string' 'Update and resave Matlab paths' 'tag' 'updatepath' 'value' 1 'callback' cb_path } ...
@@ -234,11 +245,19 @@ if strcmpi(response, 'custom')
         {} { 'style' 'checkbox' 'string' 'Copy EEGLAB preferences'             'value' 1 'tag' 'copyprefs'   } ...
         };
     
-    geom     = { [1] [1 2 0.4] [1] [1] [0.1 1] [0.1 1] [0.1 1] [1] [1] [0.1 1] [0.1 1] [0.1 1] };
-    geomvert = [ 1   1         0.5 1   1       1       1       0.5 1   1       1       1       ];
+    geom     = { [1] [1 2 0.4] [1] [1] [0.1 1] [1] [1] [0.1 1] [0.1 1] [0.1 1] };
+    geomvert = [ 1   1         0.5 1   1       0.5 1   1       1       1       ];
     [ res2, ~, ~, res] = inputgui( 'geometry', geom, 'geomvert', geomvert, 'uilist', uilist, ...
         'helpcom', 'pophelp(''eeglab_update'')', 'title', 'Update EEGLAB -- eeglab_update()');
     if isempty(res2), return; end
+    res.oldnothing  = false;
+    res.oldmove     = false;
+    res.olddelete   = false;
+    switch res.popmenuchoice
+        case 1, res.oldnothing = true;
+        case 2, res.oldmove    = true;
+        case 3, res.olddelete  = true;
+    end
 else
     res.folder      = eeglabNewPath;
     res.oldnothing  = false;
@@ -273,7 +292,9 @@ end
 % start downloading EEGLAB
 % ------------------------
 try
-    disp('Downloading, hang in there...');
+    restmp = questdlg2('This will download about 80Mb with no wait bar, be patient.', 'Warning', 'Cancel', 'OK', 'OK');
+    if isempty(restmp) || strcmpi(restmp, 'Cancel'), return; end;
+    disp('Downloading about 80Mb, hang in there...');
     plugin_urlwrite( zipfilelink, fullfile(parentPath, zipfile));
 catch
     msg = [ 'Could not download EEGLAB. Server might be' 10 ...
@@ -321,7 +342,11 @@ end
 % ----------------
 if res.updatepath
     p = path;
-    p = textscan(p, '%s', 'delimiter', ':');
+    if ispc
+        p = textscan(p, '%s', 'delimiter', ';');
+    else
+        p = textscan(p, '%s', 'delimiter', ':');
+    end
     p = p{1};
     rmInd = [];
     for iPath = 1:length(p)
@@ -341,17 +366,28 @@ end
 
 % copying plugins
 % ---------------
+disp('EEGLAB require some plugins to function properly.');
+disp('Updated vesions of plugins Dipfit, Firfilt, ICLabel, and clean_rawdata are automatically included');
 if res.copyplugins
     pluginOri  = fullfile(eeglabpath, 'plugins');
     pluginDest = fullfile(parentPath, eeglabFolder, 'plugins');
     
     pluginOriList = dir(pluginOri);
     for iPlugin = 1:length(pluginOriList)
-        if contains(lower(pluginOriList(iPlugin).name), 'dipfit') && ...
-                contains(lower(pluginOriList(iPlugin).name), 'firfilt') && ...
-                contains(lower(pluginOriList(iPlugin).name), 'iclabel') && ...
-                contains(lower(pluginOriList(iPlugin).name), 'clean_rawdata')
-            copyfile(fullfile( pluginOri, pluginOriList(iPlugin).name), pluginDest);
+        if ~isequal(pluginOriList(iPlugin).name, '.') && ...
+                ~isequal(pluginOriList(iPlugin).name, '..') && ...
+                ~contains(lower(pluginOriList(iPlugin).name), 'dipfit') && ...
+                ~contains(lower(pluginOriList(iPlugin).name), 'firfilt') && ...
+                ~contains(lower(pluginOriList(iPlugin).name), 'iclabel') && ...
+                ~contains(lower(pluginOriList(iPlugin).name), 'clean_rawdata')
+            destPath = fullfile(pluginDest, pluginOriList(iPlugin).name);
+            try
+                mkdir(destPath);
+                copyfile(fullfile( pluginOri, pluginOriList(iPlugin).name, '*'), destPath);
+                fprintf('Plugin %s copied successfully\n', pluginOriList(iPlugin).name);
+            catch
+                fprintf('Issue with copying plugin %s - we suggest you reinstall it from the plugin manager\n', pluginOriList(iPlugin).name);
+            end
         end
     end
 end

@@ -147,4 +147,14 @@ for index = 1:length(ALLEEG)
 %     end
 end
 
-    
+% check HED field with unicode characters
+% ---------------------------------------
+if isfield(STUDY.datasetinfo, 'trialinfo')
+    if isfield(STUDY.datasetinfo(1).trialinfo(1), 'HED')
+        for iDat = 1:length(STUDY.datasetinfo)
+            for iTrial = 1:length(STUDY.datasetinfo(iDat).trialinfo)
+                STUDY.datasetinfo(iDat).trialinfo(iTrial).HED(STUDY.datasetinfo(iDat).trialinfo(iTrial).HED > 255) = 32;
+            end
+        end
+    end
+end
