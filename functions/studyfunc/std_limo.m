@@ -100,7 +100,7 @@ if ischar(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || ...
     opt.measure  = varargin{1};
     opt.design   = varargin{2};
     opt.erase    = 'on';
-    opt.method   = 'OSL';
+    opt.method   = 'WSL';
 else
     opt = finputcheck( varargin, ...
         { 'measure'        'string'  { 'daterp' 'datspec' 'dattimef' 'icaerp' 'icaspec' 'icatimef' } 'daterp'; ...
@@ -190,7 +190,7 @@ if strcmp(model.defaults.type,'Components')
     end
 end
 
-% computing channel neighbox matrix
+% computing channel neighbour matrix
 % ---------------------------------
 if skip_chanlocs == 0
     chanloc_created = 1;
@@ -233,18 +233,6 @@ if chanloc_created
     fprintf('Saving channel neighbors for correction for multiple comparisons in \n%s\n', limoChanlocsFile);
 end
 
-% 1st level analysis
-% -------------------------------------------------------------------------
-model.cat_files  = [];
-model.cont_files = [];
-unique_subjects  = STUDY.design(STUDY.currentdesign).cases.value'; % all designs have the same cases
-nb_subjects      = length(unique_subjects);
-
-% also should split per session
-% for s = nb_subjects:-1:1
-%     nb_sets(s) = numel(find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject})));
-% end
-
 % find out if the channels are interpolated
 % -----------------------------------------
 interpolated = zeros(1,length(STUDY.datasetinfo));
@@ -255,6 +243,18 @@ if strcmp(model.defaults.type,'Channels')
         if length(tmpChans.labels) > ALLEEG(iDat).nbchan, interpolated(iDat) = 1; end
     end
 end
+
+% 1st level analysis
+% -------------------------------------------------------------------------
+model.cat_files  = [];
+model.cont_files = [];
+unique_subjects  = STUDY.design(STUDY.currentdesign).cases.value'; % unique_subject uses the STUDY name
+nb_subjects      = length(unique_subjects);
+
+% also should split per session
+% for s = nb_subjects:-1:1
+%     nb_sets(s) = numel(find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject})));
+% end
 
 % simply reshape to read columns
 % -------------------------------------------------------------------------
@@ -432,7 +432,7 @@ for s = 1:nb_subjects
     STUDY.limo.subjects(s).cat_file    = catMat;
     STUDY.limo.subjects(s).cont_file   = contMat;
 end
-
+ 
 % then we add contrasts for conditions that were merged during design selection
 if ~isempty(factors)
     if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
@@ -564,8 +564,8 @@ else
     end
 end
 
-% split txt files
-if ~isempty(STUDY.group) && sum(procstatus)~=0
+% split txt files if more than 1 group
+if length(STUDY.group) > 1
     glm_name = [STUDY.design(STUDY.currentdesign).name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
     for g= 1:length(STUDY.group)
         subset = arrayfun(@(x)(strcmpi(x.group,STUDY.group{g})), STUDY.datasetinfo);
