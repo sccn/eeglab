@@ -140,14 +140,16 @@ if ~isempty(contVar)
     contMat = zeros(length(trialinfo),1);
     
     for iVar = 1:length(contVar)
-        limodesign.continuous{iVar} = {factors(contVar(iVar)).label};
+        limodesign.continuous{iVar} = {factors(contVar(iVar)).label '' };
     end
     
     % split variables if necessary
     if strcmpi(opt.splitreg, 'on')
         limodesign.continuous = inter( { limodesign.continuous, alloptionsinter{:} } );
         for iOpt = 1:length(limodesign.continuous)
-            limodesign.continuous{iOpt} = [ limodesign.continuous{iOpt}{:} ];
+            if isnumeric(limodesign.continuous{iOpt}{1})
+                limodesign.continuous{iOpt} = [ limodesign.continuous{iOpt}{:} ];
+            end
         end
     end
     

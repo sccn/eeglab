@@ -65,7 +65,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [trialindsx eventvals] = std_gettrialsind(filename,varargin)
+function [trialindsx, eventvals] = std_gettrialsind(filename,varargin)
 
 trialindsx = [];
 eventvals = [];
@@ -80,7 +80,7 @@ try
         varargin = varargin{:}; % Call from std_readfile or other func
     end
     varsin = varargin;
-    if ~isempty( varargin ),
+    if ~isempty( varargin )
         for i = 1:2:numel(varsin)
             queryvars.(varsin{i}) = varsin{i+1};
         end

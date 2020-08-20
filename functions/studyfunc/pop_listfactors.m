@@ -222,7 +222,11 @@ for iCat = 1:length(des.categorical)
     end
 end
 for iCont = 1:length(des.continuous)
-    allLabels{count} = [ int2str(count) '. ' formatcond(des.continuous{iCont}) ];
+    if iscell(des.continuous{iCont})
+        allLabels{count} = [ int2str(count) '. ' formatcond(des.continuous{iCont}) ];
+    else
+        allLabels{count} = [ int2str(count) '. ' formatcond({ des.continuous{iCont} } ) ];
+    end
     count = count+1;
 end
 allLabels{count} = [ int2str(count) '. Constant' ];
