@@ -250,51 +250,49 @@ end
 
 % extract epochs if necessary
 % ---------------------------
-if ~strcmpi(g.specmode, 'psd')
-    if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
-        epochCount  = 1;
-        sampleCount = 1;
-        for iEEG = 1:length(EEG)
-            TMP = EEG(1);
-            TMP.data = X;
-            TMP.icaweights = [];
-            TMP.icasphere  = [];
-            TMP.icawinv    = [];
-            TMP.icaact     = [];
-            TMP.icachansind = [];
-            TMP.trials = size(TMP.data,3);
-            TMP.pnts   = size(TMP.data,2);
-            TMP.event  = [];
-            TMP.epoch  = [];
-            for index = 1:length(boundaries)
-                TMP.event(index).type = 'boundary';
-                TMP.event(index).latency = boundaries(index);
-            end
-            TMP = eeg_checkset(TMP);
-            if TMP.trials > 1
-                % epoch data - need to re-extract data
-                TMP = pop_select(TMP, 'trials', [epochCount:(epochCount+EEG(iEEG).trials-1)]);
-                epochCount = epochCount+EEG(iEEG).trials;
-                TMP = eeg_epoch2continuous(TMP);
-            else
-                % continuous data - need to re-extract data
-                TMP = pop_select(TMP, 'point', [sampleCount:(sampleCount+EEG(iEEG).pnts-1)]);
-                sampleCount = sampleCount+EEG(iEEG).pnts;
-            end
-            TMP = eeg_regepochs(TMP, g.epochrecur, g.epochlim);
-            disp('Warning: continuous data, extracting 1-second epochs'); 
-            if iEEG == 1, 
-                XX = TMP.data;
-                newTrialInfo = g.trialinfo(iEEG);
-                newTrialInfo(1:size(TMP.data,3)) = g.trialinfo(iEEG);
-            else
-                XX(:,:,end+1:end+size(TMP.data,3)) = TMP.data;
-                newTrialInfo(end+1:end+size(TMP.data,3)) = g.trialinfo(iEEG);
-            end
+if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
+    epochCount  = 1;
+    sampleCount = 1;
+    for iEEG = 1:length(EEG)
+        TMP = EEG(1);
+        TMP.data = X;
+        TMP.icaweights = [];
+        TMP.icasphere  = [];
+        TMP.icawinv    = [];
+        TMP.icaact     = [];
+        TMP.icachansind = [];
+        TMP.trials = size(TMP.data,3);
+        TMP.pnts   = size(TMP.data,2);
+        TMP.event  = [];
+        TMP.epoch  = [];
+        for index = 1:length(boundaries)
+            TMP.event(index).type = 'boundary';
+            TMP.event(index).latency = boundaries(index);
         end
-        g.trialinfo = newTrialInfo;
-        X = XX;
+        TMP = eeg_checkset(TMP);
+        if TMP.trials > 1
+            % epoch data - need to re-extract data
+            TMP = pop_select(TMP, 'trials', [epochCount:(epochCount+EEG(iEEG).trials-1)]);
+            epochCount = epochCount+EEG(iEEG).trials;
+            TMP = eeg_epoch2continuous(TMP);
+        else
+            % continuous data - need to re-extract data
+            TMP = pop_select(TMP, 'point', [sampleCount:(sampleCount+EEG(iEEG).pnts-1)]);
+            sampleCount = sampleCount+EEG(iEEG).pnts;
+        end
+        TMP = eeg_regepochs(TMP, g.epochrecur, g.epochlim);
+        disp('Warning: continuous data, extracting 1-second epochs');
+        if iEEG == 1,
+            XX = TMP.data;
+            newTrialInfo = g.trialinfo(iEEG);
+            newTrialInfo(1:size(TMP.data,3)) = g.trialinfo(iEEG);
+        else
+            XX(:,:,end+1:end+size(TMP.data,3)) = TMP.data;
+            newTrialInfo(end+1:end+size(TMP.data,3)) = g.trialinfo(iEEG);
+        end
     end
+    g.trialinfo = newTrialInfo;
+    X = XX;
 end
 
 % compute spectral decomposition
@@ -303,10 +301,19 @@ if strcmpi(g.logtrials, 'notset'), if strcmpi(g.specmode, 'fft') g.logtrials = '
 if strcmpi(g.logtrials, 'on'), datatype = 'SPECTRUMLOG'; else datatype = 'SPECTRUMABS'; end
 if strcmpi(g.specmode, 'psd')
     if strcmpi(g.savetrials, 'on') || strcmpi(g.logtrials, 'on')
-        fprintf('Computing spectopo accross trials: ');
+        if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
+            if isequal(g.epochlim, [0 1])
+                fprintf('Spectopo(psd): randomly extracted epochs are only 1 seconds. PSD is better suited for longer epochs.\n');
+            end
+        end
+        fprintf('Computing spectopo (psd) accross trials: ');
         for iTrial = 1:size(X,3)
-            [XX(:,:,iTrial), f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, 'verbose', 'off', spec_opt{:});
-            if iTrial == 1 && size(X,3) > 1, XX(:,:,size(X,3)) = 0; end
+            [tmp, f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, 'verbose', 'off', spec_opt{:});
+            if iTrial == 1
+                XX = zeros(size(tmp,1), size(tmp,2), size(X,3));
+            end
+            XX(:,:,iTrial) = tmp;
+            %if iTrial == 1 && size(X,3) > 1, XX(:,:,size(X,3)) = 0; end
             if mod(iTrial,10) == 0, fprintf('%d ', iTrial); end
         end
         fprintf('\n');
