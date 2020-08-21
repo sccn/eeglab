@@ -346,9 +346,9 @@ elseif strcmpi(mode, 'gui') % GUI mode
     
     % check channel labels
     % --------------------
-    ALLEEG   = userdat2{1};
-    if isfield(ALLEEG, 'chanlocs')
-        allchans = { ALLEEG.chanlocs };
+    TMPALLEEG   = userdat2{1};
+    if isfield(TMPALLEEG, 'chanlocs')
+        allchans = { TMPALLEEG.chanlocs };
         if any(cellfun('isempty', allchans))
             txt = strvcat('Some datasets do not have channel labels. Do you wish to generate', ...
                           'channel labels automatically for all datasets ("1" for channel 1,', ...
