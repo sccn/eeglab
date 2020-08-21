@@ -31,7 +31,9 @@
 % Fieldtrip options:
 %   Any option to the freqanalysis, the statistics_montecarlo, the
 %   statistics_analysis, statistics_stat, statistics_glm may be used
-%   using 'key', val argument pairs.
+%   using 'key', val argument pairs. Note that although 'fieldtripmcorrect'
+%   is used by std_stat, this function uses 'mcorrect'. See Fieldtrip
+%   documentation for more information.
 %
 % Outputs:
 %   stats      = F- or T-value array of the same size as input data without 
@@ -98,6 +100,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
     if ~isempty(g.mode), g.method = g.mode; end
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end
     if strcmpi(g.method, 'permutation'), g.method = 'montecarlo'; end
+    if isfield(g, 'fieldtripmcorrect'), disp('WARNING: THIS FUNCTION DOES NOT RECOGNIZE "fieldtripmcorrect" USE "mcorrect" INSTEAD'); end
     if ~isempty(g.neighbours) && isempty(g.chanlocs)
         g.chanlocs = struct('labels', { g.neighbours(:).label });
     end
