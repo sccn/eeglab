@@ -100,7 +100,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
     if ~isempty(g.mode), g.method = g.mode; end
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end
     if strcmpi(g.method, 'permutation'), g.method = 'montecarlo'; end
-    if isfield(g, 'fieldtripmcorrect'), disp('WARNING: THIS FUNCTION DOES NOT RECOGNIZE "fieldtripmcorrect" USE "mcorrect" INSTEAD'); end
+    if isfield(g, 'fieldtripmcorrect'), error('THIS FUNCTION DOES NOT RECOGNIZE "fieldtripmcorrect" USE "mcorrect" INSTEAD'); end
     if ~isempty(g.neighbours) && isempty(g.chanlocs)
         g.chanlocs = struct('labels', { g.neighbours(:).label });
     end
