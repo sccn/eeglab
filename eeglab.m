@@ -809,7 +809,7 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     eegmenu( versL,  rej_m2, 'Label', 'Export marks to data reject'            , 'userdata', onepoch, 'CallBack', cb_rejsup3, 'separator', 'on');
     eegmenu( versL,  rej_m2, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
 
-    eegmenu( false,  tools_m, 'Label', 'Remove components from data'           , 'userdata', ondata, 'CallBack', cb_subcomp);
+    eegmenu( false,  tools_m, 'Label', 'Remove components from data'           , 'userdata', ondata, 'CallBack', cb_subcomp, 'userdata', 'startup:off;study:on');
     eegmenu( false,  tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on', 'userdata', 'startup:off;study:on');
     eegmenu( false,  tools_m, 'Label', 'Remove epoch baseline'                 , 'userdata', ondatastudy, 'CallBack', cb_rmbase);
 

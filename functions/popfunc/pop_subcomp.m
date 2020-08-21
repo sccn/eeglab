@@ -138,9 +138,12 @@ end
 % -------------------------
 if length(EEG) > 1
     if nargin < 2
-        [ EEG, com ] = eeg_eval( 'pop_reref', EEG, 'warning', 'on', 'params', { components } );
+        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'warning', 'on', 'params', { components } );
     else
-        [ EEG, com ] = eeg_eval( 'pop_reref', EEG, 'params', { components } );
+        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'params', { components } );
+    end
+    if isempty( components )
+        com = [ com ' % [] or '' means removing components flaged for rejection' ];
     end
     return;
 end
