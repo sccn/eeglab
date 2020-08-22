@@ -101,6 +101,7 @@ if ischar(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || ...
     opt.design   = varargin{2};
     opt.erase    = 'on';
     opt.method   = 'WSL';
+    opt.zscore   = 1;
 else
     opt = finputcheck( varargin, ...
         { 'measure'        'string'  { 'daterp' 'datspec' 'dattimef' 'icaerp' 'icaspec' 'icatimef' } 'daterp'; ...
@@ -413,8 +414,13 @@ factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one'
 for s = 1:nb_subjects
     % save continuous and categorical data files
     trialinfo = std_combtrialinfo(STUDY.datasetinfo, unique_subjects{s});
-    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
-
+    % [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
+    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
+    if strcmpi(opt.splitreg,'on')
+        contMat    = limo_split_continuous(catMat,contMat);
+        opt.zscore = 0; % regressors are now zscored
+    end
+    
     % copy results
     model.cat_files{s}                 = catMat;
     model.cont_files{s}                = contMat;
@@ -434,22 +440,18 @@ for s = 1:nb_subjects
 end
  
 % then we add contrasts for conditions that were merged during design selection
-% just perform this if there is a single categorical variable available
-if ~isempty(factors)
-    factInds = strmatch( 'categorical', { factors.vartype }, 'exact' ); % only categorical var
-    if ~isempty(factInds)
-        if length(unique({factors(factInds).label})) == 1 % only ONE categorical var
-            
-            indVar = strmatch(factors(factInds(1)).label ,{ STUDY.design(opt.design).variable.label }, 'exact'); % index of that variable
-            if length(indVar) == 1
-                limocontrast  = zeros(length(STUDY.design(opt.design).variable(indVar).value),length(factors)+1); % length(factors)+1 to add the contant
-                
-                % scan factors
-                for iFact=1:length(factInds)
-                    factor_names{iFact} = factors(factInds(iFact)).value;
-                    limocontrast(iFact, factInds(iFact)) = 1;
-                end
-            end
+% i.e. multiple categorical variables (factors) and yet not matching the number 
+% of variables (contrasts are then a weigthed sum of the crossed factors)
+if ~isempty(factors) && length(STUDY.design(opt.design).variable) == 1  % only one variable
+    if length(STUDY.design(opt.design).variable(1).value) ~= length(factors) % and this var has more values than the number of factors 
+        limocontrast = zeros(length(STUDY.design(opt.design).variable(1).value),length(factors)+1); % length(factors)+1 to add the contant
+        for n=1:length(factors)
+            factor_names{n} = factors(n).value;
+        end
+        
+        for c=1:length(STUDY.design(opt.design).variable.value)
+            limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
+            limocontrast(c,1:length(factors)) = limocontrast(c,1:length(factors)) ./ sum(limocontrast(c,1:length(factors))); % scale by the number of variables
         end
     end
 end
@@ -518,7 +520,7 @@ elseif strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
 end
 
 model.defaults.fullfactorial    = 0;                 % all variables
-model.defaults.zscore           = 0;                 % done that already
+model.defaults.zscore           = opt.zscore;        % done that already
 model.defaults.bootstrap        = 0 ;                % only for single subject analyses - not included for studies
 model.defaults.tfce             = 0;                 % only for single subject analyses - not included for studies
 model.defaults.method           = opt.method;        % default is OLS - to be updated to 'WLS' once validated
