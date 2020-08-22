@@ -99,9 +99,10 @@ if ischar(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || ...
         strcmpi(varargin{1}, 'icatimef'))
     opt.measure  = varargin{1};
     opt.design   = varargin{2};
-    opt.erase    = 'on';
-    opt.method   = 'WSL';
-    opt.zscore   = 1;
+    opt.ow_chanlocfile = 'no';  % if chanloc file exist, do not overwrite
+    opt.erase          = 'on';  % erase previous folders/file with the same name
+    opt.method         = 'WSL'; % weighted least squares by default
+    opt.zscore         = 1;     % zscore regressors
 else
     opt = finputcheck( varargin, ...
         { 'measure'        'string'  { 'daterp' 'datspec' 'dattimef' 'icaerp' 'icaspec' 'icatimef' } 'daterp'; ...
@@ -114,7 +115,9 @@ else
           'timelim'        'real'    []               [] ;
           'neighboropt'    'cell'    {}               {} ;
           'chanloc'        'struct'  {}               struct('no', {}); % default empty structure
-          'neighbormat'    'real'    []               [] },...
+          'neighbormat'    'real'    []               [] ;
+          'zscore'         'real'    [0,1]            1  ;
+          'ow_chanlocfile' 'string'  {'yes','no'}     {}},...
           'std_limo');
     if ischar(opt), error(opt); end
 end
@@ -149,8 +152,11 @@ elseif exist(fullfile(STUDY.filepath, 'limo_chanlocs.mat'),'file')
 end
 
 if ~isempty(limoChanlocs)
-    ow= questdlg2('channel location file found, do you want to overwrite','overwrite?','yes','no','no');
-    if isempty(ow) || strcmpi(ow,'no')
+    if ~strcmpi(opt.ow_chanlocfile,'no') % empty or yes
+        ow_chanlocfile = questdlg2('channel location file found, do you want to overwrite','overwrite?','yes','no','no');
+    end
+    
+    if isempty(ow_chanlocfile) || strcmpi(ow_chanlocfile,'no')
         skip_chanlocs = 1;
     end
 end
