@@ -417,7 +417,10 @@ for s = 1:nb_subjects
     % [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
     [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
     if strcmpi(opt.splitreg,'on')
-        contMat    = limo_split_continuous(catMat,contMat);
+        for c=1:size(contMat,2)
+            splitreg{c} = limo_split_continuous(catMat,contMat(:,c));
+        end
+        contMat    = cell2mat(splitreg);
         opt.zscore = 0; % regressors are now zscored
     end
     
