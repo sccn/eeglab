@@ -36,9 +36,6 @@
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
 %                the last dimension of data array is of different lengths}.
-%                For two independent variables, this input is a cell array,
-%                for example { 'on' 'off' } indicating that the first
-%                independent variable is paired and the second is not.
 %   'method'   = ['perm'|'bootstrap'|'param'] method for computing the p-values:
 %                 'param' or 'parametric' = parametric testing (standard ANOVA
 %                                           or t-test); 
