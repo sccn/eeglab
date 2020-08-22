@@ -434,22 +434,19 @@ for s = 1:nb_subjects
 end
  
 % then we add contrasts for conditions that were merged during design selection
-% just perform this if there is a single categorical variable available
-if ~isempty(factors)
-    factInds = strmatch( 'categorical', { factors.vartype }, 'exact' ); % only categorical var
-    if ~isempty(factInds)
-        if length(unique({factors(factInds).label})) == 1 % only ONE categorical var
-            
-            indVar = strmatch(factors(factInds(1)).label ,{ STUDY.design(opt.design).variable.label }, 'exact'); % index of that variable
-            if length(indVar) == 1
-                limocontrast  = zeros(length(STUDY.design(opt.design).variable(indVar).value),length(factors)+1); % length(factors)+1 to add the contant
-                
-                % scan factors
-                for iFact=1:length(factInds)
-                    factor_names{iFact} = factors(factInds(iFact)).value;
-                    limocontrast(iFact, factInds(iFact)) = 1;
-                end
-            end
+% i.e. multiple categorical variables (factors) and yet not matching the number 
+% of variables (contrasts are then a weigthed sum of the crossed factors)
+ factInds = strmatch( 'categorical', { factors.vartype }, 'exact' );
+if ~isempty(factors) && length(unique({factors(factInds).label})) == 1  % only ONE categorical var
+    if length(STUDY.design(opt.design).variable(1).value) ~= length(factors)
+        limocontrast = zeros(length(STUDY.design(opt.design).variable(1).value),length(factors)+1); % length(factors)+1 to add the contant
+        for n=1:length(factors)
+            factor_names{n} = factors(n).value;
+        end
+        
+        for c=1:length(STUDY.design(opt.design).variable.value)
+            limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable.value{c}));
+            limocontrast(c,1:length(factors)) = limocontrast(c,1:length(factors)) ./ sum(limocontrast(c,1:length(factors))); % scale by the number of variables
         end
     end
 end
