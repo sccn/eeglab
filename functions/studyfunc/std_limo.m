@@ -117,7 +117,7 @@ else
           'chanloc'        'struct'  {}               struct('no', {}); % default empty structure
           'neighbormat'    'real'    []               [] ;
           'zscore'         'real'    [0,1]            1  ;
-          'ow_chanlocfile' 'string'  {'yes','no'}     {}},...
+          'ow_chanlocfile' 'string'  {'yes','no'}     'no'},...
           'std_limo');
     if ischar(opt), error(opt); end
 end
