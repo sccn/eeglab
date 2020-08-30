@@ -153,10 +153,10 @@ end
 
 if ~isempty(limoChanlocs)
     if ~strcmpi(opt.ow_chanlocfile,'no') % empty or yes
-        ow_chanlocfile = questdlg2('channel location file found, do you want to overwrite','overwrite?','yes','no','no');
+        opt.ow_chanlocfile = questdlg2('channel location file found, do you want to overwrite','overwrite?','yes','no','no');
     end
     
-    if isempty(ow_chanlocfile) || strcmpi(ow_chanlocfile,'no')
+    if isempty(opt.ow_chanlocfile) || strcmpi(opt.ow_chanlocfile,'no')
         skip_chanlocs = 1;
     end
 end
