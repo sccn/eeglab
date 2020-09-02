@@ -283,6 +283,11 @@ if ~isempty(opt.clusters)
     realDim  = dim;
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
     for iDat1 = 1:length(dataTmp)
+        for iDat2 = 1:length(dataTmp{iDat1})
+            if isempty(dataTmp{iDat1}{iDat2})
+                dataTmp{iDat1}{iDat2} = []; % sometimes empty but all dim not 0
+            end
+        end
         compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
         uniqComps = unique(compNumbers);
         if length(uniqComps) > 1 
@@ -291,16 +296,21 @@ if ~isempty(opt.clusters)
             end
         end
         
-        for iComps = 1:compNumbers(1)
-            dataTmp2{end+1} = [];
+        if any(compNumbers)
             for iDat2 = 1:length(dataTmp{iDat1}(:))
-                % check dimensions of components
-                if strcmpi(opt.singletrials, 'on') && strcmpi(tmpDataType, 'timef'),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
-                elseif strcmpi(opt.singletrials, 'on') || strcmpi(tmpDataType, 'timef') dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
-                else                                                                    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
+                if compNumbers(iDat2)
+                    for iComps = 1:compNumbers(iDat2)
+                        dataTmp2{end+1} = cell(size(dataTmp{iDat1}));
+                        % check dimensions of components
+                        if ~isempty(dataTmp{iDat1}{iDat2})
+                            if strcmpi(opt.singletrials, 'on') && strcmpi(tmpDataType, 'timef'),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
+                            elseif strcmpi(opt.singletrials, 'on') || strcmpi(tmpDataType, 'timef') dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                            else                                                                    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
+                            end
+                        end
+                    end
                 end
             end
-            dataTmp2{end} = reshape(dataTmp2{end}, size(dataTmp{iDat1}));
         end
     end
     dataTmp = dataTmp2;
