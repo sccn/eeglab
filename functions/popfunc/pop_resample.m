@@ -69,10 +69,12 @@ command = '';
 if nargin < 1
     help pop_resample;
     return;
-end;     
+end    
 if isempty(EEG(1).data)
     disp('Pop_resample error: cannot resample empty dataset'); return;
-end;    
+end
+
+if ~plugin_askinstall('Firfilt', 'pop_firwsord'), return; end
 
 if nargin < 2 
 
