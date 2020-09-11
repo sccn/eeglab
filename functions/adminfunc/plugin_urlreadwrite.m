@@ -37,9 +37,9 @@ useNewProxyInfo = 0;
 try
     if exist('OCTAVE_VERSION', 'builtin') == 0
         [matlabversion matlabdate] = version;
-        matlabversion2 = regexp(matlabversion,"R20(\d\d)([abcd])",'match');
+        matlabversion2 = regexp(matlabversion,'R20(\d\d)([abcd])','match');
         if ~isempty(matlabversion2)
-            matlabyear = regexp(matlabversion2,"20(\d\d)",'match');
+            matlabyear = regexp(matlabversion2,'20(\d\d)','match');
             if ~isempty(matlabyear)
                 matlabyear = str2double(matlabyear{1,1});
                 %matlabsubversion = regexp(matlabversion2,strcat(num2str(matlabyear), "([abcd])"),'match','once');
@@ -48,7 +48,7 @@ try
         end
     end
 catch
-    warning("An error occured when checking MATLAB/Octave version");
+    warning('An error occured when checking MATLAB/Octave version');
 end
 
 try
@@ -71,7 +71,7 @@ try
         end
     end
 catch
-    warning("An error occured when checking proxy information using new format");
+    warning('An error occured when checking proxy information using new format');
 end
 
 % Create the URL object.
