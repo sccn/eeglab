@@ -451,7 +451,7 @@ end
 % then we add contrasts for conditions that were merged during design selection
 % i.e. multiple categorical variables (factors) and yet not matching the number 
 % of variables (contrasts are then a weigthed sum of the crossed factors)
-if ~isempty(factors) && length(STUDY.design(opt.design).variable) == 1  % only one variable
+if ~isempty(factors) && length(STUDY.design(opt.design).variable) == 1 && isfield(factors, 'value') % only one non-continuous variable 
     if length(STUDY.design(opt.design).variable(1).value) ~= length(factors) % and this var has more values than the number of factors 
         limocontrast = zeros(length(STUDY.design(opt.design).variable(1).value),length(factors)+1); % length(factors)+1 to add the contant
         for n=1:length(factors)
