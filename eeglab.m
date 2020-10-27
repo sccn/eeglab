@@ -970,6 +970,7 @@ else
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'compat') , 'electrodenormalize' );
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'forward'), 'ft_sourcedepth.m');
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'utilities'), 'ft_datatype.m');
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'plotting'), 'ft_plot_mesh.m');
                     ptopoplot  = fileparts(mywhich('cbar'));
                     ptopoplot2 = fileparts(mywhich('topoplot'));
                     if ~isequal(ptopoplot, ptopoplot2)
