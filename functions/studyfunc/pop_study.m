@@ -121,6 +121,15 @@ if strcmpi(mode, 'script') % script mode
     [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, varargin{:});
     return;
 elseif strcmpi(mode, 'gui') % GUI mode
+
+    % check events
+    fieldList = { 'condition' 'group' 'subject' 'session' 'run' };
+    for iField = 1:length(fieldList)
+        if any(cellfun(@(x)isfield(x, fieldList{iField}), {ALLEEG.event}))
+            fprintf(2, 'Rename field "%s" in datasets'' event structure as it conflicts with the STUDY field bearing the same name\n', fieldList{iField});
+        end
+    end
+    
     % show warning if necessary
     % -------------------------
     if isreal(ALLEEG)
@@ -360,7 +369,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
             end
         end
     end
-    
+        
     % run command and create history
     % ------------------------------
     if alleegEmpty
@@ -369,6 +378,15 @@ elseif strcmpi(mode, 'gui') % GUI mode
         com = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, ALLEEG, %s );\n[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);', vararg2str(options) );
     end
     [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, options{:});
+
+    % check sessions
+    % --------------
+    allSessions = [ STUDY.datasetinfo.session ];
+    if ~isempty(allSessions)
+        if ~ismember(1, allSessions)
+            fprintf(2, 'Sessions are usually numbered starting at 1; Do not use session to store custom information\n');
+        end
+    end
     
 else % internal command
     
