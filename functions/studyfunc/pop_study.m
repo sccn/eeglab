@@ -32,12 +32,12 @@
 %  "subject"             - [edit box] subject code associated with the dataset. If no 
 %                          subject code is provided, each dataset will assumed to be from 
 %                          a different subject {default: 'S1', 'S2', ..., 'Sn'}
-%  "run"                 - [edit box] dataset run. If no run information is
-%                          provided, all datasets that belong to one subject are assumed to
-%                          have been recorded within one run {default: []}
 %  "session"             - [edit box] dataset session. If no session information is
 %                          provided, all datasets that belong to one subject are assumed to
 %                          have been recorded within one session {default: []}
+%  "run"                 - [edit box] dataset run. If no run information is
+%                          provided, all datasets that belong to one subject are assumed to
+%                          have been recorded within one run {default: []}
 %  "condition"           - [edit box] dataset condition. If no condition code is provided,
 %                          all datasets are assumed to be from the same condition {default:[]}
 %  "group"               - [edit box] the subject group the dataset belongs to. If no group
@@ -121,6 +121,15 @@ if strcmpi(mode, 'script') % script mode
     [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, varargin{:});
     return;
 elseif strcmpi(mode, 'gui') % GUI mode
+
+    % check events
+    fieldList = { 'condition' 'group' 'subject' 'session' 'run' };
+    for iField = 1:length(fieldList)
+        if any(cellfun(@(x)isfield(x, fieldList{iField}), {ALLEEG.event}))
+            fprintf(2, 'Rename field "%s" in datasets'' event structure as it conflicts with the STUDY field bearing the same name\n', fieldList{iField});
+        end
+    end
+    
     % show warning if necessary
     % -------------------------
     if isreal(ALLEEG)
@@ -216,14 +225,14 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {} ...
         {'style' 'text' 'string' 'dataset filename' 'userdata' 'addt'} {'style' 'text' 'string' 'browse' 'userdata' 'addt'} ...
         {'style' 'text' 'string' 'subject'    'userdata' 'addt'} ...
-        {'style' 'text' 'string' 'run'        'userdata' 'addt'} ...
         {'style' 'text' 'string' 'session'    'userdata' 'addt'} ...
+        {'style' 'text' 'string' 'run'        'userdata' 'addt'} ...
         {'style' 'text' 'string' 'condition'  'userdata' 'addt'} ...
         {'style' 'text' 'string' 'group'      'userdata' 'addt'} ...
         {'style' 'pushbutton' 'string' 'Select by r.v.' 'userdata' 'addt' 'callback' cb_dipole } ...
         {} };
     geomUnit  = [0.2 1 3.5];
-    geomUnit2 = [0.2 1.05 0.35 0.4 0.25 0.35 0.6 0.4 0.6 0.3];
+    geomUnit2 = [0.2 1.05 0.35 0.4 0.35 0.25 0.6 0.4 0.6 0.3];
 	guigeom = { [1] geomUnit geomUnit geomUnit [1] geomUnit2 };
 	
     % create edit boxes
@@ -242,8 +251,8 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'edit'       'string' ''      'tag' [ 'set'   int2str(index) ] 'userdata' index 'callback' loadsetedit}, ...
         {'style' 'pushbutton' 'string' '...'   'tag' [ 'brw'   int2str(index) ] 'userdata' index 'Callback' select_com}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'sub'   int2str(index) ] 'userdata' index 'Callback' subcom}, ...
-        {'style' 'edit'       'string' ''      'tag' [ 'run'   int2str(index) ] 'userdata' index 'Callback' runcom}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'sess'  int2str(index) ] 'userdata' index 'Callback' sescom}, ...
+        {'style' 'edit'       'string' ''      'tag' [ 'run'   int2str(index) ] 'userdata' index 'Callback' runcom}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'cond'  int2str(index) ] 'userdata' index 'Callback' condcom}, ...
         {'style' 'edit'       'string' ''      'tag' [ 'group' int2str(index) ] 'userdata' index 'Callback' grpcom}, ...
         {'style' 'pushbutton' 'string' 'All comp.'   'tag' [ 'comps' int2str(index) ] 'userdata' index 'Callback' compcom}, ...
@@ -360,7 +369,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
             end
         end
     end
-    
+        
     % run command and create history
     % ------------------------------
     if alleegEmpty
@@ -369,6 +378,15 @@ elseif strcmpi(mode, 'gui') % GUI mode
         com = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, ALLEEG, %s );\n[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);', vararg2str(options) );
     end
     [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, options{:});
+
+    % check sessions
+    % --------------
+    allSessions = [ STUDY.datasetinfo.session ];
+    if ~isempty(allSessions)
+        if ~ismember(1, allSessions)
+            fprintf(2, 'Sessions are usually numbered starting at 1; Do not use session to store custom information\n');
+        end
+    end
     
 else % internal command
     

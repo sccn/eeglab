@@ -195,11 +195,11 @@ if EEG.nbchan > 100
 end
 
 if icacomp == 1
-	eegplot( EEG.data, 'srate', EEG.srate, 'title', 'Scroll channel activities -- eegplot()', ...
+	eegplot( EEG.data, 'srate', EEG.srate, 'title', ['Scroll channel activities -- eegplot() -- ', EEG.setname], ...
 			  'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
 else
     tmpdata = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
-	eegplot( tmpdata, 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
+	eegplot( tmpdata, 'srate', EEG.srate, 'title', ['Scroll component activities -- eegplot() -- ', EEG.setname], ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
 end
 com = [ com sprintf('pop_eegplot( EEG, %d, %d, %d);', icacomp, superpose, reject) ]; 

@@ -71,31 +71,49 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, command, dat] = pop_biosig(filename, varargin); 
-EEG = [];
+function [ALLEEG, command, dat] = pop_biosig(filename, varargin)
+ALLEEG = [];
 command = '';
 
 if ~plugin_askinstall('Biosig', 'sopen'), return; end
 biosigpathfirst;
     
+saveData = false;
 if nargin < 1
 	% ask user
-	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()'); %%% this is incorrect in original version!!!!!!!!!!!!!!
+	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()', 'multiselect', 'on'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
-	if filename == 0 return; end
-	filename = [filepath filename];
+	if isequal(filename,0) return; end
     
+    if iscell(filename)
+        buttonName = questdlg2([ 'Do you want to automatically save imported datasets?' 10 ...
+            '(the name will remain the same as the original dataset' 10 ...
+            'and the .set extension will be used)' ], 'pop_biosig() - import dataset(s)', 'Cancel', 'No thanks', 'Yes Save', 'Yes Save');
+        switch buttonName
+            case 'Cancel', return;
+            case 'No thanks', saveData = false;
+            otherwise saveData = true;
+        end
+    else
+        filename = { filename };
+    end
+
     % look if MEG
     % -----------
     if length(filepath)>4
-        if strcmpi(filepath(end-3:end-1), '.ds'), filename = filepath(1:end-1); end
+        if strcmpi(filepath(end-3:end-1), '.ds')
+            filename = { filepath(1:end-1) }; % should not be able to select more than one MEG file anyway
+        end
+    end
+    for iFile = 1:length(filename)
+        filename{iFile} = fullfile(filepath, filename{iFile});
     end
     
     % open file to get infos
     % ----------------------
     disp('Reading data file header...');
-    dat = sopen(filename, 'r', [], 'OVERFLOWDETECTION:OFF');
+    dat = sopen(filename{1}, 'r', [], 'OVERFLOWDETECTION:OFF');
     if ~isfield(dat, 'NRec')
         error('Unsuported data format');
     end
@@ -159,72 +177,83 @@ g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
 if ischar(g), error(g); end
 
-% import data
-% -----------
-EEG = eeg_emptyset;
-[dat DAT interval] = readfile(filename, g.channels, g.blockrange, g.memorymapped);
+if ~iscell(filename) filename = { filename }; end
 
-if strcmpi(g.blockepoch, 'off')
-    dat.NRec = 1;
-end
+for iFile = 1:length(filename)
+    % import data
+    % -----------
+    EEG = eeg_emptyset;
+    [dat, DAT, interval] = readfile(filename{iFile}, g.channels, g.blockrange, g.memorymapped);
     
-EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'), strcmpi(g.importannot, 'on'));
-
-if strcmpi(g.rmeventchan, 'on') && strcmpi(dat.TYPE, 'BDF') && isfield(dat, 'BDF')
-    if size(EEG.data,1) >= dat.BDF.Status.Channel, 
-        disp('Removing event channel...');
-        EEG.data(dat.BDF.Status.Channel,:) = []; 
-        if ~isempty(EEG.chanlocs) && length(EEG.chanlocs) >= dat.BDF.Status.Channel
-            EEG.chanlocs(dat.BDF.Status.Channel) = [];
-        end
+    if strcmpi(g.blockepoch, 'off')
+        dat.NRec = 1;
     end
-    EEG.nbchan = size(EEG.data,1);
-end
-
-% rerefencing
-% -----------
-if ~isempty(g.ref)
-    disp('Re-referencing...');
-    EEG = pop_reref(EEG, g.ref, g.refoptions{:});
-%     EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
-%     if length(g.ref) == size(EEG.data,1)
-%         EEG.ref  = 'averef';
-%     end
-%     if length(g.ref) == 1
-%         disp([ 'Warning: channel ' int2str(g.ref) ' is now zeroed (but still present in the data)' ]);
-%     else
-%         disp([ 'Warning: data matrix rank has decreased through re-referencing' ]);
-%     end
-end
-
-% test if annotation channel is present
-% -------------------------------------
-if isfield(dat, 'EDFplus') && strcmpi(g.importannot, 'on')
-    tmpfields = fieldnames(dat.EDFplus);
-    for ind = 1:length(tmpfields)
-        tmpdat = getfield(dat.EDFplus, tmpfields{ind});
-        if length(tmpdat) == EEG.pnts
-            EEG.data(end+1,:) = tmpdat;
-            EEG.nbchan        = EEG.nbchan+1;
-            if ~isempty(EEG.chanlocs)
-                EEG.chanlocs(end+1).labels = tmpfields{ind};
+    
+    EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'), strcmpi(g.importannot, 'on'));
+    
+    if strcmpi(g.rmeventchan, 'on') && strcmpi(dat.TYPE, 'BDF') && isfield(dat, 'BDF')
+        if size(EEG.data,1) >= dat.BDF.Status.Channel
+            disp('Removing event channel...');
+            EEG.data(dat.BDF.Status.Channel,:) = [];
+            if ~isempty(EEG.chanlocs) && length(EEG.chanlocs) >= dat.BDF.Status.Channel
+                EEG.chanlocs(dat.BDF.Status.Channel) = [];
+            end
+        end
+        EEG.nbchan = size(EEG.data,1);
+    end
+    
+    % rerefencing
+    % -----------
+    if ~isempty(g.ref)
+        disp('Re-referencing...');
+        EEG = pop_reref(EEG, g.ref, g.refoptions{:});
+    end
+    
+    % test if annotation channel is present
+    % -------------------------------------
+    if isfield(dat, 'EDFplus') && strcmpi(g.importannot, 'on')
+        tmpfields = fieldnames(dat.EDFplus);
+        for ind = 1:length(tmpfields)
+            tmpdat = getfield(dat.EDFplus, tmpfields{ind});
+            if length(tmpdat) == EEG.pnts
+                EEG.data(end+1,:) = tmpdat;
+                EEG.nbchan        = EEG.nbchan+1;
+                if ~isempty(EEG.chanlocs)
+                    EEG.chanlocs(end+1).labels = tmpfields{ind};
+                end
             end
         end
     end
+    
+    % check and store data
+    % --------------------
+    EEG = eeg_checkset(EEG, 'makeur');   % Make EEG.urevent field
+    EEG = eeg_checkset(EEG, 'eventconsistency');
+    EEG = eeg_checkset(EEG);
+    if saveData
+        EEG = pop_saveset(EEG, [ filename{iFile}(1:end-4) '.set' ]);
+        EEG(1).saved = 'justloaded';
+    end
+    if iFile == 1
+        ALLEEG = EEG;
+    else
+        ALLEEG(iFile) = EEG;
+    end
+    
 end
-
-% convert data to single if necessary
-% -----------------------------------
-EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
-EEG = eeg_checkset(EEG);
 
 % history
 % -------
-if isempty(options)
-    command = sprintf('EEG = pop_biosig(''%s'');', filename); 
+if length(filename) == 1
+    command = sprintf('EEG = pop_biosig(''%s''', filename{1});
 else
-    command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
-end;    
+    command = sprintf('EEG = pop_biosig(%s', vararg2str(filename));
+end
+if isempty(options)
+    command = [ command ');' ];
+else
+    command = [ command sprintf(', %s);', vararg2str(options)) ];
+end
 
 % Checking if str2double is on top of the path
 biosigpathlast;
@@ -232,7 +261,7 @@ biosigpathlast;
 % ---------
 % read data
 % ---------
-function [dat DAT interval] = readfile(filename, channels, blockrange, memmapdata);
+function [dat, DAT, interval] = readfile(filename, channels, blockrange, memmapdata);
 
 if isempty(channels), channels = 0; end
 dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');

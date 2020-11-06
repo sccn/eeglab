@@ -143,7 +143,12 @@ if isempty(varargin)
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
     res.filter    = str2num( res.filter );
-    
+    if ~isempty(diff(res.timerange))
+        if diff(res.timerange) < 5
+            fprintf(2, 'Time range is less than 5 ms; are you sure you entered the time range in milliseconds, not seconds?\n');
+        end
+    end
+
     % build command call
     % ------------------
     options = {};
