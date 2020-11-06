@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration file="/Users/arno/temp/eeglab/eeglab.prj" location="/Users/arno/temp/eeglab" name="eeglab" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="751778857" file="/data/matlab/eeglab_versions/eeglabcompile/eeglab.prj" location="/data/matlab/eeglab_versions/eeglabcompile" name="eeglab" preferred-package-location="/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_redistribution" preferred-package-type="package.type.app" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
@@ -28,15 +28,15 @@ If it is defined, set it to the concatenation of these strings:
     MCR_ROOT/v92/runtime/maci64:
     MCR_ROOT/v92/sys/os/maci64:
     MCR_ROOT/v92/bin/maci64</param.install.notes>
-    <param.target.install.notes>In the following directions, replace MR/v95 by the directory on the target machine where MATLAB is installed, or MR by the directory where the MATLAB Runtime is installed.
+    <param.target.install.notes>In the following directions, replace MR/v98 by the directory on the target machine where MATLAB is installed, or MR by the directory where the MATLAB Runtime is installed.
 
 If the environment variable DYLD_LIBRARY_PATH is undefined, set it to the following string:
 
-MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci64
+MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci64
 
 If it is defined, set it to the following:
 
-${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci64</param.target.install.notes>
+${DYLD_LIBRARY_PATH}:MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci64</param.target.install.notes>
     <param.intermediate>${PROJECT_ROOT}/eeglab/for_testing</param.intermediate>
     <param.files.only>${PROJECT_ROOT}/eeglab/for_redistribution_files_only</param.files.only>
     <param.output>${PROJECT_ROOT}/eeglab/for_redistribution</param.output>
@@ -57,7 +57,14 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
     <param.native.matlab>false</param.native.matlab>
     <param.checkbox>false</param.checkbox>
     <param.example />
-    <param.help.text />
+    <param.help.text>Syntax 
+	 eeglab -? 
+	 eeglab onearg 
+ Input Arguments 
+	 -?  print help on how to use the application 
+	 onearg  input arguments 
+ Description 
+ 	 EEGLAB is an interactive Matlab toolbox for processing continuous and event-related EEG, MEG and other electrophysiological data incorporating independent component analysis (ICA), time/frequency analysis, artifact rejection, event-related statistics, and several useful modes of visualization of the averaged and single-trial data.</param.help.text>
     <unset>
       <param.icon />
       <param.icons />
@@ -80,10 +87,10 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
       <param.web.mcr.name />
       <param.package.mcr.name />
       <param.no.mcr.name />
+      <param.windows.command.prompt />
       <param.native.matlab />
       <param.checkbox />
       <param.example />
-      <param.help.text />
     </unset>
     <fileset.main>
       <file>${PROJECT_ROOT}/eeglab.m</file>
@@ -99,10 +106,6 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
       <file>${PROJECT_ROOT}/functions/supportfiles</file>
       <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
       <file>${PROJECT_ROOT}/plugins/ANTeepimport1.13</file>
-      <file>${PROJECT_ROOT}/plugins/bva-io1.5.13</file>
-      <file>${PROJECT_ROOT}/plugins/clean_rawdata</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit</file>
-      <file>${PROJECT_ROOT}/plugins/egilegacy1.0</file>
       <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703</file>
       <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/forward</file>
       <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/inverse</file>
@@ -111,11 +114,19 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
       <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/trialfun</file>
       <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/utilities</file>
       <file>${PROJECT_ROOT}/plugins/Fileio20200703</file>
-      <file>${PROJECT_ROOT}/plugins/firfilt</file>
       <file>${PROJECT_ROOT}/plugins/ICLabel</file>
       <file>${PROJECT_ROOT}/plugins/PICARD1.0</file>
+      <file>${PROJECT_ROOT}/plugins/VisEd1.05</file>
+      <file>${PROJECT_ROOT}/plugins/bva-io1.5.13</file>
+      <file>${PROJECT_ROOT}/plugins/clean_rawdata</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit3.4</file>
+      <file>${PROJECT_ROOT}/plugins/egilegacy1.0</file>
+      <file>${PROJECT_ROOT}/plugins/firfilt</file>
+      <file>${PROJECT_ROOT}/plugins/iirfilt1.03</file>
       <file>${PROJECT_ROOT}/plugins/musemonitor3.2</file>
       <file>${PROJECT_ROOT}/plugins/neuroscanio1.3</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.17</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.17/xdf</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/1ST_README.txt</file>
@@ -125,16 +136,58 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
       <file>${PROJECT_ROOT}/sample_data</file>
       <file>${PROJECT_ROOT}/sample_locs</file>
     </fileset.package>
-    <fileset.depfun />
+    <fileset.depfun>
+      <file>${MATLAB_ROOT}/examples/rptgen/data/peppers.png</file>
+      <file>${MATLAB_ROOT}/toolbox/local/restoredefaultpath.m</file>
+      <file>${MATLAB_ROOT}/toolbox/local/userpath.m</file>
+      <file>${MATLAB_ROOT}/toolbox/matlab/demos/watchoff.m</file>
+      <file>${MATLAB_ROOT}/toolbox/matlab/demos/watchon.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/display.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/eegobj.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/fieldnames.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/horzcat2.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/isfield.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/isstruct.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/length.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/orderfields.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/rmfield.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/simpletest.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/subsasgn.m</file>
+      <file>${PROJECT_ROOT}/functions/@eegobj/subsref.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/binaryopp.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/bsxfun.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/changefile.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/checkcopies_local.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/checkworkspace.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/ctranspose.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/display.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/double.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/end.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/fft.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/isnumeric.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/length.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/mmo.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/ndims.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/permute.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/reshape.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/size.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/subsasgn.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/subsasgn_old.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/subsref.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/sum.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/transpose.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/unitaryopp.m</file>
+      <file>${PROJECT_ROOT}/functions/@mmo/var.m</file>
+    </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/Users/arno/temp/eeglab/eeglab/for_testing/readme.txt</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/Users/arno/temp/eeglab/eeglab/for_testing/EEGLAB.app</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/Users/arno/temp/eeglab/eeglab/for_testing/splash.png</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/Users/arno/temp/eeglab/eeglab/for_testing/run_EEGLAB.sh</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/EEGLAB.app</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/run_EEGLAB.sh</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/Applications/MATLAB_R2018b.app</root>
+      <root>/Applications/MATLAB_R2020a.app</root>
       <toolboxes>
         <toolbox name="matlabcoder" />
         <toolbox name="neuralnetwork" />
@@ -159,7 +212,7 @@ ${DYLD_LIBRARY_PATH}:MR/v95/runtime/maci64:MR/v95/sys/os/maci64:MR/v95/bin/maci6
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.14.4</osver>
+      <osver>10.14.6</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>
