@@ -767,17 +767,14 @@ for inddataset = 1:length(ALLEEG)
         
         if (ndims(EEG.data)) < 3 && (EEG.pnts > 1)
             if mod(size(EEG.data,2), EEG.pnts) ~= 0
-                if popask( [ 'eeg_checkset error: the number of frames does not divide the number of columns in the data.'  10 ...
-                        'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the command line)'])
-                    error('eeg_checkset error: user abort');
-                    %res = com;
-                    %EEG.pnts = size(EEG.data,2);
-                    %EEG = eeg_checkset(EEG);
-                    %return;
-                else
+                fprintf(2, 'eeg_checkset error: binary data file likely truncated, importing anyway...');
+                if EEG.trials > 1
+                    EEG.trials = floor(size(EEG.data,2)/EEG.pnts);
+                    EEG.data(:,EEG.trials*EEG.pnts+1:end) = [];
                     res = com;
-                    return;
-                    %error( 'eeg_checkset error: number of points does not divide the number of columns in data');
+                else
+                    EEG.pnts   = size(EEG.data,2);
+                    res = com;
                 end
             else
                 if EEG.trials > 1
