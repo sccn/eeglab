@@ -767,7 +767,7 @@ for inddataset = 1:length(ALLEEG)
         
         if (ndims(EEG.data)) < 3 && (EEG.pnts > 1)
             if mod(size(EEG.data,2), EEG.pnts) ~= 0
-                fprintf(2, 'eeg_checkset error: binary data file likely truncated, importing anyway...');
+                fprintf(2, 'eeg_checkset error: binary data file likely truncated, importing anyway...\n');
                 if EEG.trials > 1
                     EEG.trials = floor(size(EEG.data,2)/EEG.pnts);
                     EEG.data(:,EEG.trials*EEG.pnts+1:end) = [];
