@@ -174,7 +174,11 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     % add initial event to eventtmp when missing
     if ~isempty(eventtmp) && ~isempty(EEG.event) && ...
             strcmpi(EEG.event(1).type, 'boundary') && EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
-        eventtmp = [ eventtmp(1) eventtmp(1:end) ];
+        if size(eventtmp,2) > 1
+            eventtmp = [ eventtmp(1) eventtmp(1:end) ];
+        else
+            eventtmp = [ eventtmp(1) eventtmp(1:end)' ];
+        end
         eventtmp(1).type = 'boundary';
         eventtmp(1).latency = 0.5;
         eventtmp(1).duration = EEG.event(1).duration;
