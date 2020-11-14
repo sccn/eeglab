@@ -2,7 +2,7 @@
 %
 % Usage:
 %   >> OUTEEG = pop_biosig; % pop up window
-%   >> OUTEEG = pop_biosig( filename, channels, type);
+%   >> OUTEEG = pop_biosig( filename, 'key', val, ...);
 %
 % Inputs:
 %   filename - [string] file name
