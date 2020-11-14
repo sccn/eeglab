@@ -186,7 +186,7 @@ if strcmpi(g.savemode, 'resave')
         return;
     end
     
-    if strcmpi( EEG.saved, 'yes'), disp('Dataset has not been modified; No need to resave it.'); return; end
+    %if strcmpi( EEG.saved, 'yes'), disp('Dataset has not been modified; No need to resave it.'); return; end
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
     if isfield(EEG, 'datfile')
