@@ -933,7 +933,20 @@ else
     % scan plugin folder
     % ------------------
     dircontent  = dir(fullfile(p, 'plugins'));
-    dircontent  = { dircontent.name };
+    if ~isfield(dircontent, 'folder')
+        [dircontent(:).folder] = deal(fullfile(p, 'plugins'));
+    end
+    
+    % scan local plugin folder
+    % ------------------------
+    dircontent2  = dir(fullfile(pwd, 'plugins'));
+    if ~isempty(dircontent2)
+        fprintf(2, 'WARNING: plugins in current folders may shadow plugins installed in EEGLAB plugins folder\n');
+        if ~isfield(dircontent2, 'folder')
+            [dircontent2(:).folder] = deal(fullfile(pwd, 'plugins'));
+        end
+        dircontent = [dircontent;dircontent2];
+    end
     
     pluginstats = [];
 	if option_checkversion && ismatlab
@@ -955,13 +968,12 @@ else
         % -------------
         funcname = '';
         pluginVersion = [];
-        if exist([p 'plugins' filesep dircontent{index}]) == 7
-            if ~strcmpi(dircontent{index}, '.') && ~strcmpi(dircontent{index}, '..')
-                newpath = [ 'plugins' filesep dircontent{index} ];
-                tmpdir = dir([ p 'plugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
+        if exist(fullfile(dircontent(index).folder, dircontent(index).name), 'dir')
+            if ~strcmpi(dircontent(index).name, '.') && ~strcmpi(dircontent(index).name, '..')
+                tmpdir = dir(fullfile(dircontent(index).folder, dircontent(index).name, 'eegplugin*.m'));
                 
-                addpathifnotinlist(fullfile(eeglabpath, newpath));
-                [ pluginName, pluginVersion ] = parsepluginname(dircontent{index});
+                addpathifnotinlist(fullfile(dircontent(index).folder, dircontent(index).name));
+                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name);
                 if ~isempty(tmpdir)
                     %myaddpath(eeglabpath, tmpdir(1).name, newpath);
                     funcname = tmpdir(1).name(1:end-2);
@@ -969,11 +981,11 @@ else
                 
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
-                if ~isempty(findstr(lower(dircontent{index}), 'fieldtrip'))
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'compat') , 'electrodenormalize' );
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'forward'), 'ft_sourcedepth.m');
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'utilities'), 'ft_datatype.m');
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'plotting'), 'ft_plot_mesh.m');
+                if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip'))
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'compat') , 'electrodenormalize' );
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'forward'), 'ft_sourcedepth.m');
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'utilities'), 'ft_datatype.m');
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'plotting'), 'ft_plot_mesh.m');
                     ptopoplot  = fileparts(mywhich('cbar'));
                     ptopoplot2 = fileparts(mywhich('topoplot'));
                     if ~isequal(ptopoplot, ptopoplot2)
@@ -983,17 +995,17 @@ else
                     
                 % special case of subfolder for BIOSIG
                 % ------------------------------------
-                if ~isempty(findstr(lower(dircontent{index}), 'biosig')) && isempty(findstr(lower(dircontent{index}), 'biosigplot'))
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't200_FileAccess'), 'sopen.m');
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't250_ArtifactPreProcessingQualityControl'), 'regress_eog.m' );
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 'doc'), 'DecimalFactors.txt');
+                if ~isempty(findstr(lower(dircontent(index).name), 'biosig')) && isempty(findstr(lower(dircontent(index).name), 'biosigplot'))
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 't200_FileAccess'), 'sopen.m');
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 't250_ArtifactPreProcessingQualityControl'), 'regress_eog.m' );
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 'doc'), 'DecimalFactors.txt');
                 end
                     
             end
         else 
-            if ~isempty(findstr(dircontent{index}, 'eegplugin')) && dircontent{index}(end) == 'm'
-                funcname = dircontent{index}(1:end-2); % remove .m
-                [ pluginName, pluginVersion ] = parsepluginname(dircontent{index}(10:end-2));
+            if ~isempty(findstr(dircontent(index).name, 'eegplugin')) && dircontent(index).name(end) == 'm'
+                funcname = dircontent(index).name(1:end-2); % remove .m
+                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name(10:end-2));
             end
         end
 
@@ -1004,7 +1016,7 @@ else
                 disp([ 'EEGLAB: adding "' pluginName '" to the path; subfolders (if any) might be missing from the path' ]);
                 pluginlist(plugincount).plugin     = pluginName;
                 pluginlist(plugincount).version    = pluginVersion;
-                pluginlist(plugincount).foldername = dircontent{index};
+                pluginlist(plugincount).foldername = dircontent(index).name;
                 pluginlist(plugincount).status     = 'ok';
                 plugincount = plugincount+1;
             else
@@ -1035,7 +1047,7 @@ else
                     end
                 end
                 pluginlist(plugincount).funcname   = funcname(10:end);
-                pluginlist(plugincount).foldername = dircontent{index};
+                pluginlist(plugincount).foldername = dircontent(index).name;
                 if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
                     pluginlist(plugincount).funcname(1) = [];
                 end 
