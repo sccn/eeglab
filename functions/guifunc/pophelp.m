@@ -51,7 +51,15 @@ end
 
 if exist('help2html')
     if length(funct) > 3 && strcmpi(funct(end-3:end), '.txt')
-        web(funct);
+        %web(funct);
+        fid = fopen(funct, 'r');
+        text1 = textscan(fid, '%s', 'delimiter', '');
+        fclose(fid);
+        text1 = cellfun(@(x)[10 x], text1{1}, 'uniformoutput', false);
+        tmp = char('text://<pre>', text1{:});
+        tmp = tmp';
+        tmp = tmp(:);
+        web( tmp' );
     else
         pathHelpHTML = fileparts(which('help2html'));
         if ~isempty(findstr('NFT', pathHelpHTML)), rmpath(pathHelpHTML); end
