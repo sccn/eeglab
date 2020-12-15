@@ -154,8 +154,8 @@ end
 if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     % assess difference between old and new event latencies
     [ eventtmp ] = eeg_insertboundold(oldEEGevents, oldEEGpnts, regions);
-    [~,indEvent] = sort([ eventtmp.latency ]);
     if ~isempty(eventtmp)
+        [~,indEvent] = sort([ eventtmp.latency ]);
         eventtmp = eventtmp(indEvent);
     end
     if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && isequal(eventtmp(1).type, 'boundary')
