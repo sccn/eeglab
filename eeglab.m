@@ -926,26 +926,26 @@ else
     pluginlist  = [];
     plugincount = 1;
     
-    p = mywhich('eeglab.m');
-    p = p(1:findstr(p,'eeglab.m')-1);
-    if strcmpi(p, './') || strcmpi(p, '.\'), p = [ pwd filesep ]; end
+    eeglabp = fileparts(mywhich('eeglab.m'));
         
     % scan plugin folder
     % ------------------
-    dircontent  = dir(fullfile(p, 'plugins'));
+    dircontent  = dir(fullfile(eeglabp, 'plugins'));
     if ~isfield(dircontent, 'folder')
         [dircontent(:).folder] = deal(fullfile(p, 'plugins'));
     end
     
     % scan local plugin folder
     % ------------------------
-    dircontent2  = dir(fullfile(pwd, 'plugins'));
-    if ~isempty(dircontent2)
-        fprintf(2, 'WARNING: plugins in current folders may shadow plugins installed in EEGLAB plugins folder\n');
-        if ~isfield(dircontent2, 'folder')
-            [dircontent2(:).folder] = deal(fullfile(pwd, 'plugins'));
+    if ~isequal(pwd, eeglabp)
+        dircontent2  = dir(fullfile(pwd, 'plugins'));
+        if ~isempty(dircontent2)
+            fprintf(2, 'WARNING: plugins in current folders may shadow plugins installed in EEGLAB plugins folder\n');
+            if ~isfield(dircontent2, 'folder')
+                [dircontent2(:).folder] = deal(fullfile(pwd, 'plugins'));
+            end
+            dircontent = [dircontent;dircontent2];
         end
-        dircontent = [dircontent;dircontent2];
     end
     
     pluginstats = [];
