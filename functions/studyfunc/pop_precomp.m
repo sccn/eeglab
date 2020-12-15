@@ -369,13 +369,17 @@ else
             %catch, warndlg2('Error while calling function, check parameters'); end
 
         case 'testersp'
-            try,
-                ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
-                tmpstruct = struct(ersp_params{:});
-                [ tmpX, tmpt, tmpf, ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'parallel', 'off', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
-                std_plottf(tmpt, tmpf, { tmpX });
-            catch, warndlg2('Error while calling function, check syntax'); end
-                
+            if ALLEEG(1).trials == 1
+                warndlg2('Cannot calculate ERSP/ITC on continuous data');
+            else
+                try,
+                    ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
+                    tmpstruct = struct(ersp_params{:});
+                    [ tmpX, tmpt, tmpf, ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'parallel', 'off', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
+                    std_plottf(tmpt, tmpf, { tmpX });
+                catch, warndlg2('Error while calling function, check syntax'); end
+            end
+            
         case 'testerpimage'
             % THIS CODE IS NOT FUNCTIONAL ANY MORE
             try,
