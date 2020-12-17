@@ -415,6 +415,7 @@ if ischar(filename)
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
        if isfield(eloc, 'type')
            for index = 1:length(eloc)
+               eloc(index).labels = strtrim(eloc(index).labels);
                type = eloc(index).type;
                if type == 69,     eloc(index).type = 'EEG';
                elseif type == 88, eloc(index).type = 'REF';
