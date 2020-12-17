@@ -102,6 +102,9 @@ for k = 1:length(STUDY.datasetinfo)
 end
 
 % check for old study format
+if ~isfield(STUDY, 'design')
+    STUDY.design = [];
+end
 if ~isempty(STUDY.design)
     if isfield(STUDY.design, 'cell')
         txt = [ 'You are loading a STUDY from a previous version of EEGLAB.' 10 ...
