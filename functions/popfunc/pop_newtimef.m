@@ -156,13 +156,17 @@ end
 % pop up window
 % -------------
 if popup
-	[txt vars] = gethelpvar('newtimef.m');
+	[txt, vars] = gethelpvar('newtimef.m');
+    commandchan = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on'', ''selectionmode'', ''single''); set(findobj(gcbf, ''tag'', ''chan''), ''string'',tmpval); clear tmp tmpchanlocs tmpval'; 
 	
     g = [1 0.3 0.6 0.4];
-	geometry = { g g g g g g g g [0.975 1.27] [1] [1.2 1 1.2]};
+    g2 = [1 0.3 0.25 0.75];
+	geometry = { g2 g g g g g g g [0.975 1.27] [1] [1.2 1 1.2]};
     uilist = { ...
                { 'Style', 'text', 'string', fastif(typeproc, 'Channel number', 'Component number'), 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') 'tag' 'chan'} {} {} ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') 'tag' 'chan'} ...
+               { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(~isempty(EEG(1).chanlocs) && typeproc, 'on', 'off') 'callback' commandchan } ...               
+               {} ...
                ...
 			   { 'Style', 'text', 'string', 'Sub epoch time limits [min max] (msec)', 'fontweight', 'bold' } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,4,[],[ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ]) 'tag' 'tlimits' } ...
@@ -214,7 +218,7 @@ if popup
 			%		'as red (+) or blue (-)'] } ...
 			%   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotphase','present',1) } { } ...
 
-	[ tmp1 tmp2 strhalt result ] = inputgui( geometry, uilist, 'pophelp(''pop_newtimef'');', ...
+	[ tmp1, tmp2, strhalt, result ] = inputgui( geometry, uilist, 'pophelp(''pop_newtimef'');', ...
 					   fastif(typeproc, 'Plot channel time frequency -- pop_newtimef()', ...
 							  'Plot component time frequency -- pop_newtimef()'));
 	if length( tmp1 ) == 0 return; end
@@ -222,7 +226,7 @@ if popup
 	if result.fft,      result.cycle = '0'; end
 	if result.nobase,   result.baseline = 'NaN'; end
     
-	num	     = eval( [ '[' result.chan    ']' ] ); 
+    num   = eeg_decodechan(EEG.chanlocs, result.chan );
 	tlimits	 = eval( [ '[' result.tlimits ']' ] ); 
 	cycles	 = eval( [ '[' result.cycle   ']' ] );
     freqs    = eval( [ '[' result.freqs   ']' ] );
@@ -261,8 +265,8 @@ if popup
     if result.ntimesout == 3,        options = [ options ', ''ntimesout'', 150' ];        end
     if result.ntimesout == 5,        options = [ options ', ''ntimesout'', 300' ];        end
     if result.ntimesout == 6,        options = [ options ', ''ntimesout'', 400' ];        end
-    if result.nfreqs == 1,           options = [ options ', ''padratio'', 1' ];           end;    
-    if result.nfreqs == 2,           options = [ options ', ''padratio'', 2' ];           end;    
+    if result.nfreqs == 1,           options = [ options ', ''padratio'', 1' ];           end  
+    if result.nfreqs == 2,           options = [ options ', ''padratio'', 2' ];           end   
     if result.nfreqs == 3,           options = [ options ', ''padratio'', 4' ];           end
     if result.nfreqs == 4,           options = [ options ', ''nfreqs'', ' int2str(length(freqs)) ]; end
     if result.basenorm == 2,         options = [ options ', ''basenorm'', ''on''' ];      end
@@ -295,7 +299,7 @@ end
 % --------------------
 if isempty(tlimits)
 	tlimits = [EEG.xmin, EEG.xmax]*1000;
-end;	
+end
 pointrange1 = round(max((tlimits(1)/1000-EEG.xmin)*EEG.srate, 1));
 pointrange2 = round(min((tlimits(2)/1000-EEG.xmin)*EEG.srate+1, EEG.pnts));
 pointrange = [pointrange1:pointrange2];

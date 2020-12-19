@@ -80,15 +80,30 @@ end
 if typecomp == 0 && isempty(EEG.icaweights)
    error('No ICA weights recorded for this dataset -- first run ICA on it');
 end
+chanoristr = '';
 if nargin == 2
-	promptstr    = { fastif(typecomp,'Channel index(ices) to plot:','Component index(ices) to plot:') ...
-                     'Spectral options (see spectopo() help):' };
-	inistr       = { '1' '''freqrange'', [2 50]' };
-	result       = inputdlg2( promptstr, 'Component properties - pop_prop()', 1,  inistr, 'pop_prop');
+    commandchan = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on'', ''selectionmode'', ''single''); set(findobj(gcbf, ''tag'', ''chan''), ''string'',tmpval); clear tmp tmpchanlocs tmpval'; 
+    
+    uitext = { { 'style' 'text' 'string' fastif(typecomp,'Channel index(ices) to plot:','Component index(ices) to plot:') } ...
+               { 'style' 'edit' 'string' '1', 'tag', 'chan' } ...
+               { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(~isempty(EEG(1).chanlocs) && typecomp, 'on', 'off') 'callback' commandchan } ...               
+               { 'style' 'text' 'string' 'Spectral options (see spectopo() help):' } ...
+               { 'style' 'edit' 'string' '''freqrange'', [2 50]' } {} };
+    uigeom = { [2 1 0.5 ] [2 1 0.5] };
+    result = inputgui('geometry', uigeom, 'uilist', uitext, 'helpcom', 'pophelp(''pop_prop'');', ...
+							 'title', fastif( typecomp, 'Channel properties - pop_prop()', 'Component properties - pop_prop()'));
 	if size( result, 1 ) == 0 return; end
    
-	chanorcomp   = eval( [ '[' result{1} ']' ] );
+    chanoristr = result{1};
+    chanorcomp   = eeg_decodechan(EEG.chanlocs, result{1} );
     spec_opt     = eval( [ '{' result{2} '}' ] );
+end
+
+if ischar(chanorcomp)
+    chanoristr = chanorcomp;
+    chanorcomp = eeg_decodechan(EEG.chanlocs, chanorcomp );
+elseif isempty(chanoristr)
+    chanoristr = int2str(chanorcomp);
 end
 
 % plotting several component properties
@@ -122,7 +137,7 @@ catch
 	BACKCOLOR = [0.8 0.8 0.8];
 	GUIBUTTONCOLOR   = [0.8 0.8 0.8]; 
 end
-basename = [fastif(typecomp,'Channel ', 'Component ') int2str(chanorcomp) ];
+basename = [fastif(typecomp,'Channel ', 'Component ') chanoristr ];
 
 fhandle = figure('name', ['pop_prop() - ' basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
 pos     = get(fhandle,'Position');
@@ -150,7 +165,7 @@ if isfield(EEG.chanlocs, 'theta')
 else
     axis(h,'off');
 end
-basename = [fastif(typecomp,'Channel ', 'IC') int2str(chanorcomp) ];
+basename = [fastif(typecomp,'Channel ', 'IC') chanoristr ];
 % title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
 title(basename, 'fontsize', 14);
 
