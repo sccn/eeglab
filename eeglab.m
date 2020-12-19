@@ -814,7 +814,7 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     eegmenu( versL,  rej_m2, 'Label', 'Export marks to data reject'            , 'userdata', onepoch, 'CallBack', cb_rejsup3, 'separator', 'on');
     eegmenu( versL,  rej_m2, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
 
-    eegmenu( false,  tools_m, 'Label', 'Remove components from data'           , 'userdata', onstudynoroi, 'CallBack', cb_subcomp );
+    eegmenu( false,  tools_m, 'Label', 'Remove components from data'           , 'userdata', ondatastudy, 'CallBack', cb_subcomp );
     eegmenu( false,  tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondatastudy , 'CallBack', cb_epoch, 'Separator', 'on');
     eegmenu( false,  tools_m, 'Label', 'Remove epoch baseline'                 , 'userdata', ondatastudy , 'CallBack', cb_rmbase);
 
@@ -833,6 +833,7 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     eegmenu( false,  topo_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot1);
     eegmenu( false,  topo_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot1);
     eegmenu( versL,  plot_m, 'Label', 'Sum/Compare ERPs'                       , 'userdata', onepoch, 'CallBack', cb_comperp1);
+    eegmenu(~versL,  plot_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
 
     eegmenu( false,  plot_m, 'Label', 'Component activations (scroll)'         , 'userdata', ondata     , 'CallBack', cb_eegplot2,'Separator', 'on');
     eegmenu( false,  plot_m, 'Label', 'Component spectra and maps'             , 'userdata', ondatanoroi, 'CallBack', cb_spectopo2);
@@ -847,18 +848,19 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     eegmenu( false,  ERPC_m, 'Label', 'With component maps'                    , 'userdata', onepochnoroi, 'CallBack', cb_envtopo1);
     eegmenu( false,  ERPC_m, 'Label', 'With comp. maps (compare)'              , 'userdata', onepochnoroi, 'CallBack', cb_envtopo2);
     eegmenu( false,  ERPC_m, 'Label', 'In rectangular array'                   , 'userdata', onepoch      , 'CallBack', cb_plotdata2);
-    eegmenu( false,  plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'userdata', onepochnoroi, 'userdata', onepoch, 'CallBack', cb_comperp2);
+    eegmenu( versL,  plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'userdata', onepochnoroi, 'userdata', onepoch, 'CallBack', cb_comperp2);
 
     stat_m = eegmenu( versL,  plot_m, 'Label', 'Data statistics', 'Separator', 'on', 'userdata', ondata );
     eegmenu( versL,  stat_m, 'Label', 'Channel statistics'                     , 'CallBack', cb_signalstat1);
     eegmenu( versL,  stat_m, 'Label', 'Component statistics'                   , 'CallBack', cb_signalstat2);
     eegmenu( versL,  stat_m, 'Label', 'Event statistics'                       , 'CallBack', cb_eventstat);
 
-    spec_m = eegmenu( false,  plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
-    eegmenu( false,  spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
-    eegmenu( false,  spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
-    eegmenu( false,  spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
-    eegmenu( false,  spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
+    spec_m = eegmenu( versL,  plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
+    eegmenu( versL,  spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
+    eegmenu( versL,  spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
+    eegmenu( versL,  spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
+    eegmenu( versL,  spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
+    eegmenu(~versL,  plot_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2);     
 
     eegmenu( false,  std_m,  'Label', 'Edit study info'                        , 'userdata', onstudy, 'CallBack', cb_study3);
     eegmenu( false,  std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
