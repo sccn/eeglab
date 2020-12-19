@@ -174,7 +174,7 @@ if nargin < 2 || plotag ~= 0
 
     ButtonName = 'continue';
     while ~strcmpi(ButtonName, 'Cancel') & ~strcmpi(ButtonName, 'Accept')
-        ButtonName=questdlg2( [ 'Please confirm. Are you sure you want to remove these components?' ], ...
+        ButtonName=questdlg2( [ 'Please confirm your choice. Are you sure you want to remove the selected components from the data?' ], ...
                              'Confirmation', 'Cancel', 'Plot ERPs', 'Plot single trials', 'Accept', 'Accept');
         if strcmpi(ButtonName, 'Plot ERPs')
             if EEG.trials > 1
