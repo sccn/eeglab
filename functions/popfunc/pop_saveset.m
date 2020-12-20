@@ -16,7 +16,7 @@
 %                in the dataset; 'onefile' saves the full EEG 
 %                structure in a Matlab '.set' file, 'twofiles' saves 
 %                the structure without the data in a Matlab '.set' file
-%                and the transposed data in a binary float '.dat' file.
+%                and the transposed data in a binary float '.fdt' file.
 %                By default the option from the eeg_options.m file is 
 %                used.
 %   'version' - ['6'|'7.3'] save Matlab file as version 6 or
@@ -175,10 +175,29 @@ data_on_disk     = 0;
 if strcmpi(g.savemode, 'resave')
     % process multiple datasets
     % -------------------------
+    
+    % check if called from EEGLAB
+    % if this is not the case, resave the file anyway
+    calledFromEEGLABFlag = true;
+    try
+        db = dbstack;
+        eeglabp = fileparts(which('eeglab.m'));
+        if length(db) > 1
+            if ~contains(which(db(2).file), eeglabp)
+                calledFromEEGLABFlag = false;
+            end
+        end
+    catch
+    end
+    
     if length(EEG) > 1
         for index = 1:length(EEG)
-            pop_saveset(EEG(index), 'savemode', 'resave');
-            EEG(index).saved = 'yes';
+            if strcmpi( EEG(index).saved, 'yes') && calledFromEEGLABFlag
+                disp('Dataset has not been modified; No need to resave it.'); 
+            else
+                pop_saveset(EEG(index), 'savemode', 'resave');
+                EEG(index).saved = 'yes';
+            end
         end
         if nargout > 1
             com = sprintf('EEG = pop_saveset( EEG, %s);', vararg2str(options));
@@ -186,7 +205,10 @@ if strcmpi(g.savemode, 'resave')
         return;
     end
     
-    if strcmpi( EEG.saved, 'yes'), disp('Dataset has not been modified; No need to resave it.'); return; end
+    if strcmpi( EEG.saved, 'yes') && calledFromEEGLABFlag
+        disp('Dataset has not been modified; No need to resave it.'); 
+        return; 
+    end
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
     if isfield(EEG, 'datfile')
