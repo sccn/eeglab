@@ -211,7 +211,7 @@ function m = serialize_cell(v)
         if all(cellfun('isclass',v(:),'char')) && all(all(all(size1 <= 1))) % #ok<AND2>
             % all horizontal strings or proper empty strings            
             m = [uint8(36); serialize_string([v{:}]); serialize_numeric_simple(uint32(size2)); serialize_logical(size1(:)==0)];
-        elseif all(all(all(size1+size2 == 0))) && (dims == 2) % #ok<AND2>
+        elseif all(all(all(size1+size2 == 0))) && all(dims == 2) % #ok<AND2>
             % all empty and non-degenerate elements
             if all(cellfun('isclass',v(:),'double')) || all(cellfun('isclass',v(:),'cell')) || all(cellfun('isclass',v(:),'struct'))
                 % of standard data types: Tag, Type Tag, #Dims, Dims
