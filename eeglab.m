@@ -1402,7 +1402,7 @@ warning off;
 clear functions;
 warning(tmp);
 eeglab_options;
-if isempty(ALLEEG) && ~isempty(EEG) && ~isempty(EEG.data)
+if isempty(ALLEEG) && ~isempty(EEG) && all(arrayfun(@(eeg) ~isempty(eeg.data), EEG))
     ALLEEG = EEG;
 end
 
