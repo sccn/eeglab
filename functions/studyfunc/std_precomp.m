@@ -255,53 +255,7 @@ if ~isempty(g.customfunc)
         end
     end
 end
-% 
-%     
-%     
-%     allSubjects = { STUDY.datasetinfo.subject };
-%     uniqueSubjects = unique(allSubjects);
-%     allLocs = eeg_mergelocs(ALLEEG.chanlocs);
-%     for iSubj = 1:length(uniqueSubjects)
-%         inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
-%         inds2 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
-%         inds = intersect(inds1, inds2);
-%         filepath = STUDY.datasetinfo(inds(1)).filepath;
-%         filebase = fullfile(filepath, uniqueSubjects{iSubj});
-%         trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
-%         
-%         addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo };
-%         if strcmpi(computewhat, 'channels')
-%             TMP = pop_mergeset(ALLEEG(inds), [1:length(inds)], 1);
-%             [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g); %'channel', tmpchanlist,
-%             [X,boundaries]  = eeg_getdatact(TMP, 'rmcomps', getclustcomps(STUDY, g.rmclust, inds(1)), opts{:});
-%             
-%             % select channsles
-%             TMP.chanlocs = allLocs;
-%             inds = std_chaninds(TMP, chanlist);
-%             X = X(inds,:,:);
-%             TMP.chanlocs = TMP.chanlocs(inds);
-%             
-%             % remove ICA comp if some channels are removed
-%             if length(inds) < length(allLocs) 
-%                 TMP.icaweights = [];
-%                 TMP.icasphere  = [];
-%                 TMP.icawinv    = [];
-%             end
-%             TMP.data = X;
-%             TMP.nbchan = size(X,1);
-%             TMP.icaact     = [];
-%             TMP = eeg_checkset(TMP);
-%             tmpData = feval(g.customfunc, TMP, g.customparams{:});
-%         else
-%             if length(inds)>1 && ~isequal(chanlist{inds})
-%                 error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
-%             end
-%             tmpData = feval(g.customfunc, ALLEEG(inds), 'components', chanlist{inds(1)}, opts{:}, addopts{:}, g.customparams{:});
-%         end
-%         customRes{iSubj} = tmpData;
-%     end
-% end
-    
+   
 % compute ERPs
 % ------------
 if strcmpi(g.erp, 'on')
