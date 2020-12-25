@@ -88,7 +88,7 @@ STUDY = pop_erspparams(STUDY, 'default');
     'clusters'      'integer' []             [];
     'timerange'     'real'    []             [];
     'freqrange'     'real'    []             [];
-    'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' 'erpim' } 'erp';
+    'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' 'erpim' 'custom' } 'erp';
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
@@ -237,6 +237,8 @@ for iSubj = 1:length(subjectList)
                 [dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}] = processerpim(dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}, xvals, params);
             end
             yvals = 1:size(dataTmp{iSubj}{1},1);
+        elseif strcmpi(opt.datatype, 'custom')
+            disp('Nothing to do for custom data');
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
         end
