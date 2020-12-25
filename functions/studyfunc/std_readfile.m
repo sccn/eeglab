@@ -226,7 +226,8 @@ if ~isempty( strmatch('parameters', fileFields) )
 end
 if ~isempty(strmatch('times', fileFields, 'exact')),  measureRange1 = fileData.times; end
 if ~isempty(strmatch('freqs', fileFields, 'exact')),  measureRange2 = fileData.freqs; end
-
+if isempty(measureRange1) && isfield(fileData, 'chan1'), measureRange1 = 1:size(fileData.chan1,1); end
+    
 % if the function is only called to get parameters
 % ------------------------------------------------
 if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; opt.timelimits = opt.freqlimits; end
@@ -402,6 +403,9 @@ end
 function v6 = testv6(x)
 
 fid=fopen(x);
+if fid == -1
+    error('File %s not found', x);
+end
 txt=char(fread(fid,[1,140],'*char'));
 tmp = fclose(fid);
 txt=[txt,char(0)];
