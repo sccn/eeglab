@@ -678,12 +678,14 @@ if isempty( options )
     else
         tmptopo = '';
     end
-    fields = fieldnames(opt);
-    values = struct2cell(opt);
-    params = { fields{:}; values{:} };
-    options = [ ',' vararg2str( { params{:} } ) ];
-    tmpind = find( options == '\' ); options(tmpind(1:2:end)) = [];
-    if ~isempty(tmptopo), options = [ options ',''topo'',' tmptopo ]; end
+    if ~isempty(opt)
+        fields = fieldnames(opt);
+        values = struct2cell(opt);
+        params = { fields{:}; values{:} };
+        options = [ ',' vararg2str( { params{:} } ) ];
+        tmpind = find( options == '\' ); options(tmpind(1:2:end)) = [];
+        if ~isempty(tmptopo), options = [ options ',''topo'',' tmptopo ]; end
+    end
 end
 
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
