@@ -1,12 +1,12 @@
-% std_spec() - Returns the ICA component spectra for a dataset. Updates the EEG structure 
+% std_spec() - Returns the data or ICA component spectra for a dataset. Updates the EEG structure 
 %              in the Matlab environment and in the .set file as well. Saves the spectra 
 %              in a file.
 % Usage:    
 %           >> [spec freqs] = std_spec(EEG, 'key', 'val', ...);
 %
-%              Computes the mean spectra of the activites of specified components of the 
-%              supplied dataset. The spectra are saved in a Matlab file. If such a file 
-%              already exists, loads the spectral information from this file.  
+%              Computes the mean spectra of the data channels or activites of specified 
+%              components of the supplied dataset. The spectra are saved in a Matlab file. 
+%              If such a file already exists, loads the spectral information from this file.  
 %              Options (below) specify which components to use, and the desired frequency 
 %              range. There is also an option to specify other spectopo() input variables 
 %              (see >> help spectopo for details).
