@@ -1540,27 +1540,16 @@ end
 % test if dataset has changed
 % ---------------------------
 if length(EEG) == 1
-    if ~isempty(ALLEEG) && CURRENTSET~= 0 && ~isequal(EEG.data, ALLEEG(CURRENTSET).data) && ~isnan(EEG.data(1))
-        % the above comparison does not work for ome structures
-        %tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
-        %                      'Dataset change detected', ...
-        %                      'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
-        disp('Warning: for some reason, the backup dataset in EEGLAB memory does not');
-        disp('         match the current dataset. The dataset in memory has been overwritten');
-        [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-        eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
-        
-        %if tmpanswer(1) == 'D' % delete changes
-        %    [EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
-        %    eegh('[EEG ALLEEG] = eeg_retrieve( ALLEEG, CURRENTSET);');
-        %elseif tmpanswer(1) == 'K' % keep changes
-        %    [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-        %    eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
-        %else % make new dataset
-        %    [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
-        %    eegh(LASTCOM);
-        %    MAX_SET = max(length( ALLEEG ), length(EEGMENU));
-        %end;
+    if ~isempty(ALLEEG) && CURRENTSET~= 0 &&  ~isequal(EEG.data, ALLEEG(CURRENTSET).data)
+        if exist('isequaln','builtin') ~= 5, isequalfunc = @isequal; else  isequalfunc = @isequaln; end
+        if isequalfunc(EEG.data, ALLEEG(CURRENTSET).data)
+            disp('Warning: Your data contains NaNs.');
+        else
+            disp('Warning: The backup dataset in EEGLAB memory does not match the current dataset.');
+            disp('         The dataset in memory has been overwritten');
+            [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+            eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
+        end
     end
 end
 
