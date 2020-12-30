@@ -73,14 +73,11 @@ for index = 1:length(difffield)
         valempt = mycellfun('isempty', allvalues);
     end
     arraytmpinfo = cell(1,EEG.trials);
+    if ischar(allvalues{1}), arraytmpinfo(:) = {''}; end % preserves uniformity of char or num
     
     % get the field content
     % ---------------------
-    indexevent = find(~valempt);
-    if any(valempt)
-        fprintf(['eeg_uniformepochinfo: found empty values for field ''' difffield{index} ''' for %d epochs\n'], sum(valempt));
-        fprintf(['                      filling with values of other events in the same epochs\n']);
-    end
+    indexevent = find(~valempt); % non empty
     if length(unique(allepochs(indexevent))) > length(allepochs(indexevent))
         msg = 'Duplicate event information detected when uniformizing epoch information';
         if strcmpi(opt.checkepochs, 'warning')
@@ -89,16 +86,20 @@ for index = 1:length(difffield)
             error(msg);
         end
     end
-    if mod(sum(valempt), EEG.trials) ~= 0
-        msg = sprintf('                      note: epochs not uniform (should be multiple of %d epochs)', EEG.trials);
-        disp(msg);
-    end        
     arraytmpinfo(allepochs(indexevent)) = allvalues(indexevent);
 
     % uniformize content for all epochs
     % ---------------------------------
-    indexevent = find(valempt);
+    indexevent = find(valempt); % empty
     tmpevent   = EEG.event;
     [tmpevent(indexevent).(difffield{index})] = arraytmpinfo{allepochs(indexevent)};
-    EEG.event  = tmpevent;
+    if ~isequal(EEG.event, tmpevent) % might be slow?
+        EEG.event  = tmpevent;
+        fprintf(['eeg_uniformepochinfo: found empty values for field ''' difffield{index} ''' for %d epochs\n'], sum(valempt));
+        fprintf(['                      filling with values of other events in the same epochs\n']);
+        if mod(sum(valempt), EEG.trials) ~= 0
+            msg = sprintf('                      note: epochs not uniform (should be multiple of %d epochs)', EEG.trials);
+            disp(msg);
+        end        
+    end    
 end
