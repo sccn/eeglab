@@ -116,7 +116,14 @@ else
         filename = fullfile(g.filepath, g.filename{ifile});
         fprintf('pop_loadset(): loading file %s ...\n', filename);
         %try
-        TMPVAR = load('-mat', filename);
+        if strcmpi(g.loadmode, 'info')
+            TMPVAR = load('-mat', filename, '-regexp', '^((?!data).)*$');
+            if isfield(TMPVAR, 'setname')
+                TMPVAR.data = 'in set file';
+            end
+        else
+            TMPVAR = load('-mat', filename);
+        end
         %catch,
         %    error([ filename ': file is protected or does not exist' ]);
         %end
