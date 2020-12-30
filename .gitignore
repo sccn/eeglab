@@ -1,3 +1,4 @@
 # ignore everything in plugin folders, but keep track of plugin submodules 
 /plugins/*/**
 !/plugins/*
+.DS_Store
