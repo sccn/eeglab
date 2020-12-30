@@ -1,3 +1,6 @@
+function test_compiled_version(varargin)
+global CURRENTSTUDY CURRENTSET ALLEEG EEG STUDY
+
 res = questdlg2('Are you seing the command line outputs?', 'Compiled version', 'No', 'Yes', 'Yes');
 if strcmpi(res, 'No')
     res = questdlg2( [ 'Users need to be able to see command line' 10 ...
@@ -83,23 +86,14 @@ try
     delete('*.daterp');
     delete('eeglab_data.spl');
     
-catch
+catch lasterr
     % show error on command line
-    lasterr
-    l = lasterror
-    for iL = 1:length(l.stack)
-        l.stack(iL)
-    end
-    
-    le  = lasterr;
+    disp(lasterr.getReport())
     warndlg2( [ 'Script failed with error below (see also command line). Fix and try again.' 10 10 ...
-        le ], 'Compiled version');
+        lasterr.message ], 'Compiled version');
     return
 end
 
 warndlg2( [ 'Script run successfully.' ], 'Compiled version');
 
-
-
-    
-    
+end
