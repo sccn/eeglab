@@ -135,36 +135,12 @@ end
 % check for change in saving mode
 % -------------------------------
 if length(EEG) == 1
-    if strcmpi(g.savemode, 'resave') && isfield(EEG, 'datfile') && ~option_savetwofiles
+    if strcmpi(g.savemode, 'resave') && isfield(EEG, 'datfile') && ~isempty(EEG.datfile) && ~option_savetwofiles
         disp('Note that your memory options for saving datasets does not correspond')
         disp('to the format of the datasets on disk (ignoring memory options)')
-% $$$         but = questdlg2(strvcat('This dataset has an associated ''.dat'' file, but since you have', ...
-% $$$                           'changed of saving mode, all the data will now be saved within the', ...
-% $$$                           'Matlab file and the ''.dat'' file will be deleted.', ...
-% $$$                           '(Note: Just press ''No'' if you do not know what you are doing)'), ...
-% $$$                           'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
-% $$$         switch but
-% $$$             case 'Cancel', return;
-% $$$             case 'No, save as before', % nothing
-% $$$             case 'Yes, do it', g.savemode = 'onefile';
-% $$$         end
-% $$$         g.filename = EEG.filename;
-% $$$         g.filepath = EEG.filepath;
     elseif strcmpi(g.savemode, 'resave') && ~isfield(EEG, 'datfile') && option_savetwofiles
         disp('Note that your memory options for saving datasets does not correspond')
         disp('to the format of the datasets on disk (ignoring memory options)')
-% $$$         but = questdlg2(strvcat('This dataset does not have yet an associated ''.dat'' file, but since you have', ...
-% $$$                           'changed of saving mode, all the data will now be saved within the ''.dat''', ...
-% $$$                           'file and not in the Matlab file (as it is currently the case).', ...
-% $$$                           '(Note: Just press ''No'' if you do not know what you are doing)'), ...
-% $$$                           'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
-% $$$         switch but
-% $$$             case 'Cancel', return;
-% $$$             case 'No, save as before', % nothing
-% $$$             case 'Yes, do it', g.savemode = 'twofiles';
-% $$$         end
-% $$$         g.filename = EEG.filename;
-% $$$         g.filepath = EEG.filepath;
     end
 end
 
@@ -262,57 +238,40 @@ try,
             EEG.data = EEG.datfile;
             tmpdata = floatwrite( tmpdata, fullfile(EEG.filepath, EEG.data), 'ieee-le');
         end
-    else
-        if isfield(EEG, 'datfile')
-            if ~isempty(EEG.datfile)
-                if exist(fullfile(EEG.filepath, EEG.datfile))
-                    try, 
-                        delete(fullfile(EEG.filepath, EEG.datfile));
-                        disp('Deleting .dat/.fdt file on disk (all data is within the Matlab file)');
-                    catch, end
-                end
-            end
-            EEG.datfile = [];
-        end
     end
-
+    
+    % reload daata before saving if necessary
+    tmpdata2 = [];
+    if ~option_savetwofiles && ischar(EEG.data)
+        tmpdata2 = EEG.data;
+        EEG.data = eeg_getdatact(EEG);
+        EEG.datfile = [];
+    end
+    
     try
-        if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', 'EEG');
-        else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', 'EEG');
+        if option_saveasstruct
+            if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', '-struct', 'EEG');
+            else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', '-struct', 'EEG');
+            end
+        else
+            if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', 'EEG');
+            else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', 'EEG');
+            end
         end
     catch
         save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
     end
+    
+    % put back the EEG structure field as they were
+    if ~isempty(tmpdata2)
+        EEG.data = tmpdata2;
+    end
+    
     if save_as_dat_file && strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
     end
-    
-    % save ICA activities
-    % -------------------
-%     icafile = fullfile(EEG.filepath, [EEG.filename(1:end-4) '.icafdt' ]);
-%     if isempty(EEG.icaweights) & exist(icafile)
-%         disp('ICA activation file found on disk, but no more ICA activities. Deleting file.');
-%         delete(icafile);
-%     end
-%     if ~option_saveica & exist(icafile)
-%         disp('Options indicate not to save ICA activations. Deleting ICA activation file.');
-%         delete(icafile);
-%     end
-%     if option_saveica & ~isempty(EEG.icaweights)
-%         if ~exist('tmpdata')
-%             TMP = eeg_checkset(EEG, 'loaddata');
-%             tmpdata = TMP.data;
-%         end
-%         if isempty(tmpica)
-%              tmpica2 = (EEG.icaweights*EEG.icasphere)*tmpdata(EEG.icachansind,:);
-%         else tmpica2 = tmpica;
-%         end
-%         tmpica2 = reshape(tmpica2, size(tmpica2,1), size(tmpica2,2)*size(tmpica2,3));
-%         floatwrite( tmpica2, icafile, 'ieee-le');
-%         clear tmpica2;
-%     end
-    
-catch,
+        
+catch
     rethrow(lasterror);
 end
 
@@ -324,6 +283,7 @@ if exist(tmpfilename) == 2
     try,
         delete(tmpfilename);
         disp('Delete sucessfull.');
+        EEG.datfile = [];
     catch, disp('Error while attempting to remove file'); 
     end
 end
@@ -331,9 +291,10 @@ if save_as_dat_file == 0
     tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
     if exist(tmpfilename) == 2
         disp('Old .fdt file detected on disk, deleting file the Matlab file contains all data...');
-        try,
+        try
             delete(tmpfilename);
             disp('Delete sucessfull.');
+            EEG.datfile = [];
         catch, disp('Error while attempting to remove file'); 
         end
     end

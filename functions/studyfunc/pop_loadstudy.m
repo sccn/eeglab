@@ -170,7 +170,7 @@ elseif isfield(STUDY.datasetinfo, 'trialinfo') && isfield(STUDYTMP.datasetinfo, 
 end
 if ~sameTrialInfo
     if isempty(varargin)
-        res = questdlg2([ 'Warning: trial information contained in datasets not consistent' 10 'with STUDY information. Should EEGLAB fix the problem?' ], 'STUDY Warning', 'No', 'Yes', 'Yes');
+        res = questdlg2([ 'Warning: trial information contained in datasets not consistent' 10 'with STUDY information. Should EEGLAB overwrite STUDY trial information?' ], 'STUDY Warning', 'No', 'Yes', 'Yes');
         if isequal(res, 'Yes')
             STUDY = STUDYTMP;
         end

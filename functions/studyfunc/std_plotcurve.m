@@ -334,9 +334,9 @@ end
 
 if isempty(opt.ylim)
     if strcmpi(opt.plotsubjects, 'off')
-        opt.ylim = [min(cellfun(@(x)min(min(mean(x,3))), data(:))) max(cellfun(@(x)max(max(mean(x,3))), data(:)))];
+        opt.ylim = [min(cellfun(@(x)single(min(min(mean(x,3)))), data(:))) max(cellfun(@(x)single(max(max(mean(x,3)))), data(:)))];
     else
-        opt.ylim = [min(cellfun(@(x)min(x(:)), data(:))) max(cellfun(@(x)max(x(:)), data(:)))];
+        opt.ylim = [min(cellfun(@(x)single(min(x(:))), data(:))) max(cellfun(@(x)single(max(x(:))), data(:)))];
     end
 end
 
