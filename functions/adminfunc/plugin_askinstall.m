@@ -47,7 +47,7 @@ if nargin < 2 || ~exist(char(pluginFunc))
     
     if ~forceInstall
         db = dbstack;
-        if length(db) > 2 && ~strcmpi(db(end).name, 'checkouteeglab.m')
+        if length(db) > 2 && ~strcmpi(db(end).file, 'checkouteeglab.m')
             error([ 'Cannot find ' pluginName ' extension, use EEGLAB Extension Manager to install it' ]);
         end
 
