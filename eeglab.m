@@ -899,7 +899,9 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
 end
 
 statusconnection = 1;
-if isdeployed
+if isdeployed || ismcc
+%#function pop_reref
+%#function netICL.mat netICL_beta.mat netICL_lite.mat pop_icflag
     disp('Loading plugins');
     funcname = { ...
                  @eegplugin_eepimport ...
