@@ -1,4 +1,5 @@
 # ignore everything in plugin folders, but keep track of plugin submodules 
 /plugins/*/**
 !/plugins/*
+/plugins/mffmatlabio
 .DS_Store
