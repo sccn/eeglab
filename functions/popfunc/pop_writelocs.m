@@ -76,9 +76,11 @@ formatskip = [ chanformat(indformat).skipline ];
    
 %[listtype formatinfo listcolformat formatskip] = readlocs('getinfoswrite');
 
-listtype{end+1} = 'custom';
-formatinfo{end+1} = {};
-formatskip = [ formatskip 0];
+% GUI support of `custom` filetype, removed until `custom` can pass readlocs() check
+%listtype{end+1} = 'custom';
+%formatinfo{end+1} = {};
+%formatskip = [ formatskip 0];
+
 
 if nargin < 2
    updatefields = [ 'tmpdata = get(gcf, ''userdata'');' ...
