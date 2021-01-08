@@ -39,8 +39,12 @@ if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end
 % retreiving statistics
 try
     disp( [ 'Retreiving download statistics...' ] );
-    [stats, status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki.php');
-    stats = textscan(stats, '%s%d%s%s%f%d%s%s%s%s%s%f', 'delimiter', char(9));
+    if exist('OCTAVE_VERSION', 'builtin') == 0
+        [stats, status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki.php');
+    else
+        [stats, status] = urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki.php');
+    end
+    stats = textscan(stats, '%s%d%s%s%f%d%s%s%s%s%s%s', 'delimiter', char(9));
     if length(unique(cellfun(@length, stats))) > 1
         disp('Issue with retrieving statistics for extensions');
         return;
@@ -77,7 +81,7 @@ for iRow = 1:length(stats{1})
     plugin(iRow).contactname  = stats{9}{iRow};
     plugin(iRow).contactemail = stats{10}{iRow};
     plugin(iRow).webdoc    = stats{11}{iRow};
-    plugin(iRow).size      = stats{12}(iRow);
+    plugin(iRow).size      =  sscanf(stats{12}{iRow}, '%f'); % Only numeric part is taken, possible KB or MB additions are ignored
     plugin(iRow).webrating = [ 'https://sccn.ucsd.edu/eeglab/plugin_uploader/simplestar.php?plugin=' plugin(iRow).name '&version=' plugin(iRow).version ];
     
     % match with existiting plugins
