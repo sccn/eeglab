@@ -974,12 +974,12 @@ else
             if ~strcmpi(dircontent(index).name, '.') && ~strcmpi(dircontent(index).name, '..')
                 tmpdir = dir(fullfile(dircontent(index).folder, dircontent(index).name, 'eegplugin*.m'));
                 
-                addpathifnotinlist(fullfile(dircontent(index).folder, dircontent(index).name));
-                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name);
                 if ~isempty(tmpdir)
                     %myaddpath(eeglabpath, tmpdir(1).name, newpath);
                     funcname = tmpdir(1).name(1:end-2);
                 end
+                addpathifnotinlist(fullfile(dircontent(index).folder, dircontent(index).name));
+                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name, funcname(11:end));
                 
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
@@ -2054,7 +2054,7 @@ function myaddpath(eeglabpath, functionname, pathtoadd)
     
 % parse plugin function name
 % --------------------------
-function [name, vers] = parsepluginname(dirName)
+function [name, vers] = parsepluginname(dirName, funcname)
     ind = find( dirName >= '0' & dirName <= '9' );
     if isempty(ind)
         name = dirName;
@@ -2066,9 +2066,25 @@ function [name, vers] = parsepluginname(dirName)
         end
         name = dirName(1:ind);
         vers = dirName(ind+1:end);
-        vers(find(vers == '_')) = '.';
+        vers(vers == '_') = '.';
+        if ~isempty(vers)
+            if vers(1) == '.', vers(1) = []; end
+        end
     end
-
+    
+    % check with function name and change version if necessary (for loadhdf5)
+    if nargin > 1 && contains(dirName, funcname)
+        name1 = funcname;
+        vers2 = dirName(length(funcname)+1:end);
+        if ~isempty(vers2)
+            vers2(vers2 == '_') = '.';
+            if ~isequal(vers, vers2) ... % differebt versions
+                && (vers2(1) >= '0' && vers2(1) <= '9') % version 2 is numerical
+                vers = vers2;
+            end
+        end
+    end
+    
 % required here because path not added yet
 % to the admin folder
 function res = ismatlab
