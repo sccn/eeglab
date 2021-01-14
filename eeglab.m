@@ -557,7 +557,6 @@ cb_plugin      = [ nocheck 'if plugin_menu(PLUGINLIST) , close(findobj(''tag'', 
 cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
 cb_runsc       = [ nocheck 'LASTCOM = pop_runscript;'          e_hist   ];
-cb_testc       = 'test_compiled_version;';
 cb_quit        = [ 'close(gcf); disp(''To save the EEGLAB command history  >> pop_saveh(ALLCOM);'');' ...
                    'clear global EEG ALLEEG LASTCOM CURRENTSET;'];
 
@@ -756,7 +755,7 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     eegmenu( false,  hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
     eegmenu( false,  hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);
     if isdeployed
-        eegmenu( false,  hist_m, 'Label', 'Test compiled version'              , 'userdata', on         , 'CallBack', cb_testc);
+        eegmenu( false,  hist_m, 'Label', 'Test compiled version'              , 'userdata', on         , 'CallBack', @test_compiled_version);
     end
 
     if ~isdeployed
@@ -900,28 +899,39 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
 end
 
 statusconnection = 1;
-if isdeployed
-    funcname = {  'eegplugin_eepimport' ...
-                  'eegplugin_bva_io' ...
-                  'eegplugin_clean_rawdata' ...                  
-                  'eegplugin_dipfit' ...
-                  'eegplugin_egilegacy' ...
-                  'eegplugin_firfilt' ...
-                  'eegplugin_iclabel' ...
-                  'eegplugin_mffmatlabio' ...
-                  'eegplugin_musemonitor' ...
-                  'eegplugin_neuroscanio' ...
-                  'eegplugin_xdfimport' ...
-                  'eegplugin_iirfilt' ...
-                  'eegplugin_VisEd' ...
-                    };
+if isdeployed || ismcc
+%#function pop_reref
+%#function netICL.mat netICL_beta.mat netICL_lite.mat pop_icflag
+    disp('Loading plugins');
+    funcname = { ...
+                 @eegplugin_eepimport ...
+                 @eegplugin_bva_io, ...
+                 @eegplugin_clean_rawdata, ...
+                 @eegplugin_dipfit, ...
+                 @eegplugin_egilegacy, ...
+                 @eegplugin_firfilt, ...
+                 @eegplugin_iclabel, ...
+                 @eegplugin_mffmatlabio, ...
+                 @eegplugin_musemonitor, ...
+                 @eegplugin_neuroscanio, ...
+                 @eegplugin_xdfimport, ...
+                 @eegplugin_iirfilt, ...
+                 @eegplugin_VisEd, ...
+               };
     for indf = 1:length(funcname)
-        try 
-            vers = feval(funcname{indf}, gcf, trystrs, catchstrs);
-            disp(['EEGLAB: adding "' vers '" plugin' ]);  
-        catch
-            feval(funcname{indf}, gcf, trystrs, catchstrs);
-            disp(['EEGLAB: adding plugin function "' funcname{indf} '"' ]);   
+        pluginfun = funcname{indf};
+        pluginname = func2str(pluginfun);
+        try
+            outargs = nargout(pluginfun);
+            if outargs == 1
+                vers = feval(pluginfun, gcf, trystrs, catchstrs);
+                disp(['EEGLAB: adding "' vers '" plugin' ]);
+            else
+                feval(funcname{indf}, gcf, trystrs, catchstrs);
+                disp(['EEGLAB: adding plugin function "' pluginname '"' ]);
+            end
+        catch e
+            disp(['EEGLAB: Could not load "' pluginname '": ' e.message]);
         end
     end
 else    
@@ -974,12 +984,12 @@ else
             if ~strcmpi(dircontent(index).name, '.') && ~strcmpi(dircontent(index).name, '..')
                 tmpdir = dir(fullfile(dircontent(index).folder, dircontent(index).name, 'eegplugin*.m'));
                 
-                addpathifnotinlist(fullfile(dircontent(index).folder, dircontent(index).name));
-                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name);
                 if ~isempty(tmpdir)
                     %myaddpath(eeglabpath, tmpdir(1).name, newpath);
                     funcname = tmpdir(1).name(1:end-2);
                 end
+                addpathifnotinlist(fullfile(dircontent(index).folder, dircontent(index).name));
+                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name, funcname(11:end));
                 
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
@@ -2054,7 +2064,7 @@ function myaddpath(eeglabpath, functionname, pathtoadd)
     
 % parse plugin function name
 % --------------------------
-function [name, vers] = parsepluginname(dirName)
+function [name, vers] = parsepluginname(dirName, funcname)
     ind = find( dirName >= '0' & dirName <= '9' );
     if isempty(ind)
         name = dirName;
@@ -2066,9 +2076,25 @@ function [name, vers] = parsepluginname(dirName)
         end
         name = dirName(1:ind);
         vers = dirName(ind+1:end);
-        vers(find(vers == '_')) = '.';
+        vers(vers == '_') = '.';
+        if ~isempty(vers)
+            if vers(1) == '.', vers(1) = []; end
+        end
     end
-
+    
+    % check with function name and change version if necessary (for loadhdf5)
+    if nargin > 1 && contains(dirName, funcname)
+        name1 = funcname;
+        vers2 = dirName(length(funcname)+1:end);
+        if ~isempty(vers2)
+            vers2(vers2 == '_') = '.';
+            if ~isequal(vers, vers2) ... % differebt versions
+                && (vers2(1) >= '0' && vers2(1) <= '9') % version 2 is numerical
+                vers = vers2;
+            end
+        end
+    end
+    
 % required here because path not added yet
 % to the admin folder
 function res = ismatlab

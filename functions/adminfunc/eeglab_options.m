@@ -40,8 +40,8 @@ try
     %clear eeg_options; % note: we instead clear this function handle in pop_editoptions()
     
     eeg_optionsbackup;
-    if iseeglabdeployed
-        fileName = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_options.txt');
+    if isdeployed || ismcc
+        fileName = which('eeg_options.txt');
         
         com2 = readtxtfile(fileName);
         eval( com2 );

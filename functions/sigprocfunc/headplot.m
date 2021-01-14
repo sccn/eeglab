@@ -830,19 +830,21 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
 % get mesh information
 % --------------------
 function [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(meshfile);
+%#function mheadnew.mat
+meshpath = fileparts(which('mheadnew.mat'));
 if isdeployed
-    addpath( fullfile( ctfroot, 'EEGLAB', 'functions', 'supportfiles') );
+    addpath( meshpath );
 end
         
 if ~isstruct(meshfile)
-    if ~exist(meshfile)
+    if ~exist(meshfile, 'file')
         if isdeployed
-            meshfile = fullfile( ctfroot, 'EEGLAB', 'functions', 'supportfiles', meshfile);
-            if ~exist(meshfile)
-                error(sprintf('headplot(): deployed mesh file "%s" not found\n',meshfile));
+            meshfile = fullfile( meshpath, meshfile);
+            if ~exist(meshfile, 'file')
+                error('headplot(): deployed mesh file "%s" not found\n', meshfile);
             end
         else
-            error(sprintf('headplot(): mesh file "%s" not found\n',meshfile));
+            error('headplot(): mesh file "%s" not found\n', meshfile);
         end
     end
     fprintf('Loaded mesh file %s\n',meshfile);

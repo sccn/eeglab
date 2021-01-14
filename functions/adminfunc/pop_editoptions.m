@@ -96,9 +96,9 @@ end
 % parse the eeg_options file
 % ----------------------------
 eeglab_options;
-if iseeglabdeployed
-    filename = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_options.txt');
-    eegoptionbackup = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_optionsbackup.txt');
+if isdeployed || ismcc
+    filename = which('eeg_options.txt');
+    eegoptionbackup = which('eeg_optionsbackup.txt');
 else
     % folder for eeg_options file (also update the eeglab_options)
     if ~isempty(EEGOPTION_PATH)

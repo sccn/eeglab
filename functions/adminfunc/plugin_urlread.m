@@ -36,6 +36,8 @@ if exist('OCTAVE_VERSION', 'builtin') == 0
     com.mathworks.mlwidgets.html.HTMLPrefs.setProxySettings
 end
 
+
+
 % Check number of inputs and outputs.
 if ~ischar(urlChar)
     error('MATLAB:urlread:InvalidInput','The first input, the URL, must be a character array.');
