@@ -150,12 +150,12 @@ if length(EEG) > 1
 end
 
 if isempty(components)
-	if ~isempty(EEG.reject.gcompreject)
-      		components = find(EEG.reject.gcompreject == 1);
-   	else
-        	fprintf('Warning: no components specified, no rejection performed\n');
-         	return;
-   	end
+    if ~isempty(EEG.reject.gcompreject)
+        components = find(EEG.reject.gcompreject == 1);
+    else
+        fprintf('Warning: no components specified, no rejection performed\n');
+        return;
+    end
 else
     if keep_flag == 1; components  = setdiff_bc([1:size(EEG.icaweights,1)], components); end
     if (max(components) > size(EEG.icaweights,1)) || min(components) < 1
@@ -163,7 +163,7 @@ else
     end
 end
 
-fprintf('Computing projection ....\n');
+fprintf('Computing projection and removing %d components ....\n', length(components));
 component_keep = setdiff_bc(1:size(EEG.icaweights,1), components);
 compproj = EEG.icawinv(:, component_keep)*eeg_getdatact(EEG, 'component', component_keep, 'reshape', '2d');
 compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
