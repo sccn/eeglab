@@ -259,6 +259,7 @@ try,
             end
         end
     catch
+        disp('Cannot save in v6 format (Unicode characters?), using default (possible x20 slow down)');
         save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
     end
     
@@ -290,7 +291,7 @@ end
 if save_as_dat_file == 0
     tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
     if exist(tmpfilename) == 2
-        disp('Old .fdt file detected on disk, deleting file the Matlab file contains all data...');
+        disp('Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data');
         try
             delete(tmpfilename);
             disp('Delete sucessfull.');
