@@ -157,8 +157,8 @@ clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
 % ----------------------------------------------------------------------
 
 % INSERT location of ica executable (UNIX ONLY) for binica.m below
+eeglab_p = fileparts(which('eeglab'));
 if ~isdeployed
-    eeglab_p = fileparts(which('eeglab'));
     ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_linux'); 
     tmpComputer = computer;
     if strcmpi(tmpComputer(1:3), 'MAC')
@@ -168,7 +168,7 @@ if ~isdeployed
     end
     clear tmpComputer
 else
-    ICABINARY = fullfile(ctfroot, 'EEGLAB', 'functions', 'supportfiles', 'ica_linux');
+    ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_linux');
 end
 
 try
