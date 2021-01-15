@@ -176,9 +176,9 @@ end
 % Detecting type of analysis
 % -------------------------------------------------------------------------
 model.defaults.datatype = opt.measureori(4:end);
-if contains(Analysis,'dat')
+if ~isempty(strfind(Analysis,'dat'))
     model.defaults.type = 'Channels';
-elseif contains(Analysis,'ica')
+elseif  ~isempty(strfind(Analysis,'ica'))
     [STUDY,flags]=std_checkdatasession(STUDY,ALLEEG);
     if sum(flags)>0
         error('some subjects have data from different sessions - can''t do ICA');
@@ -228,6 +228,7 @@ if skip_chanlocs == 0
 end
 
 if chanloc_created
+    % contains will not work in Octave
     if isempty(contains(STUDY.filepath,'derivatives'))
         if ~exist([STUDY.filepath filesep 'derivatives'],'dir')
             mkdir([STUDY.filepath filesep 'derivatives']);
@@ -383,6 +384,7 @@ for s = 1:nb_subjects
     OUTEEG.etc.datafiles.icaitc   = [];
 
     % Filling fields
+    % contains will not work in Octave
     single_trials_filename = fullfile(STUDY.datasetinfo(index(1)).filepath,  [STUDY.datasetinfo(index(1)).subject '.' FN{find(contains(FN,opt.measureori))}]);
     if exist(single_trials_filename,'file') 
         if strcmpi(measureflags.daterp,'on')

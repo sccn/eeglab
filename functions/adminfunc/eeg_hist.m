@@ -48,7 +48,7 @@ if ~isfield(EEG, 'history')
     EEG.history = '';
 end
 
-if ~isempty(command) &&  ~contains(command, 'pop_loadset')
+if ~isempty(command) &&  isempty(strfind(command, 'pop_loadset'))
     try
         EEG.history = [ EEG.history 10 command ];
     catch

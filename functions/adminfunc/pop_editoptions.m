@@ -96,7 +96,7 @@ end
 % parse the eeg_options file
 % ----------------------------
 eeglab_options;
-if isdeployed || ismcc
+if isdeployed || (exist('ismcc') && ismcc)
     filename = which('eeg_options.txt');
     eegoptionbackup = which('eeg_optionsbackup.txt');
 else
