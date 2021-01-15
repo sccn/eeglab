@@ -124,7 +124,7 @@ else
     optionsplot = options;
 end
 
-if ~contains(optionsplot,'figure')
+if isempty(strfind(optionsplot,'figure'))
 	fig = figure('Units', 'normalized','PaperPositionMode','auto','InvertHardcopy','off');
     if ~isnumeric(fig), fig = fig.Number; end
     optionsplot = [ options ', ''figure'',' int2str(fig) ];

@@ -40,7 +40,7 @@ try
     %clear eeg_options; % note: we instead clear this function handle in pop_editoptions()
     
     eeg_optionsbackup;
-    if isdeployed || ismcc
+    if isdeployed || (exist('ismcc') && ismcc)
         fileName = which('eeg_options.txt');
         
         com2 = readtxtfile(fileName);
