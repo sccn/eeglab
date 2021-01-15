@@ -10,3 +10,6 @@
 [submodule "plugins/ICLabel"]
 	path = plugins/ICLabel
 	url = https://github.com/sccn/ICLabel
+[submodule "tutorial_scripts"]
+	path = tutorial_scripts
+	url = https://github.com/sccn/eeglab_tutorial_scripts.git
