@@ -77,7 +77,15 @@ end
 if nargin < 3
 	plotag = 0;
 end
-if nargin == 4 && ismember(keepcomp,[1 0]); keep_flag = keepcomp; if isempty(plotag) plotag = 0; end;  else keep_flag = 0; end
+if nargin < 4
+    keepcomp = 0;
+end
+if nargin == 4 && ismember(keepcomp,[1 0])
+    keep_flag = keepcomp; 
+    if isempty(plotag) plotag = 0; end
+else
+    keep_flag = 0;
+end
 
 if nargin < 2
     components = [];
