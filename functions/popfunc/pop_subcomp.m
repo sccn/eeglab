@@ -67,7 +67,7 @@
 % 01-25-02 reformated help & license -ad 
 % 02-15-02 propagate ica weight matrix -ad sm jorn 
 
-function [EEG, com] = pop_subcomp( EEG, components, plotag, keepcomp)
+function [EEG, com] = pop_subcomp( EEG, components, plotag, keepflag)
 
 com='';
 if nargin < 1
@@ -78,13 +78,7 @@ if nargin < 3
 	plotag = 0;
 end
 if nargin < 4
-    keepcomp = 0;
-end
-if nargin == 4 && ismember(keepcomp,[1 0])
-    keep_flag = keepcomp; 
-    if isempty(plotag) plotag = 0; end
-else
-    keep_flag = 0;
+    keepflag = 0;
 end
 
 if nargin < 2
@@ -136,9 +130,9 @@ if nargin < 2
                                          'title', 'Remove components from data -- pop_subcomp()');
         if length(result) == 0 return; end
         components   = eval( [ '[' result{1} ']' ] );
-        if ~isempty(result{2}), 
+        if ~isempty(result{2})
             components   = eval( [ '[' result{2} ']' ] );
-            keep_flag = 1; %components  = setdiff_bc([1:size(EEG.icaweights,1)], components); 
+            keepflag = 1; %components  = setdiff_bc([1:size(EEG.icaweights,1)], components); 
         end
     end
 end
@@ -147,9 +141,9 @@ end
 % -------------------------
 if length(EEG) > 1
     if nargin < 2
-        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'warning', 'on', 'params', { components } );
+        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'params', { components, plotag, keepflag }, 'warning', 'on' );
     else
-        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'params', { components, plotag, keepcomp } );
+        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'params', { components, plotag, keepflag } );
     end
     if isempty( components )
         com = [ com ' % [] or '' means removing components flaged for rejection' ];
@@ -165,7 +159,7 @@ if isempty(components)
         return;
     end
 else
-    if keep_flag == 1; components  = setdiff_bc([1:size(EEG.icaweights,1)], components); end
+    if keepflag == 1; components  = setdiff_bc([1:size(EEG.icaweights,1)], components); end
     if (max(components) > size(EEG.icaweights,1)) || min(components) < 1
         error('Component index out of range');
     end
@@ -181,7 +175,7 @@ compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
 if nargin < 2 || plotag ~= 0
 
     ButtonName = 'continue';
-    while ~strcmpi(ButtonName, 'Cancel') & ~strcmpi(ButtonName, 'Accept')
+    while ~strcmpi(ButtonName, 'Cancel') && ~strcmpi(ButtonName, 'Accept')
         ButtonName=questdlg2( [ 'Please confirm your choice. Are you sure you want to remove the selected components from the data?' ], ...
                              'Confirmation', 'Cancel', 'Plot ERPs', 'Plot single trials', 'Accept', 'Accept');
         if strcmpi(ButtonName, 'Plot ERPs')
@@ -197,12 +191,12 @@ if nargin < 2 || plotag ~= 0
         	eegplot( EEG.data(EEG.icachansind,:,:), 'srate', EEG.srate, 'title', 'Black = channel before rejection; red = after rejection -- eegplot()', ...
             	 'limits', [EEG.xmin EEG.xmax]*1000, 'data2', compproj); 
         end
-    end;    
-    switch ButtonName,
-        case 'Cancel', 
+    end
+    switch ButtonName
+        case 'Cancel'
         	disp('Operation cancelled');
         	return; 
-        case 'Accept',
+        case 'Accept'
        		disp('Components removed');
     end % switch
 end
@@ -226,7 +220,7 @@ if isfield(EEG.etc, 'ic_classification')
     end
 end
 
-try,
+try
     EEG.dipfit.model = EEG.dipfit.model(goodinds);
 catch, end
 
