@@ -150,21 +150,23 @@ optionsToShow = {
     'option_cachesize' };
 
 % remove advanced options if necessary
-if ~option_showadvanced
-    % remove options 
-    for iOpt = length(opt):-1:1
-        if ~isempty(opt(iOpt).varname) && ~ismember(opt(iOpt).varname, optionsToShow)
-            opt(iOpt) = [];
+if isempty(varargin)
+    if ~option_showadvanced
+        % remove options 
+        for iOpt = length(opt):-1:1
+            if ~isempty(opt(iOpt).varname) && ~ismember(opt(iOpt).varname, optionsToShow)
+                opt(iOpt) = [];
+            end
         end
-    end
-    % remove header not serving any option
-    for iOpt = length(opt)-1:-1:1
-        if isempty(opt(iOpt).varname) && isempty(opt(iOpt+1).varname)
-            opt(iOpt) = [];
+        % remove header not serving any option
+        for iOpt = length(opt)-1:-1:1
+            if isempty(opt(iOpt).varname) && isempty(opt(iOpt+1).varname)
+                opt(iOpt) = [];
+            end
         end
     end
 end
-    
+
 if nargin < 2
     geometry = { [6 1] };
     tmpfile = fullfile(filepath, filename);
