@@ -899,7 +899,7 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
 end
 
 statusconnection = 1;
-if isdeployed || ismcc
+if isdeployed || (exist('ismcc') && ismcc)
 %#function pop_reref
 %#function netICL.mat netICL_beta.mat netICL_lite.mat pop_icflag
     disp('Loading plugins');
@@ -2083,7 +2083,7 @@ function [name, vers] = parsepluginname(dirName, funcname)
     end
     
     % check with function name and change version if necessary (for loadhdf5)
-    if nargin > 1 && contains(dirName, funcname)
+    if nargin > 1 && ~isempty(strfind(dirName, funcname))
         name1 = funcname;
         vers2 = dirName(length(funcname)+1:end);
         if ~isempty(vers2)

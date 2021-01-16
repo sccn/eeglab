@@ -159,7 +159,7 @@ if strcmpi(g.savemode, 'resave')
         db = dbstack;
         eeglabp = fileparts(which('eeglab.m'));
         if length(db) > 1
-            if ~contains(which(db(2).file), eeglabp)
+            if isempty(strfind(which(db(2).file), eeglabp))
                 calledFromEEGLABFlag = false;
             end
         end
