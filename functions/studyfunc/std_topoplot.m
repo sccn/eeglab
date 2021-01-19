@@ -301,7 +301,7 @@ else
     comp_ind = varargin{1}; 
 end
 STUDY = std_readtopoclust(STUDY,ALLEEG, cls);
-for ci = 1:length(comp_ind)
+for ci = 1:size(comp_ind,2)
     abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).index;
     subject = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
     comp  = STUDY.cluster(cls).comps(comp_ind(ci));
