@@ -236,7 +236,7 @@ if ~isempty( events )
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
 				if ~ischar( tmpevent ), tmpevent = num2str( tmpevent ); end
-				Ieventtmp = [ Ieventtmp ; strmatch(deblank(tmpevent), tmpeventtype, 'exact') ];
+				Ieventtmp = [ Ieventtmp ; find(strcmp(deblank(tmpevent), tmpeventtype))' ];
 			end
 		else
 			for index2 = 1:length( events )
