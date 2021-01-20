@@ -1027,7 +1027,7 @@ for inddataset = 1:length(ALLEEG)
         
         % reference (use EEG structure)
         % ---------
-        if isfield(EEG, 'ref')
+        if ~isfield(EEG, 'ref')
             EEG.ref = '';
         end
         if isfield(EEG.chanlocs, 'ref') && ~isempty(EEG.chanlocs(1).ref)
