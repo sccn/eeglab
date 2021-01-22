@@ -967,6 +967,7 @@ else
             [pluginTmp, eeglabVersionStatus] = plugin_getweb('startup', pluginlist);
         catch
             disp('Issue with retrieving statistics for extensions');
+            pluginTmp = [];
         end
         if ~isempty(pluginTmp) && isfield(pluginTmp, 'name') && isfield(pluginTmp, 'version')
             pluginstats.name    = { pluginTmp.name };

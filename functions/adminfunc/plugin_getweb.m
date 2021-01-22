@@ -38,12 +38,13 @@ if nargin < 2, pluginOri = []; end
 if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end
 
 % retreiving statistics
+eeglab_options;
 try
     disp( [ 'Retreiving download statistics...' ] );
     if exist('OCTAVE_VERSION', 'builtin') == 0
-        [plugin, status] = plugin_urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type ]);
+        [plugin, status] = plugin_urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type '&upload=' num2str(option_showpendingplugins)]);
     else
-        [plugin, status] = urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type ]);
+        [plugin, status] = urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type '&upload=' num2str(option_showpendingplugins)]);
     end
     if isempty(plugin)
         disp('Issue with retrieving statistics for extensions');

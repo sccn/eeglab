@@ -72,7 +72,7 @@ for iRow = 1:length(plugin)
         plugin(iRow).text =  [ plugin(iRow).text ' update available ' ];
     end
     plugin(iRow).text =  [ plugin(iRow).text ' (' int2str(plugin(iRow).downloads) ' downloads' ];
-    if plugin(iRow).numrating
+    if ~isnan(plugin(iRow).numrating) && plugin(iRow).numrating
         plugin(iRow).text =  [ plugin(iRow).text '; ' int2str(plugin(iRow).numrating) ' rating' ];
     end
     plugin(iRow).text =  [ plugin(iRow).text ')</b></font></font></html>' ];

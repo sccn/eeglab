@@ -16,11 +16,12 @@ option_eegobject     = 0 ;  % If set, use the EEGLAB EEG object instead of the s
 option_computeica    = 1 ;  % If set, precompute ICA activations. This requires more RAM but allows faster plotting of component activations. 
 option_scaleicarms   = 1 ;  % If set, scale ICA component activities to RMS (Root Mean Square) in microvolt (recommended).
 % Folder options
-option_rememberfolder = 1 ;  % If set, when browsing to open a new dataset assume the folder/directory of previous dataset.
+option_rememberfolder = 1 ;  % If set, when browsing to open a new dataset assume the folder/directory of the previous dataset.
 % Toolbox options
 option_donotusetoolboxes = 0 ;  % If set, do not use Matlab additional toolboxes functions even if they are present (need to restart EEGLAB).
 % EEGLAB connectivity and support
 option_showadvanced      = 0 ;  % If set, show advanced options (close and reopen this GUI to effect changes)
+option_showpendingplugins = 0 ;  % If set, show plugins pending approval instead of approved plugins (for developers only) 
 option_allmenus          = 0 ;  % If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.
 option_checkversion      = 1 ;  % If set, check for new version of EEGLAB and EEGLAB extensions at startup.
 option_cachesize         = 500 ;  % Size of cache in Mbytes for EEGLAB STUDY cache in RAM.
