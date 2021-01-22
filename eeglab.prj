@@ -106,27 +106,31 @@ ${DYLD_LIBRARY_PATH}:MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci6
       <file>${PROJECT_ROOT}/functions/supportfiles</file>
       <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
       <file>${PROJECT_ROOT}/plugins/ANTeepimport1.13</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/forward</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/inverse</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/preproc</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/statfun</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/trialfun</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20200703/utilities</file>
-      <file>${PROJECT_ROOT}/plugins/Fileio20200703</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/forward</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/inverse</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/preproc</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/statfun</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/trialfun</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/external/biosig</file>
+      <file>${PROJECT_ROOT}/plugins/Fileio20210120</file>
       <file>${PROJECT_ROOT}/plugins/ICLabel</file>
       <file>${PROJECT_ROOT}/plugins/PICARD1.0</file>
       <file>${PROJECT_ROOT}/plugins/VisEd1.05</file>
-      <file>${PROJECT_ROOT}/plugins/bva-io1.5.13</file>
+      <file>${PROJECT_ROOT}/plugins/bids-matlab-tools5.3</file>
+      <file>${PROJECT_ROOT}/plugins/bids-matlab-tools5.3/JSONIO</file>
+      <file>${PROJECT_ROOT}/plugins/bids-validator1.1</file>
+      <file>${PROJECT_ROOT}/plugins/bva-io1.7</file>
       <file>${PROJECT_ROOT}/plugins/clean_rawdata</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit3.4</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit</file>
       <file>${PROJECT_ROOT}/plugins/egilegacy1.0</file>
       <file>${PROJECT_ROOT}/plugins/firfilt</file>
       <file>${PROJECT_ROOT}/plugins/iirfilt1.03</file>
+      <file>${PROJECT_ROOT}/plugins/musedirect1.2</file>
       <file>${PROJECT_ROOT}/plugins/musemonitor3.2</file>
-      <file>${PROJECT_ROOT}/plugins/neuroscanio1.3</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.17</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.17/xdf</file>
+      <file>${PROJECT_ROOT}/plugins/neuroscanio1.4</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.18</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.18/xdf</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/1ST_README.txt</file>
