@@ -76,7 +76,12 @@ if ~isequal(eeglabVersionUpdate.version, eeglabVersionNumber)
     warning(stateWarning.state, 'backtrace');
 else
     msg = 'You are using the latest version of EEGLAB.';
-    fprintf('%s\n', msg);
+    if nargin > 0
+        fprintf('%s\n', msg);
+    else
+        warndlg2(msg);
+    end
+    return
 end
 
 % return at once if users said to not show this interface again or no new version available
@@ -106,7 +111,7 @@ uilist   = { ...
     { 'style' 'text' 'String' [ 'Note: requires 120MB of free space plus the space ' 10 'for copying plugins from the current version' ] } ...
     };
 geom     = { [1.3 1] [1] [0.5 1 0.5] [0.5 1 0.5] [0.5 1 0.5] [1] [1] };
-geomvert = [ 1     1   1           1           1           1     1.5 1   ];
+geomvert = [ 1     1   1           1           1           1     1.5   ];
 res = supergui( 'geomhoriz', geom, 'geomvert', geomvert, 'uilist', uilist, 'title', 'Update EEGLAB -- eeglab_update()');
 set(gcf, 'userdata', 'wait');
 waitfor( gcf, 'userdata');
