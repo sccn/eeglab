@@ -38,101 +38,57 @@ function eeglab_update(varargin)
 % return at once if users said not to check version
 % -------------------------------------------------
 eeglab_options;
-if ~option_checkversion && nargin == 0
+if nargin == 0
+    [~,eeglabVersionUpdate] = plugin_getweb('update', []);
+else
+    eeglabVersionUpdate = varargin{1};
+    if ~option_checkversion && isempty(eeglabVersionUpdate)
+        return;
+    end
+end
+
+% Cannot check version for some reason
+if isempty(eeglabVersionUpdate)
+    msg = [ 'Could not check for the latest EEGLAB version (internet may be disconnected).' 10 ...
+        'To prevent long startup time, disable checking for new EEGLAB versions (File > Preferences).' ];
+    stateWarning = warning('query', 'backtrace');
+    warning('off', 'backtrace');
+    warning(msg);
+    warning(stateWarning.state, 'backtrace');
     return
 end
 
-%% automatic updater
-try
-    [~, eeglabVersionNumber, currentReleaseDateString] = eeg_getversion;
-    if isempty(eeglabVersionNumber)
-        eeglabVersionNumber = 'dev';
-    end
-    eeglabUpdater = up.updater(eeglabVersionNumber, 'http://sccn.ucsd.edu/eeglab/updater/latest_version.php', 'EEGLAB', currentReleaseDateString);
-    
-    % place it in the base workspace.
-    assignin('base', 'eeglabUpdater', eeglabUpdater);
-    
-    eeglabUpdater.checkForNewVersion({'eeglab_event' 'setup'});
-    if strcmpi(eeglabVersionNumber, 'dev')
-        return;
-    end
-    newMajorRevision = 0;
-    
-    % eeglab new version
-    eeglabv = num2str(eeglabUpdater.latestVersionNumber);
-    posperiod = find(eeglabv == '.');
-    if isempty(posperiod), posperiod = length(eeglabv)+1; eeglabv = [ eeglabv '.0' ]; end
-    if length(eeglabv(posperiod+1:end)) < 2, eeglabv = [ eeglabv '0' ]; end
-    %if length(eeglabv(posperiod+1:end)) < 3, eeglabv = [ eeglabv '0' ]; end
-    eeglabv = [ eeglabv(1:posperiod+1) '.' eeglabv(posperiod+2) ]; %'.' eeglabv(posperiod+3) ];
-    if strcmpi(eeglabv(end-1:end), '.0'), eeglabv(end-1:end) = []; end
-    
-    msg = '';
-    if ~isempty(eeglabUpdater.newMajorRevision)
-        msg = sprintf('A new major version of EEGLAB (EEGLAB%s) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.', eeglabUpdater.newMajorRevision);
-        fprintf('\n%s\n', msg);
-        newMajorRevision = 1;
-    end
-    if eeglabUpdater.newerVersionIsAvailable
-        
-        stateWarning = warning('query', 'backtrace');
-        warning('off', 'backtrace');
-        if newMajorRevision
-            fprintf('\n');
-            msg = sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
-                eeglabUpdater.releaseNotes ' See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
-                'You may disable this message in the File>Preferences menu but will miss critical updates.\n' ], ...
-                floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
-            if nargin == 0, warning( msg ); end
-        else
-            msg =  sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
-                eeglabUpdater.releaseNotes ' See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
-                'You may disable this message in the File>Preferences menu but will miss critical updates.\n' ], ...
-                eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl);
-            if nargin == 0, warning( msg ); end
-        end
-        warning(stateWarning.state, 'backtrace');
-        
-    elseif isempty(eeglabUpdater.lastTimeChecked)
-        msg = [ 'Could not check for the latest EEGLAB version (internet may be disconnected).' 10 ...
-            -               'To prevent long startup time, disable checking for new EEGLAB version (File>Preferences).' ];
-        fprintf('%s\n', msg);
-    else
-        if ~newMajorRevision
-            msg = 'You are using the latest version of EEGLAB.';
-            fprintf('%s\n', msg);
-        else
-            msg = sprintf('You are currently using the latest revision of EEGLAB%d (no critical update available).', floor(eeglabVersionNumber));
-            fprintf('%s\n', msg);
-        end
-    end
-catch
-    msg = 'Updater could not be initialized';
+%% automatic update
+eeglabVersionNumber = eeg_getversion;
+if isempty(eeglabVersionNumber)
+    eeglabVersionNumber = 'dev';
+end
+
+if ~isequal(eeglabVersionUpdate.version, eeglabVersionNumber)
+    stateWarning = warning('query', 'backtrace');
+    warning('off', 'backtrace');
+    msg = sprintf(['\nA %s revision of EEGLAB (v%s) is available <a href="matlab:eeglab_update;">HERE</a>.\n%s\n' ...
+        'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
+        'You may disable this message in the File > Preferences menu.\n' ], ...
+        fastif(eeglabVersionUpdate.critical, 'CRITICAL', 'newer'), eeglabVersionUpdate.version, ...
+        eeglabVersionUpdate.releasenotes, eeglabVersionUpdate.webdoc);
+    if nargin > 0, warning( msg ); end
+    warning(stateWarning.state, 'backtrace');
+else
+    msg = 'You are using the latest version of EEGLAB.';
     fprintf('%s\n', msg);
-    return
 end
 
 % return at once if users said to not show this interface again or no new version available
 % -----------------------------------------------------------------------------------------
 eeglab_options;
-if ~option_updateeeglab && nargin == 0
+if nargin > 0
     return
 end    
-if ~exist('eeglabUpdater', 'var') || isempty(eeglabUpdater.newerVersionIsAvailable) || ~eeglabUpdater.newerVersionIsAvailable
-    return
-end
-if ~isempty(strfind(eeglabUpdater.releaseDate, '00:00:00'))
-    % kill switch to disable GUI update if releaseNotes contains the text EEGLAB
-    if nargin > 0
-        disp('Functionality currently disabled');
-    end; 
-    return;
-end
 
 % try saving path
 % ---------------
-cb_notes = [ 'web(''' eeglabUpdater.releaseNotesUrl ''', ''-browser'');' ];
+cb_notes = [ 'web(''' eeglabVersionUpdate.webdoc ''', ''-browser'');' ];
 cb_install = 'set(gcbf, ''userdata'', ''install'');';
 cb_custom  = 'set(gcbf, ''userdata'', ''custom'');';
 cb_ignore  = 'set(gcbf, ''userdata'', ''ignore'');';
@@ -140,7 +96,7 @@ cb_ignore  = 'set(gcbf, ''userdata'', ''ignore'');';
 % cb_custom  = 'set(findobj(gcbf, ''tag'', ''eeglab''), ''userdata'', ''custom'');';
 % cb_ignore  = 'set(findobj(gcbf, ''tag'', ''eeglab''), ''userdata'', ''ignore'');';
 uilist   = { ...
-    { 'style' 'text' 'String' [ 'EEGLAB ' eeglabv ' now available' ] 'fontweight' 'bold' } ...
+    { 'style' 'text' 'String' [ 'EEGLAB ' eeglabVersionUpdate.version ' now available' ] 'fontweight' 'bold' } ...
     { 'style' 'pushbutton' 'string' 'See release notes' 'callback' cb_notes 'tag' 'eeglab' 'userdata' []} ...
     {} ...
     {} { 'style' 'pushbutton' 'String' 'Automatic install' 'callback' cb_install } {} ...
@@ -148,9 +104,8 @@ uilist   = { ...
     {} { 'style' 'pushbutton' 'String' 'Ignore for now'    'callback' cb_ignore  } {} ...
     {} ...
     { 'style' 'text' 'String' [ 'Note: requires 120MB of free space plus the space ' 10 'for copying plugins from the current version' ] } ...
-    { 'style' 'checkbox' 'String' 'Do not show this message at startup' 'tag' 'hidemsg' 'value' ~option_updateeeglab } ...
     };
-geom     = { [1.3 1] [1] [0.5 1 0.5] [0.5 1 0.5] [0.5 1 0.5] [1] [1] [1] };
+geom     = { [1.3 1] [1] [0.5 1 0.5] [0.5 1 0.5] [0.5 1 0.5] [1] [1] };
 geomvert = [ 1     1   1           1           1           1     1.5 1   ];
 res = supergui( 'geomhoriz', geom, 'geomvert', geomvert, 'uilist', uilist, 'title', 'Update EEGLAB -- eeglab_update()');
 set(gcf, 'userdata', 'wait');
@@ -158,13 +113,6 @@ waitfor( gcf, 'userdata');
 response = get(gcf, 'userdata');
 if iscell(response) % closed figure
     return;
-end
-
-% hide interface next time
-% ------------------------
-doNotShow = get(findobj(gcf, 'tag', 'hidemsg'), 'value');
-if doNotShow == option_updateeeglab
-    pop_editoptions( 'option_updateeeglab', ~doNotShow);
 end
 
 % process GUI output
@@ -207,7 +155,6 @@ if nargin < 1
         eeglabpath2 = mywhich('eeglab.m');
     end
     if ~isempty(eeglabpath2)
-        %evalin('base', 'clear classes updater;'); % this clears all the variables
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
         tmpWarning = warning('backtrace');
         warning backtrace off;
@@ -221,7 +168,7 @@ if nargin < 1
 end
 
 zipfilelink = 'http://sccn.ucsd.edu/eeglab/plugins/eeglab_current.zip';
-[~,zipfile,zipext] = fileparts(eeglabUpdater.downloadUrl);
+[~,zipfile,zipext] = fileparts(eeglabVersionUpdate.zip);
 zipfile = [ zipfile zipext ];
 
 eeglabNewPath = fullfile( fileparts(fileparts(which('eeglab.m'))), [ 'eeglab' eeglabv ]);

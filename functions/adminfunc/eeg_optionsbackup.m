@@ -23,5 +23,4 @@ option_donotusetoolboxes = 0 ;  % If set, do not use Matlab additional toolboxes
 option_showadvanced      = 0 ;  % If set, show advanced options (close and reopen this GUI to effect changes)
 option_allmenus          = 0 ;  % If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.
 option_checkversion      = 1 ;  % If set, check for new version of EEGLAB and EEGLAB extensions at startup.
-option_updateeeglab      = 1 ;  % If set, prompt user to update EEGLAB at startup when a new version is available.
 option_cachesize         = 500 ;  % Size of cache in Mbytes for EEGLAB STUDY cache in RAM.

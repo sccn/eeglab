@@ -240,7 +240,6 @@ if nargin < 1 && ~isdeployed
         eeglabpath2 = mywhich('eeglab.m');
     end
     if ~isempty(eeglabpath2)
-        %evalin('base', 'clear classes updater;'); % this clears all the variables
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
         tmpWarning = warning('query', 'backtrace'); 
         warning off backtrace;
@@ -874,7 +873,7 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
     if ~isdeployed
         %newerVersionMenu = eegmenu( false,  help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
-        eegmenu( false,  help_m, 'Label', 'Check for EEGLAB update'                , 'userdata', on, 'CallBack', 'eeglab_update(''menucall'');');
+        eegmenu( false,  help_m, 'Label', 'Check for EEGLAB update'                , 'userdata', on, 'CallBack', 'eeglab_update;');
         eegmenu( false,  help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
         eegmenu( false,  help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
 
@@ -899,9 +898,8 @@ if ismatlab && ~strcmpi(onearg, 'nogui')
 end
 
 statusconnection = 1;
+eeglabVersionStatus = [];
 if isdeployed || (exist('ismcc') && ismcc)
-%#function pop_reref
-%#function netICL.mat netICL_beta.mat netICL_lite.mat pop_icflag
     disp('Loading plugins');
     funcname = { ...
                  @eegplugin_eepimport ...
@@ -964,7 +962,7 @@ else
 	if option_checkversion && ismatlab
         disp('Retrieving plugin versions from server...');
         try
-            pluginTmp = plugin_getweb('', pluginlist, 'newlist');
+            [pluginTmp, eeglabVersionStatus] = plugin_getweb('startup', pluginlist);
         catch
             disp('Issue with retrieving statistics for extensions');
         end
@@ -1185,7 +1183,7 @@ if nargout < 1
 end
 
 % check if update is available
-eeglab_update;
+eeglab_update(eeglabVersionStatus);
 
 if ~ismatlab
     close(W_MAIN);
@@ -1194,11 +1192,7 @@ end
 % REMOVED MENUS
 	%eegmenu( false,  tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
 	%eegmenu( false,  tools_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
-
-     function command_on_update_menu_click(callerHandle, tmp, eeglabUpdater, installDirectory, goOneFolderLevelIn, backGroundColor)
-         postInstallCallbackString = 'clear all function functions; eeglab';
-         eeglabUpdater.launchGui(installDirectory, goOneFolderLevelIn, backGroundColor, postInstallCallbackString);
-    
+   
 %     
 % --------------------
 % draw the main figure

@@ -75,7 +75,7 @@ if nargin < 2 || ~exist(char(pluginFunc))
     
     if strcmpi(res, 'no'), return, end
     try
-        plugins = plugin_getweb('', []);
+        plugins = plugin_getweb('plugin_install', []);
     catch
         error('Issue with retrieving statistics for extensions, maybe check your connection');
     end

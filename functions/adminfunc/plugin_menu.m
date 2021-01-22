@@ -39,13 +39,14 @@ FONTSIZE = 0; % set to 4 for high-res screen
 
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
-plugin = plugin_getweb('', pluginlist, 'newlist');
+plugin = plugin_getweb('plugin_check', pluginlist);
 if isempty(plugin)           
     errordlg2(['Either you are offline, a firewall is blocking EEGLAB from accessing its' char(10) ...
         'plugin server or there is a problem with Java. For Java problems, refer to' char(10) ...
         'https://github.com/sccn/eeglab/issues/20']);
     return;
 end
+
 % sort plugins by download score
 [~,scoreOrder] = sort([ plugin.downloads ], 2, 'descend');
 plugin = plugin(scoreOrder);
