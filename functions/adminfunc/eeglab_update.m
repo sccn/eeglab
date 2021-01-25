@@ -172,11 +172,12 @@ if nargin < 1
     end
 end
 
-zipfilelink = 'http://sccn.ucsd.edu/eeglab/plugins/eeglab_current.zip';
+% force HTTPS
+eeglabVersionUpdate.zip = strrep(eeglabVersionUpdate.zip, 'http://', 'https://');
 [~,zipfile,zipext] = fileparts(eeglabVersionUpdate.zip);
 zipfile = [ zipfile zipext ];
 
-eeglabNewPath = fullfile( fileparts(fileparts(which('eeglab.m'))), [ 'eeglab' eeglabv ]);
+eeglabNewPath = fullfile( fileparts(fileparts(which('eeglab.m'))), [ 'eeglab' eeglabVersionUpdate.version ]);
 
 if strcmpi(response, 'custom')
     cb_folder = 'tmpfolder = uigetdir; if ~isequal(tmpfolder, 0), set(findobj(gcbf, ''tag'', ''folder''), ''string'', tmpfolder); end; clear tmpfolder;';
@@ -245,13 +246,13 @@ end
 % ------------------------
 try
     restmp = questdlg2('This will download about 80Mb with no wait bar, be patient.', 'Warning', 'Cancel', 'OK', 'OK');
-    if isempty(restmp) || strcmpi(restmp, 'Cancel'), return; end;
+    if isempty(restmp) || strcmpi(restmp, 'Cancel'), return; end
     disp('Downloading about 80Mb, hang in there...');
-    plugin_urlwrite( zipfilelink, fullfile(parentPath, zipfile));
+    plugin_urlwrite( eeglabVersionUpdate.zip, fullfile(parentPath, zipfile));
 catch
-    msg = [ 'Could not download EEGLAB. Server might be' 10 ...
-        'unavailable, or your internet might be too slow or down.' 10 ...
-        'Try again just in case.' ];
+    msg = [ 'Could not download EEGLAB. Server might be unavailable, or your internet might' 10 ...
+        'be down or too slow. Alternatively, your version of Matlab might not support HTTPS.' 10 ...
+        'Try again just in case. Otherwise, download the new zip file from the Internet.' ];
     warndlg2(msg);
     return;
 end
@@ -264,7 +265,7 @@ unzip(fullfile(parentPath, zipfile), fullfile(parentPath, eeglabFolder));
 disp('Cleaning EEGLAB zip file...');
 delete(fullfile(parentPath, zipfile));
 
-% seeing what is in the plugin and moving files if necessary
+% seeing what is in the plugin folder and moving files if necessary
 % ----------------------------------------------------------
 eeglabContent = dir(fullfile(parentPath, eeglabFolder));
 if length(eeglabContent) < 5
@@ -327,7 +328,7 @@ if res.copyplugins
     pluginOriList = dir(pluginOri);
     for iPlugin = 1:length(pluginOriList)
         if ~isequal(pluginOriList(iPlugin).name, '.') && ...
-                isequal(pluginOriList(iPlugin).name, '..') && ...
+                ~isequal(pluginOriList(iPlugin).name, '..') && ...
                 isempty(strfind(lower(pluginOriList(iPlugin).name), 'dipfit')) && ...
                 isempty(strfind(lower(pluginOriList(iPlugin).name), 'firfilt')) && ...
                 isempty(strfind(lower(pluginOriList(iPlugin).name), 'iclabel')) && ...
