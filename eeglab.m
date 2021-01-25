@@ -944,7 +944,7 @@ else
     % ------------------
     dircontent  = dir(fullfile(eeglabp, 'plugins'));
     if ~isfield(dircontent, 'folder')
-        [dircontent(:).folder] = deal(fullfile(p, 'plugins'));
+        [dircontent(:).folder] = deal(fullfile(eeglabp, 'plugins'));
     end
     
     % scan local plugin folder
