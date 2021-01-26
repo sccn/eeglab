@@ -1374,7 +1374,7 @@ else
 		eegplot( 'drawp', p1, p2, g.children);
 		figure(figh);
      end
-
+    
      % draw second data if necessary
      if ~isempty(g.data2)
          tmpdata = data;
@@ -2031,9 +2031,9 @@ else
   % push button: create/remove window
   % ---------------------------------
   case 'defdowncom'
-    show_mocap_timer = timerfind('tag','mocapDisplayTimer'); if ~isempty(show_mocap_timer),  end; % nima
     fig = varargin{1};
     g = get(fig,'UserData');
+    if strcmp(g.mocap,'on'), show_mocap_timer = timerfind('tag','mocapDisplayTimer'); if ~isempty(show_mocap_timer),  end; end; % nima
     
     ax1 = findobj('tag','backeeg','parent',fig); 
     tmppos = get(ax1, 'currentpoint');

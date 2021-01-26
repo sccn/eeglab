@@ -157,7 +157,7 @@ end
 % -------------
 if popup
 	[txt, vars] = gethelpvar('newtimef.m');
-    commandchan = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on'', ''selectionmode'', ''single''); set(findobj(gcbf, ''tag'', ''chan''), ''string'',tmpval); clear tmp tmpchanlocs tmpval'; 
+    commandchan = 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on'', ''selectionmode'', ''single''); set(findobj(gcbf, ''tag'', ''chan''), ''string'',tmpval); clear tmpEEG tmp tmpchanlocs tmpval'; 
 	
     g = [1 0.3 0.6 0.4];
     g2 = [1 0.3 0.25 0.75];
@@ -218,9 +218,9 @@ if popup
 			%		'as red (+) or blue (-)'] } ...
 			%   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotphase','present',1) } { } ...
 
-	[ tmp1, tmp2, strhalt, result ] = inputgui( geometry, uilist, 'pophelp(''pop_newtimef'');', ...
-					   fastif(typeproc, 'Plot channel time frequency -- pop_newtimef()', ...
-							  'Plot component time frequency -- pop_newtimef()'));
+	[ tmp1, tmp2, strhalt, result ] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_newtimef'');', ...
+					   'title', fastif(typeproc, 'Plot channel time frequency -- pop_newtimef()', ...
+							  'Plot component time frequency -- pop_newtimef()'), 'userdata', EEG);
 	if length( tmp1 ) == 0 return; end
 
 	if result.fft,      result.cycle = '0'; end

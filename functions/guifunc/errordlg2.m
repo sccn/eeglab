@@ -52,5 +52,4 @@ end
 if nargin <2
 	Title = 'Error';
 end
-if ~ismatlab, error(Prompt); end
 questdlg2(Prompt, Title, 'OK', 'OK');
