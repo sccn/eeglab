@@ -400,7 +400,11 @@ try,
         factmulty = factmulty*1.08;
     end
 catch, end
-factmulty = factmulty*0.9; % global shinking
+if exist('OCTAVE_VERSION', 'builtin') == 0
+    factmulty = factmulty*0.9; % global shinking
+else
+    factmulty = factmulty*1.5;
+end
 warning on;	
 
 % scale and replace the figure in the screen

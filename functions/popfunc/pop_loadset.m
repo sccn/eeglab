@@ -119,7 +119,14 @@ else
             fprintf('pop_loadset(): loading file %s ...\n', filename);
         end
         if strcmpi(g.loadmode, 'info')
-            TMPVAR = load('-mat', filename, '-regexp', '^((?!data).)*$');
+            if ismatlab
+                TMPVAR = load('-mat', filename, '-regexp', '^((?!data).)*$');
+            else
+                TMPVAR = load('-mat', filename);
+                if isfield(TMPVAR, 'data')
+                    TMPVAR = rmfield(TMPVAR, 'data');
+                end
+            end
             if isfield(TMPVAR, 'setname')
                 TMPVAR.data = 'in set file';
             end

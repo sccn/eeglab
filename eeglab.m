@@ -501,7 +501,7 @@ catchstrs.load_study             = e_load_study;
 
 % create eeglab figure
 % --------------------
-if ismatlab && ~strcmpi(onearg, 'nogui')
+if ~strcmpi(onearg, 'nogui')
     eeg_mainfig(onearg);
 end
 
@@ -692,7 +692,7 @@ onepochchan       = 'startup:off;continuous:off;chanloc:on';
 onstudy           = 'startup:off;epoch:off;continuous:off;study:on';
 onstudynoroi      = 'startup:off;epoch:off;continuous:off;study:on;roi:off';
 
-if ismatlab && ~strcmpi(onearg, 'nogui')
+if ~strcmpi(onearg, 'nogui')
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
@@ -1145,7 +1145,7 @@ if ~strcmp(dipplotpath,dipfitpath)
     addpath(dipfitpath,'-begin');
 end
 
-if ~ismatlab || strcmpi(onearg, 'nogui')
+if strcmpi(onearg, 'nogui')
     return;
 end
 
@@ -1186,10 +1186,8 @@ if nargout < 1
 end
 
 % check if update is available
-eeglab_update(eeglabVersionStatus);
-
-if ~ismatlab
-    close(W_MAIN);
+if ismatlab
+    eeglab_update(eeglabVersionStatus);
 end
 
 % REMOVED MENUS
@@ -1244,6 +1242,9 @@ if ~isempty(numVersion)
     txtVersion = [ 'EEGLAB v' txtVersion ];
 else
     txtVersion = [ 'EEGLAB ' txtVersion ];    
+end
+if ~ismatlab && ismac
+    txtVersion = [ txtVersion ' - menu is on the top bar' ];
 end
 
 % create figures
@@ -2096,12 +2097,7 @@ function [name, vers] = parsepluginname(dirName, funcname)
 % to the admin folder
 function res = ismatlab
 
-    v = version;
-    if v(1) > '5'
-        res = 1;
-    else
-        res = 0;
-    end
+res = exist('OCTAVE_VERSION', 'builtin') == 0;
     
 function res = mywhich(varargin)
 try
