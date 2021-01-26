@@ -1229,6 +1229,10 @@ else
     FONTNAME        = '';
     FONTSIZE        = 11;
 end    
+if ~ismatlab
+    WINMAXX  = WINMAXX*1.35;
+    WINY     = WINY*1.4;
+end
 
 hh = findobj('tag', 'EEGLAB');
 if ~isempty(hh)
