@@ -365,6 +365,11 @@ for counter = 1:maxcount
                     end
                     
                     factmultx = max(factmultx, curext(3)/curpos(3));
+                    tmptxt = get(allhandlers{counter}, 'string');
+%                   % text to get which UI modify horizontal size
+%                    if iscell(tmptxt) fprintf('%s -> %f\n', 'cell', curext(3)/curpos(3));
+%                    else              fprintf('%s -> %f\n', tmptxt, curext(3)/curpos(3));
+%                    end                      
                     if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
                 end
             end

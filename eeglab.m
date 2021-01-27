@@ -200,6 +200,8 @@ if ismatlab && vers < 7.06
 end 
 if ~ismatlab
     warning('off', 'Octave:abbreviated-property-match');
+    warning('off', 'Octave:legacy-function');
+    warning('off', 'Octave:num-to-str');
     warning('off', 'backtrace');
     warning('off', 'Octave:divide-by-zero');
     try
@@ -870,7 +872,7 @@ if ~strcmpi(onearg, 'nogui')
     eegmenu( false,  clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudynoroi, 'CallBack', cb_clust);
     eegmenu( false,  std_m,  'Label', 'Edit/plot component clusters'           , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
-    if ~isdeployed
+    if ~isdeployed && ismatlab
         %newerVersionMenu = eegmenu( false,  help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
         eegmenu( false,  help_m, 'Label', 'Check for EEGLAB update'                , 'userdata', on, 'CallBack', 'eeglab_update;');
@@ -888,13 +890,14 @@ if ~strcmpi(onearg, 'nogui')
         eegmenu( false,  help_1, 'Label', 'Misc. command line functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
 
         eegmenu( false,  help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB tutorial'                            , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+        eegmenu( false,  help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
     else
         eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'abouteeglab;');
         eegmenu( false,  help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
-    end
+        eegmenu( false,  help_m, 'Label', 'EEGLAB tutorial'                            , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+     end
 
-    eegmenu( false,  help_m, 'Label', 'EEGLAB tutorial'                            , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
-    eegmenu( false,  help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end
 
 statusconnection = 1;
@@ -1678,11 +1681,11 @@ if study_selected
     set( g.val4, 'String', [ int2str(max(1, length(STUDY.condition))) txtcond ]);
     set( g.val5, 'String', [ int2str(max(1, length(STUDY.session)))   txtsess ]);
     set( g.val6, 'String', [ int2str(max(1, length(STUDY.group)))    txtgroup ]);
-    set( g.val7, 'String', epochconsist);
-    set( g.val8, 'String', chanlenstr);
-    set( g.val9, 'String', chanlocs);
-    set( g.val10, 'String', length(STUDY.cluster));
-    set( g.val11, 'String', studystatus);
+    set( g.val7, 'String', char(epochconsist));
+    set( g.val8, 'String', char(chanlenstr));
+    set( g.val9, 'String', char(chanlocs));
+    set( g.val10, 'String', num2str(length(STUDY.cluster)));
+    set( g.val11, 'String', char(studystatus));
     set( g.val12, 'String', num2str(round(sum( [ totsize.bytes] )/1E6*10)/10));        
     
 elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data) 
@@ -1756,15 +1759,15 @@ elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data)
         % ------
         set( g.win1, 'String', sprintf('Groupname: -(soon)-\n'));
         set( g.val2, 'String', int2str(length(EEG)));
-        set( g.val3, 'String', datasettype);
-        set( g.val4, 'String', epochconsist);
-        set( g.val5, 'String', chanlenstr);
-        set( g.val6, 'String', chanconsist);
-        set( g.val7, 'String', chanlocs);
-        set( g.val8, 'String', totevents);
-        set( g.val9, 'String', srate);
-        set( g.val10, 'String', icaweights);
-        set( g.val11, 'String', icaconsist);
+        set( g.val3, 'String', char(datasettype));
+        set( g.val4, 'String', char(epochconsist));
+        set( g.val5, 'String', char(chanlenstr));
+        set( g.val6, 'String', char(chanconsist));
+        set( g.val7, 'String', char(chanlocs));
+        set( g.val8, 'String', char(totevents));
+        set( g.val9, 'String', char(srate));
+        set( g.val10, 'String', char(icaweights));
+        set( g.val11, 'String', char(icaconsist));
         set( g.val12, 'String', num2str(round(totsize.bytes/1E6*10)/10));        
         
     else % one continous dataset selected

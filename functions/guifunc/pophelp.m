@@ -74,8 +74,11 @@ if exist('help2html')
                                '___________________________________________________________________</pre><br><br>' text2 ];
             catch, end
         end
-
-        web([ 'text://' text1 ]);
+        if  exist('OCTAVE_VERSION','builtin') == 0
+            web([ 'text://' text1 ]);
+        else
+            disp(text1);
+        end
     end
 else
     if isempty(funct), return; end
@@ -94,7 +97,13 @@ else
         catch, end
     end
 
-    textgui(doc1);1000
+    if exist('OCTAVE_VERSION','builtin') ~= 0
+        for iRow = 1:length(doc1)
+            disp(doc1{iRow});
+        end
+        return
+    end
+    textgui(doc1);
     h = findobj('parent', gcf, 'style', 'slider');
     try, icadefs; catch, 
         GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
