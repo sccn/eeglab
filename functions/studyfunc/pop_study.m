@@ -124,9 +124,11 @@ elseif strcmpi(mode, 'gui') % GUI mode
 
     % check events
     fieldList = { 'condition' 'group' 'subject' 'session' 'run' };
-    for iField = 1:length(fieldList)
-        if any(cellfun(@(x)isfield(x, fieldList{iField}), {ALLEEG.event}))
-            fprintf(2, 'Rename field "%s" in datasets'' event structure as it conflicts with the STUDY field bearing the same name\n', fieldList{iField});
+    if ~isempty(ALLEEG) && isstruct(ALLEEG) && isfield(ALLEEG, 'event')
+        for iField = 1:length(fieldList)
+            if any(cellfun(@(x)isfield(x, fieldList{iField}), {ALLEEG.event}))
+                fprintf(2, 'Rename field "%s" in datasets'' event structure as it conflicts with the STUDY field bearing the same name\n', fieldList{iField});
+            end
         end
     end
     
