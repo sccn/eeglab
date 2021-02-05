@@ -98,7 +98,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [STUDY,com] = pop_limo(STUDY, ALLEEG, measureflag, varargin)
+function [STUDY,com,limofiles] = pop_limo(STUDY, ALLEEG, measureflag, varargin)
 
 if nargin < 2
     help pop_limo;
@@ -165,5 +165,5 @@ else
     options = varargin; 
 end
 
-[STUDY tmp] = std_limo(STUDY, ALLEEG, options{:});
+[STUDY,limofiles] = std_limo(STUDY, ALLEEG, options{:});
 com = sprintf('pop_limo(STUDY, ALLEEG, %s);', vararg2str(options));
