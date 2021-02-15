@@ -229,7 +229,7 @@ end
 
 if chanloc_created
     % contains will not work in Octave
-    if isempty(contains(STUDY.filepath,'derivatives'))
+    if isempty(strfind(STUDY.filepath,'derivatives'))
         if ~exist([STUDY.filepath filesep 'derivatives'],'dir')
             mkdir([STUDY.filepath filesep 'derivatives']);
         end
