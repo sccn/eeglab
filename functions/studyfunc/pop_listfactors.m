@@ -56,6 +56,7 @@ end
 
 g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
     'splitreg'    'string' { 'on','off' } 'off';
+    'contrast'    'string' { 'on','off' } 'off';
     'level'       'string' { 'one','two','both'} 'both';
     'interaction' 'string' { 'on','off' } 'off' });
 if ischar(g)
@@ -145,20 +146,42 @@ if strcmpi(g.gui, 'on')
     else
         listui(1,:) = [];
     end
-    geometry = cell(1,size(listui,2));
-    geometry(:) = {ones(1,size(listui,1))};
-    listui = listui(:);
-    listui{end+1} = {};
-    geometry{end+1} = [1];
     
-    geometry = { geometry{:} 1 };
-    listui = {listui{:} { 'width',80,'align','center','Style', 'pushbutton', 'string', 'OK', 'callback', ['set(gcbf, ''userdata'', ''OK'');'] }  };
-    
-    fig = figure('visible', 'off');
-    [~, ~, allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
-        'borders', [0.05 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'off' );
-    
-    waitfor( fig, 'userdata');
+    if strcmpi(g.contrast, 'on')
+        listui{2,1} = { };
+        listui{2,2} = { 'Style', 'text', 'string' 'Weight' };
+        for index = 1:max(length(allLabels2), length(allLabels1))
+            listui{2,index+2} = { 'Style', 'edit', 'string' '' };
+        end
+        geometry = cell(1,size(listui,2));
+        geometry(:) = { [ 1 0.3 ] };
+        listui = listui(:)';
+        warningmsg = [ 'warndlg2([ ''A contrast is any linear combination of beta parameters.'' 10 ' ...
+                       ''''' 10 ''To compute a difference between conditions,'' 10 ' ...
+                       '''enter "1" for the first condition/beta and "-1"'' 10 ' ...
+                       '''for the second condition/beta.'' 10 ''    '' 10 ' ...
+                       '''You need to balance positive and negative weights.'' 10 ' ...
+                       '''Say you have 3 betas for "face unknown", "face known",'' 10 ' ...
+                       '''and "no face" and want to build a contrast face vs no'' 10 ' ...
+                       '''face. Then you need to assign 1 to the first 2 beta'' 10 ' ...
+                       '''parameters and -2 to the last "no face" one.'' ]);' ];
+        
+        [~, ~, allobj] = inputgui( 'geometry', geometry, 'uilist', listui, 'helpcom',  warningmsg);
+    else
+        geometry = cell(1,size(listui,2));
+        geometry(:) = {ones(1,size(listui,1))};
+        listui = listui(:);
+        listui{end+1} = {};
+        geometry{end+1} = [1];
+        geometry = { geometry{:} 1 };
+        listui = {listui{:} { 'width',80,'align','center','Style', 'pushbutton', 'string', 'OK', 'callback', ['set(gcbf, ''userdata'', ''OK'');'] }  };
+        
+        fig = figure('visible', 'off');
+        [~, ~, allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
+            'borders', [0.05 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'off' );
+        
+        waitfor( fig, 'userdata');
+    end
     
     try,
         result = get(fig, 'userdata');
