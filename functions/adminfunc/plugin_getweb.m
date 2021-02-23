@@ -37,6 +37,12 @@ if nargin < 2, pluginOri = []; end
 % convert plugin list format if necessary
 if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end
 
+[~,dateTmp] = version;
+if datenum(dateTmp) < 736583
+    error( [ 'The plugin manager is only available for Matlab version 2016b and later versions.' 10 ...
+              'Download plugins from the internet and unzip them in the plugin folder instead.' ] );
+end
+
 % retreiving statistics
 eeglab_options;
 try

@@ -300,36 +300,37 @@ if ~ischar(varargin{1})
     end
     all_comps = length(STUDY.cluster(1).comps);
     
-    show_clust      = [ 'pop_clustedit(''showclust'',gcf);'];
-    show_comps      = [ 'pop_clustedit(''showcomplist'',gcf);'];
-	plot_clus_maps  = [ 'pop_clustedit(''topoplot'',gcf); ']; 
-    plot_comp_maps  = [ 'pop_clustedit(''plotcomptopo'',gcf); ']; 
-    plot_clus_ersps = ['pop_clustedit(''erspplot'',gcf); '];
-    plot_comp_ersps = ['pop_clustedit(''plotcompersp'',gcf); '];
-    plot_clus_itcs  = ['pop_clustedit(''itcplot'',gcf); '];
-    plot_comp_itcs  = ['pop_clustedit(''plotcompitc'',gcf); '];
-    plot_clus_erpim = ['pop_clustedit(''erpimageplot'',gcf); '];
-    plot_comp_erpim = ['pop_clustedit(''plotcomperpimage'',gcf); '];
-    plot_clus_spectra = ['pop_clustedit(''specplot'',gcf); '];
-    plot_comp_spectra = ['pop_clustedit(''plotcompspec'',gcf); '];
-    plot_clus_erp = ['pop_clustedit(''erpplot'',gcf); '];
-    plot_comp_erp = ['pop_clustedit(''plotcomperp'',gcf); '];
-    plot_clus_dip = ['pop_clustedit(''dipplot'',gcf); '];
-    plot_comp_dip = ['pop_clustedit(''plotcompdip'',gcf); '];
-    plot_clus_sum = ['pop_clustedit(''plotsum'',gcf); '];
-    plot_comp_sum = ['pop_clustedit(''plotcompsum'',gcf); '];
-    rename_clust  = ['pop_clustedit(''renameclust'',gcf);']; 
-    move_comp     = ['pop_clustedit(''movecomp'',gcf);'];
-    move_outlier  = ['pop_clustedit(''moveoutlier'',gcf);'];
-    create_clus   = ['pop_clustedit(''createclust'',gcf);'];
-    reject_outliers = ['pop_clustedit(''rejectoutliers'',gcf);'];
-    merge_clusters = ['pop_clustedit(''mergeclusters'',gcf);'];
-    dip_opt        = ['pop_clustedit(''dip_opt'',gcf);'];
-    erp_opt        = ['pop_clustedit(''erp_opt'',gcf);'];
-    spec_opt       = ['pop_clustedit(''spec_opt'',gcf);'];
-    ersp_opt       = ['pop_clustedit(''ersp_opt'',gcf);'];
-    erpim_opt      = ['pop_clustedit(''erpim_opt'',gcf);'];
-    stat_opt       = ['pop_clustedit(''stat_opt'',gcf);'];
+    show_clust_gcf  = [ 'pop_clustedit(''showclust'',gcf);'];
+    show_clust      = [ 'pop_clustedit(''showclust'',gcbf);'];
+    show_comps      = [ 'pop_clustedit(''showcomplist'',gcbf);'];
+	plot_clus_maps  = [ 'pop_clustedit(''topoplot'',gcbf); ']; 
+    plot_comp_maps  = [ 'pop_clustedit(''plotcomptopo'',gcbf); ']; 
+    plot_clus_ersps = ['pop_clustedit(''erspplot'',gcbf); '];
+    plot_comp_ersps = ['pop_clustedit(''plotcompersp'',gcbf); '];
+    plot_clus_itcs  = ['pop_clustedit(''itcplot'',gcbf); '];
+    plot_comp_itcs  = ['pop_clustedit(''plotcompitc'',gcbf); '];
+    plot_clus_erpim = ['pop_clustedit(''erpimageplot'',gcbf); '];
+    plot_comp_erpim = ['pop_clustedit(''plotcomperpimage'',gcbf); '];
+    plot_clus_spectra = ['pop_clustedit(''specplot'',gcbf); '];
+    plot_comp_spectra = ['pop_clustedit(''plotcompspec'',gcbf); '];
+    plot_clus_erp = ['pop_clustedit(''erpplot'',gcbf); '];
+    plot_comp_erp = ['pop_clustedit(''plotcomperp'',gcbf); '];
+    plot_clus_dip = ['pop_clustedit(''dipplot'',gcbf); '];
+    plot_comp_dip = ['pop_clustedit(''plotcompdip'',gcbf); '];
+    plot_clus_sum = ['pop_clustedit(''plotsum'',gcbf); '];
+    plot_comp_sum = ['pop_clustedit(''plotcompsum'',gcbf); '];
+    rename_clust  = ['pop_clustedit(''renameclust'',gcbf);']; 
+    move_comp     = ['pop_clustedit(''movecomp'',gcbf);'];
+    move_outlier  = ['pop_clustedit(''moveoutlier'',gcbf);'];
+    create_clus   = ['pop_clustedit(''createclust'',gcbf);'];
+    reject_outliers = ['pop_clustedit(''rejectoutliers'',gcbf);'];
+    merge_clusters = ['pop_clustedit(''mergeclusters'',gcbf);'];
+    dip_opt        = ['pop_clustedit(''dip_opt'',gcbf);'];
+    erp_opt        = ['pop_clustedit(''erp_opt'',gcbf);'];
+    spec_opt       = ['pop_clustedit(''spec_opt'',gcbf);'];
+    ersp_opt       = ['pop_clustedit(''ersp_opt'',gcbf);'];
+    erpim_opt      = ['pop_clustedit(''erpim_opt'',gcbf);'];
+    stat_opt       = ['pop_clustedit(''stat_opt'',gcbf);'];
     saveSTUDY      = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
     browsesave     = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
@@ -422,7 +423,7 @@ if ~ischar(varargin{1})
    [out_param, userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''pop_clustoutput'')', ...
                                    'title', 'View and edit current component clusters -- pop_clustedit()' , 'userdata', fig_arg, ...
-                                   'geomvert', geomvert, 'eval', show_clust );
+                                   'geomvert', geomvert, 'eval', show_clust_gcf );
 	
    if ~isempty(userdat)
        ALLEEG = userdat{1}{1};

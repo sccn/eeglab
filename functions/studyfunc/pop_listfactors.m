@@ -56,6 +56,7 @@ end
 
 g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
     'splitreg'    'string' { 'on','off' } 'off';
+    'contrast'    'string' { 'on','off' } 'off';
     'level'       'string' { 'one','two','both'} 'both';
     'interaction' 'string' { 'on','off' } 'off' });
 if ischar(g)
@@ -145,20 +146,52 @@ if strcmpi(g.gui, 'on')
     else
         listui(1,:) = [];
     end
-    geometry = cell(1,size(listui,2));
-    geometry(:) = {ones(1,size(listui,1))};
-    listui = listui(:);
-    listui{end+1} = {};
-    geometry{end+1} = [1];
     
-    geometry = { geometry{:} 1 };
-    listui = {listui{:} { 'width',80,'align','center','Style', 'pushbutton', 'string', 'OK', 'callback', ['set(gcbf, ''userdata'', ''OK'');'] }  };
-    
-    fig = figure('visible', 'off');
-    [~, ~, allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
-        'borders', [0.05 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'off' );
-    
-    waitfor( fig, 'userdata');
+    if strcmpi(g.contrast, 'on')
+        listui{2,1} = { };
+        listui{2,2} = { 'Style', 'text', 'string' 'Weight' };
+        for index = 1:max(length(allLabels2), length(allLabels1))
+            listui{2,index+2} = { 'Style', 'edit', 'string' '' };
+        end
+        geometry = cell(1,size(listui,2));
+        geometry(:) = { [ 1 0.3 ] };
+        listui = listui(:)';
+        warningmsg = [ 'warndlg2([ ''A contrast is linear combination of variables (model parameters).'' 10 ' ...
+            '''Two types of contrasts are valid:'' 10 ' ...
+            ''' '' 10 ' ...
+            '''- sum/averages: add together variables, e.g., weights of 0.5 (1st var),'' 10 ' ...
+            '''and 0.5 (2nd var) creates the average of variables 1 and 2.'' 10 ' ...
+            ''' '' 10 ' ...
+            '''- differences: weight variables with coefficients adding up to zero, '' 10 ' ...
+            '''e.g. 0.5, 0.5, -0.5 and -0.5 creates the difference between the averages '' 10 ' ...
+            '''of variables 1&2 vs. 3&4. '' 10 ' ...
+            ''' '' 10 ' ...
+            '''Make sure you create meaningful contrasts that are easy to interpret. '' 10 ' ...
+            '''Plotting and checking the values of an ERP/Spectra/ERSP contrast '' 10 ' ...
+            '''[0.5 0.5 -0.5 -0.5] is looking at the difference between two means. '' 10 ' ...
+            '''Plotting and checking the values of an ERP/Spectra/ERSP contrast '' 10 ' ...
+            '''[1 1 -1 -1] is looking at the difference between two sums. These two '' 10 ' ...
+            '''contrasts will give the same statistical result (T/p values) but the '' 10 ' ...
+            '''former is easier to interpret than the latter. Contrast validity is '' 10 ' ...
+            '''automatically checked.'' ]);' ];
+        
+        
+        [~, ~, allobj] = inputgui( 'geometry', geometry, 'uilist', listui, 'helpcom',  warningmsg);
+    else
+        geometry = cell(1,size(listui,2));
+        geometry(:) = {ones(1,size(listui,1))};
+        listui = listui(:);
+        listui{end+1} = {};
+        geometry{end+1} = [1];
+        geometry = { geometry{:} 1 };
+        listui = {listui{:} { 'width',80,'align','center','Style', 'pushbutton', 'string', 'OK', 'callback', ['set(gcbf, ''userdata'', ''OK'');'] }  };
+        
+        fig = figure('visible', 'off');
+        [~, ~, allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
+            'borders', [0.05 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'off' );
+        
+        waitfor( fig, 'userdata');
+    end
     
     try,
         result = get(fig, 'userdata');

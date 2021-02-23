@@ -356,11 +356,24 @@ for counter = 1:maxcount
                         (~isempty(currentelem{4}) && isempty(findstr('html', currentelem{4}{1}))))
                     %tmp = curext(3)/curpos(3);
                     %if tmp > 3*factmultx && factmultx > 0, adsfasd; end
+                    if exist('OCTAVE_VERSION','builtin') ~= 0
+                      curtxt = get(allhandlers{counter}, 'string');
+                      if ischar(curtxt)
+                        nLines = length(find(curtxt == 10))+1;
+                        curext(3) = curext(3)/nLines;
+                      end
+                    end
+                    
                     factmultx = max(factmultx, curext(3)/curpos(3));
+                    tmptxt = get(allhandlers{counter}, 'string');
+%                   % text to get which UI modify horizontal size
+%                    if iscell(tmptxt) fprintf('%s -> %f\n', 'cell', curext(3)/curpos(3));
+%                    else              fprintf('%s -> %f\n', tmptxt, curext(3)/curpos(3));
+%                    end                      
                     if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
                 end
             end
-            if  ~strcmp(style, 'listbox')
+            if  ~strcmp(style, 'listbox') &&  ~strcmp(style, 'popupmenu')
                 factmulty = max(factmulty, curext(4)/curpos(4));
             end
             

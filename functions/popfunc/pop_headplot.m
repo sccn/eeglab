@@ -103,7 +103,7 @@ if nargin < 3 % Open GUI input window
     compute_file = 0;
     if typeplot == 1 % ********** data plot
         fieldname    = 'splinefile';        
-        if isempty(EEG.splinefile) && exist(EEG.splinefile, 'file')          
+        if isempty(EEG.splinefile) && exist(char(EEG.splinefile), 'file')          
             if length(EEG.icachansind) == EEG.nbchan && ~isempty(EEG.icasplinefile)
                 EEG.splinefile = EEG.icasplinefile;
             else
@@ -114,7 +114,7 @@ if nargin < 3 % Open GUI input window
         end
     else % ************* Component plot       
         fieldname    = 'icasplinefile';
-        if isempty(EEG.icasplinefile) && exist(EEG.icasplinefile, 'file')
+        if isempty(EEG.icasplinefile) && exist(char(EEG.icasplinefile), 'file')
             if length(EEG.icachansind) == EEG.nbchan && ~isempty(EEG.splinefile)
                 EEG.icasplinefile = EEG.splinefile;
             else
@@ -231,7 +231,7 @@ if nargin < 3 % Open GUI input window
     end
 	txt = { { 'style' 'text'        'string' 'Co-register channel locations with head mesh and compute a mesh spline file (each scalp montage needs a headplot() spline file)' 'fontweight' 'bold' } ...
             { 'style' 'checkbox'    'string' 'Use the following spline file or structure' 'userdata' 'loadfile' 'tag' 'loadcb' 'callback' cb_load 'value' ~compute_file } ...
-            { 'style' 'edit'        'string' fastif(typeplot, EEG.splinefile, EEG.icasplinefile)  'userdata' 'load' 'tag' 'load' 'enable' enableload } ...
+            { 'style' 'edit'        'string' char(fastif(typeplot, EEG.splinefile, EEG.icasplinefile))  'userdata' 'load' 'tag' 'load' 'enable' enableload } ...
             { 'style' 'pushbutton'  'string' 'Browse'        'callback' cb_browseload                               'tag' 'load' 'enable' enableload } ... 
             { 'style' 'pushbutton'  'string' 'Help'          'callback' cb_helpload } ...
             { 'style' 'checkbox'    'string' 'Or (re)compute a new spline file named:' 'tag' 'compcb' 'callback' cb_comp 'value' compute_file } ...

@@ -135,42 +135,43 @@ if ~ischar(varargin{1})
         disp('Warning: history not saved for group creation');
     end
     
-    show_chan          = ['pop_chanplot(''showchan'',gcf);'];
-    show_onechan       = ['pop_chanplot(''showchanlist'',gcf);'];
-	plot_chan_maps     = ['pop_chanplot(''topoplot'',gcf); ']; 
-    plot_onechan_maps  = ['pop_chanplot(''plotchantopo'',gcf); ']; 
-    plot_chan_ersps    = ['pop_chanplot(''erspplot'',gcf); '];
-    plot_onechan_ersps = ['pop_chanplot(''plotchanersp'',gcf); '];
-    plot_chan_itcs     = ['pop_chanplot(''itcplot'',gcf); '];
-    plot_onechan_itcs  = ['pop_chanplot(''plotchanitc'',gcf); '];
-    plot_chan_erpim    = ['pop_chanplot(''erpimageplot'',gcf); '];
-    plot_onechan_erpim = ['pop_chanplot(''plotchanerpimage'',gcf); '];
-    plot_chan_spectra  = ['pop_chanplot(''specplot'',gcf); '];
-    plot_onechan_spectra = ['pop_chanplot(''plotchanspec'',gcf); '];
-    plot_chan_erp      = ['pop_chanplot(''erpplot'',gcf); '];
-    plot_onechan_erp   = ['pop_chanplot(''plotchanerp'',gcf); '];
-    plot_chan_dip      = ['pop_chanplot(''dipplot'',gcf); '];
-    plot_onechan_dip   = ['pop_chanplot(''plotchandip'',gcf); '];
-    plot_chan_sum      = ['pop_chanplot(''plotsum'',gcf); '];
-    plot_onechan_sum   = ['pop_chanplot(''plotonechanum'',gcf); '];
-    rename_chan        = ['pop_chanplot(''renamechan'',gcf);']; 
-    move_onechan       = ['pop_chanplot(''movecomp'',gcf);'];
-    move_outlier       = ['pop_chanplot(''moveoutlier'',gcf);'];
-    create_chan        = ['pop_chanplot(''createchan'',gcf);'];
-    reject_outliers    = ['pop_chanplot(''rejectoutliers'',gcf);'];
-    merge_channels     = ['pop_chanplot(''mergechannels'',gcf);'];
-    erp_opt            = ['pop_chanplot(''erp_opt'',gcf);'];
-    spec_opt           = ['pop_chanplot(''spec_opt'',gcf);'];
-    erpim_opt          = ['pop_chanplot(''erpim_opt'',gcf);'];
-    ersp_opt           = ['pop_chanplot(''ersp_opt'',gcf);'];
-    stat_opt           = ['pop_chanplot(''stat_opt'',gcf);'];
-    create_group       = ['pop_chanplot(''create_group'',gcf);'];
-    edit_group         = ['pop_chanplot(''edit_group'',gcf);'];
-    delete_group       = ['pop_chanplot(''delete_group'',gcf);'];
-    saveSTUDY          = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
+    show_chan          = ['pop_chanplot(''showchan'',gcbf);'];
+    show_chan_gcf      = ['pop_chanplot(''showchan'',gcf);'];
+    show_onechan       = ['pop_chanplot(''showchanlist'',gcbf);'];
+	plot_chan_maps     = ['pop_chanplot(''topoplot'',gcbf); ']; 
+    plot_onechan_maps  = ['pop_chanplot(''plotchantopo'',gcbf); ']; 
+    plot_chan_ersps    = ['pop_chanplot(''erspplot'',gcbf); '];
+    plot_onechan_ersps = ['pop_chanplot(''plotchanersp'',gcbf); '];
+    plot_chan_itcs     = ['pop_chanplot(''itcplot'',gcbf); '];
+    plot_onechan_itcs  = ['pop_chanplot(''plotchanitc'',gcbf); '];
+    plot_chan_erpim    = ['pop_chanplot(''erpimageplot'',gcbf); '];
+    plot_onechan_erpim = ['pop_chanplot(''plotchanerpimage'',gcbf); '];
+    plot_chan_spectra  = ['pop_chanplot(''specplot'',gcbf); '];
+    plot_onechan_spectra = ['pop_chanplot(''plotchanspec'',gcbf); '];
+    plot_chan_erp      = ['pop_chanplot(''erpplot'',gcbf); '];
+    plot_onechan_erp   = ['pop_chanplot(''plotchanerp'',gcbf); '];
+    plot_chan_dip      = ['pop_chanplot(''dipplot'',gcbf); '];
+    plot_onechan_dip   = ['pop_chanplot(''plotchandip'',gcbf); '];
+    plot_chan_sum      = ['pop_chanplot(''plotsum'',gcbf); '];
+    plot_onechan_sum   = ['pop_chanplot(''plotonechanum'',gcbf); '];
+    rename_chan        = ['pop_chanplot(''renamechan'',gcbf);']; 
+    move_onechan       = ['pop_chanplot(''movecomp'',gcbf);'];
+    move_outlier       = ['pop_chanplot(''moveoutlier'',gcbf);'];
+    create_chan        = ['pop_chanplot(''createchan'',gcbf);'];
+    reject_outliers    = ['pop_chanplot(''rejectoutliers'',gcbf);'];
+    merge_channels     = ['pop_chanplot(''mergechannels'',gcbf);'];
+    erp_opt            = ['pop_chanplot(''erp_opt'',gcbf);'];
+    spec_opt           = ['pop_chanplot(''spec_opt'',gcbf);'];
+    erpim_opt          = ['pop_chanplot(''erpim_opt'',gcbf);'];
+    ersp_opt           = ['pop_chanplot(''ersp_opt'',gcbf);'];
+    stat_opt           = ['pop_chanplot(''stat_opt'',gcbf);'];
+    create_group       = ['pop_chanplot(''create_group'',gcbf);'];
+    edit_group         = ['pop_chanplot(''edit_group'',gcbf);'];
+    delete_group       = ['pop_chanplot(''delete_group'',gcbf);'];
+    saveSTUDY          = [ 'set(findobj(''parent'', gcbf, ''userdat'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
     browsesave         = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_chan()''); ' ... 
                            'set(faindobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
-    sel_all_chans      = ['pop_chanplot(''sel_all_chans'',gcf);'];
+    sel_all_chans      = ['pop_chanplot(''sel_all_chans'',gcbf);'];
                        
     % list of channel groups
     % ----------------------
@@ -250,7 +251,7 @@ if ~ischar(varargin{1})
     [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
         'helpcom', 'pophelp(''pop_chanplot'')', ...
         'title', 'View and edit current channels -- pop_chanplot()' , 'userdata', fig_arg, ...
-        'geomvert', geomvert, 'eval', show_chan );
+        'geomvert', geomvert, 'eval', show_chan_gcf );
 	
    if ~isempty(userdat)
        ALLEEG = userdat{1}{1};
@@ -264,7 +265,7 @@ if ~ischar(varargin{1})
    
 else
     hdl = varargin{2};  %figure handle
-    userdat  = get(varargin{2}, 'userdat');    
+    userdat  = get(hdl, 'userdat');    
     ALLEEG   = userdat{1}{1};
     STUDY    = userdat{1}{2};
     cls      = userdat{1}{3};

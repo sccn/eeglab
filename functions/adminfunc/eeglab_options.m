@@ -1,3 +1,5 @@
+echo off;
+
 % eeglab_options() - handle EEGLAB options. This script (not function)
 %                    set the various options in the eeg_options() file.
 %
@@ -67,6 +69,7 @@ try
                 cd(tmpp2);
             end
         catch, end
+        echo off;
         eeg_options; % default one with EEGLAB
         cd(oldp);
     end
