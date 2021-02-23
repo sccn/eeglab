@@ -102,7 +102,14 @@ name = fullfile(path_tmp, STUDY.datasetinfo(index).subject);
 if strcmpi(opt.datatype,'channels')
     % DATERP 
     if strcmp(opt.erp,'on')
-        data = load('-mat',[name '.daterp']);
+        if ~exist([name '.daterp'],'file')
+            tmp = dir([name '*.daterp']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and .daterp\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.daterp']);
+        end
         EEG.etc.timeerp = data.times;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
@@ -116,7 +123,14 @@ if strcmpi(opt.datatype,'channels')
     
     % DATSPEC
     if strcmp(opt.spec,'on')
-        data = load('-mat',[name '.datspec']);
+        if ~exist([name '.datspec'],'file')
+            tmp = dir([name '*.datspec']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and .datspec\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.datspec']);
+        end
         EEG.etc.freqspec = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
@@ -129,7 +143,14 @@ if strcmpi(opt.datatype,'channels')
     end
     % DATERSP    
     if strcmp(opt.timef,'on')
-        data = load('-mat',[name '.dattimef'],'times','freqs');
+        if ~exist([name '.dattimef'],'file')
+            tmp = dir([name '*.dattimef']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and .dattimef\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.dattimef'],'times','freqs');
+        end
         EEG.etc.timeersp = data.times;
         EEG.etc.freqersp = data.freqs;
         if strcmp(opt.format,'matrix')
@@ -144,7 +165,14 @@ if strcmpi(opt.datatype,'channels')
     end
     % DATITC
     if strcmp(opt.itc,'on')
-        data = load('-mat',[name '.datitc']);
+        if ~exist([name '.datitc'],'file')
+            tmp = dir([name '*.datitc']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and .datitc\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.datitc']);
+        end
         EEG.etc.timeitc = data.times;
         EEG.etc.freqitc = data.freqs;
         if strcmp(opt.format,'matrix')
@@ -162,7 +190,14 @@ end
 %  -------------------------------
 if strcmpi(opt.datatype,'components')
     if strcmp(opt.erp,'on')
-        data = load('-mat',[name '.icaerp']);
+        if ~exist([name '.icaerp'],'file')
+            tmp = dir([name '*.icaerp']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and .icaerp\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.icaerp']);
+        end
         EEG.etc.timeerp = data.times;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
@@ -175,7 +210,14 @@ if strcmpi(opt.datatype,'components')
     end
     % ICAERP
     if strcmp(opt.spec,'on')
-        data = load('-mat',[name '.icaspec']);
+        if ~exist([name '.icaspec'],'file')
+            tmp = dir([name '*.icaspec']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and .icaspec\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.icaspec']);
+        end
         EEG.etc.freqspec = data.freqs;
         if strcmp(opt.format,'matrix')
             data = limo_struct2mat(data);
@@ -188,7 +230,14 @@ if strcmpi(opt.datatype,'components')
     end
     % ICAERSP    
     if strcmp(opt.timef,'on')
-        data = load('-mat',[name '.icatimef']);
+        if ~exist([name '.icatimef'],'file')
+            tmp = dir([name '*.icatimef']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and .icatimef\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.icatimef']);
+        end
         EEG.etc.timeersp = data.times;
         EEG.etc.freqersp = data.freqs;
         if strcmp(opt.format,'matrix')
@@ -202,7 +251,14 @@ if strcmpi(opt.datatype,'components')
     end
     % ICAITC
     if strcmp(opt.itc,'on')
-        data = load('-mat',[name '.icaitc']);
+        if ~exist([name '.icaitc'],'file')
+            tmp = dir([name '*.icaitc']);
+            name = fullfile(tmp(1).folder,tmp(1).name);
+            warning('couldn''t find a direct match between .set and ..icaitc\n loading %s',name)
+            data = load('-mat',name);
+        else
+            data = load('-mat',[name '.icaitc']);
+        end
         EEG.etc.timeitc = data.times;
         EEG.etc.freqitc = data.freqs;
         if strcmp(opt.format,'matrix')
