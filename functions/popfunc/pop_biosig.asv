@@ -229,22 +229,31 @@ for iFile = 1:length(filename)
         end
     end
     
-    % import events using mexSLOAD method (Cedric edits 2/23/2021)
+    % import events using mexSLOAD method
     if strcmpi(g.importmex, 'on')
-        [s,HDR] = mexSLOAD(filename);
+        [s,HDR] = mexSLOAD(fileName);
         event_types = HDR.EVENT.TYP;
-        for iEvent = 1:length(event_types)
-            if event_types(iEvent) == 1
-                events(iEvent).type = 'T0';
-            elseif event_types(iEvent) == 2
-                events(iEvent).type = 'T2';
-            elseif event_types(iEvent) == 3
-                events(iEvent).type = 'T1';
-            end
-            events(iEvent).latency = HDR.EVENT.POS(iEvent);
-            events(iEvent).urevent = iEvent;
+    
+    for iEvent = 1:length(event_types)
+        if event_types(iEvent) == 1
+            events(iEvent).type = 'T0';
+        elseif event_types(iEvent) == 2
+            events(iEvent).type = 'T2';
+        elseif event_types(iEvent) == 3
+            events(iEvent).type = 'T1';
+        elseif event_types(iEvent) == 4
+            events(iEvent).type = 'T3';
+        elseif event_types(iEvent) == 5
+            events(iEvent).type = 'T4';
+        elseif event_types(iEvent) == 6
+            events(iEvent).type = 'T5';
         end
-        EEG.event = events;
+        
+        events(iEvent).latency = HDR.EVENT.POS(iEvent);
+        events(iEvent).urevent = iEvent;
+        
+    end
+
     end
     
     % check and store data
