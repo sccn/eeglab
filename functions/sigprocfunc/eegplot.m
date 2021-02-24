@@ -236,7 +236,7 @@ if datenum(versiont) <= 737315 || FORCE_EEGPLOT_LEGACY % Matlab 2018b and earlie
 end
 if isempty(message)
     message = 1;
-    fprintf('You are a new version of eegplot - if you encounter problems\ntype "edit eegplot.m" and change FORCE_EEGPLOT_LEGACY to true\n');
+    fprintf('You are using a new version of eegplot - if you encounter problems\ntype "edit eegplot.m" and change FORCE_EEGPLOT_LEGACY to true\n');
 end
 
 % Defaults (can be re-defined):
