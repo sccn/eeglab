@@ -14,6 +14,7 @@
 %                  Default is empty -> import all data blocks. 
 %  'importevent' - ['on'|'off'] import events. Default if 'on'.
 %  'importannot' - ['on'|'off'] import annotations (EDF+ only). Default if 'on'
+%  'importmex' - ['on'|'off'] import events with Biosig mexSLOAD as an alternative. Default if 'off'
 %  'blockepoch'  - ['on'|'off'] force importing continuous data. Default is 'on'
 %  'ref'         - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
@@ -232,16 +233,19 @@ for iFile = 1:length(filename)
         end
     end
     
-    % import using mexSLOAD method (Cedric edits 2/23/2021)
+    % import using Biosig mexSLOAD method (Cedric edits 2/23/2021)
     if strcmpi(g.importmex, 'on')
         [s,HDR] = mexSLOAD(filename);
-        events = [];
         for iEvent = 1:length(HDR.EVENT.TYP)
-            events(iEvent).type = HDR.EVENT.TYP(iEvent);
-            events(iEvent).latency = HDR.EVENT.POS(iEvent);
-            events(iEvent).urevent = iEvent;
+            if ~isempty(HDR.EVENT.CodeDesc)
+                EEG.event(iEvent).type = char(HDR.EVENT.CodeDesc(HDR.EVENT.TYP(iEvent)));
+            else
+                EEG.event(iEvent).type = HDR.EVENT.TYP(iEvent);
+                disp('Warning: event names were not found. Check names in the filename.edf.event file with a text editor');
+            end                
+            EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
+            EEG.event(iEvent).urevent = iEvent;
         end
-        EEG.event = events;
     end
     
     % check and store data
