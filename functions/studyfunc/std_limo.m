@@ -249,7 +249,7 @@ model.cont_files = [];
 % order properly STUDY.design(STUDY.currentdesign).cases.value based on
 % users subjects name
 for s=length(STUDY.datasetinfo):-1:1
-    if contains(STUDY.datasetinfo(s).subject,STUDY.design(STUDY.currentdesign).cases.value)
+    if ismember(STUDY.datasetinfo(s).subject,STUDY.design(STUDY.currentdesign).cases.value)
         unique_subjects{s} = STUDY.datasetinfo(s).subject; % current design has this subject
     end
 end
