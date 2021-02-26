@@ -245,12 +245,19 @@ end
 % -------------------------------------------------------------------------
 model.cat_files  = [];
 model.cont_files = [];
-unique_subjects  = STUDY.design(STUDY.currentdesign).cases.value'; % unique_subject uses the STUDY name
-nb_subjects      = length(unique_subjects);
+
+% order properly STUDY.design(STUDY.currentdesign).cases.value based on
+% users subjects name
+for s=length(STUDY.datasetinfo):-1:1
+    if contains(STUDY.datasetinfo(s).subject,STUDY.design(STUDY.currentdesign).cases.value)
+        unique_subjects{s} = STUDY.datasetinfo(s).subject; % current design has this subject
+    end
+end
+nb_subjects = length(unique_subjects);
 
 % simply reshape to read columns
 % -------------------------------------------------------------------------
-order = cell(1,nb_subjects);
+order = cell(1,nb_subjects); % STUDY oder of each unique subject // include sessions with each cell
 for s = 1:nb_subjects
     order{s} = find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject}));
 end
@@ -315,10 +322,9 @@ for s = 1:nb_subjects
         % EEGLIMO.icawinv
         % EEGLIMO.icaweights
         
-        filename = [STUDY.datasetinfo(order{s}(ss)).subject '_limo_file_design' num2str(design_index) '_sess' num2str(ss) '.set'];
+        filename = [STUDY.datasetinfo(s).subject '_limo_file_design' num2str(design_index) '_sess' num2str(ss) '.set'];
         index    = [STUDY.datasetinfo(order{s}(ss)).index];
-        tmp      = {STUDY.datasetinfo(order{s}(ss)).subject};
-        if length(unique(tmp)) ~= 1
+        if size(unique(STUDY.datasetinfo(order{s}).subject),1) ~= 1
             error('it seems that sets of different subjects are merged')
         end
         
