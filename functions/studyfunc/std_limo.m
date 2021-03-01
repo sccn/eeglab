@@ -1,3 +1,4 @@
+
 % std_limo() - Export and run in LIMO the EEGLAB STUDY design.
 %           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
 %
@@ -576,22 +577,6 @@ if isempty(keep_files) || strcmpi(keep_files,'no')
 else
     for s = find(procstatus)
         delete(model.set_files{s});
-    end
-end
-
-% split txt files if more than 1 group
-if length(STUDY.group) > 1
-    glm_name = [STUDY.design(STUDY.currentdesign).name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
-    for g= 1:length(STUDY.group)
-        subset = arrayfun(@(x)(strcmpi(x.group,STUDY.group{g})), STUDY.datasetinfo);
-        cell2csv(fullfile(LIMO_files.LIMO, ['LIMO_files_Gp' STUDY.group{g} '_' glm_name '.txt']), LIMO_files.mat(subset));
-        cell2csv(fullfile(LIMO_files.LIMO, ['Beta_files_Gp' STUDY.group{g} '_' glm_name '.txt']), LIMO_files.Beta(subset));
-        if isfield(LIMO_files,'con')
-            tmpcell = LIMO_files.con(subset);
-            for c=1:length(tmpcell{1})
-                cell2csv(fullfile(LIMO_files.LIMO, ['con' num2str(c) '_Gp' STUDY.group{g} '_' glm_name '.txt']),cellfun(@(x) x(c), tmpcell));
-            end
-        end
     end
 end
 
