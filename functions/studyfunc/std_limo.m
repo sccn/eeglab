@@ -47,11 +47,10 @@
 % Example:
 %  [STUDY LIMO_files] = std_limo(STUDY,ALLEEG,'measure','daterp')
 %
-% Author: Arnaud Delorme, SCCN, 2018 based on a previous version of
-%         Cyril Pernet (LIMO Team), The university of Edinburgh, 2014
-%         Ramon Martinez-Cancino and Arnaud Delorme
-
-% Copyright (C) 2018 Arnaud Delorm
+% Author: Arnaud Delorme (SCCN) & Cyril Pernet (LIMO Team)
+%         Based on previous version from Ramon Martinez-Cancino and Arnaud Delorme
+%
+% Copyright (C) 2018 Arnaud Delorme
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -248,17 +247,20 @@ model.cat_files  = [];
 model.cont_files = [];
 
 % order properly STUDY.design(STUDY.currentdesign).cases.value based on
-% users subjects name
+% users subjects name 
 for s=length(STUDY.datasetinfo):-1:1
     if ismember(STUDY.datasetinfo(s).subject,STUDY.design(STUDY.currentdesign).cases.value)
         unique_subjects{s} = STUDY.datasetinfo(s).subject; % current design has this subject
     end
 end
+unique_subjects(cellfun(@isempty,unique_subjects)) = [];
+unique_subjects = unique(unique_subjects); % remove repeats
 nb_subjects = length(unique_subjects);
 
-% simply reshape to read columns
+% STUDY order of each unique subject // include sessions within each cell, 
+% allows unbalance in the number of sessions
 % -------------------------------------------------------------------------
-order = cell(1,nb_subjects); % STUDY oder of each unique subject // include sessions with each cell
+order = cell(1,nb_subjects); 
 for s = 1:nb_subjects
     order{s} = find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject}));
 end
@@ -423,7 +425,7 @@ for s = 1:length(STUDY.datasetinfo)
     [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
     if strcmpi(opt.splitreg,'on')
         for c=1:size(contMat,2)
-            splitreg{c} = limo_split_continuous(catMat,contMat(:,c));
+            splitreg{c} = limo_split_continuous(catMat,contMat(:,c)); % std_limodesign does something else when splitting regressors
         end
         contMat    = cell2mat(splitreg);
         opt.zscore = 0; % regressors are now zscored
@@ -560,10 +562,10 @@ keep_files = 'no';
 if sum(procstatus) == nb_subjects
     disp('All subjects have been successfully processed.')
 else
-    if sum(procstatus)==0
-        errordlg2('all subjects failed to process, check batch report')
+    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tell the user
+        errordlg2('all subjects failed to process, check limo batch report')
     else
-        warndlg2('some subjects failed to process, check batch report')
+        warndlg2('some subjects failed to process, check limo batch report')
     end
     % cleanup temp files - except for subjects with errors?
     keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
