@@ -1,10 +1,10 @@
-% eegplot() - Scroll (horizontally and/or vertically) through multichannel data.
+% eegplotlegacy() - Scroll (horizontally and/or vertically) through multichannel data.
 %             Allows vertical scrolling through channels and manual marking 
 %             and unmarking of data stretches or epochs for rejection.
 % Usage: 
-%           >> eegplot(data, 'key1', value1 ...); % use interface buttons, etc.
+%           >> eegplotlegacy(data, 'key1', value1 ...); % use interface buttons, etc.
 %      else
-%           >> eegplot('noui', data, 'key1', value1 ...); % no user interface;
+%           >> eegplotlegacy('noui', data, 'key1', value1 ...); % no user interface;
 %                                                         % use for plotting
 % Menu items:
 %    "Figure > print" - [menu] Print figure in portrait or landscape.
@@ -20,7 +20,7 @@
 %                  Clicked on a marked region to unmark it. Called from the
 %                  command line, marked data stretches or epochs are returned in 
 %                  the TMPREJ variable in the global workspace *if/when* the "Reject" 
-%                  button is pressed (see Outputs); called from pop_eegplot() or 
+%                  button is pressed (see Outputs); called from pop_eegplotlegacy() or 
 %                  eeglab(), the marked data portions are removed from the current
 %                  dataset, and the dataset is automatically updated.
 %     "Display > Marking color > Choose color" - [menu] Change the background marking 
@@ -46,7 +46,7 @@
 %                  of the activity plot. Command line equivalent: 'dispchans'
 %     "Settings > Channel labels > ..."  - [menu] Use numbers as channel labels or load
 %                  a channel location file from disk. If called from the eeglab() menu or
-%                  pop_eegplot(), the channel labels of the dataset will be used. 
+%                  pop_eegplotlegacy(), the channel labels of the dataset will be used. 
 %                  Command line equivalent: 'eloc_file'
 %     "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off for time and
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
@@ -136,9 +136,9 @@
 %    'events'     - [struct] EEGLAB event structure (EEG.event) to use to show events.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
-%    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
-%                    keeping track of several simultaneous eegplot() windows). 
-%    'children'   - [integer] Figure handle of a *dependent* eegplot() window. Scrolling
+%    'tag'        - [string] Matlab object tag to identify this eegplotlegacy() window (allows 
+%                    keeping track of several simultaneous eegplotlegacy() windows). 
+%    'children'   - [integer] Figure handle of a *dependent* eegplotlegacy() window. Scrolling
 %                    horizontally in the master window will produce the same scroll in 
 %                    the dependent window. Allows comparison of two concurrent datasets,
 %                    or of channel and component data from the same dataset.
@@ -161,7 +161,7 @@
 %
 % Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/INC/UCSD, 1998-2001
 %
-% See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
+% See also: eeg_multieegplotlegacy(), eegplot2event(), eegplot2trial(), eeglab()
 
 % deprecated 
 %    'colmodif'   - nested cell array of window colors that may be marked/unmarked. Default
@@ -211,36 +211,11 @@
 %    4 - maxfreq    % empty [] if no gfrequency content
 % 'buttons hold other informations' Eposition for instance hold the current postition
 
-function [outvar1] = eegplot(data, varargin)
-
-
-
-
-
-FORCE_EEGPLOT_LEGACY = false; % change to true here if you experience problems
-
-
-
-
-
-persistent message;
-outvar1 = [];
-[~,versiont] = version;
-if datenum(versiont) <= 737315 || FORCE_EEGPLOT_LEGACY % Matlab 2018b and earlier
-    [outvar1] = eegplotlegacy(data, varargin{:});
-    if isempty(message)
-        message = 1;
-        disp('Because you are using Matlab 2018b or earlier, you are using eegplotlegacy');
-    end
-    return
-end
-if isempty(message)
-    message = 1;
-    fprintf('You are using a new version of eegplot - if you encounter problems\ntype "edit eegplot.m" and change FORCE_EEGPLOT_LEGACY to true\n');
-end
+function [outvar1] = eegplotlegacy(data, varargin); % p1,p2,p3,p4,p5,p6,p7,p8,p9)
 
 % Defaults (can be re-defined):
 
+outvar1 = [];
 DEFAULT_PLOT_COLOR = { [0 0 1], [0.7 0.7 0.7]};         % EEG line color
 try, icadefs;
 	DEFAULT_FIG_COLOR = BACKCOLOR;
@@ -283,7 +258,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
            end
        else g= []; end
    catch
-       disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
+       disp('eegplotlegacy() error: calling convention {''key'', value, ... } error'); return;
    end;	
    
    % Selection of data range If spectrum plot  
@@ -305,10 +280,10 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 
   % push button: create/remove window
   % ---------------------------------
-  defdowncom   = 'eegplot(''defdowncom'',   gcbf);'; % push button: create/remove window
-  defmotioncom = 'eegplot(''defmotioncom'', gcbf);'; % motion button: move windows or display current position
-  defupcom     = 'eegplot(''defupcom'',     gcbf);';
-  defctrldowncom = 'eegplot(''topoplot'',   gcbf);'; % CTRL press and motion -> do nothing by default
+  defdowncom   = 'eegplotlegacy(''defdowncom'',   gcbf);'; % push button: create/remove window
+  defmotioncom = 'eegplotlegacy(''defmotioncom'', gcbf);'; % motion button: move windows or display current position
+  defupcom     = 'eegplotlegacy(''defupcom'',     gcbf);';
+  defctrldowncom = 'eegplotlegacy(''topoplot'',   gcbf);'; % CTRL press and motion -> do nothing by default
   defctrlmotioncom = ''; % CTRL press and motion -> do nothing by default
   defctrlupcom = ''; % CTRL press and up -> do nothing by default
 		 
@@ -317,7 +292,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
    try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
    try, g.position; 	    catch, g.position	= ORIGINAL_POSITION; 	end
-   try, g.title; 		    catch, g.title		= ['Scroll activity -- eegplot()']; 	end
+   try, g.title; 		    catch, g.title		= ['Scroll activity -- eegplotlegacy()']; 	end
    try, g.plottitle; 		catch, g.plottitle	= ''; 	end
    try, g.trialstag; 		catch, g.trialstag	= -1; 	end
    try, g.winrej; 			catch, g.winrej		= []; 	end
@@ -532,7 +507,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
       if isstruct(g.eloc_file) && length(g.eloc_file) > size(data,1)
           g.eloc_file(end) = []; % common reference channel location
       end
-      eegplot('setelect', g.eloc_file, ax1);
+      eegplotlegacy('setelect', g.eloc_file, ax1);
   end
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -571,7 +546,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'string','<<',...
 	'Callback',['global in_callback;', ...
                 'if isempty(in_callback);in_callback=1;', ...
-                '    try eegplot(''drawp'',1);', ...
+                '    try eegplotlegacy(''drawp'',1);', ...
                 '        clear global in_callback;', ...
                 '    catch error_struct;', ...
                 '        clear global in_callback;', ...
@@ -585,7 +560,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'string','<',...
 	'Callback',['global in_callback;', ...
                 'if isempty(in_callback);in_callback=1;', ...
-                '    try eegplot(''drawp'',2);', ...
+                '    try eegplotlegacy(''drawp'',2);', ...
                 '        clear global in_callback;', ...
                 '    catch error_struct;', ...
                 '        clear global in_callback;', ...
@@ -599,7 +574,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Style','edit', ...
 	'Tag','EPosition',...
 	'string', fastif(g.trialstag(1) == -1, '0', '1'),...
-	'Callback', 'eegplot(''drawp'',0);' );
+	'Callback', 'eegplotlegacy(''drawp'',0);' );
   u(3) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'Position',posbut(3,:), ...
@@ -607,7 +582,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'string','>',...
 	'Callback',['global in_callback;', ...
                 'if isempty(in_callback);in_callback=1;', ...
-                '    try eegplot(''drawp'',3);', ...
+                '    try eegplotlegacy(''drawp'',3);', ...
                 '        clear global in_callback;', ...
                 '    catch error_struct;', ...
                 '        clear global in_callback;', ...
@@ -621,7 +596,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'string','>>',...
 	'Callback',['global in_callback;', ...
                 'if isempty(in_callback);in_callback=1;', ...
-                '    try eegplot(''drawp'',4);', ...
+                '    try eegplotlegacy(''drawp'',4);', ...
                 '        clear global in_callback;', ...
                 '    catch error_struct;', ...
                 '        clear global in_callback;', ...
@@ -638,7 +613,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Style','edit', ...
 	'Tag','ESpacing',...
 	'string',num2str(g.spacing),...
-	'Callback', 'eegplot(''draws'',0);' );
+	'Callback', 'eegplotlegacy(''draws'',0);' );
 
 % Slider for vertical motion
   u(20) = uicontrol('Parent',figh, ...
@@ -651,7 +626,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    'callback', [ 'tmpg = get(gcbf, ''userdata'');' ... 
    				'tmpg.elecoffset = get(gcbo, ''value'')*(tmpg.chans-tmpg.dispchans);' ...
                'set(gcbf, ''userdata'', tmpg);' ...
-               'eegplot(''drawp'',0);' ...
+               'eegplotlegacy(''drawp'',0);' ...
                'clear tmpg;' ], ...
    'value', 0);
 
@@ -719,14 +694,14 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Tag','Pushbutton5',...
 	'string','+',...
 	'FontSize',8,...
-	'Callback','eegplot(''draws'',1)');
+	'Callback','eegplotlegacy(''draws'',1)');
   u(8) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'Position',posbut(11,:), ...
 	'Tag','Pushbutton6',...
 	'string','-',...
 	'FontSize',8,...
-	'Callback','eegplot(''draws'',2)');
+	'Callback','eegplotlegacy(''draws'',2)');
 
   cb_normalize = ['g = get(gcbf,''userdata'');if g.normed, disp(''Denormalizing...''); else, disp(''Normalizing...''); end;'...
     'hmenu = findobj(gcf, ''Tag'', ''Normalize_menu'');' ...
@@ -745,10 +720,10 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
     'end;'...
     'set(gcbo,''string'', ''Denorm'');g.oldspacing = g.spacing;set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',''5'');end;' ...
     'g.normed = 1 - g.normed;' ...
-    'eegplot(''draws'',0);'...
+    'eegplotlegacy(''draws'',0);'...
     'set(hmenu, ''Label'', fastif(g.normed,''Denormalize channels'',''Normalize channels''));' ...
     'set(gcbf,''userdata'',g);set(ax1,''UserData'',data);clear ax1 g data;' ...
-    'eegplot(''drawp'',0);' ...
+    'eegplotlegacy(''drawp'',0);' ...
     'disp(''Done.'')'];
 % Button for Normalizing data
 u(21) = uicontrol('Parent',figh, ...
@@ -763,7 +738,7 @@ cb_envelope = ['g = get(gcbf,''userdata'');'...
     'set(gcbf,''userdata'',g);'...
     'set(gcbo,''string'',fastif(g.envelope,''Spread'',''Stack''));' ...
     'set(hmenu, ''Label'', fastif(g.envelope,''Spread channels'',''Stack channels''));' ...
-    'eegplot(''drawp'',0);clear g;'];
+    'eegplotlegacy(''drawp'',0);clear g;'];
 
 % Button to plot envelope of data
 u(22) = uicontrol('Parent',figh, ...
@@ -801,7 +776,7 @@ u(22) = uicontrol('Parent',figh, ...
       u(17) = uicontrol('Parent',figh, ...
                         'Units', 'normalized', ...
                         'Position',posbut(17,:), ...
-                        'string', 'Event types', 'callback', 'eegplot(''drawlegend'', gcbf)');
+                        'string', 'Event types', 'callback', 'eegplotlegacy(''drawlegend'', gcbf)');
   end
 
   for i = 1: length(u) % Matlab 2014b compatibility
@@ -818,7 +793,7 @@ u(22) = uicontrol('Parent',figh, ...
 
   m(7) = uimenu('Parent',figh,'Label','Figure');
   m(8) = uimenu('Parent',m(7),'Label','Print');
-  uimenu('Parent',m(7),'Label','Edit figure', 'Callback', 'eegplot(''noui'');');
+  uimenu('Parent',m(7),'Label','Edit figure', 'Callback', 'eegplotlegacy(''noui'');');
   uimenu('Parent',m(7),'Label','Accept and close', 'Callback', acceptcommand );
   uimenu('Parent',m(7),'Label','Cancel and close', 'Callback','delete(gcbf)')
   
@@ -876,7 +851,7 @@ u(22) = uicontrol('Parent',figh, ...
             'end;' ...
             'g.winstatus = ~g.winstatus;' ...
             'set(gcbf, ''userdata'', g);' ...
-            'eegplot(''drawb''); clear g;'] )
+            'eegplotlegacy(''drawb''); clear g;'] )
 
 	% color %%%%%%%%%%%%%%%%%%%%%%%%%%
     if isunix % for some reasons, does not work under Windows
@@ -921,7 +896,7 @@ u(22) = uicontrol('Parent',figh, ...
               'end;' ...
               'g.ploteventdur = ~g.ploteventdur;' ...
               'set(gcbf, ''userdata'', g);' ...
-              'eegplot(''drawb''); clear g;'] )
+              'eegplotlegacy(''drawb''); clear g;'] )
   end
 
   % X grid %%%%%%%%%%%%
@@ -986,18 +961,18 @@ u(22) = uicontrol('Parent',figh, ...
               '  g.submean =''on'';' ...
               'end;' ...
               'set(gcbf, ''userdata'', g);' ...
-              'eegplot(''drawp'', 0); clear g;'];
+              'eegplotlegacy(''drawp'', 0); clear g;'];
   uimenu('Parent',m(1),'Label',fastif(strcmp(g.submean, 'on'), ...
          'Do not remove DC offset','Remove DC offset'), 'Callback',cb)
 
   % Scale Eye %%%%%%%%%
   timestring = ['[OBJ1,FIG1] = gcbo;',...
-	        'eegplot(''scaleeye'',OBJ1,FIG1);',...
+	        'eegplotlegacy(''scaleeye'',OBJ1,FIG1);',...
 		'clear OBJ1 FIG1;'];
   m(7) = uimenu('Parent',m(1),'Label','Show scale','Callback',timestring);
   
   % Title %%%%%%%%%%%%
-  uimenu('Parent',m(1),'Label','Title','Callback','eegplot(''title'')')
+  uimenu('Parent',m(1),'Label','Title','Callback','eegplotlegacy(''title'')')
   
   % Stack/Spread %%%%%%%%%%%%%%%
   cb =       ['g = get(gcbf, ''userdata'');' ...
@@ -1012,7 +987,7 @@ u(22) = uicontrol('Parent',figh, ...
               '  set(hbutton, ''String'', ''Stack'');' ...
               'end;' ...
               'set(gcbf, ''userdata'', g);' ...
-              'eegplot(''drawp'', 0); clear g;'];
+              'eegplotlegacy(''drawp'', 0); clear g;'];
   uimenu('Parent',m(1),'Label',fastif(g.envelope == 0, ...
          'Stack channels','Spread channels'), 'Callback',cb, 'Tag', 'Envelope_menu')
      
@@ -1037,9 +1012,9 @@ u(22) = uicontrol('Parent',figh, ...
     '  set(gcbo, ''label'', ''Denormalize channels'');' ...
     '  g.oldspacing = g.spacing;set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',''5'');end;' ...
     'g.normed = 1 - g.normed;' ...
-    'eegplot(''draws'',0);'...
+    'eegplotlegacy(''draws'',0);'...
     'set(gcbf,''userdata'',g);set(ax1,''UserData'',data);clear ax1 g data;' ...
-    'eegplot(''drawp'',0);' ...
+    'eegplotlegacy(''drawp'',0);' ...
     'disp(''Done.'')'];
   uimenu('Parent',m(1),'Label',fastif(g.envelope == 0, ...
          'Normalize channels','Denormalize channels'), 'Callback',cb_normalize, 'Tag', 'Normalize_menu')
@@ -1051,11 +1026,11 @@ u(22) = uicontrol('Parent',figh, ...
   
   % Window %%%%%%%%%%%%
   uimenu('Parent',m(2),'Label','Time range to display',...
-      'Callback','eegplot(''window'')')
+      'Callback','eegplotlegacy(''window'')')
   
   % Electrode window %%%%%%%%
   uimenu('Parent',m(2),'Label','Number of channels to display',...
-      'Callback','eegplot(''winelec'')')
+      'Callback','eegplotlegacy(''winelec'')')
   
   % Electrodes %%%%%%%%
   m(6) = uimenu('Parent',m(2),'Label','Channel labels');
@@ -1073,21 +1048,21 @@ u(22) = uicontrol('Parent',figh, ...
 	        'if ischar(g.eloc_file) || isstruct(g.eloc_file)'...
 	        'if isstruct(g.eloc_file) && length(g.eloc_file) > size(data,1)'...
 	        'g.eloc_file(end) = []; end;'... 
-	        'eegplot(''setelect'', g.eloc_file, ax1); end;'];
+	        'eegplotlegacy(''setelect'', g.eloc_file, ax1); end;'];
   uimenu('Parent',m(6),'Label','Show label','Callback',showlab)
   uimenu('Parent',m(6),'Label','Load .loc(s) file',...
-      'Callback','eegplot(''loadelect'');')
+      'Callback','eegplotlegacy(''loadelect'');')
   
   % Zooms %%%%%%%%
   zm = uimenu('Parent',m(2),'Label','Zoom off/on');
    if matVers < 8.4
-        commandzoom = [ 'set(gcbf, ''WindowButtonDownFcn'', [ ''zoom(gcbf,''''down''''); eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
+        commandzoom = [ 'set(gcbf, ''WindowButtonDownFcn'', [ ''zoom(gcbf,''''down''''); eegplotlegacy(''''zoom'''', gcbf, 1);'' ]);' ...
                         'tmpg = get(gcbf, ''userdata'');' ...
                         'clear tmpg tmpstr;'];
    else
        % Temporary fix to avoid warning when setting a callback and the  mode is active
        % This is failing for us http://undocumentedmatlab.com/blog/enabling-user-callbacks-during-zoom-pan
-       commandzoom = [ 'wtemp = warning; warning off;set(gcbf, ''WindowButtonDownFcn'', [ ''zoom(gcbf); eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
+       commandzoom = [ 'wtemp = warning; warning off;set(gcbf, ''WindowButtonDownFcn'', [ ''zoom(gcbf); eegplotlegacy(''''zoom'''', gcbf, 1);'' ]);' ...
                        'tmpg = get(gcbf, ''userdata'');' ...
                        'warning(wtemp);'...
                        'clear wtemp tmpg tmpstr; ']; 
@@ -1110,14 +1085,14 @@ u(22) = uicontrol('Parent',figh, ...
   zm = uimenu('Parent',m(2),'Label','Events');
   complotevent = [ 'tmpg = get(gcbf, ''userdata'');' ...
                   'tmpg.plotevent = ''on'';' ...                  
-                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
+                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplotlegacy(''drawp'', 0);'];
   comnoevent   = [ 'tmpg = get(gcbf, ''userdata'');' ...
                   'tmpg.plotevent = ''off'';' ...                  
-                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
+                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplotlegacy(''drawp'', 0);'];
   comeventmaxstring   = [ 'tmpg = get(gcbf, ''userdata'');' ...
                 'tmpg.plotevent = ''on'';' ...
-                'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''emaxstring'');']; % JavierLC      
-  comeventleg  = [ 'eegplot(''drawlegend'', gcbf);'];
+                'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplotlegacy(''emaxstring'');']; % JavierLC      
+  comeventleg  = [ 'eegplotlegacy(''drawlegend'', gcbf);'];
     
   uimenu('Parent',zm,'Label','Events on'    , 'callback', complotevent, 'enable', fastif(isempty(g.events), 'off', 'on'));
   uimenu('Parent',zm,'Label','Events off'   , 'callback', comnoevent  , 'enable', fastif(isempty(g.events), 'off', 'on'));
@@ -1210,17 +1185,17 @@ u(22) = uicontrol('Parent',figh, ...
   if strcmp(SPACING_EYE,'on'),  set(m(7),'checked','on')
   else set(m(7),'checked','off');
   end 
-  eegplot('scaleeye', [], gcf);
+  eegplotlegacy('scaleeye', [], gcf);
   if strcmp(lower(g.scale), 'off')
-	  eegplot('scaleeye', 'off', gcf);
+	  eegplotlegacy('scaleeye', 'off', gcf);
   end
   
-  % eegplot('drawp', 0);
-  eegplot('drawp', 0);
+  % eegplotlegacy('drawp', 0);
+  eegplotlegacy('drawp', 0);
   if g.dispchans ~= g.chans
-  	   eegplot('zoom', gcf);
+  	   eegplotlegacy('zoom', gcf);
   end;  
-  eegplot('scaleeye', [], gcf);
+  eegplotlegacy('scaleeye', [], gcf);
   
   h = findobj(gcf, 'style', 'pushbutton');
   set(h, 'backgroundcolor', BUTTON_COLOR);
@@ -1236,7 +1211,7 @@ else
   try, p1 = varargin{1}; p2 = varargin{2}; p3 = varargin{3}; catch, end
   switch data
   case 'drawp' % Redraw EEG and change position
-    
+
     % this test help to couple eegplot windows
     if exist('p3', 'var')
     	figh = p3;
@@ -1250,7 +1225,6 @@ else
     end
     ax0 = findobj('tag','backeeg','parent',figh); % axes handle
     ax1 = findobj('tag','eegaxis','parent',figh); % axes handle
-    
     g = get(figh,'UserData');
     data = get(ax1,'UserData');
     ESpacing = findobj('tag','ESpacing','parent',figh);   % ui handle
@@ -1315,16 +1289,19 @@ else
          otherwise, meandata = zeros(1,g.chans);
         end
     end
-    if strcmpi(g.plotdata2, 'on')
-        hold on;
-    else
-        cla(ax1);
+    if strcmpi(g.plotdata2, 'off')
+        axes(ax1)
+        cla
     end
     
     oldspacing = g.spacing;
     if g.envelope
         g.spacing = 0;
     end
+    % plot data
+    % ---------
+    axes(ax1)
+    hold on
     
      % plot channels whose "badchan" field is set to 1.
     % Bad channels are plotted first so that they appear behind the good
@@ -1337,39 +1314,29 @@ else
         
         if isfield(g, 'eloc_file') && isfield(g.eloc_file, 'badchan') && g.eloc_file(g.chans-i+1).badchan
             tmpcolor = [ .85 .85 .85 ];
-            plot(ax1, data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), ...
+            plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), ...
                 'color', tmpcolor, 'clipping','on')
-            plot(ax1, 1,mean(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing),2),'<r','MarkerFaceColor','r','MarkerSize',6);
+            plot(1,mean(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing),2),'<r','MarkerFaceColor','r','MarkerSize',6);
         end
                
     end
     
     % plot good channels on top of bad channels (if g.eloc_file(i).badchan = 0... or there is no bad channel information)
-    if strcmpi(g.plotdata2, 'on')
-        tmpcolor = [ 1 0 0 ];
-    else tmpcolor = g.color{mod(g.chans-i,length(g.color))+1};
+    for i = 1:g.chans
+        if strcmpi(g.plotdata2, 'on')
+             tmpcolor = [ 1 0 0 ];
+        else tmpcolor = g.color{mod(g.chans-i,length(g.color))+1};
+        end
+        
+%        keyboard;  
+        if (isfield(g, 'eloc_file') && isfield(g.eloc_file, 'badchan') && ~g.eloc_file(g.chans-i+1).badchan) || ...
+                   (~isfield(g, 'eloc_file')) || (~isfield(g.eloc_file, 'badchan'))
+               plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), ...
+                   'color', tmpcolor, 'clipping','on')
+        end
+               
     end
-    
-    %        keyboard;
-    if (isfield(g, 'eloc_file') && isfield(g.eloc_file, 'badchan') && ~g.eloc_file(g.chans-i+1).badchan) || ...
-            (~isfield(g, 'eloc_file')) || (~isfield(g.eloc_file, 'badchan'))
-        plot(ax1, bsxfun(@plus, data(end:-1:1,lowlim:highlim), g.spacing*[1:g.chans]'-meandata(end:-1:1)')' + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), ...
-            'color', tmpcolor, 'clipping','on');
-% % This speeds things up below but there are
-% % drawback the plot handles should be passed as argument instead of using
-% % persistent var; also this does not allow plotting 2 sets of data
-%         persistent hplot;
-%         if isempty(hplot)
-%             hplot = plot(bsxfun(@plus, data(end:-1:1,lowlim:highlim), g.spacing*[1:g.chans]'-meandata(end:-1:1)')' + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), ...
-%                 'color', tmpcolor, 'clipping','on');
-%         else
-%             data2plot = bsxfun(@plus, data(end:-1:1,lowlim:highlim), g.spacing*[1:g.chans]'-meandata(end:-1:1)')' + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing);
-%             for iChan = 1:g.chans
-%                 set(hplot(iChan), 'ydata', data2plot(:,iChan)');
-%             end
-%         end
-    end
-    
+     
     % draw selected channels
     % ------------------------
     if ~isempty(g.winrej) && size(g.winrej,2) > 2
@@ -1382,7 +1349,7 @@ else
 				abscmax = min(abscmax, round(maxXlim(2)-1));	 
    				for i = 1:g.chans
    					if g.winrej(tpmi,g.chans-i+1+5)
-   						plot(ax1, abscmin+1:abscmax+1,data(g.chans-i+1,abscmin+lowlim:abscmax+lowlim) ...
+   						plot(abscmin+1:abscmax+1,data(g.chans-i+1,abscmin+lowlim:abscmax+lowlim) ...
    							-meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), 'color','r','clipping','on')
 					end
     			end
@@ -1405,7 +1372,7 @@ else
 		if ~exist('p2', 'var')
 			p2 =[];
         end
-		eegplot( 'drawp', p1, p2, g.children);
+		eegplotlegacy( 'drawp', p1, p2, g.children);
 		figure(figh);
      end
     
@@ -1416,13 +1383,13 @@ else
          g.data2 = [];
          g.plotdata2 = 'on';
          set(figh, 'userdata', g);
-         eegplot('drawp', 0);
+         eegplotlegacy('drawp', 0);
          g.plotdata2 = 'off';
          g.data2 = get(ax1, 'userdata');
          set(ax1, 'userdata', tmpdata);
          set(figh, 'userdata', g);
-     else
-         eegplot('drawb'); % draw backgound first
+     else 
+         eegplotlegacy('drawb');
      end
   
   case 'drawb' % Draw background ******************************************************
@@ -1430,13 +1397,13 @@ else
 
     ax0 = findobj('tag','backeeg','parent',gcf); % axes handle
     ax1 = findobj('tag','eegaxis','parent',gcf); % axes handle
-    ylims=ylim(ax0);
         
     g = get(gcf,'UserData');  % Data (Note: this could also be global)
 
     % Plot data and update axes
-	cla(ax0);
-	hold(ax0, 'on');
+    axes(ax0);
+	cla;
+	hold on;
 	% plot rejected windows
 	if g.trialstag ~= -1
 		multiplier = g.trialstag;	
@@ -1470,7 +1437,7 @@ else
 					heightbeg = count(poscumul)/cumul(poscumul);
 					heightend = heightbeg + 1/cumul(poscumul);
 					count(poscumul) = count(poscumul)+1;
-					h = patch(ax0, [tmpwins1(tmpi)-lowlim tmpwins2(tmpi)-lowlim ...
+					h = patch([tmpwins1(tmpi)-lowlim tmpwins2(tmpi)-lowlim ...
 							   tmpwins2(tmpi)-lowlim tmpwins1(tmpi)-lowlim], ...
 							  [heightbeg heightbeg heightend heightend], ...
 							  tmpcols(tmpi,:));  % this argument is color
@@ -1488,7 +1455,7 @@ else
     				 tmpcols  = g.winrej(tpmi,3:5);
                 else tmpcols  = g.wincolor;
                 end
-                h = patch(ax0, [g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
+                h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
                            g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
                           [0 0 1 1], tmpcols);  
                 set(h, 'EdgeColor', get(h, 'facecolor')) 
@@ -1532,12 +1499,13 @@ else
             %Just repeat for the first one
             if index == 1
                 EVENTFONT = ' \fontsize{10} ';
+                ylims=ylim;
             end
             
             % draw latency line
             % -----------------
             tmplat = g.eventlatencies(event2plot(index))-lowlim-1;
-            tmph   = plot(ax0, [ tmplat tmplat ], ylims, 'color', g.eventcolors{ event2plot(index) }, ...
+            tmph   = plot([ tmplat tmplat ], ylims, 'color', g.eventcolors{ event2plot(index) }, ...
                           'linestyle', g.eventstyle { event2plot(index) }, ...
                           'linewidth', g.eventwidths( event2plot(index) ) );
     
@@ -1548,7 +1516,7 @@ else
             evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
             if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end; % truncate
             try, 
-                tmph2 = text(ax0, [tmplat], ylims(2)-0.005, [EVENTFONT evntxt], ...
+                tmph2 = text([tmplat], ylims(2)-0.005, [EVENTFONT evntxt], ...
                                     'color', g.eventcolors{ event2plot(index) }, ...
                                     'horizontalalignment', 'left',...
                                     'rotation',90);
@@ -1562,7 +1530,7 @@ else
                 if tmplatend ~= 0
                     tmplim = ylims;
                     tmpcol = g.eventcolors{ event2plot(index) };
-                    h = patch(ax0, [ tmplat tmplatend tmplatend tmplat ], ...
+                    h = patch([ tmplat tmplatend tmplatend tmplat ], ...
                               [ tmplim(1) tmplim(1) tmplim(2) tmplim(2) ], ...
                               tmpcol );  % this argument is color
                     set(h, 'EdgeColor', 'none') 
@@ -1581,7 +1549,7 @@ else
         tmptag = [lowlim:highlim];
        	tmpind = find(mod(tmptag-1, g.trialstag) == 0);
         for index = tmpind
-            plot(ax0, [tmptag(index)-lowlim tmptag(index)-lowlim], [0 1], 'b--');
+            plot([tmptag(index)-lowlim tmptag(index)-lowlim], [0 1], 'b--');
         end
         alltag = tmptag(tmpind);
 
@@ -1592,6 +1560,7 @@ else
 		'Xlim',[0 g.winlength*multiplier-1],...
 		'XTick',alltag-lowlim+g.trialstag/2, 'YTick',[], 'tag','backeeg');
 		
+		axes(ax1);
 		tagpos  = [];
 		tagtext = [];
 		if ~isempty(alltag)
@@ -1644,6 +1613,7 @@ else
 		'Xlim',[0 g.winlength*multiplier],...
 		'XTick',[], 'YTick',[], 'tag','backeeg');
 
+		axes(ax1);
         if g.isfreq
             set(ax1, 'XTickLabel', num2str((g.freqs(1):DEFAULT_GRID_SPACING:g.freqs(end))'),...
                      'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
@@ -1652,14 +1622,15 @@ else
                     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
         end
 
-        set(ax1, 'Position', AXES_POSITION) % JavierLC
-        set(ax0, 'Position', AXES_POSITION) % JavierLC
+    set(ax1, 'Position', AXES_POSITION) % JavierLC
+    set(ax0, 'Position', AXES_POSITION) % JavierLC
     end
     		
     % ordinates: even if all elec are plotted, some may be hidden
-    set(ax0, 'ylim',ylims );
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
     
+    axes(ax1)	
+
   case 'draws'
     % Redraw EEG and change scale
 
@@ -1690,7 +1661,7 @@ else
     % ---------------
     set(ESpacing,'string',num2str(g.spacing,4))  
     set(gcf, 'userdata', g);
-	 eegplot('drawp', 0);
+	 eegplotlegacy('drawp', 0);
     set(ax1,'YLim',[0 (g.chans+1)*g.spacing],'YTick',[0:g.spacing:g.chans*g.spacing])
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
     
@@ -1713,7 +1684,7 @@ else
 
 	g.winlength = eval(result{1}); 
 	set(gcf, 'UserData', g);
-	eegplot('drawp',0);	
+	eegplotlegacy('drawp',0);	
 	return;
     
   case 'winelec'  % change channel window size
@@ -1721,7 +1692,8 @@ else
                   % -------------------------------------
    fig = gcf;
    g = get(gcf,'UserData');
-   result = inputdlg2({ 'Number of channels to display:' } , 'Change number of channels to display', 1,  { num2str(g.dispchans) });
+   result = inputdlg2( ...
+{ 'Number of channels to display:' } , 'Change number of channels to display', 1,  { num2str(g.dispchans) });
    if size(result,1) == 0 return; end
    
    g.dispchans = eval(result{1});
@@ -1729,9 +1701,9 @@ else
        g.dispchans =g.chans;
    end
    set(gcf, 'UserData', g);
-   eegplot('updateslider', fig);
-   eegplot('drawp',0);	
-   eegplot('scaleeye', [], fig);
+   eegplotlegacy('updateslider', fig);
+   eegplotlegacy('drawp',0);	
+   eegplotlegacy('scaleeye', [], fig);
    return;
    
    case 'emaxstring'  % change events' string length  ;  JavierLC
@@ -1742,7 +1714,7 @@ else
       if size(result,1) == 0 return; end;                  
       g.maxeventstring = eval(result{1});
       set(gcf, 'UserData', g);
-      eegplot('drawb');
+      eegplotlegacy('drawb');
       return;
       
   case 'loadelect' % load channels
@@ -1753,7 +1725,7 @@ else
 	end
 
 	AXH0 = findobj('tag','eegaxis','parent',gcf);
-	eegplot('setelect',[ inputpath inputname ],AXH0);
+	eegplotlegacy('setelect',[ inputpath inputname ],AXH0);
 	return;
   
   case 'setelect'
@@ -1850,7 +1822,7 @@ else
     
   case 'noui'
       if ~isempty(varargin)
-          eegplot( varargin{:} ); fig = gcf;
+          eegplotlegacy( varargin{:} ); fig = gcf;
       else 
           fig = findobj('tag', 'EEGPLOT');
       end
@@ -1902,15 +1874,15 @@ else
       g.dispchans  = round(1000*(tmpylim(2)-tmpylim(1))/g.spacing)/1000;      
       
       set(fig,'UserData', g);
-      eegplot('updateslider', fig);
-      eegplot('drawp', 0);
-      eegplot('scaleeye', [], fig);
+      eegplotlegacy('updateslider', fig);
+      eegplotlegacy('drawp', 0);
+      eegplotlegacy('scaleeye', [], fig);
 
       % reactivate zoom if 3 arguments
       % ------------------------------
       if exist('p2', 'var') == 1
           if matVers < 8.4
-              set(gcbf, 'windowbuttondownfcn', [ 'zoom(gcbf,''down''); eegplot(''zoom'', gcbf, 1);' ]);
+              set(gcbf, 'windowbuttondownfcn', [ 'zoom(gcbf,''down''); eegplotlegacy(''zoom'', gcbf, 1);' ]);
           else
               % This is failing for us: http://undocumentedmatlab.com/blog/enabling-user-callbacks-during-zoom-pan
               %               hManager = uigetmodemanager(gcbf);
@@ -1918,7 +1890,7 @@ else
               
               % Temporary fix
               wtemp = warning; warning off;
-              set(gcbf, 'WindowButtonDownFcn', [ 'zoom(gcbf); eegplot(''zoom'', gcbf, 1);' ]);
+              set(gcbf, 'WindowButtonDownFcn', [ 'zoom(gcbf); eegplotlegacy(''zoom'', gcbf, 1);' ]);
               warning(wtemp);
           end
       end
@@ -1947,7 +1919,7 @@ else
          g.elecoffset = g.chans-g.dispchans;
       end
       set(fig,'UserData', g);
-	  eegplot('scaleeye', [], fig);
+	  eegplotlegacy('scaleeye', [], fig);
    
    case 'drawlegend'
       fig = varargin{1};
@@ -2054,8 +2026,8 @@ else
         end
     end
     set(fig,'UserData', g);
-    eegplot('drawp', 0);
-    if strcmp(g.mocap,'on'), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end; % nima
+    eegplotlegacy('drawp', 0);
+    if strcmp(g.mocap,'on'), show_mocap_for_eegplotlegacy(g.winrej); g.winrej = g.winrej(end,:); end; % nima
          
   % push button: create/remove window
   % ---------------------------------
@@ -2116,7 +2088,7 @@ else
                     end
                 end
                 set(fig,'UserData', g);
-                % eegplot('drawp', 0);  % redraw background
+                % eegplotlegacy('drawp', 0);  % redraw background
             end
         end
     elseif strcmp(get(fig, 'SelectionType'),'normal');
@@ -2124,7 +2096,7 @@ else
         
     end   
    otherwise
-      error(['Error - invalid eegplot() parameter: ',data])
+      error(['Error - invalid eegplotlegacy() parameter: ',data])
   end  
 end
 % Function to show the value and electrode at mouse position
@@ -2142,9 +2114,7 @@ function defmotion(varargin)
         if g.incallback
             g.winrej = [g.winrej(1:end-1,:)' [g.winrej(end,1) tmppos(1)+lowlim g.winrej(end,3:end)]']';
             set(fig,'UserData', g);
-            if exist('OCTAVE_VERSION', 'builtin') == 0
-                eegplot('drawb');
-            end
+            eegplotlegacy('drawb');
         else
             hh = varargin{6}; % h = findobj('tag','Etime','parent',fig);
             if g.trialstag ~= -1

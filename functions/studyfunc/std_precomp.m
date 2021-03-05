@@ -264,9 +264,10 @@ if strcmpi(g.erp, 'on')
     % -------------------------
     allPnts = [ALLEEG(:).pnts];
     if iscell(allPnts), allPnts = [ allPnts{:} ]; end
-    if length(unique(allPnts)) > 1
-        error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
-    end
+% we can align time frames later - not necessary
+%     if length(unique(allPnts)) > 1
+%         error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
+%     end
     
     for iSubj = 1:length(uniqueSubjects)
         

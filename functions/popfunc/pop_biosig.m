@@ -14,6 +14,7 @@
 %                  Default is empty -> import all data blocks. 
 %  'importevent' - ['on'|'off'] import events. Default if 'on'.
 %  'importannot' - ['on'|'off'] import annotations (EDF+ only). Default if 'on'
+%  'importmex' - ['on'|'off'] import events with Biosig mexSLOAD as an alternative. Default if 'off'
 %  'blockepoch'  - ['on'|'off'] force importing continuous data. Default is 'on'
 %  'ref'         - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
@@ -126,38 +127,44 @@ if nargin < 1
         disp(upper('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!'));
         disp('For more information, see <a href="http://www.biosemi.com/faq/cms&drl.htm">http://www.biosemi.com/faq/cms&drl.htm</a>');
     end
+    checkmex = [ 'if ~exist(''mexSLOAD''), set(gcbo, ''value'', 0); ' ...
+                 'warndlg2([ ''mexSLOAD not found in path. It needs to be installed.'' 10 ' ...
+                 '''It is easier to use this option on Windows where mexSLOAD'' 10 ' ...
+                 '''is automatically installed with BIOSIG.'' ]); end' ];
     uilist = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
-                 { 'style' 'edit' 'string' '' } ...
+                 { 'style' 'edit' 'string' '' 'tag' 'channels' } ...
                  { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
-                 { 'style' 'edit' 'string' '' } ...
-                 { 'style' 'text' 'String' 'Extract event' } ...
-                 { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'on' } {} ...
-                 { 'style' 'text' 'String' 'Import anotations (EDF+ only)' } ...
-                 { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'on' } {} ...
-                 { 'style' 'text' 'String' 'Force importing continuous data' 'value' 1} ...
-                 { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
+                 { 'style' 'edit' 'string' '' 'tag' 'blockrange'  } ...
                  { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
-                 { 'style' 'edit' 'string' '' } ...
-                  { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata } };
-    geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 0.35 0.5] [3 1] [1] };
+                 { 'style' 'edit' 'string' ''  'tag' 'ref' } ...
+                 { 'style' 'checkbox' 'string' 'Extract event from marker channel' 'value' 1 'tag' 'importevent' } ...
+                 { 'style' 'checkbox' 'String' 'Force continuous data when data is stored in blocks' 'value' 1 'tag' 'blockepoch' } ...
+                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata 'tag' 'memorymapped' } ...
+                 { 'style' 'checkbox' 'string' 'Import EDF+ anotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
+                 { 'style' 'checkbox' 'string' 'Import using alternative BIOSIG method (mexSLOAD)' 'value' 0 'callback' checkmex 'tag' 'importmex' } };
+    geom = { [3 1] [3 1] [3 1] [1] [1] [1] [1] [1] };
 
-    result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
+    [~,~,~,result] = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
     if length(result) == 0 return; end
     
     % decode GUI params
     % -----------------
     options = {};
-    if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end
-    if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end
-    if length(result) > 2
-        if ~result{3},          options = { options{:} 'importevent'  'off'  }; end
-        if ~result{4},          options = { options{:} 'importannot'  'off'  }; end
-        if  result{5},          options = { options{:} 'blockepoch'   'off' }; end
-        if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end
-        if  result{7},          options = { options{:} 'memorymapped' 'on' }; end
-    end
-    if length(eval( [ '[' result{6} ']' ] )) > 1
+    if ~isempty(result.channels)  , options = { options{:} 'channels'   eval( [ '[' result.channels ']' ] ) }; end
+    if ~isempty(result.blockrange), options = { options{:} 'blockrange' eval( [ '[' result.blockrange ']' ] ) }; end
+    if ~isempty(result.ref       ), options = { options{:} 'ref'        eval( [ '[' result.ref ']' ] ) }; end
+    
+    % default to 1
+    if ~result.importevent,    options = { options{:} 'importevent'  'off'  }; end
+    if ~result.blockepoch ,    options = { options{:} 'blockepoch'   'off'  }; end
+    if ~result.importannot ,   options = { options{:} 'importannot'  'off'  }; end
+    
+    % default to 0
+    if result.memorymapped,    options = { options{:} 'memorymapped'  'on'  }; end
+    if result.importmex   ,    options = { options{:} 'importmex'     'on'  }; end
+    
+    if length(eval( [ '[' result.ref ']' ] )) > 1
         options = { options{:} 'refoptions' { 'keepref' 'off' } };
     end
 else
@@ -173,6 +180,7 @@ g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'rmeventchan'  'string'  { 'on';'off' } 'on';
                             'importevent'  'string'  { 'on';'off' } 'on';
                             'importannot'  'string'  { 'on';'off' } 'on';
+                            'importmex'   'string'  { 'on';'off' }  'off';
                             'memorymapped' 'string'  { 'on';'off' } 'off';
                             'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
 if ischar(g), error(g); end
@@ -222,6 +230,21 @@ for iFile = 1:length(filename)
                     EEG.chanlocs(end+1).labels = tmpfields{ind};
                 end
             end
+        end
+    end
+    
+    % import using Biosig mexSLOAD method (Cedric edits 2/23/2021)
+    if strcmpi(g.importmex, 'on')
+        [s,HDR] = mexSLOAD(filename);
+        for iEvent = 1:length(HDR.EVENT.TYP)
+            if ~isempty(HDR.EVENT.CodeDesc)
+                EEG.event(iEvent).type = char(HDR.EVENT.CodeDesc(HDR.EVENT.TYP(iEvent)));
+            else
+                EEG.event(iEvent).type = HDR.EVENT.TYP(iEvent);
+                disp('Warning: event names were not found. Check names in the filename.edf.event file with a text editor');
+            end                
+            EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
+            EEG.event(iEvent).urevent = iEvent;
         end
     end
     
