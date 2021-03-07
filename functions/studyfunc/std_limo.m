@@ -262,7 +262,7 @@ nb_subjects = length(unique_subjects);
 % -------------------------------------------------------------------------
 order = cell(1,nb_subjects); 
 for s = 1:nb_subjects
-    order{s} = find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject}));
+    order{s} = find(strcmp({STUDY.datasetinfo.subject},unique_subjects{s}));
 end
 
 % Cleaning old files from the current design (Cleaning ALL)
@@ -325,8 +325,8 @@ for s = 1:nb_subjects
         % EEGLIMO.icawinv
         % EEGLIMO.icaweights
         
-        filename = [STUDY.datasetinfo(s).subject '_limo_file_design' num2str(design_index) '_sess' num2str(ss) '.set'];
         index    = [STUDY.datasetinfo(order{s}(ss)).index];
+        filename = [STUDY.datasetinfo(order{s}(ss)).subject '_limo_file_design' num2str(design_index) '_sess' num2str(ss) '.set'];
         if size(unique(STUDY.datasetinfo(order{s}).subject),1) ~= 1
             error('it seems that sets of different subjects are merged')
         end
