@@ -364,7 +364,9 @@ for counter = 1:maxcount
                       end
                     end
                     
-                    factmultx = max(factmultx, curext(3)/curpos(3));
+                    if curext(3)/curpos(3) < 3
+                        factmultx = max(factmultx, curext(3)/curpos(3));
+                    end
                     tmptxt = get(allhandlers{counter}, 'string');
 %                   % text to get which UI modify horizontal size
 %                    if iscell(tmptxt) fprintf('%s -> %f\n', 'cell', curext(3)/curpos(3));
@@ -426,7 +428,7 @@ pos = get(g.fig, 'position');
 if factmulty > 1
 	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
 end
-pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
+pos(1) = max(0,pos(1)+pos(3)*(1-factmultx)/2);
 pos(3) = max(pos(3)*factmultx, g.minwidth);
 pos(4) = pos(4)*factmulty;
 set(g.fig, 'position', pos);

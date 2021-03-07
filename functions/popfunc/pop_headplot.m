@@ -482,7 +482,7 @@ if nbgraph> 1,
     a = textsc(0.5, 0.05, topotitle); 
     set(a, 'fontweight', 'bold');
     axcopy(gcf, [ 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position'''');' ...
-                  'set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d(gcf); clear postmp;' ]);
+                  'set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d; clear postmp;' ]);
 end
 
 % generate output command
