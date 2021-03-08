@@ -1,3 +1,4 @@
+
 % std_limo() - Export and run in LIMO the EEGLAB STUDY design.
 %           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
 %
@@ -46,11 +47,10 @@
 % Example:
 %  [STUDY LIMO_files] = std_limo(STUDY,ALLEEG,'measure','daterp')
 %
-% Author: Arnaud Delorme, SCCN, 2018 based on a previous version of
-%         Cyril Pernet (LIMO Team), The university of Edinburgh, 2014
-%         Ramon Martinez-Cancino and Arnaud Delorme
-
-% Copyright (C) 2018 Arnaud Delorm
+% Author: Arnaud Delorme (SCCN) & Cyril Pernet (LIMO Team)
+%         Based on previous version from Ramon Martinez-Cancino and Arnaud Delorme
+%
+% Copyright (C) 2018 Arnaud Delorme
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -246,20 +246,22 @@ end
 model.cat_files  = [];
 model.cont_files = [];
 
-% order properly STUDY.design(STUDY.currentdesign).cases.value based on
-% users subjects name
+% order properly STUDY.design(STUDY.currentdesign).cases.value 
+% based on users subjects name 
 for s=length(STUDY.datasetinfo):-1:1
     if ismember(STUDY.datasetinfo(s).subject,STUDY.design(STUDY.currentdesign).cases.value)
         unique_subjects{s} = STUDY.datasetinfo(s).subject; % current design has this subject
     end
 end
+unique_subjects(cellfun(@isempty,unique_subjects)) = [];
+unique_subjects = unique(unique_subjects); % remove repeats
 nb_subjects = length(unique_subjects);
 
-% simply reshape to read columns
-% -------------------------------------------------------------------------
-order = cell(1,nb_subjects); % STUDY oder of each unique subject // include sessions with each cell
+% STUDY order of each unique subject // include sessions within each cell, 
+% allows unbalance in the number of sessions
+order = cell(1,nb_subjects); 
 for s = 1:nb_subjects
-    order{s} = find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject}));
+    order{s} = find(strcmp({STUDY.datasetinfo.subject},unique_subjects{s}));
 end
 
 % Cleaning old files from the current design (Cleaning ALL)
@@ -309,9 +311,9 @@ STUDY.etc.measureflags = measureflags;
 % -------------------------------------------------
 fprintf('generating temporary files, pulling relevant trials ... \n')
 mergedChanlocs = eeg_mergelocs(ALLEEG.chanlocs);
-fileindex = 0;
-for s = 1:nb_subjects
-    for ss = 1:length(order{s})
+index = 1;
+for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
+    for ss = 1:length(order{s}) % order is the repeat of STUDY 'subject' user column (char)
         % field which are needed by LIMO
         % EEGLIMO.etc
         % EEGLIMO.times
@@ -322,22 +324,22 @@ for s = 1:nb_subjects
         % EEGLIMO.icawinv
         % EEGLIMO.icaweights
         
-        filename = [STUDY.datasetinfo(s).subject '_limo_file_design' num2str(design_index) '_sess' num2str(ss) '.set'];
-        index    = [STUDY.datasetinfo(order{s}(ss)).index];
+        if isfield(ALLEEG,'name')
+            subname  = ALLEEG(index).name(1:end-4);
+        else
+            subname  = ALLEEG(index).filename(1:end-4);
+        end
+        filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];
         if size(unique(STUDY.datasetinfo(order{s}).subject),1) ~= 1
             error('it seems that sets of different subjects are merged')
         end
         
         % Creating fields for limo
         % ------------------------
-        for sets = 1:length(index)
-            EEGTMP = std_lm_seteegfields(STUDY,ALLEEG(index(sets)), index(sets),'datatype',model.defaults.type,'format', 'cell');
-            ALLEEG = eeg_store(ALLEEG, EEGTMP, index(sets));
-        end
-        
-        fileindex                  = fileindex+1;
-        file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
-        model.set_files{fileindex} = fullfile(file_fullpath , filename);
+        EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(index), index,'datatype',model.defaults.type,'format', 'cell');
+        ALLEEG                     = eeg_store(ALLEEG, EEGTMP, index);
+        file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
+        model.set_files{index}     = fullfile(file_fullpath , filename);
         
         OUTEEG = [];
         if all([ALLEEG(index).trials] == 1)
@@ -346,25 +348,25 @@ for s = 1:nb_subjects
             OUTEEG.trials = sum([ALLEEG(index).trials]);
         end
         
-        filepath_tmp           = rel2fullpath(STUDY.filepath,ALLEEG(index(1)).filepath);
-        OUTEEG.filepath        = filepath_tmp;
-        OUTEEG.filename        = filename;
-        OUTEEG.srate           = ALLEEG(index(1)).srate;
-        OUTEEG.icaweights      = ALLEEG(index(1)).icaweights;
-        OUTEEG.icasphere       = ALLEEG(index(1)).icasphere;
-        OUTEEG.icawinv         = ALLEEG(index(1)).icawinv;
-        OUTEEG.icachansind     = ALLEEG(index(1)).icachansind;
-        OUTEEG.etc             = ALLEEG(index(1)).etc;
-        OUTEEG.times           = ALLEEG(index(1)).times;
+        filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
+        OUTEEG.filepath            = filepath_tmp;
+        OUTEEG.filename            = filename;
+        OUTEEG.srate               = ALLEEG(index).srate;
+        OUTEEG.icaweights          = ALLEEG(index).icaweights;
+        OUTEEG.icasphere           = ALLEEG(index).icasphere;
+        OUTEEG.icawinv             = ALLEEG(index).icawinv;
+        OUTEEG.icachansind         = ALLEEG(index).icachansind;
+        OUTEEG.etc                 = ALLEEG(index).etc;
+        OUTEEG.times               = ALLEEG(index).times;
         if any(interpolated)
-            OUTEEG.chanlocs    = mergedChanlocs;
-            OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(index(1)).chanlocs.labels }));
+            OUTEEG.chanlocs        = mergedChanlocs;
+            OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(index).chanlocs.labels }));
         else
-            OUTEEG.chanlocs    = ALLEEG(index(1)).chanlocs;
+            OUTEEG.chanlocs        = ALLEEG(index).chanlocs;
         end
         
         % update EEG.etc
-        OUTEEG.etc.merged{1}   = ALLEEG(index(1)).filename;
+        OUTEEG.etc.merged{1}       = ALLEEG(index).filename;
         
         % Def fields
         OUTEEG.etc.datafiles.daterp   = [];
@@ -380,7 +382,7 @@ for s = 1:nb_subjects
         
         % Filling fields
         % contains will not work in Octave
-        single_trials_filename = fullfile(STUDY.datasetinfo(index(1)).filepath,  [STUDY.datasetinfo(index(1)).subject '.' FN{find(contains(FN,opt.measureori))}]);
+        single_trials_filename = fullfile(STUDY.datasetinfo(index).filepath,  [STUDY.datasetinfo(index).subject '.' FN{find(contains(FN,opt.measureori))}]);
         if exist(single_trials_filename,'file')
             if strcmpi(measureflags.daterp,'on')
                 OUTEEG.etc.datafiles.daterp = single_trials_filename;
@@ -402,13 +404,14 @@ for s = 1:nb_subjects
                 OUTEEG.etc.datafiles.dattimef = single_trials_filename;
             end
         end
+        index = index +1;
         
         % Save info
         EEG = OUTEEG;
         save('-mat', fullfile( filepath_tmp, OUTEEG.filename), 'EEG');
         clear OUTEEG filepath_tmp
-    end
-end
+    end % exit session
+end % exit subject
 
 % generate data files
 % -------------------
@@ -422,7 +425,7 @@ for s = 1:length(STUDY.datasetinfo)
     [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
     if strcmpi(opt.splitreg,'on')
         for c=1:size(contMat,2)
-            splitreg{c} = limo_split_continuous(catMat,contMat(:,c));
+            splitreg{c} = limo_split_continuous(catMat,contMat(:,c)); % std_limodesign does something else when splitting regressors
         end
         contMat    = cell2mat(splitreg);
         opt.zscore = 0; % regressors are now zscored
@@ -477,8 +480,13 @@ if all(cellfun(@isempty, model.cont_files)), model.cont_files = []; end
 % -----------------------------------------------------------------
 if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     model.defaults.analysis = 'Time';
-    model.defaults.start    = ALLEEG(index(1)).xmin*1000;
-    model.defaults.end      = ALLEEG(index(1)).xmax*1000;
+    for s=nb_subjects:-1:1
+        vs(s) = ALLEEG(s).xmin*1000; 
+        ve(s) = ALLEEG(s).xmax*1000;
+    end
+    model.defaults.start    = max(vs);
+    model.defaults.end      = min(ve);
+
     if length(opt.timelim) == 2 && opt.timelim(1) < opt.timelim(end)
         % start value
         if opt.timelim(1) < model.defaults.start
@@ -493,7 +501,6 @@ if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
             model.defaults.end = opt.timelim(end);
         end
     end
-
     model.defaults.lowf  = [];
     model.defaults.highf = [];
 
@@ -506,11 +513,17 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     else
         error('std_limo: Frequency limits need to be specified');
     end
+    model.defaults.start    = [];
+    model.defaults.end      = [];
 
 elseif strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
-    model.defaults.start    = ALLEEG(index(1)).times(1);
-    model.defaults.end      = ALLEEG(index(1)).times(end);
+    for s=nb_subjects:-1:1
+        vs(s) = ALLEEG(s).xmin*1000; 
+        ve(s) = ALLEEG(s).xmax*1000;
+    end
+    model.defaults.start    = max(vs);
+    model.defaults.end      = min(ve);
     model.defaults.lowf     = [];
     model.defaults.highf    = [];
 
@@ -559,10 +572,10 @@ keep_files = 'no';
 if sum(procstatus) == nb_subjects
     disp('All subjects have been successfully processed.')
 else
-    if sum(procstatus)==0
-        errordlg2('all subjects failed to process, check batch report')
+    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tell the user
+        errordlg2('all subjects failed to process, check limo batch report')
     else
-        warndlg2('some subjects failed to process, check batch report')
+        warndlg2('some subjects failed to process, check limo batch report')
     end
     % cleanup temp files - except for subjects with errors?
     keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
@@ -576,22 +589,6 @@ if isempty(keep_files) || strcmpi(keep_files,'no')
 else
     for s = find(procstatus)
         delete(model.set_files{s});
-    end
-end
-
-% split txt files if more than 1 group
-if length(STUDY.group) > 1
-    glm_name = [STUDY.design(STUDY.currentdesign).name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
-    for g= 1:length(STUDY.group)
-        subset = arrayfun(@(x)(strcmpi(x.group,STUDY.group{g})), STUDY.datasetinfo);
-        cell2csv(fullfile(LIMO_files.LIMO, ['LIMO_files_Gp' STUDY.group{g} '_' glm_name '.txt']), LIMO_files.mat(subset));
-        cell2csv(fullfile(LIMO_files.LIMO, ['Beta_files_Gp' STUDY.group{g} '_' glm_name '.txt']), LIMO_files.Beta(subset));
-        if isfield(LIMO_files,'con')
-            tmpcell = LIMO_files.con(subset);
-            for c=1:length(tmpcell{1})
-                cell2csv(fullfile(LIMO_files.LIMO, ['con' num2str(c) '_Gp' STUDY.group{g} '_' glm_name '.txt']),cellfun(@(x) x(c), tmpcell));
-            end
-        end
     end
 end
 
