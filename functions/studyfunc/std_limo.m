@@ -324,7 +324,11 @@ for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
         % EEGLIMO.icawinv
         % EEGLIMO.icaweights
         
-        subname  = ALLEEG(index).name(1:end-4);
+        if isfield(ALLEEG,'name')
+            subname  = ALLEEG(index).name(1:end-4);
+        else
+            subname  = ALLEEG(index).filename(1:end-4);
+        end
         filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];
         if size(unique(STUDY.datasetinfo(order{s}).subject),1) ~= 1
             error('it seems that sets of different subjects are merged')
