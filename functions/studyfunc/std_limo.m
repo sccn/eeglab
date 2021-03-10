@@ -329,7 +329,13 @@ for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
         else
             subname  = ALLEEG(index).filename(1:end-4);
         end
-        filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];
+        % should match STUDY.datasetinfo(index).filename
+        if strcmp(subname(1:4),'sub-')
+            filename = [subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];
+        else
+            filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];            
+        end
+        
         if size(unique(STUDY.datasetinfo(order{s}).subject),1) ~= 1
             error('it seems that sets of different subjects are merged')
         end
