@@ -246,7 +246,13 @@ for iFile = 1:length(filename)
                 EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
             end
         else
-            warning('Inconsistency between event types and names. Check your events or convert your data format with EDFBrowser: https://www.teuniz.net/edfbrowser/');
+            for iEvent = 1:length(HDR.EVENT.TYP)
+                EEG.event(iEvent).type = HDR.EVENT.TYP(iEvent);
+                EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
+                EEG.event(iEvent).urevent = iEvent;
+            end
+            warning('Inconsistency between event types and names or event names were not found.');
+            warning('Check your events or convert your data format with EDFBrowser: https://www.teuniz.net/edfbrowser/');
         end
     end
     
