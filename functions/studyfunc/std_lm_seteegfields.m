@@ -117,7 +117,7 @@ if strcmpi(opt.datatype,'channels')
             EEG.etc.datafiles.daterp = [name '_daterp.mat'];
             delete([name '.daterp']);
         else
-            EEG.etc.datafiles.daterp = [name '.daterp'];
+            EEG.etc.datafiles.daterp = name;
         end
     end
     
@@ -138,7 +138,7 @@ if strcmpi(opt.datatype,'channels')
             EEG.etc.datafiles.datspec = [name '_datspec.mat'];
             delete([name '.datspec']);
         else
-            EEG.etc.datafiles.datspec = [name '.datspec'];
+            EEG.etc.datafiles.datspec = name;
         end
     end
     % DATERSP    
@@ -160,7 +160,7 @@ if strcmpi(opt.datatype,'channels')
             save([name '_datersp.mat'],'data'); clear data
             EEG.etc.datafiles.datersp = [name '_datersp.mat'];
         else
-            EEG.etc.datafiles.datersp = [name '.dattimef'];
+            EEG.etc.datafiles.datersp = name;
         end
     end
     % DATITC
@@ -181,7 +181,7 @@ if strcmpi(opt.datatype,'channels')
             EEG.etc.datafiles.datitc = [name '_datitc.mat'];
             delete([name '.datitc']);
         else
-            EEG.etc.datafiles.datitc = [name '.datitc'];
+            EEG.etc.datafiles.datitc = name;
         end
     end
 end
@@ -205,7 +205,7 @@ if strcmpi(opt.datatype,'components')
             EEG.etc.datafiles.daterp = [name '_icaerp.mat'];
             delete([name '.icaerp']);
         else
-            EEG.etc.datafiles.icaerp = [name '.icaerp'];
+            EEG.etc.datafiles.icaerp = name;
         end
     end
     % ICAERP
@@ -225,7 +225,7 @@ if strcmpi(opt.datatype,'components')
             EEG.etc.datafiles.datspec = [name '_icaspec.mat'];
             delete([name '.icaspec']);
         else
-            EEG.etc.datafiles.icaspec = [name '.icaspec'];
+            EEG.etc.datafiles.icaspec = name;
         end
     end
     % ICAERSP    
@@ -246,7 +246,7 @@ if strcmpi(opt.datatype,'components')
             EEG.etc.datafiles.datersp = [name '_icaersp.mat'];
             delete([name '.icatimef']);
         else
-            EEG.etc.datafiles.icaersp = [name '.icatimef'];
+            EEG.etc.datafiles.icaersp = name;
         end
     end
     % ICAITC
@@ -267,7 +267,7 @@ if strcmpi(opt.datatype,'components')
             EEG.etc.datafiles.datitc = [name '_icaitc.mat'];
             delete([name '.icaitc']);
         else
-            EEG.etc.datafiles.icaitc = [name '.icaitc'];
+            EEG.etc.datafiles.icaitc = name;
         end
     end
 end
