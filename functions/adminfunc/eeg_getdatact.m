@@ -203,12 +203,15 @@ else
         filename = fullfile(EEG.filepath, EEG.data);
         fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
         if fid == -1
-            error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
-                'the .set file, you must also rename/move the associated data file.' ]);
-        else
-            if strcmpi(opt.verbose, 'on')
-                fprintf('Reading float file ''%s''...\n', filename);
+            filename = fullfile(EEG.data);
+            fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
+            if fid == -1
+                error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
+                    'the .set file, you must also rename/move the associated data file.' ]);
             end
+        end
+        if strcmpi(opt.verbose, 'on')
+            fprintf('Reading float file ''%s''...\n', filename);
         end
 
         % old format = .fdt; new format = .dat (transposed)
