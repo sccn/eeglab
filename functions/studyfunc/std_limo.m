@@ -282,7 +282,7 @@ for iDat = 1:length(STUDY.datasetinfo)
     fileName = fullfile(STUDY.datasetinfo(iDat).filepath, [ STUDY.datasetinfo(iDat).subject '*.' opt.measure ]);
     % fileName should already match unless user moves / rename, hence using dir
     fileName = dir(fileName);
-    if ~exist(fullfile(fileName(1).folder,fileName(1).name),'file')
+    if isempty(fileName)
         error('std_limo subject %s: Measures must be computed first',STUDY.datasetinfo(iDat).subject);
     else
         if strcmp(model.defaults.type,'Channels')
@@ -306,48 +306,86 @@ measureflags = struct('daterp','off',...
 FN = fieldnames(measureflags);
 measureflags.(lower(opt.measureori))= 'on'; 
 STUDY.etc.measureflags = measureflags;
+mergedChanlocs = eeg_mergelocs(ALLEEG.chanlocs);
+fprintf('generating temporary files, pulling relevant trials ... \n')
 
 % generate temporary merged datasets needed by LIMO
+% this section is inspired from the code in std_precomp
 % -------------------------------------------------
-fprintf('generating temporary files, pulling relevant trials ... \n')
-mergedChanlocs = eeg_mergelocs(ALLEEG.chanlocs);
+% allSubjects = { STUDY.datasetinfo.subject };
+% allSessions = { STUDY.datasetinfo.session };
+% uniqueSubjects = unique(allSubjects);
+% allSessions(cellfun(@isempty, allSessions)) = { 1 };
+% allSessions = cellfun(@num2str, allSessions, 'uniformoutput', false);
+% uniqueSessions = unique(allSessions);
+% modelFileIndex = 1;
+% for iSubj = 1:length(uniqueSubjects)
+%     for iSess = 1:length(uniqueSessions)
+%         inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+%         inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
+%         inds  = intersect(inds1, inds2);
+%         
+%         if ~isempty(inds)
+%             filebase        = getfilename(STUDY.datasetinfo(inds(1)).filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, [ num2str(ceil(rand(1)*1000000)) '.set' ], length(uniqueSessions) == 1);
+%             filebaseMeasure = getfilename(STUDY.datasetinfo(inds(1)).filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, [ '.' opt.measure ], length(uniqueSessions) == 1);
+%             EEGTMP          = std_lm_seteegfields(STUDY,ALLEEG(inds(1)), inds(1),'datatype',model.defaults.type,'format', 'cell');
+% 
+%             % field which are needed by LIMO
+%             EEG = [];
+%             fieldNeededLimo = { 'etc' 'times' 'chanlocs' 'srate' 'filepath' 'filename' 'icawinv' 'icaweights' };
+%             for iField = 1:length(fieldNeededLimo)
+%                 EEG.(fieldNeededLimo{iField}) = ALLEEG(inds(1)).(fieldNeededLimo{iField});
+%             end
+%             if any(interpolated)
+%                 EEG.chanlocs                 = mergedChanlocs;
+%                 EEG.etc.interpolatedchannels = setdiff(1:length(EEG.chanlocs), std_chaninds(EEG, { EEG(index).chanlocs.labels }));
+%             end
+%             
+%             EEG.trials = sum( [ ALLEEG(inds).trials ]);
+%             EEG.data   = [];
+%             EEG.etc = EEGTMP.etc;
+%             EEG.etc.datafiles = [];
+%             EEG.etc.datafiles.(opt.measure) = filebaseMeasure;
+%             EEG.etc.merged = { ALLEEG(inds).filename };
+%             if ~exist(filebaseMeasure, 'file')
+%                 error('Cannot find measure file');
+%             end
+%             save('-mat', filebase, 'EEG');
+%             model.set_files{modelFileIndex} = filebase;
+%             modelFileIndex = modelFileIndex + 1;
+%         end
+%     end
+% end
+
 index = 1;
 for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
     for ss = 1:length(order{s}) % order is the repeat of STUDY 'subject' user column (char)
-        % field which are needed by LIMO
-        % EEGLIMO.etc
-        % EEGLIMO.times
-        % EEGLIMO.chanlocs
-        % EEGLIMO.srate
-        % EEGLIMO.filepath
-        % EEGLIMO.filename
-        % EEGLIMO.icawinv
-        % EEGLIMO.icaweights
-        
+
+
         if isfield(ALLEEG,'name')
             subname  = ALLEEG(index).name(1:end-4);
         else
             subname  = ALLEEG(index).filename(1:end-4);
         end
         filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];
-        if size(unique(STUDY.datasetinfo(order{s}).subject),1) ~= 1
+        if size(unique({ STUDY.datasetinfo(order{s}).subject }),1) ~= 1
             error('it seems that sets of different subjects are merged')
         end
-        
+
         % Creating fields for limo
         % ------------------------
         EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(index), index,'datatype',model.defaults.type,'format', 'cell');
         ALLEEG                     = eeg_store(ALLEEG, EEGTMP, index);
         file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
         model.set_files{index}     = fullfile(file_fullpath , filename);
-        
+
         OUTEEG = [];
         if all([ALLEEG(index).trials] == 1)
             OUTEEG.trials = 1;
         else
             OUTEEG.trials = sum([ALLEEG(index).trials]);
         end
-        
+
         filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
         OUTEEG.filepath            = filepath_tmp;
         OUTEEG.filename            = filename;
@@ -364,10 +402,10 @@ for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
         else
             OUTEEG.chanlocs        = ALLEEG(index).chanlocs;
         end
-        
+
         % update EEG.etc
         OUTEEG.etc.merged{1}       = ALLEEG(index).filename;
-        
+
         % Def fields
         OUTEEG.etc.datafiles.daterp   = [];
         OUTEEG.etc.datafiles.datspec  = [];
@@ -379,10 +417,11 @@ for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
         OUTEEG.etc.datafiles.icaersp  = [];
         OUTEEG.etc.datafiles.icatimef = [];
         OUTEEG.etc.datafiles.icaitc   = [];
-        
+
         % Filling fields
         % contains will not work in Octave
-        single_trials_filename = fullfile(STUDY.datasetinfo(index).filepath,  [STUDY.datasetinfo(index).subject '.' FN{find(contains(FN,opt.measureori))}]);
+        single_trials_filename = EEGTMP.etc.datafiles.(opt.measureori);
+%       single_trials_filename = fullfile(STUDY.datasetinfo(index).filepath,  [STUDY.datasetinfo(index).subject '.' FN{find(contains(FN,opt.measureori))}]);
         if exist(single_trials_filename,'file')
             if strcmpi(measureflags.daterp,'on')
                 OUTEEG.etc.datafiles.daterp = single_trials_filename;
@@ -405,7 +444,7 @@ for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
             end
         end
         index = index +1;
-        
+
         % Save info
         EEG = OUTEEG;
         save('-mat', fullfile( filepath_tmp, OUTEEG.filename), 'EEG');
@@ -625,4 +664,14 @@ for i = 1:nit
             file_fullpath = pathtmp;
         end
     end
+end
+
+% get file base name (from std_precomp)
+% ------------------
+function filebase = getfilename(filepath, subj, sess, fileSuffix, onlyOneSession)
+if onlyOneSession
+    filebase = fullfile(filepath, [ subj fileSuffix ] );
+else
+    sesStr   = [ '0' sess ];
+    filebase = fullfile(filepath, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
 end
