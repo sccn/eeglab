@@ -236,21 +236,29 @@ for iFile = 1:length(filename)
     % import using Biosig mexSLOAD method (Cedric edits 2/23/2021)
     if strcmpi(g.importmex, 'on')
         [s,HDR] = mexSLOAD(filename);
-        for iEvent = 1:length(HDR.EVENT.TYP)
-            if ~isempty(HDR.EVENT.CodeDesc)
+        
+        %Get correct event names contained in CodeDesc
+        num_ev_type = unique(HDR.EVENT.TYP);
+        num_ev_name = unique(HDR.EVENT.CodeDesc);
+        if ~isempty(HDR.EVENT.CodeDesc) && length(num_ev_type) == length(num_ev_name)
+            for iEvent = 1:length(HDR.EVENT.TYP)
                 EEG.event(iEvent).type = char(HDR.EVENT.CodeDesc(HDR.EVENT.TYP(iEvent)));
-            else
+                EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
+            end
+        else
+            for iEvent = 1:length(HDR.EVENT.TYP)
                 EEG.event(iEvent).type = HDR.EVENT.TYP(iEvent);
-                disp('Warning: event names were not found. Check names in the filename.edf.event file with a text editor');
-            end                
-            EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
-            EEG.event(iEvent).urevent = iEvent;
+                EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
+                EEG.event(iEvent).urevent = iEvent;
+            end
+            warning('Inconsistency between event types and names or event names were not found.');
+            warning('Check your events or convert your data format with EDFBrowser: https://www.teuniz.net/edfbrowser/');
         end
     end
     
     % check and store data
     % --------------------
-    EEG = eeg_checkset(EEG, 'makeur');   % Make EEG.urevent field
+%     EEG = eeg_checkset(EEG, 'makeur');   % Make EEG.urevent field
     EEG = eeg_checkset(EEG, 'eventconsistency');
     EEG = eeg_checkset(EEG);
     if saveData
