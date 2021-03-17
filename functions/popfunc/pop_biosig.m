@@ -11,7 +11,7 @@
 %   'channels'   - [integer array] list of channel indices
 %   'blockrange' - [min max] integer range of data blocks to import, in seconds.
 %                  Entering [0 3] will import the first three blocks of data.
-%                  Default is empty -> import all data blocks. 
+%                  Default is empty -> import all data blocks.
 %  'importevent' - ['on'|'off'] import events. Default if 'on'.
 %  'importannot' - ['on'|'off'] import annotations (EDF+ only). Default if 'on'
 %  'importmex' - ['on'|'off'] import events with Biosig mexSLOAD as an alternative. Default if 'off'
@@ -20,20 +20,20 @@
 %                  Reference channels are not removed from the data,
 %                  allowing easy re-referencing. If more than one
 %                  channel, data are referenced to the average of the
-%                  indexed channels. WARNING! Biosemi Active II data 
-%                  are recorded reference-free, but LOSE 40 dB of SNR 
+%                  indexed channels. WARNING! Biosemi Active II data
+%                  are recorded reference-free, but LOSE 40 dB of SNR
 %                  if no reference is used!. If you do not know which
-%                  channel to use, pick one and then re-reference after 
+%                  channel to use, pick one and then re-reference after
 %                  the channel locations are read in. {default: none}.
 %                  For more information see http://www.biosemi.com/faq/cms&drl.htm
-%  'refoptions'  - [Cell] Option for the pop_reref function. Default is to 
-%                  remove the reference channel if there is one of them and to 
+%  'refoptions'  - [Cell] Option for the pop_reref function. Default is to
+%                  remove the reference channel if there is one of them and to
 %                  keep it if there are several of them from the graphic
-%                  interface. From the command line default option is to 
+%                  interface. From the command line default option is to
 %                  keep the reference channel.
-%  'rmeventchan' - ['on'|'off'] remove event channel after event 
+%  'rmeventchan' - ['on'|'off'] remove event channel after event
 %                  extraction. Default is 'on'.
-%  'memorymapped' - ['on'|'off'] import memory mapped file (useful if 
+%  'memorymapped' - ['on'|'off'] import memory mapped file (useful if
 %                  encountering memory errors). Default is 'off'.
 %
 % Outputs:
@@ -41,7 +41,7 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Oct. 29, 2003-
 %
-% Note: BIOSIG toolbox must be installed. Download BIOSIG at 
+% Note: BIOSIG toolbox must be installed. Download BIOSIG at
 %       http://biosig.sourceforge.net
 %       Contact a.schloegl@ieee.org for troubleshooting using BIOSIG.
 
@@ -76,16 +76,21 @@ function [ALLEEG, command, dat] = pop_biosig(filename, varargin)
 ALLEEG = [];
 command = '';
 
-if ~plugin_askinstall('Biosig', 'sopen'), return; end
-biosigpathfirst;
-    
+global flag_mexbiosig % by default, the m-file implementation is used instead of mexbiosig
+flag_mexbiosig = 0;
+
+if ~exist('sopen','file') && ~exist('mexSLOAD','file')
+    if ~plugin_askinstall('Biosig', 'sopen'), return; end
+    biosigpathfirst;
+end
+
 saveData = false;
 if nargin < 1
-	% ask user
-	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()', 'multiselect', 'on'); %%% this is incorrect in original version!!!!!!!!!!!!!!
+    % ask user
+    [filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()', 'multiselect', 'on'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
-	if isequal(filename,0) return; end
+    if isequal(filename,0), return; end
     
     if iscell(filename)
         buttonName = questdlg2([ 'Do you want to automatically save imported datasets?' 10 ...
@@ -94,12 +99,12 @@ if nargin < 1
         switch buttonName
             case 'Cancel', return;
             case 'No thanks', saveData = false;
-            otherwise saveData = true;
+            otherwise, saveData = true;
         end
     else
         filename = { filename };
     end
-
+    
     % look if MEG
     % -----------
     if length(filepath)>4
@@ -114,9 +119,19 @@ if nargin < 1
     % open file to get infos
     % ----------------------
     disp('Reading data file header...');
-    dat = sopen(filename{1}, 'r', [], 'OVERFLOWDETECTION:OFF');
+    dat = [];
+    if exist('sopen','file')
+        dat = sopen(filename, 'r', [], 'OVERFLOWDETECTION:OFF');
+    end
+    if ~isfield(dat, 'NRec') || isfield(dat,'EDFplus')
+        if exist('mexSOPEN','file')
+            dat = mexSOPEN(filename);
+            dat.InChanSelect = 1:dat.NS;
+            flag_mexbiosig = 1;
+        end
+    end
     if ~isfield(dat, 'NRec')
-        error('Unsuported data format');
+        error('Unsupported data format');
     end
     
     % special BIOSEMI
@@ -128,24 +143,24 @@ if nargin < 1
         disp('For more information, see <a href="http://www.biosemi.com/faq/cms&drl.htm">http://www.biosemi.com/faq/cms&drl.htm</a>');
     end
     checkmex = [ 'if ~exist(''mexSLOAD''), set(gcbo, ''value'', 0); ' ...
-                 'warndlg2([ ''mexSLOAD not found in path. It needs to be installed.'' 10 ' ...
-                 '''It is easier to use this option on Windows where mexSLOAD'' 10 ' ...
-                 '''is automatically installed with BIOSIG.'' ]); end' ];
+        'warndlg2([ ''mexSLOAD not found in path. It needs to be installed.'' 10 ' ...
+        '''It is easier to use this option on Windows where mexSLOAD'' 10 ' ...
+        '''is automatically installed with BIOSIG.'' ]); end' ];
     uilist = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
-                 { 'style' 'edit' 'string' '' 'tag' 'channels' } ...
-                 { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
-                 { 'style' 'edit' 'string' '' 'tag' 'blockrange'  } ...
-                 { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
-                 { 'style' 'edit' 'string' ''  'tag' 'ref' } ...
-                 { 'style' 'checkbox' 'string' 'Extract event from marker channel' 'value' 1 'tag' 'importevent' } ...
-                 { 'style' 'checkbox' 'String' 'Force continuous data when data is stored in blocks' 'value' 1 'tag' 'blockepoch' } ...
-                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata 'tag' 'memorymapped' } ...
-                 { 'style' 'checkbox' 'string' 'Import EDF+ anotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
-                 { 'style' 'checkbox' 'string' 'Import using alternative BIOSIG method (mexSLOAD)' 'value' 0 'callback' checkmex 'tag' 'importmex' } };
+        { 'style' 'edit' 'string' '' 'tag' 'channels' } ...
+        { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
+        { 'style' 'edit' 'string' '' 'tag' 'blockrange'  } ...
+        { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
+        { 'style' 'edit' 'string' ''  'tag' 'ref' } ...
+        { 'style' 'checkbox' 'string' 'Extract event from marker channel' 'value' 1 'tag' 'importevent' } ...
+        { 'style' 'checkbox' 'String' 'Force continuous data when data is stored in blocks' 'value' 1 'tag' 'blockepoch' } ...
+        { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata 'tag' 'memorymapped' } ...
+        { 'style' 'checkbox' 'string' 'Import EDF+ anotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
+        { 'style' 'checkbox' 'string' 'Import using alternative BIOSIG method (mexSLOAD)' 'value' 0 'callback' checkmex 'tag' 'importmex' } };
     geom = { [3 1] [3 1] [3 1] [1] [1] [1] [1] [1] };
-
+    
     [~,~,~,result] = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
-                                 'Load data using BIOSIG -- pop_biosig()');
+        'Load data using BIOSIG -- pop_biosig()');
     if length(result) == 0 return; end
     
     % decode GUI params
@@ -174,15 +189,15 @@ end
 % decode imput parameters
 % -----------------------
 g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
-                            'channels'     'integer' [0 Inf]    [];
-                            'ref'          'integer' [0 Inf]    [];
-                            'refoptions'   'cell'    {}             { 'keepref' 'on' };
-                            'rmeventchan'  'string'  { 'on';'off' } 'on';
-                            'importevent'  'string'  { 'on';'off' } 'on';
-                            'importannot'  'string'  { 'on';'off' } 'on';
-                            'importmex'   'string'  { 'on';'off' }  'off';
-                            'memorymapped' 'string'  { 'on';'off' } 'off';
-                            'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
+    'channels'     'integer' [0 Inf]    [];
+    'ref'          'integer' [0 Inf]    [];
+    'refoptions'   'cell'    {}             { 'keepref' 'on' };
+    'rmeventchan'  'string'  { 'on';'off' } 'on';
+    'importevent'  'string'  { 'on';'off' } 'on';
+    'importannot'  'string'  { 'on';'off' } 'on';
+    'importmex'   'string'  { 'on';'off' }  'off';
+    'memorymapped' 'string'  { 'on';'off' } 'off';
+    'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
 if ischar(g), error(g); end
 
 if ~iscell(filename) filename = { filename }; end
@@ -235,7 +250,7 @@ for iFile = 1:length(filename)
     
     % import using Biosig mexSLOAD method (Cedric edits 2/23/2021)
     if strcmpi(g.importmex, 'on')
-        [s,HDR] = mexSLOAD(filename);
+        [s,HDR] = mexSLOAD(filename, 'OVERFLOWDETECTION:OFF');
         
         %Get correct event names contained in CodeDesc
         num_ev_type = unique(HDR.EVENT.TYP);
@@ -258,7 +273,7 @@ for iFile = 1:length(filename)
     
     % check and store data
     % --------------------
-%     EEG = eeg_checkset(EEG, 'makeur');   % Make EEG.urevent field
+    EEG = eeg_checkset(EEG, 'makeur');   % Make EEG.urevent field
     EEG = eeg_checkset(EEG, 'eventconsistency');
     EEG = eeg_checkset(EEG);
     if saveData
@@ -292,23 +307,42 @@ biosigpathlast;
 % ---------
 % read data
 % ---------
-function [dat, DAT, interval] = readfile(filename, channels, blockrange, memmapdata);
+function [dat, DAT, interval] = readfile(filename, channels, blockrange, memmapdata)
+
+global flag_mexbiosig
 
 if isempty(channels), channels = 0; end
-dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');
 
-if strcmpi(memmapdata, 'off')
-    fprintf('Reading data in %s format...\n', dat.TYPE);
-
+if ~exist('sopen','file') && flag_mexbiosig
+    [DAT, dat] = mexSLOAD(filename, channels, 'OVERFLOWDETECTION:OFF');
+    dat.InChanSelect = 1:dat.NS;
+    if ~isempty(blockrange)
+        DAT=DAT(blockrange(1)*HDR.SPR+1:blockrange(2)*HDR.SPR,:);
+    end
+    
+elseif strcmpi(memmapdata, 'off')
+    
     if ~isempty(blockrange)
         newblockrange    = blockrange;
-%         newblockrange    = newblockrange*dat.Dur;    
-        DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1));
-    else 
-        DAT=sread(dat, Inf);% this isn't transposed in original!!!!!!!!
-        newblockrange    = [];
+        dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');
+        fprintf('Reading data in %s format...\n', dat.TYPE);
+        DAT = sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1));
+        sclose(dat);
+    else
+        if flag_mexbiosig
+            fprintf('Reading data with mexSLOAD');
+            [DAT,dat] = mexSLOAD(filename, channels,' OVERFLOWDETECTION:OFF');
+            dat.InChanSelect = 1:dat.NS;
+        else
+            dat = sopen(filename, 'r', channels, 'OVERFLOWDETECTION:OFF');
+            fprintf('Reading data in %s format...\n', dat.TYPE);
+            DAT = sread(dat, Inf); % this isn't transposed in original!!!!!!!!
+            sclose(dat);
+        end
+        newblockrange = [];
     end
-    sclose(dat);
+dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');
+
 else
     fprintf('Reading data in %s format (file will be mapped to memory so this may take a while)...\n', dat.TYPE);
     inc = ceil(250000/(dat.NS*dat.SPR)); % 1Mb block
@@ -329,7 +363,10 @@ else
 end
 
 if ~isempty(blockrange)
-     interval(1) = blockrange(1) * dat.SampleRate(1) + 1;
-     interval(2) = blockrange(2) * dat.SampleRate(1);
-else interval = [];
+    interval(1) = blockrange(1) * dat.SampleRate(1) + 1;
+    interval(2) = blockrange(2) * dat.SampleRate(1);
+else
+    interval = [];
+    
 end
+
