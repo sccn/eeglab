@@ -912,6 +912,7 @@ else
                         chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
                         chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
                         chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
+						chans(ind2(index)).type       = tmplocs(ind1(index)).type;
                     end
                     tmpdiff = setdiff_bc([1:length(chans)], ind2);
                     if ~isempty(tmpdiff)
