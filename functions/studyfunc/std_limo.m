@@ -298,139 +298,221 @@ mergedChanlocs = eeg_mergelocs(ALLEEG.chanlocs);
 fprintf('generating temporary files, pulling relevant trials ... \n')
 
 % generate temporary merged datasets needed by LIMO
+% this section is inspired from the code in std_precomp
 % -------------------------------------------------
-index = 1;
-for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
-    for ss = 1:length(order{s}) % order is the repeat of STUDY 'subject' user column (char)
-
-        [~,subname] = fileparts(STUDY.datasetinfo(index).filename);
-        if isfield(ALLEEG,'filename')
-            if ~strcmp(subname,ALLEEG(index).filename(1:end-4))
-                error('STUDY and ALLEEG mismatch, can''t figure out which file to use')
-            end
-        else
-            warning('No filename in ALLEEG, pulling data blindly from STUDY')
-        end
-        
-        if strcmp(subname(1:4),'sub-')
-            filename = [subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];
-        else
-            filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];            
-        end
-        
-        % Creating fields for limo
-        % ------------------------
-        EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(index), index,'datatype',model.defaults.type,'format', 'cell');
-        ALLEEG                     = eeg_store(ALLEEG, EEGTMP, index);
-        file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
-        model.set_files{index}     = fullfile(file_fullpath , filename);
-
-        OUTEEG = [];
-        if all([ALLEEG(index).trials] == 1)
-            OUTEEG.trials = 1;
-        else
-            OUTEEG.trials = sum([ALLEEG(index).trials]);
-        end
-
-        filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
-        OUTEEG.filepath            = filepath_tmp;
-        OUTEEG.filename            = filename;
-        OUTEEG.srate               = ALLEEG(index).srate;
-        OUTEEG.icaweights          = ALLEEG(index).icaweights;
-        OUTEEG.icasphere           = ALLEEG(index).icasphere;
-        OUTEEG.icawinv             = ALLEEG(index).icawinv;
-        OUTEEG.icachansind         = ALLEEG(index).icachansind;
-        OUTEEG.etc                 = ALLEEG(index).etc;
-        OUTEEG.times               = ALLEEG(index).times;
-        if any(interpolated)
-            OUTEEG.chanlocs        = mergedChanlocs;
-            OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(index).chanlocs.labels }));
-        else
-            OUTEEG.chanlocs        = ALLEEG(index).chanlocs;
-        end
-
-        % update EEG.etc
-        OUTEEG.etc.merged{1}       = ALLEEG(index).filename;
-
-        % Def fields
-        OUTEEG.etc.datafiles.daterp   = [];
-        OUTEEG.etc.datafiles.datspec  = [];
-        OUTEEG.etc.datafiles.datersp  = [];
-        OUTEEG.etc.datafiles.dattimef = [];
-        OUTEEG.etc.datafiles.datitc   = [];
-        OUTEEG.etc.datafiles.icaerp   = [];
-        OUTEEG.etc.datafiles.icaspec  = [];
-        OUTEEG.etc.datafiles.icaersp  = [];
-        OUTEEG.etc.datafiles.icatimef = [];
-        OUTEEG.etc.datafiles.icaitc   = [];
-
-        % Filling fields
-        single_trials_filename = EEGTMP.etc.datafiles.(opt.measureori);
-        if exist(single_trials_filename,'file')
-            if strcmpi(measureflags.daterp,'on')
-                OUTEEG.etc.datafiles.daterp = single_trials_filename;
-            elseif strcmpi(measureflags.datspec,'on')
-                OUTEEG.etc.datafiles.datspec = single_trials_filename;
-            elseif strcmpi(measureflags.datersp,'on')
-                OUTEEG.etc.datafiles.datersp = single_trials_filename;
-            elseif strcmpi(measureflags.datitc,'on')
-                OUTEEG.etc.datafiles.datitc = single_trials_filename;
-            elseif strcmpi(measureflags.icaerp,'on')
-                OUTEEG.etc.datafiles.icaerp = single_trials_filename;
-            elseif strcmpi(measureflags.icaspec,'on')
-                OUTEEG.etc.datafiles.icaspec = single_trials_filename;
-            elseif strcmpi(measureflags.icaersp,'on')
-                OUTEEG.etc.datafiles.icaersp = single_trials_filename;
-            elseif strcmpi(measureflags.icaitc,'on')
-                OUTEEG.etc.datafiles.icaitc = single_trials_filename;
-            elseif strcmpi(measureflags.dattimef,'on')
-                OUTEEG.etc.datafiles.dattimef = single_trials_filename;
-            end
-        end
-        index = index +1;
-
-        % Save info
-        EEG = OUTEEG;
-        save('-mat', fullfile( filepath_tmp, OUTEEG.filename), 'EEG');
-        clear OUTEEG filepath_tmp
-    end % exit session
-end % exit subject
-
-% generate data files
-% -------------------
-fprintf('making up statistical models ... \n')
-% by default we create a design matrix with all condition
+allSubjects = { STUDY.datasetinfo.subject };
+allSessions = { STUDY.datasetinfo.session };
+uniqueSubjects = unique(allSubjects);
+allSessions(cellfun(@isempty, allSessions)) = { 1 };
+allSessions = cellfun(@num2str, allSessions, 'uniformoutput', false);
+uniqueSessions = unique(allSessions);
+modelFileIndex = 1;
 factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
-for s = 1:length(STUDY.datasetinfo)
-    % save continuous and categorical data files
-    trialinfo = std_combtrialinfo(STUDY.datasetinfo, s);
-    % [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
-    [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
-    if strcmpi(opt.splitreg,'on')
-        for c=size(contMat,2):-1:1
-            splitreg{c} = limo_split_continuous(catMat,contMat(:,c)); % std_limodesign does something else when splitting regressors
+indTot = 1;
+for iSubj = 1:length(uniqueSubjects)
+    for iSess = 1:length(uniqueSessions)
+        inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+        inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
+        inds  = intersect(inds1, inds2);
+
+        if ~isempty(inds)
+            filebase        = getfilename(STUDY.datasetinfo(inds(1)).filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, [ num2str(ceil(rand(1)*1000000)) '.set' ], length(uniqueSessions) == 1);
+            filebaseMeasure = getfilename(STUDY.datasetinfo(inds(1)).filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, [ '.' opt.measure ], length(uniqueSessions) == 1);
+            EEGTMP          = std_lm_seteegfields(STUDY,ALLEEG(inds(1)), inds(1),'datatype',model.defaults.type,'format', 'cell');
+
+            % field which are needed by LIMO
+            EEG = eeg_emptyset;
+            fieldNeededLimo = { 'etc' 'times' 'chanlocs' 'srate' 'filepath' 'filename' 'icawinv' 'icaweights' };
+            for iField = 1:length(fieldNeededLimo)
+                EEG.(fieldNeededLimo{iField}) = ALLEEG(inds(1)).(fieldNeededLimo{iField});
+            end
+            if any(interpolated)
+                EEG.chanlocs                 = mergedChanlocs;
+                EEG.etc.interpolatedchannels = setdiff(1:length(EEG.chanlocs), std_chaninds(EEG, { EEG.chanlocs.labels }));
+            end
+
+            EEG.trials = sum( [ ALLEEG(inds).trials ]);
+            EEG.data   = [];
+            EEG.etc = EEGTMP.etc;
+            EEG.etc.datafiles = [];
+            EEG.etc.datafiles.(opt.measure) = filebaseMeasure;
+            EEG.etc.merged = { ALLEEG(inds).filename };
+            if ~exist(filebaseMeasure, 'file')
+                error('Cannot find measure file');
+            end
+            save('-mat', filebase, 'EEG');
+            model.set_files{modelFileIndex} = filebase;
+            modelFileIndex = modelFileIndex + 1;
+            
+            % by default we create a design matrix with all condition
+            % save continuous and categorical data files
+            trialinfo = load('-mat', EEG.etc.datafiles.(opt.measure), 'trialinfo');
+            % [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
+            [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
+            if strcmpi(opt.splitreg,'on')
+                for c=size(contMat,2):-1:1
+                    splitreg{c} = limo_split_continuous(catMat,contMat(:,c)); % std_limodesign does something else when splitting regressors
+                end
+                contMat    = cell2mat(splitreg);
+                opt.zscore = 0; % regressors are now zscored
+            end
+                
+            % copy results
+            model.cat_files{indTot}                 = catMat;
+            model.cont_files{indTot}                = contMat;
+            if isfield(limodesign, 'categorical')
+                STUDY.limo.categorical = limodesign.categorical;
+            else
+                STUDY.limo.categorical = {};
+            end
+            if isfield(limodesign, 'continuous')
+                STUDY.limo.continuous = limodesign.continuous;
+            else
+                STUDY.limo.continuous = {};
+            end
+            STUDY.limo.subjects(indTot).subject     = uniqueSubjects{iSubj};
+            STUDY.limo.subjects(indTot).session     = uniqueSessions{iSess};
+            STUDY.limo.subjects(indTot).cat_file    = catMat;
+            STUDY.limo.subjects(indTot).cont_file   = contMat;
+            indTot = indTot+1;
         end
-        contMat    = cell2mat(splitreg);
-        opt.zscore = 0; % regressors are now zscored
     end
-    
-    % copy results
-    model.cat_files{s}                 = catMat;
-    model.cont_files{s}                = contMat;
-    if isfield(limodesign, 'categorical')
-        STUDY.limo.categorical = limodesign.categorical;
-    else
-        STUDY.limo.categorical = {};
-    end
-    if isfield(limodesign, 'continuous')
-        STUDY.limo.continuous = limodesign.continuous;
-    else
-        STUDY.limo.continuous = {};
-    end
-    STUDY.limo.subjects(s).subject     = STUDY.datasetinfo(s).subject;
-    STUDY.limo.subjects(s).cat_file    = catMat;
-    STUDY.limo.subjects(s).cont_file   = contMat;
 end
+
+% generate temporary merged datasets needed by LIMO
+% -------------------------------------------------
+% index = 1;
+% for s = 1:nb_subjects % unique STUDY 'subject' user column (char)
+%     for ss = 1:length(order{s}) % order is the repeat of STUDY 'subject' user column (char)
+% 
+%         [~,subname] = fileparts(STUDY.datasetinfo(index).filename);
+%         if isfield(ALLEEG,'filename')
+%             if ~strcmp(subname,ALLEEG(index).filename(1:end-4))
+%                 error('STUDY and ALLEEG mismatch, can''t figure out which file to use')
+%             end
+%         else
+%             warning('No filename in ALLEEG, pulling data blindly from STUDY')
+%         end
+%         
+%         if strcmp(subname(1:4),'sub-')
+%             filename = [subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];
+%         else
+%             filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(ss) '.set'];            
+%         end
+%         
+%         % Creating fields for limo
+%         % ------------------------
+%         EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(index), index,'datatype',model.defaults.type,'format', 'cell');
+%         ALLEEG                     = eeg_store(ALLEEG, EEGTMP, index);
+%         file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
+%         model.set_files{index}     = fullfile(file_fullpath , filename);
+% 
+%         OUTEEG = [];
+%         if all([ALLEEG(index).trials] == 1)
+%             OUTEEG.trials = 1;
+%         else
+%             OUTEEG.trials = sum([ALLEEG(index).trials]);
+%         end
+% 
+%         filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
+%         OUTEEG.filepath            = filepath_tmp;
+%         OUTEEG.filename            = filename;
+%         OUTEEG.srate               = ALLEEG(index).srate;
+%         OUTEEG.icaweights          = ALLEEG(index).icaweights;
+%         OUTEEG.icasphere           = ALLEEG(index).icasphere;
+%         OUTEEG.icawinv             = ALLEEG(index).icawinv;
+%         OUTEEG.icachansind         = ALLEEG(index).icachansind;
+%         OUTEEG.etc                 = ALLEEG(index).etc;
+%         OUTEEG.times               = ALLEEG(index).times;
+%         if any(interpolated)
+%             OUTEEG.chanlocs        = mergedChanlocs;
+%             OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(index).chanlocs.labels }));
+%         else
+%             OUTEEG.chanlocs        = ALLEEG(index).chanlocs;
+%         end
+% 
+%         % update EEG.etc
+%         OUTEEG.etc.merged{1}       = ALLEEG(index).filename;
+% 
+%         % Def fields
+%         OUTEEG.etc.datafiles.daterp   = [];
+%         OUTEEG.etc.datafiles.datspec  = [];
+%         OUTEEG.etc.datafiles.datersp  = [];
+%         OUTEEG.etc.datafiles.dattimef = [];
+%         OUTEEG.etc.datafiles.datitc   = [];
+%         OUTEEG.etc.datafiles.icaerp   = [];
+%         OUTEEG.etc.datafiles.icaspec  = [];
+%         OUTEEG.etc.datafiles.icaersp  = [];
+%         OUTEEG.etc.datafiles.icatimef = [];
+%         OUTEEG.etc.datafiles.icaitc   = [];
+% 
+%         % Filling fields
+%         single_trials_filename = EEGTMP.etc.datafiles.(opt.measureori);
+%         if exist(single_trials_filename,'file')
+%             if strcmpi(measureflags.daterp,'on')
+%                 OUTEEG.etc.datafiles.daterp = single_trials_filename;
+%             elseif strcmpi(measureflags.datspec,'on')
+%                 OUTEEG.etc.datafiles.datspec = single_trials_filename;
+%             elseif strcmpi(measureflags.datersp,'on')
+%                 OUTEEG.etc.datafiles.datersp = single_trials_filename;
+%             elseif strcmpi(measureflags.datitc,'on')
+%                 OUTEEG.etc.datafiles.datitc = single_trials_filename;
+%             elseif strcmpi(measureflags.icaerp,'on')
+%                 OUTEEG.etc.datafiles.icaerp = single_trials_filename;
+%             elseif strcmpi(measureflags.icaspec,'on')
+%                 OUTEEG.etc.datafiles.icaspec = single_trials_filename;
+%             elseif strcmpi(measureflags.icaersp,'on')
+%                 OUTEEG.etc.datafiles.icaersp = single_trials_filename;
+%             elseif strcmpi(measureflags.icaitc,'on')
+%                 OUTEEG.etc.datafiles.icaitc = single_trials_filename;
+%             elseif strcmpi(measureflags.dattimef,'on')
+%                 OUTEEG.etc.datafiles.dattimef = single_trials_filename;
+%             end
+%         end
+%         index = index +1;
+% 
+%         % Save info
+%         EEG = OUTEEG;
+%         save('-mat', fullfile( filepath_tmp, OUTEEG.filename), 'EEG');
+%         clear OUTEEG filepath_tmp
+%     end % exit session
+% end % exit subject
+
+% % generate data files
+% % -------------------
+% fprintf('making up statistical models ... \n')
+% % by default we create a design matrix with all condition
+% factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
+% for s = 1:length(STUDY.datasetinfo)
+%     % save continuous and categorical data files
+%     trialinfo = std_combtrialinfo(STUDY.datasetinfo, s);
+%     % [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
+%     [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
+%     if strcmpi(opt.splitreg,'on')
+%         for c=size(contMat,2):-1:1
+%             splitreg{c} = limo_split_continuous(catMat,contMat(:,c)); % std_limodesign does something else when splitting regressors
+%         end
+%         contMat    = cell2mat(splitreg);
+%         opt.zscore = 0; % regressors are now zscored
+%     end
+%     
+%     % copy results
+%     model.cat_files{s}                 = catMat;
+%     model.cont_files{s}                = contMat;
+%     if isfield(limodesign, 'categorical')
+%         STUDY.limo.categorical = limodesign.categorical;
+%     else
+%         STUDY.limo.categorical = {};
+%     end
+%     if isfield(limodesign, 'continuous')
+%         STUDY.limo.continuous = limodesign.continuous;
+%     else
+%         STUDY.limo.continuous = {};
+%     end
+%     STUDY.limo.subjects(s).subject     = STUDY.datasetinfo(s).subject;
+%     STUDY.limo.subjects(s).cat_file    = catMat;
+%     STUDY.limo.subjects(s).cont_file   = contMat;
+% end
  
 % then we add contrasts for conditions that were merged during design selection
 % i.e. multiple categorical variables (factors) and yet not matching the number 
@@ -561,7 +643,7 @@ end
 cd(STUDY.filepath);
 STUDY      = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
 keep_files = 'no';
-if sum(procstatus) == nb_subjects
+if all(procstatus)
     disp('All subjects have been successfully processed.')
 else
     if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tell the user
