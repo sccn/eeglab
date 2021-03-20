@@ -327,7 +327,8 @@ for iSubj = 1:length(uniqueSubjects)
                 EEG.(fieldNeededLimo{iField}) = ALLEEG(inds(1)).(fieldNeededLimo{iField});
             end
             if any(interpolated)
-                EEG.chanlocs                 = mergedChanlocs;
+                EEG.chanlocs = mergedChanlocs;
+                EEG.nbchan   = 1:length(EEG.chanlocs);
                 EEG.etc.interpolatedchannels = setdiff(1:length(EEG.chanlocs), std_chaninds(EEG, { EEG.chanlocs.labels }));
             end
 
