@@ -541,27 +541,29 @@ end
 glm_name = [design_name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
 
 % further split that list per regressor and group
-maxcon = max(cellfun(@(x) str2double(x(strfind(x,'con_')+4:strfind(x,'sess_')-1)),allcon));
-for con=1:maxcon
-    index = find(cellfun(@(x) ~isempty(x),cellfun(@(x) strfind(x,['con_' num2str(con)]),allcon','UniformOutput',false)));
-    cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) glm_name '.txt'], allcon(index)');
-    if length(STUDY.group) > 1
-        for g= 1:length(STUDY.group)
-            % find subjects of group g
-            subset = find(arrayfun(@(x)(strcmpi(x.group,STUDY.group{g})), STUDY.datasetinfo));
-            for s=1:length(subset)
-                sub{s} = STUDY.datasetinfo(subset(s)).subject; 
-            end
-            sub = unique(sub); 
-            % find subjects of group g and contrast con
-            subcon = [];
-            for s = 1:length(sub)
-                subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,['sub-' sub{s} ]),allcon','UniformOutput',false)))); % subject s group g
-                subcon = [subcon intersect(index,subindex)];
-            end
-            % save
-            if ~isempty(subcon)
-                cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) 'Gp' STUDY.group{g} '_' glm_name '.txt'], allcon(subcon)');
+if exist('allcon','var')
+    maxcon = max(cellfun(@(x) str2double(x(strfind(x,'con_')+4:strfind(x,'sess_')-1)),allcon));
+    for con=1:maxcon
+        index = find(cellfun(@(x) ~isempty(x),cellfun(@(x) strfind(x,['con_' num2str(con)]),allcon','UniformOutput',false)));
+        cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) glm_name '.txt'], allcon(index)');
+        if length(STUDY.group) > 1
+            for g= 1:length(STUDY.group)
+                % find subjects of group g
+                subset = find(arrayfun(@(x)(strcmpi(x.group,STUDY.group{g})), STUDY.datasetinfo));
+                for s=1:length(subset)
+                    sub{s} = STUDY.datasetinfo(subset(s)).subject;
+                end
+                sub = unique(sub);
+                % find subjects of group g and contrast con
+                subcon = [];
+                for s = 1:length(sub)
+                    subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,['sub-' sub{s} ]),allcon','UniformOutput',false)))); % subject s group g
+                    subcon = [subcon intersect(index,subindex)];
+                end
+                % save
+                if ~isempty(subcon)
+                    cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) 'Gp' STUDY.group{g} '_' glm_name '.txt'], allcon(subcon)');
+                end
             end
         end
     end
