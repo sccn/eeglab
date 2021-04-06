@@ -892,6 +892,9 @@ else
                 elseif strcmpi(chaninfo.filename, 'standard_1005.elc')
                     dipfitdefs;
                     chaninfo.filename = template_models(2).chanfile;
+                elseif strcmpi(chaninfo.filename, 'standard_1005_BIDS.ced')
+                    dipfitdefs;
+                    chaninfo.filename = template_models(2).chanfile;
                 end
                 tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );                
                 for indexchan = 1:length(chans)
