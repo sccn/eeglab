@@ -453,7 +453,7 @@ if ischar(filename)
        % --------------
        if isempty(g.skiplines), g.skiplines = 0; end
        if strcmpi(g.filetype, 'chanedit')
-           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines, 'blankcell', 'off');
+           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines);
        else
            array = load_file_or_array( filename, g.skiplines);
        end
@@ -486,8 +486,8 @@ if ischar(filename)
        % removing comments and empty lines
        % ---------------------------------
        indexbeg = 1;
-       while isempty(array{indexbeg,1}) | ...
-               (ischar(array{indexbeg,1}) & array{indexbeg,1}(1) == '%' )
+       while isempty(array{indexbeg,1}) || ...
+               (ischar(array{indexbeg,1}) && array{indexbeg,1}(1) == '%' )
            indexbeg = indexbeg+1;
        end
        array = array(indexbeg:end,:);
@@ -495,7 +495,7 @@ if ischar(filename)
        % converting file
        % ---------------
        for indexcol = 1:min(size(array,2), length(g.format))
-           [str mult] = checkformat(g.format{indexcol});
+           [str, mult] = checkformat(g.format{indexcol});
            for indexrow = 1:size( array, 1)
                if mult ~= 1
                    eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
@@ -545,7 +545,7 @@ if ischar(filename)
 
        % converting XYZ coordinates to polar
        % -----------------------------------
-   elseif isfield(eloc, 'sph_theta')
+   elseif isfield(eloc, 'sph_theta') && any(~cellfun(@isempty, { eloc.sph_theta }))
        try
            eloc = convertlocs(eloc, 'sph2all');  
        catch, disp('Warning: coordinate conversion failed'); end

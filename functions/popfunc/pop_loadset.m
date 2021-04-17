@@ -71,7 +71,12 @@ else
     % account for old calling format
     % ------------------------------
     if ~strcmpi(inputname, 'filename') && ~strcmpi(inputname, 'filepath') && ~strcmpi(inputname, 'eeg') && ~strcmpi(inputname, 'loadmode') && ~strcmpi(inputname, 'check')
-        options = { 'filename' inputname }; 
+        if nargin == 1
+            [filepath, filename, ext] = fileparts(inputname);
+            options = { 'filename' [filename ext], 'filepath' filepath }; 
+        else
+            options = { 'filename' inputname }; 
+        end
         if nargin > 1
             options = { options{:} 'filepath' inputpath }; 
         end
