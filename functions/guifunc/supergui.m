@@ -247,6 +247,9 @@ for counter = 1:maxcount
 	clear rowhandle;
     gm = g.geom{counter};
     [posx posy width height] = getcoord(gm{1}, gm{2}, gm{3}, gm{4}, g.borders, g.spacing);
+%     str1 = sprintf('%d, %d, [%1.2f,%1.2f], [%1.2f,%1.2f]', gm{1}, gm{2}, gm{3}(1), gm{3}(2), gm{4}(1), gm{4}(2));
+%     str2 = sprintf('%.4f, ', [posx posy width height]);
+%     fprintf('%s -> %s -> %s\n', str1, str2, g.uilist{ counter }{4});
     
     try
         currentelem = g.uilist{ counter };
