@@ -892,7 +892,7 @@ else
                 elseif strcmpi(chaninfo.filename, 'standard_1005.elc')
                     dipfitdefs;
                     chaninfo.filename = template_models(2).chanfile;
-                elseif strcmpi(chaninfo.filename, 'standard_1005_BIDS.ced')
+                elseif strcmpi(chaninfo.filename, 'standard_1005.ced')
                     dipfitdefs;
                     chaninfo.filename = template_models(2).chanfile;
                 end
