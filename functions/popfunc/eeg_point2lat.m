@@ -99,4 +99,4 @@ else
     pnts = 0;
 end
 newlat  = ((lat_array - (epoch_array-1)*pnts-1)/srate+timewin(1))/timeunit;
-newlat = round(newlat*1E9)*1E-9;
+newlat = round(newlat*1E9)/1E9;
