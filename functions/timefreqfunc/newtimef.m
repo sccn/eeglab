@@ -1441,7 +1441,7 @@ end
 % --------------
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
-    if strcmpi(g.scale, 'log'), mbase = 10^(mbase/10); end
+    if strcmpi(g.scale, 'log'), mbase = 10.^(mbase/10); end
 end
 if strcmpi(g.verbose, 'on')
     disp('Note: Add output variables to command line call in history to');
