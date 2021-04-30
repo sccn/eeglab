@@ -136,7 +136,11 @@ EEG.pnts   = size(EEG.data,2);
 EEG.xmax   = EEG.xmax+EEG.xmin;
 if length(event2) > 1 && event2(1).latency == 0, event2(1) = []; end
 if length(event2) > 1 && event2(end).latency == EEG.pnts, event2(end) = []; end
-if length(event2) > 2 && event2(end).latency == event2(end-1).latency, event2(end) = []; end
+if length(event2) > 2 && event2(end).latency == event2(end-1).latency
+    if isfield(event2, 'type') && isequal(event2(end).type, event2(end-1).type)
+        event2(end) = []; 
+    end
+end
 
 
 % add boundary events
@@ -190,10 +194,14 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
             differs = differs+1;
         end
     end
+    
     if 100*differs/length(EEG.event) > 50
-        fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF EEGLAB (<2017)\n' ...
+        db = dbstack;
+        if length(db) > 1 
+            fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF EEGLAB (<2017)\n' ...
                 'TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA, EVENTS MIGHT HAVE\n' ...
                 'BEEN CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
+        end
     end
     
     alllats = [ EEG.event.latency ];
