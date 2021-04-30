@@ -37,7 +37,6 @@
 %                trial data. Else if one positive value is given, use its 
 %                negative as the lower bound. The given values are also 
 %                considered outliers (min max) {default: none}
-%   'verbose'  - ['yes'|'no'] {default: 'yes'}
 %   'newname'  - [string] New dataset name {default: "[old_dataset] epochs"}
 %   'epochinfo'- ['yes'|'no'] Propagate event information into the new
 %                epoch structure {default: 'yes'}
@@ -211,7 +210,7 @@ end
 % ------------------------------
 try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end; % obsolete
 try, g.timeunit; 	 	  catch, g.timeunit = 'points'; end
-try, g.verbose; 	      catch, g.verbose = 'on'; end
+try, g.verbose; 	      catch, g.verbose = 'on'; end % obsolete
 try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', [EEG.setname ' epochs' ]); end
 try, g.eventindices;      catch, g.eventindices = 1:length(EEG.event); end
 try, g.epochinfo;         catch, g.epochinfo = 'yes'; end
