@@ -19,7 +19,7 @@
 %                and the transposed data in a binary float '.fdt' file.
 %                By default the option from the eeg_options.m file is 
 %                used.
-%   'version' - ['6'|'7.3'] save Matlab file as version 6 or
+%   'version' - ['6'|'7'|'7.3'] save Matlab file as version 6, 7, or
 %               '7.3' (default; as defined in eeg_option file).
 %
 % Outputs:
@@ -111,7 +111,7 @@ eeglab_options;
 defaultSave = fastif(option_saveversion6, '6', '7.3');
 g = finputcheck(options,  { 'filename'   'string'   []     '';
                             'filepath'   'string'   []     '';
-                            'version'    'string'   { '6','7.3' } defaultSave;
+                            'version'    'string'   { '6','7','7.3' } defaultSave;
                             'check'      'string'   { 'on','off' }     'off';
                             'savemode'   'string'   { 'resave','onefile','twofiles','' } '' });
 if ischar(g), error(g); end
@@ -251,10 +251,12 @@ try,
     try
         if option_saveasstruct
             if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', '-struct', 'EEG');
+            elseif strcmpi(g.version, '7') save(fullfile(EEG.filepath, EEG.filename), '-v7', '-mat', '-struct', 'EEG');
             else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', '-struct', 'EEG');
             end
         else
             if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', 'EEG');
+            elseif strcmpi(g.version, '7') save(fullfile(EEG.filepath, EEG.filename), '-v7', '-mat', 'EEG');
             else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', 'EEG');
             end
         end

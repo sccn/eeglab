@@ -1266,13 +1266,13 @@ else
     end
     
     if p1 == 1
-      g.time = g.time-g.winlength;     % << subtract one window length
+      g.time = g.time-g.winlength*0.9;     % << subtract one window length
     elseif p1 == 2               
-      g.time = g.time-fastif(g.winlength>=1, 1, g.winlength/5);             % < subtract one second
+      g.time = g.time-fastif(g.winlength>=1, 5, g.winlength/5);             % < subtract one second
     elseif p1 == 3
-      g.time = g.time+fastif(g.winlength>=1, 1, g.winlength/5);             % > add one second
+      g.time = g.time+fastif(g.winlength>=1, 5, g.winlength/5);             % > add one second
     elseif p1 == 4
-      g.time = g.time+g.winlength;     % >> add one window length
+      g.time = g.time+g.winlength*0.9;     % >> add one window length
     end
     
 	 if g.trialstag ~= -1 % time in second or in trials

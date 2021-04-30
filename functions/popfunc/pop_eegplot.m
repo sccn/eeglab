@@ -196,7 +196,7 @@ end
 
 if icacomp == 1
 	eegplot( EEG.data, 'srate', EEG.srate, 'title', ['Scroll channel activities -- eegplot() -- ', EEG.setname], ...
-			  'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
+			  'limits', [EEG.xmin EEG.xmax]*1000 , 'winlength', 30, 'spacing', 300, 'command', command, eegplotoptions{:}, varargin{:}); 
 else
     tmpdata = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
 	eegplot( tmpdata, 'srate', EEG.srate, 'title', ['Scroll component activities -- eegplot() -- ', EEG.setname], ...
