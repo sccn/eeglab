@@ -312,7 +312,7 @@ if ~isempty(opt.channels)
     end
     [pcond, pgroup, pinter] = std_stat(erpdata, stats);
     if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end % single subject STUDY                                
-    if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end % topo plotting for single subject
+    if ~isempty(params.topotime) && length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end % topo plotting for single subject
     if strcmpi(opt.noplot, 'on') return; end
     
     % get titles (not included in std_erspplot because it is not possible
