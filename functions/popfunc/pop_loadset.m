@@ -203,6 +203,8 @@ else
             end
         else
             EEG = checkoldformat(TMPVAR);
+            [ EEG.filepath EEG.filename ext ] = fileparts( g.filename );
+            EEG.filename = [ EEG.filename ext ];
             if ~isfield( EEG, 'data')
                 error('pop_loadset(): not an EEG dataset file');
             end
