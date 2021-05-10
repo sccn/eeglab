@@ -208,7 +208,7 @@ else
             if ~isfield( EEG, 'data')
                 error('pop_loadset(): not an EEG dataset file');
             end
-            if ischar(EEG.data), EEG.filepath = g.filepath; end
+            if ischar(EEG.data) && ~isempty(g.filepath), EEG.filepath = g.filepath; end
         end
         
         %ALLEEGLOC = pop_newset(ALLEEGLOC, EEG, 1);
