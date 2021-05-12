@@ -301,11 +301,17 @@ else
             if  (~set_ersp && ~set_itc )
                 set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'off');
                 set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'off');
-                set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'off');                
+                set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'off');
             else
-                set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'on');
-                set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'on');                
-                set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'on');                
+                if any([ ALLEEG.trials ] == 1)
+                    warndlg2('Some datasets have only one trial, cannot compute ERPimages');
+                    set(findobj('parent', hdl,'tag', 'itc_on'), 'value', 0);
+                    set(findobj('parent', hdl,'tag', 'ersp_on'), 'value', 0);
+                else
+                    set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'on');
+                    set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'on');                
+                    set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'on');      
+                end
             end
             userdat{5} = 0;
             set(hdl, 'userdata',userdat); 
@@ -328,9 +334,14 @@ else
         case 'seterpimage'
             set_spec = get(findobj('parent', hdl, 'tag', 'erpimage_on'), 'value'); 
             if set_spec
-                 set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'on');
-                 set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'on');
-                 set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'on');
+                if any([ ALLEEG.trials ] == 1)
+                    warndlg2('Some datasets have only one trial, cannot compute ERPimages');
+                    set(findobj('parent', hdl,'tag', 'erpimage_on'), 'value', 0);
+                else
+                     set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'on');
+                     set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'on');
+                     set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'on');
+                end
             else set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'off');
                  set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'off');
                  set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'off');
@@ -339,8 +350,13 @@ else
         case 'seterp'
             set_erp = get(findobj('parent', hdl, 'tag', 'erp_on'), 'value'); 
             if set_erp
-                 set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'on');
-                 set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'on');
+                if any([ ALLEEG.trials ] == 1)
+                    warndlg2('Some datasets have only one trial, cannot compute ERPs');
+                    set(findobj('parent', hdl,'tag', 'erp_on'), 'value', 0);
+                else
+                     set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'on');
+                     set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'on');
+                end
             else set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'off');
                  set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'off');
             end

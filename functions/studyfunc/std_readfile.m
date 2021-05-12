@@ -95,10 +95,18 @@ if iscell(fileBaseName)
     % then we need to call std_readfile several times and combine
     % the results
     % ------------------------------------------------------------
+%     compList = varargin{end};
+%     idxSeq = [find(compList==1) length(compList)];
+%     if length(fileBaseName) > 1
+%         for iFile = 1:length(fileBaseName)
+%             varargin{end} = compList(idxSeq(iFile):idxSeq(iFile+1)-1);
+%             [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
+%         end
     if length(fileBaseName) > 1
         for iFile = 1:length(fileBaseName)
             [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
         end
+        
         % combine arrays
         measureData = measureDataTmp{1};
         events = eventsTmp{1};
@@ -106,7 +114,7 @@ if iscell(fileBaseName)
             for iCell = 1:length(measureDataTmp{iData}(:))
                 if ~isempty(measureDataTmp{iData}{iCell})
                     if ndims(measureDataTmp{iData}{iCell}) == 2, measureData{iCell} = [ measureData{iCell} measureDataTmp{iData}{iCell} ];
-                    elseif ndims(measureDataTmp{iData}{iCell}) == 2, measureData{iCell}(:, :, end+1:end+size(measureDataTmp{iData}{iCell},3)) = measureDataTmp{iData}{iCell};
+                    elseif ndims(measureDataTmp{iData}{iCell}) == 3, measureData{iCell}(:, :, end+1:end+size(measureDataTmp{iData}{iCell},3)) = measureDataTmp{iData}{iCell};
                     end
                 end
             end
@@ -135,7 +143,7 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
     'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
     'triallimits'      'real'     []    []; % ERPimage only
     'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
-    'dataindices'      'integer'  []    [] }, 'std_readdatafile');
+    'dataindices'      'integer'  []    [] }, 'std_readfile');
 if ischar(opt), error(opt); end
 
 if ~isempty(opt.triallimits), opt.freqlimits = opt.triallimits; end
