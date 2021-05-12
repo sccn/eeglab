@@ -95,13 +95,6 @@ if iscell(fileBaseName)
     % then we need to call std_readfile several times and combine
     % the results
     % ------------------------------------------------------------
-%     compList = varargin{end};
-%     idxSeq = [find(compList==1) length(compList)];
-%     if length(fileBaseName) > 1
-%         for iFile = 1:length(fileBaseName)
-%             varargin{end} = compList(idxSeq(iFile):idxSeq(iFile+1)-1);
-%             [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
-%         end
     if length(fileBaseName) > 1
         for iFile = 1:length(fileBaseName)
             [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
