@@ -58,7 +58,9 @@ if iscolumn(distribution)
 end
 
 n = size(distribution, numDims);
-pvals = sum(distribution >= observed, numDims) / n;
+% once support for matlab <= R2016b is dropped:
+% pvals = sum(distribution >= observed, numDims) / n;
+pvals = sum(bsxfun(@ge, distribution, observed), numDims) / n;
 
 if strcmpi(tail, 'both')
 	pvals = 2 * min(pvals, 1 - pvals);
