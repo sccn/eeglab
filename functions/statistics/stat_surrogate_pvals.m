@@ -52,36 +52,22 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 function pvals = stat_surrogate_pvals(distribution,observed,tail)
-
-numDims = myndims(distribution);
-
-% append observed to last dimension of surrogate distribution
-distribution = cat(numDims,distribution,observed);
-
-numDims = myndims(distribution);
-
-% sort along last dimension (replications)
-[tmp idx] = sort( distribution, numDims,'ascend');
-[tmp mx]  = max( idx,[], numDims);
-
-len = size(distribution,  numDims );
-pvals = 1-(mx-0.5)/len;
-if strcmpi(tail, 'both')
-    pvals = min(pvals, 1-pvals);
-    pvals = 2*pvals;
+numDims = ndims(distribution);
+if iscolumn(distribution)
+	numDims = 1;
 end
 
+n = size(distribution, numDims);
+pvals = sum(distribution >= observed, numDims) / n;
 
-% get the number of dimensions in a matrix
-function val = myndims(a)
-if ndims(a) > 2
-    val = ndims(a);
+if strcmpi(tail, 'both')
+	pvals = 2 * min(pvals, 1 - pvals);
+elseif strcmpi(tail, 'left')
+	pvals = 1 - pvals;
+elseif any(strcmpi(tail, {'right', 'one'}))
+	% nothing to be done
 else
-    if size(a,1) == 1,
-        val = 2;
-    elseif size(a,2) == 1,
-        val = 1;
-    else
-        val = 2;
-    end
+	error('invalid value for tail: "%s", should be left, right, one or both', tail);
+end
+
 end
