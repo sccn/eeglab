@@ -62,12 +62,17 @@ n = size(distribution, numDims);
 % pvals = sum(distribution >= observed, numDims) / n;
 pvals = sum(bsxfun(@ge, distribution, observed), numDims) / n;
 
-if strcmpi(tail, 'both')
-	pvals = 2 * min(pvals, 1 - pvals);
-elseif strcmpi(tail, 'left')
-	pvals = 1 - pvals;
-elseif any(strcmpi(tail, {'right', 'one'}))
+if any(strcmpi(tail, {'right', 'one'}))
 	% nothing to be done
+	return;
+end
+
+p_left = 1 - pvals + sum(bsxfun(@eq, distribution, observed), numDims) / n;
+
+if strcmpi(tail, 'both')
+	pvals = 2 * min(pvals, p_left);
+elseif strcmpi(tail, 'left')
+	pvals = p_left;
 else
 	error('invalid value for tail: "%s", should be left, right, one or both', tail);
 end
