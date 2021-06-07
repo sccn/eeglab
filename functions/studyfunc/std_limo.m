@@ -310,7 +310,12 @@ for iSubj = 1:nb_subjects
         inds  = intersect(inds1, inds2);
         if ~isempty(inds)
             % record allows unbalance in the number of sessions - reuse for contrasts
-            order{iSubj}(iSess) = str2num(allSessions{inds});
+            if length(inds) == 1
+                order{iSubj}(iSess) = str2num(allSessions{inds(1)});
+            else
+                error([ 'Cannot calculate contrast because more than 1 dataset per session.' 10 ...
+                    'Merge datasets for each subject and try again' ]);
+            end
             
             % make file-up
             [~,subname] = fileparts(STUDY.datasetinfo(index).filename);
@@ -408,7 +413,7 @@ for iSubj = 1:nb_subjects
             % -------------------
             fprintf('making up statistical model for %s ... \n',filename)
             % save continuous and categorical data files
-            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds(1));
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
             % [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
             [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
             if strcmpi(opt.splitreg,'on')
