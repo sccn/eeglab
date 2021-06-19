@@ -243,6 +243,9 @@ if ~isequal('off', g.interpchan )
     if isempty(g.interpchan) 
         if isfield(EEG.chaninfo, 'removedchans')
             chanlocs2interp = EEG.chaninfo.removedchans;
+            if ~isempty(chanlocs2interp)
+                interpflag = 1;
+            end
         else
             try
                 urchantype  = {EEG.urchanlocs.type};
