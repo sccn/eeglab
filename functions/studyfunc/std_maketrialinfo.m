@@ -151,10 +151,15 @@ end
 % ---------------------------------------
 if isfield(STUDY.datasetinfo, 'trialinfo')
     if isfield(STUDY.datasetinfo(1).trialinfo(1), 'HED')
+        changeUnicode = false;
         for iDat = 1:length(STUDY.datasetinfo)
             for iTrial = 1:length(STUDY.datasetinfo(iDat).trialinfo)
                 STUDY.datasetinfo(iDat).trialinfo(iTrial).HED(STUDY.datasetinfo(iDat).trialinfo(iTrial).HED > 255) = 32;
+                changeUnicode = true;
             end
+        end
+        if changeUnicode
+            disp('Unicode character detected in HED event field, removing them to improve stability');
         end
     end
 end
