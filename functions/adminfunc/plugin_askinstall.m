@@ -1,7 +1,7 @@
 % plugin_askinstall() - install EEGLAB plugin from a GUI or comamnd line
 %                       call.
 % Usage:
-%  plugin_install(pluginName, pluginFunc, force);
+%  plugin_askinstall(pluginName, pluginFunc, force);
 %
 % Inputs:
 %  pluginName - [string] name of the plugin
