@@ -100,18 +100,39 @@ if iscell(fileBaseName)
             [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
         end
         
+        % combine arrays (old code, slow)
+%         measureData2 = measureDataTmp{1};
+%         events = eventsTmp{1};
+%         for iData = 2:length(measureDataTmp)
+%             for iCell = 1:length(measureDataTmp{iData}(:)) % all cells should contain the same number of elements
+%                 if ~isempty(measureDataTmp{iData}{iCell})
+%                     if ndims(measureDataTmp{iData}{iCell}) == 2
+%                         measureData2{iCell} = [ measureData2{iCell} measureDataTmp{iData}{iCell} ];
+%                     elseif ndims(measureDataTmp{iData}{iCell}) == 3
+%                         measureData2{iCell}(:, end+1:end+size(measureDataTmp{iData}{iCell},2),:) = measureDataTmp{iData}{iCell};
+%                     end
+%                 end
+%             end
+%         end
+        
+        measureData = cell(size(measureDataTmp{1}));
+        for iCell = 1:length(measureDataTmp{1}(:))
+            ndim2 = cellfun(@(x)size(x{1},2), measureDataTmp);
+            measureData{iCell} = zeros(size(measureDataTmp{1}{1}, 1), sum(ndim2), size(measureDataTmp{1}{1}, 3));
+        end
+
         % combine arrays
-        measureData = measureDataTmp{1};
         events = eventsTmp{1};
-        for iData = 2:length(measureDataTmp)
-            for iCell = 1:length(measureDataTmp{iData}(:))
+        for iCell = 1:length(measureDataTmp{1}(:)) % all cells should contain the same number of elements
+            pointer = 1;
+            for iData = 1:length(measureDataTmp)
                 if ~isempty(measureDataTmp{iData}{iCell})
-                    if ndims(measureDataTmp{iData}{iCell}) == 2, measureData{iCell} = [ measureData{iCell} measureDataTmp{iData}{iCell} ];
-                    elseif ndims(measureDataTmp{iData}{iCell}) == 3, measureData{iCell}(:, :, end+1:end+size(measureDataTmp{iData}{iCell},3)) = measureDataTmp{iData}{iCell};
-                    end
+                    measureData{iCell}(:, pointer:pointer+size(measureDataTmp{iData}{iCell},2)-1,:) = measureDataTmp{iData}{iCell};
+                    pointer = pointer + size(measureDataTmp{iData}{iCell},2);
                 end
             end
         end
+        
         return
     else
         fileBaseName = fileBaseName{1};
@@ -255,7 +276,7 @@ if isempty(opt.designvar)
     measureData = { measureData };
     events      = { events };
 else
-    [ measureData, events ] = globalgetfiledata(fileData, opt.designvar, options, {});
+    [ measureData, events ] = globalgetfiledata(fileData, opt.designvar, options, {}, v6Flag);
 end
 
 % remove duplicates in the list of parameters
@@ -269,7 +290,7 @@ cella = cella(sort(union(indices*2-1, indices*2)));
 
 % find indices for selection of measure
 % -------------------------------------
-function [measureRange, indBegin, indEnd] = indicesselect(measureRange, measureLimits);
+function [measureRange, indBegin, indEnd] = indicesselect(measureRange, measureLimits)
 indBegin = 1;
 indEnd   = length(measureRange);
 if ~isempty(measureRange) && ~isempty(measureLimits) && (measureLimits(1) > measureRange(1) || measureLimits(end) < measureRange(end))
@@ -280,10 +301,10 @@ end
 
 % recursive function to load data
 % -------------------------------
-function [ measureData, eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect);
+function [ measureData, eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect, v6Flag)
 
 if length(designvar) == 0
-    [ measureData, eventVals ] = getfiledata(fileData, trialselect, options{:});
+    [ measureData, eventVals ] = getfiledata(fileData, trialselect, v6Flag, options{:});
     measureData = { measureData };
     eventVals   = { eventVals   };
 else
@@ -291,13 +312,13 @@ else
     if isfield(designvar(1), 'vartype') && strcmpi('continuous', designvar(1).vartype)
         if ~ischar(designvar(1).value), designvar(1).value = ''; end
         trialselect = { trialselect{:} designvar(1).label designvar(1).value };
-        [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+        [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
         measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
         eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
     else
         for iField = 1:length(designvar(1).value)
             trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
-            [ tmpMeasureData, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+            [ tmpMeasureData, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
             measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
             eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
         end
@@ -306,7 +327,7 @@ end
 
 % load data from structure or file
 % --------------------------------
-function [ fieldData, events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
+function [ fieldData, events ] = getfiledata(fileData, trialselect, v6Flag, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
 
 persistent tmpcache;
 persistent hashcode;
@@ -325,14 +346,16 @@ if ~isempty(trialselect)
         trials = [1:length(fileData.trialinfo)]; % read all trials if NaN
     else
         [trials, events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
-        if length(unique(diff(trials))) > 1
+        if length(unique(diff(trials))) > 1 && ~v6Flag
             temptrials = [trials(1):trials(end)];
             subTrials  = trials-trials(1)+1;
             trials     = temptrials;
         end
     end
 end
-
+% if ~isempty(subTrials)
+%     trials = subTrials(trials(
+    
 for index = 1:length(chan)
     allfields   = fieldnames(fileData);
     topoFlag    = ~isempty(findstr(allfields{1}, '_grid'));
@@ -370,7 +393,8 @@ for index = 1:length(chan)
         elseif ndims(fileData.(fieldToRead)) == 2
             tmpFieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
             if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
-        else tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
+        else
+            tmpFieldData = fileData.(fieldToRead)(indBegin2:indEnd2,indBegin1:indEnd1,trials); % frequencies first here
             if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, :, subTrials); end
         end
     end
@@ -407,11 +431,9 @@ fid=fopen(x);
 if fid == -1
     error('File %s not found', x);
 end
-txt=char(fread(fid,[1,140],'*char'));
+txt=char(fread(fid,20,'uchar')');
 tmp = fclose(fid);
 txt=[txt,char(0)];
 txt=txt(1:find(txt==0,1,'first')-1);
 if ~isempty(strfind(txt, 'MATLAB 5.0')), v6 = true; else v6 = false; end
-
-
 
