@@ -303,6 +303,12 @@ else
                 set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'off');
                 set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'off');                
             else
+                if any( [ ALLEEG.trials ] == 1)
+                        set(findobj('parent', hdl, 'tag', 'itc_on'), 'value', 0)
+                        set(findobj('parent', hdl, 'tag', 'ersp_on'), 'value', 0)
+                        warndlg2('Cannot compute ERSP or ITC for continuous data');
+                        return;
+                end
                 set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'on');
                 set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'on');                
                 set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'on');                
@@ -326,8 +332,13 @@ else
             end
             
         case 'seterpimage'
-            set_spec = get(findobj('parent', hdl, 'tag', 'erpimage_on'), 'value'); 
-            if set_spec
+            set_erpim = get(findobj('parent', hdl, 'tag', 'erpimage_on'), 'value'); 
+            if set_erpim
+                 if any( [ ALLEEG.trials ] == 1)
+                        set(findobj('parent', hdl, 'tag', 'erpimage_on'), 'value', 0)
+                        warndlg2('Cannot compute ERPimage for continuous data');
+                        return;
+                 end
                  set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'on');
                  set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'on');
                  set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'on');
@@ -339,6 +350,11 @@ else
         case 'seterp'
             set_erp = get(findobj('parent', hdl, 'tag', 'erp_on'), 'value'); 
             if set_erp
+                 if any( [ ALLEEG.trials ] == 1)
+                        set(findobj('parent', hdl, 'tag', 'erp_on'), 'value', 0)
+                        warndlg2('Cannot compute ERP for continuous data');
+                        return;
+                 end
                  set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'on');
                  set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'on');
             else set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'off');
