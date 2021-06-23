@@ -263,7 +263,7 @@ if ~isempty(g.customfunc)
                     if length(inds)>1 && ~isequal(chanlist{inds})
                         error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                     end
-                    std_custom(ALLEEG(inds), g.customfunc, 'components', chanlist{inds(1)}, customparams{:});
+                    std_custom(ALLEEG(inds), g.customfunc, 'components', chanlist{inds(1)}, g.customparams{:});
                 end
             end
         end
