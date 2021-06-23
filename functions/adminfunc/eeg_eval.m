@@ -47,7 +47,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, com] = eeg_eval( funcname, EEG, varargin);
+function [EEG, com] = eeg_eval( funcname, EEG, varargin)
     
     com = '';
     if nargin < 2
@@ -76,9 +76,21 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
                                 'Are you sure you want to proceed with this operation?' ], ...
                             'Confirmation', 'Cancel', 'Proceed', 'Proceed');
         end
-        switch lower(res),
-         case 'cancel', return;
-         case 'proceed',;
+        switch lower(res)
+            case 'cancel', return;
+            case 'proceed'
+        end
+        vPar = ver('parallel');
+        if option_parallel && ~isempty(vPar)
+            res = questdlg2(strvcat( 'You have selected to use the parallel toolbox,', ...
+                                 'to process multiple datasets. If you saturate the ', ...
+                                 'memory, this could cause your computer to become.', ...
+                                 'unresponsive or even crash.'), ...
+                 'Multiple dataset warning', 'Cancel', 'Proceed', 'Proceed');
+        end
+        switch lower(res)
+            case 'cancel', return;
+            case 'proceed'
         end
     end
  
@@ -87,26 +99,51 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     v = version;
     if str2num(v(1)) == '5' % Matlab 5
         command = [ 'TMPEEG = ' funcname '( TMPEEG, ' vararg2str(g.params) ');' ];
-    else
+    elseif isstr(funcname)
         eval( [ 'func = @' funcname ';' ] );
+    else
+        func = funcname;
     end
-        
-    NEWEEG = [];
-    for i = 1:length(EEG)
-        fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
-        TMPEEG    = eeg_retrieve(EEG, i);
-        if v(1) == '5', eval(command);                      % Matlab 5
-        else            TMPEEG = feval(func, TMPEEG, g.params{:}); % Matlab 6 and higher
+    
+%     notCompatibleFunc = { 
+%         @clean_artifacts
+%     };
+    
+    NEWEEG = EEG;
+    if option_parallel
+        disp('Using the parallel toolbox to process multiple datasets (change in File > Preferences)');
+        myPool = gcp;
+        tmpoptions_store = option_storedisk;
+        parfor i = 1:length(EEG)
+            fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
+            TMPEEG    = eeg_retrieve(EEG, i);
+            TMPEEG = feval(func, TMPEEG, g.params{:});
+            TMPEEG = eeg_checkset(TMPEEG);
+            TMPEEG.saved = 'no';
+            if tmpoptions_store
+                TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
+                TMPEEG = update_datafield(TMPEEG);
+                NEWEEG(i) = TMPEEG;
+                NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
+            else
+                NEWEEG(i) = TMPEEG;
+            end
         end
-        TMPEEG = eeg_checkset(TMPEEG);
-        TMPEEG.saved = 'no';
-        if option_storedisk
-            TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
-            TMPEEG = update_datafield(TMPEEG);
-        end
-        NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
-        if option_storedisk
-            NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
+    else
+        for i = 1:length(EEG)
+            fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
+            TMPEEG    = eeg_retrieve(EEG, i);
+            TMPEEG = feval(func, TMPEEG, g.params{:});
+            TMPEEG = eeg_checkset(TMPEEG);
+            TMPEEG.saved = 'no';
+            if option_storedisk
+                TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
+                TMPEEG = update_datafield(TMPEEG);
+            end
+            NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
+            if option_storedisk
+                NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
+            end
         end
     end
     EEG = NEWEEG;
@@ -114,10 +151,10 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     % history
     % -------
     if nargout > 1
-        com = sprintf('%s = %s( %s,%s);', inputname(2), funcname, inputname(2), vararg2str(g.params));
+        com = sprintf('%s = %s( %s,%s);', inputname(2), char(funcname), inputname(2), vararg2str(g.params));
     end
 
-function EEG = update_datafield(EEG);
+function EEG = update_datafield(EEG)
     if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end
     if ~isempty(EEG.datfile)
         EEG.data = EEG.datfile;

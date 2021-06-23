@@ -395,6 +395,7 @@ elseif ischar(STUDY)
         case 'editvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
+            if isempty(val2), return; end
             tmpval = des(val).variable(val2).value;
             if strcmpi(des(val).variable(val2).vartype, 'continuous'), tmpval = []; end
             [tmpVar tmpVarList cat] = pop_addindepvar(usrdat, [], des(val).variable(val2).label, tmpval);

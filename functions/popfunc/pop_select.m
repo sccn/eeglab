@@ -111,7 +111,7 @@
 % 03-17-02 added channel info subsets selection -ad 
 % 03-21-02 added event latency recalculation -ad 
 
-function [EEG, com] = pop_select( EEG, varargin);
+function [EEG, com] = pop_select( EEG, varargin)
 
 com = '';
 if nargin < 1
@@ -171,7 +171,7 @@ if nargin < 2
    end
 
    if ~isempty( results{7} )
-       [ chaninds chanlist ] = eeg_decodechan(EEG(1).chanlocs, results{7});
+       [ chaninds, chanlist ] = eeg_decodechan(EEG(1).chanlocs, results{7});
        if isempty(chanlist), chanlist = chaninds; end
        if ~results{8}, args = { args{:}, 'channel'  , chanlist };
        else            args = { args{:}, 'nochannel', chanlist }; end
@@ -293,11 +293,11 @@ if ~isempty(g.channel)
     end
 end
 
-if size(g.point,2) > 2, 
+if size(g.point,2) > 2
     g.point = [g.point(1) g.point(end)];
     disp('Warning: vector format for point range is deprecated');
 end
-if size(g.nopoint,2) > 2, 
+if size(g.nopoint,2) > 2
     g.nopoint = [g.nopoint(1) g.nopoint(end)];
     disp('Warning: vector format for point range is deprecated');
 end
@@ -392,7 +392,7 @@ try
 
                 %-------------------------------------------
 
-                [EEG com] = pop_select(EEG,args{:});
+                [EEG, com] = pop_select(EEG,args{:});
 
                 %-------------------------------------------
 
@@ -435,7 +435,7 @@ if length(g.trial) ~= EEG.trials && ~isempty(EEG.event)
                                 
                                 %-------------------------------------------
                                 
-                                [EEG com] = pop_select(EEG,args{:});
+                                [EEG, com] = pop_select(EEG,args{:});
                                 
                                 %-------------------------------------------
                                 
@@ -486,7 +486,7 @@ if ~isempty(g.time) || ~isempty(g.notime)
         end
         alllatencies = 1-(EEG.xmin*EEG.srate); % time 0 point
         alllatencies = linspace( alllatencies, EEG.pnts*(EEG.trials-1)+alllatencies, EEG.trials);
-        [EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, ...
+        [EEG.data, tmptime, indices, epochevent]= epoch(EEG.data, alllatencies, ...
                                                      [g.time(1) g.time(2)]*EEG.srate, 'allevents', tmpeventlatency);
         tmptime = tmptime/EEG.srate;
         if g.time(1) ~= tmptime(1) && g.time(2)-1/EEG.srate ~= tmptime(2)
@@ -541,9 +541,9 @@ if ~isempty(g.time) || ~isempty(g.notime)
                     else             g.notime(index) = g.notime(index) - 1/EEG.srate;
                     end
                 end
-            end;        
+            end 
             g.notime = reshape(g.notime, 2, length(g.notime)/2)';
-        end;   
+        end
         
         nbtimes = length(g.notime(:));
         [points,flag] = eeg_lat2point(g.notime(:)', ones(1,nbtimes), EEG.srate, [EEG.xmin EEG.xmax]);
@@ -577,11 +577,15 @@ EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);
 EEG.nbchan    = length(g.channel);
 if ~isempty(EEG.chanlocs)
-    EEG.chanlocs = EEG.chanlocs(g.channel);
     if ~isfield(EEG.chaninfo, 'removedchans')
         EEG.chaninfo.removedchans = [];
     end
-    try EEG.chaninfo.removedchans = [ EEG.chaninfo.removedchans EEG.chanlocs(diff1) ]; catch, end;
+    try 
+        EEG.chaninfo.removedchans = [ EEG.chaninfo.removedchans EEG.chanlocs(diff1) ]; 
+    catch
+        disp('There was an issue storing removed channels in pop_select');
+    end
+    EEG.chanlocs = EEG.chanlocs(g.channel);
 end
 if ~isempty(EEG.epoch)
    EEG.epoch = EEG.epoch( g.trial );
@@ -592,7 +596,7 @@ if ~isempty(EEG.specdata)
    	else
    		EEG.specdata = [];
    		fprintf('Warning: spectral data were removed because of the change in the numner of points\n');
-   	end;		
+    end
 end
 
 % ica specific

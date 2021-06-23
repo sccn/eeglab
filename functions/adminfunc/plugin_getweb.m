@@ -112,7 +112,7 @@ for iRow = 1:length(plugin)
         plugin(iRow).status          = 'notinstalled';
     else
         if length(indMatch) > 1
-            disp([ 'Warning: duplicate extension ' plugin(iRow).name ' instaled' ]); 
+            disp([ 'Warning: duplicate extension ' plugin(iRow).name ' installed' ]); 
         end
         plugin(iRow).currentversion = pluginOri(indMatch).currentversion;
         plugin(iRow).foldername     = pluginOri(indMatch).foldername;
