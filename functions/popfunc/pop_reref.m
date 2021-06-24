@@ -120,15 +120,22 @@ if nargin < 2
                   'if get(gcbo, ''value''),' cb_setref ...
                   'else,'                    cb_setave ...
                   'end;' ];
-    cb_chansel1 = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''reref''   ), ''string'',tmpval); clear tmpchanlocs tmp tmpval';
-    cb_chansel2 = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''exclude'' ), ''string'',tmpval); clear tmpchanlocs tmp tmpval';
-    cb_chansel3 = [ 'if ~isfield(EEG(1).chaninfo, ''nodatchans''), ' ...
+    cb_chansel1 = 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''reref''   ), ''string'',tmpval); clear tmpEEG tmpchanlocs tmp tmpval';
+    cb_chansel2 = 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''exclude'' ), ''string'',tmpval); clear tmpEEG tmpchanlocs tmp tmpval';
+    cb_chansel3 = [ 'tmpEEG = get(gcbf, ''userdata''); if ~isfield(tmpEEG(1).chaninfo, ''nodatchans''), ' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
-                    'elseif isempty(EEG(1).chaninfo.nodatchans),' ...
+                    'elseif isempty(tmpEEG(1).chaninfo.nodatchans),' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
-                    'else,' ...
-                    '   tmpchaninfo = EEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.nodatchans.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval); clear tmpchanlocs tmp tmpval;' ...
-                    'end;' ];
+                    'elseif isfield(tmpEEG(1).chaninfo.nodatchans, ''type''),' ...
+                    '   fidType = ismember(cellfun(@char, {  tmpEEG(1).chaninfo.nodatchans.type}, ''UniformOutput'', false), ''FID'');' ...
+                    '   if sum(fidType == 0) == 0,' ...
+                    '      warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
+                    '   else,' ...
+                    '      tmpchaninfo = tmpEEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.nodatchans(~fidType).labels}, ''withindex'', ''on'');' ...
+                    '      set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval);' ...
+                    '   end;' ...
+                    'end;' ...
+                    'clear tmpEEG tmpchanlocs tmp tmpval;' ];
     if isempty(EEG(1).chanlocs), cb_chansel1 = ''; cb_chansel2 = ''; cb_chansel3 = ''; end
     
     % find current reference (= reference most used)
@@ -159,17 +166,17 @@ if nargin < 2
                ...
                {} ...
                ...
-               { 'style' 'checkbox' 'value' 0 'enable' 'off' 'tag' 'keepref' 'string' 'Retain old reference channels in data' } ...
+               { 'style' 'checkbox' 'value' 0 'enable' 'off' 'tag' 'keepref' 'string' 'Retain ref. channel(s) in data (will be flat for single-channel ref.)' } ...
                ...
                { 'style' 'text' 'string' 'Exclude channel indices (EMG, EOG)' } ...
                { 'style' 'edit' 'tag' 'exclude' 'string' '' } ...
                { 'style' 'pushbutton' 'string' '...' 'callback' cb_chansel2 } ...
                ...
-               { 'style' 'text' 'tag' 'reflocstr' 'string' 'Add current reference channel back to the data' } ...
+               { 'style' 'text' 'tag' 'reflocstr' 'string' 'Add old ref. channel back to the data' } ...
                { 'style' 'edit' 'tag' 'refloc' 'string' '' } ...
                { 'style' 'pushbutton' 'string' '...' 'callback' cb_chansel3 } };
     
-    [result,~,~,restag] = inputgui(geometry, uilist, 'pophelp(''pop_reref'')', 'pop_reref - average reference or re-reference data');
+    [result,~,~,restag] = inputgui('geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_reref'')', 'title', 'pop_reref - average reference or re-reference data', 'userdata', EEG);
     if isempty(result), return; end
 
     % decode inputs
@@ -234,53 +241,59 @@ if ~isequal('off', g.interpchan )
     
     % Case no channel provided, infering them from urchanlocs field
     if isempty(g.interpchan) 
-        try
-            urchantype  = {EEG.urchanlocs.type};
-            chanloctype = {EEG.chanlocs.type};
-            if  any(cellfun(@isempty,urchantype)) || any(cellfun(@isempty,chanloctype))
-                eegtypeindx0 = [1:length(EEG.urchanlocs)]';
-                eegtypeindx1 = [1:length(EEG.chanlocs)]';
-                % Excluding fiducials if exist
-                try
-                    indxfid_urch = find(strcmpi({'fid'},urchantype));
-                    indxfid_ch   = find(strcmpi({'fid'},chanloctype));
-                    if ~isempty(indxfid_urch), eegtypeindx0(indxfid_urch) = []; end
-                    if ~isempty(indxfid_ch),   eegtypeindx1(indxfid_ch)   = []; end
-                catch
-                    fprintf('pop_reref message: Unable to find fiducials...\n');
-                end
-            else   
-                eegtypeindx0 = strmatch('EEG',urchantype);
-                eegtypeindx1 = strmatch('EEG',chanloctype);    
-            end     
-        catch
-            fprintf(2,'pop_reref error: Unable to check for deleted channels. Missing field ''type'' in channel location \n');
-            return;
-        end
-        
-        if isempty(eegtypeindx0) || isempty(eegtypeindx1)
-            fprintf(2,'pop_reref error: Unable to get channel type from this data. Check field ''type'' on EEG.urchanlocs or EEG.chanlocs. \n');
-            return;
-        end
-        
-        chan2interp = setdiff_bc({EEG.urchanlocs(eegtypeindx0).labels}, {EEG.chanlocs(eegtypeindx1).labels});       
-        if isempty(chan2interp)
-            fprintf('pop_reref message: No removed channel found. Halting interpolation and moving forward...\n');
+        if isfield(EEG.chaninfo, 'removedchans')
+            chanlocs2interp = EEG.chaninfo.removedchans;
+            if ~isempty(chanlocs2interp)
+                interpflag = 1;
+            end
         else
-           chan2interpindx = find(cell2mat(cellfun(@(x) ismember(x, chan2interp), {EEG.urchanlocs.labels}, 'UniformOutput', 0)));  
-           
-           % Checking validity of channels selected for interpolation by assessing X ccordinate
-           for ichan = 1:length(chan2interpindx)
-               validchan(ichan) = ~isempty(EEG.urchanlocs(chan2interpindx(ichan)).X);
-           end
-           if all(validchan == 0)
-               fprintf('pop_reref message: Invalid channel(s) for interpolation. Halting interpolation and moving forward...\n');
-           else
-               chanlocs2interp =  EEG.urchanlocs(chan2interpindx(find(validchan)));
-               interpflag = 1;
-           end
+            try
+                urchantype  = {EEG.urchanlocs.type};
+                chanloctype = {EEG.chanlocs.type};
+                if  any(cellfun(@isempty,urchantype)) || any(cellfun(@isempty,chanloctype))
+                    eegtypeindx0 = [1:length(EEG.urchanlocs)]';
+                    eegtypeindx1 = [1:length(EEG.chanlocs)]';
+                    % Excluding fiducials if exist
+                    try
+                        indxfid_urch = find(strcmpi({'fid'},urchantype));
+                        indxfid_ch   = find(strcmpi({'fid'},chanloctype));
+                        if ~isempty(indxfid_urch), eegtypeindx0(indxfid_urch) = []; end
+                        if ~isempty(indxfid_ch),   eegtypeindx1(indxfid_ch)   = []; end
+                    catch
+                        fprintf('pop_reref message: Unable to find fiducials...\n');
+                    end
+                else   
+                    eegtypeindx0 = strmatch('EEG',urchantype);
+                    eegtypeindx1 = strmatch('EEG',chanloctype);    
+                end     
+            catch
+                fprintf(2,'pop_reref error: Unable to check for deleted channels. Missing field ''type'' in channel location \n');
+                return;
+            end
+
+            if isempty(eegtypeindx0) || isempty(eegtypeindx1)
+                fprintf(2,'pop_reref error: Unable to get channel type from this data. Check field ''type'' on EEG.urchanlocs or EEG.chanlocs. \n');
+                return;
+            end
+
+            chan2interp = setdiff_bc({EEG.urchanlocs(eegtypeindx0).labels}, {EEG.chanlocs(eegtypeindx1).labels});       
+            if isempty(chan2interp)
+                fprintf('pop_reref message: No removed channel found. Halting interpolation and moving forward...\n');
+            else
+               chan2interpindx = find(cell2mat(cellfun(@(x) ismember(x, chan2interp), {EEG.urchanlocs.labels}, 'UniformOutput', 0)));  
+
+               % Checking validity of channels selected for interpolation by assessing X ccordinate
+               for ichan = 1:length(chan2interpindx)
+                   validchan(ichan) = ~isempty(EEG.urchanlocs(chan2interpindx(ichan)).X);
+               end
+               if all(validchan == 0)
+                   fprintf('pop_reref message: Invalid channel(s) for interpolation. Halting interpolation and moving forward...\n');
+               else
+                   chanlocs2interp =  EEG.urchanlocs(chan2interpindx(find(validchan)));
+                   interpflag = 1;
+               end
+            end
         end
-    
     % Case where channel loc structure is provided    
     elseif isstruct(g.interpchan) 
         chanlocs2interp = g.interpchan;
@@ -330,22 +343,28 @@ if ~isempty(refchan)
     else
         allf = fieldnames(refchan);
         n    = length(EEG.chaninfo.nodatchans);
-        for ind = 1:length(allf)
-            EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n }, ...
-                allf{ind}, getfield(refchan, allf{ind}));
+        for iRef = 1:length(refchan)
+            for ind = 1:length(allf)
+                EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n+iRef }, ...
+                    allf{ind}, getfield(refchan(iRef), allf{ind}));
+            end
         end
     end
 end
-if ~isempty(g.refloc)
-    allinds = [];
-    tmpchaninfo = EEG.chaninfo;
-    for iElec = 1:length(g.refloc)
-        if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
-            error('There is no such reference channel');
+if ~isempty(g.refloc) 
+    if isfield(EEG.chaninfo, 'nodatchans') && ~isempty(EEG.chaninfo.nodatchans)
+        allinds = [];
+        tmpchaninfo = EEG.chaninfo;
+        for iElec = 1:length(g.refloc)
+            if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
+                error('Missing reference channel information. Edit channels and add reference first.');
+            end
+            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
         end
-        allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
+        EEG.chaninfo.nodatchans(allinds) = [];
+    else
+        error('Missing reference channel information. Edit channels and add reference first.');
     end
-    EEG.chaninfo.nodatchans(allinds) = [];
 end
     
 % legacy EEG.ref field

@@ -96,9 +96,9 @@ end
 % parse the eeg_options file
 % ----------------------------
 eeglab_options;
-if iseeglabdeployed
-    filename = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_options.txt');
-    eegoptionbackup = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_optionsbackup.txt');
+if isdeployed || (exist('ismcc') && ismcc)
+    filename = which('eeg_options.txt');
+    eegoptionbackup = which('eeg_optionsbackup.txt');
 else
     % folder for eeg_options file (also update the eeglab_options)
     if ~isempty(EEGOPTION_PATH)
@@ -136,6 +136,35 @@ else
     % --------------------------------------
     [ header, opt ] = eeg_readoptions( eegoptionbackup ); 
     [ header, opt ] = eeg_readoptions( fid, opt  ); % use opt from above as default
+end
+
+optionsToShow = {
+    'option_storedisk' ...
+    'option_savetwofiles'  ...
+    'option_parallel'  ...
+    'option_computeica'  ...
+    'option_rememberfolder' ...
+    'option_allmenus'  ...
+    'option_checkversion' ...
+    'option_showadvanced' ...
+    'option_cachesize' };
+
+% remove advanced options if necessary
+if isempty(varargin)
+    if ~option_showadvanced
+        % remove options 
+        for iOpt = length(opt):-1:1
+            if ~isempty(opt(iOpt).varname) && ~ismember(opt(iOpt).varname, optionsToShow)
+                opt(iOpt) = [];
+            end
+        end
+        % remove header not serving any option
+        for iOpt = length(opt)-1:-1:1
+            if isempty(opt(iOpt).varname) && isempty(opt(iOpt+1).varname)
+                opt(iOpt) = [];
+            end
+        end
+    end
 end
 
 if nargin < 2

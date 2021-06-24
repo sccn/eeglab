@@ -27,7 +27,9 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function plugin = plugin_getweb(type, pluginOri, varargin)
+function [plugin,eeglabVersionStatus] = plugin_getweb(type, pluginOri, varargin)
+plugin = [];
+eeglabVersionStatus = [];
 
 if nargin < 1, help plugin_getweb; return; end
 if nargin < 2, pluginOri = []; end
@@ -35,44 +37,70 @@ if nargin < 2, pluginOri = []; end
 % convert plugin list format if necessary
 if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end
 
+[~,dateTmp] = version;
+if datenum(dateTmp) < 736583
+    error( [ 'The plugin manager is only available for Matlab version 2016b and later versions.' 10 ...
+              'Download plugins from the internet and unzip them in the plugin folder instead.' ] );
+end
+
 % retreiving statistics
+eeglab_options;
 try
     disp( [ 'Retreiving download statistics...' ] );
-    [stats, status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki.php');
-    stats = textscan(stats, '%s%d%s%s%f%d%s%s%s%s%s%f', 'delimiter', char(9));
+    if exist('OCTAVE_VERSION', 'builtin') == 0
+        [plugin, status] = plugin_urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type '&upload=' num2str(option_showpendingplugins)]);
+    else
+        [plugin, status] = urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type '&upload=' num2str(option_showpendingplugins)]);
+    end
+    if isempty(plugin)
+        disp('Issue with retrieving statistics for extensions');
+        return;
+    end
+    try
+        plugin = jsondecode(plugin);
+    catch
+        disp('Issue with decoding plugin information, Octave 7.x required to decode JSON strings');
+    end
 catch
-    stats = {};
     disp('Cannot connect to the Internet to retrieve statistics for extensions');
+    return
 end
 
 if status == 0
-    error('Cannot connect to the Internet to retrieve extension list');
+    disp('Cannot connect to the Internet to retrieve extension list');
+    return
 end
 
-% decode stats into plugins
-% -------------------------
-plugin = [];
+%% rename fields for backward compabitiligy
+renameField = { 'plugin' 'name';
+                'count'  'downloads';
+                'curversion' 'version';
+                'link'   'zip' };
+
 if ~isempty(pluginOri)
-     currentNames = lower({ pluginOri.name });
-else currentNames = {};
+    currentNames = lower({ pluginOri.name });
+else
+    currentNames = {};
 end
-for iRow = 1:length(stats{1})
-    plugin(iRow).name      = stats{1}{iRow};
-    plugin(iRow).downloads = stats{2}(iRow);
-    plugin(iRow).version   = stats{3}{iRow};
-    plugin(iRow).zip       = stats{4}{iRow};
-    plugin(iRow).rating    = stats{5}(iRow);
-    plugin(iRow).numrating = stats{6}(iRow);
-    plugin(iRow).description  = stats{7}{iRow};
-    plugin(iRow).rawtags      = stats{8}{iRow};
+for iRow = 1:length(plugin)
+    
+    % rename fields
+    for iField = 1:size(renameField, 1)
+        plugin(iRow).(renameField{iField, 2}) = plugin(iRow).(renameField{iField, 1});
+    end
+    
+    % decode tags
+    plugin(iRow).rawtags = plugin(iRow).tags;
     if ~isempty(plugin(iRow).rawtags)
         tmpTags = textscan(plugin(iRow).rawtags, '%s', 'delimiter', ',');
-        plugin(iRow).tags         = tmpTags{1}';
+        plugin(iRow).tags = tmpTags{1}';
     end
-    plugin(iRow).contactname  = stats{9}{iRow};
-    plugin(iRow).contactemail = stats{10}{iRow};
-    plugin(iRow).webdoc    = stats{11}{iRow};
-    plugin(iRow).size      = stats{12}(iRow);
+    
+    plugin(iRow).numrating =  str2double(plugin(iRow).numrating);
+    plugin(iRow).rating    =  str2double(plugin(iRow).rating);
+    plugin(iRow).critical  =  str2double(plugin(iRow).critical);
+    plugin(iRow).downloads =  str2double(plugin(iRow).downloads);
+    plugin(iRow).size      =  sscanf(plugin(iRow).size, '%f'); % Only numeric part is taken, possible KB or MB additions are ignored
     plugin(iRow).webrating = [ 'https://sccn.ucsd.edu/eeglab/plugin_uploader/simplestar.php?plugin=' plugin(iRow).name '&version=' plugin(iRow).version ];
     
     % match with existiting plugins
@@ -84,7 +112,7 @@ for iRow = 1:length(stats{1})
         plugin(iRow).status          = 'notinstalled';
     else
         if length(indMatch) > 1
-            disp([ 'Warning: duplicate extension ' plugin(iRow).name ' instaled' ]); 
+            disp([ 'Warning: duplicate extension ' plugin(iRow).name ' installed' ]); 
         end
         plugin(iRow).currentversion = pluginOri(indMatch).currentversion;
         plugin(iRow).foldername     = pluginOri(indMatch).foldername;
@@ -97,6 +125,12 @@ for iRow = 1:length(stats{1})
         end
     end
 end
+plugin = rmfield(plugin, renameField(:,1)');
+
+% handle the special case of EEGLAB version
+indEEGLAB = cellfun(@(x)isequal(x, 'eeglab'), lower( { plugin.name } ));
+eeglabVersionStatus = plugin(indEEGLAB);
+plugin(indEEGLAB) = [];
 
 % remove plugins with no zip file
 % -------------------------------

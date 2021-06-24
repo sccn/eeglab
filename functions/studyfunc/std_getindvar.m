@@ -66,8 +66,16 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
     ff = fieldnames(setinfo);
     ff = setdiff_bc(ff, { 'filepath' 'filename' 'subject' 'index' 'ncomps' 'comps' 'trialinfo' });
     for index = 1:length(ff)
-        if ischar(getfield(setinfo(1), ff{index}))
-            eval( [ 'tmpvals = unique_bc({ setinfo.' ff{index} '});' ] );
+        % check we have the same data type
+        allSetinfoVals = { setinfo.(ff{index}) };
+        if any(cellfun(@ischar, allSetinfoVals))
+            if ~all(cellfun(@ischar, allSetinfoVals))
+                allSetinfoVals = cellfun(@num2str, allSetinfoVals, 'uniformoutput', false);
+            end
+        end
+
+        if ischar(allSetinfoVals{1})
+            tmpvals = unique_bc(allSetinfoVals);
             if length(tmpvals) > 1
                 factor{    countfact} = ff{index};
                 factorvals{countfact} = tmpvals;
@@ -89,7 +97,7 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                 countfact = countfact + 1;
             end
         else
-            eval( [ 'tmpvals = unique_bc([ setinfo.' ff{index} ']);' ] );
+            tmpvals = unique_bc([ allSetinfoVals{:} ] );
             if length(tmpvals) > 1
                 factor{    countfact} = ff{index};
                 factorvals{countfact} = mattocell(tmpvals);

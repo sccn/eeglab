@@ -24,6 +24,7 @@
 %
 % Usage: 1) To (re)start EEGLAB, type
 %            >> eeglab           % Ignores any loaded datasets
+%            >> eeglab nogui     % Do not pop up GUI
 %        2) To redaw and update the EEGLAB interface, type
 %            >> eeglab redraw    % Scans for non-empty datasets
 %            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
@@ -152,7 +153,7 @@ function varargout = eeglab( onearg )
 ver = version;
 if strcmpi(ver, '9.4.0.813654 (R2018a)')
     disp('Link to install <a href="https://www.mathworks.com/downloads/web_downloads/download_update?release=R2018a&s_tid=ebrg_R2018a_2_1757132">2018a Update 2</a>');
-    errordlg( [ 'You are running Matlab version R2018a, which has important bugs' 10 'Matlab crashes when running EEGLAB in this vesion of Matlab' 10 'Install 2018a Update 2 to fix the issue (link on the command line)' ]);
+    errordlg( [ 'You are running Matlab version R2018a, which has important bugs' 10 'Matlab crashes when running EEGLAB in this version of Matlab' 10 'Install 2018a Update 2 to fix the issue (link on the command line)' ]);
 end
 
 if nargout > 0
@@ -199,6 +200,8 @@ if ismatlab && vers < 7.06
 end 
 if ~ismatlab
     warning('off', 'Octave:abbreviated-property-match');
+    warning('off', 'Octave:legacy-function');
+    warning('off', 'Octave:num-to-str');
     warning('off', 'backtrace');
     warning('off', 'Octave:divide-by-zero');
     try
@@ -213,6 +216,13 @@ if ~ismatlab
     end
 end
 
+% check potential issues with strjoin
+% -----------------------------------
+strjoinPath = fileparts(which('strjoin'));
+[~,strjoinPath2] = fileparts(strjoinPath);
+if ~strcmpi(strjoinPath2, 'strfun')
+    warning(sprintf('Potential function conflict for strjoin.m located in "%s" \nWe suggest removing the path from Matlab to avoid problems.', strjoinPath));
+end
 
 % check for duplicate versions of EEGLAB
 % --------------------------------------
@@ -232,7 +242,6 @@ if nargin < 1 && ~isdeployed
         eeglabpath2 = mywhich('eeglab.m');
     end
     if ~isempty(eeglabpath2)
-        %evalin('base', 'clear classes updater;'); % this clears all the variables
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
         tmpWarning = warning('query', 'backtrace'); 
         warning off backtrace;
@@ -312,7 +321,6 @@ if ~isdeployed
     myaddpath( eeglabpath, 'timefreq.m',       [ 'functions' filesep 'timefreqfunc'     ]);
     myaddpath( eeglabpath, 'icademo.m',        [ 'functions' filesep 'miscfunc'         ]);
     myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'supportfiles'     ]);
-    myaddpath( eeglabpath, 'startpane.m',      [ 'functions' filesep 'javachatfunc' ]);
     addpathifnotinlist(fullfile(eeglabpath, 'plugins'));
     eeglab_options;
     
@@ -379,12 +387,12 @@ if nargin < 1 || exist('EEG') ~= 1
     end
 end
 
+versL = ~option_allmenus;
 if nargin == 1
 	if strcmp(onearg, 'versions')
         disp( [ 'EEGLAB v' eeg_getversion ] );
 	elseif strcmp(onearg, 'nogui')
         if nargout < 1, clear ALLEEG; end % do not return output var
-        return;
 	elseif strcmp(onearg, 'redraw')
 		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
@@ -399,6 +407,8 @@ if nargin == 1
         close(W_MAIN);
         eeglab redraw;
         return;
+    elseif strcmp(onearg, 'full')
+        versL = false;
     else
         fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
         eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
@@ -408,6 +418,9 @@ else
 end
 ALLCOM = ALLCOM;
 try, colordef('white'); catch end
+if versL
+    disp('Some menus items hidden. Use Preference menu to show them all.');
+end
 
 % default option folder
 % ---------------------
@@ -480,6 +493,7 @@ trystrs.check_epoch_ica          = checkepochica;
 trystrs.check_chanlocs           = checkplot;
 trystrs.check_epoch_chanlocs     = checkepochplot;
 trystrs.check_epoch_ica_chanlocs = checkepochicaplot;
+trystrs.check_ica_chanlocs       = checkicaplot;
 catchstrs.add_to_hist            = e_hist;
 catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
@@ -489,7 +503,7 @@ catchstrs.load_study             = e_load_study;
 
 % create eeglab figure
 % --------------------
-if ismatlab
+if ~strcmpi(onearg, 'nogui')
     eeg_mainfig(onearg);
 end
 
@@ -534,7 +548,7 @@ cb_study1      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_stud
 cb_study2      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]; 
 cb_studyerp    = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_studyerp;' e_load_study]; 
 cb_loadstudy   = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy; if ~isempty(LASTCOM), STUDYTMP = std_renamestudyfiles(STUDYTMP, ALLEEGTMP); end;' e_load_study]; 
-cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study];
+cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resavegui'');'      e_load_study];
 cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);'                                e_load_study];
 cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
 cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
@@ -552,12 +566,13 @@ cb_editeventf  = [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG);' e_store
 cb_editeventv  = [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);'  e_store];
 cb_adjustevents= [ checkevent '[EEG LASTCOM] = pop_adjustevents(EEG);'   e_store];
 cb_comments    = [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store];
-cb_chanedit    = [ 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
+cb_chanedit    = [ check 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
                    'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
                    'disp(''TIP: Call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
                    'disp(''     to convert between channel location file formats'');' ...
-                   '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize'');' ...
-                   'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
+                   '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); clear TMPINFO TMP; if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
+                   e_store ];
+                   %'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
 cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'                     e_newset];
 cb_rmdat       = [ checkevent '[EEG LASTCOM] = pop_rmdat(EEG);'                      e_newset];
 cb_selectevent = [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ];
@@ -568,8 +583,8 @@ cb_resample    = [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset];
 cb_eegfilt     = [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);'  e_newset];
 cb_interp      = [ check      '[EEG LASTCOM] = pop_interp(EEG); '  e_newset];
 cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
-cb_eegplot     = [ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);'   e_hist];
-cb_epoch       = [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_newset e_check_study ];
+cb_eegplot     = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'   e_hist];
+cb_epoch       = [ check      '[EEG,~,LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_newset e_check_study ];
 cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_newset];
 cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store e_check_study];
 cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
@@ -623,8 +638,8 @@ cb_topoplot2   = [ checkicaplot  'LASTCOM = pop_topoplot(EEG, 0);'        e_hist
 cb_headplot2   = [ checkicaplot  '[EEG LASTCOM] = pop_headplot(EEG, 0);'  e_store];
 cb_prop2       = [ checkicaplot  'LASTCOM = pop_prop(EEG,0);'             e_hist];
 cb_erpimage2   = [ checkepochica 'LASTCOM = pop_erpimage(EEG, 0, eegh(''find'',''pop_erpimage(EEG,0''));' e_hist];
-cb_envtopo1    = [ checkica      'LASTCOM = pop_envtopo(EEG);'            e_hist];
-cb_envtopo2    = [ checkica      'if length(ALLEEG) == 1, error(''Need at least 2 datasets''); end; LASTCOM = pop_envtopo(ALLEEG);' e_hist];
+cb_envtopo1    = [ checkicaplot  'LASTCOM = pop_envtopo(EEG);'            e_hist];
+cb_envtopo2    = [ checkicaplot  'if length(ALLEEG) == 1, error(''Need at least 2 datasets''); end; LASTCOM = pop_envtopo(ALLEEG);' e_hist];
 cb_plotdata2   = [ checkepochica '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist];
 cb_comperp2    = [ checkepochica 'LASTCOM = pop_comperp(ALLEEG, 0);'      e_hist];
 
@@ -665,242 +680,298 @@ cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clusted
 % epoch:on
 % continuous:on
 
-on          = 'study:on';
-onnostudy   = '';
-ondata      = 'startup:off';
-onepoch     = 'startup:off;continuous:off';
-ondatastudy = 'startup:off;study:on';
-onchannel   = 'startup:off;chanloc:on';
-onepochchan = 'startup:off;continuous:off;chanloc:on';
-onstudy     = 'startup:off;epoch:off;continuous:off;study:on';
+on                = 'study:on';
+onnostudy         = '';
+ondata            = 'startup:off';
+ondatanoroi       = 'startup:off;roi:off';
+onepoch           = 'startup:off;continuous:off';
+onepochnoroi      = 'startup:off;continuous:off;roi:off';
+ondatastudy       = 'startup:off;study:on';
+ondatastudynoroi  = 'startup:off;study:on;roi:off';
+onchannel         = 'startup:off;chanloc:on';
+onchannelnoroi    = 'startup:off;chanloc:on;roi:off';
+onepochchan       = 'startup:off;continuous:off;chanloc:on';
+onstudy           = 'startup:off;epoch:off;continuous:off;study:on';
+onstudynoroi      = 'startup:off;epoch:off;continuous:off;study:on;roi:off';
 
-if ismatlab
+if ~strcmpi(onearg, 'nogui')
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
-    file_m   = uimenu( W_MAIN,   'Label', 'File'                                    , 'userdata', on);
-    import_m = uimenu( file_m,   'Label', 'Import data'                             , 'userdata', onnostudy); 
-    neuro_m  = uimenu( import_m, 'Label', 'Using EEGLAB functions and plugins'      , 'tag', 'import data' , 'userdata', onnostudy); 
-    epoch_m  = uimenu( file_m,   'Label', 'Import epoch info', 'tag', 'import epoch', 'userdata', onepoch); 
-    event_m  = uimenu( file_m,   'Label', 'Import event info', 'tag', 'import event', 'userdata', ondata); 
-    exportm  = uimenu( file_m,   'Label', 'Export'           , 'tag', 'export'      , 'userdata', ondata); 
-    edit_m   = uimenu( W_MAIN,   'Label', 'Edit'                                    , 'userdata', ondatastudy);
-    tools_m  = uimenu( W_MAIN,   'Label', 'Tools',             'tag', 'tools'       , 'userdata', ondatastudy);
-    plot_m   = uimenu( W_MAIN,   'Label', 'Plot',              'tag', 'plot'        , 'userdata', ondata);
-    loc_m    = uimenu( plot_m,   'Label', 'Channel locations'                       , 'userdata', onchannel);
-    std_m    = uimenu( W_MAIN,   'Label', 'Study', 'tag', 'study'                   , 'userdata', onstudy);
-    set_m    = uimenu( W_MAIN,   'Label', 'Datasets'                                , 'userdata', ondatastudy);
-    help_m   = uimenu( W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
+    file_m   = eegmenu( false,  W_MAIN,   'Label', 'File'                                    , 'userdata', on);
+    import_m = eegmenu( false,  file_m,   'Label', 'Import data'                             , 'userdata', onnostudy); 
+    neuro_m  = eegmenu( false,  import_m, 'Label', 'Using EEGLAB functions and plugins'      , 'tag', 'import data' , 'userdata', onnostudy); 
+    epoch_m  = eegmenu( false,  file_m,   'Label', 'Import epoch info', 'tag', 'import epoch', 'userdata', onepoch); 
+    event_m  = eegmenu( false,  file_m,   'Label', 'Import event info', 'tag', 'import event', 'userdata', ondata); 
+    exportm  = eegmenu( false,  file_m,   'Label', 'Export'           , 'tag', 'export'      , 'userdata', ondata); 
+    edit_m   = eegmenu( false,  W_MAIN,   'Label', 'Edit'                                    , 'userdata', ondatastudy);
+    tools_m  = eegmenu( false,  W_MAIN,   'Label', 'Tools',             'tag', 'tools'       , 'userdata', ondatastudy);
+    plot_m   = eegmenu( false,  W_MAIN,   'Label', 'Plot',              'tag', 'plot'        , 'userdata', ondata);
+    loc_m    = eegmenu( false,  plot_m,   'Label', 'Channel locations'                       , 'userdata', onchannel);
+    std_m    = eegmenu( false,  W_MAIN,   'Label', 'Study', 'tag', 'study'                   , 'userdata', onstudy);
+    set_m    = eegmenu( false,  W_MAIN,   'Label', 'Datasets'                                , 'userdata', ondatastudy);
+    help_m   = eegmenu( false,  W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
 
-    uimenu( neuro_m, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
-    uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata, 'separator', 'on');
-    %uimenu( neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
+    eegmenu( false,  neuro_m, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
+    eegmenu( false,  neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata, 'separator', 'on');
+    %eegmenu( false,  neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
 
     % BIOSIG MENUS
     % ------------
-    uimenu( neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
+    eegmenu( false,  neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
+    eegmenu( false,  neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
 
-    uimenu( epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
-    uimenu( event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
-    uimenu( event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
-    uimenu( event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
-    uimenu( event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
-    uimenu( event_m, 'Label', 'From ERPLAB text files'                , 'CallBack', cb_importerplab); 
+    eegmenu( false,  epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
+    eegmenu( false,  event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
+    eegmenu( false,  event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
+    eegmenu( false,  event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
+    eegmenu( false,  event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
+    eegmenu( false,  event_m, 'Label', 'From ERPLAB text files'                , 'CallBack', cb_importerplab); 
 
-    uimenu( exportm, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
-    uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export, 'separator', 'on');
-    uimenu( exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
-    uimenu( exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2);
-    uimenu( exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
-    uimenu( exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
+    eegmenu( false,  exportm, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
+    eegmenu( false,  exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export, 'separator', 'on');
+    eegmenu( false,  exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
+    eegmenu( false,  exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2);
+    eegmenu( false,  exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
+    eegmenu( false,  exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
 
-    uimenu( file_m, 'Label', 'Load existing dataset'                  , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
-    uimenu( file_m, 'Label', 'Save current dataset(s)'                , 'userdata', ondatastudy, 'CallBack', cb_saveset);
-    uimenu( file_m, 'Label', 'Save current dataset as'                , 'userdata', ondata,      'CallBack', cb_savesetas);
-    uimenu( file_m, 'Label', 'Clear dataset(s)'                       , 'userdata', ondata,      'CallBack', cb_delset);
+    eegmenu( false,  file_m, 'Label', 'Load existing dataset'                  , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
+    eegmenu( false,  file_m, 'Label', 'Save current dataset(s)'                , 'userdata', ondatastudy, 'CallBack', cb_saveset);
+    eegmenu( false,  file_m, 'Label', 'Save current dataset as'                , 'userdata', ondata,      'CallBack', cb_savesetas);
+    eegmenu( false,  file_m, 'Label', 'Clear dataset(s)'                       , 'userdata', ondata,      'CallBack', cb_delset);
 
-    std2_m = uimenu( file_m, 'Label', 'Create study'                  , 'userdata', on     , 'Separator', 'on'); 
-    uimenu( std2_m,  'Label', 'Using all loaded datasets'             , 'userdata', ondata , 'Callback', cb_study1); 
-    uimenu( std2_m,  'Label', 'Browse for datasets'                   , 'userdata', on     , 'Callback', cb_study2); 
-    uimenu( std2_m,  'Label', 'Simple ERP STUDY'                      , 'userdata', on     , 'Callback', cb_studyerp); 
+    std2_m = eegmenu( false,  file_m, 'Label', 'Create study'                  , 'userdata', on     , 'Separator', 'on'); 
+    eegmenu( false,  std2_m,  'Label', 'Using all loaded datasets'             , 'userdata', ondata , 'Callback', cb_study1); 
+    eegmenu( false,  std2_m,  'Label', 'Browse for datasets'                   , 'userdata', on     , 'Callback', cb_study2); 
+    eegmenu( false,  std2_m,  'Label', 'Simple ERP STUDY'                      , 'userdata', on     , 'Callback', cb_studyerp); 
 
-    uimenu( file_m, 'Label', 'Load existing study'                    , 'userdata', on     , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
-    uimenu( file_m, 'Label', 'Save current study'                     , 'userdata', onstudy, 'CallBack', cb_savestudy1);
-    uimenu( file_m, 'Label', 'Save current study as'                  , 'userdata', onstudy, 'CallBack', cb_savestudy2);
-    uimenu( file_m, 'Label', 'Clear study / Clear all'                , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
-    uimenu( file_m, 'Label', 'Memory and other options'               , 'userdata', on     , 'CallBack', cb_editoptions, 'Separator', 'on');
+    eegmenu( false,  file_m, 'Label', 'Load existing study'                    , 'userdata', on     , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
+    eegmenu( false,  file_m, 'Label', 'Save current study'                     , 'userdata', onstudy, 'CallBack', cb_savestudy1);
+    eegmenu( false,  file_m, 'Label', 'Save current study as'                  , 'userdata', onstudy, 'CallBack', cb_savestudy2);
+    eegmenu( false,  file_m, 'Label', 'Clear study / Clear all'                , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
+    eegmenu( false,  file_m, 'Label', 'Preferences'                            , 'userdata', on     , 'CallBack', cb_editoptions, 'Separator', 'on');
 
-    hist_m = uimenu( file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
-    uimenu( hist_m, 'Label', 'Save dataset history script'            , 'userdata', ondata     , 'CallBack', cb_saveh1);
-    uimenu( hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
-    uimenu( hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
-
-    if ~isdeployed
-        uimenu( file_m,   'Label', 'Manage EEGLAB extensions'  , 'userdata', on, 'CallBack', cb_plugin);
+    hist_m = eegmenu( false,  file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
+    eegmenu( false,  hist_m, 'Label', 'Save dataset history script'            , 'userdata', ondata     , 'CallBack', cb_saveh1);
+    eegmenu( false,  hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
+    eegmenu( false,  hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);
+    if isdeployed
+        eegmenu( false,  hist_m, 'Label', 'Test compiled version'              , 'userdata', on         , 'CallBack', @test_compiled_version);
     end
-    uimenu( file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
-
-    uimenu( edit_m, 'Label', 'Dataset info'                           , 'userdata', ondata, 'CallBack', cb_editset);
-    uimenu( edit_m, 'Label', 'Event fields'                           , 'userdata', ondata, 'CallBack', cb_editeventf);
-    uimenu( edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
-    uimenu( edit_m, 'Label', 'Adjust event latencies'                 , 'userdata', ondata, 'CallBack', cb_adjustevents);
-    uimenu( edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
-    uimenu( edit_m, 'Label', 'Channel locations'                      , 'userdata', ondata, 'CallBack', cb_chanedit);
-    uimenu( edit_m, 'Label', 'Select data'                            , 'userdata', ondata, 'CallBack', cb_select, 'Separator', 'on', 'userdata', 'study:on');
-    uimenu( edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
-    uimenu( edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
-    uimenu( edit_m, 'Label', 'Copy current dataset'                   , 'userdata', ondata, 'CallBack', cb_copyset, 'Separator', 'on');
-    uimenu( edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
-    uimenu( edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
-
-    uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample);
-
-    filter_m = uimenu( tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
-    uimenu( filter_m, 'Label', 'Basic FIR filter (legacy)'            , 'userdata', ondatastudy, 'CallBack', cb_eegfilt);
-
-    uimenu( tools_m, 'Label', 'Re-reference'                          , 'userdata', ondata, 'CallBack', cb_reref, 'userdata', 'study:on');
-    uimenu( tools_m, 'Label', 'Interpolate electrodes'                , 'userdata', ondata, 'CallBack', cb_interp);
-    uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'userdata', ondata, 'CallBack', cb_eegplot);
-    uimenu( tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on', 'userdata', 'study:on');
-    uimenu( tools_m, 'Label', 'Remove baseline'                       , 'userdata', ondatastudy, 'CallBack', cb_rmbase);
-    uimenu( tools_m, 'Label', 'Run ICA'                               , 'userdata', ondatastudy, 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
-    uimenu( tools_m, 'Label', 'Remove components'                     , 'userdata', ondata, 'CallBack', cb_subcomp);
-    uimenu( tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej, 'Separator', 'on');
-    uimenu( tools_m, 'Label', 'Automatic continuous rejection'        , 'userdata', ondata, 'CallBack', cb_rejcont);
-    uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'userdata', onepoch, 'CallBack', cb_autorej);
-    rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs'           , 'userdata', onepoch);
-    rej_m2 = uimenu( tools_m, 'Label', 'Reject data using ICA'        , 'userdata', ondata );
-
-    uimenu( rej_m1, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu1);
-    uimenu( rej_m1, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej1);
-    uimenu( rej_m1, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh1);
-    uimenu( rej_m1, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend1);
-    uimenu( rej_m1, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob1);
-    uimenu( rej_m1, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt1);
-    uimenu( rej_m1, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec1);
-    uimenu( rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
-    uimenu( rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
-    uimenu( rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
-    uimenu( rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
-    uimenu( rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
-    uimenu( rej_m2, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh2);
-    uimenu( rej_m2, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend2);
-    uimenu( rej_m2, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob2);
-    uimenu( rej_m2, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt2);
-    uimenu( rej_m2, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec2);
-    uimenu( rej_m2, 'Label', 'Export marks to data reject'            , 'userdata', onepoch, 'CallBack', cb_rejsup3, 'separator', 'on');
-    uimenu( rej_m2, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
-
-    uimenu( loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
-    uimenu( loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
-    uimenu( plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
-    uimenu( plot_m, 'Label', 'Channel spectra and maps'               , 'userdata', ondata , 'CallBack', cb_spectopo1);
-    uimenu( plot_m, 'Label', 'Channel properties'                     , 'userdata', ondata , 'CallBack', cb_prop1);
-    uimenu( plot_m, 'Label', 'Channel ERP image'                      , 'userdata', onepoch, 'CallBack', cb_erpimage1);
-
-    ERP_m = uimenu( plot_m, 'Label', 'Channel ERPs'                   , 'userdata', onepoch);
-    uimenu( ERP_m,  'Label', 'With scalp maps'                        , 'CallBack', cb_timtopo);
-    uimenu( ERP_m,  'Label', 'In scalp/rect. array'                   , 'CallBack', cb_plottopo);
-
-    topo_m = uimenu( plot_m, 'Label', 'ERP map series'                , 'userdata', onepochchan);
-    uimenu( topo_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot1);
-    uimenu( topo_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot1);
-    uimenu( plot_m, 'Label', 'Sum/Compare ERPs'                       , 'userdata', onepoch, 'CallBack', cb_comperp1);
-
-    uimenu( plot_m, 'Label', 'Component activations (scroll)'         , 'userdata', ondata , 'CallBack', cb_eegplot2,'Separator', 'on');
-    uimenu( plot_m, 'Label', 'Component spectra and maps'             , 'userdata', ondata , 'CallBack', cb_spectopo2);
-
-    tica_m = uimenu( plot_m, 'Label', 'Component maps'                , 'userdata', onchannel);
-    uimenu( tica_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot2);
-    uimenu( tica_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot2);
-    uimenu( plot_m, 'Label', 'Component properties'                   , 'userdata', ondata , 'CallBack', cb_prop2);
-    uimenu( plot_m, 'Label', 'Component ERP image'                    , 'userdata', onepoch, 'CallBack', cb_erpimage2);
-
-    ERPC_m = uimenu( plot_m, 'Label', 'Component ERPs'                , 'userdata', onepoch);
-    uimenu( ERPC_m, 'Label', 'With component maps'                    , 'CallBack', cb_envtopo1);
-    uimenu( ERPC_m, 'Label', 'With comp. maps (compare)'              , 'CallBack', cb_envtopo2);
-    uimenu( ERPC_m, 'Label', 'In rectangular array'                   , 'CallBack', cb_plotdata2);
-    uimenu( plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'userdata', onepoch, 'CallBack', cb_comperp2);
-
-    stat_m = uimenu( plot_m, 'Label', 'Data statistics', 'Separator', 'on', 'userdata', ondata );
-    uimenu( stat_m, 'Label', 'Channel statistics'                     , 'CallBack', cb_signalstat1);
-    uimenu( stat_m, 'Label', 'Component statistics'                   , 'CallBack', cb_signalstat2);
-    uimenu( stat_m, 'Label', 'Event statistics'                       , 'CallBack', cb_eventstat);
-
-    spec_m = uimenu( plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
-    uimenu( spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
-    uimenu( spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
-    uimenu( spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
-    uimenu( spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
-
-    uimenu( std_m,  'Label', 'Edit study info'                        , 'userdata', onstudy, 'CallBack', cb_study3);
-    uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
-    uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
-    uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
-    uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
-    clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
-    uimenu( clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
-    uimenu( clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
-    uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
     if ~isdeployed
-        %newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
-        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
-        uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
-        uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
+        eegmenu( false,  file_m,   'Label', 'Manage EEGLAB extensions'  , 'userdata', on, 'CallBack', cb_plugin);
+    end
+    eegmenu( false,  file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
 
-        help_1 = uimenu( help_m, 'Label', 'EEGLAB functions', 'userdata', on);
-        uimenu( help_1, 'Label', 'Admin. functions'                          , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
-        uimenu( help_1, 'Label', 'Interactive pop_ functions'                , 'userdata', on, 'Callback', 'pophelp(''eeg_helppop'');');	
-        uimenu( help_1, 'Label', 'Signal processing functions'               , 'userdata', on, 'Callback', 'pophelp(''eeg_helpsigproc'');');	
-        uimenu( help_1, 'Label', 'Group data (STUDY) functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstudy'');');	
-        uimenu( help_1, 'Label', 'Time-frequency functions'                  , 'userdata', on, 'Callback', 'pophelp(''eeg_helptimefreq'');');	
-        uimenu( help_1, 'Label', 'Statistical functions'                     , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstatistics'');');	
-        uimenu( help_1, 'Label', 'Graphic interface builder functions'       , 'userdata', on, 'Callback', 'pophelp(''eeg_helpgui'');');	
-        uimenu( help_1, 'Label', 'Misc. command line functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
+    eegmenu( false,  edit_m, 'Label', 'Dataset info'                           , 'userdata', ondata, 'CallBack', cb_editset);
+    eegmenu( versL,  edit_m, 'Label', 'Event fields'                           , 'userdata', ondata, 'CallBack', cb_editeventf);
+    eegmenu( false,  edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
+    eegmenu( versL,  edit_m, 'Label', 'Adjust event latencies'                 , 'userdata', ondata, 'CallBack', cb_adjustevents);
+    eegmenu( false,  edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
+    eegmenu( false,  edit_m, 'Label', 'Channel locations'                      , 'userdata', ondatastudy, 'CallBack', cb_chanedit);
+    eegmenu( false,  edit_m, 'Label', 'Select data'                            , 'userdata', ondatastudy, 'CallBack', cb_select, 'Separator', 'on');
+    eegmenu( false,  edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
+    eegmenu( false,  edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
+    eegmenu( false,  edit_m, 'Label', 'Copy current dataset'                   , 'userdata', ondata, 'CallBack', cb_copyset, 'Separator', 'on');
+    eegmenu( false,  edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
+    eegmenu( false,  edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
 
-        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+    eegmenu(~versL,  tools_m, 'Label', '(Expand tool choices via "File > Preferences")'    , 'userdata', 'enable:off');
+    eegmenu( false,  tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample, 'Separator', 'on');
+
+    filter_m = eegmenu( false,  tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
+    eegmenu( false,  filter_m, 'Label', 'Basic FIR filter (legacy)'            , 'userdata', ondatastudy, 'CallBack', cb_eegfilt);
+
+    eegmenu( false,  tools_m, 'Label', 'Re-reference the data'                 , 'userdata', ondatastudy, 'CallBack', cb_reref);
+    eegmenu( false,  tools_m, 'Label', 'Interpolate electrodes'                , 'userdata', ondata, 'CallBack', cb_interp);
+    eegmenu( false,  tools_m, 'Label', 'Inspect/reject data by eye'            , 'userdata', ondata, 'CallBack', cb_eegplot, 'Separator', 'on');
+    eegmenu( versL,  tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej);
+    eegmenu( versL,  tools_m, 'Label', 'Automatic continuous rejection'        , 'userdata', ondata, 'CallBack', cb_rejcont);
+    eegmenu( versL,  tools_m, 'Label', 'Automatic epoch rejection'             , 'userdata', onepoch, 'CallBack', cb_autorej);
+    eegmenu( false,  tools_m, 'Label', 'Decompose data by ICA'                 , 'userdata', ondatastudynoroi, 'CallBack', cb_runica, 'Separator', 'on');
+    rej_m1 = eegmenu( versL,  tools_m, 'Label', 'Reject data epochs'           , 'userdata', onepoch);
+    rej_m2 = eegmenu( versL,  tools_m, 'Label', 'Reject data using ICA'        , 'userdata', ondata );
+
+    eegmenu( versL,  rej_m1, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt1);
+    eegmenu( versL,  rej_m1, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec1);
+    eegmenu( versL,  rej_m1, 'Label', 'Export marks to ICA reject'             , 'userdata', onepoch, 'CallBack', cb_rejsup1, 'separator', 'on');
+    eegmenu( versL,  rej_m1, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup2, 'separator', 'on', 'foregroundcolor', 'b');
+    eegmenu(~versL,  tools_m,'Label', 'Inspect/label components by map'        , 'userdata', ondata , 'CallBack', cb_selectcomps);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject components by map'               , 'userdata', ondata , 'CallBack', cb_selectcomps);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject data (all methods)'              , 'userdata', onepoch, 'CallBack', cb_rejmenu2, 'Separator', 'on');
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by inspection'                   , 'userdata', onepoch, 'CallBack', cb_eegplotrej2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject extreme values'                  , 'userdata', onepoch, 'CallBack', cb_eegthresh2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by linear trend/variance'        , 'userdata', onepoch, 'CallBack', cb_rejtrend2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by probability'                  , 'userdata', onepoch, 'CallBack', cb_jointprob2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by kurtosis'                     , 'userdata', onepoch, 'CallBack', cb_rejkurt2);
+    eegmenu( versL,  rej_m2, 'Label', 'Reject by spectra'                      , 'userdata', onepoch, 'CallBack', cb_rejspec2);
+    eegmenu( versL,  rej_m2, 'Label', 'Export marks to data reject'            , 'userdata', onepoch, 'CallBack', cb_rejsup3, 'separator', 'on');
+    eegmenu( versL,  rej_m2, 'Label', 'Reject marked epochs'                   , 'userdata', onepoch, 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
+
+    eegmenu( false,  tools_m, 'Label', 'Remove components from data'           , 'userdata', ondatastudy, 'CallBack', cb_subcomp );
+    eegmenu( false,  tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondatastudy , 'CallBack', cb_epoch, 'Separator', 'on');
+    eegmenu( false,  tools_m, 'Label', 'Remove epoch baseline'                 , 'userdata', ondatastudy , 'CallBack', cb_rmbase);
+
+    eegmenu( false,  loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
+    eegmenu( false,  loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
+    eegmenu( false,  plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
+    eegmenu( false,  plot_m, 'Label', 'Channel spectra and maps'               , 'userdata', ondata , 'CallBack', cb_spectopo1);
+    eegmenu( false,  plot_m, 'Label', 'Channel properties'                     , 'userdata', ondata , 'CallBack', cb_prop1);
+    eegmenu( false,  plot_m, 'Label', 'Channel ERP image'                      , 'userdata', onepoch, 'CallBack', cb_erpimage1);
+
+    ERP_m = eegmenu( false,  plot_m, 'Label', 'Channel ERPs'                   , 'userdata', onepoch);
+    eegmenu( false,  ERP_m,  'Label', 'With scalp maps'                        , 'CallBack', cb_timtopo);
+    eegmenu( false,  ERP_m,  'Label', 'In scalp/rect. array'                   , 'CallBack', cb_plottopo);
+
+    topo_m = eegmenu( false,  plot_m, 'Label', 'ERP map series'                , 'userdata', onepochchan);
+    eegmenu( false,  topo_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot1);
+    eegmenu( false,  topo_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot1);
+    eegmenu( versL,  plot_m, 'Label', 'Sum/Compare ERPs'                       , 'userdata', onepoch, 'CallBack', cb_comperp1);
+    eegmenu(~versL,  plot_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
+
+    eegmenu( false,  plot_m, 'Label', 'Component activations (scroll)'         , 'userdata', ondata     , 'CallBack', cb_eegplot2,'Separator', 'on');
+    eegmenu( false,  plot_m, 'Label', 'Component spectra and maps'             , 'userdata', ondatanoroi, 'CallBack', cb_spectopo2);
+
+    tica_m = eegmenu( false,  plot_m, 'Label', 'Component maps'                , 'userdata', onchannelnoroi);
+    eegmenu( false,  tica_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot2);
+    eegmenu( false,  tica_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot2);
+    eegmenu( false,  plot_m, 'Label', 'Component properties'                   , 'userdata', ondata , 'CallBack', cb_prop2);
+    eegmenu( false,  plot_m, 'Label', 'Component ERP image'                    , 'userdata', onepoch, 'CallBack', cb_erpimage2);
+
+    ERPC_m = eegmenu( false,  plot_m, 'Label', 'Component ERPs'                , 'userdata', onepoch);
+    eegmenu( false,  ERPC_m, 'Label', 'With component maps'                    , 'userdata', onepochnoroi, 'CallBack', cb_envtopo1);
+    eegmenu( false,  ERPC_m, 'Label', 'With comp. maps (compare)'              , 'userdata', onepochnoroi, 'CallBack', cb_envtopo2);
+    eegmenu( false,  ERPC_m, 'Label', 'In rectangular array'                   , 'userdata', onepoch      , 'CallBack', cb_plotdata2);
+    eegmenu( versL,  plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'userdata', onepochnoroi, 'userdata', onepoch, 'CallBack', cb_comperp2);
+
+    stat_m = eegmenu( versL,  plot_m, 'Label', 'Data statistics', 'Separator', 'on', 'userdata', ondata );
+    eegmenu( versL,  stat_m, 'Label', 'Channel statistics'                     , 'CallBack', cb_signalstat1);
+    eegmenu( versL,  stat_m, 'Label', 'Component statistics'                   , 'CallBack', cb_signalstat2);
+    eegmenu( versL,  stat_m, 'Label', 'Event statistics'                       , 'CallBack', cb_eventstat);
+
+    spec_m = eegmenu( versL,  plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
+    eegmenu( versL,  spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
+    eegmenu( versL,  spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
+    eegmenu( versL,  spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
+    eegmenu( versL,  spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
+    eegmenu(~versL,  plot_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2);     
+
+    eegmenu( false,  std_m,  'Label', 'Edit study info'                        , 'userdata', onstudy, 'CallBack', cb_study3);
+    eegmenu( false,  std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
+    eegmenu( false,  std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
+    eegmenu( false,  std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
+    eegmenu( false,  std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
+    clust_m = eegmenu( false,  std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudynoroi);
+    eegmenu( false,  clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudynoroi, 'CallBack', cb_preclust);
+    eegmenu( false,  clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudynoroi, 'CallBack', cb_clust);
+    eegmenu( false,  std_m,  'Label', 'Edit/plot component clusters'           , 'userdata', onstudy, 'CallBack', cb_clustedit);
+
+    if ~isdeployed && ismatlab
+        %newerVersionMenu = eegmenu( false,  help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
+        eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
+        eegmenu( false,  help_m, 'Label', 'Check for EEGLAB update'                , 'userdata', on, 'CallBack', 'eeglab_update;');
+        eegmenu( false,  help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
+
+        help_1 = eegmenu( false,  help_m, 'Label', 'EEGLAB functions', 'userdata', on);
+        eegmenu( false,  help_1, 'Label', 'Admin. functions'                          , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
+        eegmenu( false,  help_1, 'Label', 'Interactive pop_ functions'                , 'userdata', on, 'Callback', 'pophelp(''eeg_helppop'');');	
+        eegmenu( false,  help_1, 'Label', 'Signal processing functions'               , 'userdata', on, 'Callback', 'pophelp(''eeg_helpsigproc'');');	
+        eegmenu( false,  help_1, 'Label', 'Group data (STUDY) functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstudy'');');	
+        eegmenu( false,  help_1, 'Label', 'Time-frequency functions'                  , 'userdata', on, 'Callback', 'pophelp(''eeg_helptimefreq'');');	
+        eegmenu( false,  help_1, 'Label', 'Statistical functions'                     , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstatistics'');');	
+        eegmenu( false,  help_1, 'Label', 'Graphic interface builder functions'       , 'userdata', on, 'Callback', 'pophelp(''eeg_helpgui'');');	
+        eegmenu( false,  help_1, 'Label', 'Misc. command line functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
+
+        eegmenu( false,  help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB tutorial'                            , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+        eegmenu( false,  help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
     else
-        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'abouteeglab;');
-        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
-    end
+        eegmenu( false,  help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'abouteeglab;');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+        eegmenu( false,  help_m, 'Label', 'EEGLAB tutorial'                            , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+     end
 
-    uimenu( help_m, 'Label', 'EEGLAB tutorial'                               , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
-    uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end
 
 statusconnection = 1;
-if isdeployed
-    funcname = {  'eegplugin_dipfit' ...
-                  'eegplugin_firfilt' ...
-                  'eegplugin_musemonitor' };
+eeglabVersionStatus = [];
+if isdeployed || (exist('ismcc') && ismcc)
+    disp('Loading plugins');
+    funcname = { ...
+                 @eegplugin_eepimport ...
+                 @eegplugin_iclabel, ...
+                 @eegplugin_VisEd, ...
+                 @eegplugin_bids, ...
+                 @eegplugin_bidsvalidator, ...
+                 @eegplugin_bva_io, ...
+                 @eegplugin_clean_rawdata, ...
+                 @eegplugin_dipfit, ...
+                 @eegplugin_egilegacy, ...
+                 @eegplugin_firfilt, ...
+                 @eegplugin_iirfilt, ...
+                 @eegplugin_musedirect, ...
+                 @eegplugin_musemonitor, ...
+                 @eegplugin_neuroscanio, ...
+                 @eegplugin_xdfimport, ...
+               };
     for indf = 1:length(funcname)
-        try 
-            vers = feval(funcname{indf}, gcf, trystrs, catchstrs);
-            disp(['EEGLAB: adding "' vers '" plugin' ]);  
-        catch
-            feval(funcname{indf}, gcf, trystrs, catchstrs);
-            disp(['EEGLAB: adding plugin function "' funcname{indf} '"' ]);   
+        pluginfun = funcname{indf};
+        pluginname = func2str(pluginfun);
+        try
+            outargs = nargout(pluginfun);
+            if outargs == 1
+                vers = feval(pluginfun, gcf, trystrs, catchstrs);
+                disp(['EEGLAB: adding "' vers '" plugin' ]);
+            else
+                feval(funcname{indf}, gcf, trystrs, catchstrs);
+                disp(['EEGLAB: adding plugin function "' pluginname '"' ]);
+            end
+        catch e
+            disp(['EEGLAB: Could not load "' pluginname '": ' e.message]);
         end
     end
 else    
     pluginlist  = [];
     plugincount = 1;
     
-    p = mywhich('eeglab.m');
-    p = p(1:findstr(p,'eeglab.m')-1);
-    if strcmpi(p, './') || strcmpi(p, '.\'), p = [ pwd filesep ]; end
+    eeglabp = fileparts(mywhich('eeglab.m'));
         
     % scan plugin folder
     % ------------------
-    dircontent  = dir(fullfile(p, 'plugins'));
-    dircontent  = { dircontent.name };
+    dircontent  = dir(fullfile(eeglabp, 'plugins'));
+    if ~isfield(dircontent, 'folder')
+        [dircontent(:).folder] = deal(fullfile(eeglabp, 'plugins'));
+    end
+    
+    % scan local plugin folder
+    % ------------------------
+    if ~isequal(pwd, eeglabp)
+        dircontent2  = dir(fullfile(pwd, 'plugins'));
+        if ~isempty(dircontent2)
+            fprintf(2, 'WARNING: plugins in current folders may shadow plugins installed in EEGLAB plugins folder\n');
+            if ~isfield(dircontent2, 'folder')
+                [dircontent2(:).folder] = deal(fullfile(pwd, 'plugins'));
+            end
+            dircontent = [dircontent;dircontent2];
+        end
+    end
     
     pluginstats = [];
 	if option_checkversion && ismatlab
         disp('Retrieving plugin versions from server...');
-        pluginTmp = plugin_getweb('', pluginlist, 'newlist');
+        try
+            [pluginTmp, eeglabVersionStatus] = plugin_getweb('startup', pluginlist);
+        catch
+            disp('Issue with retrieving statistics for extensions');
+            pluginTmp = [];
+        end
         if ~isempty(pluginTmp) && isfield(pluginTmp, 'name') && isfield(pluginTmp, 'version')
             pluginstats.name    = { pluginTmp.name };
             pluginstats.version = { pluginTmp.version };
@@ -913,24 +984,24 @@ else
         % -------------
         funcname = '';
         pluginVersion = [];
-        if exist([p 'plugins' filesep dircontent{index}]) == 7
-            if ~strcmpi(dircontent{index}, '.') && ~strcmpi(dircontent{index}, '..')
-                newpath = [ 'plugins' filesep dircontent{index} ];
-                tmpdir = dir([ p 'plugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
+        if exist(fullfile(dircontent(index).folder, dircontent(index).name), 'dir')
+            if ~strcmpi(dircontent(index).name, '.') && ~strcmpi(dircontent(index).name, '..')
+                tmpdir = dir(fullfile(dircontent(index).folder, dircontent(index).name, 'eegplugin*.m'));
                 
-                addpathifnotinlist(fullfile(eeglabpath, newpath));
-                [ pluginName pluginVersion ] = parsepluginname(dircontent{index});
                 if ~isempty(tmpdir)
                     %myaddpath(eeglabpath, tmpdir(1).name, newpath);
                     funcname = tmpdir(1).name(1:end-2);
                 end
+                addpathifnotinlist(fullfile(dircontent(index).folder, dircontent(index).name));
+                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name, funcname(11:end));
                 
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
-                if ~isempty(findstr(lower(dircontent{index}), 'fieldtrip'))
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'compat') , 'electrodenormalize' );
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'forward'), 'ft_sourcedepth.m');
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'utilities'), 'ft_datatype.m');
+                if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip'))
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'compat') , 'electrodenormalize' );
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'forward'), 'ft_sourcedepth.m');
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'utilities'), 'ft_datatype.m');
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'plotting'), 'ft_plot_mesh.m');
                     ptopoplot  = fileparts(mywhich('cbar'));
                     ptopoplot2 = fileparts(mywhich('topoplot'));
                     if ~isequal(ptopoplot, ptopoplot2)
@@ -940,17 +1011,17 @@ else
                     
                 % special case of subfolder for BIOSIG
                 % ------------------------------------
-                if ~isempty(findstr(lower(dircontent{index}), 'biosig')) && isempty(findstr(lower(dircontent{index}), 'biosigplot'))
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't200_FileAccess'), 'sopen.m');
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't250_ArtifactPreProcessingQualityControl'), 'regress_eog.m' );
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 'doc'), 'DecimalFactors.txt');
+                if ~isempty(findstr(lower(dircontent(index).name), 'biosig')) && isempty(findstr(lower(dircontent(index).name), 'biosigplot'))
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 't200_FileAccess'), 'sopen.m');
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 't250_ArtifactPreProcessingQualityControl'), 'regress_eog.m' );
+                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 'doc'), 'DecimalFactors.txt');
                 end
                     
             end
         else 
-            if ~isempty(findstr(dircontent{index}, 'eegplugin')) && dircontent{index}(end) == 'm'
-                funcname = dircontent{index}(1:end-2); % remove .m
-                [ pluginName, pluginVersion ] = parsepluginname(dircontent{index}(10:end-2));
+            if ~isempty(findstr(dircontent(index).name, 'eegplugin')) && dircontent(index).name(end) == 'm'
+                funcname = dircontent(index).name(1:end-2); % remove .m
+                [ pluginName, pluginVersion ] = parsepluginname(dircontent(index).name(10:end-2));
             end
         end
 
@@ -961,7 +1032,7 @@ else
                 disp([ 'EEGLAB: adding "' pluginName '" to the path; subfolders (if any) might be missing from the path' ]);
                 pluginlist(plugincount).plugin     = pluginName;
                 pluginlist(plugincount).version    = pluginVersion;
-                pluginlist(plugincount).foldername = dircontent{index};
+                pluginlist(plugincount).foldername = dircontent(index).name;
                 pluginlist(plugincount).status     = 'ok';
                 plugincount = plugincount+1;
             else
@@ -969,28 +1040,30 @@ else
                 pluginlist(plugincount).version    = pluginVersion;
                 vers2  = '';
                 status = 'ok';
-                try
-                    %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
-                    vers2 = feval(funcname, gcf, trystrs, catchstrs);
-                    [~, vers2] = parsepluginname(vers2);
-                catch
+                if ~strcmpi(onearg, 'nogui')
                     try
-                        eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                        %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
+                        vers2 = feval(funcname, gcf, trystrs, catchstrs);
+                        [~, vers2] = parsepluginname(vers2);
                     catch
-                        disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
-                        disp([ '   ' lasterr] );
-                        status = 'error';
+                        try
+                            eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                        catch
+                            disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
+                            disp([ '   ' lasterr] );
+                            status = 'error';
+                        end
                     end
                 end
                 if isempty(pluginlist(plugincount).version)
                     pluginlist(plugincount).version = vers2;
                 elseif ~isempty(vers2)
                     if ~isequal(pluginlist(plugincount).version, vers2)
-                        fprintf('WARNING: for plugin "%s" vesion in the folder name "%s" and in the eegplugin_ file "%s" differ\n', pluginlist(plugincount).plugin, pluginlist(plugincount).version,vers2);
+                        fprintf('WARNING: for plugin "%s" version in the folder name "%s" and in the eegplugin_ file "%s" differ\n', pluginlist(plugincount).plugin, pluginlist(plugincount).version,vers2);
                     end
                 end
                 pluginlist(plugincount).funcname   = funcname(10:end);
-                pluginlist(plugincount).foldername = dircontent{index};
+                pluginlist(plugincount).foldername = dircontent(index).name;
                 if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
                     pluginlist(plugincount).funcname(1) = [];
                 end 
@@ -1000,7 +1073,7 @@ else
                     fprintf('EEGLAB: adding "%s" v%s (see >> help %s)', ...
                         pluginlist(plugincount).plugin, vers, funcname);
                     if ~isempty(pluginstats)
-                        indPlugin = strmatch(pluginlist(plugincount).plugin, pluginstats.name, 'exact');
+                        indPlugin = strmatch(lower(pluginlist(plugincount).plugin), lower(pluginstats.name), 'exact');
                         if length(indPlugin) == 1
                             if ~strcmpi(vers, pluginstats.version{indPlugin})
                                 fprintf(2, ' - new version %s available\n', pluginstats.version{indPlugin});
@@ -1021,31 +1094,37 @@ else
     
     % add menus for plugins to install
     % --------------------------------
-    if ismatlab
+    if ismatlab && ~strcmpi(onearg, 'nogui')
         if ~exist('mff_import', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
             cb_mff = [ 'if ~plugin_askinstall(''mffmatlabio'', ''mff_import''), return; end;' ...
                        'eval(char(get(findobj(''label'', ''Import Philips .mff file''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'Import Philips .mff file', 'CallBack', cb_mff, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'Import Philips .mff file', 'CallBack', cb_mff, 'separator', 'on');
         end
         if ~exist('eegplugin_neuroscanio', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
             neuroscan_check = 'if ~plugin_askinstall(''neuroscanio'', ''eegplugin_neuroscanio''), return; end;';
             cb_neuroscan1 = [ neuroscan_check 'eval(char(get(findobj(''label'', ''From Neuroscan .CNT file''), ''callback'')));' ];
             cb_neuroscan2 = [ neuroscan_check 'eval(char(get(findobj(''label'', ''From Neuroscan .EEG file''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file', 'CallBack', cb_neuroscan1, 'Separator', 'on');
-            uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file', 'CallBack', cb_neuroscan2);
+            eegmenu( false,  neuro_m, 'Label', 'From Neuroscan .CNT file', 'CallBack', cb_neuroscan1, 'Separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'From Neuroscan .EEG file', 'CallBack', cb_neuroscan2);
         end
         if ~exist('eegplugin_firfilt', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'filter');
             cb_filter = [ 'if ~plugin_askinstall(''firfilt'', ''eegplugin_firfilt''), return; end;' ...
                        'eval(char(get(findobj(''label'', ''Basic FIR filter (new, default)''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'Basic FIR filter (new, default)', 'CallBack', cb_filter, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'Basic FIR filter (new, default)', 'CallBack', cb_filter, 'separator', 'on');
+        end
+        if ~exist('eegplugin_iclabel', 'file')
+            fprintf(2, 'Warning: ICLabel default plugin missing (probably due to downloading zip file from Github). Install manually.\n');
+        end
+        if ~exist('eegplugin_clean_rawdata', 'file')
+            fprintf(2, 'Warning: Clean Rawdata  plugin missing (probably due to downloading zip file from Github). Install manually.\n');
         end
         if ~exist('pop_dipfit_settings', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'tools');
             cb_dipfit = [ 'if ~plugin_askinstall(''dipfit'', ''pop_dipfit_settings''), return; end;'  ];
-            uimenu( neuro_m, 'Label', 'Locate dipoles using DIPFIT 2.x', 'CallBack', cb_dipfit, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'Locate dipoles using DIPFIT 2.x', 'CallBack', cb_dipfit, 'separator', 'on');
         end
         if ~exist('pop_loadbva', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
@@ -1053,25 +1132,32 @@ else
                        'eval(char(get(findobj(''label'', ''From Brain Vis. Rec. .vhdr file''), ''callback'')));' ];
             cb_bva2 = [ 'if ~plugin_askinstall(''bva-io'', ''pop_loadbva''), return; end;' ...
                        'eval(char(get(findobj(''label'', ''From Brain Vis. Anal. Matlab file''), ''callback'')));' ];
-            uimenu( neuro_m, 'Label', 'From Brain Vis. Rec. .vhdr file', 'CallBack', cb_bva1, 'separator', 'on');
-            uimenu( neuro_m, 'Label', 'From Brain Vis. Anal. Matlab file', 'CallBack', cb_bva2);
+            eegmenu( false,  neuro_m, 'Label', 'From Brain Vis. Rec. .vhdr file', 'CallBack', cb_bva1, 'separator', 'on');
+            eegmenu( false,  neuro_m, 'Label', 'From Brain Vis. Anal. Matlab file', 'CallBack', cb_bva2);
         end
     end
-end
-
-if ~ismatlab
-    return;
 end
 
 % Path exception for BIOSIG (sending BIOSIG down into the path)
 biosigpathlast; % fix str2double issue
 
+% push SIFT path last for dipplot
+dipplotpath = fileparts( which('dipplot') );
+dipfitpath  = fileparts( which('dipfit_1_to_2') );
+if ~strcmp(dipplotpath,dipfitpath)
+    addpath(dipfitpath,'-begin');
+end
+
+if strcmpi(onearg, 'nogui')
+    return;
+end
+
 % add other import ...
 % --------------------
 cb_others = [ 'pophelp(''troubleshooting_data_formats'');' ];
-uimenu( import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
-uimenu( import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
-uimenu( import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
+eegmenu( false,  import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
+eegmenu( false,  import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
+eegmenu( false,  import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
 
 % changing plugin menu color
 % --------------------------
@@ -1085,7 +1171,8 @@ exportsub_m = findobj('parent', exportm);
 filter_m    = findobj('parent', filter_m);
 
 icadefs; % containing PLUGINMENUCOLOR
-if length(fourthsub_m) > 11, set(fourthsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end
+if versL, tm = 14; else tm = 16; end
+if length(fourthsub_m) > tm, set(fourthsub_m(1:end-tm), 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(importsub_m) > 4,  set(importsub_m(1:end-4) , 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(epochsub_m ) > 3 , set(epochsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end
@@ -1094,112 +1181,22 @@ if length(exportsub_m) > 4 , set(exportsub_m(1:end-4 ), 'foregroundcolor', PLUGI
 if length(editsub_m)   > 10, set(editsub_m(  1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end
 if length(filter_m)    > 3 , set(filter_m   (1:end-1 ), 'foregroundcolor', PLUGINMENUCOLOR); end
 
-EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
+EEGMENU = eegmenu( false,  set_m, 'Label', '------', 'Enable', 'off');
 eval('set(W_MAIN, ''userdat'', { EEGUSERDAT{1} EEGMENU });');
 eeglab('redraw');
 if nargout < 1
     clear ALLEEG;
 end
 
-%% automatic updater
-try
-    [dummy, eeglabVersionNumber, currentReleaseDateString] = eeg_getversion;
-    if isempty(eeglabVersionNumber)
-        eeglabVersionNumber = 'dev';
-    end
-    eeglabUpdater = up.updater(eeglabVersionNumber, 'http://sccn.ucsd.edu/eeglab/updater/latest_version.php', 'EEGLAB', currentReleaseDateString);
-        
-    % create a new GUI item (e.g. under Help)
-    %newerVersionMenu = uimenu(help_m, 'Label', 'Upgrade to the Latest Version', 'visible', 'off', 'userdata', 'startup:on;study:on');
-    
-    % set the callback to bring up the updater GUI
-    eeglabFolder = fileparts(mywhich('eeglab.m'));
-    %eeglabUpdater.menuItemHandle = []; %newerVersionMenu;
-    %eeglabUpdater.menuItemCallback = {@command_on_update_menu_click, eeglabUpdater, eeglabFolder, true, BACKEEGLABCOLOR};
-
-    % place it in the base workspace.
-    assignin('base', 'eeglabUpdater', eeglabUpdater);
-    
-    % only start timer if the function is called from the command line
-    % (which means that the stack should only contain one element)
-    stackVar = dbstack;
-    if length(stackVar) == 1
-        if option_checkversion
-            eeglabUpdater.checkForNewVersion({'eeglab_event' 'setup'});
-            if strcmpi(eeglabVersionNumber, 'dev') && statusconnection
-                return;
-            end
-            newMajorRevision = 0;
-            if ~isempty(eeglabUpdater.newMajorRevision)
-                fprintf('\nA new major version of EEGLAB (EEGLAB%s - beta) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.\n', eeglabUpdater.newMajorRevision);
-                newMajorRevision = 1;
-            end
-            if eeglabUpdater.newerVersionIsAvailable
-                eeglabv = num2str(eeglabUpdater.latestVersionNumber);
-                posperiod = find(eeglabv == '.');
-                if isempty(posperiod), posperiod = length(eeglabv)+1; eeglabv = [ eeglabv '.0' ]; end
-                if length(eeglabv(posperiod+1:end)) < 2, eeglabv = [ eeglabv '0' ]; end
-                %if length(eeglabv(posperiod+1:end)) < 3, eeglabv = [ eeglabv '0' ]; end
-                eeglabv = [ eeglabv(1:posperiod+1) '.' eeglabv(posperiod+2) ]; %'.' eeglabv(posperiod+3) ];
-
-                stateWarning = warning('query', 'backtrace');
-                warning('off', 'backtrace');
-                if newMajorRevision
-                    fprintf('\n');
-                    warning( sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
-                        eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
-                        'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
-                        floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl));
-                else
-                    warning( sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
-                        eeglabUpdater.releaseNotes 'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations.\n' ...
-                        'You may disable this message in the Option menu but will miss critical updates.\n' ], ...
-                        eeglabv, eeglabUpdater.downloadUrl, eeglabUpdater.releaseNotesUrl));
-                end
-                warning(stateWarning.state, 'backtrace');
-
-                % make the Help menu item dark red
-                set(help_m, 'foregroundColor', [0.6, 0 0]);
-            elseif isempty(eeglabUpdater.lastTimeChecked)
-                fprintf('Could not check for the latest EEGLAB version (internet may be disconnected).\n');
-                fprintf('To prevent long startup time, disable checking for new EEGLAB version (FIle > Memory and other options).\n');
-            else
-                if ~newMajorRevision
-                    fprintf('You are using the latest version of EEGLAB.\n');
-                else
-                    fprintf('You are currently using the latest revision of EEGLAB%d (no critical update available).\n', floor(eeglabVersionNumber));
-                end
-            end    
-        else
-            eeglabtimers = timerfind('name', 'eeglabupdater');
-            if ~isempty(eeglabtimers)
-                stop(eeglabtimers);
-                delete(eeglabtimers);
-            end
-            % This is disabled because it cause Matlab to hang in case
-            % there is no connection or the connection is available but not
-            % usable
-            % start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
-        end
-    end
-catch
-    if option_checkversion
-        fprintf('Updater could not be initialized.\n');
-    end
-end
-
-if ~ismatlab
-    close(W_MAIN);
+% check if update is available
+if ismatlab
+    eeglab_update(eeglabVersionStatus);
 end
 
 % REMOVED MENUS
-	%uimenu( tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
-	%uimenu( tools_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
-
-     function command_on_update_menu_click(callerHandle, tmp, eeglabUpdater, installDirectory, goOneFolderLevelIn, backGroundColor)
-         postInstallCallbackString = 'clear all function functions; eeglab';
-         eeglabUpdater.launchGui(installDirectory, goOneFolderLevelIn, backGroundColor, postInstallCallbackString);
-    
+	%eegmenu( false,  tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
+	%eegmenu( false,  tools_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
+   
 %     
 % --------------------
 % draw the main figure
@@ -1214,7 +1211,6 @@ WINMAXX         = 260;
 WINYDEC			= 13;
 NBLINES         = 16;
 WINY		    = WINYDEC*NBLINES;
-javaChatFlag    = 1;
 
 BORDERINT       = 4;
 BORDEREXT       = 10;
@@ -1236,6 +1232,10 @@ else
     FONTNAME        = '';
     FONTSIZE        = 11;
 end    
+if ~ismatlab
+    WINMAXX  = WINMAXX*1.35;
+    WINY     = WINY*1.4;
+end
 
 hh = findobj('tag', 'EEGLAB');
 if ~isempty(hh)
@@ -1249,6 +1249,9 @@ if ~isempty(numVersion)
     txtVersion = [ 'EEGLAB v' txtVersion ];
 else
     txtVersion = [ 'EEGLAB ' txtVersion ];    
+end
+if ~ismatlab && ismac
+    txtVersion = [ txtVersion ' - menu is on the top bar' ];
 end
 
 % create figures
@@ -1279,7 +1282,7 @@ W_MAIN = figure('Units','points', ...
 % java chat
 eeglab_options;
 
-try,
+try
     set(W_MAIN, 'NextPlot','new');
 catch, end
 
@@ -1389,7 +1392,7 @@ return;
 % Revision 1.2  2002/04/09 20:47:41  arno
 % introducing event number into gui
 
-function updatemenu();
+function updatemenu()
 eeg_global;
 
 W_MAIN = findobj('tag', 'EEGLAB');
@@ -1414,7 +1417,7 @@ warning off;
 clear functions;
 warning(tmp);
 eeglab_options;
-if isempty(ALLEEG) && ~isempty(EEG) && ~isempty(EEG.data)
+if isempty(ALLEEG) && ~isempty(EEG) && all(arrayfun(@(eeg) ~isempty(eeg.data), EEG))
     ALLEEG = EEG;
 end
 
@@ -1423,18 +1426,18 @@ end
 while( index <= MAX_SET)
     try
         set( EEGMENU(index), 'Label', '------', 'checked', 'off');
-    catch,
+    catch
         if mod(index, 30) == 0
             tag = [ 'More (' int2str(index/30) ') ->' ];
             tmp_m = findobj('label', tag);
             if isempty(tmp_m)
-                 set_m = uimenu( set_m, 'Label', tag, 'userdata', 'study:on'); 
+                 set_m = eegmenu( false,  set_m, 'Label', tag, 'userdata', 'study:on'); 
             else set_m = tmp_m;
             end	
         end
         try
             set( EEGMENU(index), 'Label', '------', 'checked', 'off');
-        catch, EEGMENU(index) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end	
+        catch, EEGMENU(index) = eegmenu( false,  set_m, 'Label', '------', 'Enable', 'on'); end	
     end        
 	set( EEGMENU(index), 'Enable', 'on', 'separator', 'off' );
 	try, ALLEEG(index).data;
@@ -1467,7 +1470,7 @@ if index ~= 0
                   '    eeglab(''redraw'');' ...
                   'end;' ...
                   'clear tmpind nonempty;' ];
-    if MAX_SET == length(EEGMENU), EEGMENU(end+1) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end
+    if MAX_SET == length(EEGMENU), EEGMENU(end+1) = eegmenu( false,  set_m, 'Label', '------', 'Enable', 'on'); end
     
     set(EEGMENU(end), 'enable', 'on', 'Label', 'Select multiple datasets', ...
                       'callback', cb_select, 'separator', 'on', 'userdata', 'study:on');
@@ -1519,7 +1522,7 @@ if exist_study
                   'eeglab(''redraw'');' ];
     tmp_m = findobj('label', 'Select the study set');
     delete(tmp_m); % in case it is not at the end
-    tmp_m = uimenu( set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
+    tmp_m = eegmenu( false,  set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
     set(tmp_m, 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
 else 
     delete( findobj('label', 'Select the study set') );
@@ -1538,7 +1541,7 @@ if (isempty(CURRENTSET) || length(ALLEEG) < CURRENTSET(1) || CURRENTSET(1) == 0 
 	end
 	if CURRENTSET ~= 0
 		eegh([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ])
-		[EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
+		[EEG, ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
 	else 
 		EEG = eeg_emptyset;
 	end
@@ -1546,33 +1549,22 @@ end
 
 if (isempty(EEG) || isempty(EEG(1).data)) && CURRENTSET(1) ~= 0
 	eegh([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ])
-	[EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
+	[EEG, ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
 end
 
 % test if dataset has changed
 % ---------------------------
 if length(EEG) == 1
-    if ~isempty(ALLEEG) && CURRENTSET~= 0 && ~isequal(EEG.data, ALLEEG(CURRENTSET).data) && ~isnan(EEG.data(1))
-        % the above comparison does not work for ome structures
-        %tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
-        %                      'Dataset change detected', ...
-        %                      'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
-        disp('Warning: for some reason, the backup dataset in EEGLAB memory does not');
-        disp('         match the current dataset. The dataset in memory has been overwritten');
-        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-        eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
-        
-        %if tmpanswer(1) == 'D' % delete changes
-        %    [EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
-        %    eegh('[EEG ALLEEG] = eeg_retrieve( ALLEEG, CURRENTSET);');
-        %elseif tmpanswer(1) == 'K' % keep changes
-        %    [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-        %    eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
-        %else % make new dataset
-        %    [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
-        %    eegh(LASTCOM);
-        %    MAX_SET = max(length( ALLEEG ), length(EEGMENU));
-        %end;
+    if ~isempty(ALLEEG) && CURRENTSET~= 0 &&  ~isequal(EEG.data, ALLEEG(CURRENTSET).data)
+        if exist('isequaln','builtin') ~= 5, isequalfunc = @isequal; else  isequalfunc = @isequaln; end
+        if isequalfunc(EEG.data, ALLEEG(CURRENTSET).data)
+            disp('Warning: Your data contains NaNs.');
+        else
+            disp('Warning: The backup dataset in EEGLAB memory does not match the current dataset.');
+            disp('         The dataset in memory has been overwritten');
+            [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+            eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
+        end
     end
 end
 
@@ -1589,6 +1581,15 @@ if exist('STUDY') && exist('CURRENTSTUDY')
 end
 
 menustatus = {};
+try
+    curroiFlag = unique(cellfun(@(x)getfield(x, 'eeglab_using_roi'), { EEG(:).roi }));
+    if length(curroiFlag) == 1 && curroiFlag
+        menustatus = { menustatus{:} 'roi_connect' };
+    else
+        disp('Warning: different settings for using ROIs detected in different datasets');
+    end
+catch
+end
 if study_selected
     menustatus = { menustatus{:} 'study' };
     
@@ -1627,9 +1628,9 @@ if study_selected
 
     % consistency && other parameters
     % ------------------------------
-    [EEG epochconsist] = eeg_checkset(EEG, 'epochconsist');        % epoch consistency
-    [EEG chanconsist ] = eeg_checkset(EEG, 'chanconsist');         % channel consistency
-    [EEG icaconsist  ] = eeg_checkset(EEG, 'icaconsist');          % ICA consistency
+    [EEG, epochconsist] = eeg_checkset(EEG, 'epochconsist');        % epoch consistency
+    [EEG, chanconsist ] = eeg_checkset(EEG, 'chanconsist');         % channel consistency
+    [EEG, icaconsist  ] = eeg_checkset(EEG, 'icaconsist');          % ICA consistency
     totevents = num2str(sum( cellfun( 'length', { EEG.event }) )); % total number of events
     totsize   = whos('STUDY', 'ALLEEG');                              % total size
     if isempty(STUDY.session),   sessionstr = ''; else sessionstr = vararg2str(STUDY.session); end
@@ -1680,11 +1681,11 @@ if study_selected
     set( g.val4, 'String', [ int2str(max(1, length(STUDY.condition))) txtcond ]);
     set( g.val5, 'String', [ int2str(max(1, length(STUDY.session)))   txtsess ]);
     set( g.val6, 'String', [ int2str(max(1, length(STUDY.group)))    txtgroup ]);
-    set( g.val7, 'String', epochconsist);
-    set( g.val8, 'String', chanlenstr);
-    set( g.val9, 'String', chanlocs);
-    set( g.val10, 'String', length(STUDY.cluster));
-    set( g.val11, 'String', studystatus);
+    set( g.val7, 'String', char(epochconsist));
+    set( g.val8, 'String', char(chanlenstr));
+    set( g.val9, 'String', char(chanlocs));
+    set( g.val10, 'String', num2str(length(STUDY.cluster)));
+    set( g.val11, 'String', char(studystatus));
     set( g.val12, 'String', num2str(round(sum( [ totsize.bytes] )/1E6*10)/10));        
     
 elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data) 
@@ -1733,9 +1734,9 @@ elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data)
 
         % consistency & other parameters
         % ------------------------------
-        [EEG epochconsist] = eeg_checkset(EEG, 'epochconsist');        % epoch consistency
-        [EEG chanconsist ] = eeg_checkset(EEG, 'chanconsist');         % channel consistency
-        [EEG icaconsist  ] = eeg_checkset(EEG, 'icaconsist');          % ICA consistency
+        [EEG, epochconsist] = eeg_checkset(EEG, 'epochconsist');        % epoch consistency
+        [EEG, chanconsist ] = eeg_checkset(EEG, 'chanconsist');         % channel consistency
+        [EEG, icaconsist  ] = eeg_checkset(EEG, 'icaconsist');          % ICA consistency
         totevents = num2str(sum( cellfun( 'length', { EEG.event }) )); % total number of events
         srate     = vararg2str( mattocell( unique( [ EEG.srate ] ) )); % sampling rate
         totsize   = whos('EEG');                                       % total size
@@ -1758,15 +1759,15 @@ elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data)
         % ------
         set( g.win1, 'String', sprintf('Groupname: -(soon)-\n'));
         set( g.val2, 'String', int2str(length(EEG)));
-        set( g.val3, 'String', datasettype);
-        set( g.val4, 'String', epochconsist);
-        set( g.val5, 'String', chanlenstr);
-        set( g.val6, 'String', chanconsist);
-        set( g.val7, 'String', chanlocs);
-        set( g.val8, 'String', totevents);
-        set( g.val9, 'String', srate);
-        set( g.val10, 'String', icaweights);
-        set( g.val11, 'String', icaconsist);
+        set( g.val3, 'String', char(datasettype));
+        set( g.val4, 'String', char(epochconsist));
+        set( g.val5, 'String', char(chanlenstr));
+        set( g.val6, 'String', char(chanconsist));
+        set( g.val7, 'String', char(chanlocs));
+        set( g.val8, 'String', char(totevents));
+        set( g.val9, 'String', char(srate));
+        set( g.val10, 'String', char(icaweights));
+        set( g.val11, 'String', char(icaconsist));
         set( g.val12, 'String', num2str(round(totsize.bytes/1E6*10)/10));        
         
     else % one continous dataset selected
@@ -1826,7 +1827,7 @@ elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data)
 
         % reference
         if isfield(EEG(1).chanlocs, 'ref')
-            [curref tmp allinds] = unique_bc( { EEG(1).chanlocs.ref });
+            [curref, ~, allinds] = unique_bc( { EEG(1).chanlocs.ref });
             maxind = 1;
             for ind = unique_bc(allinds)
                 if length(find(allinds == ind)) > length(find(allinds == maxind))
@@ -1869,7 +1870,7 @@ elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data)
         end
     end
 else
-    menustatus = { menustatus{:} 'startup' };
+    menustatus = { 'startup' };
     
 	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'on');
 	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'off');
@@ -1883,7 +1884,7 @@ else
 	set( g.mainwin6, 'String', '  "Edit > Channel locations" (look up locations)');
 	set( g.mainwin7, 'String', '  "File > Import event info" (for continuous data)');
 	set( g.mainwin8, 'String', '- Filter data: "Tools > Filter data"');
-	set( g.mainwin9, 'String', '- Reject data: "Tools > Reject continuous data"');
+	set( g.mainwin9, 'String', '- Reject data: "Tools > Reject data by eye"');
 	set( g.mainwin10,'String', '- Run ICA: "Tools > Run ICA" (can take time)');
 	set( g.mainwin11,'String', '- Reject by ICA: "Tools > Reject data using ICA"');
 	set( g.mainwin12,'String', '- Epoch data: "Tools > Extract epochs"');
@@ -1947,6 +1948,12 @@ if any(strcmp(menustatus, 'ica_absent'))
     set(allmenus(indmatchvar), 'enable', 'off');
     
 end
+if any(strcmp(menustatus, 'roi_connect'))
+    
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''roi:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');
+    
+end
 
 % allways off
 eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''enable:off''))), allstrs);');  
@@ -2001,7 +2008,7 @@ function g = myguihandles(fig)
 	end
 
     
-function rmpathifpresent(newpath);  
+function rmpathifpresent(newpath)
     comp = computer;
     if strcmpi(comp(1:2), 'PC')
         newpath = [ newpath ';' ];
@@ -2016,7 +2023,7 @@ function rmpathifpresent(newpath);
         
 % add path only if it is not already in the list
 % ----------------------------------------------
-function addpathifnotinlist(newpath);  
+function addpathifnotinlist(newpath)
 
     comp = computer;
     if strcmpi(comp(1:2), 'PC')
@@ -2032,7 +2039,7 @@ function addpathifnotinlist(newpath);
         end
     end
 
-function addpathifnotexist(newpath, functionname);
+function addpathifnotexist(newpath, functionname)
     tmpp = mywhich(functionname);
         
     if isempty(tmpp)
@@ -2041,7 +2048,7 @@ function addpathifnotexist(newpath, functionname);
     
 % find a function path and add path if not present
 % ------------------------------------------------
-function myaddpath(eeglabpath, functionname, pathtoadd);
+function myaddpath(eeglabpath, functionname, pathtoadd)
 
     tmpp = mywhich(functionname);
     tmpnewpath = [ eeglabpath pathtoadd ];
@@ -2062,7 +2069,7 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
     
 % parse plugin function name
 % --------------------------
-function [name, vers] = parsepluginname(dirName);
+function [name, vers] = parsepluginname(dirName, funcname)
     ind = find( dirName >= '0' & dirName <= '9' );
     if isempty(ind)
         name = dirName;
@@ -2074,24 +2081,41 @@ function [name, vers] = parsepluginname(dirName);
         end
         name = dirName(1:ind);
         vers = dirName(ind+1:end);
-        vers(find(vers == '_')) = '.';
-    end
-
-% required here because path not added yet
-% to the admin folder
-function res = ismatlab;
-
-    v = version;
-    if v(1) > '5'
-        res = 1;
-    else
-        res = 0;
+        vers(vers == '_') = '.';
+        if ~isempty(vers)
+            if vers(1) == '.', vers(1) = []; end
+        end
     end
     
-function res = mywhich(varargin);
+    % check with function name and change version if necessary (for loadhdf5)
+    if nargin > 1 && ~isempty(strfind(dirName, funcname))
+        name1 = funcname;
+        vers2 = dirName(length(funcname)+1:end);
+        if ~isempty(vers2)
+            vers2(vers2 == '_') = '.';
+            if ~isequal(vers, vers2) ... % differebt versions
+                && (vers2(1) >= '0' && vers2(1) <= '9') % version 2 is numerical
+                vers = vers2;
+            end
+        end
+    end
+    
+% required here because path not added yet
+% to the admin folder
+function res = ismatlab
+
+res = exist('OCTAVE_VERSION', 'builtin') == 0;
+    
+function res = mywhich(varargin)
 try
     res = which(varargin{:});
 catch
     fprintf('Warning: permission error accesssing %s\n', varargin{1});
 end
    
+function h = eegmenu( versL, varargin)
+    h = [];
+    if ~versL
+        h = uimenu(varargin{:});
+    end
+     

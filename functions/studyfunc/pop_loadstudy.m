@@ -102,13 +102,15 @@ for k = 1:length(STUDY.datasetinfo)
 end
 
 % check for old study format
+if ~isfield(STUDY, 'design')
+    STUDY.design = [];
+end
 if ~isempty(STUDY.design)
     if isfield(STUDY.design, 'cell')
         txt = [ 'You are loading a STUDY from a previous version of EEGLAB.' 10 ...
                 'Most study settings are backward compatible but require that' 10 ... 
                 'you recompute the measure data files for all measures (ERP, ERSP,' 10 ...
-                'ITC, spectrum). For more information about the new STUDY design,' 10 ...
-                'see https://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_15.' ];
+                'ITC, spectrum).' ];
         dbs = dbstack;
         if isempty(varargin) % means that it was called from a call back
             warndlg2(txt);
@@ -153,102 +155,30 @@ if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
     end
 end
 
-% Update the design path
-if isfield(STUDY.design, 'cell')
-    for inddes = 1:length(STUDY.design)
-        for indcell = 1:length(STUDY.design(inddes).cell)
-            if isempty(STUDY.design(inddes).filepath)
-                pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
-            else
-                pathname = STUDY.design(inddes).filepath;
-            end
-            filebase = STUDY.design(inddes).cell(indcell).filebase;
-            tmpinds1 = find(filebase == '/');
-            tmpinds2 = find(filebase == '\');
-            if ~isempty(tmpinds1)
-                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds1(end)+1:end));
-            elseif ~isempty(tmpinds2)
-                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
-            else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
-            end
-        end
-    end
-end
-
-% Update the design path
-if isfield(STUDY.design, 'cell')
-    for inddes = 1:length(STUDY.design)
-        for indcell = 1:length(STUDY.design(inddes).cell)
-            pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
-            filebase = STUDY.design(inddes).cell(indcell).filebase;
-            tmpinds1 = find(filebase == '/');
-            tmpinds2 = find(filebase == '\');
-            if ~isempty(tmpinds1)
-                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds1(end)+1:end));
-            elseif ~isempty(tmpinds2)
-                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
-            else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
-            end
-        end
-    end
-end
-
-% check for corrupted ERSP ICA data files
-% A corrupted file is present if
-% - components have been selected
-% - .icaersp or .icaitc files are present
-% - the .trialindices field is missing from these files
-try
-    %% check for corrupted ERSP ICA data files
-    ncomps1 = cellfun(@length, { STUDY.datasetinfo.comps });
-    ncomps2 = cellfun(@(x)(size(x,1)), { ALLEEG.icaweights });
-    if any(~isempty(ncomps1))
-        if any(ncomps1 ~= ncomps2)
-            warningshown = 0;
-
-            for des = 1:length(STUDY.design)
-                for iCell = 1:length(STUDY.datasetinfo) % length(STUDY.design(des).cell)
-                    if ~warningshown
-                        if isfield( STUDY.design(des), 'cell')
-                            if exist( [ STUDY.design(des).cell(iCell).filebase '.icaersp' ] )
-                                warning('off', 'MATLAB:load:variableNotFound');
-                                tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
-                                warning('on', 'MATLAB:load:variableNotFound');
-                                if ~isfield(tmp, 'trialindices')
-                                    warningshown = 1;
-                                    warndlg2( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
-                                                 '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'nonmodal');
-                                end
-                            end
-                            if warningshown == 0 && exist( [ STUDY.design(des).cell(iCell).filebase '.icaitc' ] )
-                                tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
-                                if ~isfield(tmp, 'trialindices')
-                                    warningshown = 1;
-                                    warndlg2( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
-                                                 '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'modal');
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-catch, 
-    disp('Warning: failed to test STUDY file version');
-end
-
 TMP = STUDY.datasetinfo;
 STUDYTMP = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
-if ~isfield(STUDYTMP.datasetinfo, 'trialinfo')
+sameTrialInfo = true;
+if isfield(STUDY.datasetinfo, 'trialinfo') ~= isfield(STUDYTMP.datasetinfo, 'trialinfo')
     sameTrialInfo = false;
-else
-    sameTrialInfo = isequal( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
+elseif isfield(STUDY.datasetinfo, 'trialinfo') && isfield(STUDYTMP.datasetinfo, 'trialinfo')
+    if exist('isequaln', 'builtin')
+        sameTrialInfo = isequaln( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
+    else
+        sameTrialInfo = true;
+    end
+end
+if ~sameTrialInfo
+    if isempty(varargin)
+        res = questdlg2([ 'Warning: trial information contained in datasets not consistent' 10 'with STUDY information. Should EEGLAB overwrite STUDY trial information?' ], 'STUDY Warning', 'No', 'Yes', 'Yes');
+        if isequal(res, 'Yes')
+            STUDY = STUDYTMP;
+        end
+    else
+        disp('Warning: trial information contained in datasets not consistent with STUDY information.');
+        disp('         In rare cases, this could be intentional. Use "STUDY = std_maketrialinfo(STUDY, ALLEEG);" to fix.');
+    end
 end
 clear STUDYTMP;
-if ~sameTrialInfo
-    disp('STUDY Warning: the trial information collected from datasets has changed; use STUDY menu to reconcile if necessary');
-end
 std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 STUDY = std_selectdesign(STUDY, ALLEEG, STUDY.currentdesign);

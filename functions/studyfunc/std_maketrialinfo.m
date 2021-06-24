@@ -41,7 +41,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function STUDY = std_maketrialinfo(STUDY, ALLEEG);
+function STUDY = std_maketrialinfo(STUDY, ALLEEG)
 
 %% test if .epoch field exist in ALLEEG structure
 epochfield = cellfun(@isempty, { ALLEEG.epoch });
@@ -49,6 +49,11 @@ if any(epochfield)
     fprintf('Warning: some datasets are continuous and trial information cannot be created\n');
     return;
 end
+
+for iEEG = 1:length(ALLEEG)
+    % fill in empty field values and fill in with values in the same epoch
+    ALLEEG(iEEG) = eeg_uniformepochinfo(ALLEEG(iEEG));
+end    
 
 %% check if conversion of event is necessary
 ff = {};
@@ -142,4 +147,19 @@ for index = 1:length(ALLEEG)
 %     end
 end
 
-    
+% check HED field with unicode characters
+% ---------------------------------------
+if isfield(STUDY.datasetinfo, 'trialinfo')
+    if isfield(STUDY.datasetinfo(1).trialinfo(1), 'HED')
+        changeUnicode = false;
+        for iDat = 1:length(STUDY.datasetinfo)
+            for iTrial = 1:length(STUDY.datasetinfo(iDat).trialinfo)
+                STUDY.datasetinfo(iDat).trialinfo(iTrial).HED(STUDY.datasetinfo(iDat).trialinfo(iTrial).HED > 255) = 32;
+                changeUnicode = true;
+            end
+        end
+        if changeUnicode
+            disp('Unicode character detected in HED event field, removing them to improve stability');
+        end
+    end
+end

@@ -2863,6 +2863,9 @@ if Erpflag == YES && strcmpi(NoShow, 'no')
     %
     %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
+    if ~isempty(erpsig)
+        erpsig = [erpsig;-1*erpsig];
+    end
     if isnan(maxerp)
         fac = 10;
         maxerp = 0;
@@ -2875,7 +2878,6 @@ if Erpflag == YES && strcmpi(NoShow, 'no')
             maxerp = max(maxerp, round(fac*YEXPAND*max(erp+stdev))/fac);
         end
         if ~isempty(erpsig)
-            erpsig = [erpsig;-1*erpsig];
             maxerp = max(maxerp, round(fac*YEXPAND*max(erpsig))/fac);
         end
         maxerp=max(maxerp);

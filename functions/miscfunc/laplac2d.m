@@ -1,4 +1,4 @@
-% laplac2d() - generate a 2 dimensional gaussian matrice
+% laplac2d() - generate a 2 dimensional laplacian matrice
 %
 % Usage :
 %    >> [ gaussmatrix ] = laplac2d( rows, columns, sigma, ...

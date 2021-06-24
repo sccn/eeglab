@@ -83,7 +83,8 @@
 %                       {default: none, or if {markchans} only are specified, then {markchans,'o','r',10,1}}
 %   'hcolor'          - color of the cartoon head. Use 'hcolor','none' to plot no head. {default: 'k' = black}
 %   'shading'         - 'flat','interp'  {default: 'flat'}
-%   'numcontour'      - number of contour lines {default: 6}
+%   'numcontour'      - number of contour lines {default: 6}. You may also enter a vector to set contours 
+%                       at specified values.
 %   'contourvals'     - values for contour {default: same as input values}
 %   'pmask'           - values for masking topoplot. Array of zeros and 1 of the same size as the input 
 %                       value array {default: []}
@@ -590,6 +591,7 @@ if nargs > 2
                 % if max(abs(plotchans))>max(Values) | max(abs(plotchans))>length(Values) -sm ???
             case {'whitebk','whiteback','forprint'}
                 whitebk = Value;
+            case {'iclabel'} % list of options to ignore
             otherwise
                 error(['Unknown input parameter ''' Param ''' ???'])
         end

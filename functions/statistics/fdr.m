@@ -14,7 +14,7 @@
 % Outputs:
 %   p_fdr    - pvalue used for threshold (based on independence
 %              or positive dependence of measurements)
-%   p_masked - p-value thresholded. Same size as pvals.
+%   p_masked - p-value thresholded. Same size as pvals. Can only be 0 or 1.
 %
 % Author: Arnaud Delorme, SCCN, 2008-
 %         Based on a function by Tom Nichols

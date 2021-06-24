@@ -122,7 +122,7 @@ g = finputcheck( varargin, { 'fields'  'cell'     []                    {};
                          'optimalign'  'string'  { 'on';'off' }         'on';
                          'optimoffset' 'string'  { 'on';'off' }         'off';
                          'optimmeas'   'string'  { 'median';'mean' }    'mean';
-                         'delim'       {'integer';'string'}   []        char([9 32 44])}, 'importevent');
+                         'delim'       {'integer';'string'}   []        char([9 ' ' 44])}, 'importevent');
 if ischar(g), error(g); end
 if ~isempty(g.indices), g.append = 'yes'; end
 g.delim = char(g.delim);    
@@ -155,10 +155,10 @@ g.align.val = tmpalign;
 if ~isnan(g.align.val)
     if isempty(oldevent)
         error('Setevent: no pre-existing event, cannot perform alignment');
-    end;    
+    end
     if ~isfield(oldevent, 'latency')
         error('Setevent: pre-existing events do not have a latency field for re-alignment');
-    end;    
+    end
     switch g.append
         case {'yes' '''yes'''}, disp('Setevent warning: cannot align and append events at the same time; disabling event alignment');
     end
@@ -279,7 +279,7 @@ end
 function array = load_file_or_array( varname, skipline, delim );
     if ischar(varname) && exist(varname) == 2  % mean that it is a filename
                                              % --------------------------
-        array = loadtxt( varname, 'skipline', skipline, 'delim', delim, 'blankcell', 'off' );
+        array = loadtxt( varname, 'skipline', skipline, 'delim', delim );
         
     else 
          if ~iscell(varname)

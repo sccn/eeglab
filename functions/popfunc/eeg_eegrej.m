@@ -116,6 +116,19 @@ end
 if size(regions,2) > 2, regions = regions(:, 3:4); end
 regions = combineregions(regions);
 
+% remove events within regions
+% ----------------------------
+if ~isempty(EEG.event)
+    allEventLatencies = [ EEG.event.latency];
+    allEventFlag      = zeros(1,length(allEventLatencies));
+    for iRegion = 1:size(regions,1)
+        allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
+    end
+    EEG.event(allEventFlag) = [];
+end
+
+% reject data
+% -----------
 [EEG.data, EEG.xmax, event2, boundevents] = eegrej( EEG.data, regions, EEG.xmax-EEG.xmin, EEG.event);
 oldEEGpnts = EEG.pnts;
 oldEEGevents = EEG.event;
@@ -123,7 +136,12 @@ EEG.pnts   = size(EEG.data,2);
 EEG.xmax   = EEG.xmax+EEG.xmin;
 if length(event2) > 1 && event2(1).latency == 0, event2(1) = []; end
 if length(event2) > 1 && event2(end).latency == EEG.pnts, event2(end) = []; end
-if length(event2) > 2 && event2(end).latency == event2(end-1).latency, event2(end) = []; end
+if length(event2) > 2 && event2(end).latency == event2(end-1).latency
+    if isfield(event2, 'type') && isequal(event2(end).type, event2(end-1).type)
+        event2(end) = []; 
+    end
+end
+
 
 % add boundary events
 % -------------------
@@ -140,8 +158,8 @@ end
 if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     % assess difference between old and new event latencies
     [ eventtmp ] = eeg_insertboundold(oldEEGevents, oldEEGpnts, regions);
-    [~,indEvent] = sort([ eventtmp.latency ]);
     if ~isempty(eventtmp)
+        [~,indEvent] = sort([ eventtmp.latency ]);
         eventtmp = eventtmp(indEvent);
     end
     if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && isequal(eventtmp(1).type, 'boundary')
@@ -154,16 +172,36 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
             end
         end
     end
+    if ~isempty(eventtmp) && eventtmp(end).latency > EEG.pnts
+        eventtmp(end) = [];
+    end
+    % add initial event to eventtmp when missing
+    if ~isempty(eventtmp) && ~isempty(EEG.event) && ...
+            strcmpi(EEG.event(1).type, 'boundary') && EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
+        if size(eventtmp,2) > 1
+            eventtmp = [ eventtmp(1) eventtmp(1:end) ];
+        else
+            eventtmp = [ eventtmp(1) eventtmp(1:end)' ];
+        end
+        eventtmp(1).type = 'boundary';
+        eventtmp(1).latency = 0.5;
+        eventtmp(1).duration = EEG.event(1).duration;
+    end
+        
     differs = 0;
     for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
         if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
             differs = differs+1;
         end
     end
+    
     if 100*differs/length(EEG.event) > 50
-        fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF EEGLAB (<2017)\n' ...
+        db = dbstack;
+        if length(db) > 1 
+            fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF EEGLAB (<2017)\n' ...
                 'TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA, EVENTS MIGHT HAVE\n' ...
                 'BEEN CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
+        end
     end
     
     alllats = [ EEG.event.latency ];
@@ -219,11 +257,34 @@ function res = issameevent(evt1, evt2)
 res = true;
 if isequal(evt1,evt2)
     return;
-elseif isfield(evt1, 'duration') && isnan(evt1.duration) && isfield(evt2, 'duration') && isnan(evt2.duration)
-    evt1.duration = 1;
-    evt2.duration = 1;
-    if isequal(evt1,evt2)
-        return;
+else
+    if isfield(evt1, 'type') && isnumeric(evt2.type) && ~isnumeric(evt1.type) 
+        evt2.type = num2str(evt2.type);
+        if isequal(evt1,evt2)
+            return;
+        end
+    end
+    if isfield(evt1, 'duration') && isfield(evt2, 'duration')
+        if isnan(evt1.duration) && isnan(evt2.duration)
+            evt1.duration = 1;
+            evt2.duration = 1;
+        end
+        if abs( evt1.duration - evt2.duration) < 1e-10
+            evt1.duration = 1;
+            evt2.duration = 1;
+        end
+        if isequal(evt1,evt2)
+            return;
+        end
+    end
+    if isfield(evt1, 'latency') && isfield(evt2, 'latency')
+        if abs( evt1.latency - evt2.latency) < 1e-10
+            evt1.latency = 1;
+            evt2.latency = 1;
+        end
+        if isequal(evt1,evt2)
+            return;
+        end
     end
 end
 res = false;

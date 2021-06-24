@@ -165,7 +165,10 @@ if length(defdes.variable) == 0, defdes.variable(1).label = 'continuous'; defdes
 if length(defdes.variable) == 1, defdes.variable(2).label = 'continuous'; defdes.variable(2).vartype = 'categorical'; defdes.variable(2).value = {}; end
 if length(defdes.variable) == 2, defdes.variable(3).label = 'continuous'; defdes.variable(3).vartype = 'categorical'; defdes.variable(3).value = {}; end
 if length(defdes.variable) == 3, defdes.variable(4).label = 'continuous'; defdes.variable(4).vartype = 'categorical'; defdes.variable(4).value = {}; end
-for iVar = 1:4, if isempty(defdes.variable(iVar).vartype), defdes.variable(iVar).vartype = 'continuous'; end; end
+for iVar = 1:4
+    if isempty(defdes.variable(iVar).vartype), defdes.variable(iVar).vartype = 'continuous'; end
+    if isempty(defdes.variable(iVar).label)  , defdes.variable(iVar).label = ''; end
+end
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
                               'variable3'     'string'    []     defdes.variable(3).label;
@@ -193,14 +196,39 @@ if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end
 if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end
 %if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end
 %if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end
-    
+   
+% check inputs
+% ------------
+[indvars, indvarvals, ~, paired] = std_getindvar(STUDY);
+if isfield(STUDY.datasetinfo, 'trialinfo')
+     alltrialinfo = { STUDY.datasetinfo.trialinfo };
+     dattrialselect = cellfun(@(x)([1:length(x)]), alltrialinfo, 'uniformoutput', false);
+else alltrialinfo = cell(length(STUDY.datasetinfo));
+     for i=1:length(ALLEEG), dattrialselect{i} = [1:ALLEEG(i).trials]; end
+end
+
+% get values for each independent variable
+% ----------------------------------------
+m1 = strmatch(opt.variable1, indvars, 'exact'); if isempty(m1), opt.variable1 = ''; end
+m2 = strmatch(opt.variable2, indvars, 'exact'); if isempty(m2), opt.variable2 = ''; end
+m3 = strmatch(opt.variable3, indvars, 'exact'); if isempty(m3), opt.variable3 = ''; end
+m4 = strmatch(opt.variable4, indvars, 'exact'); if isempty(m4), opt.variable4 = ''; end
+if isempty(opt.values1) && ~isempty(opt.variable1), opt.values1 = indvarvals{m1}; end
+if isempty(opt.values2) && ~isempty(opt.variable2), opt.values2 = indvarvals{m2}; end
+if isempty(opt.values3) && ~isempty(opt.variable3), opt.values3 = indvarvals{m3}; end
+if isempty(opt.values4) && ~isempty(opt.variable4), opt.values4 = indvarvals{m4}; end
+if isempty(opt.variable1), opt.values1 = { '' }; end
+if isempty(opt.variable2), opt.values2 = { '' }; end
+if isempty(opt.variable3), opt.values3 = { '' }; end
+if isempty(opt.variable4), opt.values4 = { '' }; end
+
 % build command list for history
 % ------------------------------
 listcom = { 'name' opt.name 'delfiles' opt.delfiles 'defaultdesign' opt.defaultdesign };
-if ~isempty(opt.values1), listcom = { listcom{:} 'variable1' opt.variable1 'values1' opt.values1 'vartype1' opt.vartype1 }; end
-if ~isempty(opt.values2), listcom = { listcom{:} 'variable2' opt.variable2 'values2' opt.values2 'vartype2' opt.vartype2 }; end
-if ~isempty(opt.values3), listcom = { listcom{:} 'variable3' opt.variable3 'values3' opt.values3 'vartype3' opt.vartype3 }; end
-if ~isempty(opt.values4), listcom = { listcom{:} 'variable4' opt.variable4 'values4' opt.values4 'vartype4' opt.vartype4 }; end
+if ~isempty(opt.variable1), listcom = { listcom{:} 'variable1' opt.variable1 'values1' opt.values1 'vartype1' opt.vartype1 }; end
+if ~isempty(opt.variable2), listcom = { listcom{:} 'variable2' opt.variable2 'values2' opt.values2 'vartype2' opt.vartype2 }; end
+if ~isempty(opt.variable3), listcom = { listcom{:} 'variable3' opt.variable3 'values3' opt.values3 'vartype3' opt.vartype3 }; end
+if ~isempty(opt.variable4), listcom = { listcom{:} 'variable4' opt.variable4 'values4' opt.values4 'vartype4' opt.vartype4 }; end
 if ~isempty(opt.subjselect),  listcom = { listcom{:} 'subjselect'  opt.subjselect }; end
 if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end
 if ~isempty(opt.filepath),    listcom = { listcom{:} 'filepath'  opt.filepath }; end
@@ -247,31 +275,6 @@ elseif strcmpi(opt.delfiles, 'limited')
         end
     end
 end
-
-% check inputs
-% ------------
-[indvars, indvarvals, ~, paired] = std_getindvar(STUDY);
-if isfield(STUDY.datasetinfo, 'trialinfo')
-     alltrialinfo = { STUDY.datasetinfo.trialinfo };
-     dattrialselect = cellfun(@(x)([1:length(x)]), alltrialinfo, 'uniformoutput', false);
-else alltrialinfo = cell(length(STUDY.datasetinfo));
-     for i=1:length(ALLEEG), dattrialselect{i} = [1:ALLEEG(i).trials]; end
-end
-
-% get values for each independent variable
-% ----------------------------------------
-m1 = strmatch(opt.variable1, indvars, 'exact'); if isempty(m1), opt.variable1 = ''; end
-m2 = strmatch(opt.variable2, indvars, 'exact'); if isempty(m2), opt.variable2 = ''; end
-m3 = strmatch(opt.variable3, indvars, 'exact'); if isempty(m3), opt.variable3 = ''; end
-m4 = strmatch(opt.variable4, indvars, 'exact'); if isempty(m4), opt.variable4 = ''; end
-if isempty(opt.values1) && ~isempty(opt.variable1), opt.values1 = indvarvals{m1}; end
-if isempty(opt.values2) && ~isempty(opt.variable2), opt.values2 = indvarvals{m2}; end
-if isempty(opt.values3) && ~isempty(opt.variable3), opt.values3 = indvarvals{m3}; end
-if isempty(opt.values4) && ~isempty(opt.variable4), opt.values4 = indvarvals{m4}; end
-if isempty(opt.variable1), opt.values1 = { '' }; end
-if isempty(opt.variable2), opt.values2 = { '' }; end
-if isempty(opt.variable3), opt.values3 = { '' }; end
-if isempty(opt.variable4), opt.values4 = { '' }; end
 
 % preselect data
 % --------------
@@ -331,6 +334,8 @@ if ~isfield(STUDY, 'design') || isempty(STUDY.design)
 else
     STUDY.design(designind) = des;  % fill STUDY.design
 end
+
+STUDY = std_addvarlevel(STUDY, designind);
 
 % remove empty variables
 if designind <= length(STUDY.design)

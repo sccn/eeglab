@@ -1,3 +1,5 @@
+echo off;
+
 % eeglab_options() - handle EEGLAB options. This script (not function)
 %                    set the various options in the eeg_options() file.
 %
@@ -40,8 +42,8 @@ try
     %clear eeg_options; % note: we instead clear this function handle in pop_editoptions()
     
     eeg_optionsbackup;
-    if iseeglabdeployed
-        fileName = fullfile( ctfroot, 'EEGLAB', 'functions', 'adminfunc', 'eeg_options.txt');
+    if isdeployed || (exist('ismcc') && ismcc)
+        fileName = which('eeg_options.txt');
         
         com2 = readtxtfile(fileName);
         eval( com2 );
@@ -67,11 +69,15 @@ try
                 cd(tmpp2);
             end
         catch, end
+        echo off;
         eeg_options; % default one with EEGLAB
         cd(oldp);
     end
     option_savematlab = ~option_savetwofiles;
     
+    if option_donotusetoolboxes
+        disp('Not using signal processing toolbox, if you experience problem, reset your Matlab path to default')
+    end
 catch 
     lasterr
     disp('Warning: could not access the local eeg_options file');

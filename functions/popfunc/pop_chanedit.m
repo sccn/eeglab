@@ -177,6 +177,29 @@ if isempty(chans) || all(~ishandle(chans))
     % in case an EEG structure was given as input
     % -------------------------------------------
     if isfield(chans, 'chanlocs')
+        
+        % process multiple datasets
+        if length(chans) > 1
+            sameAsFirst = arrayfun(@(x)isequaln(chans(1).chanlocs, x.chanlocs), chans(2:end));
+            if ~all(sameAsFirst)
+                error( [ 'All datasets need to have the exact same channel structure.' 10 'If you want to look up channel location for all datasets,' 10 'do so for the first one and write a loop' ] );
+            end
+            
+            % pop up GUI for first dataset
+            EEG = chans(1);
+            [chansout, chaninfo, urchans, com] = pop_chanedit(EEG, orichaninfo, varargin{:});
+            chans(1) = chansout;
+            
+            % pop up GUI for first dataset
+            for iDat = 2:length(chans)
+                EEG = chans(iDat);
+                eval(com);
+                chans(iDat) = EEG;
+            end
+            chansout = chans;
+            return;
+        end
+            
         dataset_input = 1;
         EEG           = chans;
         chans         = EEG(1).chanlocs;
@@ -236,7 +259,7 @@ if ~isempty(indx_tmp)
     flag_replurchan = varargin{indx_tmp+1};
 end
 
-if nargin < 3
+if nargin < 3 && isstruct(chans)
 
     totaluserdat = {};
     % lookup channel locations if necessary
@@ -347,7 +370,7 @@ if nargin < 3
         { } ...
         { 'Style', 'pushbutton', 'string', 'Plot 2-D', 'callback', 'pop_chanedit(gcbf, [], ''plot2d'', []);' },...
         { 'Style', 'text', 'string', 'Plot radius (0.2-1, []=auto)'} ...
-        { 'Style', 'edit', 'string', chaninfo.plotrad, 'tag', 'plotrad' 'callback' 'pop_chanedit(gcbf, [], ''plotrad'', []);' } ...
+        { 'Style', 'edit', 'string', char(chaninfo.plotrad), 'tag', 'plotrad' 'callback' 'pop_chanedit(gcbf, [], ''plotrad'', []);' } ...
         { 'Style', 'popupmenu',  'string', 'Nose along +X|Nose along -X|Nose along +Y|Nose along -Y', ...
         'tag' 'nosedir' 'value',noseparam, 'callback' 'pop_chanedit(gcbf,[],''nosedir'',[]);' 'listboxtop' noseparam } ...
         { 'Style', 'pushbutton', 'string', 'Plot 3-D (xyz)',     'callback', 'pop_chanedit(gcbf, [], ''plot3d'', []);' } ...
@@ -843,9 +866,9 @@ else
                         uilist = { { 'style' 'text' 'string' textcomment } ...
                             { 'style' 'popupmenu'  'string' [ 'use BESA file for 4-shell dipfit spherical model' ...
                             '|use MNI coordinate file for BEM dipfit model|Use spherical file with eye channels' ] ...
-                            'callback' setmodel } ...
+                            'callback' setmodel 'value' 2 } ...
                             { } ...
-                            { 'style' 'edit'       'string' userdatatmp{1} 'tag' 'elec' } ...
+                            { 'style' 'edit'       'string' userdatatmp{2} 'tag' 'elec' } ...
                             { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
                             { } };
 %                             { 'Style', 'checkbox', 'value', 0, 'string','Overwrite Original Channels' } };
@@ -869,6 +892,9 @@ else
                 elseif strcmpi(chaninfo.filename, 'standard_1005.elc')
                     dipfitdefs;
                     chaninfo.filename = template_models(2).chanfile;
+                elseif strcmpi(chaninfo.filename, 'standard_1005.ced')
+                    dipfitdefs;
+                    chaninfo.filename = template_models(2).chanfile;
                 end
                 tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );                
                 for indexchan = 1:length(chans)
@@ -889,6 +915,7 @@ else
                         chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
                         chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
                         chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
+						chans(ind2(index)).type       = tmplocs(ind1(index)).type;
                     end
                     tmpdiff = setdiff_bc([1:length(chans)], ind2);
                     if ~isempty(tmpdiff)

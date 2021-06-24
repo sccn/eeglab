@@ -97,7 +97,7 @@ if iscell(EEG) || (~ischar(EEG) && length(EEG) > 1)
             data       = tmpdata;
             boundaries = datboundaries;
         else
-            if size(tmpdata,3) == 1 % continuous data
+            if size(tmpdata,3) == 1 && size(data,2) ~= size(tmpdata,2) % continuous data (if same number of data points, consider 1 trial dataset)
                 if size(data,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end
 
                 % adding boundaries
@@ -147,7 +147,7 @@ if (~isempty(opt.rmcomps) || ~isempty(opt.component)) && isempty(EEG.icaweights)
 end
 
 if strcmpi(EEG.data, 'in set file')
-    EEG = pop_loadset('filename', EEG.filename, 'filepath', EEG.filepath);
+    EEG = pop_loadset('filename', EEG.filename, 'filepath', EEG.filepath, 'verbose', 'off');
 end
 
 % get data boundaries if continuous data
@@ -203,12 +203,15 @@ else
         filename = fullfile(EEG.filepath, EEG.data);
         fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
         if fid == -1
-            error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
-                'the .set file, you must also rename/move the associated data file.' ]);
-        else
-            if strcmpi(opt.verbose, 'on')
-                fprintf('Reading float file ''%s''...\n', filename);
+            filename = fullfile(EEG.data);
+            fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
+            if fid == -1
+                error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
+                    'the .set file, you must also rename/move the associated data file.' ]);
             end
+        end
+        if strcmpi(opt.verbose, 'on')
+            fprintf('Reading float file ''%s''...\n', filename);
         end
 
         % old format = .fdt; new format = .dat (transposed)

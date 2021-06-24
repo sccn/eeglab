@@ -84,17 +84,17 @@
 % 03-07-02 added srate argument to eegplot call -ad
 
 function [EEG, Irej, com] = pop_eegthresh( EEG, icacomp, elecrange, negthresh, posthresh, ...
-   						starttime, endtime, superpose, reject, topcommand);
+   						starttime, endtime, superpose, reject, topcommand)
 
 Irej = [];
 com = '';
 if nargin < 1
    help pop_eegthresh;
    return;
-end;  
+end
 if nargin < 2
    icacomp = 1;
-end;  
+end
 
 if icacomp == 0
 	if isempty( EEG.icasphere )
@@ -227,12 +227,10 @@ end
 %   inputname(1), icacomp, num2str(elecrange),  num2str(negthresh), ...
 %   num2str(posthresh), num2str(starttime ) , num2str(endtime), superpose, reject ); 
 com = [ com sprintf('EEG = pop_eegthresh(EEG,%s);', ...
-		vararg2str({icacomp,elecrange,negthresh,posthresh,starttime,endtime,superpose,reject})) ]; 
+		vararg2str({icacomp,elecrange,negthresh,posthresh,starttime,endtime,superpose,0})) ]; % reject is always set to 0 because trials are rejected in eegplot
 if nargin < 3
 	Irej = com;
 end
-
-return;
 
 % reject artifacts in a sequential fashion to save memory (ICA ONLY)
 % -------------------------------------------------------

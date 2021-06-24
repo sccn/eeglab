@@ -92,20 +92,20 @@ com = '';
 if nargin < 1
    help pop_rejtrend
    return;
-end;  
+end
 if nargin < 2
    icacomp = 1;
-end;  
+end
 if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
-    	switch ButtonName,
+    	switch ButtonName
         	case 'NO', disp('Operation cancelled'); return;   
-        	case 'YES', [ EEG com ] = pop_runica(EEG);
+        	case 'YES', [ EEG, com ] = pop_runica(EEG);
     	end % switch
 	end
-end;	
+end
 if exist('reject') ~= 1
     reject = 1;
 end
@@ -153,11 +153,12 @@ if nargin < 3
     calldisp     = 1;
 end
 
+calldisp = 0;
 if ~exist('superpose','var'), superpose = 0; end
 if ~exist('reject','var'),    reject    = 0; end
 if ~exist('calldisp','var'),  calldisp  = 1; end
 
-if nargin < 9
+if nargin < 8
     calldisp = 1;
 end
 
@@ -203,22 +204,23 @@ if calldisp
 	else
 		eegplot( icaacttmp, 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
-	end;	
-end
-if ~isempty(rej)
-	if icacomp	== 1
-		EEG.reject.rejconst = rej;
-		EEG.reject.rejconstE = rejE;
-	else
-		EEG.reject.icarejconst = rej;
-		EEG.reject.icarejconstE = rejE;
-	end
-    if reject
-        EEG = pop_rejepoch(EEG, rej, 0);
+    end
+else
+    if ~isempty(rej)
+        if icacomp	== 1
+            EEG.reject.rejconst = rej;
+            EEG.reject.rejconstE = rejE;
+        else
+            EEG.reject.icarejconst = rej;
+            EEG.reject.icarejconstE = rejE;
+        end
+        if reject
+            EEG = pop_rejepoch(EEG, rej, 0);
+        end
     end
 end
 
 com = [ com sprintf('EEG = pop_rejtrend(EEG,%s);', ...
-		vararg2str({icacomp,elecrange,winsize,minslope,minstd,superpose,reject})) ]; 
+		vararg2str({icacomp,elecrange,winsize,minslope,minstd,superpose, ~calldisp & reject })) ]; 
 
 return;

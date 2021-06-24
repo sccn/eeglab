@@ -715,9 +715,11 @@ if isempty(g.topovec)
     end
 end
 
-if (round(g.naccu*g.alpha) < 2)
-    verboseprintf(g.verbose, 'Value of alpha is outside its normal range [%g,0.5]\n',2/g.naccu);
-    g.naccu = round(2/g.alpha);
+% naccu adjustment for FDR
+% ------------------------
+if (round(g.naccu*g.alpha) < 10)
+    verboseprintf(g.verbose, 'Value of alpha is outside its normal range [%g,0.5]\n',10/g.naccu);
+    g.naccu = round(10/g.alpha);
     verboseprintf(g.verbose, '  Increasing the number of iterations to %d\n',g.naccu);
 end
 
@@ -1439,7 +1441,7 @@ end
 % --------------
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
-    if strcmpi(g.scale, 'log'), mbase = 10^(mbase/10); end
+    if strcmpi(g.scale, 'log'), mbase = 10.^(mbase/10); end
 end
 if strcmpi(g.verbose, 'on')
     disp('Note: Add output variables to command line call in history to');

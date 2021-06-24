@@ -880,7 +880,7 @@ function [index, usedplots] = closestplot(xpos, xcentercoords, usedplots);
 % function computing spectrum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
-    usepwelch = license('checkout','Signal_Toolbox');
+    usepwelch = license('checkout','Signal_Toolbox') && exist('pwelch');
     
 	if exist('newweights') == 1
 		nchans = size(newweights,1);
@@ -916,7 +916,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
         fftlength = 2^(nextpow2(length(winlength)))*g.freqfac;
     end
     
-    if ~usepwelch, 
+    if ~usepwelch
         myfprintf(g.verbose, '\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
         myfprintf(g.verbose, 'function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
     end

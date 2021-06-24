@@ -79,7 +79,7 @@ if ~ischar(varargin{1}) %intial settings
     chanlist       = ['pop_precomp(''chanlist'',gcf);']; 
     chanlist       = 'warndlg2([ ''You need to compute measures on all data channels.'' 10 ''This functionality is under construction.'']);';
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
-    warninterp     = ''; %['warndlg2(''EEGLAB will crash when plotting a given channel if it is missing in one dataset'');' ];
+    warninterp     = 'warndlg2(''Not interpolating channels may sometimes lead to unexpected errors when ploting results'');';
     cb_ica1        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica2_on''), ''value'', 0); end;' ];
     cb_ica2        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica1_on''), ''value'', 0); end;' ];
     
@@ -269,8 +269,8 @@ if ~ischar(varargin{1}) %intial settings
         warndlg2('No measure selected: aborting.'); 
         return; 
     end
-    [STUDY ALLEEG] = std_precomp(options{:});
-    com = sprintf('[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
+    [STUDY, ALLEEG] = std_precomp(options{:});
+    com = sprintf('[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
     
 else
     hdl = varargin{2}; %figure handle
@@ -301,11 +301,17 @@ else
             if  (~set_ersp && ~set_itc )
                 set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'off');
                 set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'off');
-                set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'off');                
+                set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'off');
             else
-                set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'on');
-                set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'on');                
-                set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'on');                
+                if any([ ALLEEG.trials ] == 1)
+                    warndlg2('Some datasets have only one trial, cannot compute ERPimages');
+                    set(findobj('parent', hdl,'tag', 'itc_on'), 'value', 0);
+                    set(findobj('parent', hdl,'tag', 'ersp_on'), 'value', 0);
+                else
+                    set(findobj('parent', hdl,'tag', 'ersp_push'),   'enable', 'on');
+                    set(findobj('parent', hdl,'tag', 'ersp_params'), 'enable', 'on');                
+                    set(findobj('parent', hdl,'tag', 'ersp_test'),   'enable', 'on');      
+                end
             end
             userdat{5} = 0;
             set(hdl, 'userdata',userdat); 
@@ -328,9 +334,14 @@ else
         case 'seterpimage'
             set_spec = get(findobj('parent', hdl, 'tag', 'erpimage_on'), 'value'); 
             if set_spec
-                 set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'on');
-                 set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'on');
-                 set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'on');
+                if any([ ALLEEG.trials ] == 1)
+                    warndlg2('Some datasets have only one trial, cannot compute ERPimages');
+                    set(findobj('parent', hdl,'tag', 'erpimage_on'), 'value', 0);
+                else
+                     set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'on');
+                     set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'on');
+                     set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'on');
+                end
             else set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'off');
                  set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'off');
                  set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'off');
@@ -339,8 +350,13 @@ else
         case 'seterp'
             set_erp = get(findobj('parent', hdl, 'tag', 'erp_on'), 'value'); 
             if set_erp
-                 set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'on');
-                 set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'on');
+                if any([ ALLEEG.trials ] == 1)
+                    warndlg2('Some datasets have only one trial, cannot compute ERPs');
+                    set(findobj('parent', hdl,'tag', 'erp_on'), 'value', 0);
+                else
+                     set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'on');
+                     set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'on');
+                end
             else set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'off');
                  set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'off');
             end
@@ -369,13 +385,17 @@ else
             %catch, warndlg2('Error while calling function, check parameters'); end
 
         case 'testersp'
-            try,
-                ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
-                tmpstruct = struct(ersp_params{:});
-                [ tmpX, tmpt, tmpf, ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'parallel', 'off', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
-                std_plottf(tmpt, tmpf, { tmpX });
-            catch, warndlg2('Error while calling function, check syntax'); end
-                
+            if ALLEEG(1).trials == 1
+                warndlg2('Cannot calculate ERSP/ITC on continuous data');
+            else
+                try,
+                    ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
+                    tmpstruct = struct(ersp_params{:});
+                    [ tmpX, tmpt, tmpf, ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'parallel', 'off', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
+                    std_plottf(tmpt, tmpf, { tmpX });
+                catch, warndlg2('Error while calling function, check syntax'); end
+            end
+            
         case 'testerpimage'
             % THIS CODE IS NOT FUNCTIONAL ANY MORE
             try,

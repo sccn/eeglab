@@ -50,7 +50,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
   
-function [res precomp ] = surrogdistrib(data, varargin)
+function [res, precomp ] = surrogdistrib(data, varargin)
 
 if nargin < 1
     help surrogdistrib,
@@ -60,7 +60,7 @@ end
 if ~strcmpi(varargin{1}, 'precomp')
     opt = finputcheck(varargin, { 'naccu'      'integer'   [1 Inf]             1;
                                   'method'     'string'    { 'perm','permutation','bootstrap' }  'perm';
-                                  'pairing'    'string'    { 'on','off' }      'on';
+                                  'pairing'    'string'    { 'on' 'off' }      'on';
                                   'precomp'    'cell'      {} {} }, 'surrogdistrib');
     if ischar(opt), error(opt); end
     if strcmpi(opt.method, 'permutation'), opt.method = 'perm'; end
@@ -78,7 +78,7 @@ end
 % concatenate data
 % ----------------
 if isempty(opt.precomp)
-    [ datavals datalen datadims ] = concatdata( data );
+    [ datavals, datalen, datadims ] = concatdata( data );
     precomp = { datavals datalen datadims bootflag pairflag opt.naccu};
 else
     precomp   = opt.precomp;
@@ -98,7 +98,7 @@ else
     res = surrogate( datavals, datalen, datadims, bootflag, pairflag);
 end
 
-function res = supersurrogate(dat, lens, dims, bootstrapflag, pairedflag, naccu); % for increased speed only shuffle half the indices
+function res = supersurrogate(dat, lens, dims, bootstrapflag, pairedflag, naccu) % for increased speed only shuffle half the indices
 
     % recompute indices in set and target cell indices
     % ------------------------------------------------
@@ -111,11 +111,11 @@ function res = supersurrogate(dat, lens, dims, bootstrapflag, pairedflag, naccu)
         end
     else
         if pairedflag
-            [tmp idx] = sort(rand(naccu,nsubj,ncond),3);
+            [tmp, idx] = sort(rand(naccu,nsubj,ncond),3);
             indswap   = ((idx)-1)*nsubj + repmat( repmat([1:nsubj], [naccu 1 1]),[1 1 ncond]);
             indswap   = reshape(indswap, [naccu lens(end)]);
         else
-            [tmp indswap] = sort(rand(naccu, lens(end)),2);
+            [tmp, indswap] = sort(rand(naccu, lens(end)),2);
         end
     end
 
@@ -127,7 +127,7 @@ function res = supersurrogate(dat, lens, dims, bootstrapflag, pairedflag, naccu)
     end
     res = reshape(res, dims);
 
-function res = surrogate(dataconcat, lens, dims, bootstrapflag, pairedflag); % for increased speed only shuffle half the indices
+function res = surrogate(dataconcat, lens, dims, bootstrapflag, pairedflag) % for increased speed only shuffle half the indices
        
     % recompute indices in set and target cell indices
     % ------------------------------------------------
@@ -141,13 +141,13 @@ function res = surrogate(dataconcat, lens, dims, bootstrapflag, pairedflag); % f
             indswap  = [1:lens(end)];
             indswap  = reshape(indswap, [lens(2) length(lens)-1]);
             for i = 1:size(indswap,1) % shuffle each row
-                [tmp idx] = sort(rand(1,size(indswap,2)));
+                [tmp, idx] = sort(rand(1,size(indswap,2)));
                 indswap(i,:) = indswap(i,idx);
             end;    
             indswap  = reshape(indswap, [1 lens(2)*(length(lens)-1)]);
         else
             oriindices = [1:lens(end)]; % just shuffle indices
-            [tmp idx] = sort(rand(1,length(oriindices)));
+            [tmp, idx] = sort(rand(1,length(oriindices)));
             indswap   = oriindices(idx);
         end
     end
@@ -165,12 +165,12 @@ function val = myndims(a)
     if ndims(a) > 2
         val = ndims(a);
     else
-        if size(a,1) == 1,
+        if size(a,1) == 1
             val = 2;
-        elseif size(a,2) == 1,
+        elseif size(a,2) == 1
             val = 1;
         else
             val = 2;
         end
-    end; 
+    end
     

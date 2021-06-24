@@ -143,7 +143,7 @@ if nargin < 3
         { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      , 'string' ,inistr{1} 'tag' 'cpnum'}...
         { 'Style', 'text', 'string', promptstr{2}} {} { 'Style','edit'      , 'string' ,inistr{2} 'tag' 'singlelimit'}...
         { 'Style', 'text', 'string', promptstr{3}} {} { 'Style','edit'      , 'string' ,inistr{3} 'tag' 'alllimit'}...
-        { 'Style', 'text', 'string', promptstr{4}} {} { 'Style','popupmenu' , 'string' , vismodelist 'tag' 'specmethod' }...
+        { 'Style', 'text', 'string', promptstr{4}} {} { 'Style','popupmenu' , 'string' , vismodelist 'tag' 'specmethod' 'value' 2 }...
         {}...
         { 'Style', 'text', 'string', promptstr{5}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value'  str2double(inistr{5})  'tag' 'rejmarks' }...
         { 'Style', 'text', 'string', promptstr{6}} {} { 'Style','checkbox'  ,'string'  ,' ' 'value'  str2double(inistr{6})  'tag' 'rejtrials'} ...
@@ -247,15 +247,18 @@ if calldisp
 			[ rej, rejE, n, locthresh, globthresh] = ... 
 				rejstatepoch( icaacttmp, EEG.stats.icakurtE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.icakurt, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off' );
-		end;		
+        end	
 		nrej = n;
-	end;	
+    end
 else
 	% compute rejection locally
 	rejtmp = max(rejE(elecrange,:),[],1);
 	rej = rejtmp | rej;
 	nrej =  sum(rej);
 	fprintf('%d trials marked for rejection\n', nrej);
+    if reject
+        EEG = pop_rejepoch(EEG, rej, 0);
+    end
 end
 if ~isempty(rej)
 	if icacomp	== 1
@@ -265,14 +268,11 @@ if ~isempty(rej)
 		EEG.reject.icarejkurt = rej;
 		EEG.reject.icarejkurtE = rejE;
 	end
-    if reject
-        EEG = pop_rejepoch(EEG, rej, 0);
-    end
 end
 nrej = sum(rej);
 
 com = [ com sprintf('EEG = pop_rejkurt(EEG,%s);',...
-		vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject,vistype, [], plotflag})) ];
+		vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject & ~calldisp,vistype, [], plotflag})) ];
 if nargin < 3 && nargout == 2
 	locthresh = com;
 end

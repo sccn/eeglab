@@ -2,7 +2,7 @@
 %
 % Usage:
 %   >> OUTEEG = pop_biosig; % pop up window
-%   >> OUTEEG = pop_biosig( filename, channels, type);
+%   >> OUTEEG = pop_biosig( filename, 'key', val, ...);
 %
 % Inputs:
 %   filename - [string] file name
@@ -14,6 +14,7 @@
 %                  Default is empty -> import all data blocks. 
 %  'importevent' - ['on'|'off'] import events. Default if 'on'.
 %  'importannot' - ['on'|'off'] import annotations (EDF+ only). Default if 'on'
+%  'importmex' - ['on'|'off'] import events with Biosig mexSLOAD as an alternative. Default if 'off'
 %  'blockepoch'  - ['on'|'off'] force importing continuous data. Default is 'on'
 %  'ref'         - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
@@ -71,31 +72,49 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, command, dat] = pop_biosig(filename, varargin); 
-EEG = [];
+function [ALLEEG, command, dat] = pop_biosig(filename, varargin)
+ALLEEG = [];
 command = '';
 
 if ~plugin_askinstall('Biosig', 'sopen'), return; end
 biosigpathfirst;
     
+saveData = false;
 if nargin < 1
 	% ask user
-	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()'); %%% this is incorrect in original version!!!!!!!!!!!!!!
+	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()', 'multiselect', 'on'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
-	if filename == 0 return; end
-	filename = [filepath filename];
+	if isequal(filename,0) return; end
     
+    if iscell(filename)
+        buttonName = questdlg2([ 'Do you want to automatically save imported datasets?' 10 ...
+            '(the name will remain the same as the original dataset' 10 ...
+            'and the .set extension will be used)' ], 'pop_biosig() - import dataset(s)', 'Cancel', 'No thanks', 'Yes Save', 'Yes Save');
+        switch buttonName
+            case 'Cancel', return;
+            case 'No thanks', saveData = false;
+            otherwise saveData = true;
+        end
+    else
+        filename = { filename };
+    end
+
     % look if MEG
     % -----------
     if length(filepath)>4
-        if strcmpi(filepath(end-3:end-1), '.ds'), filename = filepath(1:end-1); end
+        if strcmpi(filepath(end-3:end-1), '.ds')
+            filename = { filepath(1:end-1) }; % should not be able to select more than one MEG file anyway
+        end
+    end
+    for iFile = 1:length(filename)
+        filename{iFile} = fullfile(filepath, filename{iFile});
     end
     
     % open file to get infos
     % ----------------------
     disp('Reading data file header...');
-    dat = sopen(filename, 'r', [], 'OVERFLOWDETECTION:OFF');
+    dat = sopen(filename{1}, 'r', [], 'OVERFLOWDETECTION:OFF');
     if ~isfield(dat, 'NRec')
         error('Unsuported data format');
     end
@@ -108,38 +127,44 @@ if nargin < 1
         disp(upper('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!'));
         disp('For more information, see <a href="http://www.biosemi.com/faq/cms&drl.htm">http://www.biosemi.com/faq/cms&drl.htm</a>');
     end
+    checkmex = [ 'if ~exist(''mexSLOAD''), set(gcbo, ''value'', 0); ' ...
+                 'warndlg2([ ''mexSLOAD not found in path. It needs to be installed.'' 10 ' ...
+                 '''It is easier to use this option on Windows where mexSLOAD'' 10 ' ...
+                 '''is automatically installed with BIOSIG.'' ]); end' ];
     uilist = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
-                 { 'style' 'edit' 'string' '' } ...
+                 { 'style' 'edit' 'string' '' 'tag' 'channels' } ...
                  { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
-                 { 'style' 'edit' 'string' '' } ...
-                 { 'style' 'text' 'String' 'Extract event' } ...
-                 { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'on' } {} ...
-                 { 'style' 'text' 'String' 'Import anotations (EDF+ only)' } ...
-                 { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'on' } {} ...
-                 { 'style' 'text' 'String' 'Force importing continuous data' 'value' 1} ...
-                 { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
+                 { 'style' 'edit' 'string' '' 'tag' 'blockrange'  } ...
                  { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
-                 { 'style' 'edit' 'string' '' } ...
-                  { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata } };
-    geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 0.35 0.5] [3 1] [1] };
+                 { 'style' 'edit' 'string' ''  'tag' 'ref' } ...
+                 { 'style' 'checkbox' 'string' 'Extract event from marker channel' 'value' 1 'tag' 'importevent' } ...
+                 { 'style' 'checkbox' 'String' 'Force continuous data when data is stored in blocks' 'value' 1 'tag' 'blockepoch' } ...
+                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata 'tag' 'memorymapped' } ...
+                 { 'style' 'checkbox' 'string' 'Import EDF+ anotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
+                 { 'style' 'checkbox' 'string' 'Import using alternative BIOSIG method (mexSLOAD)' 'value' 0 'callback' checkmex 'tag' 'importmex' } };
+    geom = { [3 1] [3 1] [3 1] [1] [1] [1] [1] [1] };
 
-    result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
+    [~,~,~,result] = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
     if length(result) == 0 return; end
     
     % decode GUI params
     % -----------------
     options = {};
-    if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end
-    if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end
-    if length(result) > 2
-        if ~result{3},          options = { options{:} 'importevent'  'off'  }; end
-        if ~result{4},          options = { options{:} 'importannot'  'off'  }; end
-        if  result{5},          options = { options{:} 'blockepoch'   'off' }; end
-        if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end
-        if  result{7},          options = { options{:} 'memorymapped' 'on' }; end
-    end
-    if length(eval( [ '[' result{6} ']' ] )) > 1
+    if ~isempty(result.channels)  , options = { options{:} 'channels'   eval( [ '[' result.channels ']' ] ) }; end
+    if ~isempty(result.blockrange), options = { options{:} 'blockrange' eval( [ '[' result.blockrange ']' ] ) }; end
+    if ~isempty(result.ref       ), options = { options{:} 'ref'        eval( [ '[' result.ref ']' ] ) }; end
+    
+    % default to 1
+    if ~result.importevent,    options = { options{:} 'importevent'  'off'  }; end
+    if ~result.blockepoch ,    options = { options{:} 'blockepoch'   'off'  }; end
+    if ~result.importannot ,   options = { options{:} 'importannot'  'off'  }; end
+    
+    % default to 0
+    if result.memorymapped,    options = { options{:} 'memorymapped'  'on'  }; end
+    if result.importmex   ,    options = { options{:} 'importmex'     'on'  }; end
+    
+    if length(eval( [ '[' result.ref ']' ] )) > 1
         options = { options{:} 'refoptions' { 'keepref' 'off' } };
     end
 else
@@ -155,76 +180,111 @@ g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'rmeventchan'  'string'  { 'on';'off' } 'on';
                             'importevent'  'string'  { 'on';'off' } 'on';
                             'importannot'  'string'  { 'on';'off' } 'on';
+                            'importmex'   'string'  { 'on';'off' }  'off';
                             'memorymapped' 'string'  { 'on';'off' } 'off';
                             'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
 if ischar(g), error(g); end
 
-% import data
-% -----------
-EEG = eeg_emptyset;
-[dat DAT interval] = readfile(filename, g.channels, g.blockrange, g.memorymapped);
+if ~iscell(filename) filename = { filename }; end
 
-if strcmpi(g.blockepoch, 'off')
-    dat.NRec = 1;
-end
+for iFile = 1:length(filename)
+    % import data
+    % -----------
+    EEG = eeg_emptyset;
+    [dat, DAT, interval] = readfile(filename{iFile}, g.channels, g.blockrange, g.memorymapped);
     
-EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'));
-
-if strcmpi(g.rmeventchan, 'on') && strcmpi(dat.TYPE, 'BDF') && isfield(dat, 'BDF')
-    if size(EEG.data,1) >= dat.BDF.Status.Channel, 
-        disp('Removing event channel...');
-        EEG.data(dat.BDF.Status.Channel,:) = []; 
-        if ~isempty(EEG.chanlocs) && length(EEG.chanlocs) >= dat.BDF.Status.Channel
-            EEG.chanlocs(dat.BDF.Status.Channel) = [];
-        end
+    if strcmpi(g.blockepoch, 'off')
+        dat.NRec = 1;
     end
-    EEG.nbchan = size(EEG.data,1);
-end
-
-% rerefencing
-% -----------
-if ~isempty(g.ref)
-    disp('Re-referencing...');
-    EEG = pop_reref(EEG, g.ref, g.refoptions{:});
-%     EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
-%     if length(g.ref) == size(EEG.data,1)
-%         EEG.ref  = 'averef';
-%     end
-%     if length(g.ref) == 1
-%         disp([ 'Warning: channel ' int2str(g.ref) ' is now zeroed (but still present in the data)' ]);
-%     else
-%         disp([ 'Warning: data matrix rank has decreased through re-referencing' ]);
-%     end
-end
-
-% test if annotation channel is present
-% -------------------------------------
-if isfield(dat, 'EDFplus') && strcmpi(g.importannot, 'on')
-    tmpfields = fieldnames(dat.EDFplus);
-    for ind = 1:length(tmpfields)
-        tmpdat = getfield(dat.EDFplus, tmpfields{ind});
-        if length(tmpdat) == EEG.pnts
-            EEG.data(end+1,:) = tmpdat;
-            EEG.nbchan        = EEG.nbchan+1;
-            if ~isempty(EEG.chanlocs)
-                EEG.chanlocs(end+1).labels = tmpfields{ind};
+    
+    EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'), strcmpi(g.importannot, 'on'));
+    
+    if strcmpi(g.rmeventchan, 'on') && strcmpi(dat.TYPE, 'BDF') && isfield(dat, 'BDF')
+        if size(EEG.data,1) >= dat.BDF.Status.Channel
+            disp('Removing event channel...');
+            EEG.data(dat.BDF.Status.Channel,:) = [];
+            if ~isempty(EEG.chanlocs) && length(EEG.chanlocs) >= dat.BDF.Status.Channel
+                EEG.chanlocs(dat.BDF.Status.Channel) = [];
+            end
+        end
+        EEG.nbchan = size(EEG.data,1);
+    end
+    
+    % rerefencing
+    % -----------
+    if ~isempty(g.ref)
+        disp('Re-referencing...');
+        EEG = pop_reref(EEG, g.ref, g.refoptions{:});
+    end
+    
+    % test if annotation channel is present
+    % -------------------------------------
+    if isfield(dat, 'EDFplus') && strcmpi(g.importannot, 'on')
+        tmpfields = fieldnames(dat.EDFplus);
+        for ind = 1:length(tmpfields)
+            tmpdat = getfield(dat.EDFplus, tmpfields{ind});
+            if length(tmpdat) == EEG.pnts
+                EEG.data(end+1,:) = tmpdat;
+                EEG.nbchan        = EEG.nbchan+1;
+                if ~isempty(EEG.chanlocs)
+                    EEG.chanlocs(end+1).labels = tmpfields{ind};
+                end
             end
         end
     end
+    
+    % import using Biosig mexSLOAD method (Cedric edits 2/23/2021)
+    if strcmpi(g.importmex, 'on')
+        [s,HDR] = mexSLOAD(filename);
+        
+        %Get correct event names contained in CodeDesc
+        num_ev_type = unique(HDR.EVENT.TYP);
+        num_ev_name = unique(HDR.EVENT.CodeDesc);
+        if ~isempty(HDR.EVENT.CodeDesc) && length(num_ev_type) == length(num_ev_name)
+            for iEvent = 1:length(HDR.EVENT.TYP)
+                EEG.event(iEvent).type = char(HDR.EVENT.CodeDesc(HDR.EVENT.TYP(iEvent)));
+                EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
+            end
+        else
+            for iEvent = 1:length(HDR.EVENT.TYP)
+                EEG.event(iEvent).type = HDR.EVENT.TYP(iEvent);
+                EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
+                EEG.event(iEvent).urevent = iEvent;
+            end
+            warning('Inconsistency between event types and names or event names were not found.');
+            warning('Check your events or convert your data format with EDFBrowser: https://www.teuniz.net/edfbrowser/');
+        end
+    end
+    
+    % check and store data
+    % --------------------
+%     EEG = eeg_checkset(EEG, 'makeur');   % Make EEG.urevent field
+    EEG = eeg_checkset(EEG, 'eventconsistency');
+    EEG = eeg_checkset(EEG);
+    if saveData
+        EEG = pop_saveset(EEG, [ filename{iFile}(1:end-4) '.set' ]);
+        EEG(1).saved = 'justloaded';
+    end
+    if iFile == 1
+        ALLEEG = EEG;
+    else
+        ALLEEG(iFile) = EEG;
+    end
+    
 end
-
-% convert data to single if necessary
-% -----------------------------------
-EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
-EEG = eeg_checkset(EEG);
 
 % history
 % -------
-if isempty(options)
-    command = sprintf('EEG = pop_biosig(''%s'');', filename); 
+if length(filename) == 1
+    command = sprintf('EEG = pop_biosig(''%s''', filename{1});
 else
-    command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
-end;    
+    command = sprintf('EEG = pop_biosig(%s', vararg2str(filename));
+end
+if isempty(options)
+    command = [ command ');' ];
+else
+    command = [ command sprintf(', %s);', vararg2str(options)) ];
+end
 
 % Checking if str2double is on top of the path
 biosigpathlast;
@@ -232,7 +292,7 @@ biosigpathlast;
 % ---------
 % read data
 % ---------
-function [dat DAT interval] = readfile(filename, channels, blockrange, memmapdata);
+function [dat, DAT, interval] = readfile(filename, channels, blockrange, memmapdata);
 
 if isempty(channels), channels = 0; end
 dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');

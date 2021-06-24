@@ -472,7 +472,10 @@ function cluster = checkcentroidfield(cluster, varargin);
     
     % rapid filtering for ERP (from std_plotcurve)
 % -----------------------
-function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass); 
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass);
+if ischar(highpass)
+    highpass = str2num(highpass);
+end
     bscorrect = 1;
     if bscorrect
         % Getting initial baseline

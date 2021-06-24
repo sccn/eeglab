@@ -75,9 +75,9 @@ end
 % set buttons
 set(findobj(fig, 'tag', 'install'), 'enable', 'on');
 if selectedPlugins(lastSelect).installed
-    set(findobj(fig, 'tag', 'remove'), 'enable', 'on');
+    set(findobj(fig, 'tag', 'rmbut'), 'enable', 'on');
 else
-    set(findobj(fig, 'tag', 'remove'), 'enable', 'off');
+    set(findobj(fig, 'tag', 'rmbut'), 'enable', 'off');
 end
 if ~isempty(selectedPlugins(lastSelect).webdoc)
     set(findobj(fig, 'tag', 'documentation'), 'enable', 'on', 'callback', ['web(''' selectedPlugins(lastSelect).webdoc ''', ''-browser'');' ]);

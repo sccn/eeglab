@@ -45,7 +45,7 @@ function eeglab_error
     if iseeglaberror
         tmp = lasterror; % Add more information to eeglab errors JRI, RMC
         if ~isempty(tmp.stack)
-            tmplasterr = sprintf('%s,\n\n  (Error occurred in function %s() at line %d)',...
+              tmplasterr = sprintf('%s,\n\nThis is not a bug (Error occurred in function %s() at line %d)',...
               tmplasterr, tmp.stack(1).name, tmp.stack(1).line);
         else
             tmplasterr = sprintf('%s,\n', tmplasterr);

@@ -83,16 +83,16 @@ if ischar(bootside)
 	bootside = { bootside };
 end
 for index = 1:length(bootside)
-	if ~strcmpi(bootside, 'both') && ~strcmpi(bootside, 'upper')
+	if ~strcmpi(bootside{index}, 'both') && ~strcmpi(bootside{index}, 'upper')
 		error('Bootside must be either ''both'' or ''upper''');
 	end
-end;	
+end
 if ischar(condboot)
 	condboot = { condboot };
 end
 for index = 1:length(condboot)
 	if isempty(condboot{index}), condboot{index} = 'complex'; end
-end;	
+end
 		
 for index = 1:length(varargin)
 	if ~iscell(varargin) || length(varargin{index}) ~=2
@@ -194,33 +194,33 @@ for index= 1:length(formula)
     % compute bootstrap significance level
     i = round(naccu*alpha);
     switch ndims(accarray)
-	 case 3, 
+	 case 3
 	     accarray = sort(accarray,3); % always sort on naccu (when 3D, naccu is the second dim)
-         if strcmpi(bootside{min(length(bootside), index)}, 'upper');
-			 accarray = mean(accarray(:,:,naccu-i+1:naccu),3);
+         if strcmpi(bootside{min(length(bootside), index)}, 'upper')
+			 accarray = accarray(:,:,floor(naccu-i/2+1));
 	     else
 			 accarray = accarray(:,:,[end:-1:1]); 
-			 accarraytmp(:,:,2) = mean(accarray(:,:,1:i),3);
-			 accarraytmp(:,:,1) = mean(accarray(:,:,naccu-i+1:naccu),3);
+			 accarraytmp(:,:,2) = accarray(:,:,ceil(i/2));
+			 accarraytmp(:,:,1) = accarray(:,:,floor(naccu-i/2+1));
 			 accarray = accarraytmp;
 		 end
 	 
-	 case 2, 
+	 case 2
 	     accarray = sort(accarray,2); % always sort on naccu (when 3D, naccu is the second dim)
-         if strcmpi(bootside{min(length(bootside), index)}, 'upper');
-			 accarray = mean(accarray(:,naccu-i+1:naccu),2);
+         if strcmpi(bootside{min(length(bootside), index)}, 'upper')
+			 accarray = accarray(:,floor(naccu-i/2+1));
 	     else
-			 accarraytmp(:,2) = mean(accarray(:,1:i),2);
-			 accarraytmp(:,1) = mean(accarray(:,naccu-i+1:naccu),2);
+			 accarraytmp(:,2) = accarray(:,ceil(i/2));
+			 accarraytmp(:,1) = accarray(:,floor(naccu-i/2+1));
 			 accarray = accarraytmp;
 		 end
-	 case 1, 
+	 case 1
 	     accarray = sort(accarray,1); % always sort on naccu (when 3D, naccu is the second dim)
-         if strcmpi(bootside{min(length(bootside), index)}, 'upper');
-			 accarray = mean(accarray(naccu-i+1:naccu),1);
+         if strcmpi(bootside{min(length(bootside), index)}, 'upper')
+			 accarray = accarray(floor(naccu-i/2+1));
 	     else
-			 accarraytmp(2) = mean(accarray(1:i),1);
-			 accarraytmp(1) = mean(accarray(naccu-i+1:naccu),1);
+			 accarraytmp(2) = accarray(ceil(i/2));
+			 accarraytmp(1) = accarray(floor(naccu-i/2+1));
 			 accarray = accarraytmp;
 		 end
     end

@@ -103,8 +103,8 @@ for index = 1:length(allargs)
 			strout = [ strout ',' array2str( tmpvar ) ];
 		elseif iscell( tmpvar )
             tmpres = vararg2str( tmpvar );
-            comas  = find( tmpres == ',' );
-            tmpres(comas) = ' ';
+%             comas  = find( tmpres == ',' );
+%             tmpres(comas) = ' ';
 			strout = [ strout ',{' tmpres '}' ];
 		elseif isstruct(tmpvar)
 			strout = [ strout ',' struct2str( tmpvar ) ];		

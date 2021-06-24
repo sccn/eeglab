@@ -54,6 +54,7 @@ HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down'
                             % (e.g., timef/newtimef frequency direction)
                             
 % Checking MATLAB version
+clear version
 tmpvers = version;
 indp = find(tmpvers == '.');
 if str2num(tmpvers(indp(1)+1)) >= 1, tmpvers = [ tmpvers(1:indp(1)) '0' tmpvers(indp(1)+1:end) ]; end
@@ -156,16 +157,18 @@ clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
 % ----------------------------------------------------------------------
 
 % INSERT location of ica executable (UNIX ONLY) for binica.m below
+eeglab_p = fileparts(which('eeglab'));
 if ~isdeployed
-    eeglab_p = fileparts(which('eeglab'));
     ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_linux'); 
     tmpComputer = computer;
     if strcmpi(tmpComputer(1:3), 'MAC')
-        ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_osx_intel_64');
-        clear tmpComputer
+        ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_osx');
+    elseif strcmpi(tmpComputer(1:2), 'PC')
+        ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'binica.exe');
     end
+    clear tmpComputer
 else
-    ICABINARY = fullfile(ctfroot, 'EEGLAB', 'functions', 'supportfiles', 'ica_linux');
+    ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_linux');
 end
 
 try

@@ -294,9 +294,12 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
          end
          pcaflag = 'on';
          ncomps = Value;
-         if ncomps > chans || ncomps < 1,
-            fprintf('runica(): pca value must be in range [1,%d]\n',chans)
+         if ncomps > chans || ncomps < -1
+            fprintf('runica(): pca value must be in range [%d,%d]\n',-chans+1, chans)
             return
+         end
+         if ncomps < 0
+             ncomps = size(data,1)+ncomps;
          end
          chans = ncomps;
        elseif strcmp(Keyword,'interupt') || strcmp(Keyword,'interrupt') 
@@ -305,7 +308,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
            return
          else 
            Value = lower(Value);
-           if ~strcmp(Value,'on') && ~strcmp(Value,'off'),
+           if ~strcmp(Value,'on') && ~strcmp(Value,'off')
              fprintf('runica(): interrupt value must be on or off')
              return
            end
@@ -329,11 +332,11 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
          lrate = Value;
-         if lrate>MAX_LRATE || lrate <0,
+         if lrate>MAX_LRATE || lrate <0
            fprintf('runica(): lrate value is out of bounds'); 
            return
          end
-         if ~lrate,
+         if ~lrate
             lrate = DEFAULT_LRATE;
          end
       elseif strcmp(Keyword,'block') || strcmp(Keyword,'blocksize')
@@ -342,11 +345,11 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
          block = floor(Value);
-         if ~block,
+         if ~block
            block = DEFAULT_BLOCK; 
          end
       elseif strcmp(Keyword,'stop') || strcmp(Keyword,'nochange') ...
-                    | strcmp(Keyword,'stopping')
+                    || strcmp(Keyword,'stopping')
          if ischar(Value)
             fprintf('runica(): stop wchange value must be a number')
             return
@@ -364,7 +367,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
          maxsteps = Value;
-         if ~maxsteps,
+         if ~maxsteps
             maxsteps   = DEFAULT_MAXSTEPS;
          end
          if maxsteps < 0
@@ -377,7 +380,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
          annealstep = Value;
-         if annealstep <=0 || annealstep > 1,
+         if annealstep <=0 || annealstep > 1
             fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
             return
          end
@@ -387,7 +390,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
             return
          end
          annealdeg = Value;
-         if ~annealdeg,
+         if ~annealdeg
              annealdeg = DEFAULT_ANNEALDEG;
          elseif annealdeg > 180 || annealdeg < 0
           fprintf('runica(): annealdeg (%3.1f) is out of bounds [0,180]',...
@@ -406,7 +409,7 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
           return
          end
       elseif strcmp(Keyword,'sphering') || strcmp(Keyword,'sphereing') ...
-                | strcmp(Keyword,'sphere')
+                || strcmp(Keyword,'sphere')
          if ~ischar(Value)
            fprintf('runica(): sphering value must be on, off, or none')
            return
@@ -496,9 +499,9 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
            extblocks = fix(Value); % number of blocks per kurt() compute
            if extblocks < 0
                 nsub = -1*fix(extblocks);  % fix this many sub-Gauss comps
-           elseif ~extblocks,
+           elseif ~extblocks
                 extended = 0;             % turn extended-ICA off
-           elseif kurtsize>frames,   % length of kurtosis calculation
+           elseif kurtsize>frames   % length of kurtosis calculation
                 kurtsize = frames;
                 if kurtsize < MIN_KURTSIZE
                    fprintf(...
@@ -511,9 +514,9 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
          if ~ischar(Value)
             fprintf('runica(): verbose flag value must be on or off')
             return
-         elseif strcmp(Value,'on'),
+         elseif strcmp(Value,'on')
              verbose = 1; 
-         elseif strcmp(Value,'off'),
+         elseif strcmp(Value,'off')
              verbose = 0; 
          else
              fprintf('runica(): verbose flag value must be on or off')
@@ -540,17 +543,17 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Initialize weights, etc. %%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~annealstep,
-  if ~extended,
+if ~annealstep
+  if ~extended
     annealstep = DEFAULT_ANNEALSTEP;     % defaults defined above
   else
     annealstep = DEFAULT_EXTANNEAL;       % defaults defined above
   end
 end % else use annealstep from commandline
 
-if ~annealdeg, 
+if ~annealdeg
     annealdeg  = DEFAULT_ANNEALDEG - momentum*90; % heuristic
-    if annealdeg < 0,
+    if annealdeg < 0
         annealdeg = 0;
     end
 end
@@ -561,16 +564,16 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%% Check keyword values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if frames<chans,
+if frames<chans
     fprintf('runica(): data length (%d) < data channels (%d)!\n',frames,chans)
     return
-elseif block < 2,
+elseif block < 2
     fprintf('runica(): block size %d too small!\n',block)
     return
-elseif block > frames, 
+elseif block > frames
     fprintf('runica(): block size exceeds data length!\n');
     return
-elseif floor(epochs) ~= epochs,
+elseif floor(epochs) ~= epochs
     fprintf('runica(): data length is not a multiple of the epoch length!\n');
     return
 elseif nsub > ncomps
@@ -586,11 +589,11 @@ else
 end
 verb = verbose;
 
-if weights ~= 0,                    % initialize weights
+if weights ~= 0                    % initialize weights
   % starting weights are being passed to runica() from the commandline
-    if  chans>ncomps && weights ~=0,
+    if  chans>ncomps && weights ~=0
         [r,c]=size(weights);
-        if r~=ncomps || c~=chans,
+        if r~=ncomps || c~=chans
             fprintf('runica(): weight matrix must have %d rows, %d columns.\n', ...
                     chans,ncomps);
             return;

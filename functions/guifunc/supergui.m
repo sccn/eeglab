@@ -247,6 +247,9 @@ for counter = 1:maxcount
 	clear rowhandle;
     gm = g.geom{counter};
     [posx posy width height] = getcoord(gm{1}, gm{2}, gm{3}, gm{4}, g.borders, g.spacing);
+%     str1 = sprintf('%d, %d, [%1.2f,%1.2f], [%1.2f,%1.2f]', gm{1}, gm{2}, gm{3}(1), gm{3}(2), gm{4}(1), gm{4}(2));
+%     str2 = sprintf('%.4f, ', [posx posy width height]);
+%     fprintf('%s -> %s -> %s\n', str1, str2, g.uilist{ counter }{4});
     
     try
         currentelem = g.uilist{ counter };
@@ -356,11 +359,26 @@ for counter = 1:maxcount
                         (~isempty(currentelem{4}) && isempty(findstr('html', currentelem{4}{1}))))
                     %tmp = curext(3)/curpos(3);
                     %if tmp > 3*factmultx && factmultx > 0, adsfasd; end
-                    factmultx = max(factmultx, curext(3)/curpos(3));
+                    if exist('OCTAVE_VERSION','builtin') ~= 0
+                      curtxt = get(allhandlers{counter}, 'string');
+                      if ischar(curtxt)
+                        nLines = length(find(curtxt == 10))+1;
+                        curext(3) = curext(3)/nLines;
+                      end
+                    end
+                    
+                    if curext(3)/curpos(3) < 3
+                        factmultx = max(factmultx, curext(3)/curpos(3));
+                    end
+                    tmptxt = get(allhandlers{counter}, 'string');
+%                   % text to get which UI modify horizontal size
+%                    if iscell(tmptxt) fprintf('%s -> %f\n', 'cell', curext(3)/curpos(3));
+%                    else              fprintf('%s -> %f\n', tmptxt, curext(3)/curpos(3));
+%                    end                      
                     if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
                 end
             end
-            if  ~strcmp(style, 'listbox')
+            if  ~strcmp(style, 'listbox') &&  ~strcmp(style, 'popupmenu')
                 factmulty = max(factmulty, curext(4)/curpos(4));
             end
             
@@ -384,7 +402,7 @@ end
 
 % adjustments
 % -----------
-factmultx = factmultx*1.02;% because some text was still hidden
+factmultx = factmultx*1.1;% because some text was still hidden
 if factmultx < 0.1
 	factmultx = 0.1;
 end
@@ -400,7 +418,11 @@ try,
         factmulty = factmulty*1.08;
     end
 catch, end
-factmulty = factmulty*0.9; % global shinking
+if exist('OCTAVE_VERSION', 'builtin') == 0
+    factmulty = factmulty*0.9; % global shinking
+else
+    factmulty = factmulty*1.5;
+end
 warning on;	
 
 % scale and replace the figure in the screen
@@ -409,7 +431,7 @@ pos = get(g.fig, 'position');
 if factmulty > 1
 	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
 end
-pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
+pos(1) = max(0,pos(1)+pos(3)*(1-factmultx)/2);
 pos(3) = max(pos(3)*factmultx, g.minwidth);
 pos(4) = pos(4)*factmulty;
 set(g.fig, 'position', pos);

@@ -2,11 +2,11 @@
 %
 % >> mergelocs = eeg_getica(EEG, comp);
 %
-% Inputs: 
+% Inputs:
 %     EEG     - EEGLAB dataset structure
 %     comp    - component index
 %
-% Output: 
+% Output:
 %     icaact  - ICA component activity
 %
 % Author: Arnaud Delorme, 2006
@@ -40,17 +40,18 @@
 
 function icaact = eeg_getica(EEG, comp)
 
-  if nargin < 1
+if nargin < 1
     help eeg_getica;
     return;
-  end
-  if nargin < 2
+end
+if nargin < 2
     comp = 1:size(EEG.icaweights,1);
-  end
-  
-  if ~isempty(EEG.icaact)
+end
+
+EEG = eeg_checkset(EEG, 'loaddata');
+if ~isempty(EEG.icaact)
     icaact = EEG.icaact(comp,:,:);
-  else
+else
     disp('Recomputing ICA activations');
     if isempty(EEG.icachansind)
         EEG.icachansind = 1:EEG.nbchan;
@@ -58,4 +59,4 @@ function icaact = eeg_getica(EEG, comp)
     end
     icaact = (EEG.icaweights(comp,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
     icaact = reshape( icaact, size(icaact,1), EEG.pnts, EEG.trials);
-  end
+end

@@ -71,7 +71,12 @@ else
     % account for old calling format
     % ------------------------------
     if ~strcmpi(inputname, 'filename') && ~strcmpi(inputname, 'filepath') && ~strcmpi(inputname, 'eeg') && ~strcmpi(inputname, 'loadmode') && ~strcmpi(inputname, 'check')
-        options = { 'filename' inputname }; 
+        if nargin == 1
+            [filepath, filename, ext] = fileparts(inputname);
+            options = { 'filename' [filename ext], 'filepath' filepath }; 
+        else
+            options = { 'filename' inputname }; 
+        end
         if nargin > 1
             options = { options{:} 'filepath' inputpath }; 
         end
@@ -89,6 +94,7 @@ g = finputcheck( options, ...
                  { 'filename'   { 'string';'cell' }    []   '';
                    'filepath'   'string'               []   '';
                    'check'      'string'               { 'on';'off' }   'on';
+                   'verbose'    'string'               { 'on';'off' }   'on';
                    'loadmode'   { 'string';'integer' } { { 'info' 'all' } [] }  'all';
                    'eeg'        'struct'               []   struct('data',{}) }, 'pop_loadset');
 if ischar(g), error(g); end
@@ -114,12 +120,24 @@ else
         % read file
         % ---------
         filename = fullfile(g.filepath, g.filename{ifile});
-        fprintf('pop_loadset(): loading file %s ...\n', filename);
-        %try
-        TMPVAR = load('-mat', filename);
-        %catch,
-        %    error([ filename ': file is protected or does not exist' ]);
-        %end
+        if strcmpi(g.verbose, 'on')
+            fprintf('pop_loadset(): loading file %s ...\n', filename);
+        end
+        if strcmpi(g.loadmode, 'info')
+            if ismatlab
+                TMPVAR = load('-mat', filename, '-regexp', '^((?!data).)*$');
+            else
+                TMPVAR = load('-mat', filename);
+                if isfield(TMPVAR, 'data')
+                    TMPVAR = rmfield(TMPVAR, 'data');
+                end
+            end
+            if isfield(TMPVAR, 'setname')
+                TMPVAR.data = 'in set file';
+            end
+        else
+            TMPVAR = load('-mat', filename);
+        end
 
         % variable not found
         % ------------------
@@ -145,7 +163,8 @@ else
                 end
                 if ~strcmp(EEG.filename(1:end-3), EEG.data(1:end-3))
                     disp('Warning: the name of the dataset has changed on disk, updating EEG structure accordingly');
-                    EEG.data = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
+                    EEG.data    = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
+                    EEG.datfile = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
                     EEG.saved = 'no';
                 end
 
@@ -184,10 +203,12 @@ else
             end
         else
             EEG = checkoldformat(TMPVAR);
+            [ EEG.filepath EEG.filename ext ] = fileparts( g.filename{ifile} );
+            EEG.filename = [ EEG.filename ext ];
             if ~isfield( EEG, 'data')
                 error('pop_loadset(): not an EEG dataset file');
             end
-            if ischar(EEG.data), EEG.filepath = g.filepath; end
+            if ischar(EEG.data) && ~isempty(g.filepath), EEG.filepath = g.filepath; end
         end
         
         %ALLEEGLOC = pop_newset(ALLEEGLOC, EEG, 1);

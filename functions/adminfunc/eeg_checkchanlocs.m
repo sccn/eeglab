@@ -184,6 +184,8 @@ if (any( cellfun('isempty',{ chanedit.X })) || any( cellfun('isempty', { chanedi
    (any(~cellfun('isempty',{ chanedit.X })) || any(~cellfun('isempty', { chanedit.theta})) || any(~cellfun('isempty', { chanedit.sph_theta})))
     try
         chanedit = convertlocs(chanedit,'auto');
+        if isfield(chanedit, 'sph_theta_besa') chanedit = rmfield(chanedit, 'sph_theta_besa'); end
+        if isfield(chanedit, 'sph_phi_besa'  ) chanedit = rmfield(chanedit, 'sph_phi_besa'  ); end
     catch
         disp('eeg_checkchanlocs: Unable to convert electrode locations between coordinate systems');
     end

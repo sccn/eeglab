@@ -457,11 +457,15 @@ else
        'meshfile'   {'string','struct' } []  DEFAULT_MESH;
        'electrodes' 'string' { 'on','off' }  'on';            
        'electrodes3d' 'string' { 'on','off' }  'off';            
+       'eleccolor'   'cell'    { }           {};            
        'material'     'string'            [] 'dull';
        'orilocs'    { 'string','struct' } [] '';            
        'labels'     'integer' [0 1 2]        0 }, 'headplot');
    if ischar(g) error(g); end
    plotelecopt.electrodes3d = g.electrodes3d;
+   if length(g.eleccolor) > 0 && length(g.eleccolor) ~= length(values)
+       error('The number of color must be the same as the number of channels to plot');
+   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Open head mesh and electrode spline files
@@ -471,7 +475,7 @@ else
            spline_file));
   end
   load(spline_file, '-mat');
-  if exist('indices'), 
+  if exist('indices')
       try,
           values = values(indices);
       catch, error('problem of index or electrode number with splinefile'); end
@@ -504,7 +508,7 @@ else
   % --------------
   % load mesh file
   % --------------
-  [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(g.meshfile);
+  [newPOS, POS, TRI1, TRI2, NORM, index1, center] = getMeshData(g.meshfile);
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%
   % Perform interpolation
@@ -658,6 +662,7 @@ else
   if strcmp(g.electrodes,'on') % plot the electrode locations
       if exist('newElect')
           plotelecopt.labelflag = g.labels;
+          plotelecopt.eleccolor = g.eleccolor;
           plotelec(newElect, ElectrodeNames, HeadCenter, plotelecopt);
       else
           fprintf('Variable newElect not read from spline file.\n');
@@ -776,8 +781,22 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
             else               % plot electrode markers
                 
                 if strcmpi(opt.electrodes3d, 'off')
-                    line(newElect(:,1),newElect(:,2),newElect(:,3),'marker',...
-                          '.','markersize',20,'color',opt.MarkerColor,'linestyle','none');
+                    if isempty(opt.eleccolor) 
+                        line(newElect(i,1),newElect(i,2),newElect(i,3),'marker',...
+                              '.','markersize',20,'color',opt.MarkerColor,'linestyle','none');
+                    else
+                        if isempty(opt.eleccolor{i})
+                            line(newElect(i,1),newElect(i,2),newElect(i,3),'marker',...
+                                  '.','markersize',12,'color',opt.MarkerColor,'linestyle','none');
+                        else
+                            line(newElect(i,1),newElect(i,2),newElect(i,3),'marker',...
+                                  '.','markersize',35,'color',opt.MarkerColor,'linestyle','none');
+                            line(newElect(i,1),newElect(i,2),newElect(i,3),'marker',...
+                                  '.','markersize',28,'color',[1 1 1],'linestyle','none');
+                            line(newElect(i,1),newElect(i,2),newElect(i,3),'marker',...
+                                  '.','markersize',15,'color',opt.eleccolor{i},'linestyle','none');
+                        end
+                    end
                 else
                     [xc yc zc] = cylinder( 2, 10);
                     [xs ys zs] = sphere(10);
@@ -811,19 +830,21 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
 % get mesh information
 % --------------------
 function [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(meshfile);
+%#function mheadnew.mat
+meshpath = fileparts(which('mheadnew.mat'));
 if isdeployed
-    addpath( fullfile( ctfroot, 'EEGLAB', 'functions', 'supportfiles') );
+    addpath( meshpath );
 end
         
 if ~isstruct(meshfile)
-    if ~exist(meshfile)
+    if ~exist(meshfile, 'file')
         if isdeployed
-            meshfile = fullfile( ctfroot, 'EEGLAB', 'functions', 'supportfiles', meshfile);
-            if ~exist(meshfile)
-                error(sprintf('headplot(): deployed mesh file "%s" not found\n',meshfile));
+            meshfile = fullfile( meshpath, meshfile);
+            if ~exist(meshfile, 'file')
+                error('headplot(): deployed mesh file "%s" not found\n', meshfile);
             end
         else
-            error(sprintf('headplot(): mesh file "%s" not found\n',meshfile));
+            error('headplot(): mesh file "%s" not found\n', meshfile);
         end
     end
     fprintf('Loaded mesh file %s\n',meshfile);

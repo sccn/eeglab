@@ -115,7 +115,7 @@ end
 % ---------------------------------
 bg = 0;        % beginning of data
 en = EEG.xmax; % end of data in sec
-nu = floor(EEG.xmax/g.recurrence); % number of type 'X' events to add and epoch on
+nu = floor((EEG.xmax+1/EEG.srate)/g.recurrence); % number of type 'X' events to add and epoch on
 
 % bg = EEG.event(1).latency/EEG.srate;   % time in sec of first event
 % en = EEG.event(end).latency/EEG.srate; % time in sec of last event
@@ -129,7 +129,9 @@ end
 % -------------------------
 eplength = g.limits(2)-g.limits(1);
 fprintf('The input dataset will be split into %d epochs of %g s\n',nu,eplength);
-fprintf('Epochs will overlap by %2.0f%%.\n',(eplength-g.recurrence)/eplength*100);
+if (eplength-g.recurrence)/eplength*100 > 0
+    fprintf('Epochs will overlap by %2.0f%%.\n',(eplength-g.recurrence)/eplength*100);
+end
 
 % insert events and urevents at the end of the current (ur)event tables
 % ---------------------------------------------------------------------

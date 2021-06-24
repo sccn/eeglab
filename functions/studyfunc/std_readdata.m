@@ -88,7 +88,7 @@ STUDY = pop_erspparams(STUDY, 'default');
     'clusters'      'integer' []             [];
     'timerange'     'real'    []             [];
     'freqrange'     'real'    []             [];
-    'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' 'erpim' } 'erp';
+    'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' 'erpim' 'custom' } 'erp';
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
@@ -179,6 +179,9 @@ for iSubj = 1:length(subjectList)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
         polList     = [];
+        if size(STUDY.cluster(opt.clusters).sets,2) ~= length(datasetInds)
+            error('Cannot process components from different ICA decomposition of the same subjects'); % sometimes different sessions
+        end            
         if isempty(opt.component)
             for iDat = datasetInds(:)'
                 indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject so we many only consider the first row
@@ -237,6 +240,8 @@ for iSubj = 1:length(subjectList)
                 [dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}] = processerpim(dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}, xvals, params);
             end
             yvals = 1:size(dataTmp{iSubj}{1},1);
+        elseif strcmpi(opt.datatype, 'custom')
+            disp('Nothing to do for custom data');
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
         end
@@ -283,21 +288,34 @@ if ~isempty(opt.clusters)
     realDim  = dim;
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
     for iDat1 = 1:length(dataTmp)
+        for iDat2 = 1:length(dataTmp{iDat1})
+            if isempty(dataTmp{iDat1}{iDat2})
+                dataTmp{iDat1}{iDat2} = []; % sometimes empty but all dim not 0
+            end
+        end
         compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
-        if length(unique(compNumbers)) > 1
-            error('Cannot handle conditions with different number of components');
+        uniqComps = unique(compNumbers);
+        if length(uniqComps) > 1 
+            if ~(uniqComps(1) == 0 && length(uniqComps) == 2)
+                error('Cannot handle conditions with different number of components for a given subject');
+            end
         end
         
-        for iComps = 1:compNumbers(1)
-            dataTmp2{end+1} = [];
+        if any(compNumbers)
             for iDat2 = 1:length(dataTmp{iDat1}(:))
-                % check dimensions of components
-                if strcmpi(opt.singletrials, 'on') && strcmpi(tmpDataType, 'timef'),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
-                elseif strcmpi(opt.singletrials, 'on') || strcmpi(tmpDataType, 'timef') dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
-                else                                                                    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
+                if compNumbers(iDat2)
+                    for iComps = 1:compNumbers(iDat2)
+                        dataTmp2{end+1} = cell(size(dataTmp{iDat1}));
+                        % check dimensions of components
+                        if ~isempty(dataTmp{iDat1}{iDat2})
+                            if strcmpi(opt.singletrials, 'on') && strcmpi(tmpDataType, 'timef'),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
+                            elseif strcmpi(opt.singletrials, 'on') || strcmpi(tmpDataType, 'timef') dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                            else                                                                    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
+                            end
+                        end
+                    end
                 end
             end
-            dataTmp2{end} = reshape(dataTmp2{end}, size(dataTmp{iDat1}));
         end
     end
     dataTmp = dataTmp2;
@@ -478,6 +496,9 @@ else
             sesStr   = [ '0' sess{iSess} ];
         end
         filebase{iSess} = fullfile(filepath{iSess}, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
+    end
+    if length(unique(filebase)) < length(filebase)
+        filebase = unique(filebase); % order is not important
     end
 end    
     

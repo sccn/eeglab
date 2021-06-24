@@ -70,21 +70,27 @@ if ischar(chanstr)
     chanstr(find(chanstr == '[')) = [];
     chanlistnum = [];
     chanstr  = [ ' ' chanstr ' ' ];
-    chanlist = {};
-    sp = find(chanstr == ' ');
-    for i = 1:length(sp)-1
-        c = chanstr(sp(i)+1:sp(i+1)-1);
-        if ~isempty(c)
-            chanlist{end+1} = c;
-            if isnan(str2double(chanlocs(1).(field))) % channel labels are not numerical
-                if ~isnan(str2double(c))
-                    chanlistnum(end+1) = str2double(c);
+    try
+        chanlist = eval( [ '{' chanstr '}' ] );
+        chanlistnum = cellfun(@str2double, chanlist);
+        if isnumeric(chanlist{1}) chanlist = [ chanlist{:} ]; end
+    catch
+        chanlist = {};
+        sp = find(chanstr == ' ');
+        for i = 1:length(sp)-1
+            c = chanstr(sp(i)+1:sp(i+1)-1);
+            if ~isempty(c)
+                chanlist{end+1} = c;
+                if isnan(str2double(chanlocs(1).(field))) % channel labels are not numerical
+                    if ~isnan(str2double(c))
+                        chanlistnum(end+1) = str2double(c);
+                    end
                 end
             end
         end
-    end
-    if length(chanlistnum) == length(chanlist)
-        chanlist = chanlistnum;
+        if length(chanlistnum) == length(chanlist)
+            chanlist = chanlistnum;
+        end
     end
 else
     chanlist = chanstr;

@@ -97,7 +97,7 @@
 %   EEG.icawinv     - inverse (ICA) weight matrix. Columns gives the projected
 %                     topographies of the components to the electrodes.
 %   EEG.icaact      - ICA activations matrix (components, frames, epochs)
-%                     Note: [] here means that 'compute_ica' option has bee set
+%                     Note: [] here means that 'compute_ica' option has been set
 %                     to 0 under 'File > Memory options' In this case,
 %                     component activations are computed only as needed.
 %   EEG.icasplinefile - location of the spline file used by headplot() to plot
@@ -291,7 +291,8 @@ for inddataset = 1:length(ALLEEG)
                 case 'event',
                     if isempty(EEG.event)
                         errordlg2(strvcat('Requires events. You need to add events first.', ...
-                            'Use "File > Import event info" or "File > Import epoch info"'), 'Error');
+                            'Use "File > Import event info" or "File > Import epoch info"', ...
+                            'Install plugin VidEd to manually add events as you scroll the data.' ), 'Error');
                         return;
                     end
                 case 'chanloc',
@@ -426,12 +427,14 @@ for inddataset = 1:length(ALLEEG)
                         % remove fields with empty epochs
                         % -------------------------------
                         removeevent = [];
-                        try, tmpevent = EEG.event; allepochs = [ tmpevent.epoch ];
-                            removeevent = find( allepochs < 1 || allepochs > EEG.trials);
+                        try
+                            tmpevent = EEG.event; 
+                            allepochs = [ tmpevent.epoch ];
+                            removeevent = find( allepochs < 1 | allepochs > EEG.trials);
                             if ~isempty(removeevent)
                                 disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch numbers and were removed']);
                             end
-                        catch,
+                        catch
                             for indexevent = 1:length(EEG.event)
                                 if isempty( EEG.event(indexevent).epoch ) || ~isnumeric(EEG.event(indexevent).epoch) ...
                                         || EEG.event(indexevent).epoch < 1 || EEG.event(indexevent).epoch > EEG.trials
@@ -441,56 +444,19 @@ for inddataset = 1:length(ALLEEG)
                             end
                         end
                         EEG.event(removeevent) = [];
-                        tmpevent  = EEG.event;
-                        allepochs = [ tmpevent.epoch ];
-                        
-                        % uniformize fields content for the different epochs
-                        % --------------------------------------------------
-                        % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
-                        % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
-                        difffield = fieldnames(EEG.event);
-                        difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')|strcmp(difffield,'mffkeys')|strcmp(difffield,'mffkeysbackup')|strcmp(difffield,'begintime')));
-                        for index = 1:length(difffield)
-                            tmpevent  = EEG.event;
-                            allvalues = { tmpevent.(difffield{index}) };
-                            try
-                                valempt = cellfun('isempty', allvalues);
-                            catch
-                                valempt = mycellfun('isempty', allvalues);
-                            end
-                            arraytmpinfo = cell(1,EEG.trials);
-                            
-                            % spetial case of duration
-                            % ------------------------
-                            if strcmp( difffield{index}, 'duration')
-                                if any(valempt)
-                                    fprintf(['eeg_checkset: found empty values for field ''' difffield{index} ...
-                                        ''' (filling with 0)\n']);
-                                end
-                                for indexevent = find(valempt)
-                                    EEG.event(indexevent).duration = 0;
-                                end
-                            else
-                                
-                                % get the field content
-                                % ---------------------
-                                indexevent = find(~valempt);
-                                arraytmpinfo(allepochs(indexevent)) = allvalues(indexevent);
-                                
-                                % uniformize content for all epochs
-                                % ---------------------------------
-                                indexevent = find(valempt);
-                                tmpevent   = EEG.event;
-                                [tmpevent(indexevent).(difffield{index})] = arraytmpinfo{allepochs(indexevent)};
-                                EEG.event  = tmpevent;
-                                if any(valempt)
-                                    fprintf(['eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
-                                    fprintf(['              filling with values of other events in the same epochs\n']);
-                                end
+                    end
+                    if isempty(EEG.event), return; end
+                    
+                    % Duration set to 0 if empty
+                    % --------------------------
+                    if isfield(EEG.event, 'duration')
+                        emptyDur = cellfun(@isempty, { EEG.event.duration });
+                        if any(emptyDur)
+                            for indexevent = find(emptyDur)
+                                EEG.event(indexevent).duration = 0;
                             end
                         end
                     end
-                    if isempty(EEG.event), return; end
                     
                     % uniformize fields (str or int) if necessary
                     % -------------------------------------------
@@ -801,17 +767,14 @@ for inddataset = 1:length(ALLEEG)
         
         if (ndims(EEG.data)) < 3 && (EEG.pnts > 1)
             if mod(size(EEG.data,2), EEG.pnts) ~= 0
-                if popask( [ 'eeg_checkset error: the number of frames does not divide the number of columns in the data.'  10 ...
-                        'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the command line)'])
-                    error('eeg_checkset error: user abort');
-                    %res = com;
-                    %EEG.pnts = size(EEG.data,2);
-                    %EEG = eeg_checkset(EEG);
-                    %return;
-                else
+                fprintf(2, 'eeg_checkset error: binary data file likely truncated, importing anyway...\n');
+                if EEG.trials > 1
+                    EEG.trials = floor(size(EEG.data,2)/EEG.pnts);
+                    EEG.data(:,EEG.trials*EEG.pnts+1:end) = [];
                     res = com;
-                    return;
-                    %error( 'eeg_checkset error: number of points does not divide the number of columns in data');
+                else
+                    EEG.pnts   = size(EEG.data,2);
+                    res = com;
                 end
             else
                 if EEG.trials > 1
@@ -1064,7 +1027,15 @@ for inddataset = 1:length(ALLEEG)
         
         % reference (use EEG structure)
         % ---------
-        if ~isfield(EEG, 'ref'), EEG.ref = ''; end
+        if ~isfield(EEG, 'ref')
+            EEG.ref = '';
+        end
+        if isfield(EEG.chanlocs, 'ref') && ~isempty(EEG.chanlocs(1).ref)
+            if ~isequal(EEG.chanlocs(1).ref, EEG.ref)
+                EEG.ref = EEG.chanlocs(1).ref; 
+                res = com;
+            end
+        end
         if strcmpi(EEG.ref, 'averef')
             ref = 'average';
         else ref = '';

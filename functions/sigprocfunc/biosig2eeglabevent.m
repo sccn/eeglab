@@ -40,10 +40,13 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function event = biosig2eeglabevent(EVENT, interval, unused)
+function event = biosig2eeglabevent(EVENT, interval, importEDFplus)
 
 if nargin < 2
     interval = [];
+end
+if nargin < 3
+    importEDFplus = false;
 end
 
 event = [];
@@ -58,8 +61,28 @@ if isempty(interval)
     end
     if isfield(EVENT, 'TYP')
         for index = 1:length( EVENT.TYP )
-            typ = EVENT.TYP(index);
-            event(index).type = typ;
+            eType = EVENT.TYP(index);
+            
+            % use file in
+            % https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1387 to test
+            % for boundary events
+            if eType < 256 && importEDFplus && isfield(EVENT,'CodeDesc') && eType < length(EVENT.CodeDesc)
+                event(index).type = EVENT.CodeDesc{eType};
+                event(index).edftype = eType;
+            elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
+                try
+                    event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
+                    event(index).edftype = eType;
+                catch
+                    event(index).type = eType;
+                end
+                if eType == 32766 || eType == 32767
+                    event(index).edfplustype = event(index).type;
+                    event(index).type = 'boundary';
+                end
+            else
+                event(index).type = eType;
+            end
         end
     end
     if isfield(EVENT, 'POS')
@@ -90,8 +113,25 @@ elseif isfield(EVENT,'POS')
         if pos_tmp > 0 && EVENT.POS(index) <= interval(2)
             event(count).latency = pos_tmp;
             if isfield(EVENT, 'TYP')
-                typ = EVENT.TYP(index);
-                event(count).type = typ;
+                eType = EVENT.TYP(index);
+
+                if isfield(EVENT, 'CodeDesc')
+                    if eType < 256 && importEDFplus && eType < length(EVENT.CodeDesc)
+                        event(index).type = EVENT.CodeDesc{eType};
+                        event(index).edftype = eType;
+                    elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
+                        event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
+                        event(index).edftype = eType;
+                        if eType == 32766 || eType == 32767
+                            event(index).edfplustype = event(index).type;
+                            event(index).type = 'boundary';
+                        end
+                    else
+                        event(index).type = eType;
+                    end
+                else
+                    event(index).type = eType;
+                end
             end
             if isfield(EVENT, 'CHN')
                 event(count).chanindex = EVENT.CHN(index);

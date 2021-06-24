@@ -47,7 +47,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function latout = eeg_urlatency( events, latin );
+function latout = eeg_urlatency( events, latin )
     
     if nargin < 2
         help eeg_urlatency;
@@ -57,7 +57,12 @@ function latout = eeg_urlatency( events, latin );
     boundevents = { events.type };
     latout      = latin;
     if ~isempty(boundevents) && ischar(boundevents{1})
-        indbound = strmatch('boundary', boundevents);
+        try
+            indbound = strmatch('boundary', boundevents);
+        catch
+            % crash in the unlikely case of numerical events
+            return
+        end
         
         if isfield(events, 'duration') && ~isempty(indbound)
             for index = indbound'

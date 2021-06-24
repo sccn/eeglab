@@ -98,7 +98,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [STUDY,com] = pop_limo(STUDY, ALLEEG, measureflag, varargin)
+function [STUDY,com,limofiles] = pop_limo(STUDY, ALLEEG, measureflag, varargin)
 
 if nargin < 2
     help pop_limo;
@@ -120,8 +120,8 @@ else
 end
     
 if nargin < 4
-    dataMeasures = { 'ERP' 'Spectrum' };
-    fileMeasures = { 'daterp' 'datspec'; 'icaerp' 'icaspec' };
+    dataMeasures = { 'ERP' 'Spectrum' 'ERSP'};
+    fileMeasures = { 'daterp' 'datspec' 'dattimef'; 'icaerp' 'icaspec' 'icatimef'};
     methods      = { 'WLS' 'OLS' 'IRLS'};
     cb_measure   = [ 'if get(gcbo, ''value'') == 1,' ...
                      '   set(findobj(gcbf, ''tag'', ''options''), ''string'', '''');' ...
@@ -129,6 +129,7 @@ if nargin < 4
                      '   set(findobj(gcbf, ''tag'', ''options''), ''string'', ''''''freqlim'''', [1 25]'');' ...
                      'end;' ];
     cb_listfactors = [ 'pop_listfactors(STUDY, ''gui'', ''on'', ' ...
+                               '''level'', ''one'',' ...
                                '''splitreg''   , fastif(get(findobj(gcbf, ''tag'', ''splitreg''   ), ''value''), ''on'', ''off''),' ...
                                '''interaction'', fastif(get(findobj(gcbf, ''tag'', ''interaction''), ''value''), ''on'', ''off''));' ];
     uilist = { ...
@@ -161,8 +162,8 @@ if nargin < 4
                 'splitreg'    fastif(res.splitreg, 'on', 'off') ...
                 'interaction' fastif(res.interaction, 'on', 'off') };
 else
-    options = varargin;
+    options = varargin; 
 end
 
-[STUDY tmp] = std_limo(STUDY, ALLEEG, options{:});
+[STUDY,limofiles] = std_limo(STUDY, ALLEEG, options{:});
 com = sprintf('pop_limo(STUDY, ALLEEG, %s);', vararg2str(options));

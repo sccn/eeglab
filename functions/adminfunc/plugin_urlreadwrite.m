@@ -32,6 +32,48 @@ switch protocol
         handler = [];
 end
 
+%Try to fix proxy
+useNewProxyInfo = 0;
+try
+    if exist('OCTAVE_VERSION', 'builtin') == 0
+        [matlabversion matlabdate] = version;
+        matlabversion2 = regexp(matlabversion,'R20(\d\d)([abcd])','match');
+        if ~isempty(matlabversion2)
+            matlabyear = regexp(matlabversion2,'20(\d\d)','match');
+            if ~isempty(matlabyear)
+                matlabyear = str2double(matlabyear{1,1});
+                %matlabsubversion = regexp(matlabversion2,strcat(num2str(matlabyear), "([abcd])"),'match','once');
+                useNewProxyInfo = matlabyear>=2018;
+            end
+        end
+    end
+catch
+    warning('An error occured when checking MATLAB/Octave version');
+end
+
+try
+    if useNewProxyInfo == 1
+        s = settings;
+        proxyHost = s.matlab.web.ProxyHost.ActiveValue;
+        proxyPort = s.matlab.web.ProxyPort.ActiveValue;
+        switch protocol
+            case 'http'
+                java.lang.System.setProperty('http.proxyHost',proxyHost);
+                java.lang.System.setProperty('http.proxyPort',proxyPort);
+            case 'https'
+                s = settings;
+                proxyHost = s.matlab.web.ProxyHost.ActiveValue;
+                proxyPort = s.matlab.web.ProxyPort.ActiveValue;
+                java.lang.System.setProperty('https.proxyHost',proxyHost);
+                java.lang.System.setProperty('https.proxyPort',proxyPort);
+            otherwise
+                warning('Unknown web protocol');
+        end
+    end
+catch
+    warning('An error occured when checking proxy information using new format');
+end
+
 % Create the URL object.
 try
     if isempty(handler)

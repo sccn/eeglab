@@ -127,7 +127,7 @@ for iRegion1=1:size(regions,1)
     duration(iRegion1)    = regions(iRegion1,2)-regions(iRegion1,1)+1;
     
     % add nested boundary events
-    if ~isempty(events) && ischar(events(1).type) && isfield(events, 'duration')
+    if ~isempty(events) && isfield(events, 'type') && ischar(events(1).type) && isfield(events, 'duration')
         selectedEvent = oriEvents(rejectedEvents{iRegion1});
         indBound      = strmatch('boundary', { selectedEvent.type });
         duration(iRegion1) = duration(iRegion1) + sum([selectedEvent(indBound).duration]);

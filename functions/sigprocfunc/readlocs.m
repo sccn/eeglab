@@ -144,6 +144,8 @@
 %                           ...
 %   '.asc', '.dat':     
 %               Neuroscan-.'asc' or '.dat' Cartesian polar coordinates text file.
+%   '.mat':     
+%               Brainstrom channel location file.
 %   '.sfp': 
 %               BESA/EGI-xyz Cartesian coordinates. Notes: For EGI, x is toward right ear, 
 %               y is toward the nose, z is toward the vertex. EEGLAB converts EGI 
@@ -168,6 +170,9 @@
 %
 %    Fieldtrip structure: 
 %               If a Fieltrip structure is given as input, an EEGLAB
+%               chanlocs structure is returned
+%    Brainstrom Matlab file: 
+%               If a Brainstrom Matlab file is given as input, an EEGLAB
 %               chanlocs structure is returned
 %
 % Author: Arnaud Delorme, Salk Institute, 8 Dec 2002
@@ -239,8 +244,9 @@ chanformat(2).importformat = { 'type' 'labels' 'sph_theta_besa' 'sph_phi_besa' '
 % ---------------------------------------------------------------------------------------------------
 chanformat(3).type         = 'xyz';
 chanformat(3).typestring   = 'Matlab .xyz file';
-chanformat(3).description  = [ 'Standard 3-D cartesian coordinate files with electrode labels in ' ...
-                               'the first column and X, Y, and Z coordinates in columns 2, 3, and 4' ];
+chanformat(3).description  = [ 'Standard 3-D cartesian coordinate files with electrode numbers in ' ...
+                               'the first column and X, Y, and Z coordinates in columns 2, 3, and 4' ...
+                               ' and channel labels in column 5' ];
 chanformat(3).importformat = { 'channum' '-Y' 'X' 'Z' 'labels'};
 % ---------------------------------------------------------------------------------------------------
 chanformat(4).type         = 'sfp';
@@ -289,10 +295,22 @@ chanformat(10).importformat = { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z'
                                'sph_radius' 'type' };
 chanformat(10).skipline     = 1;
 % ---------------------------------------------------------------------------------------------------
-chanformat(11).type         = 'custom';
-chanformat(11).typestring   = 'Custom file format';
-chanformat(11).description  = 'Custom ASCII file format where user can define content for each file columns.';
-chanformat(11).importformat = '';
+chanformat(11).type         = 'tsv';
+chanformat(11).typestring   = 'BIDS .tsv file';
+chanformat(11).description  = [ 'Standard 3-D cartesian coordinate files with electrode labels in ' ...
+                               'the first column and X, Y, and Z coordinates in columns 2, 3, and 4' ];
+chanformat(11).importformat = { 'labels' 'X' 'Y' 'Z' };
+chanformat(11).skipline     = 1;
+% ---------------------------------------------------------------------------------------------------
+chanformat(12).type         = 'mat';
+chanformat(12).typestring   = 'Brainstorm Matlab file format';
+chanformat(12).description  = 'Custom Matlab file.';
+chanformat(12).importformat = '';
+% ---------------------------------------------------------------------------------------------------
+chanformat(13).type         = 'custom';
+chanformat(13).typestring   = 'Custom file format';
+chanformat(13).description  = 'Custom ASCII file format where user can define content for each file columns.';
+chanformat(13).importformat = '';
 % ---------------------------------------------------------------------------------------------------
 % ----- ADD MORE FORMATS HERE -----------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
@@ -317,7 +335,7 @@ g = finputcheck( varargin, ...
      'skiplines'   'integer' [0 Inf] 			[];
      'elecind'     'integer' [1 Inf]	    	[];
      'format'	   'cell'	 []					{} }, 'readlocs');
-if ischar(g), error(g); end;  
+if ischar(g), error(g); end 
 if ~isempty(g.format), g.filetype = 'custom'; end
 
 if ischar(filename)
@@ -326,11 +344,11 @@ if ischar(filename)
 	% --------------------
    if strcmpi(g.filetype, 'autodetect'), g.filetype = ''; end
    g.filetype = strtok(g.filetype);
-   periods = find(filename == '.');
-   fileextension = filename(periods(end)+1:end);
+   [~,~,fileextension] = fileparts(filename);
+   fileextension = fileextension(2:end);
    g.filetype = lower(g.filetype);
    if isempty(g.filetype)
-       switch lower(fileextension),
+       switch lower(fileextension)
         case {'loc' 'locs' 'eloc'}, g.filetype = 'loc'; % 5/27/2014 Ramon: 'eloc' option introduced.
         case 'xyz', g.filetype = 'xyz'; 
           fprintf( [ 'WARNING: Matlab Cartesian coord. file extension (".xyz") detected.\n' ... 
@@ -343,6 +361,8 @@ if ischar(filename)
         case 'elc', g.filetype = 'elc';
         case 'eps', g.filetype = 'besa';
         case 'sfp', g.filetype = 'sfp';
+        case 'tsv', g.filetype = 'tsv';
+        case 'mat', g.filetype = 'mat';
         otherwise, g.filetype =  ''; 
        end
        fprintf('readlocs(): ''%s'' format assumed from file extension\n', g.filetype); 
@@ -368,12 +388,34 @@ if ischar(filename)
    
    % import file
    % -----------
-   if strcmp(g.filetype, 'asc') || strcmp(g.filetype, 'dat')
+   if strcmp(g.filetype, 'mat')
+       elocBrainstrom = load('-mat', filename );
+       for iChan = 1:length(elocBrainstrom.Channel)
+           eloc(iChan).labels = elocBrainstrom.Channel(iChan).Name;
+           eloc(iChan).X      = elocBrainstrom.Channel(iChan).Loc(1);
+           eloc(iChan).Y      = elocBrainstrom.Channel(iChan).Loc(2);
+           eloc(iChan).Z      = elocBrainstrom.Channel(iChan).Loc(3);
+           eloc(iChan).type   = elocBrainstrom.Channel(iChan).Type;
+       end
+       if isfield(elocBrainstrom, 'SCS')
+           chans = { 'NAS' 'LPA' 'RPA' };
+           for iChan = 1:length(chans)
+               if isfield(elocBrainstrom.SCS, chans{iChan})
+                    eloc(end+1).labels = chans{iChan};
+                   eloc(end).X      = elocBrainstrom.SCS.(chans{iChan})(1);
+                   eloc(end).Y      = elocBrainstrom.SCS.(chans{iChan})(2);
+                   eloc(end).Z      = elocBrainstrom.SCS.(chans{iChan})(3);
+                   eloc(end).type   = elocBrainstrom.Channel(iChan).Type;
+               end
+           end
+       end
+   elseif strcmp(g.filetype, 'asc') || strcmp(g.filetype, 'dat')
        eloc = readneurolocs( filename );
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
        if isfield(eloc, 'type')
            for index = 1:length(eloc)
+               eloc(index).labels = strtrim(eloc(index).labels);
                type = eloc(index).type;
                if type == 69,     eloc(index).type = 'EEG';
                elseif type == 88, eloc(index).type = 'REF';
@@ -411,7 +453,7 @@ if ischar(filename)
        % --------------
        if isempty(g.skiplines), g.skiplines = 0; end
        if strcmpi(g.filetype, 'chanedit')
-           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines, 'blankcell', 'off');
+           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines);
        else
            array = load_file_or_array( filename, g.skiplines);
        end
@@ -444,8 +486,8 @@ if ischar(filename)
        % removing comments and empty lines
        % ---------------------------------
        indexbeg = 1;
-       while isempty(array{indexbeg,1}) | ...
-               (ischar(array{indexbeg,1}) & array{indexbeg,1}(1) == '%' )
+       while isempty(array{indexbeg,1}) || ...
+               (ischar(array{indexbeg,1}) && array{indexbeg,1}(1) == '%' )
            indexbeg = indexbeg+1;
        end
        array = array(indexbeg:end,:);
@@ -453,7 +495,7 @@ if ischar(filename)
        % converting file
        % ---------------
        for indexcol = 1:min(size(array,2), length(g.format))
-           [str mult] = checkformat(g.format{indexcol});
+           [str, mult] = checkformat(g.format{indexcol});
            for indexrow = 1:size( array, 1)
                if mult ~= 1
                    eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
@@ -503,7 +545,7 @@ if ischar(filename)
 
        % converting XYZ coordinates to polar
        % -----------------------------------
-   elseif isfield(eloc, 'sph_theta')
+   elseif isfield(eloc, 'sph_theta') && any(~cellfun(@isempty, { eloc.sph_theta }))
        try
            eloc = convertlocs(eloc, 'sph2all');  
        catch, disp('Warning: coordinate conversion failed'); end
@@ -613,7 +655,7 @@ end
 
 % process fiducials if any
 % ------------------------
-fidnames = { 'nz' 'lpa' 'rpa' 'nasion' 'left' 'right' 'nazion' 'fidnz' 'fidt9' 'fidt10' 'cms' 'drl' 'nas' 'lht' 'rht' };
+fidnames = { 'nz' 'lpa' 'rpa' 'nasion' 'left' 'right' 'nazion' 'fidnz' 'fidt9' 'fidt10' 'cms' 'drl' 'nas' 'lht' 'rht' 'lhj' 'rhj' };
 for index = 1:length(fidnames)
     ind = strmatch(fidnames{index}, lower(labels), 'exact');
     if ~isempty(ind), eloc(ind).type = 'FID'; end

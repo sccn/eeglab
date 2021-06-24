@@ -62,7 +62,7 @@ end
 % Inds or subjectname
 if isnumeric(inds)
     if ~isempty(find(~ismember(inds(:), [datasetinfo.index]))) %#ok<EFIND>
-         error(['std_combtrialinfo error: Indices '' ' num2str(inds) ' '' aout of range']);
+        error(['std_combtrialinfo error: Indices '' ' num2str(inds) ' '' aout of range']);
     end
 elseif ischar(inds)
     if ~ismember(inds, {datasetinfo.subject})
@@ -103,17 +103,28 @@ else
     nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
 end
 
+fields = fieldnames(datasetinfo);
+fields = setdiff( fields, { 'filepath'  'filename' 'subject' 'index' 'comps' 'trialinfo' });
 for iDat = 1:length(inds)
+    
+    for iField = 1:length(fields)
+        [trialinfo(nvals(iDat):nvals(iDat+1)-1).(fields{iField})] = deal( datasetinfo(inds(iDat)).(fields{iField}) );
+    end
+    
     % Checking if field do not exist or if exist and is empty
-    if ~isfield(trialinfo,'condition') || length(trialinfo) < nvals(iDat+1)-1 || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).condition}))
-        [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
-    end
+    % This is old legacy code and it is unclear why the test were so
+    % complex so we left it for now to see if the new code generates any
+    % problem
+    %     if ~isfield(trialinfo,'condition') || length(trialinfo) < nvals(iDat+1)-1 || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).condition}))
+    %         [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
+    %     end
+    %
+    %     if ~isfield(trialinfo,'group') || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).group}))
+    %         [trialinfo(nvals(iDat):nvals(iDat+1)-1).group    ] = deal( datasetinfo(inds(iDat)).group     );
+    %     end
+    %
+    %     if ~isfield(trialinfo,'session') || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).session}))
+    %         [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
+    %     end
     
-    if ~isfield(trialinfo,'group') || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).group}))
-        [trialinfo(nvals(iDat):nvals(iDat+1)-1).group    ] = deal( datasetinfo(inds(iDat)).group     );
-    end
-    
-    if ~isfield(trialinfo,'session') || any(cellfun(@isempty, {trialinfo(nvals(iDat):nvals(iDat+1)-1).session}))     
-        [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
-    end
 end

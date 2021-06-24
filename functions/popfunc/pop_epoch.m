@@ -37,7 +37,6 @@
 %                trial data. Else if one positive value is given, use its 
 %                negative as the lower bound. The given values are also 
 %                considered outliers (min max) {default: none}
-%   'verbose'  - ['yes'|'no'] {default: 'yes'}
 %   'newname'  - [string] New dataset name {default: "[old_dataset] epochs"}
 %   'epochinfo'- ['yes'|'no'] Propagate event information into the new
 %                epoch structure {default: 'yes'}
@@ -88,12 +87,12 @@
 % 03-18-02 interface and debugging -ad
 % 03-27-02 interface and debugging -ad & sm
 
-function [EEG, indices, com] = pop_epoch( EEG, events, lim, varargin );
+function [EEG, indices, com] = pop_epoch( EEG, events, lim, varargin )
 
 if nargin < 1
    help pop_epoch;
 	return;
-end;	
+end
 com = '';
 indices = [];
 
@@ -135,11 +134,12 @@ if nargin < 3
                     'Name for the new dataset:', ... 
 					'Out-of-bounds EEG rejection limits ([min max], []=none):'  };
 
-   cbevent = ['if ~isfield(EEG(1).event, ''type'')' ...
+   cbevent = ['tmpEEG = get(gcbf, ''userdata'');' ...
+           'if ~isfield(tmpEEG(1).event, ''type'')' ...
 				   '   errordlg2(''No type field'');' ...
 				   'else' ...
-                   '   tmpevent = EEG(1).event;' ...
-                   '   if isnumeric(EEG(1).event(1).type),' ...
+                   '   tmpevent = tmpEEG(1).event;' ...
+                   '   if isnumeric(tmpEEG(1).event(1).type),' ...
 				   '        [tmps,tmpstr] = pop_chansel(unique([ tmpevent.type ]));' ...
 				   '   else,' ...
                    '        [tmps,tmpstr] = pop_chansel(unique({ tmpevent.type }));' ...
@@ -148,7 +148,7 @@ if nargin < 3
 				   '       set(findobj(''parent'', gcbf, ''tag'', ''events''), ''string'', tmpstr);' ...
 				   '   end;' ...
 				   'end;' ...
-				   'clear tmps tmpevent tmpv tmpstr tmpfieldnames;' ];
+				   'clear tmps tmpevent tmpEEG tmpv tmpstr tmpfieldnames;' ];
    
    geometry = { [2 1 0.5] [2 1 0.5] [2 1.5] [2 1 0.5] };
    uilist = { { 'style' 'text'       'string' 'Time-locking event type(s) ([]=all)' } ...
@@ -162,7 +162,7 @@ if nargin < 3
               { 'style' 'text'       'string' 'Out-of-bounds EEG limits if any [min max]' } ...
               { 'style' 'edit'       'string' '' } { } };
               
-   result = inputgui( geometry, uilist, 'pophelp(''pop_epoch'')', 'Extract data epochs - pop_epoch()');
+   result = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_epoch'')', 'title', 'Extract data epochs - pop_epoch()', 'userdata', EEG);
    if length(result) == 0 return; end
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end
@@ -210,7 +210,7 @@ end
 % ------------------------------
 try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end; % obsolete
 try, g.timeunit; 	 	  catch, g.timeunit = 'points'; end
-try, g.verbose; 	      catch, g.verbose = 'on'; end
+try, g.verbose; 	      catch, g.verbose = 'on'; end % obsolete
 try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', [EEG.setname ' epochs' ]); end
 try, g.eventindices;      catch, g.eventindices = 1:length(EEG.event); end
 try, g.epochinfo;         catch, g.epochinfo = 'yes'; end
@@ -229,13 +229,15 @@ if ~isempty( events )
     % ------------------------------
     Ieventtmp = [];
     tmpevent = EEG.event;
-    tmpeventtype  = { tmpevent.type };
+    tmpeventtype = { tmpevent.type };
+    if ischar(tmpeventtype{1}), tmpeventtype  = deblank(tmpeventtype); end
     if iscell(events)
 		if ischar(EEG.event(1).type)
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
 				if ~ischar( tmpevent ), tmpevent = num2str( tmpevent ); end
-				Ieventtmp = [ Ieventtmp ; strmatch(tmpevent, tmpeventtype, 'exact') ];
+                tmpEventList = strmatch(deblank(tmpevent), tmpeventtype, 'exact');
+				Ieventtmp = [ Ieventtmp ; tmpEventList(:) ];
 			end
 		else
 			for index2 = 1:length( events )
@@ -384,6 +386,7 @@ for index=1:EEG.trials
 end
 EEG.event = newevent;
 EEG.epoch = [];
+EEG.saved = 'no';
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % check for boundary events
@@ -410,8 +413,8 @@ end
 % generate text command
 % ---------------------
 com = sprintf('EEG = pop_epoch( EEG, { ');
-for j=1:length(events);
-    if ischar( events{j} )   com = sprintf('%s ''%s'' ', com, events{j} );
+for j=1:length(events)
+    if ischar( events{j} )  com = sprintf('%s ''%s'' ', com, events{j} );
     else                    com = sprintf('%s [%s] ',   com, num2str(events{j}) );
     end
 end

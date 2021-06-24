@@ -52,36 +52,29 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 function pvals = stat_surrogate_pvals(distribution,observed,tail)
-
-numDims = myndims(distribution);
-
-% append observed to last dimension of surrogate distribution
-distribution = cat(numDims,distribution,observed);
-
-numDims = myndims(distribution);
-
-% sort along last dimension (replications)
-[tmp idx] = sort( distribution, numDims,'ascend');
-[tmp mx]  = max( idx,[], numDims);
-
-len = size(distribution,  numDims );
-pvals = 1-(mx-0.5)/len;
-if strcmpi(tail, 'both')
-    pvals = min(pvals, 1-pvals);
-    pvals = 2*pvals;
+numDims = ndims(distribution);
+if iscolumn(distribution)
+	numDims = 1;
 end
 
+n = size(distribution, numDims);
+% once support for matlab <= R2016b is dropped:
+% pvals = sum(distribution >= observed, numDims) / n;
+pvals = sum(bsxfun(@ge, distribution, observed), numDims) / n;
 
-% get the number of dimensions in a matrix
-function val = myndims(a)
-if ndims(a) > 2
-    val = ndims(a);
+if any(strcmpi(tail, {'right', 'one'}))
+	% nothing to be done
+	return;
+end
+
+p_left = 1 - pvals + sum(bsxfun(@eq, distribution, observed), numDims) / n;
+
+if strcmpi(tail, 'both')
+	pvals = 2 * min(pvals, p_left);
+elseif strcmpi(tail, 'left')
+	pvals = p_left;
 else
-    if size(a,1) == 1,
-        val = 2;
-    elseif size(a,2) == 1,
-        val = 1;
-    else
-        val = 2;
-    end
+	error('invalid value for tail: "%s", should be left, right, one or both', tail);
+end
+
 end

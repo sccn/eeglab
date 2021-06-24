@@ -411,14 +411,18 @@ function array = load_file_or_array( varname, skipline, delim );
             
         else % variable in the global workspace
              % --------------------------
-            array = evalin('base', varname);
-            if ~iscell(array)
-                array = mattocell(array, ones(1, size(array,1)), ones(1, size(array,2)));
-            end;   
+             try
+                array = evalin('base', varname);
+             catch
+                 array = { varname };
+             end
+             if ~iscell(array)
+                 array = mattocell(array, ones(1, size(array,1)), ones(1, size(array,2)));
+             end
         end
     else
         array = mattocell(varname);
-    end;     
+    end
 return;
 
 % update latency values

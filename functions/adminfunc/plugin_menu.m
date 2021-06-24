@@ -1,6 +1,10 @@
 % plugin_menu() - main function to install EEGLAB plugins
 %
-% Usage: plugin_menu(PLUGINLIST); pop up gui
+% To install plugins from the command line, type in
+%
+% plugin_askinstall('xxxxxx', [], true); % with xxxx being the name of the plugin
+%
+% Usage: plugin_menu(PLUGINLIST); % pop up gui
 
 % Copyright (C) 2019 Arnaud Delorme
 %
@@ -35,13 +39,14 @@ FONTSIZE = 0; % set to 4 for high-res screen
 
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
-plugin = plugin_getweb('', pluginlist, 'newlist');
+plugin = plugin_getweb('plugin_check', pluginlist);
 if isempty(plugin)           
-           errordlg2(['The Java version that Matlab uses does not allow the EEGLAB plugin manager' char(10)...
-               'to function properly. We suggest you update the Java version that Matlab uses.' char(10)...
-               'For more information see: https://github.com/sccn/eeglab/issues/20']);
+    errordlg2(['Either you are offline, a firewall is blocking EEGLAB from accessing its' char(10) ...
+        'plugin server or there is a problem with Java. For Java problems, refer to' char(10) ...
+        'https://github.com/sccn/eeglab/issues/20']);
     return;
 end
+
 % sort plugins by download score
 [~,scoreOrder] = sort([ plugin.downloads ], 2, 'descend');
 plugin = plugin(scoreOrder);
@@ -67,10 +72,11 @@ for iRow = 1:length(plugin)
         plugin(iRow).text =  [ plugin(iRow).text ' update available ' ];
     end
     plugin(iRow).text =  [ plugin(iRow).text ' (' int2str(plugin(iRow).downloads) ' downloads' ];
-    if plugin(iRow).numrating
+    if ~isnan(plugin(iRow).numrating) && plugin(iRow).numrating
         plugin(iRow).text =  [ plugin(iRow).text '; ' int2str(plugin(iRow).numrating) ' rating' ];
     end
     plugin(iRow).text =  [ plugin(iRow).text ')</b></font></font></html>' ];
+    plugin(iRow).strsearch = lower([ plugin(iRow).name plugin(iRow).rawtags plugin(iRow).description ]);  
 end
 
 %cb_select = 'tmpobj = get(gcbf, ''userdata''); tmpstr = tmpobj(get(gcbo, ''value'')).longdescription; tmpstr = textwrap(findobj(gcbf, ''tag'', ''description''), {tmpstr}); set(findobj(gcbf, ''tag'', ''description''), ''string'', tmpstr); clear tmpobj tmpstr;';
@@ -88,11 +94,12 @@ filterList2 = { 'No topic filter' ...
                'Filter by study' ...
                'Filter by time-freq' ...
                'Filter by other' };
-           
+search_icon_path = ['file://' fullfile(fileparts(which('plugin_menu.m')),'search-icon.png')];           
 uilist =  {
-    { 'style', 'text', 'string', 'List of plugins (bolded plugins are installed)' 'fontweight' 'bold' } ...
+    { 'style', 'text', 'string', 'List of plugins (bolded means installed)' 'fontweight' 'bold' } ...
     { 'style', 'popupmenu', 'string', filterList1 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter1' } ...
     { 'style', 'popupmenu', 'string', filterList2 'callback' 'plugin_uifilter(gcbf);' 'tag' 'filter2' } ...
+    { 'style', 'pushbutton', 'string', ['<html><img width=17 height=16 src="' search_icon_path '"> &nbsp; Search</html>'] 'callback' 'plugin_search(gcbf);' 'tag' 'search' 'tooltipstring' 'Enter search term' } ...
     { 'style', 'listbox', 'string', { plugin.text } 'callback' 'plugin_uiupdate(gcbf);' 'Min', 0, 'Max', 2, 'value' [] 'tag', 'pluginlist' 'fontsize', 16, 'tooltipstring', [ 'Bold plugins are installed.' 10 'Red plugins need updating.' 10 '(Wong font size? Change it in plugin_menu.m)' ] } ...
     { 'style', 'pushbutton', 'string', [ 'Rate this plugin' ] 'tag' 'rating' } ...
     { 'style', 'pushbutton', 'string', [ 'Web documentation' ] 'tag' 'documentation' } ...
@@ -108,7 +115,7 @@ uilist =  {
     {} ...
     {} ...
     { 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cc' 'callback', 'close gcbf' } ...
-    { 'Style', 'pushbutton', 'tag', 'remove', 'string', 'Remove', 'callback', 'set(findobj(gcbf, ''tag'', ''install''), ''userdata'', ''remove'');' 'enable' 'off ' } ...
+    { 'Style', 'pushbutton', 'tag', 'rmbut', 'string', 'Remove', 'callback', 'set(findobj(gcbf, ''tag'', ''install''), ''userdata'', ''remove'');' 'enable' 'off ' } ...
     { 'Style', 'pushbutton', 'tag', 'install', 'string', 'Install/Update', 'callback', 'set(gcbo, ''userdata'', ''install'');' 'userdata' 'test' 'enable' 'off' } ...
     };
 
@@ -116,7 +123,7 @@ usrDat.allplugins = plugin;
 usrDat.selectedplugins = plugin;
 usrDat.selection = [];
 fig = figure('visible', 'off');
-supergui('fig', fig, 'uilist', uilist, 'geomhoriz', {[1 0.5 0.5] 1 [1 1 1] [0.2 1] [0.2 1] [0.2 1] 1 1 1 [0.43 0.37 0.4 0.5]}, 'geomvert', [1 10 1 1 1 1 1 2.5 1 1], 'userdata', usrDat);
+supergui('fig', fig, 'uilist', uilist, 'geomhoriz', {[0.9 0.5 0.5 0.5] 1 [1 1 1] [0.2 1] [0.2 1] [0.2 1] 1 1 1 [0.43 0.37 0.4 0.5]}, 'geomvert', [1 10 1 1 1 1 1 2.5 1 1], 'userdata', usrDat);
 %pos = get(fig, 'position');
 %set(fig, 'position', [pos(1) pos(2) pos(3)/841*200 pos(4) ]);
 

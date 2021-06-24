@@ -58,13 +58,10 @@ disp('         IF NOT, THE EXPORTED FILE COORDINATES MAY BE INACURATE')
 
 % get infos from readlocs
 % -----------------------
-[chanformat listcolformat] = readlocs('getinfos');
+[chanformat, listcolformat] = readlocs('getinfos');
 chanformat(end)    = [];
-listcolformat(end) = []; % remove chanedit
-chanformat(end)    = [];
-listcolformat(end) = []; % remove chanedit
 indformat  = [];
-for index = 1:length(chanformat), 
+for index = 1:length(chanformat)
     if ~ischar(chanformat(index).importformat)
         indformat = [ indformat index ];
     end
@@ -76,9 +73,11 @@ formatskip = [ chanformat(indformat).skipline ];
    
 %[listtype formatinfo listcolformat formatskip] = readlocs('getinfoswrite');
 
-listtype{end+1} = 'custom';
-formatinfo{end+1} = {};
-formatskip = [ formatskip 0];
+% GUI support of `custom` filetype, removed until `custom` can pass readlocs() check
+%listtype{end+1} = 'custom';
+%formatinfo{end+1} = {};
+%formatskip = [ formatskip 0];
+
 
 if nargin < 2
    updatefields = [ 'tmpdata = get(gcf, ''userdata'');' ...
@@ -120,7 +119,7 @@ if nargin < 2
                    'catch, end;' ... % catch for custom case
                    'tmpobj = findobj(gcf, ''userdata'', ''setfield'');' ...
                    'if tmpval == ' int2str(length(listtype)) ',' ... % disable if non-custom type
-                   '   set(tmpobj, ''enable'', ''on'');' ...
+                   '   set(tmpobj, ''enable'', ''off'');' ...
                    'else,' ...
                    '   set(tmpobj, ''enable'', ''off'');' ...
                    'end; clear tmpobj tmpobj2 tmpdata tmpval;' ];

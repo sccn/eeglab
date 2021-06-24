@@ -67,7 +67,7 @@
 % 01-25-02 reformated help & license -ad 
 % 02-15-02 propagate ica weight matrix -ad sm jorn 
 
-function [EEG, com] = pop_subcomp( EEG, components, plotag, keepcomp)
+function [EEG, com] = pop_subcomp( EEG, components, plotag, keepflag)
 
 com='';
 if nargin < 1
@@ -77,50 +77,95 @@ end
 if nargin < 3
 	plotag = 0;
 end
-if nargin == 4 && ismember(keepcomp,[1 0]); keep_flag = keepcomp; if isempty(plotag) plotag = 0; end;  else keep_flag = 0; end
+if nargin < 4
+    keepflag = 0;
+end
+
 if nargin < 2
+    components = [];
 	% popup window parameters
 	% -----------------------
-	if ~isempty(EEG.reject.gcompreject)
-        components = find(EEG.reject.gcompreject == 1);
-        components = components(:)';
-        promptstr    = { ['Component(s) to remove from the data ([] = marked comps.)'] };
-        %promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
+    res = 'Manual rej.';
+    if any(cellfun(@(x)any(x.gcompreject), { EEG.reject }))
+        if length(EEG) == 1
+            compStr = sprintf('%d,', find(EEG.reject.gcompreject == 1));
+            msg = sprintf('Components [%s] flaged for rejection.', compStr(1:end-1));
+            res = questdlg2(strvcat(msg, 'Do you want to remove these components?', 'Note: we recommend removing components in STUDY instead'), 'Remove components from data', 'Cancel', 'Manual rej.', 'Yes', 'Cancel');
+        else
+            msg = 'Components flaged for rejection detected in some datasets.';
+            res = questdlg2(strvcat(msg, 'Do you want to remove these components?', 'Note: we recommend removing components in STUDY instead'), 'Remove components from data', 'Cancel', 'Yes', 'Cancel');
+        end
+        if strcmpi(res, 'Cancel')
+            return;
+        end
+        if strcmpi(res, 'Yes')
+            components = '';
+        end
     else
-        components = [];
-        promptstr    = { ['Component(s) to remove from data:'] };
+        if length(EEG) > 1
+            warndlg2(strvcat('You have multiple datasets selected and no components', ...
+                'flagged for rejection. Flag components first.'));
+            return;
+        end
     end
-    uilist    = { { 'style' 'text' 'string' ['Component(s) to remove from data:'] } ...
-                  { 'style' 'edit' 'string' int2str(components) } ...
-                  { 'style' 'text' 'string' 'Component(s) to retain (overwrites "Component(s) to remove")' } ...
-                  { 'style' 'edit' 'string' '' } ...
-                  };
-    geom = { [2 0.7] [2 0.7] };
-	result       = inputgui( 'uilist', uilist, 'geometry', geom, 'helpcom', 'pophelp(''pop_subcomp'')', ...
-                                     'title', 'Remove components from data -- pop_subcomp()');
-	if length(result) == 0 return; end
-	components   = eval( [ '[' result{1} ']' ] );
-    if ~isempty(result{2}), 
-        components   = eval( [ '[' result{2} ']' ] );
-        keep_flag = 1; %components  = setdiff_bc([1:size(EEG.icaweights,1)], components); 
+    
+    if strcmpi(res, 'Manual rej.')
+        if ~isempty(EEG.reject.gcompreject)
+            components = find(EEG.reject.gcompreject == 1);
+            components = components(:)';
+            promptstr    = { ['Component(s) to remove from the data ([] = marked comps.)'] };
+            %promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
+        else
+            components = [];
+            promptstr    = { ['Component(s) to remove from data:'] };
+        end
+        uilist    = { { 'style' 'text' 'string' 'Note: for group level analysis, remove components in STUDY' } ...
+                      { 'style' 'text' 'string' ['List of component(s) to remove from data'] } ...
+                      { 'style' 'edit' 'string' int2str(components) } ...
+                      { 'style' 'text' 'string' 'Or list of component(s) to retain' } ...
+                      { 'style' 'edit' 'string' '' } ...
+                      };
+        geom = { 1 [2 0.7] [2 0.7] };
+        result       = inputgui( 'uilist', uilist, 'geometry', geom, 'helpcom', 'pophelp(''pop_subcomp'')', ...
+                                         'title', 'Remove components from data -- pop_subcomp()');
+        if length(result) == 0 return; end
+        components   = eval( [ '[' result{1} ']' ] );
+        if ~isempty(result{2})
+            components   = eval( [ '[' result{2} ']' ] );
+            keepflag = 1; %components  = setdiff_bc([1:size(EEG.icaweights,1)], components); 
+        end
     end
 end
  
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'params', { components, plotag, keepflag }, 'warning', 'on' );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'params', { components, plotag, keepflag } );
+    end
+    if isempty( components )
+        com = [ com ' % [] or '' means removing components flaged for rejection' ];
+    end
+    return;
+end
+
 if isempty(components)
-	if ~isempty(EEG.reject.gcompreject)
-      		components = find(EEG.reject.gcompreject == 1);
-   	else
-        	fprintf('Warning: no components specified, no rejection performed\n');
-         	return;
-   	end
+    if ~isempty(EEG.reject.gcompreject)
+        components = find(EEG.reject.gcompreject == 1);
+    else
+        fprintf('Warning: no components specified, no rejection performed\n');
+        return;
+    end
 else
-    if keep_flag == 1; components  = setdiff_bc([1:size(EEG.icaweights,1)], components); end
+    if keepflag == 1; components  = setdiff_bc([1:size(EEG.icaweights,1)], components); end
     if (max(components) > size(EEG.icaweights,1)) || min(components) < 1
         error('Component index out of range');
     end
 end
 
-fprintf('Computing projection ....\n');
+fprintf('Computing projection and removing %d components ....\n', length(components));
 component_keep = setdiff_bc(1:size(EEG.icaweights,1), components);
 compproj = EEG.icawinv(:, component_keep)*eeg_getdatact(EEG, 'component', component_keep, 'reshape', '2d');
 compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
@@ -130,8 +175,8 @@ compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
 if nargin < 2 || plotag ~= 0
 
     ButtonName = 'continue';
-    while ~strcmpi(ButtonName, 'Cancel') & ~strcmpi(ButtonName, 'Accept')
-        ButtonName=questdlg2( [ 'Please confirm. Are you sure you want to remove these components?' ], ...
+    while ~strcmpi(ButtonName, 'Cancel') && ~strcmpi(ButtonName, 'Accept')
+        ButtonName=questdlg2( [ 'Please confirm your choice. Are you sure you want to remove the selected components from the data?' ], ...
                              'Confirmation', 'Cancel', 'Plot ERPs', 'Plot single trials', 'Accept', 'Accept');
         if strcmpi(ButtonName, 'Plot ERPs')
             if EEG.trials > 1
@@ -146,12 +191,12 @@ if nargin < 2 || plotag ~= 0
         	eegplot( EEG.data(EEG.icachansind,:,:), 'srate', EEG.srate, 'title', 'Black = channel before rejection; red = after rejection -- eegplot()', ...
             	 'limits', [EEG.xmin EEG.xmax]*1000, 'data2', compproj); 
         end
-    end;    
-    switch ButtonName,
-        case 'Cancel', 
+    end
+    switch ButtonName
+        case 'Cancel'
         	disp('Operation cancelled');
         	return; 
-        case 'Accept',
+        case 'Accept'
        		disp('Components removed');
     end % switch
 end
@@ -165,9 +210,22 @@ EEG.specicaact  = [];
 EEG.specdata    = [];
 EEG.reject      = [];
 
-try,
+if isfield(EEG.etc, 'ic_classification')
+    if isfield(EEG.etc.ic_classification, 'ICLabel') 
+        if isfield(EEG.etc.ic_classification.ICLabel, 'classifications')
+            if ~isempty(EEG.etc.ic_classification.ICLabel.classifications)
+                EEG.etc.ic_classification.ICLabel.classifications = EEG.etc.ic_classification.ICLabel.classifications(goodinds,:);
+            end
+        end
+    end
+end
+
+try
     EEG.dipfit.model = EEG.dipfit.model(goodinds);
 catch, end
 
 com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(components), plotag);
+if isempty( components )
+    com = [ com ' % [] means removing components flaged for rejection' ];
+end
 return;

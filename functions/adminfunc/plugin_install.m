@@ -10,6 +10,10 @@
 %  size        - [real] size of the plugin in Kb
 %  force       - [boolean] force install (even if already installed)
 %
+% Note: To install plugins from the command line, type in
+%
+% plugin_askinstall('xxxxxx', [], true); % with xxxx being the name of the plugin
+%
 % See also: plugin_askinstall()
 
 % Copyright (C) 2012- Arnaud Delorme
@@ -66,8 +70,13 @@ function result = plugin_install(zipfilelink, name, version, pluginsize, forceIn
     end
          
     try
-        plugin_urlread(['http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_increment.php?plugin=' name '&version=' version ]);
-        plugin_urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
+        if exist('OCTAVE_VERSION', 'builtin') == 0
+            plugin_urlread(['http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_increment.php?plugin=' name '&version=' version ]);
+            plugin_urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
+        else
+            urlread(['http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_increment.php?plugin=' name '&version=' version ]);
+            urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
+        end
     catch
         msg = [ 'Could not download extension. Host site might be' 10 ...
                 'unavailable, too slow or you do not have permission' 10 ...

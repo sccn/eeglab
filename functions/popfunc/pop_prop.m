@@ -21,6 +21,9 @@
 %                the spectopo() function. 
 %                For example { 'freqrange' [2 50] }
 % 
+% Note: Type "set(gcf, ''renderer'', ''painter'')" before saving the figure 
+% in postscript (epsc) or jpg format
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
 % See also: pop_runica(), eeglab()
@@ -76,16 +79,31 @@ if nargin == 1
 end
 if typecomp == 0 && isempty(EEG.icaweights)
    error('No ICA weights recorded for this dataset -- first run ICA on it');
-end;   
+end
+chanoristr = '';
 if nargin == 2
-	promptstr    = { fastif(typecomp,'Channel index(ices) to plot:','Component index(ices) to plot:') ...
-                     'Spectral options (see spectopo() help):' };
-	inistr       = { '1' '''freqrange'', [2 50]' };
-	result       = inputdlg2( promptstr, 'Component properties - pop_prop()', 1,  inistr, 'pop_prop');
+    commandchan = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on'', ''selectionmode'', ''single''); set(findobj(gcbf, ''tag'', ''chan''), ''string'',tmpval); clear tmp tmpchanlocs tmpval'; 
+    
+    uitext = { { 'style' 'text' 'string' fastif(typecomp,'Channel index(ices) to plot:','Component index(ices) to plot:') } ...
+               { 'style' 'edit' 'string' '1', 'tag', 'chan' } ...
+               { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(~isempty(EEG(1).chanlocs) && typecomp, 'on', 'off') 'callback' commandchan } ...               
+               { 'style' 'text' 'string' 'Spectral options (see spectopo() help):' } ...
+               { 'style' 'edit' 'string' '''freqrange'', [2 50]' } {} };
+    uigeom = { [2 1 0.5 ] [2 1 0.5] };
+    result = inputgui('geometry', uigeom, 'uilist', uitext, 'helpcom', 'pophelp(''pop_prop'');', ...
+							 'title', fastif( typecomp, 'Channel properties - pop_prop()', 'Component properties - pop_prop()'));
 	if size( result, 1 ) == 0 return; end
    
-	chanorcomp   = eval( [ '[' result{1} ']' ] );
+    chanoristr = result{1};
+    chanorcomp   = eeg_decodechan(EEG.chanlocs, result{1} );
     spec_opt     = eval( [ '{' result{2} '}' ] );
+end
+
+if ischar(chanorcomp)
+    chanoristr = chanorcomp;
+    chanorcomp = eeg_decodechan(EEG.chanlocs, chanorcomp );
+elseif isempty(chanoristr)
+    chanoristr = int2str(chanorcomp);
 end
 
 % plotting several component properties
@@ -101,7 +119,7 @@ end
 
 % should test for > number of components ??? -sm. 
 % yes (max num components is not necessarily same as nbchan). -jri
-if typecomp == 1,
+if typecomp == 1
   maxChanorcomp = EEG.nbchan;
 else
   maxChanorcomp = size(EEG.icaweights, 1);
@@ -109,16 +127,17 @@ end
 
 if chanorcomp < 1 || chanorcomp > maxChanorcomp 
    error('Component index out of range');
-end;  
+end 
 
 % assumed input is chanorcomp
 % -------------------------
-try, icadefs; 
-catch, 
+try 
+    icadefs; 
+catch
 	BACKCOLOR = [0.8 0.8 0.8];
 	GUIBUTTONCOLOR   = [0.8 0.8 0.8]; 
 end
-basename = [fastif(typecomp,'Channel ', 'Component ') int2str(chanorcomp) ];
+basename = [fastif(typecomp,'Channel ', 'Component ') chanoristr ];
 
 fhandle = figure('name', ['pop_prop() - ' basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
 pos     = get(fhandle,'Position');
@@ -146,7 +165,7 @@ if isfield(EEG.chanlocs, 'theta')
 else
     axis(h,'off');
 end
-basename = [fastif(typecomp,'Channel ', 'IC') int2str(chanorcomp) ];
+basename = [fastif(typecomp,'Channel ', 'IC') chanoristr ];
 % title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
 title(basename, 'fontsize', 14);
 
@@ -216,7 +235,7 @@ else
             text(0.1, 0.3, [ 'No erpimage plotted' 10 'for small continuous data']);
     end
     axes(hhh);
-end;	
+end
 
 % plotting spectrum
 % -----------------
@@ -232,13 +251,13 @@ end
 try
 	eeglab_options; 
 	if typecomp == 1
-		[spectra freqs] = spectopo( EEG.data(chanorcomp,:), EEG.pnts, EEG.srate, spec_opt{:} );
+		[spectra, freqs] = spectopo( EEG.data(chanorcomp,:), EEG.pnts, EEG.srate, spec_opt{:} );
 	else 
 		if option_computeica  
-			[spectra freqs] = spectopo( EEG.icaact(chanorcomp,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chanorcomp), spec_opt{:} );
+			[spectra, freqs] = spectopo( EEG.icaact(chanorcomp,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chanorcomp), spec_opt{:} );
         else
     		icaacttmp = (EEG.icaweights(chanorcomp,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts); 
-			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chanorcomp), spec_opt{:} );
+			[spectra, freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chanorcomp), spec_opt{:} );
 		end
 	end
     % set up new limits
@@ -258,7 +277,7 @@ catch err
     text(0.1, 0.3, [ 'Error: no spectrum plotted' 10 err.message 10]);
 %     lasterror
 % 	text(0.1, 0.3, [ 'Error: no spectrum plotted' 10 ' make sure you have the ' 10 'signal processing toolbox']);
-end;	
+end
 	
 % display buttons
 % ---------------
@@ -309,7 +328,7 @@ if ishandle(winhandle)
                 sprintf('if tmpstatus set(findobj(''Tag'', ''%s''), ''backgroundcolor'', %s); else set(findobj(''Tag'',''%s''), ''backgroundcolor'', %s); end;', ...
                 winhandle.Tag, COLREJ, winhandle.Tag, COLACC)];
         end
-	end;				
+    end			
 	command = [ command 'close(gcf); clear tmpstatus' ];
 	h  = uicontrol(fhandle, 'Style', 'pushbutton', 'string', 'OK', 'backgroundcolor', GUIBUTTONCOLOR, 'Units','Normalized', 'Position',[90 -10 15 6].*s+q, 'callback', command);
 
@@ -354,6 +373,8 @@ if ishandle(winhandle)
 else
 	com = sprintf('pop_prop( EEG, %d, %d, NaN, %s);', typecomp, chanorcomp, vararg2str( { spec_opt } ) );
 end
+disp('Note: Type "set(gcf, ''renderer'', ''painter'')" before saving the figure in postscript (epsc) or jpg format');
+
 
 return;
 
@@ -405,7 +426,7 @@ val=abs(val);
 if val>=1
     ord=1;
     val=floor(val/10);
-    while val>=1,
+    while val>=1
         ord=ord*10;
         val=floor(val/10);
     end
@@ -413,7 +434,7 @@ if val>=1
 else
     ord=1/10;
     val=val*10;
-    while val<1,
+    while val<1
         ord=ord/10;
         val=val*10;
     end

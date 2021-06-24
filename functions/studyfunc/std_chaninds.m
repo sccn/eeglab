@@ -64,5 +64,8 @@ function finalinds = std_chaninds(instruct, channames);
             chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
             if isempty(chanind), warning(sprintf([ 'Channel "%s" and maybe others was not' 10 'found in pre-computed data file' ], channames{c})); end
         end
+        if length(chanind) > 1
+            error(sprintf('Duplicate channel label %s - fix the issue and try again', channames{c}));
+        end
         finalinds   = [ finalinds chanind ];
     end
