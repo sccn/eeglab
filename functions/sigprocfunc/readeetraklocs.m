@@ -77,7 +77,7 @@ function chanlocs = readeetraklocs( filename )
     else
         positions = locs(indpos+1:indlabels-1,1:3);
     end
-    labels    = locs(indlabels+1,:);
+    labels    = locs(indlabels+1:end,:);
         
     % create structure
     % ----------------
