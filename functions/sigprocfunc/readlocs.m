@@ -453,7 +453,7 @@ if ischar(filename)
        % --------------
        if isempty(g.skiplines), g.skiplines = 0; end
        if strcmpi(g.filetype, 'chanedit')
-           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines);
+           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines, 'blankcell', 'off');
        else
            array = load_file_or_array( filename, g.skiplines);
        end
