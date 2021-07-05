@@ -310,7 +310,9 @@ for iSubj = 1:nb_subjects
         inds  = intersect(inds1, inds2);
         if ~isempty(inds)
             % record allows unbalance in the number of sessions - reuse for contrasts
-            order{iSubj}(iSess) = str2num(allSessions{inds});
+            if length(inds) == 1
+                order{iSubj}(iSess) = str2num(allSessions{inds});
+            end
             
             % make file-up
             [~,subname] = fileparts(STUDY.datasetinfo(index).filename);
