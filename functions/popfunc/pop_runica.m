@@ -286,23 +286,43 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
             rmind = [];
             % if we have different sessions they will not be concatenated
             for tmpi = setdiff_bc(allinds,index)'
-                if ~isequal(allsessions(index), allsessions(tmpi)), rmind = [rmind tmpi];
+                if ~isequal(allsessions(index), allsessions(tmpi))
+                    rmind = [rmind tmpi];
                 end
             end
             allinds = setdiff_bc(allinds, rmind);
-            fprintf('Found %d datasets for subject ''%s''\n', length(allinds), allsubjects{index});
+            fprintf('Found %d datasets for subject ''%s'' session %d\n', length(allinds), allsubjects{index}, allsessions{index});
             dats = { dats{:} allinds };
             alltags(allinds) = 1;
         end
     end
     fprintf('**************************\nNOW RUNNING ALL DECOMPOSITIONS\n****************************\n');
-    for index = 1:length(dats)
-        ALLEEG(dats{index}) = pop_runica(ALLEEG(dats{index}), 'icatype', g.icatype, ...
-            'options', g.options, 'chanind', g.chanind, 'concatenate', 'on');
-        for idat = 1:length(dats{index})
-            ALLEEG(dats{index}(idat)).saved = 'no';
-            pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
-            ALLEEG(dats{index}(idat)).saved = 'yes';
+    eeglab_options;
+    if option_parallel
+        for index = 1:length(dats)
+            TMPEEG{index} = ALLEEG(dats{index});
+        end
+        parfor index = 1:length(dats)
+            TMPEEG{index} = pop_runica(TMPEEG{index}, 'icatype', g.icatype, ...
+                'options', g.options, 'chanind', g.chanind, 'concatenate', 'on');
+        end
+        for index = 1:length(dats)
+            ALLEEG(dats{index}) = TMPEEG{index};
+            for idat = 1:length(dats{index})
+                ALLEEG(dats{index}(idat)).saved = 'no';
+                pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
+                ALLEEG(dats{index}(idat)).saved = 'yes';
+            end
+        end
+    else
+        for index = 1:length(dats)
+            ALLEEG(dats{index}) = pop_runica(ALLEEG(dats{index}), 'icatype', g.icatype, ...
+                'options', g.options, 'chanind', g.chanind, 'concatenate', 'on');
+            for idat = 1:length(dats{index})
+                ALLEEG(dats{index}(idat)).saved = 'no';
+                pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
+                ALLEEG(dats{index}(idat)).saved = 'yes';
+            end
         end
     end
     com = sprintf('EEG = pop_runica(EEG, %s);', ...
@@ -396,7 +416,7 @@ end
 % compute ICA on a definite set
 % -----------------------------
 tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
-tmprank = getrank(double(tmpdata(:,1:min(3000, size(tmpdata,2)))));
+tmprank = getrank(double(tmpdata(:,1:min(3000, size(tmpdata,2)))), pca_opt);
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
 if ~strcmpi(g.icatype, 'binica')
     try
@@ -472,8 +492,10 @@ switch lower(g.icatype)
          options2 = g.options;
          if pca_opt
              if g.options{pca_ind+1} < 0
+                 fprintf('Decreasing data dimension from %d to %d using PCA...\n', size(tmpdata,1), size(tmpdata,1)+g.options{pca_ind+1});
                  [tmpdata,eigvec] = runpca(tmpdata, size(tmpdata,1)+g.options{pca_ind+1});
              else
+                 fprintf('Decreasing data dimension from %d to %d using PCA...\n', size(tmpdata,1), g.options{pca_ind+1});
                  [tmpdata,eigvec] = runpca(tmpdata, g.options{pca_ind+1});
              end
              options2(pca_ind:pca_ind+1) = [];
@@ -580,7 +602,7 @@ end
 
 return;
 
-function tmprank2 = getrank(tmpdata)
+function tmprank2 = getrank(tmpdata, pca_opt)
     
     tmprank = rank(tmpdata);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -591,7 +613,9 @@ function tmprank2 = getrank(tmpdata)
     rankTolerance = 1e-7;
     tmprank2=sum (diag (D) > rankTolerance);
     if tmprank ~= tmprank2
-        fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab\n', tmprank, tmprank2);
+        if pca_opt ~= 0
+            fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab\n', tmprank, tmprank2);
+        end
         tmprank2 = max(tmprank, tmprank2);
     end
             

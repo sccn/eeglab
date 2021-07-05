@@ -303,26 +303,7 @@ eeglab_options;
 usesingle = option_single;
 
 disp('Computing time/frequency decomposition...');
-
-% CHANGE THE LINE BELOW TO PARFOR TO USE THE PARALLEL TOOLBOX
-% numWorkers = 0;
-% try
-%     if strcmpi(g.parallel, 'on') && ~exist('parpool') && exist('gcp')
-%         poolobj = gcp('nocreate');
-%         if ~isempty(poolobj)
-%             numWorkers = poolobj.NumWorkers;
-%         end
-%     elseif strcmpi(g.parallel, 'on')
-%         try
-%             myCluster = parcluster('local');
-%             numWorkers = myCluster.NumWorkers;
-%         catch, disp('Cound not start parallel job; ERSP will still be computed'); end
-%     end
-% catch
-%     g.parallel = 'off';
-% end
-%parfor (k = 1:length(g.indices),numWorkers)  % for each (specified) component/channel
-for k = 1:length(g.indices)
+parfor k = 1:length(g.indices)
     tmpparams = parameters;
     if length(g.indices) > 1
         tmpparams{end+1} = 'verbose';

@@ -497,5 +497,8 @@ else
         end
         filebase{iSess} = fullfile(filepath{iSess}, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
     end
+    if length(unique(filebase)) < length(filebase)
+        filebase = unique(filebase); % order is not important
+    end
 end    
     

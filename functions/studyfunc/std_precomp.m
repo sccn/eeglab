@@ -168,7 +168,7 @@ if ischar(g), error(g); end
 if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end
 if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end
 if strcmpi(g.bids, 'on'), fileSuffix = [ '_' STUDY.task ]; else fileSuffix = ''; end
-    
+
 % union of all channel structures
 % -------------------------------
 computewhat = 'channels';
@@ -227,10 +227,24 @@ allSessions(cellfun(@isempty, allSessions)) = { 1 };
 allSessions = cellfun(@num2str, allSessions, 'uniformoutput', false);
 uniqueSessions = unique(allSessions);
 
+% handle parallelization
+% ----------------------
+eeglab_options;
+if ~option_parallel
+    delete(gcp('nocreate'));
+    ps = parallel.Settings;
+    parstatus = ps.Pool.AutoCreate;
+    ps.Pool.AutoCreate = false;
+else
+    ps = parallel.Settings;
+    parstatus = ps.Pool.AutoCreate;
+    ps.Pool.AutoCreate = true;
+end    
+
 % compute custom measure
 % ----------------------
 if ~isempty(g.customfunc)
-    for iSubj = 1:length(uniqueSubjects)
+    parfor iSubj = 1:length(uniqueSubjects)
         for iSess = 1:length(uniqueSessions)
             inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
             inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
@@ -249,7 +263,7 @@ if ~isempty(g.customfunc)
                     if length(inds)>1 && ~isequal(chanlist{inds})
                         error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                     end
-                    std_custom(ALLEEG(inds), g.customfunc, 'components', chanlist{inds(1)}, customparams{:});
+                    std_custom(ALLEEG(inds), g.customfunc, 'components', chanlist{inds(1)}, g.customparams{:});
                 end
             end
         end
@@ -269,7 +283,7 @@ if strcmpi(g.erp, 'on')
 %         error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
 %     end
     
-    for iSubj = 1:length(uniqueSubjects)
+    parfor iSubj = 1:length(uniqueSubjects)
         
         for iSess = 1:length(uniqueSessions)
             inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
@@ -304,7 +318,7 @@ end
 % ----------------
 if strcmpi(g.spec, 'on')
     
-    for iSubj = 1:length(uniqueSubjects)
+    parfor iSubj = 1:length(uniqueSubjects)
         
         for iSess = 1:length(uniqueSessions)
             inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
@@ -327,11 +341,12 @@ if strcmpi(g.spec, 'on')
                     std_spec(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:}, g.specparams{:});
                 end
             end
-            if isfield(curstruct, 'specdata')
-                curstruct = rmfield(curstruct, 'specdata');
-                curstruct = rmfield(curstruct, 'specfreqs');
-            end
         end
+    end
+    
+    if isfield(curstruct, 'specdata')
+        curstruct = rmfield(curstruct, 'specdata');
+        curstruct = rmfield(curstruct, 'specfreqs');
     end
 end
 % compute spectrum
@@ -408,7 +423,7 @@ if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
         tmpparams(2,:) = struct2cell(g.erspparams);
     end
     
-    for iSubj = 1:length(uniqueSubjects)
+    for iSubj = 1:length(uniqueSubjects) % parfor inside function
         for iSess = 1:length(uniqueSessions)
             inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
             filepath = STUDY.datasetinfo(inds(1)).filepath;
@@ -441,6 +456,10 @@ if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
     end
     
 end
+
+% set back default parallelization
+% ----------------------
+ps.Pool.AutoCreate = parstatus;
 
 % compute component scalp maps
 % ----------------------------
