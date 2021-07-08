@@ -386,6 +386,7 @@ if nargin < 1 || exist('EEG') ~= 1
         disp('Warning: screen color depth too low, some colors will be inaccurate in time-frequency plots');
     end
 end
+if isempty(CURRENTSTUDY) CURRENTSTUDY = 0; end
 
 versL = ~option_allmenus;
 if nargin == 1

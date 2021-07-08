@@ -155,7 +155,7 @@ if ~isempty(limoChanlocs)
     if ~strcmpi(opt.ow_chanlocfile,'no') % empty or yes
         opt.ow_chanlocfile = questdlg2('channel location file found, do you want to overwrite','overwrite?','yes','no','no');
     end
-    
+
     if isempty(opt.ow_chanlocfile) || strcmpi(opt.ow_chanlocfile,'no')
         skip_chanlocs = 1;
     end
@@ -206,7 +206,7 @@ if skip_chanlocs == 0
             if  ~isfield(STUDY.etc,'statistic')
                 STUDY = pop_statparams(STUDY, 'default');
             end
-            
+
             try
                 [~,~,limoChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
                 chanlocname = 'limo_gp_level_chanlocs.mat';
@@ -326,13 +326,13 @@ for iSubj = 1:nb_subjects
             else
                 warning('No filename in ALLEEG, pulling data blindly from STUDY')
             end
-            
+
             if strcmp(subname(1:4),'sub-')
                 filename = [subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
             else
                 filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
             end
-            
+
             % Creating fields for limo
             % ------------------------
             fprintf('pulling trials for %s ... \n',filename)
@@ -340,14 +340,14 @@ for iSubj = 1:nb_subjects
             ALLEEG                     = eeg_store(ALLEEG, EEGTMP, index);
             file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
             model.set_files{index}     = fullfile(file_fullpath , filename);
-            
+
             OUTEEG = [];
             if all([ALLEEG(index).trials] == 1)
                 OUTEEG.trials = 1;
             else
                 OUTEEG.trials = sum([ALLEEG(index).trials]);
             end
-            
+
             filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
             OUTEEG.filepath            = filepath_tmp;
             OUTEEG.filename            = filename;
@@ -364,10 +364,10 @@ for iSubj = 1:nb_subjects
             else
                 OUTEEG.chanlocs        = ALLEEG(index).chanlocs;
             end
-            
+
             % update EEG.etc
             OUTEEG.etc.merged{1}       = ALLEEG(index).filename;
-            
+
             % Def fields
             OUTEEG.etc.datafiles.daterp   = [];
             OUTEEG.etc.datafiles.datspec  = [];
@@ -379,7 +379,7 @@ for iSubj = 1:nb_subjects
             OUTEEG.etc.datafiles.icaersp  = [];
             OUTEEG.etc.datafiles.icatimef = [];
             OUTEEG.etc.datafiles.icaitc   = [];
-            
+
             % Filling fields
             single_trials_filename = EEGTMP.etc.datafiles.(opt.measureori);
             if exist(single_trials_filename,'file')
@@ -403,12 +403,12 @@ for iSubj = 1:nb_subjects
                     OUTEEG.etc.datafiles.dattimef = single_trials_filename;
                 end
             end
-            
+
             % Save info
             EEG = OUTEEG;
             save('-mat', fullfile( filepath_tmp, OUTEEG.filename), 'EEG');
             clear OUTEEG filepath_tmp
-            
+
             % generate data files
             % -------------------
             fprintf('making up statistical model for %s ... \n',filename)
@@ -423,7 +423,7 @@ for iSubj = 1:nb_subjects
                 contMat    = cell2mat(splitreg);
                 opt.zscore = 0; % regressors are now zscored
             end
-            
+
             % copy results
             model.cat_files{index}                 = catMat;
             model.cont_files{index}                = contMat;
@@ -455,7 +455,7 @@ if ~isempty(factors) && isfield(factors, 'value') && ...
         for n=length(factors):-1:1
             factor_names{n} = factors(n).value;
         end
-        
+
         index = find(arrayfun(@(x) ~strcmpi(x.label,'group'),STUDY.design(opt.design).variable)); % which one is not group
         for c=1:length(STUDY.design(opt.design).variable(index).value)
             limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable(index).value{c}));
@@ -484,7 +484,7 @@ if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     end
     model.defaults.start    = max(vs);
     model.defaults.end      = min(ve);
-    
+
     if length(opt.timelim) == 2 && opt.timelim(1) < opt.timelim(end)
         % start value
         if opt.timelim(1) < model.defaults.start
@@ -501,9 +501,9 @@ if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     end
     model.defaults.lowf  = [];
     model.defaults.highf = [];
-    
+
 elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
-    
+
     model.defaults.analysis= 'Frequency';
     if length(opt.freqlim) == 2
         model.defaults.lowf    = opt.freqlim(1);
@@ -513,7 +513,7 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     end
     model.defaults.start    = [];
     model.defaults.end      = [];
-    
+
 elseif strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
     model.defaults.analysis = 'Time-Frequency';
     for s=nb_subjects:-1:1
@@ -524,7 +524,7 @@ elseif strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
     model.defaults.end      = min(ve);
     model.defaults.lowf     = [];
     model.defaults.highf    = [];
-    
+
     if length(opt.timelim) == 2
         model.defaults.start    = opt.timelim(1);
         model.defaults.end      = opt.timelim(2);
@@ -579,7 +579,7 @@ for s = 1:nb_subjects
         contrast_session{s} = filesout;
         clear filesout
     end
-    
+
     if s<nb_subjects-1
         index = [1:length(find(order{s+1}))] + index(end); %#ok<NBRAK>
     end
@@ -674,11 +674,11 @@ for i = 1:nit
     else
         pathtmp = filepath;
     end
-    
+
     if strfind(pathtmp(end),filesep) %#ok<STRIFCND>
         pathtmp = pathtmp(1:end-1);
     end % Getting rid of filesep at the end
-    
+
     if ~isempty(strfind(pathtmp(1:2),['.' filesep])) || ...
             (isunix && pathtmp(1) ~= '/') || (ispc && pathtmp(2) ~= ':') %#ok<STREMP>
         if iscell(filepath)
