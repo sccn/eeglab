@@ -860,7 +860,11 @@ if strcmpi(interrupt, 'on')
     setappdata(gcf, 'run', 1);
     
     if strcmpi(interrupt, 'on')
-        drawnow;
+        try
+            drawnow limitrate;
+        catch
+            drawnow;
+        end
     end
 end
 
@@ -872,7 +876,11 @@ if biasflag && extended
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
-                drawnow;
+                try
+                    drawnow limitrate;
+                catch
+                    drawnow;
+                end
                 flag = getappdata(fig, 'run');
                 if ~flag,
                     if ~isempty(fid), fclose(fid); end
@@ -1044,7 +1052,11 @@ if biasflag && ~extended
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
-                drawnow;
+                try
+                    drawnow limitrate;
+                catch
+                    drawnow;
+                end
                 flag = getappdata(fig, 'run');
                 if ~flag,
                     if ~isempty(fid), fclose(fid); end
@@ -1164,7 +1176,11 @@ if ~biasflag && extended
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
-                drawnow;
+                try
+                    drawnow limitrate;
+                catch
+                    drawnow;
+                end
                 flag = getappdata(fig, 'run');
                 if ~flag,
                     if ~isempty(fid), fclose(fid); end
@@ -1331,7 +1347,11 @@ if ~biasflag && ~extended
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
-                drawnow;
+                try
+                    drawnow limitrate;
+                catch
+                    drawnow;
+                end
                 flag = getappdata(fig, 'run');
                 if ~flag,
                     if ~isempty(fid), fclose(fid); end
