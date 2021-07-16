@@ -344,8 +344,8 @@ if ischar(filename)
 	% --------------------
    if strcmpi(g.filetype, 'autodetect'), g.filetype = ''; end
    g.filetype = strtok(g.filetype);
-   periods = find(filename == '.');
-   fileextension = filename(periods(end)+1:end);
+   [~,~,fileextension] = fileparts(filename);
+   fileextension = fileextension(2:end);
    g.filetype = lower(g.filetype);
    if isempty(g.filetype)
        switch lower(fileextension)
@@ -415,6 +415,7 @@ if ischar(filename)
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
        if isfield(eloc, 'type')
            for index = 1:length(eloc)
+               eloc(index).labels = strtrim(eloc(index).labels);
                type = eloc(index).type;
                if type == 69,     eloc(index).type = 'EEG';
                elseif type == 88, eloc(index).type = 'REF';
@@ -485,8 +486,8 @@ if ischar(filename)
        % removing comments and empty lines
        % ---------------------------------
        indexbeg = 1;
-       while isempty(array{indexbeg,1}) | ...
-               (ischar(array{indexbeg,1}) & array{indexbeg,1}(1) == '%' )
+       while isempty(array{indexbeg,1}) || ...
+               (ischar(array{indexbeg,1}) && array{indexbeg,1}(1) == '%' )
            indexbeg = indexbeg+1;
        end
        array = array(indexbeg:end,:);
@@ -494,7 +495,7 @@ if ischar(filename)
        % converting file
        % ---------------
        for indexcol = 1:min(size(array,2), length(g.format))
-           [str mult] = checkformat(g.format{indexcol});
+           [str, mult] = checkformat(g.format{indexcol});
            for indexrow = 1:size( array, 1)
                if mult ~= 1
                    eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
@@ -544,7 +545,7 @@ if ischar(filename)
 
        % converting XYZ coordinates to polar
        % -----------------------------------
-   elseif isfield(eloc, 'sph_theta')
+   elseif isfield(eloc, 'sph_theta') && any(~cellfun(@isempty, { eloc.sph_theta }))
        try
            eloc = convertlocs(eloc, 'sph2all');  
        catch, disp('Warning: coordinate conversion failed'); end
