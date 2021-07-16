@@ -179,7 +179,7 @@ for iSubj = 1:length(subjectList)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
         polList     = [];
-        if size(STUDY.cluster(opt.clusters).sets,2) ~= length(datasetInds)
+        if size(STUDY.cluster(opt.clusters).sets,1) ~= length(datasetInds)
             error('Cannot process components from different ICA decomposition of the same subjects'); % sometimes different sessions
         end            
         if isempty(opt.component)
