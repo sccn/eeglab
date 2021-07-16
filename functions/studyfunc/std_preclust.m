@@ -251,16 +251,16 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             
             % select ica component ERPs
             % -------------------------
-            case 'erp',
-                [STUDY data, datatime] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'datatype', 'erp', 'componentpol', 'off');
+            case 'erp'
+                [STUDY, data, datatime] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'datatype', 'erp', 'componentpol', 'off');
                 % Filtering data to be plotted
                 if ~isempty(erpfilter), data = {myfilt(data{:}, 1000/(datatime(2)-datatime(1)), 0, erpfilter)}; end;       
                 data = data{1}';
                 
             % select ica component spectrum
             % -----------------------------
-            case 'spec',
-                [STUDY data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'freqrange', freqrange, 'datatype', 'spec', 'componentpol', 'off');
+            case 'spec'
+                [STUDY, data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'freqrange', freqrange, 'datatype', 'spec', 'componentpol', 'off');
                 data = data{1}';
                 
             % select ica scalp maps
@@ -288,7 +288,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
                                     && any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
                                 % find the leftmost dipole
-                                [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
+                                [~, ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
                             elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:))
                                 ldip = 2; % the leftmost dipole is the only one that exists
                             end
@@ -317,7 +317,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
                                     && any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
                                 % find the leftmost dipole
-                                [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
+                                [~, ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
                             elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:))
                                 ldip = 2; % the leftmost dipole is the only one that exists
                             end
@@ -337,23 +337,23 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             % cluster on ica ersp / itc values
             % --------------------------------
             case  {'ersp', 'itc' }
-                [STUDY data] = std_readersp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'freqrange', freqrange, 'measure', strcom);
+                [STUDY, data] = std_readersp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'freqrange', freqrange, 'measure', strcom);
                 data = reshape(data{1}, [size(data{1},1)*size(data{1},2) size(data{1},3)])';
                 
         end
 
         % adjust number of PCA values
         % ---------------------------
-        if isnan(npca), npca = 5; end; % default number of components
+        if isnan(npca), npca = 5; end % default number of components
         if npca >= size(data,2)
             % no need to run PCA, just copy the data.
             % But still run it to "normalize" coordinates
             % --------------------------------------
             npca = size(data,2);
-        end;        
+        end
         if npca >= size(data,1) % cannot be more than the number of components
             npca = size(data,1);            
-        end;        
+        end
         if ~strcmp(strcom, 'dipoles')
             fprintf('PCA dimension reduction to %d for command ''%s'' (normalize:%s; weight:%d)\n', ...
                 npca, strcom, fastif(norm, 'on', 'off'), weight);
@@ -368,10 +368,10 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             case {'ersp','itc'}
                 dsflag = 1;
                 while dsflag
-                    try,
+                    try
                         clustdatatmp = runpca( double(data.'), npca, 1);
                         dsflag = 0;
-                    catch,
+                    catch
                         % downsample frequency by 2 and times by 2
                         % ----------------------------------------
                         data = data(:,1:2:end);
@@ -460,7 +460,7 @@ function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
     end
 
 % the function below checks the precense of the centroid field
-function cluster = checkcentroidfield(cluster, varargin);
+function cluster = checkcentroidfield(cluster, varargin)
     for kk = 1:length(cluster)
         if ~isfield('centroid', cluster(kk)), cluster(kk).centroid = []; end
         for vi = 1:length(varargin)
@@ -472,7 +472,7 @@ function cluster = checkcentroidfield(cluster, varargin);
     
     % rapid filtering for ERP (from std_plotcurve)
 % -----------------------
-function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass);
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass)
 if ischar(highpass)
     highpass = str2num(highpass);
 end

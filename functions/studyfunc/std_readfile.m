@@ -272,7 +272,7 @@ end
 
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
 if isempty(opt.designvar)
-    [ measureData, events ] = getfiledata(fileData, NaN, options{:}); % read all data
+    [ measureData, events ] = getfiledata(fileData, NaN, v6Flag, options{:}); % read all data
     measureData = { measureData };
     events      = { events };
 else
