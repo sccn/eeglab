@@ -8,7 +8,7 @@
 %                   on slices of the Montreal Neurological Institute (MNI) mean 
 %                   MR brain image ('standard_BESA/avg152t1.mat'). Calls
 %                   dipplot(), 
-%                   mri3dplot(), and Fieldtrip function find_inside_vol(). 
+%                   mri3dplot(), and Fieldtrip function ft_inside_headmodel(). 
 % Usage:
 %               >> [dens3d mri] = dipoledensity( dipoles, 'key',val, ... );
 %
@@ -82,7 +82,7 @@
 % ------------------------------------
 %
 % See also:
-%           EEGLAB: dipplot(), mri3dplot(), Fieldtrip: find_inside_vol() 
+%           EEGLAB: dipplot(), mri3dplot(), Fieldtrip: ft_inside_headmodel() 
 %
 % Authors: Arnaud Delorme & Scott Makeig SCCN, INC, UCSD
 % Modified by: Makoto Miyakoshi
@@ -326,7 +326,8 @@ if ~exist(g.volmesh_fname)
     tmppath = which('ft_electroderealign');
     tmppath = fullfile(fileparts(tmppath), 'private');
     cd(tmppath);
-    [Inside Outside] = find_inside_vol(allpoints', tmp.vol); % from Fieldtrip 
+    inside = ft_inside_headmodel(allpoints', tmp.vol);
+    Inside = find(inside); Outside = find(~inside);
     cd(olddir);
     disp('Done.');
     
@@ -486,15 +487,3 @@ else
     mri3dplot( prob3d, g.mri, g.plotargs{:}); % plot the density using mri3dplot()
 end
 return;
-
-%%
-function [inside, outside] = find_inside_vol(pos, vol);
-
-% FIND_INSIDE_VOL locates dipole locations inside/outside the source
-% compartment of a volume conductor model.
-
-warning('find_inside_vol is obsolete and will be removed, please use ft_inside_vol');
-inside  = ft_inside_vol(pos, vol);
-% replace boolean vector with indexing vectors
-outside = find(~inside);
-inside  = find(inside);
