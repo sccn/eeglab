@@ -150,6 +150,8 @@
 
 function varargout = eeglab( onearg )
 
+persistent warningShowed;
+
 ver = version;
 if strcmpi(ver, '9.4.0.813654 (R2018a)')
     disp('Link to install <a href="https://www.mathworks.com/downloads/web_downloads/download_update?release=R2018a&s_tid=ebrg_R2018a_2_1757132">2018a Update 2</a>');
@@ -158,6 +160,18 @@ end
 
 if nargout > 0
     varargout = { [] [] 0 {} [] };
+end
+
+% Warning if in toolbox folder
+% ----------------------------
+if isempty(warningShowed)
+    filterPath = fileparts(fileparts(fileparts(which('filter'))));
+    eeglabPath = fileparts(fileparts(which('eeglab')));
+    if ~isempty(strfind(filterPath, eeglabPath))
+        fprintf(2, 'Warning: EEGLAB is in the MATLAB toolbox folder which is not recommended\n');
+        fprintf(2, '         You may experience errors if a plugin overloads a MATLAB function\n');
+    end    
+    warningShowed = true;
 end
 
 % check Matlab version
