@@ -57,6 +57,9 @@ if isempty(eeglabVersionUpdate)
     warning(stateWarning.state, 'backtrace');
     return
 end
+if length(eeglabVersionUpdate) > 1
+    eeglabVersionUpdate = eeglabVersionUpdate(1);
+end
 
 %% automatic update
 eeglabVersionNumber = eeg_getversion;
