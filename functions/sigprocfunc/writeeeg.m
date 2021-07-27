@@ -230,8 +230,9 @@ HDR.SampleRate = srate;
 HDR.Dur = HDR.SPR/HDR.SampleRate;
 
 % define datatypes and scaling factors
-HDR.PhysMax = max(x, [], 2);
-HDR.PhysMin = min(x, [], 2);
+HDR.PhysMax = repmat(max(x(:)), [size(x,1),1]); % #246, unify resolution across channels
+HDR.PhysMin = repmat(min(x(:)), [size(x,1),1]);
+
 if strcmp(HDR.TYPE, 'GDF')
     HDR.GDFTYP = 16*ones(1,HDR.NS);  % float32
     HDR.DigMax  = ones(HDR.NS,1)*100;  % FIXME: What are the correct values for float32?
