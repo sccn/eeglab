@@ -88,7 +88,14 @@ clear DAT;
 % catch,
 %     pack;
 %     EEG.data            = EEG.data';
-% end;    
+% end;
+
+% PhysMin & PhysMax for writeeeg.m
+if isfield(dat,'PhysMax') && isfield(dat,'PhysMin')
+   EEG.etc.PhysMax = dat.PhysMax(dat.InChanSelect);
+   EEG.etc.PhysMin = dat.PhysMin(dat.InChanSelect);
+end
+
 EEG.setname 		= sprintf('%s file', dat.TYPE);
 EEG.comments        = [ 'Original file: ' dat.FileName ];
 EEG.xmin            = 0;
