@@ -101,7 +101,7 @@ if ischar(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || ...
     opt.design   = varargin{2};
     opt.ow_chanlocfile = 'no';  % if chanloc file exist, do not overwrite
     opt.erase          = 'on';  % erase previous folders/file with the same name
-    opt.method         = 'WSL'; % weighted least squares by default
+    opt.method         = 'WLS'; % weighted least squares by default
     opt.zscore         = 1;     % zscore regressors
 else
     opt = finputcheck( varargin, ...
