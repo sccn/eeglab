@@ -58,7 +58,9 @@ function [EEG, command] = pop_fileio(filename, varargin)
 EEG = [];
 command = '';
 
-if ~plugin_askinstall('Fileio', 'ft_read_data'), return; end
+if exist('plugin_askinstall')
+    if ~plugin_askinstall('Fileio', 'ft_read_data'), return; end
+end
 
 alldata = [];
 event   = [];
