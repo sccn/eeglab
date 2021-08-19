@@ -1,11 +1,13 @@
 % fieldtrip2eeglab - convert Fieldtrip structures to EEGLAB dataset
 %
-% EEG = fieldtrip2eeglab(header, data, evt);
+% EEG = fieldtrip2eeglab(header, rawdata, evt);
+% EEG = fieldtrip2eeglab(data);
 %
 % Inputs:
 %    header   - Fieldtrip data header 
-%    data     - Fieldtrip raw data
+%    rawdata  - Fieldtrip raw data
 %    evt      - Fieldtrip event structure (optional)
+%    data     - Fieldtrip data out of ft_preprocessing
 %
 % Output:
 %    EEG     - EEGLAB structure
@@ -45,4 +47,20 @@ if nargin < 3
     evt = [];
 end
 
-EEG = pop_fileio(header, data, evt);
+if nargin >= 2
+    EEG = pop_fileio(header, data, evt);
+else
+    EEG = pop_fileio(header.hdr, header.trial);
+    if iscell(EEG.data) && length(EEG.data) == 1
+        EEG.data = EEG.data{1};
+    elseif iscell(EEG.data)
+        len = cellfun(@(x)size(x,2), EEG.data);
+        if length(unique(len)) > 1
+            error('Cannot convert epochs of different length');
+        end
+        EEG.data = [ EEG.data{:} ];
+        EEG.pnts = len(1);
+    else
+        error('Unknown fieldtrip data format');
+    end
+end   

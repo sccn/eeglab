@@ -197,7 +197,7 @@ end
 % convert to seconds for sread
 % ----------------------------
 EEG.srate           = dat.Fs;
-EEG.nbchan          = size(alldata,1);
+EEG.nbchan          = dat.nChans;
 EEG.data            = alldata;
 EEG.setname 		= '';
 EEG.comments        = [ 'Original file: ' filename ];
@@ -215,6 +215,12 @@ else
 end
 if isfield(dat, 'label') && ~isempty(dat.label)
     EEG.chanlocs = struct('labels', dat.label);
+    % channel type
+    if isfield(dat,'chantype')
+        for ichan = 1:length(dat.chantype)
+            EEG.chanlocs(ichan).type = dat.chantype{ichan};
+        end
+    end
     
     % START ----------- Extracting EEG channel location
     % Note: Currently for extensions where FT is able to generate valid 'labels' and 'elec' structure (e.g. FIF)
@@ -222,23 +228,26 @@ if isfield(dat, 'label') && ~isempty(dat.label)
     try
         if isfield(dat,'elec')
             eegchanindx = find(ft_chantype(dat, 'eeg') | ft_chantype(dat, 'pns') );
-            if ~isempty(eegchanindx)
-                for ichan = 1:length(eegchanindx)
-                    chanType = 'EEG';
-                    if isfield(dat, 'chantype') && ~isempty(dat.chantype)
-                        chanType = dat.chantype{ichan};
-                    end
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' chanType});
-                end
-                EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
-                EEG.urchanlocs = EEG.chanlocs;
-            else
-                fprintf('pop_fileio: Unable to find EEG channels to extract location\n');
+            for ichan = 1:length(eegchanindx)
+                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' chanType});
             end
         end
     catch
         fprintf('pop_fileio: Unable to import channel location\n');
     end
+    try
+        if isfield(dat,'grad')
+            eegchanindx = find(ft_chantype(dat, 'refmag') | ft_chantype(dat, 'gradmag') );
+            for ichan = 1:length(eegchanindx)
+                chanType = 'EEG';
+                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.grad.chanpos(ichan,1) 'Y' dat.grad.chanpos(ichan,2) 'Z' dat.grad.chanpos(ichan,3) });
+            end
+        end
+    catch
+        fprintf('pop_fileio: Unable to import channel location\n');
+    end
+    EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
+    EEG.urchanlocs = EEG.chanlocs;
     % END ----------- Extracting EEG channel location
 end
 
