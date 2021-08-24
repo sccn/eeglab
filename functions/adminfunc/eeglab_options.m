@@ -54,8 +54,9 @@ try
         if ~isempty(EEGOPTION_PATH) % in icadefs above
              homefolder = EEGOPTION_PATH;
         elseif ispc
-             if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end
-             homefolder = deblank(evalc('!echo %USERPROFILE%'));
+%              if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end
+%              homefolder = deblank(evalc('!echo %USERPROFILE%'));
+            homefolder = getenv('USERPROFILE');
         else homefolder = '~';
         end
         
