@@ -3,9 +3,7 @@
 %             and unmarking of data stretches or epochs for rejection.
 % Usage: 
 %           >> eegplot(data, 'key1', value1 ...); % use interface buttons, etc.
-%      else
-%           >> eegplot('noui', data, 'key1', value1 ...); % no user interface;
-%                                                         % use for plotting
+%
 % Menu items:
 %    "Figure > print" - [menu] Print figure in portrait or landscape.
 %    "Figure > Edit figure" - [menu] Remove menus and buttons and call up the standard
@@ -153,6 +151,8 @@
 %                      button is down, when it is moving and when the mouse button is up.
 %    'ctrlselectcommand' - [cell array] same as above in conjunction with pressing the 
 %                      CTRL key.
+%    'noui'          - ['on'|'off'] Remove user interface for printing {default: 'off'}
+%
 % Outputs:
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
 %                    the global workspace (only) when the REJECT button is clicked. 
@@ -277,14 +277,14 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 
    try
        options = varargin;
-       if ~isempty( varargin ), 
+       if ~isempty( varargin )
            for i = 1:2:numel(options)
                g.(options{i}) = options{i+1};
            end
        else g= []; end
    catch
        disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
-   end;	
+   end
    
    % Selection of data range If spectrum plot  
    if isfield(g,'freqlimits') || isfield(g,'freqs')
@@ -292,8 +292,8 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 %        % Check  consistency of freqs
 
        % Selecting data and freqs
-       [temp, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
-       [temp, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
+       [~, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
+       [~, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
        data = data(:,fBeg:fEnd,:);
        g.freqs     = g.freqs(fBeg:fEnd);
        
@@ -314,8 +314,8 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 		 
    try, g.srate; 		    catch, g.srate		= 256; 	end
    try, g.spacing; 			catch, g.spacing	= 0; 	end
-   try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
-   try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
+   try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end % 0 mean numbered
+   try, g.winlength; 		catch, g.winlength	= 5; 	end % Number of seconds of EEG displayed
    try, g.position; 	    catch, g.position	= ORIGINAL_POSITION; 	end
    try, g.title; 		    catch, g.title		= ['Scroll activity -- eegplot()']; 	end
    try, g.plottitle; 		catch, g.plottitle	= ''; 	end
@@ -329,7 +329,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.submean;			catch, g.submean	= 'off'; end
    try, g.children;			catch, g.children	= 0; end
    try, g.limits;		    catch, g.limits	    = [0 1000*(size(data,2)-1)/g.srate]; end
-   try, g.freqs;            catch, g.freqs	    = []; end;  % Ramon
+   try, g.freqs;            catch, g.freqs	    = []; end  % Ramon
    try, g.freqlimits;	    catch, g.freqlimits	= []; end
    try, g.dispchans; 		catch, g.dispchans  = size(data,1); end
    try, g.wincolor; 		catch, g.wincolor   = [ 0.7 1 0.9]; end
@@ -340,19 +340,20 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.ploteventdur;     catch, g.ploteventdur = 'off'; end
    try, g.data2;            catch, g.data2      = []; end
    try, g.plotdata2;        catch, g.plotdata2 = 'off'; end
-   try, g.mocap;		    catch, g.mocap		= 'off'; end; % nima
+   try, g.mocap;		    catch, g.mocap		= 'off'; end % nima
    try, g.selectcommand;     catch, g.selectcommand     = { defdowncom defmotioncom defupcom }; end
    try, g.ctrlselectcommand; catch, g.ctrlselectcommand = { defctrldowncom defctrlmotioncom defctrlupcom }; end
-   try, g.datastd;          catch, g.datastd = []; end; %ozgur
-   try, g.normed;            catch, g.normed = 0; end; %ozgur
-   try, g.envelope;          catch, g.envelope = 0; end;%ozgur
-   try, g.maxeventstring;    catch, g.maxeventstring = 10; end; % JavierLC
-   try, g.isfreq;            catch, g.isfreq = 0;    end; % Ramon
+   try, g.datastd;          catch, g.datastd = []; end %ozgur
+   try, g.normed;            catch, g.normed = 0; end %ozgur
+   try, g.envelope;          catch, g.envelope = 0; end %ozgur
+   try, g.maxeventstring;    catch, g.maxeventstring = 10; end % JavierLC
+   try, g.isfreq;            catch, g.isfreq = 0;    end % Ramon
+   try, g.noui;             catch, g.noui = 'off'; end
       
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
-   	end;	
+   end
       
    gfields = fieldnames(g);
    for index=1:length(gfields)
@@ -360,7 +361,8 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' 'plottitle' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqs' 'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq'},;
+               'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' ...
+               'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq' 'noui'},;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end
    end
@@ -1219,7 +1221,7 @@ u(22) = uicontrol('Parent',figh, ...
   eegplot('drawp', 0);
   if g.dispchans ~= g.chans
   	   eegplot('zoom', gcf);
-  end;  
+  end 
   eegplot('scaleeye', [], gcf);
   
   h = findobj(gcf, 'style', 'pushbutton');
@@ -1227,6 +1229,10 @@ u(22) = uicontrol('Parent',figh, ...
   h = findobj(gcf, 'tag', 'eegslider');
   set(h, 'backgroundcolor', BUTTON_COLOR);
   set(figh, 'visible', 'on');
+  
+  if strcmpi(g.noui, 'on')
+      eegplot('noui');
+  end
   
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function
@@ -1546,7 +1552,7 @@ else
 %             EVENTFONT = ' \fontsize{10} ';
 %             ylims=ylim;
             evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
-            if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end; % truncate
+            if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end % truncate
             try, 
                 tmph2 = text(ax0, [tmplat], ylims(2)-0.005, [EVENTFONT evntxt], ...
                                     'color', g.eventcolors{ event2plot(index) }, ...
@@ -1672,7 +1678,7 @@ else
         g.time    = str2num(get(EPosition,'string'));  
     else 
         g.time    = str2num(get(EPosition,'string'))-1;   
-    end;        
+    end       
     g.spacing = str2num(get(ESpacing,'string'));  
     
     orgspacing= g.spacing;
@@ -1739,7 +1745,7 @@ else
       % -------------------------------------
       g = get(gcf,'UserData');
       result = inputdlg2({ 'Max events'' string length:' } , 'Change events'' string length to display', 1,  { num2str(g.maxeventstring) });
-      if size(result,1) == 0 return; end;                  
+      if size(result,1) == 0 return; end                 
       g.maxeventstring = eval(result{1});
       set(gcf, 'UserData', g);
       eegplot('drawb');
@@ -1869,7 +1875,8 @@ else
 	  obj = findobj(fig, 'tag', 'Etimename');delete(obj);
 	  obj = findobj(fig, 'tag', 'Evaluename');delete(obj);
 	  obj = findobj(fig, 'type', 'uimenu');delete(obj);
- 
+      set(gcf, 'paperpositionmode', 'manual', 'WindowButtonMotionFcn', []);
+
    case 'zoom' % if zoom
       fig = varargin{1};
       ax1 = findobj('tag','eegaxis','parent',fig); 
@@ -1894,7 +1901,7 @@ else
           Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1)-1)/g.srate;
           Eposition = round(Eposition*1000)/1000;
           set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition+1));
-      end;  
+      end 
       
       % deal with ordinate
       % ------------------
@@ -2023,7 +2030,7 @@ else
     ax1 = findobj('tag','backeeg','parent',fig); 
     g.incallback = 0;
     set(fig,'UserData', g);  % early save in case of bug in the following
-    if strcmp(g.mocap,'on'), g.winrej = g.winrej(end,:);end; % nima
+    if strcmp(g.mocap,'on'), g.winrej = g.winrej(end,:);end % nima
     if ~isempty(g.winrej)', ...
         if g.winrej(end,1) == g.winrej(end,2) % remove unitary windows
             g.winrej = g.winrej(1:end-1,:);
@@ -2055,14 +2062,14 @@ else
     end
     set(fig,'UserData', g);
     eegplot('drawp', 0);
-    if strcmp(g.mocap,'on'), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end; % nima
+    if strcmp(g.mocap,'on'), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end % nima
          
   % push button: create/remove window
   % ---------------------------------
   case 'defdowncom'
     fig = varargin{1};
     g = get(fig,'UserData');
-    if strcmp(g.mocap,'on'), show_mocap_timer = timerfind('tag','mocapDisplayTimer'); if ~isempty(show_mocap_timer),  end; end; % nima
+    if strcmp(g.mocap,'on'), show_mocap_timer = timerfind('tag','mocapDisplayTimer'); if ~isempty(show_mocap_timer),  end; end % nima
     
     ax1 = findobj('tag','backeeg','parent',fig); 
     tmppos = get(ax1, 'currentpoint');
