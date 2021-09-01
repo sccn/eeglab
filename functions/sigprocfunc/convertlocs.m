@@ -61,6 +61,10 @@ if nargin < 1
    return;
 end
 
+if ~isfield(chans, 'theta') && ~isfield(chans, 'X') && ~isfield(chans, 'radius')
+    return
+end
+
 if nargin < 2
    command = 'auto';
 end
@@ -219,7 +223,7 @@ case 'cart2sphbesa'
 case 'cart2sph'
     if verbose
         disp('WARNING: If XYZ center has not been optimized, optimize it using Edit > Channel Locations');
-	end
+    end
     X  = {chans.X};
     Y  = {chans.Y};
     Z  = {chans.Z};
