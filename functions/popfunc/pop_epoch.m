@@ -243,8 +243,15 @@ if ~isempty( events )
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
 				if ischar( tmpevent ),tmpevent = str2num( tmpevent ); end
-				if isempty( tmpevent ), error('pop_epoch(): string entered in a numeric field'); end
-				Ieventtmp = [ Ieventtmp find(tmpevent == [ tmpeventtype{:} ]) ];
+				if isempty( tmpevent ) 
+                    try
+                        tmpevent = unique(cell2mat(tmpeventtype(arrayfun(@(x) strcmpi(x.trial_type,events{index2}),EEG.event))));
+                        fprintf('using EEG.event.trial_type %s to match event input\n',events{index2})
+                    catch 
+                        error('pop_epoch(): string entered in a numeric field'); 
+                    end
+                    Ieventtmp = [ Ieventtmp find(tmpevent == [ tmpeventtype{:} ]) ];
+                end
 			end
 		end
     else
