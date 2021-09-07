@@ -561,15 +561,19 @@ end
 % performing removal
 % ------------------
 if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3))
-    %EEG.data  = EEG.data(g.channel, :, g.trial);
-    % this code belows is prefered for memory mapped files
-    diff1 = setdiff_bc([1:size(EEG.data,1)], g.channel);
-    diff2 = setdiff_bc([1:size(EEG.data,3)], g.trial);
-    if ~isempty(diff1)
-         EEG.data(diff1, :, :) = [];
-    end
-    if ~isempty(diff2)
-         EEG.data(:, :, diff2) = [];
+    eeglab_options;
+    if option_memmapdata
+        % this code below is preferred for memory mapped files
+        diff1 = setdiff_bc([1:size(EEG.data,1)], g.channel);
+        diff2 = setdiff_bc([1:size(EEG.data,3)], g.trial);
+        if ~isempty(diff1)
+            EEG.data(diff1, :, :) = [];
+        end
+        if ~isempty(diff2)
+            EEG.data(:, :, diff2) = [];
+        end
+    else
+        EEG.data  = EEG.data(g.channel, :, g.trial);
     end
 end
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end
