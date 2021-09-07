@@ -222,6 +222,11 @@ if ~isfield(HDR,'PhysDim')
     HDR.PhysDim = cell(1,HDR.NS);
     HDR.PhysDim(:) = { 'uV' };
 end
+% from https://github.com/INCF/p3-validator/blob/a0365b4d3a1ca21ac3c18d3fd1b8f1e63f35eeb8/trunk/lib/eeglab9_0_4_5s/external/biosig-partial/t200_FileAccess/physicalunits.m#L225
+if ~isfield(HDR,'PhysDimCode')
+    HDR.PhysDimCode = zeros(1,HDR.NS);
+    HDR.PhysDimCode(:) = 4256 + 19;
+end
 
 % Duration of one block in seconds
 HDR.SampleRate = srate;
