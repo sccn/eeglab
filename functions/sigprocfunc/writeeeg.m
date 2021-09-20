@@ -209,8 +209,6 @@ HDR.NS = size(x,1);
 % However, likely BIOSIG takes care of that now because there is no
 % difference when the code below is added
 if strcmpi(HDR.TYPE, 'BDF')
-    HDR.PhysMax = max(x',[],1);
-    HDR.PhysMin = min(x',[],1);
     % BDF uses 24 bit signed integers 
     HDR.DigMax = repmat(2^23-1,1,HDR.NS);	
     HDR.DigMin = repmat(-2^23,1,HDR.NS);
@@ -224,14 +222,22 @@ if ~isfield(HDR,'PhysDim')
     HDR.PhysDim = cell(1,HDR.NS);
     HDR.PhysDim(:) = { 'uV' };
 end
+% from https://github.com/INCF/p3-validator/blob/a0365b4d3a1ca21ac3c18d3fd1b8f1e63f35eeb8/trunk/lib/eeglab9_0_4_5s/external/biosig-partial/t200_FileAccess/physicalunits.m#L225
+if ~isfield(HDR,'PhysDimCode')
+    HDR.PhysDimCode = zeros(1,HDR.NS);
+    HDR.PhysDimCode(:) = 4256 + 19;
+end
 
 % Duration of one block in seconds
 HDR.SampleRate = srate;
 HDR.Dur = HDR.SPR/HDR.SampleRate;
 
 % define datatypes and scaling factors
-HDR.PhysMax = max(x, [], 2);
-HDR.PhysMin = min(x, [], 2);
+absMax = max(abs(x(:)));
+HDR.PhysMax = repmat(absMax, [size(x,1),1]);
+HDR.PhysMin = -HDR.PhysMax;
+fprintf('Unifying channel resolution, clipping at +-%d uV \n', absMax)
+
 if strcmp(HDR.TYPE, 'GDF')
     HDR.GDFTYP = 16*ones(1,HDR.NS);  % float32
     HDR.DigMax  = ones(HDR.NS,1)*100;  % FIXME: What are the correct values for float32?
