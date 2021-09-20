@@ -156,7 +156,7 @@ for iVar = 1 :  length(varnames)
     end
 end
 
-% Retreiving overlapped values
+% Retrieving overlapped values
 hits = sum(hits,2);
 trialindsx = find(hits == length(varnames));
 if ~isempty(eventvals)

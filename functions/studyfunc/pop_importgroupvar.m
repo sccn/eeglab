@@ -170,7 +170,7 @@ function callback_button_add(src,eventdata,handles)
 numdesign = getappdata(0,'numdesign');
 usrdat    = getappdata(0,'usrdat');
 
-% retreiving name of variable
+% Retrieving name of variable
 varname   = get(handles.edit_varname,'String') ;
 if isempty(varname)
     error('pop_importgroupvar() error: Variable name must be provided');

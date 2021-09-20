@@ -224,7 +224,7 @@ if flag.subj ~= indtmp
 end
 subj = listsubj{indtmp};
 
-%  Retreiving all trials and values for this subject
+%  Retrieving all trials and values for this subject
 dsetinfo_subjindx = sort(find(strcmp({datasetinfo.subject},subj)));  % in datasetinfo
 trialinfo  = std_combtrialinfo(datasetinfo, dsetinfo_subjindx);      % Combining trialinfo
 

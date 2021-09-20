@@ -86,7 +86,7 @@ else
     oldpath = path;
 end
 
-% Retreiving path
+% Retrieving path
 comp = computer;
 if strcmpi(comp(1:2), 'PC')
     newpathtest = [ pluginfolder ';' ];
@@ -122,7 +122,7 @@ rmpath(genpath(pluginfolder));
      warning(tmpwarn); 
  end
  
- newpath = path; % Retreiving new path
+ newpath = path; % Retrieving new path
 
  % required here because path not added yet
 % to the admin folder

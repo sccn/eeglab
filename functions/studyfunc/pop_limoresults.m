@@ -195,7 +195,7 @@ classdef pop_limoresults < handle
                     end
                 end
                 
-                % Retreiving list of independent variables
+                % Retrieving list of independent variables
                 if ~isempty(cat_indx)
                     tmpregnames2 = tmpregnames(allcat_indx);
                     cat_indx     =  reg_indx(allcat_indx);

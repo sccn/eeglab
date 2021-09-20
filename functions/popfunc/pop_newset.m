@@ -108,7 +108,7 @@
 % Dataset (modified) selected -> create new dataset (eg. resample) 
 
 function [ALLEEG, EEG, CURRENTSET, com] = pop_newset( ALLEEG, EEG, OLDSET, varargin);
-% pop_newset( ALLEEG, EEG, 1, 'retrieve', [], 'study', [1] (retreiving a study)
+% pop_newset( ALLEEG, EEG, 1, 'retrieve', [], 'study', [1] (Retrieving a study)
 
 verbose = 0;
 if nargin < 3

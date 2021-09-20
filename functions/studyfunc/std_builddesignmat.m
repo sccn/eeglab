@@ -87,7 +87,7 @@ for i = 1 : length(varindx)
             else
                 varvallength(ivar) = length(varvaluetmp{ivar}) ;
             end
-            % Retreiving value and assigning index in design matrix
+            % Retrieving value and assigning index in design matrix
             if ~iscell(varvaluetmp{ivar})  && varvallength(ivar) == 1
                 varlist{c} = varvaluetmp{ivar};
                 varindxjoint{ivar} = c;

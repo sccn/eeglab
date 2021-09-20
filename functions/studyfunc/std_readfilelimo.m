@@ -252,7 +252,7 @@ elseif ~isempty(g.channels) && strcmp(chanoric, 'Components')
      end
 end
 
-% Retreiving data
+% Retrieving data
 %..........................................................................
 if isfield(limostruct.data,'sampling_rate')
     TimeVec = limostruct.data.start: 1000/limostruct.data.sampling_rate:limostruct.data.end

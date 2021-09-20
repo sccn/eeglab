@@ -145,7 +145,7 @@ end
 %  ----------------------------------------------------------
 var_matrix = nan(NbTrials,length(g.factors));                   % Initializing Categorical Variables
 
-%  Retreiving all trials and values for this subject
+%  Retrieving all trials and values for this subject
 trialinfo  = std_combtrialinfo(STUDY.datasetinfo, g.setindx);   % Combining trialinfo
 ntrials = 0;
 for i = 1 : length(g.setindx)
