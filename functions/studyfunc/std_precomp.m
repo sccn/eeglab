@@ -231,14 +231,20 @@ uniqueSessions = unique(allSessions);
 % ----------------------
 eeglab_options;
 if ~option_parallel
-    delete(gcp('nocreate'));
-    ps = parallel.Settings;
-    parstatus = ps.Pool.AutoCreate;
-    ps.Pool.AutoCreate = false;
+    if ~exist('gcp')
+        disp('Parallel toolbox not found');
+    else
+        delete(gcp('nocreate'));
+        ps = parallel.Settings;
+        parstatus = ps.Pool.AutoCreate;
+        ps.Pool.AutoCreate = false;
+    end
 else
-    ps = parallel.Settings;
-    parstatus = ps.Pool.AutoCreate;
-    ps.Pool.AutoCreate = true;
+    if exist('gcp')
+        ps = parallel.Settings;
+        parstatus = ps.Pool.AutoCreate;
+        ps.Pool.AutoCreate = true;
+    end
 end    
 
 % compute custom measure
