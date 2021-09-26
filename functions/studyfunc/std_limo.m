@@ -551,8 +551,11 @@ if ~exist('limocontrast','var')
 else
     contrast.mat = limocontrast;
     [LIMO_files, procstatus] = limo_batch('both',model,contrast,STUDY);
-    [p,f,~]=fileparts(fullfile(STUDY.filepath,STUDY.filename));
-    save(fullfile([p filesep 'LIMO_' f],[STUDY.design(opt.design).name '_contrast.mat']),'limocontrast');
+    if exist(fullfile([STUDY.filepath filesep 'derivatives']),'dir')
+        save(fullfile([STUDY.filepath filesep 'derivatives']),[STUDY.design(opt.design).name '_contrast.mat']),'limocontrast');
+    else
+        save(fullfile(STUDY.filepath,[STUDY.design(opt.design).name '_contrast.mat']),'limocontrast');
+    end
 end
 
 STUDY.limo.model         = model;
