@@ -212,6 +212,7 @@ else
     if strcmpi(g.savemode, 'twofiles')
         save_as_dat_file = 1;
         EEG.datfile = [ filenamenoext '.fdt' ];
+        option_savetwofiles = true; % BUG: Missing, thus it will save data in .set file as well as fdt
     end
 end
 
