@@ -204,6 +204,11 @@ if isfield(EEG.event, 'latency')
         EEG.urevent = [];
         
     else % Continuous data
+    
+    
+    EEG.event([EEG.event.latency] < bounds(1) | [EEG.event.latency] > bounds(end)) = []; % remove events with invalid latencies
+    
+    
 
         for iEvt = 1:length(EEG.event)
 
