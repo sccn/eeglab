@@ -207,6 +207,7 @@ if isfield(EEG.event, 'latency')
     
     
     EEG.event([EEG.event.latency] < bounds(1) | [EEG.event.latency] > bounds(end)) = []; % remove events with invalid latencies
+    EEG.urevent([EEG.event.latency] < bounds(1) | [EEG.event.latency] > bounds(end)) = []; % remove events with invalid latencies
     
     
 
