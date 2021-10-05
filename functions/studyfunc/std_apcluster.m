@@ -93,7 +93,7 @@ catch
     disp('std_infocluster() error: calling convention {''key'', value, ... } error'); return;
 end
 
-try opts.maxits;           catch, opts.maxits       = 200;          end; % Maximun number of iterations
+try opts.maxits;           catch, opts.maxits       = 200;          end; % Maximum number of iterations
 try opts.convits;          catch, opts.convits      = 100;          end; %
 try opts.dampfact;         catch, opts.dampfact     = 0.9;          end; %
 try opts.dist;             catch, opts.dist         = 'euclidean';  end; % Distance metric

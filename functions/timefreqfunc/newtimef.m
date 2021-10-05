@@ -68,7 +68,7 @@
 %    Optional inter-trial coherence (ITC) Type:
 %       'itctype'   = ['coher'|'phasecoher'|'phasecoher2'] Compute either linear
 %                     coherence ('coher') or phase coherence ('phasecoher').
-%                     Originall called 'phase-locking factor' {default: 'phasecoher'}
+%                     Originally called 'phase-locking factor' {default: 'phasecoher'}
 %
 %    Optional detrending:
 %       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
@@ -101,7 +101,7 @@
 %                     for wavelets. {default: use 'padratio'}
 %       'freqscale' = ['log'|'linear'] frequency scale. {default: 'linear'}
 %                     Note that for obtaining 'log' spaced freqs using FFT,
-%                     closest correspondant frequencies in the 'linear' space
+%                     closest correspondent frequencies in the 'linear' space
 %                     are returned.
 %       'verbose'   = ['on'|'off'] print text {'on'}
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
@@ -382,7 +382,7 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, fram
 % Note: Above, PA is output of 'phsamp','on'
 
 % For future 'timewarp' keyword help: 'timewarp' 3rd element {colors} contains a
-%               list of Matlab linestyles to use for vertical lines marking the occurence
+%               list of Matlab linestyles to use for vertical lines marking the occurrence
 %               of the time warped events. If '', no line will be drawn for this event
 %               column. If fewer colors than event columns, cycles through the given color
 %               labels.  Note: Not compatible with 'vert' (below).
@@ -800,7 +800,7 @@ end
 % --------------------------
 if ~isempty(g.mtaper) % multitaper, inspired from a Bijan Pesaran matlab function
     if length(g.mtaper) < 3
-        %error('mtaper arguement must be [N W] or [N W K]');
+        %error('mtaper argument must be [N W] or [N W K]');
 
         if g.mtaper(1) * g.mtaper(2) < 1
             error('mtaper 2 first arguments'' product must be larger than 1');
@@ -1142,7 +1142,7 @@ if iscell(data)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%
-% display text to user (computation perfomed only for display)
+% display text to user (computation performed only for display)
 %%%%%%%%%%%%%%%%%%%%%%
 verboseprintf(g.verbose, 'Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
@@ -1466,7 +1466,7 @@ persistent showwarning;
 if isempty(showwarning)
     warning( [ 'Some versions of Matlab crash on this function. If this is' 10 ...
                'the case, simply comment the code line 1655-1673 in newtimef.m' 10 ...
-               'which aims at "ploting marginal ERSP mean below ERSP image"' ]);
+               'which aims at "plotting marginal ERSP mean below ERSP image"' ]);
     showwarning = 1;
 end;    
 

@@ -144,8 +144,8 @@ if length(EEG) == 1
     end
 end
 
-% default saving otion
-% --------------------
+% default saving option
+% ---------------------
 save_as_dat_file = 0;
 data_on_disk     = 0;
 if strcmpi(g.savemode, 'resave')
@@ -286,7 +286,7 @@ if exist(tmpfilename) == 2
     disp('Deleting old .dat file format detected on disk (now replaced by .fdt file)');
     try,
         delete(tmpfilename);
-        disp('Delete sucessfull.');
+        disp('Delete successful.');
         EEG.datfile = [];
     catch, disp('Error while attempting to remove file'); 
     end
@@ -297,7 +297,7 @@ if save_as_dat_file == 0
         disp('Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data');
         try
             delete(tmpfilename);
-            disp('Delete sucessfull.');
+            disp('Delete successful.');
             EEG.datfile = [];
         catch, disp('Error while attempting to remove file'); 
         end

@@ -194,7 +194,7 @@
 % 03-09-02 function restructuration -ad
 %  add 'key', val arguments (+ external baseboot, baseline, color axis, angleunit...)
 %  add detrending (across time and trials) + 'coher' option for amplitude coherence
-%  significance only if alpha is given, ploting options in 'plotamp' and 'plotphase'
+%  significance only if alpha is given, plotting options in 'plotamp' and 'plotphase'
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-03-02 added new options for bootstrap -ad 
 
@@ -206,7 +206,7 @@
 %    (Coher) function Coher = coherinit(...) - initialize coherence object
 %    (Coher) function Coher = cohercomp(Coher, tmpX, tmpY, trial, time) - compute coherence
 %    (Coher) function Coher = cohercomppost(Coher, trials) - coherence normalization
-%    (Boot) function Boot = bootinit(...) - intialize bootstrap object
+%    (Boot) function Boot = bootinit(...) - initialize bootstrap object
 %    (Boot) function Boot = bootcomp(...) - compute bootstrap
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
 % and by real objects under C++ (C++ code, incomplete)
@@ -485,7 +485,7 @@ if iscell(X)
 		disp('crossf warning: The significance bootstrap type is irrelevant when comparing conditions');
 	end
 	for index = 1:2:length(vararginori)
-		if index<=length(vararginori) % needed: if elemenets are deleted
+		if index<=length(vararginori) % needed: if elements are deleted
 			%if strcmp(vararginori{index}, 'alpha'), vararginori(index:index+1) = [];
 			if strcmp(vararginori{index}, 'title'), vararginori(index:index+1) = []; 
 			end
@@ -1118,7 +1118,7 @@ Tf.subitc    = subitc; % for ITC
 Tf.type      = type; % for ITC
 Tf.saveall   = saveall;
 if (Tf.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
-   % Tf.freqs = srate/winsize*[1:2/padratio:winsize]/2; % incorect for padratio > 2
+   % Tf.freqs = srate/winsize*[1:2/padratio:winsize]/2; % incorrect for padratio > 2
    Tf.freqs = linspace(0, srate/2, length([1:2/padratio:winsize])+1);
    Tf.freqs = Tf.freqs(2:end);
    Tf.win   = hanning(winsize);
@@ -1378,7 +1378,7 @@ if ~isnan(Boot.alpha) && isnan(Boot.rboot)
             end
             Boot.Coherboot = cohercomp(Boot.Coherboot, tmpsX, tmpsY, 1, 1:Boot.naccu);
          end
-         Boot.Coherboot = cohercomppost(Boot.Coherboot);  % CHECK IF NECSSARY FOR ALL BOOT TYPE
+         Boot.Coherboot = cohercomppost(Boot.Coherboot);  % CHECK IF NECESSARY FOR ALL BOOT TYPE
          Boot.fullcoherboot(:,:,index) = Boot.Coherboot.R; 
          Boot.Coherboot = coherinit(nb_points, trials, Boot.naccu, Boot.Coherboot.type);
       end

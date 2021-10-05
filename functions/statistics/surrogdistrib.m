@@ -14,12 +14,12 @@
 %  'pairing' - ['on'|'off'] pair the data arrays.
 %  'naccu'   - [integer] number of surrogate. Default is 1.
 %  'precomp' - cell array containing precomputed value for speeding up
-%              mulitple calls
+%              multiple calls
 %
 % Output:
 %  surrog  - surrogate distribution
 %  precomp - cell array containing precomputed value for speeding up
-%            mulitple calls
+%            multiple calls
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005-
 

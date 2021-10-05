@@ -31,7 +31,7 @@
 %
 % Note: This function is backward compatible with its early versions
 %       (before the input argument 'durfield' was introduced). 
-%       It can read the 'align' value as its 5th (not 6th) paramater. 
+%       It can read the 'align' value as its 5th (not 6th) parameter. 
 %
 % See also: eeglab(), pop_importevent()
 

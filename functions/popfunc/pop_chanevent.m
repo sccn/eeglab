@@ -189,7 +189,7 @@ listcheck = { 'edge'      'string'     { 'both';'leading';'trailing'}     'both'
 g = finputcheck( options, listcheck, 'pop_chanedit');
 if ischar(g), error(g); end
 
-% check inut consistency
+% check input consistency
 % ----------------------
 if strcmpi(g.duration, 'on') && ~strcmpi(g.edge, 'leading')
     error('Must detect leading edge to extract event duration');

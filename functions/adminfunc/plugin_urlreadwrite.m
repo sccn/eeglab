@@ -48,7 +48,7 @@ try
         end
     end
 catch
-    warning('An error occured when checking MATLAB/Octave version');
+    warning('An error occurred when checking MATLAB/Octave version');
 end
 
 try
@@ -71,7 +71,7 @@ try
         end
     end
 catch
-    warning('An error occured when checking proxy information using new format');
+    warning('An error occurred when checking proxy information using new format');
 end
 
 % Create the URL object.

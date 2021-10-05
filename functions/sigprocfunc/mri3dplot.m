@@ -37,7 +37,7 @@
 %   'mixfact'   - [float] factor for mixing the background image with the
 %                 array3d information. Default is 0.5.
 %   'mixmode'   - ['add'|'overwrite'] 'add' will allow for trasnparency
-%                 while 'overwrite' will preserve the orginal MRI image 
+%                 while 'overwrite' will preserve the original MRI image 
 %                 and overwrite the pixel showind density changes.
 %
 % Outputs:

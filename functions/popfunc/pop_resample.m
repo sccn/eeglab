@@ -98,7 +98,7 @@ if nargin < 4 || isempty(df)
 end
 % fc in range?
 if fc < 0 || fc > 1
-    error('Anti-aliasing filter cutoff freqeuncy out of range.')
+    error('Anti-aliasing filter cutoff frequency out of range.')
 end
 
 % process multiple datasets

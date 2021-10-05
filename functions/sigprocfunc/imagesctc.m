@@ -4,7 +4,7 @@
 %
 % Usage: same as imagesctc
 %
-% Exemple:
+% Example:
 %         figure; 
 %         colormap(jet); 
 %         subplot(1,2,1); imagesctc(rand(10,10));

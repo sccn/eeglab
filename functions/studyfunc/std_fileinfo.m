@@ -1,4 +1,4 @@
-% std_fileinfo() - Check uniform channel distribution accross datasets
+% std_fileinfo() - Check uniform channel distribution across datasets
 %
 % Usage:    
 %   >> [struct filepresent] = std_fileinfo(ALLEEG);   

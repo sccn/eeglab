@@ -9,7 +9,7 @@
 %   filename       - EGI file name
 %   datachunks     - desired frame numbers (see readegi() help)
 %                    option available from the command line only
-%   forceversion   - [integer] force reading a specfic file version
+%   forceversion   - [integer] force reading a specific file version
 %   fileloc        - [string] channel location file name. Default is
 %                    'auto' (autodetection)
 %

@@ -49,7 +49,7 @@
 %   outstruct  - returns outputs as a structure (only tagged ui controls
 %                are considered). The field name of the structure is
 %                the tag of the ui and contain the ui value or string.
-%   instruct   - resturn inputs provided in the same format as 'outstruct'
+%   instruct   - returns inputs provided in the same format as 'outstruct'
 %                This allow to compare in/outputs more easy.
 %
 % Note: the function also adds three buttons at the bottom of each 

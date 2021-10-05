@@ -23,8 +23,8 @@
 %                  {default: 'off'}
 %  'method'      - ['parametric'|'permutation'] Type of statistics to use
 %                  default is 'parametric'. 'perm' and 'param' legacy
-%                  abreviations are still functional.
-%  'naccu'       - [integer] Number of surrogate averages fo accumulate when
+%                  abbreviations are still functional.
+%  'naccu'       - [integer] Number of surrogate averages to accumulate when
 %                  computing permutation-based statistics. For example, to
 %                  test p<0.01 use naccu>=200; for p<0.001, use naccu>=2000.
 %                  If a non-NaN 'threshold' is set (see below) and 'naccu'
@@ -36,7 +36,7 @@
 %  'mcorrect'    - ['none'|'fdr'] apply correcting for multiple comparisons.
 %  'mode'        - ['eeglab'|'fieldtrip'] statistical framework to use. 
 %                  'eeglab' uses EEGLAB statistical functions and 'fieldtrip'
-%                  uses Fieldtrip statistical funcitons. Default is 'eeglab'.
+%                  uses Fieldtrip statistical functions. Default is 'eeglab'.
 %
 % Fieldtrip statistics options:
 %  'fieldtripnaccu'   - 'numrandomization' Fieldtrip parameter

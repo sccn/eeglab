@@ -99,7 +99,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
 	for tmpindex = 1:length(boundevents) % sorted in decreasing order
         if boundevents(tmpindex) >= 0.5 && boundevents(tmpindex) <= pnts
                             
-            % find event succeding boundary to insert event 
+            % find event succeeding boundary to insert event 
             % at the correct location in the event structure
             % ----------------------------------------------
             if ~isempty(eventout) && isfield(eventout, 'latency')
@@ -150,7 +150,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
 
     
 % look for nested events
-% retrun indices of nested events and
+% return indices of nested events and
 % their total length
 % -----------------------------------
 function [ indnested, addlen ] = findnested(event, ind);
@@ -179,7 +179,7 @@ function [event, urevent] = removenested(event, urevent, nestind);
         fprintf('eeg_insertbound() debug msg: removing %d nested urevents\n', length(nestind));
         nestind = sort(nestind);
         urind = [ event.urevent ]; % this must not be done in the loop
-                                             % since the indices are dyanmically updated
+                                             % since the indices are dynamically updated
     end
     
     for ind = 1:length(nestind)

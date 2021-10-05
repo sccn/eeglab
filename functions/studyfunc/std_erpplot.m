@@ -190,7 +190,7 @@ if length(STUDY.design(opt.design).variable) > 1, allgroups     = STUDY.design(o
 % for backward compatibility
 % --------------------------
 stats = statstruct.etc.statistics;
-stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
+stats.fieldtrip.channelneighbor = struct([]); % assumes one channel or 1 component
 if isempty(STUDY.design(opt.design).variable)
     stats.paired = { };
 else

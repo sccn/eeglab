@@ -196,7 +196,7 @@ combinedEventNumber = newUreventEventNumber;%[NaN(1,length(EEG.urevent)) newUrev
 combinedUrEventLatencies = newUreventLatency;%[originalUreventLatency newUreventLatency];
 [sortedUrEventLatency order] = sort(combinedUrEventLatencies,'ascend');
 
-% make urvent stucture ready
+% make urvent structure ready
 EEG.urevent = [];
 EEG.urevent= newUreventFields{order(1)};
 

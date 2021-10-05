@@ -447,11 +447,11 @@ end % exit subject
 
 % then we add contrasts for conditions that were merged during design selection
 % i.e. multiple categorical variables (factors) and yet not matching the number
-% of variables (contrasts are then a weigthed sum of the crossed factors)
+% of variables (contrasts are then a weighted sum of the crossed factors)
 if ~isempty(factors) && isfield(factors, 'value') && ...
         sum(arrayfun(@(x) ~strcmpi(x.label,'group'),STUDY.design(opt.design).variable)) == 1 % only one non-continuous variable other than group
     if length(STUDY.design(opt.design).variable(1).value) ~= length(factors) % and this var has more values than the number of factors
-        limocontrast = zeros(length(STUDY.design(opt.design).variable(1).value),length(factors)+1); % length(factors)+1 to add the contant
+        limocontrast = zeros(length(STUDY.design(opt.design).variable(1).value),length(factors)+1); % length(factors)+1 to add the constant
         for n=length(factors):-1:1
             factor_names{n} = factors(n).value;
         end

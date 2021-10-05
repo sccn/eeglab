@@ -182,7 +182,7 @@ if length(colors) == 1
 else % length > 1
 
   if max(colors) > n
-    error('Color vector excedes size of colormap')
+    error('Color vector exceeds size of colormap')
   end
   if strcmp(arg,'vert')
     image([0 1],t,[colors]');

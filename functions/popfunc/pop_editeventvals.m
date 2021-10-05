@@ -67,7 +67,7 @@
 % 03-18-02 debug soring order - ad
 % 03-18-02 put latencies in ms - ad, lf & sm
 % 03-29-02 debug latencies in ms - ad & sm
-% 04-02-02 debuging test - ad & sm
+% 04-02-02 debugging test - ad & sm
 
 function [EEG, com] = pop_editeventvals(EEG, varargin);
 

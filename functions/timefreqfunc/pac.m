@@ -40,7 +40,7 @@
 %       'wavelet2'  = same as 'wavelet' for the second argument. Default is
 %                     same as cycles. Note that if the lowest frequency for X
 %                     and Y are different and cycle is [cycles expfactor], it
-%                     may result in discrepencies in the number of cycles at
+%                     may result in discrepancies in the number of cycles at
 %                     the same frequencies for X and Y.
 %       'ntimesout' = Number of output times (int<frames-winframes). Enter a 
 %                     negative value [-S] to subsample original time by S.
@@ -71,7 +71,7 @@
 %                     for wavelets. Default: use 'padratio'.
 %       'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
-%                     closest correspondant frequencies in the 'linear' space 
+%                     closest correspondent frequencies in the 'linear' space 
 %                     are returned.
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
 %                    (ITC) from x and y. This computes the  'intrinsic' coherence
@@ -84,7 +84,7 @@
 %
 % Outputs: 
 %        pac         = Matrix (nfreqs1,nfreqs2,timesout) of coherence (complex).
-%                      Use 20*log(abs(crossfcoh)) to vizualize log spectral diffs. 
+%                      Use 20*log(abs(crossfcoh)) to visualize log spectral diffs. 
 %        timesout    = Vector of output times (window centers) (ms).
 %        freqsout1   = Vector of frequency bin centers for first argument (Hz).
 %        freqsout2   = Vector of frequency bin centers for second argument (Hz).
@@ -218,7 +218,7 @@ if length(timesout1) ~= length(timesout2) || any( timesout1 ~= timesout2)
     alltfY = alltfY(:, ind2, :);
 end
 
-% scan accross frequency and time
+% scan across frequency and time
 % -------------------------------
 %if isempty(g.alpha)
 %    disp('Warning: if significance mask is not applied, result might be slightly')

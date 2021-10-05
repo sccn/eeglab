@@ -142,7 +142,7 @@ function m = serialize_struct(v)
     m = [uint8(128); typecast(uint32(fnLengths(:)).','uint8').'; uint8(fnChars(:)); typecast(uint32(dims), 'uint8').'];
     % Content.
     if numel(v) > length(fieldNames)
-        % more records than field names; serialize each field as a cell array to expose homogenous content
+        % more records than field names; serialize each field as a cell array to expose homogeneous content
         tmp = cellfun(@(f)serialize_cell({v.(f)}),fieldNames,'UniformOutput',false);
         m = [m; 0; vertcat(tmp{:})];
     else
@@ -151,7 +151,7 @@ function m = serialize_struct(v)
     end
 end
 
-% Cell array of heterogenous contents
+% Cell array of heterogeneous contents
 function m = serialize_cell_heterogenous(v)
     contents = cellfun(@std_serialize,v,'UniformOutput',false);
     m = [uint8(33); ndims(v); typecast(uint32(size(v)),'uint8').'; vertcat(contents{:})];

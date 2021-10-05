@@ -32,7 +32,7 @@
 %                 the subfunction ascii2num for more details.
 %   allepochval - cell array with same length as the number of epoch 
 %                 containing all values for all epochs. This output is
-%                 usefull when several value are found within each epoch.
+%                 useful when several value are found within each epoch.
 %                 Not forced to be numerical.
 %
 % Notes: 1) Each epoch structure refers to the events that occurred

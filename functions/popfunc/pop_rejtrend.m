@@ -32,7 +32,7 @@
 %   elec_comp  - [e1 e2 ...] electrode|component number(s) to take into 
 %                consideration during rejection
 %   winsize    - (integer) number of consecutive points
-%                to use in detecing linear trends
+%                to use in detecting linear trends
 %   maxslope   - maximal absolute slope of the linear trend to allow in the data
 %   minR       - minimal linear regression R-square value to allow in the data
 %                (= coefficient of determination, between 0 and 1)

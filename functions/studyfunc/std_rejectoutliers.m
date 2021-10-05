@@ -10,7 +10,7 @@
 %   clusters        - [numeric vector| 'all' ] specific cluster numbers (or 'all' clusters), which outliers  
 %                        will be rejected from. {default:'all'}.   
 %   th                 - [number] a threshold factor to select outliers. How far a component can be from the 
-%                       cluster centroid (in the cluster std multiples) befor it will be considered as an outlier. 
+%                       cluster centroid (in the cluster std multiples) before it will be considered as an outlier. 
 %                       Components that their distance from the cluster centroid are more than this factor 
 %                       times the cluster std (th *std) will be rejected. {default: 3}.          
 %

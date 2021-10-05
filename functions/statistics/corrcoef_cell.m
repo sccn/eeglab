@@ -7,7 +7,7 @@
 %
 % Inputs:
 %   data       - [cell array] data consisting of PAIRED arrays to be compared. 
-%                The last dimension of embeded data arrays is used to compute 
+%                The last dimension of embedded data arrays is used to compute 
 %                correlation (see examples).
 % Outputs:
 %   c   - Correlation values. Same size as data without the last dimension.

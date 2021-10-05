@@ -3,7 +3,7 @@
 %               CAUTION: Only for use on electrodes in
 %               and remaining in the upper spherical hemisphere,
 %               otherwise it will work improperly. Written primarily for
-%               adjusting all electrodes homogenously with Cz.
+%               adjusting all electrodes homogeneously with Cz.
 %
 % Usage:
 %   >> chanlocs = forcelocs( chanlocs ); % pop-up window mode

@@ -2,7 +2,7 @@
 %              in a 2-D circular scalp map view (as looking down at the top 
 %              of the head).  May also be used to re-plot a mean topoplot() 
 %              map for a number of subjects and/or components without all 
-%              the constitutent maps having the same channel montage.
+%              the constituent maps having the same channel montage.
 %              Nose is at top of plot. Left = left. See topoplot().
 % Usage:
 %          >>  toporeplot(topoimage,'plotrad',val1, 'intrad',val2);   
@@ -229,19 +229,19 @@ for i = 2:2:nargs
              if strcmpi(ELECTRODES,'pointlabels') || strcmpi(ELECTRODES,'ptslabels') ...
                   || strcmpi(ELECTRODES,'labelspts') || strcmpi(ELECTRODES,'ptlabels') ...
                   || strcmpi(ELECTRODES,'labelpts') 
-                 ELECTRODES = 'labelpoint'; % backwards compatability
+                 ELECTRODES = 'labelpoint'; % backwards compatibility
              end
              if strcmpi(ELECTRODES,'pointnumbers') || strcmpi(ELECTRODES,'ptsnumbers') ...
                   || strcmpi(ELECTRODES,'numberspts') || strcmpi(ELECTRODES,'ptnumbers') ...
                   || strcmpi(ELECTRODES,'numberpts')  || strcmpi(ELECTRODES,'ptsnums')  ...
                   || strcmpi(ELECTRODES,'numspts') 
-                 ELECTRODES = 'numpoint'; % backwards compatability
+                 ELECTRODES = 'numpoint'; % backwards compatibility
              end
              if strcmpi(ELECTRODES,'nums') 
-                 ELECTRODES = 'numbers'; % backwards compatability
+                 ELECTRODES = 'numbers'; % backwards compatibility
              end
              if strcmpi(ELECTRODES,'pts') 
-                 ELECTRODES = 'on'; % backwards compatability
+                 ELECTRODES = 'on'; % backwards compatibility
              end
              if ~strcmpi(ELECTRODES,'labelpoint') ...
                 && ~strcmpi(ELECTRODES,'numpoint') ...

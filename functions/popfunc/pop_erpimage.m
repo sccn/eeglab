@@ -1,7 +1,7 @@
 % pop_erpimage() - draw an ERP-image plot of a given EEG channel or independent
 %                  component. Uses a pop-up window if less than three (or four 
 %                  in one condition) input arguments are supplied. Calls erpimage(). 
-%                  For futher details see >> help erpimage
+%                  For further details see >> help erpimage
 % Usage:
 %   >> pop_erpimage(EEG, typeplot);          % pop-up a data entry window
 %   >> pop_erpimage(EEG, typeplot, lastcom); % pop-up a data entry window
@@ -44,7 +44,7 @@
 %                 based on the event 'type' field values (to scan for event types, use 
 %                 menu Edit > Events values and look at the values of the 'type'
 %                 field). For instance, entering type 'rt' (if defined) and field 
-%                 'latency' in option aboce will sort trials on reaction time latencies. 
+%                 'latency' in option above will sort trials on reaction time latencies. 
 %                 When several selected events are present in individual trials, 
 %                 the first event values are used for sorting and a warning is issued. 
 %                 erpimage() equivalent: 'sortingtype'
@@ -66,7 +66,7 @@
 %   "Don't plot value" - [checkbox] Check this box if you do not want to 
 %                 plot the selected event values, but still want to sort 
 %                 the data trials according to these values. 
-%                 erpimage() eqivalent: 'noplot' 
+%                 erpimage() equivalent: 'noplot' 
 %   "Sort by phase > Frequency" - [edit box] Specify the frequency or frequency 
 %                 range for sorting trials by phase. erpimage() equivalent: 
 %                 3rd and 4th inputs to 'phasesort' 
@@ -96,7 +96,7 @@
 %                 erpimage() equivalent: 'vert' 
 %   "More options" - [edit box] Enter 'key', 'value' sequences. Other erpimage()
 %                 options not handled by this interface, including: 'erpstd' to 
-%                 plot the ERP standard deviation; 'auxvar' to plot auxilary 
+%                 plot the ERP standard deviation; 'auxvar' to plot auxiliary 
 %                 variables; 'ampsort' to sort trials based on amplitude at 
 %                 the selected frequency, etc.  For further information see  
 %                 >> help erpimage() 
@@ -183,7 +183,7 @@
 % 02-12-02 added new event format compatibility -ad 
 % 02-15-02 text interface editing -sm & ad 
 % 03-07-02 add the eeglab computeica options -ad
-% 02-15-02 modified the function accoring to the new event/epoch structure -ad
+% 02-15-02 modified the function according to the new event/epoch structure -ad
 % 03-18-02 added title -ad & sm
 % 04-04-02 added outputs -ad & sm
 
@@ -323,7 +323,7 @@ if popup
 			   { 'Style', 'pushbutton', 'string', 'Event type(s)', 'callback', commandtype, 'tooltipstring', ['Event type(s) subset (default: all):' 10 ...
                 '(See ''/Edit/Edit event values'' for event types)']  } ...
 			   { 'Style', 'text', 'string', 'Event time range', 'tooltipstring', [ 'Sorting event window [start, end] in milliseconds (default: whole epoch):' 10 ...
-												  'events are only selected within this time window (can be usefull if several' 10 ...
+												  'events are only selected within this time window (can be useful if several' 10 ...
 												  'events of the same type are in the same epoch, or for selecting trials with given response time)']} ...
 			   { 'Style', 'text', 'string', 'Rescale', 'tooltipstring', 'Rescale sorting variable to plot window (yes|no|a*x+b)(Ex:3*x+2):' } ...
 			   { 'Style', 'text', 'string', 'Align', 'tooltipstring',  context('align',vars,txt) } ...

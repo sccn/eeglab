@@ -79,7 +79,7 @@ comps = comps(sind);
 % sort component indexes within a set
 diffsets = unique_bc(sets(1,:));
 for k = 1:length(diffsets)
-    ci = find(sets(1,:) == diffsets(k)); % find the compnents belonging to each set
+    ci = find(sets(1,:) == diffsets(k)); % find the components belonging to each set
     [tmp,cind] = sort(comps(ci));
     comps(ci) = comps(ci(cind));
 end

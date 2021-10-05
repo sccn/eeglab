@@ -6,7 +6,7 @@
 % Optional inputs:
 %        exactmatch  - [0,1] Force the function to look for an exact match of
 %                       the name provided in the input 'pluginname' 
-%                       {defaul: 0 = not exact match enforced}
+%                       {default: 0 = not exact match enforced}
 %  Outputs:
 %        
 %        status         - [Vector 1xnumber of plugins]. 0 = Not installed,

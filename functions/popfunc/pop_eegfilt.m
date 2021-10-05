@@ -13,7 +13,7 @@
 %                 given above. Set the 'locutoff' and 'hicutoff' values to the
 %                 values entered as parameters, and set 'revfilt to 1, to swap
 %                 from bandpass to notch filtering.
-%   "Filter length" - [edit box] Filter lenghth in point (default: see 
+%   "Filter length" - [edit box] Filter length in point (default: see 
 %                 >> help eegfilt). Same as 'filtorder' optional input.
 %
 % Inputs:

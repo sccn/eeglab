@@ -42,7 +42,7 @@
 %   params              - structure containing parameters saved with the data file.
 %   range1              - time points (ERP, ERSP) or frequency points (spectrum)
 %   range2              - frequency points (ERSP, ITCs)
-%   events              - Event readed from the data structure
+%   events              - Event read from the data structure
 %
 % Examples:
 %   % the examples below read all data channels for the selected files
@@ -91,7 +91,7 @@ if nargin < 1
 end
 
 if iscell(fileBaseName)
-    % this is when the data of a subject is split accross sessions
+    % this is when the data of a subject is split across sessions
     % then we need to call std_readfile several times and combine
     % the results
     % ------------------------------------------------------------
@@ -371,7 +371,7 @@ for index = 1:length(chan)
     warning('off', 'MATLAB:MatFile:OlderFormat');
     if ischar(fileData.(fieldToRead)) % special ERP-image
         try
-            fileData.chanlocsforinterp; % isfield does not work becauce fileData is a MatFile
+            fileData.chanlocsforinterp; % isfield does not work because fileData is a MatFile
         catch, error('Missing field in ERPimage STUDY file, try recomputing them');
         end
         chanlocsforinterp = fileData.chanlocsforinterp;

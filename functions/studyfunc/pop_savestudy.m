@@ -16,7 +16,7 @@
 %   'resavedatasets' - ['on'|'off'] resave STUDY datasets if necessary.
 %                Default is 'off'.
 %
-% Note: the parameter EEG is currenlty not being used. In the future, this function
+% Note: the parameter EEG is currently not being used. In the future, this function
 %       will check if any of the datasets of the study have been modified and
 %       have to be resaved.
 %

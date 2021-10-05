@@ -5,7 +5,7 @@
 %                 specified size are then labeled as artifactual.
 %
 % Usage:
-%   >> pop_rejcont( INEEG ) % pop-up interative window mode
+%   >> pop_rejcont( INEEG ) % pop-up interactive window mode
 %   >> [OUTEEG, selectedregions] = pop_rejcont( INEEG, 'key', 'val');
 %
 % Inputs:

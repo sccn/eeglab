@@ -15,7 +15,7 @@
 %
 % Optional inputs:
 %   outrange    - [1/0] Replace the points out of the range with the value of
-%                 the maximun point in the valid range or raise an error.
+%                 the maximum point in the valid range or raise an error.
 %                 Default [1] : Replace point.
 %
 % Outputs:
@@ -101,7 +101,7 @@ pnts = (timewin(2)-timewin(1))*srate+1;
 newlat  = (lat_array*timeunit-timewin(1))*srate+1 + (epoch_array-1)*pnts;
 
 % Detecting points out of range (RMC)
-% Note: This is neccesary since the double precision  multiplication could lead to the
+% Note: This is necessary since the double precision  multiplication could lead to the
 % shifting in one sample out of the valid range
 
 if  and(~isempty(newlat),~isempty(epoch_array)) && max(newlat(:)) > max((epoch_array)*pnts)

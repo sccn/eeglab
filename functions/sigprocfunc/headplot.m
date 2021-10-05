@@ -266,7 +266,7 @@ if ischar(values)
     
     %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 -1.57], 100, -[6 0 46]);
     %newcoords = transformcoords( [ Xeori Yeori Zeori ], g.transform(4:6), g.transform(7:9), g.transform(1:3));
-    % same performed below with homogenous transformation matrix
+    % same performed below with homogeneous transformation matrix
     
     transmat  = traditionaldipfit( g.transform ); % arno
     newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
@@ -364,7 +364,7 @@ if ischar(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fprintf('Computing %d vertices. Should take a while (see wait bar)\n',...
                       length(x))
-    fprintf('            but doesnt have to be done again for this montage...\n');
+    fprintf('            but does not have to be done again for this montage...\n');
     icadefs;
 
     gx = fastcalcgx(x,y,z,Xe,Ye,Ze);

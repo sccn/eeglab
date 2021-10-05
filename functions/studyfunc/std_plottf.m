@@ -38,7 +38,7 @@
 %  'maskdata'    - ['on'|'off'] when threshold is non-NaN and not both 
 %                  condition and group statistics are computed, the user 
 %                  has the option to mask the data for significance.
-%                  {defualt: 'off'}
+%                  {default: 'off'}
 %
 % Other plotting options:
 %  'plotmode'    - ['normal'|'condensed'] statistics plotting mode:
@@ -48,7 +48,7 @@
 %  'freqscale'   - ['log'|'linear'|'auto'] frequency plotting scale. This
 %                  will only change the ordinate not interpolate the data.
 %                  If you change this option blindly, your frequency scale
-%                  might be innacurate {default: 'auto'}
+%                  might be inaccurate {default: 'auto'}
 %
 % ITC/ERSP image plotting options:
 %  'tftopoopt'   - [cell array] tftopo() plotting options (ERSP and ITC)
@@ -180,7 +180,7 @@ if strcmpi(opt.plotmode, 'condensed')
     return; 
 end
 
-% plotting paramters
+% plotting parameters
 % ------------------
 if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end
 if nc > 1 && ~isempty(opt.condstats  ), addr = 1; else addr = 0; end
@@ -276,7 +276,7 @@ for c = 1:nc
             end
         end
     
-        % statistics accross groups
+        % statistics across groups
         % -------------------------
         if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && c == 1)
             if g == ng && ng > 1 && ~isempty(opt.groupstats) && ~isinf(pgroupplot{c}(1)) && ~statmask
@@ -296,7 +296,7 @@ for c = 1:nc
 end
 
 for g = 1:ng
-    % statistics accross conditions
+    % statistics across conditions
     % -----------------------------
     if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && g == 1)
         if ~isempty(opt.condstats) && ~isinf(pcondplot{g}(1)) && ~statmask && nc > 1
@@ -314,7 +314,7 @@ for g = 1:ng
     end
 end
 
-% statistics accross group and conditions
+% statistics across group and conditions
 % ---------------------------------------
 if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1 && ~isempty(pinterplot)
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, nc+addr, ng+1, opt.transpose);

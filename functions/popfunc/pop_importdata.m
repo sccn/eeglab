@@ -31,7 +31,7 @@
 %   "Ref. channel indices or mode" - [edit box] current reference. This edit box
 %                  cannot be edited. To change data reference, use menu 
 %                  Tools > Re-reference calling function pop_reref(). The reference 
-%                  can be a string, 'common' indicating an unknow common reference, 
+%                  can be a string, 'common' indicating an unknown common reference, 
 %                  'averef' indicating average reference, or an array of integer 
 %                  containing the indices of the reference channels.
 %   "Subject code" - [Edit box] subject code. For example, 'S01'. The command

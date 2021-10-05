@@ -22,8 +22,8 @@
 %  'factor2stat'   - ['on'|'off'] default is 'off'
 %  'mcorrect'      - [string] correction for multiple comparisons. Default is
 %                  empty.
-%  'statistics'  - [string] type of statictics
-%  'threshold'   - [real] treshold value
+%  'statistics'  - [string] type of statistics
+%  'threshold'   - [real] threshold value
 % 
 % Optional grouping:
 %  'factor1grouped'  - ['on'|'off'] group factor 1 together default is 'off'

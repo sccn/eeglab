@@ -12,7 +12,7 @@
 %                                                                % in all sets on all measures
 %
 %  >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG, clustind, preproc1, preproc2...);
-%                                                                % prepare to cluster specifed 
+%                                                                % prepare to cluster specified 
 %                                                                % cluster on specified measures
 % Required inputs:
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
@@ -44,7 +44,7 @@
 %                    'finaldim' = final number of dimensions. Enables second-level PCA. 
 %                                  By default this command is not used (see Example below).
 %
-%            * 'key'   optional keywords and [valuess] used to compute the above 'commands':
+%            * 'key'   optional keywords and [values] used to compute the above 'commands':
 %                    'npca'    =  [integer] number of principal components (PCA dimension) of 
 %                                   the selected measures to retain for clustering. {default: 5}
 %                    'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
@@ -189,7 +189,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         % -------------
         strcom = varargin{index}{1};
         if any(strcom == 'X'), disp('character ''X'' found in command'); end
-        %defult values
+        %default values
         npca = NaN;
         norm = 1;
         weight = 1;
@@ -388,7 +388,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 end
                 clustdatatmp = clustdatatmp.';
             case 'dipoles'
-                % normalize each cordinate by the std dev of the radii
+                % normalize each coordinate by the std dev of the radii
                 normval = std(sqrt(data(:,1).^2 + data(:,2).^2 + data(:,3).^2));
                 clustdatatmp = data./normval;
                 norm = 0;
@@ -459,7 +459,7 @@ function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
         end
     end
 
-% the function below checks the precense of the centroid field
+% the function below checks the presence of the centroid field
 function cluster = checkcentroidfield(cluster, varargin)
     for kk = 1:length(cluster)
         if ~isfield('centroid', cluster(kk)), cluster(kk).centroid = []; end

@@ -140,7 +140,7 @@ classdef pop_limoresults < handle
                     end
                 end
                 
-                % Set regressors order as LIMO asume it (first all categorical, then all continuos)
+                % Set regressors order as LIMO assumes it (first all categorical, then all continuous)
                 %----------------------------------------------------------------------------------
                 cont_indx   = find(strcmp('continuous',vartype_tmp));
                 cat_indx    = find(strcmp('categorical',vartype_tmp));
@@ -153,10 +153,10 @@ classdef pop_limoresults < handle
                 limo = load(fullfile(obj.limofiles_path,'LIMO.mat' ));
                 Nreg = size(limo.LIMO.design.X,2);
                 
-                 % Rgressors names in case of split continous ones
+                 % Rgressors names in case of split continuous ones
                  %---------------------------------------------------------
                 if ~isempty(cont_indx) && (Nreg ~= length(tmpregnames))
-                    display('Split regressor detected. Giving generic names to continuos regressors ...' );
+                    display('Split regressor detected. Giving generic names to continuous regressors ...' );
                     if ~isempty(cat_indx), inintcont = length(cat_indx)+1; else inintcont = 1 ; end
                     
                     for i = inintcont:(Nreg-1)
@@ -786,7 +786,7 @@ handles.fig = figure('MenuBar','none',...
     'Position',[549.072 185.686 283.538 466.212],...
     'Resize', 'off');
 
-%Pannel 1 (Plot Settings)
+%Panel 1 (Plot Settings)
 %--------------------------------------------------------------
 % Panel
 handles.panel_1 = uipanel('parent',handles.fig,...
@@ -798,7 +798,7 @@ handles.panel_1 = uipanel('parent',handles.fig,...
     'FontWeight','bold',...
     'Tag', 'panel_1');
 
-%Pannel 2 (Compute Statistics)
+%Panel 2 (Compute Statistics)
 %--------------------------------------------------------------------------
 handles.panel_2 = uipanel('parent',handles.fig,...
     'units','normalized',...
@@ -868,7 +868,7 @@ handles.listbox_elect2plot = uicontrol('parent',handles.panel_1,...
     'tooltipString',ttiptext{7},...
     'Tag','listbox_elect2plot');
 
-%Pannel 2 (Compute Statistics)
+%Panel 2 (Compute Statistics)
 %--------------------------------------------------------------------------
 % Checkbox
 handles.checkbox_stats = uicontrol('parent',handles.fig,...
