@@ -57,7 +57,7 @@
 %  'plotchans' = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
 %                  {default|[] -> all}, by calling topoplot().
-%  'voffsets'  = [float array] vertical line extentions above the data max to 
+%  'voffsets'  = [float array] vertical line extensions above the data max to 
 %                  disentangle plot lines (left->right heads, values in y-axis units) 
 %                  {default|[] -> none}
 %  'colors'    = [string] filename of file containing colors for envelopes, 3 chars

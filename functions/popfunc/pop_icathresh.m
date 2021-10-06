@@ -85,7 +85,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-%PROBLEM: when the % is set and we change manually yhe threshold,
+%PROBLEM: when the % is set and we change manually the threshold,
 % the software comes back to the percentage rejection
 
 % 01-25-02 reformated help & license -ad 

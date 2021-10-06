@@ -47,7 +47,7 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % 04/01/02 changed header for help2html compatibility -ad
-% 04/01/02 debuging zs -ad
+% 04/01/02 debugging zs -ad
 % 04/01/02 adding extra optional [X,Y,Z] argument -ad
 
 function  plotchans3d(elpfile, arg2, arg3)

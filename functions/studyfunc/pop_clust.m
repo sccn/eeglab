@@ -17,8 +17,8 @@
 %                 'kmeanscluster' option is included in EEGLAB. The 'Neural Network' 
 %                  option requires the Matlab Neural Net toolbox {default: 'kmeans'} 
 %   'clus_num'  - [integer] the number of desired clusters (must be > 1)
-%                 {default: 20}. Not neccesary when using Affinity Propagation algorithm 
-%   'maxiter'   - maximun numer of iterations when using Affinity Propagation algorithm 
+%                 {default: 20}. Not necessary when using Affinity Propagation algorithm 
+%   'maxiter'   - maximum number of iterations when using Affinity Propagation algorithm 
 %   'outliers'  - [integer] identify outliers further than the given number of standard
 %                 deviations from any cluster centroid. Inf --> identify no such outliers.
 %                 {default: Inf from the command line; 3 for 'kmeans' from the pop window}
@@ -179,7 +179,7 @@ if isempty(varargin) %GUI call
         try
             clustdata = STUDY.etc.preclust.preclustdata;
         catch
-            error('Error accesing preclustering data. Perform pre-clustering.');
+            error('Error accessing preclustering data. Perform pre-clustering.');
         end
         command = '[STUDY] = pop_clust(STUDY, ALLEEG,';
         

@@ -61,7 +61,7 @@
 %                             Comment lines begin with '%'. Default is 'off'.
 %   'customheader' - [string] Add a custom header at the beginning of the file and
 %                             preceded by '%'.  If used with 'header' set to 'on', 
-%                             the column names will be insterted after the custom header.
+%                             the column names will be inserted after the custom header.
 %   'elecind' - [integer array] Indices of channels to export. 
 %                             Default is all channels.
 %

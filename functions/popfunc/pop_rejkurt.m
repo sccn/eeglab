@@ -3,7 +3,7 @@
 %                 activity).
 %
 % Usage:
-%   >> pop_rejkurt( INEEG, typerej) % pop-up interative window mode
+%   >> pop_rejkurt( INEEG, typerej) % pop-up interactive window mode
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
 %		= pop_rejkurt( INEEG, typerej, elec_comp, ...
 %                   locthresh, globthresh, superpose, reject, vistype);

@@ -150,7 +150,7 @@ end
 
 clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
 
-% the eeg_options.m file also countains additional options
+% the eeg_options.m file also contains additional options
 
 % ----------------------------------------------------------------------
 % ------------------------ END OF DEFINITIONS --------------------------

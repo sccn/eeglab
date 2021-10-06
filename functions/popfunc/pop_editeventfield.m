@@ -107,7 +107,7 @@
 %02/13/2001 fix bug if EEG.event is empty -ad
 %03/12/2001 add timeunit option -ad
 %03/18/2001 debug rename option -ad & sm
-%03/18/2001 correct allignment problem -ad & ja
+%03/18/2001 correct alignment problem -ad & ja
 
 function [EEG, com] = pop_editeventfield(EEG, varargin);
 
@@ -247,7 +247,7 @@ else % no interactive inputs
     % scan args to modify array/file format
     % array are transformed into string 
     % files are transformed into string of string
-    % (this is usefull to build the string command for the function)
+    % (this is useful to build the string command for the function)
     % --------------------------------------------------------------
     for index=1:2:length(args)
         if iscell(args{index+1}), args{index+1} = { args{index+1} }; end; % double nested 
@@ -378,7 +378,7 @@ for curfield = tmpfields'
       end
 end
 
-if isempty(EEG.event) % usefull 0xNB empty structure
+if isempty(EEG.event) % useful 0xNB empty structure
     EEG.event = [];
 end
 EEG = eeg_checkset(EEG, 'eventconsistency');

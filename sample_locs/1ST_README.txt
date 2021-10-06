@@ -2,7 +2,7 @@ This directory contains sample electrode location files for the standard
 10-20 and 10-10 Systems in EEGLAB format. Copy these files, 
 then delete and/or add channels to match your electrode caps. You may
 other standard electrode cap location files at the EEGLAB website.
-".locs" files contain polar coordiantes. ".ced" files contain electrode 
+".locs" files contain polar coordinates. ".ced" files contain electrode 
 positions in polar, 3-D cartesian and 3-D spherical coordinate frames.
 
 These files can also be converted to other formats (e.g., BESA, etc.) 

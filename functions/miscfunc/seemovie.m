@@ -55,7 +55,7 @@ if nargin<3
     Colormap = 0;
 end
 if nargin<2
-	ntimes = -10;    % default to playing foward|backward endlessly
+	ntimes = -10;    % default to playing forward|backward endlessly
 end
 if ntimes == 0
 	ntimes = -10;

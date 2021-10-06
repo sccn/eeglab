@@ -1,7 +1,7 @@
 function test_compiled_version(varargin)
 global CURRENTSTUDY CURRENTSET ALLEEG EEG STUDY
 
-res = questdlg2('Are you seing the command line outputs?', 'Compiled version', 'No', 'Yes', 'Yes');
+res = questdlg2('Are you seeing the command line outputs?', 'Compiled version', 'No', 'Yes', 'Yes');
 if strcmpi(res, 'No')
     res = questdlg2( [ 'Users need to be able to see command line' 10 ...
         'output even for the compiled version. This' 10 ...

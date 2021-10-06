@@ -6,7 +6,7 @@
 %
 % Inputs:
 %   commandnames - name of the commands. Either char array or cell
-%                  array of char. All style are 'pushbuttons' exept
+%                  array of char. All style are 'pushbuttons' except
 %                  for empty commands.
 %   helparray    - cell array of commands to execute for each menu
 %                  (default is empty)  

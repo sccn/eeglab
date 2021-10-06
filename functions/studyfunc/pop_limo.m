@@ -28,7 +28,7 @@
 %
 %  "Interaction model for categorical indep. var." - When using more than 
 %                   one categorical variable, clicking this option forces
-%                   to have factors which are the conjonction of the
+%                   to have factors which are the conjunction of the
 %                   different independent var. values. This is useful only 
 %                   if you want to calculate interactions at the subject.
 %                   The 'best' option is typically to have a design with
@@ -45,7 +45,7 @@
 %                   for the GLM. Currently, only "ERP" and "spectrum" are 
 %                   supported.
 %
-%  "Optimization method" - [pop up meny] may be Ordinary Least Squares (OLS), 
+%  "Optimization method" - [pop up menu] may be Ordinary Least Squares (OLS), 
 %                   Weighted Least Squares (WLS), or Iterative Reweighted Least 
 %                   Squares. WTS should be used as it is more robust to trials
 %                   with different time course. OLS is a standard solution and 

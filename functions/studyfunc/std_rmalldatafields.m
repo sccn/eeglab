@@ -11,7 +11,7 @@
 %   type    - ['chan'|'clust'|'both'] remove from changrp channel location
 %             structure, cluster structure or both. Default is 'both'.
 %
-% Ouput:
+% Output:
 %   STUDY   - updated EEGLAB study structure
 %
 % Author: Arnaud Delorme, CERCO/CNRS, UCSD, 2010-

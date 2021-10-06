@@ -81,7 +81,7 @@ end
 %     end
 % end
 
-% Cleaning files related with design (unnecesary??)
+% Cleaning files related with design (unnecessary??)
 tmpfiles = dir([filepath filesep 'LIMO_' filename]);
 tmpfiles = {tmpfiles.name};
 

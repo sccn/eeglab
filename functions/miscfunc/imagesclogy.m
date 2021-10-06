@@ -81,7 +81,7 @@ function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
   end
   set(gca, 'yscale', 'log');
   
-  % puting ticks
+  % putting ticks
   % ------------
   if nargin >= 5, set(gca, 'xtick', xticks); end
   if nargin >= 6

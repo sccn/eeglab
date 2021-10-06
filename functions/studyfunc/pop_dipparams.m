@@ -8,7 +8,7 @@
 %
 % Optional inputs:
 %   'axistight' - ['on'|'off'] Plot closest MRI slide. Default is 'off'.
-%   'projimg'   - ['on'|'off'] lot dipoles projections on each axix. Default is 'off'.
+%   'projimg'   - ['on'|'off'] lot dipoles projections on each axis. Default is 'off'.
 %   'projlines' - ['on'|'off'] Plot projection lines. Default is 'off'.
 %   'density'   - ['on'|'off'] Plot dipole density. Default is 'off'.
 %   'centrline' - ['on'|'off'] Plot centroid's projection line. 

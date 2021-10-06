@@ -817,7 +817,7 @@ end
                                   % recompute signs vector using kurtosis
         if kurtsize < frames % 12-22-99 rand() size suggestion by M. Spratling
            rp = fix(rand(1,kurtsize)*datalength);  % pick random subset
-           % Accout for the possibility of a 0 generation by rand
+           % Account for the possibility of a 0 generation by rand
            ou = find(rp == 0);
            while ~isempty(ou) % 1-11-00 suggestion by J. Foucher
               rp(ou) = fix(rand(1,length(ou))*datalength);

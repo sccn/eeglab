@@ -100,7 +100,7 @@ for index = 1:length(filetypes)
                         if ~isequal(firstval, tmpval)
                             if ~strcmpi(fields{f_ind}, 'labels') || strcmpi(uniformchannels, 'on')
                                 if firstpass == 1, fprintf('\n'); firstpass = 0; end
-                                fprintf('  Error, difference accross data files for field "%s"\n', fields{f_ind});
+                                fprintf('  Error, difference across data files for field "%s"\n', fields{f_ind});
                                 notequal = 1;
                                 passall = 0;
                                 break;

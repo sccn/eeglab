@@ -599,7 +599,7 @@ if ~isempty(EEG.specdata)
    		EEG.specdata = EEG.specdata(g.channel, :, g.trial);
    	else
    		EEG.specdata = [];
-   		fprintf('Warning: spectral data were removed because of the change in the numner of points\n');
+   		fprintf('Warning: spectral data were removed because of the change in the number of points\n');
     end
 end
 
@@ -646,7 +646,7 @@ if ~isempty(EEG.specicaact)
         EEG.specicaact = EEG.specicaact(icachans, :, g.trial);
     else
         EEG.specicaact = [];
-        fprintf('Warning: spectral ICA data were removed because of the change in the numner of points\n');
+        fprintf('Warning: spectral ICA data were removed because of the change in the number of points\n');
     end
 end
 

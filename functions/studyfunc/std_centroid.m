@@ -26,7 +26,7 @@
 %                  have previously been computed.
 % Outputs:
 %   STUDY        - input STUDY structure with computed centroids added. 
-%                  If the requested centroids already exist, overwites them. 
+%                  If the requested centroids already exist, overwrites them. 
 %   centroid     - cell array of centroid structures, each cell corrasponding 
 %                  to a different cluster requested in 'clusters' (above).
 %                  fields of 'centroid' may include centroid.erp, centroid.dipole,
@@ -91,7 +91,7 @@ function [STUDY, centroid] = std_centroid(STUDY,ALLEEG, clsind, varargin);
          end
      end
  end
- %defult values
+ %default values
 erpC =0;
 specC =0 ;
 scalpC = 0;
@@ -292,7 +292,7 @@ if dipoleC %dipole centroid
    end
 end
 
-%updat STUDY
+%update STUDY
 for clust =  1:length(clsind) %go over all requested clusters
     for cond  = 1:Ncond
         ncomp = length(STUDY.cluster(clsind(clust)).comps);

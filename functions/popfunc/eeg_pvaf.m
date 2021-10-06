@@ -33,7 +33,7 @@
 %    vars      - variances of the requested channels
 %
 % Fields:  
-%    Assumes existence of the following EEG fiels: EEG.data, EEG.pnts, EEG.nbchan, EEG.trials,
+%    Assumes existence of the following EEG fields: EEG.data, EEG.pnts, EEG.nbchan, EEG.trials,
 %          EEG.icaact, EEG.icaweights, EEG.icasphere, EEG.icawinv, and for plot, EEG.chanlocs
 %
 % Author: Scott Makeig & Arnaud Delorme, SCCN, INC, UCSD, Fri Feb 13, 2004
@@ -224,7 +224,7 @@ if progressive % output accumulated results
   end
 elseif strcmpi(g.plot, 'on')
 %
-%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribtion of pvaf %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribution of pvaf %%%%%%%%%%%%%
 %
  if isfield(EEG,'chanlocs')
    chanlocs = EEG.chanlocs;

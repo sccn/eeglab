@@ -47,7 +47,7 @@ if isstruct(varlist)
     
     if isempty(values)
         if varlist.numerical(indVar)
-            indCat = 2; % continous
+            indCat = 2; % continuous
             indVal = [1:length(varlist.factorvals{indVar})];
         end
     else

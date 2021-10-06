@@ -43,7 +43,7 @@
 %  'T0'            - recording time [YYYY MM DD hh mm ss.ccc]
 %  'RID'           - [string] StudyID/Investigation, default is empty
 %  'REC.Hospital   - [string] default is empty
-%  'REC.Techician  - [string] default is empty
+%  'REC.Technician  - [string] default is empty
 %  'REC.Equipment  - [string] default is empty
 %  'REC.IPaddr	   - [integer array] IP address of recording system. Default is
 %                    [127,0,0,1]
@@ -119,7 +119,7 @@ if ~isfield(HDR.Manufacturer, 'SerialNumber'), HDR.Manufacturer.SerialNumber = '
 if ~isfield(HDR,'RID')                         HDR.RID = ''; end; %StudyID/Investigation [consecutive number];
 if ~isfield(HDR,'REC')                         HDR.REC = []; end
 if ~isfield(HDR.REC, 'Hospital')               HDR.REC.Hospital = ''; end; 
-if ~isfield(HDR.REC, 'Techician')              HDR.REC.Techician = ''; end
+if ~isfield(HDR.REC, 'Technician')              HDR.REC.Technician = ''; end
 if ~isfield(HDR.REC, 'Equipment')              HDR.REC.Equipment = ''; end
 if ~isfield(HDR.REC, 'IPaddr')             	   HDR.REC.IPaddr = [127,0,0,1]; end; % IP address of recording system 	
 if ~isfield(HDR.Patient, 'Weight')             HDR.Patient.Weight = 0; end; 	% undefined 

@@ -16,7 +16,7 @@
 %                 component individually. If fewer than number of 
 %                 electrodes|components, apply the last value to all remaining
 %                 electrodes|components.
-% "Maximun power  rejection threshold(s) (dB)" - Maximum rejection threshold(s) 
+% "Maximum power  rejection threshold(s) (dB)" - Maximum rejection threshold(s) 
 %                 Sets the command  line parameter 'threshold'.
 % "Low frequency  limit(s)" - [edit box] Low-frequency limit(s) in Hz of 
 %                 range to perform  rejection. Sets the command line parameter

@@ -25,7 +25,7 @@
 %               e.g. size(arg1{1})=[100 200 500], size(arg1{2})=[100 200 395]
 %    arg2     - same as arg1, note that it is compared only to itself, and has
 %               nothing to do with arg1 besides using the same formula, alpha, etc.
-% ...argn     - may call n number of arguement pairs    
+% ...argn     - may call n number of argument pairs    
 %
 % Outputs: 
 %    diffres  - difference array for the actual (non-shuffled) data, if more than one

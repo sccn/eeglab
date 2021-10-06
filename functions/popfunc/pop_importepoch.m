@@ -14,7 +14,7 @@
 %                      equivalent: filename.
 %  "File input field ..." - [edit box] enter a name for each of the column in the
 %                      text file. If columns names are defined in the text file,
-%                      they cannnot be used and you must copy their names
+%                      they cannot be used and you must copy their names
 %                      in this edit box (and skip the rows). One column name
 %                      for each column must be provided. The keywords "type" and
 %                      "latency" should not be used. Columns names can be
@@ -249,7 +249,7 @@ if size(values,1) < size(values,2), values = values'; end
 if length(fieldlist) ~= size(values,2)
     values = values';
     if length(fieldlist) ~= size(values,2)
-        error('There must be as many field names as there are columsn in the file/array');
+        error('There must be as many field names as there are columns in the file/array');
     end
 end
 if ~iscell(fieldlist)
@@ -371,7 +371,7 @@ for indexevent = 1:length(EEG.event)
     end
 end
 
-% adding desciption to the fields
+% adding description to the fields
 % -------------------------------
 if ~isfield(EEG, 'eventdescription' ) || isempty( EEG.eventdescription )
 	allfields = fieldnames(EEG.event);

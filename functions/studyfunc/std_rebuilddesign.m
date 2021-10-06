@@ -11,7 +11,7 @@
 % Optional inputs:
 %   designind - [integer>0] indices (number) of the design to rebuild.
 %               Default is all.
-% Ouput:
+% Output:
 %   STUDY     - updated EEGLAB STUDY set
 %
 % Author: Arnaud Delorme, Institute for Neural Computation UCSD, 2010-

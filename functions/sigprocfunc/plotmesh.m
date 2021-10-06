@@ -6,7 +6,7 @@
 % Input:
 %   faces   - array of N x 3. Each row defines a triangle. The 3 points
 %             in each row are row indices in the matrix below.
-%   vertex  - array of M x 3 points, (x = first colum; y=second colum
+%   vertex  - array of M x 3 points, (x = first column; y=second column
 %             z=3rd column). Each row defines a point in 3-D.
 %
 % Optional input:

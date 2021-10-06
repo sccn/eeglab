@@ -8,7 +8,7 @@
 %   errordlg2('Explanation of error','title of error');
 %
 % Input:
-%   Prompt  -   A text string explaning why the user is seeing this error message.
+%   Prompt  -   A text string explaining why the user is seeing this error message.
 %   Title   _   A text string that appears in the title bar of the error message.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002

@@ -82,13 +82,13 @@
 %                   for wavelets. Default: use 'padratio'.
 %     'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
 %                   Note that for obtaining 'log' spaced freqs using FFT,
-%                   closest correspondant frequencies in the 'linear' space
+%                   closest correspondent frequencies in the 'linear' space
 %                   are returned.
 %     'wletmethod'= ['dftfilt2'|'dftfilt3'] Wavelet method/program to use.
 %                   Default is 'dftfilt3'
 %                   'dftfilt3' Morlet wavelet or Hanning DFT
 %                   'dftfilt2' Morlet-variant or Hanning DFT.
-%                   Note that there are differences betweeen the Hanning
+%                   Note that there are differences between the Hanning
 %                   DFTs in the two programs.
 %       'causal'  = ['on'|'off'] apply FFT or time-frequency in a causal
 %                   way where only data before any given latency can 

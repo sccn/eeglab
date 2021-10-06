@@ -1,10 +1,10 @@
 % pop_jointprob() - reject artifacts in an EEG dataset using joint 
 %                   probability of the recorded electrode or component 
 %                   activities observed at each time point.  e.g., Observing 
-%                   large absoluate values at most electrodes or components 
+%                   large absolute values at most electrodes or components 
 %                   is improbable and may well mark the presence of artifact.
 % Usage:
-%   >> pop_jointprob( INEEG, typerej) % pop-up interative window mode
+%   >> pop_jointprob( INEEG, typerej) % pop-up interactive window mode
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
 %		= pop_jointprob( INEEG, typerej, elec_comp, ...
 %                   locthresh, globthresh, superpose, reject, vistype);

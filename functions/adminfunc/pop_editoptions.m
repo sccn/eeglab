@@ -10,7 +10,7 @@
 % Graphic interface inputs:
 %   "If set, keep at most one dataset in memory ..." - [checkbox] If set, EEGLAB will only retain the current
 %                   dataset in memory. All other datasets will be automatically
-%                   read and writen to disk. All EEGLAB functionalities are preserved
+%                   read and written to disk. All EEGLAB functionalities are preserved
 %                   even for dataset stored on disk. 
 %   "If set, write data in same file as dataset ..." - [checkbox] Set -> dataset data (EEG.data) are 
 %                   saved in the EEG structure in the standard Matlab dataset (.set) file. 
@@ -27,7 +27,7 @@
 %                   time courses are precomputed (this requires more RAM). 
 %                   Command line equivalent: option_computeica.
 %   "If set, remember old folder when reading dataset" - [checkbox] this option
-%                   is convinient if the file you are working on are not in the 
+%                   is convenient if the file you are working on are not in the 
 %                   current folder.
 %
 % Commandline keywords:
@@ -47,7 +47,7 @@
 %   working directory overwrites system defaults whenever EEGLAB operates in this
 %   directory (assuming your working directory is in your MATLABPATH - see path()).
 %   To adjust these options system-wide, edit the master "eeg_options.m" file in the
-%   EEGLAB directory heirarchy.
+%   EEGLAB directory hierarchy.
 %
 % Author: Arnaud Delorme, SCCN / INC / UCSD, March 2002
 %

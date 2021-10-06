@@ -87,7 +87,7 @@ for index = 2:length(varargin)
 end
 
 % union of two channel location structure
-% without loosing the order information
+% without losing the order information
 % ---------------------------------------
 function alllocs = myunion(locs1, locs2)
 

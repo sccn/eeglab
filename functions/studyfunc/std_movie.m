@@ -20,7 +20,7 @@
 %   'freqslim'  - [freqs] array of landmark frequencies to set color
 %                 limits.
 %   'movieparams' - [low inc high] lower limit, higher limit and increment. If
-%                increment is omited, movie is generate at every possible
+%                increment is omitted, movie is generate at every possible
 %                increment (max freq resolution or max time resolution)
 %
 % Authors: Arnaud Delorme, CERCO, August, 2006

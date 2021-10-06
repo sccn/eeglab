@@ -67,7 +67,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 2/06/02 modifed header - sm & ad
+% 2/06/02 modified header - sm & ad
 % 2/08/02 add field input - ad
 % 2/12/02 reprogrammed function using epochformat.m - ad
 

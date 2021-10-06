@@ -2,7 +2,7 @@
 %                  probability of the recorded electrode.
 %
 % Usage:
-%   >> pop_rejchan( INEEG ) % pop-up interative window mode
+%   >> pop_rejchan( INEEG ) % pop-up interactive window mode
 %   >> [EEG, indelec, measure, com] = ...
 %		= pop_rejchan( INEEG, 'key', 'val');
 %
@@ -12,7 +12,7 @@
 % Optional inputs:
 %   'elec'     - [n1 n2 ...] electrode number(s) to take into 
 %                consideration for rejection
-%   'threshold' - [max] absolute thresold or activity probability 
+%   'threshold' - [max] absolute threshold or activity probability 
 %                 limit(s) (in std. dev.) if norm is 'on'.
 %   'measure'  - ['prob'|'kurt'|'spec'] compute probability 'prob', kurtosis 'kurt'
 %                or spectrum 'spec' for each channel. Default is 'kurt'.

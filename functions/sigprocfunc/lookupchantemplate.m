@@ -5,7 +5,7 @@
 %
 % Inputs:
 %   filename        - channel location file name
-%   template_struct - template strcuture as defined in dipfitdefs
+%   template_struct - template structure as defined in dipfitdefs
 %
 % Outputs:
 %   found     - [0|1] 1 if a transformation was found for this template

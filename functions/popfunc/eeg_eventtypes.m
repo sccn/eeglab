@@ -1,5 +1,5 @@
 % eeg_eventtypes()  - return a list of event or urevent types in a dataset and 
-%                     the respective number of events of each type. Ouput event 
+%                     the respective number of events of each type. Output event 
 %                     types are sorted in reverse order of their number. If no 
 %                     outputs, print this list on the commandline instead.
 %
@@ -12,7 +12,7 @@
 %        numbers    - vector giving the numbers of each event type in the data
 %
 % Example:
-%           >> eeg_eventtypes(EEG);       % print numner of each event types
+%           >> eeg_eventtypes(EEG);       % print number of each event types
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, April 28, 2004-
 
@@ -30,9 +30,9 @@
 %        types {13} and {'13'} are not distinguished.
 %
 % Example:
-%           >> eeg_eventtypes(EEG);       % print numner of each event types
+%           >> eeg_eventtypes(EEG);       % print number of each event types
 %
-% Curently disabled:
+% Currently disabled:
 %           >> eeg_eventtypes(EEG,'urevent');  % print hist. of urevent types
 %           >> eeg_eventtypes(EEG,{'rt'});% print number of 'rt' events 
 %           >> eeg_eventtypes(EEG,'urevent',{'rt','break'}); 
@@ -87,7 +87,7 @@ if nargin > 1
     error('Multiple input arguments are currently disabled');
 end
 
-UREVENTS = 0; % flag returning infor for urevents instead of events
+UREVENTS = 0; % flag returning info for urevents instead of events
 typelist = [];
 if nargin>1
    if ischar(arg2)

@@ -34,7 +34,7 @@
 %          Unfortunately, structures are awkward for expert users to deal
 %          with from the command line (Ex: To get an array of 'var1' values,
 %           >> celltomat({EEG.epoch(:).var1})')
-%          In array format, asuming 'var1' is the first variable
+%          In array format, assuming 'var1' is the first variable
 %          declared, the same information is obtained by
 %           >> EEG.epoch(:,1)
 %       3) This function automatically updates the 'epochfields'

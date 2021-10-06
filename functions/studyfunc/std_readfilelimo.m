@@ -4,10 +4,10 @@
 %   >> [MeasureData, parameters, MeasureRange1, MeasureRange2] = std_readfilelimo(filestruct,'key', val)
 %
 % Inputs:
-% filestrcuct  - Strcuture with the following fields: 
+% filestrcuct  - Structure with the following fields: 
 %                datasets : Index of he datasets in datasetinfo (real)
 %                trials   : index of the trials to pull out     (cell array)
-%                value    : Cell array with the values of the independet variables of the set.                 
+%                value    : Cell array with the values of the independent variables of the set.                 
 %                case     : name of the subject /case
 %                filebase : Full Path and filename of the 
 %
@@ -280,7 +280,7 @@ switch g.measure
     % beta2
     %..................................................................
     case {'erpbeta2','erspbeta2','specbeta2','itcbeta2'}
-        error('std_readfilelimo(): Invalid optin in this realease');
+        error('std_readfilelimo(): Invalid option in this realease');
     
     % erpr2
     %..................................................................

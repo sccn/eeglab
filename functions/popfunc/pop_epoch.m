@@ -119,7 +119,7 @@ if ~isfield(EEG(1).event, 'latency'),
 end
 if size(EEG(1).data,3) > 1
     epochlim = [num2str( round(EEG.xmin)) '  '  num2str(round(EEG.xmax))]; % Units in seconds as in GUI
-%   epochlim = [num2str( round(EEG.xmin*1000)) '  '  num2str(round(EEG.xmax*1000))]; % Units in miliseconds
+%   epochlim = [num2str( round(EEG.xmin*1000)) '  '  num2str(round(EEG.xmax*1000))]; % Units in milliseconds
 else
     epochlim = '-1 2';
 end

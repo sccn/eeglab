@@ -31,7 +31,7 @@
 
 function obj = subsasgn(obj,ss,val)
 
-% check empty assignement
+% check empty assignment
 % -----------------------
 for index = 1:length(ss(1).subs)
     if isempty(ss(1).subs{index}), return; end

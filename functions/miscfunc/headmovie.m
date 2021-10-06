@@ -22,7 +22,7 @@
 %                 {default|0 -> +/-abs max of data}
 %   startsec    = starting time in seconds {default|0 -> 0.0}
 %
-% Note: BUG IN MATLAB 5.0-5.1 -- CANT SHOW MOVIES IN CORRECT COLORS
+% Note: BUG IN MATLAB 5.0-5.1 -- CAN'T SHOW MOVIES IN CORRECT COLORS
 %
 % Authors: Scott Makeig & Colin Humphries, SCCN/INC/UCSD, La Jolla, 2/1998 
 %

@@ -1,6 +1,6 @@
 % topoplot() - plot a topographic map of a scalp data field in a 2-D circular view 
 %              (looking down at the top of the head) using interpolation on a fine 
-%              cartesian grid. Can also show specified channnel location(s), or return 
+%              cartesian grid. Can also show specified channel location(s), or return 
 %              an interpolated value at an arbitrary scalp location (see 'noplot').
 %              By default, channel locations below head center (arc_length 0.5) are 
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
@@ -96,7 +96,7 @@
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
 %   'emarkercolor'    - cell array of colors for 'blank' option.
 %   'plotdisk'        - ['on'|'off'] plot disk instead of dots for electrodefor 'blank' option. Size of disk
-%                       is controled by input values at each electrode. If an imaginary value is provided, 
+%                       is controlled by input values at each electrode. If an imaginary value is provided, 
 %                       plot partial circle with red for the real value and blue for the imaginary one.
 %
 % Dipole plotting options:
@@ -434,16 +434,16 @@ if nargs > 2
                 if strcmpi(ELECTRODES,'pointlabels') || strcmpi(ELECTRODES,'ptslabels') ...
                         | strcmpi(ELECTRODES,'labelspts') | strcmpi(ELECTRODES,'ptlabels') ...
                         | strcmpi(ELECTRODES,'labelpts')
-                    ELECTRODES = 'labelpoint'; % backwards compatability
+                    ELECTRODES = 'labelpoint'; % backwards compatibility
                 elseif strcmpi(ELECTRODES,'pointnumbers') || strcmpi(ELECTRODES,'ptsnumbers') ...
                         | strcmpi(ELECTRODES,'numberspts') | strcmpi(ELECTRODES,'ptnumbers') ...
                         | strcmpi(ELECTRODES,'numberpts')  | strcmpi(ELECTRODES,'ptsnums')  ...
                         | strcmpi(ELECTRODES,'numspts')
-                    ELECTRODES = 'numpoint'; % backwards compatability
+                    ELECTRODES = 'numpoint'; % backwards compatibility
                 elseif strcmpi(ELECTRODES,'nums')
-                    ELECTRODES = 'numbers'; % backwards compatability
+                    ELECTRODES = 'numbers'; % backwards compatibility
                 elseif strcmpi(ELECTRODES,'pts')
-                    ELECTRODES = 'on'; % backwards compatability
+                    ELECTRODES = 'on'; % backwards compatibility
                 elseif ~strcmp(ELECTRODES,'off') ...
                         & ~strcmpi(ELECTRODES,'on') ...
                         & ~strcmp(ELECTRODES,'labels') ...

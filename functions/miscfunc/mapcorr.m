@@ -73,10 +73,10 @@
 % 2007/03/20 02:33:48  arno, Andreas fix
 % 2003/09/04 23:21:06  scott, changed default matching method to Max Abs Corr
 % 04-22-99 Re-written using VAM by Sigurd Enghoff, CNL/Salk
-% 04-30-99 Added revision of algorthm loop by SE -sm
+% 04-30-99 Added revision of algorithm loop by SE -sm
 % 05-25-99 Added Hungarian method assignment by SE
 % 06-15-99 Maximum correlation method reinstated by SE
-% 08-02-99 Made order of outpus match help msg -sm
+% 08-02-99 Made order of outputs match help msg -sm
 % 02-16-00 Fixed order of corr output under VAM added method explanations, 
 %          and returned corr signs in abs max method -sm
 % 01-25-02 reformated help & license, added links -ad 

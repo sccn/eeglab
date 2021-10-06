@@ -21,7 +21,7 @@ function [topology,support] = upgma(dist,labels,doplot,fontsize)
 %                       node, specifying group membership (support) at each node.
 %
 
-% To boostrap cluster support, see cluster().
+% To bootstrap cluster support, see cluster().
 
 % RE Strauss, 5/27/96
 %   9/7/99  -  miscellaneous changes for Matlab v5.

@@ -9,7 +9,7 @@
 % Optional inputs
 %   'skipline' - number of lines to skip {default:0}. If this number is
 %                negative the program will only skip non-empty lines 
-%                (can be usefull for files transmitted from one platform
+%                (can be useful for files transmitted from one platform
 %                to an other, as CR may be inserted at every lines).
 %   'convert'  - 'on' standard text conversion, see note 1
 %                'off' no conversion, considers text only
@@ -25,11 +25,11 @@
 %
 % Outputs:
 %    array - cell array. If the option 'force' is given, the function
-%            retrun a numeric array.
+%            returns a numeric array.
 %
 % Notes: 1) Since it uses cell arrays, the function can handle text input.
 %        The function reads each token and then try to convert it to a 
-%        number. If the conversion is unsucessfull, the string itself
+%        number. If the conversion is unsuccessful, the string itself
 %        is included in the array.
 %        2) The function adds empty entries for rows that contains
 %        fewer columns than others.
