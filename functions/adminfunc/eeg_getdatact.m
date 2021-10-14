@@ -198,8 +198,10 @@ else
     
         data = EEG.data;
     
-    else % channel but no data loaded
-
+    else % channel but no data loaded string
+        
+        [~,EEG.data,ext] = fileparts(EEG.data); % remove path if present
+        EEG.data = [ EEG.data ext];
         filename = fullfile(EEG.filepath, EEG.data);
         fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
         if fid == -1
