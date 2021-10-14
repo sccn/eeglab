@@ -78,7 +78,7 @@
 %   df         = degrees of freedom, a (2,1) vector, when F-values are returned
 %   pvals      = array of p-values. Same size as input data without the last
 %                data dimension. All returned p-values are two-tailed.
-%   surrog     = surrogate data array (same size as input data with the last 
+%   surrog     = surrogate statistic values (same size as stats output with the last 
 %                dimension filled with a number ('naccu') of surrogate data sets.
 %
 % Important note: When a two-way ANOVA is performed, outputs are cell arrays
