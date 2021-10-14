@@ -49,7 +49,7 @@
 %   'variance' = ['homegenous'|'inhomogenous'] this option is exclusively
 %                for parametric statistics using unpaired t-test. It allows
 %                to compute a more accurate value for the degree of freedom
-%                using the formula for inhomogenous variance (see
+%                using the formula for inhomogeneous variance (see
 %                ttest2_cell function). Default is 'inhomegenous'.
 %   'surrog'   = surrogate data array (see output).
 %   'stats'    = F- or T-value array (see output).
@@ -110,7 +110,7 @@
 %         [F df pvals] = statcond(a);  % perform a paired 2-way ANOVA 
 %         % Output:
 %           pvals{1} % a (3,4) matrix of p-values; effects across rows
-%           pvals{2} % a (3,4) matrix of p-values; effects across colums 
+%           pvals{2} % a (3,4) matrix of p-values; effects across columns 
 %           pvals{3} % a (3,4) matrix of p-values; interaction effects
 %                                      % across rows and columns
 %
@@ -524,7 +524,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         end
     end
     
-    % create a structure for outputing values
+    % create a structure for outputting values
     % ---------------------------------------
     if strcmpi(g.structoutput, 'on')
         outputstruct.method = g.method;
@@ -559,11 +559,11 @@ function [f, df] = anova1_cell_select( res, paired)
 
 % compute t-test
 % -------------------
-function [t, df] = ttest_cell_select( res, paired, homogenous)
+function [t, df] = ttest_cell_select( res, paired, homogeneous)
     if strcmpi(paired,'on')
         [t, df] = ttest_cell( res{1}, res{2});
     else
-        [t, df] = ttest2_cell( res{1}, res{2}, homogenous);
+        [t, df] = ttest2_cell( res{1}, res{2}, homogeneous);
     end
 
 % function to compute the number of dimensions

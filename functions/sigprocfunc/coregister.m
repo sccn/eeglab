@@ -48,7 +48,7 @@
 %                 'traditional' calls the dipfit2.* function traditionaldipfit()
 %                 all others are enacted by electrodenormalize()
 %                 {default: 'traditional}
-%   'transform' - [real array] homogenous transformation matrix (>>help 
+%   'transform' - [real array] homogeneous transformation matrix (>>help 
 %                 electrodenormalize) or a 1x9 matrix containing traditional 
 %                 9-parameter "Talairach model" transformation (>> help traditional) 
 %                 used to calculate locs_out.
@@ -97,7 +97,7 @@
 % Outputs:
 %  chanlocs_out - transformed input channel locations (chanlocs) structure
 %  transform    - transformation matrix. Use traditionaldipfit() to convert
-%                 this to a homogenous transformation matrix used in
+%                 this to a homogeneous transformation matrix used in
 %                 3-D plotting functions such as headplot().
 %
 % Note on how to create a template:
@@ -336,7 +336,7 @@ if ~isempty(g.transform)
     dat.transform = g.transform;
 elseif ~isempty(elec2)
 
-    % perfrom alignment
+    % perform alignment
     % -----------------
     if strcmpi(g.autoscale, 'on')
         avgrad1 = sqrt(sum(elec1.pnt.^2,2));
@@ -698,9 +698,9 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     try
         elec3 = electroderealign(cfg);
     catch
-        error( [ 'You need to select more pairs or the correspondance you selectd' 10 ...
+        error( [ 'You need to select more pairs or the correspondence you selectd' 10 ...
                  'leads to a failure in initial objective function evaluation' 10 ...
-                 'which means that the correspondance is wrong.' ]);
+                 'which means that the correspondence is wrong.' ]);
     end
     [tmp ind1 ] = intersect_bc( lower(elec1.label), lower(chanlist) );
     [tmp ind2 ] = intersect_bc( lower(elec2.label), lower(chanlist) );
@@ -894,8 +894,8 @@ function s = plotnose(transf, col)
      NaN NaN NaN NaN
      ];
 
-    % apply homogenous transformation
-    % -------------------------------
+    % apply homogeneous transformation
+    % --------------------------------
     transfhom = traditionaldipfit( transf );
     xyz       = [ x(:) y(:) z(:) ones(length(x(:)),1) ];
     xyz2      = transfhom * xyz';

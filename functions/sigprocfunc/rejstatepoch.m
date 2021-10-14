@@ -23,7 +23,7 @@
 %                  (red) (default:'on')            
 %   'threshold'  - percentage error threshold (default 1-0.25/nb_trials)
 %                  for individual trials of individual channel/component.
-%                  This treshold is expressed in term of standart 
+%                  This threshold is expressed in term of standard 
 %                  deviation from the mean (default 5).
 %   'global'     - ['on'|'off'], also perform threshold on the global
 %                  measure (by default, the mean over all channel or
@@ -34,8 +34,8 @@
 %   'thresholdg' - global threshold for the reunion of all channels
 %                  or components. By default, it is equal to 'threshold'.
 %   'normalize'  - ['on'|'off'], normalize values before applying the 
-%                  treshold. Default is 'on'.          
-%   'plotcom'    - sting command to plot single trials. Default 
+%                  threshold. Default is 'on'.          
+%   'plotcom'    - string command to plot single trials. Default 
 %                  is none.
 %   'title'      - title of the graph. Default is none.
 %   'labels'     - labels for electrodes (array not cell).
@@ -314,7 +314,7 @@ if ~ischar( signal )
 	catch, end
 else %if signal is a string draw everything
 
-	% retreive data
+	% retrieve data
 	% -------------
 	gcfdata = get(gcf, 'userdata');
 	plotsig = gcfdata {1};

@@ -9,7 +9,7 @@
 % Output:
 %    dataarray - single array containing all data
 %    len       - limits of each array
-%    dim       - dimension of the orginal array
+%    dim       - dimension of the original array
 %
 % Example:
 %   a = rand(3, 4, 3, 10);

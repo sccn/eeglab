@@ -16,7 +16,7 @@
 %   peakC   - location of the peak in each column (default: columns/2)
 %   mask    - (0->1) portion of the matrix to mask with zeros (default: 0)
 %
-% Ouput:
+% Output:
 %   gaussmatrix - 2-D gaussian matrix
 %
 % Author: Arnaud Delorme, CNL/Salk Institute, 2001
@@ -80,8 +80,8 @@ mat = exp(-0.5*(  ((X-meanX)/sigmaX).*((X-meanX)/sigmaX)...
             			/((sigmaX*sigmaY)^(0.5)*pi); 
 
 if cut > 0
-	maximun = max(max(mat))*cut;
-	I = find(mat < maximun);
+	maximum = max(max(mat))*cut;
+	I = find(mat < maximum);
 	mat(I) = 0;
 end
 

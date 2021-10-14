@@ -230,7 +230,7 @@ elseif ~isempty(g.channels)
             g.indices = eeg_chaninds(EEG(1), g.channels, 0);
             for ind = 2:length(EEG)
                 if ~isequal(eeg_chaninds(EEG(ind), g.channels, 0), g.indices)
-                    error([ 'Channel information must be consistant when ' 10 'several datasets are merged for a specific design' ]);
+                    error([ 'Channel information must be consistent when ' 10 'several datasets are merged for a specific design' ]);
                 end
             end
         end

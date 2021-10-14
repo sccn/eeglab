@@ -457,7 +457,7 @@ function val = gettimes(timevect, timevar);
             trim    = timevar(2);
             len     = length(timevect);
             trimtimevect = timevect(round(trim/100*len)+1:len-round(trim/100*len));
-            fprintf('Subsampling by %d and triming data by %1.1f percent (%d points)\n', nsub, trim, round(trim/100*len));
+            fprintf('Subsampling by %d and trimming data by %1.1f percent (%d points)\n', nsub, trim, round(trim/100*len));
             val = trimtimevect(1:nsub:end);
         end
     else
@@ -508,7 +508,7 @@ function limits = plotfig(times, freqs, vals, g)
         cbar;
     end
 
-% plot figure with symetrical phase
+% plot figure with symmetrical phase
 % ---------------------------------
 function limits = plotfigsim(times, freqs, vals, g)
     icadefs;

@@ -105,7 +105,7 @@
 %                     for wavelets. {Default: use 'padratio'}.
 %       'freqscale' = ['log'|'linear'] Frequency scaling. {Default: 'linear'}.
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
-%                     closest correspondant frequencies in the 'linear' space 
+%                     closest correspondent frequencies in the 'linear' space 
 %                     are returned.
 %       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
 %                      baseline is used. A range [min max] may also be entered
@@ -260,7 +260,7 @@
 % 03-09-02 function restructuration -ad
 %  add 'key', val arguments (+ external baseboot, baseline, color axis, angleunit...)
 %  add detrending (across time and trials) + 'coher' option for amplitude coherence
-%  significance only if alpha is given, ploting options in 'plotamp' and 'plotphase'
+%  significance only if alpha is given, plotting options in 'plotamp' and 'plotphase'
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-03-02 added new options for bootstrap -ad 
 
@@ -273,7 +273,7 @@
 %    (Coher) function Coher = coherinit(...) - initialize coherence object
 %    (Coher) function Coher = cohercomp(Coher, tmpX, tmpY, trial, time) - compute coherence
 %    (Coher) function Coher = cohercomppost(Coher, trials) - coherence normalization
-%    (Boot) function Boot = bootinit(...) - intialize bootstrap object
+%    (Boot) function Boot = bootinit(...) - initialize bootstrap object
 %    (Boot) function Boot = bootcomp(...) - compute bootstrap
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
 % - by real objects under C++ (see C++ code)
@@ -535,7 +535,7 @@ if ~strcmpi(g.condboot, 'abs') && ~strcmpi(g.condboot, 'angle') ...
 	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
 end
 if g.tlimits(2)-g.tlimits(1) < 30
-    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
+    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in milliseconds not seconds.'); 
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -584,7 +584,7 @@ if iscell(X)
     % deal with titles
     % ----------------
 	for index = length(vararginori)-1:-2:1
-		if index<=length(vararginori) % needed: if elemenets are deleted
+		if index<=length(vararginori) % needed: if elements are deleted
 			if strcmp(vararginori{index}, 'title') , vararginori(index:index+1) = []; end
 			if strcmp(vararginori{index}, 'subitc'), vararginori(index:index+1) = []; end
 			if strcmp(vararginori{index}, 'shuffle'), vararginori(index:index+1) = []; end
@@ -942,7 +942,7 @@ if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
     end
 end
 
-% proces outputs
+% process outputs
 % --------------
 Rangle = angle(coherres);
 R = abs(coherres);
@@ -1203,7 +1203,7 @@ case 'on'
    %
    h(13) = axes('Units','Normalized','Position',[.1 ordinate2 .8 height].*s+q);
    if setylim
-       if strcmpi(g.type, 'amp') % currrently -1 to 1
+       if strcmpi(g.type, 'amp') % currently -1 to 1
            maxangle = max(abs(g.amplag)) * mean(times(2:end) - times(1:end-1));
            Rangle   = Rangle * maxangle;
            maxangle = maxangle+5; % so that the min and the max does not mix

@@ -290,7 +290,7 @@ Gelec = computeg(xelec,yelec,zelec,xelec,yelec,zelec);
 Gsph  = computeg(x,y,z,xelec,yelec,zelec);
 
 % equations are 
-% Gelec*C + C0  = Potential (C unknow)
+% Gelec*C + C0  = Potential (C unknown)
 % Sum(c_i) = 0
 % so 
 %             [c_1]

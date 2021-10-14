@@ -25,7 +25,7 @@
 %                subsequent pop_clust() execution), or they must all be leaf clusters 
 %                (i.e., clusters with no child clusters) {default: all leaf clusters}.
 %   addui      - [struct] additional uicontrols entries for the graphic
-%                interface. Must contains the fiels "uilist", "geometry".
+%                interface. Must contains the fields "uilist", "geometry".
 %
 % Outputs:
 %   STUDY      - The input STUDY set structure modified according to specified user edits,
@@ -54,7 +54,7 @@
 %                another cluster or moving them to the outlier cluster.
 %  "Plot Cluster properties" - [button] Displays in one figure all the mean cluster measures
 %                (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
-%                and saved in the EEG datsets. If there is more than one condition, the ERP 
+%                and saved in the EEG datasets. If there is more than one condition, the ERP 
 %                and the spectrum will have different colors for each condition. The ERSP 
 %                and ITC plots will show only the first condition; clicking on the subplot 
 %                will open a new figure with the different conditions displayed together. 
@@ -212,7 +212,7 @@ if ~ischar(varargin{1})
                 % For any other case verify that all clusters have the same parents
                 if ~(sum(strcmp(STUDY.cluster(cls(k)).parent, parent)) == length(parent)) % different parent
                     if ~strcmp(STUDY.cluster(cls(k)).parent,'manual') && ~strcmp(parent, 'manual') 
-                        % if nither is an empty cluster (which was created manually)
+                        % if neither is an empty cluster (which was created manually)
                         sameparent = 0; % then the clusters have different parents
                     end
                 end
@@ -230,7 +230,7 @@ if ~ischar(varargin{1})
             end
         end
 
-        % ploting text etc ...
+        % plotting text etc ...
         % --------------------
         num_cls = 0;
         for k = 1:N
@@ -335,7 +335,7 @@ if ~ischar(varargin{1})
     browsesave     = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
     
-    % Create default ERSP / ITC time/freq. paramters 
+    % Create default ERSP / ITC time/freq. parameters 
     % ----------------------------------------------
     if isempty(ALLEEG)
         error('STUDY contains no datasets');

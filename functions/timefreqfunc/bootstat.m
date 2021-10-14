@@ -466,21 +466,21 @@ function array = supershuffle(array, dim)
         end
     elseif dim == 2
         indcols = shuffle(1:size(array,2));
-        for index = 1:2:length(indcols)-rem(length(indcols),2) % shuffle colums
+        for index = 1:2:length(indcols)-rem(length(indcols),2) % shuffle columns
             tmparray                    = array(:,indcols(index),:);
             array(:,indcols(index),:)   = array(:,indcols(index+1),:);
             array(:,indcols(index+1),:) = tmparray;
         end
     else
         ind3d = shuffle(1:size(array,3));
-        for index = 1:2:length(ind3d)-rem(length(ind3d),2) % shuffle colums
+        for index = 1:2:length(ind3d)-rem(length(ind3d),2) % shuffle columns
             tmparray                  = array(:,:,ind3d(index));
             array(:,:,ind3d(index))   = array(:,:,ind3d(index+1));
             array(:,:,ind3d(index+1)) = tmparray;
         end
     end
 
-% shuffle one dimension, one row/colums at a time
+% shuffle one dimension, one row/columns at a time
 % -----------------------------------------------
 function array = shuffleonedim(array, dim)
     if size(array, 1) == 1 || size(array,2) == 1

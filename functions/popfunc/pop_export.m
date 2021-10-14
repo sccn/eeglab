@@ -25,7 +25,7 @@
 %                    of precision and should be enough for EEG.
 % 
 % Outputs:
-%   com            - The expresion that execute this function. i.e. 'pop_export(MyEEG, 'ExpEEG.mat')'
+%   com            - The expression that execute this function. i.e. 'pop_export(MyEEG, 'ExpEEG.mat')'
 %
 % Note: tabulation are used as a delimiter.
 %

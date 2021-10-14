@@ -63,7 +63,7 @@ function [STUDY, ALLEEG, com] = pop_preclust(varargin)
 
 com = '';
 
-if ~ischar(varargin{1}) %intial settings
+if ~ischar(varargin{1}) %initial settings
     if length(varargin) < 2
         error('pop_preclust(): needs both ALLEEG and STUDY structures');
     end

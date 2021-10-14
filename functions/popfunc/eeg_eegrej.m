@@ -230,7 +230,7 @@ if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) 
     end
 end
 
-% debuging code below
+% debugging code below
 % regions, n1 = 1525; n2 = 1545; n = n2-n1+1;
 % a = zeros(1,n); a(:) = 1; a(strmatch('boundary', { event2(n1:n2).type })') = 8; 
 % [[n1:n2]' alllats(n1:n2)' [event2(n1:n2).latency]' alllats(n1:n2)'-[event2(n1:n2).latency]' otherorilatencies(n1:n2)' a']

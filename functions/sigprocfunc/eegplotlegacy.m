@@ -50,7 +50,7 @@
 %                  Command line equivalent: 'eloc_file'
 %     "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off for time and
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
-%                  Else, draw a rectange in the activity window to zoom the display into 
+%                  Else, draw a rectangle in the activity window to zoom the display into 
 %                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
 %     "Settings > Events" - [menu] Toggle event on or off (assuming events have been 
 %                  given as input). Press "legend" to pop up a legend window for events.
@@ -144,7 +144,7 @@
 %                    or of channel and component data from the same dataset.
 %    'scale'      - ['on'|'off'] Display the amplitude scale {default: 'on'}.
 %    'mocap'      - ['on'|'off'] Display motion capture data in a separate figure.
-%                     To run, select an EEG data period in the scolling display using 
+%                     To run, select an EEG data period in the scrolling display using 
 %                     the mouse. Motion capture (mocap) data should be
 %                     under EEG.moredata.mocap.markerPosition in xs, ys and zs fields which are
 %                     (number of markers, number of time points) arrays.                
@@ -209,7 +209,7 @@
 %    2 - colorlist
 %    3 - submean    % on or off, subtract the mean
 %    4 - maxfreq    % empty [] if no gfrequency content
-% 'buttons hold other informations' Eposition for instance hold the current postition
+% 'buttons hold other informations' Eposition for instance hold the current position
 
 function [outvar1] = eegplotlegacy(data, varargin); % p1,p2,p3,p4,p5,p6,p7,p8,p9)
 
@@ -2044,7 +2044,7 @@ else
         g = get(fig,'UserData');       
         ax1 = findobj('tag','backeeg','parent',fig);
         tmppos = get(ax1, 'currentpoint');       
-        g = get(fig,'UserData'); % get data of backgroung image {g.trialstag g.winrej incallback}
+        g = get(fig,'UserData'); % get data of background image {g.trialstag g.winrej incallback}
         if g.incallback ~= 1 % interception of nestest calls
             if g.trialstag ~= -1
                 lowlim = round(g.time*g.trialstag+1);

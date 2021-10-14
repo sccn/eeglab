@@ -405,7 +405,7 @@ for curfield = tmpfields'
                                     EEGOUT.icasphere = floatread(varname, [1 Inf]);
                                     EEGOUT.icasphere = reshape( EEGOUT.icasphere, [length(EEGOUT.icasphere)/nbcol nbcol]);
                                 catch
-                                    fprintf('pop_editset() warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                                    fprintf('pop_editset() warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
                                 end
                             end
                          else
@@ -475,7 +475,7 @@ for curfield = tmpfields'
                              else
                                  commandrestore = [];
                              end;		  
-                             % make global, must make these variable global, if you try to evaluate them direclty in the base
+                             % make global, must make these variable global, if you try to evaluate them directly in the base
                              % workspace, with a large array the computation becomes incredibly slow.  
                              %--------------------------------------------------------------------
                              comglobal = sprintf('global %s;', varname);

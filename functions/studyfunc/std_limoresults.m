@@ -34,7 +34,7 @@
 % std_limoresults(STUDY,'plottype',2,'flagdata',0,'measure','daterp','level',1,'subjindx',1,'testindx',1);       % (results single subj level)
 % std_limoresults(STUDY,'plottype',2,'flagdata',0,'measure','daterp','level',2,'testindx',1);                    % (results group level)
 % 
-% % Plot 3 (Time serie + significance)
+% % Plot 3 (Time series + significance)
 % std_limoresults(STUDY,'plottype',3,'flagdata',1,'measure','daterp','level',1,'subjindx',1,'regressor',{'[1]'},'chanindx',6);                % (data single subj level)
 % % To do (data group level)
 % std_limoresults(STUDY,'plottype',3,'flagdata',0,'measure','daterp','level',1,'subjindx',1,'testindx',1,'regressor',{'[1 2]'},'chanindx',6); % (results single subj level)
@@ -220,7 +220,7 @@ switch opt.plottype
                         load Y1r; load Y2r; limo_random_robust(3,Y1r,Y2r,eval(FileName(32:end-4)),nboot,handles.tfce); clear Y1r Y2r;
                         LIMO.design.bootstrap = 1; save LIMO LIMO
                     elseif strncmp(FileName,'Repeated_measures',17)
-                        warndlg2('repeated measure ANOVA bootstrap is not availbale at this stage, please use the random effect GUI','action not performed')
+                        warndlg2('repeated measure ANOVA bootstrap is not available at this stage, please use the random effect GUI','action not performed')
                     else
                         if strcmp(handles.LIMO.LIMO.Analysis,'Time-Frequency')
                             limo_eeg_tf(4);

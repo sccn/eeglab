@@ -8,7 +8,7 @@
 %   baseframes  - vector of frames in z-defining baseline period {default frames}
 % 
 % Outputs:
-%   zact        - activations z-scaled and reorded in reverse order of max abs
+%   zact        - activations z-scaled and reordered in reverse order of max abs
 %   basesd      - standard deviations in each activation row (reverse ordered)
 %   maz         - maximum absolute z-value for each activation row (rev ordered)
 %   mazc        - component indices of the reverse-sorted max abs z-values

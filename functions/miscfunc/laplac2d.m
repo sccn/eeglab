@@ -10,7 +10,7 @@
 % Inputs:
 %   rows    - number of rows 
 %   columns - number of columns 
-%   sigma   - standart deviation (default: rows/5)
+%   sigma   - standard deviation (default: rows/5)
 %   meanR   - mean for rows (default: center of the row)
 %   meanC   - mean for columns (default: center of the column)
 %   cut	    - percentage (0->1) of the maximum value for removing 
@@ -82,8 +82,8 @@ mat = - exp(-0.5*r2/sigma2) .* ((r2 - sigma2)/(sigma2*sigma2));
 % zeros crossing at r = -/+ sigma;
 % mat = r2;
 if cut > 0
-	maximun = max(max(mat))*cut;
-	I = find(mat < maximun);
+	maximum = max(max(mat))*cut;
+	I = find(mat < maximum);
 	mat(I) = 0;
 end
 

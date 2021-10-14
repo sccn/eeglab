@@ -211,7 +211,7 @@ function [EEG, command] = pop_loadbci(filename, srate);
     indexcorresp    = corresp(tmpcorresp);
     indexcorrespval = indeximport(tmpcorresp);
     if length(tmpcorresp) ~= length(intersect(corresp, indeximport))
-        disp('Warning: correspondance problem, some information will be lost');
+        disp('Warning: correspondence problem, some information will be lost');
     end
     
     % remove type from latency array

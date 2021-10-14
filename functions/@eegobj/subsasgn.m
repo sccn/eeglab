@@ -4,8 +4,8 @@ function this = subsasgn(this,index,c)
         this = eegobj;
     end
         
-    % mulitple dataset
-    if strcmpi(index(1).type, '()') && length(index) == 1 % dataset assignement
+    % multiple dataset
+    if strcmpi(index(1).type, '()') && length(index) == 1 % dataset assignment
         if isempty(c) % suppression
             this(index.subs{1}) = [];
         else

@@ -3,7 +3,7 @@
 %                   ("previous") type(s). Requires the EEG.urevent structure, plus 
 %                   EEG.event().urevent pointers to it. 
 %
-%           NOW SUPERCEDED BY eeg_context()
+%           NOW SUPERSEDED BY eeg_context()
 % Usage:
 %           >> [delays,targets,urtargs,urprevs] = eeg_time2prev(EEG,{target},{previous});
 % Inputs:
@@ -99,9 +99,9 @@ end
 %%%%%%%%%%%%%%%%%%%% Initialize output arrays %%%%%%%%%%%%%%%%%%%%%%
 %
 delays    = zeros(1,nevents); % holds output times in ms
-targets   = zeros(1,nevents); % holds indxes of targets
-urtargets = zeros(1,nevents); % holds indxes of targets
-urprevs   = zeros(1,nevents); % holds indxes of prevs
+targets   = zeros(1,nevents); % holds indexes of targets
+urtargets = zeros(1,nevents); % holds indexes of targets
+urprevs   = zeros(1,nevents); % holds indexes of prevs
 
 targetcount = 0; % index of current target
 % Below:

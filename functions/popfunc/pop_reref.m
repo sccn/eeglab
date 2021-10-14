@@ -239,7 +239,7 @@ if ~isfield(g, 'enforcetype'),   g.enforcetype   = 0;     end
 interpflag = 0;
 if ~isequal('off', g.interpchan )
     
-    % Case no channel provided, infering them from urchanlocs field
+    % Case no channel provided, inferring them from urchanlocs field
     if isempty(g.interpchan) 
         if isfield(EEG.chaninfo, 'removedchans')
             chanlocs2interp = EEG.chaninfo.removedchans;
@@ -282,7 +282,7 @@ if ~isequal('off', g.interpchan )
             else
                chan2interpindx = find(cell2mat(cellfun(@(x) ismember(x, chan2interp), {EEG.urchanlocs.labels}, 'UniformOutput', 0)));  
 
-               % Checking validity of channels selected for interpolation by assessing X ccordinate
+               % Checking validity of channels selected for interpolation by assessing X coordinate
                for ichan = 1:length(chan2interpindx)
                    validchan(ichan) = ~isempty(EEG.urchanlocs(chan2interpindx(ichan)).X);
                end

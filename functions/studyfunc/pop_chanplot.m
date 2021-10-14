@@ -29,7 +29,7 @@
 %                has the format: 'subject name, channel index'.
 %  "Plot channel properties" - [button] Displays in one figure all the mean channel measures
 %                (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
-%                and saved in the EEG datsets. If there is more than one condition, the ERP 
+%                and saved in the EEG datasets. If there is more than one condition, the ERP 
 %                and the spectrum will have different colors for each condition. The ERSP 
 %                and ITC plots will show only the first condition; clicking on the subplot 
 %                will open a new figure with the different conditions displayed together. 
@@ -366,7 +366,7 @@ else
                 cind     = get(findobj('parent', hdl, 'tag', 'chan_list')   , 'value');
                 changrp  = STUDY.changrp(cind);
 
-                % Find datasets availaible
+                % Find datasets available
                 % ------------------------
                 %setind = STUDY.setind .* (changrp.chaninds > 0); % set to 0 the cell not
                 %%                                       % containing any electrode

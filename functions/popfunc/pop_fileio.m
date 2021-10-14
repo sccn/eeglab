@@ -101,7 +101,7 @@ if nargin < 1
     if strcmpi(filename(end-2:end), 'mff')
         valueFormat = 48;
     end
-    uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
+    uilist   = { { 'style' 'text' 'String' 'Channel list (default all):' } ...
                  { 'style' 'edit' 'string' '' } ...
                  { 'style' 'text' 'String' [ 'Data range (in sample points) (default all [1 ' int2str(dat.nSamples) '])' ] } ...
                  { 'style' 'edit' 'string' '' } ...
@@ -145,7 +145,7 @@ else
     end
 end
 
-% decode imput parameters
+% decode input parameters
 % -----------------------
 g = struct(options{:});
 if ~isfield(g, 'samples'), g.samples = []; end
@@ -288,7 +288,7 @@ if ~isempty(event)
         EEG = eeg_checkset(EEG, 'eventconsistency');
     end
 else
-    disp('Warning: no event found. Events might be embeded in a data channel.');
+    disp('Warning: no event found. Events might be embedded in a data channel.');
     disp('         To extract events, use menu File > Import Event Info > From data channel');
 end
 

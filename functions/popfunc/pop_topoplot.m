@@ -344,12 +344,12 @@ for index = 1:size(arg2(:),1)
 	% plot scalp map
     % --------------
     if index == 1
-        addopt = { 'verbose', 'on' };
+        adopt = { 'verbose', 'on' };
     else 
-        addopt = { 'verbose', 'off' };
+        adopt = { 'verbose', 'off' };
     end
     %fprintf('Printing to figure %d.\n',curfig);
-    options = {  'maplimits' maplimits options{:} addopt{:} };
+    options = {  'maplimits' maplimits options{:} adopt{:} };
     if ~isnan(arg2(index))
 		if typeplot
             if nbgraph > 1, axes(curax); end

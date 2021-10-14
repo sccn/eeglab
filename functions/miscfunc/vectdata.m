@@ -19,7 +19,7 @@
 %        'nearest'   -> Nearest neighbor interpolation.
 %        'v4'        -> MATLAB 4 griddata method.
 %   'average'  - [real] moving average in the dimension of timesin
-%                note that extreme values might be inacurate (see 'borders'). 
+%                note that extreme values might be inaccurate (see 'borders'). 
 %                Default none or [].
 %   'avgtype'  - ['const'|'gauss'] use a const value when averaging (array of 
 %                ones) or a gaussian window. Default is 'const'.

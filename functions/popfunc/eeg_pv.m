@@ -227,7 +227,7 @@ if progressive % output accumulated results
   end
 elseif plotit 
 %
-%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribtion of pv %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribution of pv %%%%%%%%%%%%%
 %
  if isfield(EEG,'chanlocs')
    chanlocs = EEG.chanlocs;

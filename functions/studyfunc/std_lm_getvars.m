@@ -18,7 +18,7 @@
 %
 % Outputs:
 % var_matrix   - Variables retrieved from the design specified in the STUDY.
-%                Each column represent a factor a nd each row the index of
+%                Each column represents a factor and each row the index of
 %                the variables in STUDY.design.variable.value
 %                By default NaNs values will be inserted if no info from
 %                that variable is not found in the original ALLEEG index,
@@ -28,7 +28,7 @@
 %                then this info (second argument) would not be returned for
 %                that especific trial. Notice that might be possible with
 %                categotical variables, that at least one event is not
-%                contained in every trial (for all of them), then this otput
+%                contained in every trial (for all of them), then this output
 %                will be returned as empty.
 % See also:
 %
@@ -80,7 +80,7 @@ catch
     error('std_lm_getcatvars() error: calling convention {''key'', value, ... } error'); return;
 end
 
-try, g.design;         catch, g.design      = 1 ;       end; % By default will be use the fisrt design if not especified
+try, g.design;         catch, g.design      = 1 ;       end; % By default will use the first design if not especified
 try, g.vartype;        catch, g.vartype     = 'cat';    end; % 'cat' or 'cont'
 
 %% cat/cont defs
@@ -157,7 +157,7 @@ end
 %  Loop per variable
 for i = 1 : length(varindx)
     
-    % case for continous variables
+    % case for continuous variables
     if strcmp(g.vartype, 'cont')
         varlength = 1;
         catflag = 0;
@@ -203,7 +203,7 @@ for i = 1 : length(varindx)
         end
         [trialindsx, eventvals] = std_gettrialsind(trialinfo,STUDY.design(g.design).variable(varindx(i)).label, varval);
         if ~isempty(trialindsx)
-            % case for continous variables
+            % case for continuous variables
             if ~catflag
                 facval_indx = eventvals;
             end

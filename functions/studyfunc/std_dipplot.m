@@ -42,8 +42,8 @@
 %                already exists in the STUDY).  
 %   Example:
 %   >> [STUDY] = std_dipplot(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
-%                % Plot cluster-5 component dipoles (in blue), plus ther mean dipole (in red), 
-%                % on an exisiting (gui-less) figure. 
+%                % Plot cluster-5 component dipoles (in blue), plus their mean dipole (in red), 
+%                % on an existing (gui-less) figure. 
 %
 %  See also  pop_clustedit(), dipplot()        
 %
@@ -385,7 +385,7 @@ end % finished case of 'all' clusters
 if strcmpi(mode, 'multicolor')
   N = length(cls);
   %%%%%%%%%%%%%%%%%%%%% color list %%%%%%%%%%%%%%%%%%%%%
-  % This color list was developped for std_envtopo
+  % This color list was developed for std_envtopo
   % modified from dipgroups below
   colors{1}  = [1 1 1];            % White
   colors{2}  = [1 1 0];            % Yellow
@@ -772,7 +772,7 @@ function [cluster_dip_models, options] = dipgroups(ALLEEG, STUDY, cls, comp_to_d
     % fifth, use subj_groupnum as a type of dipole color
 
         %%%%%%%%%%%%%%%%%%%%% color list %%%%%%%%%%%%%%%%%%%%%
-        % This color list was developped for std_envtopo
+        % This color list was developed for std_envtopo
         % 16 colors names officially supported by W3C specification for HTML
         colors{1,1}  = [1 1 1];            % White
         colors{2,1}  = [1 1 0];            % Yellow

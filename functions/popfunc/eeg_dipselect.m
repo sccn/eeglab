@@ -1,4 +1,4 @@
-% eeg_dipselect()  - select componet dipoles from an EEG dataset with
+% eeg_dipselect()  - select component dipoles from an EEG dataset with
 %                    reisdual variance (rv) less than a selected threshold
 %                    and equivalent dipole location inside the brain volume.
 % Usage:

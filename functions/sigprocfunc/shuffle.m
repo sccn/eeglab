@@ -5,7 +5,7 @@
 % 
 % Inputs: 
 %   X   - input array
-%   DIM - dimension index (default is firt non-singleton dimention)
+%   DIM - dimension index (default is first non-singleton dimension)
 %
 % Outputs: 
 %    Y - shuffled array

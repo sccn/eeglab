@@ -20,7 +20,7 @@
 %       eated-measures-anova
 %       It allows for fast computation of about 20 thousands ANOVA per
 %       second. It is different from anova2_cell which mimics the ANOVA
-%       fonction from the Matlab statistical toolbox. This function
+%       function from the Matlab statistical toolbox. This function
 %       computes true repeated measure ANOVA.
 %
 % Example:

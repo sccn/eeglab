@@ -89,10 +89,10 @@ if nargin < 2
     if any(cellfun(@(x)any(x.gcompreject), { EEG.reject }))
         if length(EEG) == 1
             compStr = sprintf('%d,', find(EEG.reject.gcompreject == 1));
-            msg = sprintf('Components [%s] flaged for rejection.', compStr(1:end-1));
+            msg = sprintf('Components [%s] flagged for rejection.', compStr(1:end-1));
             res = questdlg2(strvcat(msg, 'Do you want to remove these components?', 'Note: we recommend removing components in STUDY instead'), 'Remove components from data', 'Cancel', 'Manual rej.', 'Yes', 'Cancel');
         else
-            msg = 'Components flaged for rejection detected in some datasets.';
+            msg = 'Components flagged for rejection detected in some datasets.';
             res = questdlg2(strvcat(msg, 'Do you want to remove these components?', 'Note: we recommend removing components in STUDY instead'), 'Remove components from data', 'Cancel', 'Yes', 'Cancel');
         end
         if strcmpi(res, 'Cancel')
@@ -146,7 +146,7 @@ if length(EEG) > 1
         [ EEG, com ] = eeg_eval( 'pop_subcomp', EEG, 'params', { components, plotag, keepflag } );
     end
     if isempty( components )
-        com = [ com ' % [] or '' means removing components flaged for rejection' ];
+        com = [ com ' % [] or '' means removing components flagged for rejection' ];
     end
     return;
 end
@@ -226,6 +226,6 @@ catch, end
 
 com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(components), plotag);
 if isempty( components )
-    com = [ com ' % [] means removing components flaged for rejection' ];
+    com = [ com ' % [] means removing components flagged for rejection' ];
 end
 return;

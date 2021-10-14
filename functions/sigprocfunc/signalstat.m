@@ -1,6 +1,6 @@
 % signalstat()  -  Computes and plots statistical characteristics of a signal,
 %                  including the data histogram, a fitted normal distribution,
-%                  a normal ditribution fitted on trimmed data, a boxplot, and
+%                  a normal distribution fitted on trimmed data, a boxplot, and
 %                  the QQ-diagram. The estimates value are printed in a panel and
 %                  can be read as output. Optionally, a topographic map (see TOPOPLOT)
 %                  can be plotted.

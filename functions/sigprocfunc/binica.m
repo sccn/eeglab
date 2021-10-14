@@ -29,7 +29,7 @@
 %   'maxsteps'   - int>0         {default: 512}
 %   'stop'       - (0<float<<<1) stopping learning rate {default: 1e-7} 
 %                    NB: 'stop' <= 1e-7 recommended
-%   'weightsin'  - Filename string of inital weight matrix of size
+%   'weightsin'  - Filename string of initial weight matrix of size
 %                  (comps,chans) floats, else a weight matrix variable 
 %                  in the current Matlab workspace (copied to a local
 %                  .inwts files). You may want to reduce the starting 

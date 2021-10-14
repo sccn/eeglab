@@ -460,7 +460,7 @@ end
 
 if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   if length(g.mtaper) < 3
-        %error('mtaper arguement must be [N W] or [N W K]');
+        %error('mtaper argument must be [N W] or [N W K]');
     
     if g.mtaper(1) * g.mtaper(2) < 1
         error('mtaper 2 first arguments'' product must be higher than 1');

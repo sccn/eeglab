@@ -199,7 +199,7 @@ function [A,C,U]=hminiass(A)
 
 [n,np1]=size(A);
 
-% Initalize return vectors.
+% Initialize return vectors.
 C=zeros(1,n);
 U=zeros(1,n+1);
 

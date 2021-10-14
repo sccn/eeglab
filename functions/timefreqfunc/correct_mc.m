@@ -1,4 +1,4 @@
-% correct_mc() - compute an upper limit for the number of independant 
+% correct_mc() - compute an upper limit for the number of independent 
 %                time-frequency estimate in a given time-frequency image. 
 %                This number can be used to correct for multiple comparisons.
 %
@@ -12,7 +12,7 @@
 %    timesout  - [integer] array of number of time points to test. 
 %
 % Output:
-%    ncorrect - number of independant tf estimate in the time-freq image
+%    ncorrect - number of independent tf estimate in the time-freq image
 %    array    - array of size (freqs x timesout) containing pvalues.
 %
 % Method details:

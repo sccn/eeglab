@@ -56,7 +56,7 @@
 %   EEG.xmin         - epoch start latency|time (in sec. relative to the
 %                      time-locking event at time 0)
 %   EEG.xmax         - epoch end latency|time (in seconds)
-%   EEG.times        - vector of latencies|times in miliseconds (one per time point)
+%   EEG.times        - vector of latencies|times in milliseconds (one per time point)
 %   EEG.ref          - ['common'|'averef'|integer] reference channel type or number
 %   EEG.history      - cell array of ascii pop-window commands that created
 %                      or modified the dataset
@@ -1125,7 +1125,7 @@ for inddataset = 1:length(ALLEEG)
             disp('         number of channels. Channel information have been removed.');
         end
     end
-    EEG.chaninfo.icachansind = EEG.icachansind; % just a copy for programming convinience
+    EEG.chaninfo.icachansind = EEG.icachansind; % just a copy for programming convenience
     
     %if ~isfield(EEG, 'urchanlocs')
     %    EEG.urchanlocs = EEG.chanlocs;

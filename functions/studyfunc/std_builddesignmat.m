@@ -14,7 +14,7 @@
 %
 % Outputs:
 %   tmpdmat    - Design matrix
-%   colLabels  - Labels for each column of the deisgn matrix
+%   colLabels  - Labels for each column of the design matrix
 %   catflag    - Binary vector with dimension equal to the number of columns in the design matrix. 
 %                [0] mean a continuous regressor, [1] means a categotical one.
 %            
@@ -79,7 +79,7 @@ for i = 1 : length(varindx)
         c = 1; varlist = {}; varvallength = []; facval_indx = []; dmatval = 1; jcount = 1;
         for ivar = 1:length(varvaluetmp)
 
-            % Legth of varvaluetmp(i)
+            % Length of varvaluetmp(i)
             if iscellstr(varvaluetmp(ivar))
                 varvallength(ivar) = length(varvaluetmp(ivar)) ;
             elseif iscell(varvaluetmp(ivar))

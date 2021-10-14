@@ -335,7 +335,7 @@ if ~exist(g.volmesh_fname)
         P = tmp.vol.bnd(1).pnt;
         T = delaunayn(P); % recompute triangularization (the original one is not compatible 
                           % with tsearchn) get coordinates of all points in the volume
-        % search for points inside or ouside the volume (takes about 14 minutes!)
+        % search for points inside or outside the volume (takes about 14 minutes!)
         IO = tsearchn(P, T, allpoints');
         Inside        = find(isnan(IO));
         Outside       = find(~isnan(IO));

@@ -24,7 +24,7 @@
 %                region, NaN is returned.
 %   boundevents - boundary events latencies 
 %
-% Exemple: 
+% Example: 
 %   [outdat t] = eegrej( 'EEG.data', [1 100; 200 300]', [0 10]);
 %   this command pick up two regions in EEG.data (from point 1 to
 %   point 100, and point 200 to point 300) and put the result in 

@@ -2,7 +2,7 @@
 %              to create GUI very fast without bothering about the 
 %              positions of the elements. After creating a geometry, 
 %              elements just place themselves into the predefined 
-%              locations. It is especially usefull for figure where you
+%              locations. It is especially useful for figure where you
 %              intend to put text button and descriptions.
 %
 % Usage:
@@ -44,7 +44,7 @@
 %   'insetv'   - vertical space between elements. Default is 2% 
 %               of window height.
 %   'spacing'  - [horiz vert] spacing in normalized units. Default 
-%   'spacingtype' - ['absolute'|'proportional'] abolute means that the 
+%   'spacingtype' - ['absolute'|'proportional'] absolute means that the 
 %               spacing values are fixed. Proportional means that they
 %               depend on the number of element in a line.
 %   'minwidth' - [integer] minimal width in pixels. Default is none.
@@ -60,7 +60,7 @@
 % Output:
 %    handles  - all the handles of the elements (in the same order as the
 %                uilist input).
-%    height    - adviced height for the figure (so the text look nice).
+%    height    - advised height for the figure (so the text look nice).
 %    allhandles - all the handles in object format
 %
 % Example:
@@ -382,7 +382,7 @@ for counter = 1:maxcount
                 factmulty = max(factmulty, curext(4)/curpos(4));
             end
             
-            % Uniformize button text aspect (first letter must be upercase)
+            % Uniformize button text aspect (first letter must be uppercase)
             % -----------------------------
             if strcmp(style, 'pushbutton') && ishandle(allhandlers{counter})
                 tmptext = get(allhandlers{counter}, 'string');

@@ -158,7 +158,7 @@ if isempty(varargin)
     if ~isequal(res.timerange, STUDY.etc.erspparams.timerange) && res.multiplechan ~= 2, options = { options{:} 'timerange' res.timerange }; end
     if ~isequal(res.freqrange, STUDY.etc.erspparams.freqrange) && res.multiplechan ~= 2, options = { options{:} 'freqrange' res.freqrange }; end
     
-    % mutliple channel option
+    % multiple channel option
     % -----------------------
     if res.multiplechan == 1
         if ~isequal('off', STUDY.etc.erspparams.averagechan), options = { options{:} 'averagechan' 'off' }; end

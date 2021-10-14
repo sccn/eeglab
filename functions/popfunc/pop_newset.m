@@ -221,7 +221,7 @@ elseif length(varargin) == 0 && length(EEG) == 1 && strcmpi(g.gui, 'on') % if se
     have_to_save_new  = 0;
 
     % ***************************************************
-    % case 5 -> single dataset, has to be saved, one dataset to retreive and study present or several dataset to retrieve
+    % case 5 -> single dataset, has to be saved, one dataset to retrieve and study present or several dataset to retrieve
     % ***************************************************
     if length(g.retrieve) > 1 || ( g.study && ~isempty(g.retrieve)) % selecting several datasets or a study is present
         if verbose, disp('Case 5'); end
@@ -254,7 +254,7 @@ elseif length(varargin) == 0 && length(EEG) == 1 && strcmpi(g.gui, 'on') % if se
         cb_owrt      = [ ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the overwrite checkbox!'','' '',' ...
-                           '''The old dataset must be overwriten since all datasets'',' ...
+                           '''The old dataset must be overwritten since all datasets'',' ...
                            '''must be in the STUDY.''), ''warning'');' ];
         value_owrt   = 1;
         filenamenew    = fullfile(EEG.filepath, EEG.filename);

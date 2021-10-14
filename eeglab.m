@@ -583,7 +583,7 @@ cb_adjustevents= [ checkevent '[EEG LASTCOM] = pop_adjustevents(EEG);'   e_store
 cb_comments    = [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store];
 cb_chanedit    = [ check 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
                    'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
-                   'disp(''TIP: Call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
+                   'disp(''TIP: Call this function directly from the prompt, ">> pop_chanedit([]);"'');' ...
                    'disp(''     to convert between channel location file formats'');' ...
                    '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); clear TMPINFO TMP; if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
                    e_store ];
@@ -1386,9 +1386,9 @@ return;
 % Revision 1.18  2002/04/18 16:28:28  scott
 % EEG.averef printed as 'Yes' or 'No' -sm
 % Revision 1.16  2002/04/18 16:03:15  scott
-% editted "Events/epoch info (nb) -> Events  -sm
+% edited "Events/epoch info (nb) -> Events  -sm
 % Revision 1.14  2002/04/18 14:46:58  scott
-% editted main window help msg -sm
+% edited main window help msg -sm
 % Revision 1.10  2002/04/18 03:02:17  scott
 % edited opening instructions -sm
 % Revision 1.9  2002/04/11 18:23:33  arno
@@ -1404,7 +1404,7 @@ return;
 % Revision 1.4  2002/04/11 15:31:47  scott
 % added test isempty(CURRENTSET) line 78 -sm
 % Revision 1.3  2002/04/11 01:41:27  arno
-% checking dataset ... and inteligent menu update
+% checking dataset ... and intelligent menu update
 % Revision 1.2  2002/04/09 20:47:41  arno
 % introducing event number into gui
 
@@ -1786,7 +1786,7 @@ elseif (exist('EEG') == 1) && ~isnumeric(EEG) && ~isempty(EEG(1).data)
         set( g.val11, 'String', char(icaconsist));
         set( g.val12, 'String', num2str(round(totsize.bytes/1E6*10)/10));        
         
-    else % one continous dataset selected
+    else % one continuous dataset selected
         
         menustatus = { menustatus{:} 'continuous_dataset' };
         
@@ -1971,7 +1971,7 @@ if any(strcmp(menustatus, 'roi_connect'))
     
 end
 
-% allways off
+% always off
 eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''enable:off''))), allstrs);');  
 set(allmenus(indmatchvar), 'enable', 'off');
     
@@ -2126,7 +2126,7 @@ function res = mywhich(varargin)
 try
     res = which(varargin{:});
 catch
-    fprintf('Warning: permission error accesssing %s\n', varargin{1});
+    fprintf('Warning: permission error accessing %s\n', varargin{1});
 end
    
 function h = eegmenu( versL, varargin)

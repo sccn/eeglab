@@ -17,7 +17,7 @@
 %   transform  - ['none'!'laplacian'|'gradient'] transform scalp map to
 %                laplacian or gradient map. Default is 'none'.
 %   mode       - ['2dmap'|'preclust'] return either a 2-D array for direct
-%                plotting ('2dmap') or an array formated for preclustering
+%                plotting ('2dmap') or an array formatted for preclustering
 %                with all the NaN values removed (ncomps x points). Default
 %                is '2dmap' for 1 component and 'preclust' for several.
 %
