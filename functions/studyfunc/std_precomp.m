@@ -233,17 +233,20 @@ eeglab_options;
 if ~option_parallel
     if ~exist('gcp')
         disp('Parallel toolbox not found');
+        parstatus_changed = 0;
     else
         delete(gcp('nocreate'));
         ps = parallel.Settings;
         parstatus = ps.Pool.AutoCreate;
         ps.Pool.AutoCreate = false;
+        parstatus_changed = 1;
     end
 else
     if exist('gcp')
         ps = parallel.Settings;
         parstatus = ps.Pool.AutoCreate;
         ps.Pool.AutoCreate = true;
+        parstatus_changed = 1;
     end
 end    
 
@@ -465,7 +468,9 @@ end
 
 % set back default parallelization
 % ----------------------
-ps.Pool.AutoCreate = parstatus;
+if parstatus_changed
+    ps.Pool.AutoCreate = parstatus;
+end
 
 % compute component scalp maps
 % ----------------------------
