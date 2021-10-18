@@ -583,7 +583,7 @@ end
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
     'cycleinc'      'string'    {'linear','log'}        'linear'
-    'colormap'      'string'    []            DEFAULT_COLORMAP;...
+    'colormap'      {'string' 'float' }    []            DEFAULT_COLORMAP;...
     }, 'newtimef', 'ignore');
 if ischar(g), error(g); end
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
@@ -1507,7 +1507,6 @@ end
 if g.plot
     % verboseprintf(g.verbose, '\nNow plotting...\n');
     set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
-    colormap(g.colormap);
     pos = get(gca,'position');
     q = [pos(1) pos(2) 0 0];
     s = [pos(3) pos(4) pos(3) pos(4)];
@@ -1887,7 +1886,7 @@ switch lower(g.plotitc)
         end
         ylabel('ERP')
 
-end; %switch
+end %switch
 
 %
 %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
@@ -1920,6 +1919,7 @@ if g.plot
 
     try, axcopy(gcf); catch, end
 end
+colormap(g.colormap);
 
 % ---------------
 % Plotting curves
