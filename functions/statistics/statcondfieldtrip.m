@@ -19,8 +19,8 @@
 %                corresponds to the 'analytic' method of Fieldtrip and
 %                'permutation' correspond to the 'montecarlo' method.
 %   'naccu'    = this input is passed on as 'numrandomization' to Fieldtrip
-%   'neighbours' = Fieldtrip channel neighbour structure to perfom statistics
-%                and cluster correction for multiple comparisons accross 
+%   'neighbours' = Fieldtrip channel neighbour structure to perform statistics
+%                and cluster correction for multiple comparisons across 
 %                channels.
 %   'alpha'    = [float] p-value threshold value. Allow returning
 %                confidence intervals and mask (requires structoutput below).

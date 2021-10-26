@@ -4,13 +4,13 @@
 %   >> [dat] = pop_snapread( filename, gain);
 %
 % Graphic interface:
-%   "Relative gain" - [edit box] to compute the relative gain, fisrt look at
+%   "Relative gain" - [edit box] to compute the relative gain, first look at
 %                   the text header of the snapmater file with a text editor. 
 %                   Find the recording unit, usually in volts (UNITS field).  
 %                   Then, find the voltage range in the "CHANNEL.RANGE" [cmin cmax]
 %                   field. Finally, determine the gain of the amplifiers (directly
 %                   on the machine, not in the header file).
-%                   Knowing that the recording precision is 12 bits. The folowing
+%                   Knowing that the recording precision is 12 bits. The following
 %                   formula 
 %                                    1/2^12*[cmax-cmin]*1e6/gain 
 %                   returns the relative gain. You have to compute it and enter

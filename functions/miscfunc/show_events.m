@@ -188,7 +188,7 @@ xlabel('Latency', 'fontsize',16);
 xlabel('Latency', 'fontsize',16);
 ylabel('Epochs', 'fontsize',16);
 
-if nargout == 0  % supress output if not requested
+if nargout == 0  % suppress output if not requested
     clear im ;
 end
     

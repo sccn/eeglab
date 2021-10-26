@@ -1,5 +1,5 @@
 % floatread() - Read matrix from float file ssuming four byte floating point number
-%               Can use fseek() to read an arbitary (continguous) submatrix.
+%               Can use fseek() to read an arbitrary (contiguous) submatrix.
 %
 % Usage:        >> a = floatread(filename,size,'format',offset) 
 %

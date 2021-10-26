@@ -1,4 +1,4 @@
-% biosig2eeglab() - convert BIOSIG structue to EEGLAB structure
+% biosig2eeglab() - convert BIOSIG structure to EEGLAB structure
 %
 % Usage:
 %   >> OUTEEG = pop_biosig2eeglab(hdr, data, interval);
@@ -226,7 +226,7 @@ if importevent
 
         EEG = eeg_checkset(EEG, 'eventconsistency');
     elseif isempty(EEG.event) 
-        disp('Warning: no event found. Events might be embeded in a data channel.');
+        disp('Warning: no event found. Events might be embedded in a data channel.');
         disp('         To extract events, use menu File > Import Event Info > From data channel');
     end
 end

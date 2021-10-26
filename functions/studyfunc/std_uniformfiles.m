@@ -1,4 +1,4 @@
-% std_uniformfiles() - Check uniform channel distribution accross data files
+% std_uniformfiles() - Check uniform channel distribution across data files
 %
 % Usage:    
 %     >> boolval = std_uniformfiles(STUDY, ALLEEG);   
@@ -87,8 +87,8 @@ if any(uniformlabels == 0)
         disp('Warning: conflict between datafiles - all should have the same channel distribution');
         for index = 1:length(selectedtypes)
             if uniformlabels(index)
-                 fprintf('  Data files with extention "%s" have interpolated channels\n',  selectedtypes{index});
-            else fprintf('  Data files with extention "%s" have non-interpolated channels\n', selectedtypes{index});
+                 fprintf('  Data files with extension "%s" have interpolated channels\n',  selectedtypes{index});
+            else fprintf('  Data files with extension "%s" have non-interpolated channels\n', selectedtypes{index});
             end
         end
         uniformlabels = -1;
@@ -99,7 +99,7 @@ else
     if ~(length(unique(uniformlabels)) == 1)
         fprintf('Warning: Data files have different number of channel in each file\n');
         for index = 1:length(selectedtypes)
-            fprintf('  Data files with extention "%s" have %d channels\n',  selectedtypes{index}, uniformlabels(index));
+            fprintf('  Data files with extension "%s" have %d channels\n',  selectedtypes{index}, uniformlabels(index));
         end
     end
     uniformlabels = 1;

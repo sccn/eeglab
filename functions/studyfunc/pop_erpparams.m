@@ -158,7 +158,7 @@ if isempty(varargin)
     if ~isequal(res.ylim       , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end
     if ~isequal(res.timerange  , STUDY.etc.erpparams.timerange) &&  res.multiplechan ~= 2, options = { options{:} 'timerange' res.timerange }; end
     
-    % mutliple channel option
+    % multiple channel option
     % -----------------------
     if res.multiplechan == 1
         if ~isequal('off', STUDY.etc.erpparams.averagechan), options = { options{:} 'averagechan' 'off' }; end

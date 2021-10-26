@@ -27,7 +27,7 @@
 %
 % Important: 
 %   DEPRECATED: cart2topo() should NOT be used if elevation angle is less than 0 
-%   (for electrodes below zero plane) since then it returns INNACURATE results. 
+%   (for electrodes below zero plane) since then it returns INACCURATE results. 
 %   SUBSTITUTE: Use cart2topo = cart2sph() -> sph2topo().
 %
 % Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,

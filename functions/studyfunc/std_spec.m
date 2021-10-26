@@ -4,7 +4,7 @@
 % Usage:    
 %           >> [spec freqs] = std_spec(EEG, 'key', 'val', ...);
 %
-%              Computes the mean spectra of the data channels or activites of specified 
+%              Computes the mean spectra of the data channels or activities of specified 
 %              components of the supplied dataset. The spectra are saved in a Matlab file. 
 %              If such a file already exists, loads the spectral information from this file.  
 %              Options (below) specify which components to use, and the desired frequency 
@@ -306,7 +306,7 @@ if strcmpi(g.specmode, 'psd')
                 fprintf('Spectopo(psd): randomly extracted epochs are only 1 seconds. PSD is better suited for longer epochs.\n');
             end
         end
-        fprintf('Computing spectopo (psd) accross trials: ');
+        fprintf('Computing spectopo (psd) across trials: ');
         for iTrial = 1:size(X,3)
             [tmp, f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, 'verbose', 'off', spec_opt{:});
             if iTrial == 1

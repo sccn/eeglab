@@ -30,7 +30,7 @@
 %  'showleg'   = ['on'|'off'] show or hide legend.
 %  'colors'    = [cell array] cell array of plot aspect. E.g. { 'k' 'k--' }
 %                for plotting the first curve in black and the second one
-%                in black dashed. Can also contain additional formating.
+%                in black dashed. Can also contain additional formatting.
 %                { { 'k' 'linewidth' 2 } 'k--' } same as above but
 %                the first line is bolded.
 %  'ydir'      = [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) {def -> -1}
@@ -83,9 +83,9 @@
 % 03-16-00 added axcopy() feature -sm & tpj
 % 08-21-00 debugged axheight/axwidth setting -sm
 % 01-25-02 reformated help & license, added links -ad 
-% 03-11-02 change the channel names ploting position and cutomize pop-up -ad 
+% 03-11-02 change the channel names plotting position and cutomize pop-up -ad 
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
-% 03-15-02 debuging chanlocs structure -ad & sm 
+% 03-15-02 debugging chanlocs structure -ad & sm 
 
 %  'chan_locs' = file of channel locations as in >> topoplot example   {grid}
 %                ELSE: [rows cols] grid size for rectangular matrix. Example: [6 4]

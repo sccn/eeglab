@@ -40,7 +40,7 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % union of two channel location structure
-% without loosing the order information
+% without losing the order information
 % ---------------------------------------
 function alllocs = myunion(locs1, locs2)
 

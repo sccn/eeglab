@@ -231,14 +231,23 @@ uniqueSessions = unique(allSessions);
 % ----------------------
 eeglab_options;
 if ~option_parallel
-    delete(gcp('nocreate'));
-    ps = parallel.Settings;
-    parstatus = ps.Pool.AutoCreate;
-    ps.Pool.AutoCreate = false;
+    if ~exist('gcp')
+        disp('Parallel toolbox not found');
+        parstatus_changed = 0;
+    else
+        delete(gcp('nocreate'));
+        ps = parallel.Settings;
+        parstatus = ps.Pool.AutoCreate;
+        ps.Pool.AutoCreate = false;
+        parstatus_changed = 1;
+    end
 else
-    ps = parallel.Settings;
-    parstatus = ps.Pool.AutoCreate;
-    ps.Pool.AutoCreate = true;
+    if exist('gcp')
+        ps = parallel.Settings;
+        parstatus = ps.Pool.AutoCreate;
+        ps.Pool.AutoCreate = true;
+        parstatus_changed = 1;
+    end
 end    
 
 % compute custom measure
@@ -459,7 +468,9 @@ end
 
 % set back default parallelization
 % ----------------------
-ps.Pool.AutoCreate = parstatus;
+if parstatus_changed
+    ps.Pool.AutoCreate = parstatus;
+end
 
 % compute component scalp maps
 % ----------------------------

@@ -106,7 +106,7 @@ nChans = length(chanlocs);
 idx = ones(nChans,1);
 setId = cell(1, length(numberOfChannelsInSubset)); % cell array containing channels in each set
 
-remainingChannels = 1:nChans; % channles that are to be assigned to subsets
+remainingChannels = 1:nChans; % channels that are to be assigned to subsets
 
 % channels that have to stay in their original subset (as in
 % mandatoryChannelsForSet) and should not be re-assigned

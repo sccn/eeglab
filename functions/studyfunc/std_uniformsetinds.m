@@ -1,4 +1,4 @@
-% std_uniformsetinds() - Check uniform channel distribution accross datasets
+% std_uniformsetinds() - Check uniform channel distribution across datasets
 %
 % Usage:    
 %                >> boolval = std_uniformsetinds(STUDY);   

@@ -51,7 +51,7 @@
 % 06-12-97 EPOCH -> epoch line 71 below -sm
 % 8-10-97 Clarified chanfile type -sm
 % 12-08-97 Added ischar(titleval) test -sm
-% 02-09-98 legnth(data)->size(data,2) -sm
+% 02-09-98 length(data)->size(data,2) -sm
 % 01-25-02 reformated help & license, added links -ad 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

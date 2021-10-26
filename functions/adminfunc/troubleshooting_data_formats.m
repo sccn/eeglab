@@ -6,7 +6,7 @@
 %The FILEIO and BIOSIG toolboxes interface also allow to import in EEGLAB a wide variety
 %of EEG/MEG data file formats -- including those imported using EEGLAB native menus
 %
-%For EEGLAB, FILEIO and BIOSIG suported data formats
+%For EEGLAB, FILEIO and BIOSIG supported data formats
 %http://sccn.ucsd.edu/wiki/A01:_Importing_Continuous_and_Epoched_Data
 %
 %For FILEIO see in addition

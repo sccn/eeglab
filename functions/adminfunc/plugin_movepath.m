@@ -11,7 +11,7 @@
 %         pluginpos    - {'begin','end'} Position to move the plugin in the path.
 %                      To the top ('begin') or to the bottom ('end').
 % Optional inputs:
-%        warns        -[0,1] Allow isplay [1] or do not display [0] warnings.
+%        warns        -[0,1] Allow display [1] or do not display [0] warnings.
 %                      Warnings are restored at the end of the process. Default[0] 
 %  Outputs:
 %        oldpath  - Original MATLAB path before entering this function
@@ -86,7 +86,7 @@ else
     oldpath = path;
 end
 
-% Retreiving path
+% Retrieving path
 comp = computer;
 if strcmpi(comp(1:2), 'PC')
     newpathtest = [ pluginfolder ';' ];
@@ -122,7 +122,7 @@ rmpath(genpath(pluginfolder));
      warning(tmpwarn); 
  end
  
- newpath = path; % Retreiving new path
+ newpath = path; % Retrieving new path
 
  % required here because path not added yet
 % to the admin folder

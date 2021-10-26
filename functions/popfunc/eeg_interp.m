@@ -154,10 +154,15 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     else
         badchans  = bad_elec;
         goodchans = setdiff_bc(1:EEG.nbchan, badchans);
-        oldelocs  = EEG.chanlocs;
-        EEG       = pop_select(EEG, 'nochannel', badchans);
-        EEG.chanlocs = oldelocs;
-        disp('Interpolating missing channels...');
+        if strcmpi(method, 'sphericalfast')
+            EEG.data(badchans,:) = [];
+            EEG.nbchan = length(goodchans);
+        else
+            oldelocs  = EEG.chanlocs;
+            EEG       = pop_select(EEG, 'nochannel', badchans);
+            EEG.chanlocs = oldelocs;
+            disp('Interpolating missing channels...');
+        end
     end
 
     % find non-empty good channels
@@ -173,7 +178,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     
     % scan data points
     % ----------------
-    if strcmpi(method, 'spherical')
+    if strcmpi(method, 'spherical') || strcmpi(method, 'sphericalfast')
         % get theta, rad of electrodes
         % ----------------------------
         tmpgoodlocs = EEG.chanlocs(goodchans);
@@ -257,8 +262,10 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     tmpdata(badchans,:,:) = badchansdata;
     EEG.data = tmpdata;
     EEG.nbchan = size(EEG.data,1);
-    EEG = eeg_checkset(EEG);
-
+    if ~strcmpi(method, 'sphericalfast')
+        EEG = eeg_checkset(EEG);
+    end
+    
 % get data channels
 % -----------------
 function datachans = getdatachans(goodchans, badchans);
@@ -283,7 +290,7 @@ Gelec = computeg(xelec,yelec,zelec,xelec,yelec,zelec);
 Gsph  = computeg(x,y,z,xelec,yelec,zelec);
 
 % equations are 
-% Gelec*C + C0  = Potential (C unknow)
+% Gelec*C + C0  = Potential (C unknown)
 % Sum(c_i) = 0
 % so 
 %             [c_1]

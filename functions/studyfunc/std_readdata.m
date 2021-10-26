@@ -367,7 +367,7 @@ function [dataTmp,eventTmp] = checkdataerpimage(dataTmp, eventTmp)
         allsizes = [ allsizes allsize2 ];
     end
     if length(unique(allsizes(:))) > 1
-        disp('********* Discrepency between the number of lines in ERP-image');
+        disp('********* Discrepancy between the number of lines in ERP-image');
     else
         return;
     end
@@ -381,14 +381,14 @@ function [dataTmp,eventTmp] = checkdataerpimage(dataTmp, eventTmp)
                 if size(dataTmp{iCase}{iItem},2)+1 == commonSize
                     dataTmp{iCase}{iItem}(:,end+1) = dataTmp{iCase}{iItem}(:,end); % duplicate last line
                     eventTmp{iCase}{iItem}(end+1) = eventTmp{iCase}{iItem}(end); % duplicate last line
-                    disp('******** ERPimage discrepency between the number of lines detected and corrected')
+                    disp('******** ERPimage discrepancy between the number of lines detected and corrected')
                 elseif size(dataTmp{iCase}{iItem},2)-1 == commonSize
                     dataTmp{iCase}{iItem}(:,end) = [];
                     eventTmp{iCase}{iItem}( end) = [];
-                    disp('******** ERPimage discrepency between the number of lines detected and corrected')
+                    disp('******** ERPimage discrepancy between the number of lines detected and corrected')
                 end
                 if size(dataTmp{iCase}{iItem},2) ~= commonSize
-                    error('ERPimage discrepency between the number of lines');
+                    error('ERPimage discrepancy between the number of lines');
                 end
             end
         end

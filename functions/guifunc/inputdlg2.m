@@ -5,7 +5,7 @@
 %   >> Answer = inputdlg2(Prompt,Title,LineNo,DefAns,funcname);
 % 
 % Inputs:
-%   Same as inputdlg. Using the optional additionnal funcname parameter 
+%   Same as inputdlg. Using the optional additional funcname parameter 
 %   the function will create a help button. The help message will be
 %   displayed using the pophelp() function.
 %

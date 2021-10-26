@@ -206,7 +206,7 @@ else params.plottf = opt.plottf;
 end
 %if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end %deprecated
 stats = statstruct.etc.statistics;
-stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
+stats.fieldtrip.channelneighbor = struct([]); % assumes one channel or 1 component
 if isempty(STUDY.design(opt.design).variable)
     stats.paired = { };
 else
@@ -263,7 +263,7 @@ if ~isempty(opt.channels)
             [allersp,basesamples,basevals] = newtimefbaseln(allersp, alltimes, paramsersp);
         else
             opt.subbaseline = 'on';
-            disp('Warning: when using single-trial statistics, a common baseline is forced accross all conditions');
+            disp('Warning: when using single-trial statistics, a common baseline is forced across all conditions');
         end
     end
     
@@ -280,7 +280,7 @@ if ~isempty(opt.channels)
         if  strcmpi(params.subbaseline, 'on')
             disp('Computing common baseline has changed since EEGLAB 14: averaging baselines is now');
             disp('performed before log-transformation of the baseline - in a similar way that baseline'); 
-            disp('is averaged accross trials (log transformation is only performed at the end for display)'); 
+            disp('is averaged across trials (log transformation is only performed at the end for display)'); 
             % see above for rational for baseline
             paramsersp.singletrials = stats.singletrials;
             paramsersp.commonbase   = params.subbaseline;
@@ -455,7 +455,7 @@ else
             if  strcmpi(params.subbaseline, 'on')
                 disp('Computing common baseline has changed since EEGLAB 14: averaging baselines is now');
                 disp('performed before log-transformation of the baseline - in a similar way that baseline');
-                disp('is averaged accross trials (log transformation is only performed at the end for display)');
+                disp('is averaged across trials (log transformation is only performed at the end for display)');
                 % see above for rational for baseline
                 paramsersp.singletrials = stats.singletrials;
                 paramsersp.commonbase   = params.subbaseline;

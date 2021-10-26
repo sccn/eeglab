@@ -156,7 +156,7 @@ if isempty(varargin)
     if ~isequal(res.ylim, STUDY.etc.specparams.ylim),               options = { options{:} 'ylim' res.ylim      }; end
     if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange) && res.multiplechan ~= 2,     options = { options{:} 'freqrange' res.freqrange }; end
     
-    % mutliple channel option
+    % multiple channel option
     % -----------------------
     if res.multiplechan == 1
         if ~isequal('off', STUDY.etc.specparams.averagechan), options = { options{:} 'averagechan' 'off' }; end

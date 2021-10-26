@@ -50,17 +50,55 @@ end
 if nargin >= 2
     EEG = pop_fileio(header, data, evt);
 else
-    EEG = pop_fileio(header.hdr, header.trial);
+    if isfield(header, 'hdr')
+        % use the hdr field in the data
+        hdr = header.hdr;
+    else
+        % create a minimal header
+        hdr.nChans  = numel(header.label);
+        hdr.nSamplesPre = 0; % FIXME perhaps better to make it nan?; And what about nSamplesPst?
+        if iscell(header.trial)
+            hdr.nTrials  = numel(header.trial);
+            hdr.nSamples = numel(header.time{1}); % variable length trials will be caught below 
+            if isfield(header, 'fsample')
+                hdr.Fs = header.fsample;
+            else
+                hdr.Fs = 1./mean(diff(header.time{1}));
+            end
+        else
+            hdr.nTrials  = size(header.trial,1);
+            hdr.nSamples = numel(header.time);
+            if isfield(header, 'fsample')
+                hdr.Fs = header.fsample;
+            else
+                hdr.Fs = 1./mean(diff(header.time));
+            end
+        end
+        
+    end
+    
+    EEG = pop_fileio(hdr, header.trial);
     if iscell(EEG.data) && length(EEG.data) == 1
-        EEG.data = EEG.data{1};
+        EEG.data  = EEG.data{1};
+        EEG.times = header.time{1};
     elseif iscell(EEG.data)
         len = cellfun(@(x)size(x,2), EEG.data);
         if length(unique(len)) > 1
             error('Cannot convert epochs of different length');
         end
-        EEG.data = [ EEG.data{:} ];
+        % EEG.data = [ EEG.data{:} ];
+        EEG.data = cat(3, EEG.data{:});
         EEG.pnts = len(1);
+        EEG.times = header.time{1};
     else
-        error('Unknown fieldtrip data format');
+        % error('Unknown fieldtrip data format');
+        % the trial field was a 3D matrix
+        EEG.data  = permute(EEG.data, [2 3 1]);
+        EEG.times = header.time; 
+        
+        % overrule the previously created metadata
+        [EEG.nbchan, EEG.pnts, EEG.trials] = size(EEG.data);
     end
+    EEG.xmin = EEG.times(1);
+    EEG.xmax = EEG.times(end);
 end   

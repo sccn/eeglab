@@ -57,7 +57,7 @@
 %                  above). 'nocurve' does not plot the mean. This functionality
 %                  does not work for all data configuration {default: 'off'}
 %  'figure'      - ['on'|'off'] creates a new figure ('on'). The 'off' mode
-%                  plots all of the groups and conditions on the same pannel.
+%                  plots all of the groups and conditions on the same panel.
 % 'plotsubjects' - ['on'|'off'] overplot traces for individual components
 %                  or channels {default: 'off'}
 % 'singlesubject' - ['on'|'off'] set to 'on' to plot single subject.
@@ -240,7 +240,7 @@ if isempty(opt.groupnames)
     if ng == 1, opt.groupnames = { '' }; end
 end
 
-% plotting paramters
+% plotting parameters
 % ------------------
 if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end
 if nc > 1 && ~isempty(opt.condstats ), addr = 1; else addr = 0; end
@@ -430,7 +430,7 @@ for c = 1:ncplot
             % tmpdata is of size "points x channels x subject x conditions"
             % or                 "points x   1   x components x conditions"
             % -------------------------------------------------------------
-            if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off') % average accross subjects
+            if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off') % average across subjects
                 tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,3)));
             end
             tmpdata = squeeze(permute(tmpdata, [2 1 3 4]));
@@ -491,7 +491,7 @@ for c = 1:ncplot
             end
         end
 
-        % statistics accross groups
+        % statistics across groups
         % -------------------------
         if g == ngplot && ng > 1 && ~isempty(opt.groupstats)            
             if ~strcmpi(opt.plotgroups, 'together') || ~isempty(opt.condstats) || isnan(opt.threshold)
@@ -521,7 +521,7 @@ for c = 1:ncplot
     end
 end
 
-% statistics accross conditions
+% statistics across conditions
 % -----------------------------
 if ~isempty(opt.condstats) && nc > 1 && (~strcmpi(opt.plotconditions, 'together') || ~isempty(opt.groupstats) || isnan(opt.threshold))
     for g = 1:ng
@@ -550,7 +550,7 @@ if ~isempty(opt.condstats) && nc > 1 && (~strcmpi(opt.plotconditions, 'together'
 end
     
     
-% statistics accross group and conditions
+% statistics across group and conditions
 % ---------------------------------------
 if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1 
     mysubplot(ncplot+addr, ngplot+addc, ncplot+addr, ngplot + 1, opt.subplot);

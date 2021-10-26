@@ -47,7 +47,7 @@
 %   'dipselect' - [float<1] select components for clustering from all STUDY 
 %                 datasets with dipole model residual var. below this value. 
 %   'inbrain'   - ['on'|'off'] same as above. This option may also be
-%                 placed in the command list (preceeding the 'dipselect'
+%                 placed in the command list (preceding the 'dipselect'
 %                 option).
 %
 % Outputs:
@@ -124,7 +124,7 @@ if ~isempty(ALLEEG)
     else
         if any(cellfun( @isempty, allchanlocs))
             error( [ 'Some datasets have channel locations and some other don''t' 10 ...
-                     'the STUDY is not homogenous and cannot be created.' ]);
+                     'the STUDY is not homogeneous and cannot be created.' ]);
         end
     end
 end

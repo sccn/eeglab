@@ -97,7 +97,7 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
   set(gca, 'yscale', 'log', 'xscale', 'log');
   try colormap(DEFAULT_COLORMAP); catch, end
   
-  % puting ticks
+  % putting ticks
   % ------------
   if nargin >= 5
       divs = xticks;

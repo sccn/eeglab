@@ -35,7 +35,7 @@
 %   'std'      - ['on'|'off'|'none'] 'on' -> plot std. devs.; 'none' -> do not 
 %                interact with other options {default:'none'}
 %
-% Vizualisation options:
+% Visualisation options:
 %   'addavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datadd' datasets
 %                {default: 'on' if 'datsub' empty, otherwise 'off'}
 %   'subavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datsub' datasets 

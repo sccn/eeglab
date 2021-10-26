@@ -22,7 +22,7 @@
 %   mask    - (0->1) percentage of low values in the matrix to mask 
 %             with zeros (default: 0 or none)
 %
-% Ouput:
+% Output:
 %   gaussmatrix - 3-D gaussian matrix
 %
 % Author: Arnaud Delorme, 2009
@@ -90,8 +90,8 @@ mat = exp(-0.5*(  ((X-meanX)/sigmaX).*((X-meanX)/sigmaX)...
             			/((sigmaX*sigmaY*sigmaZ)^(0.5)*pi); 
 
 if cut > 0
-	maximun = max(mat(:))*cut;
-	I = find(mat < maximun);
+	maximum = max(mat(:))*cut;
+	I = find(mat < maximum);
 	mat(I) = 0;
 end
 

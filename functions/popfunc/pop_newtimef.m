@@ -57,13 +57,13 @@
 %              Uncheck this box to plot the absolute power values.
 %   "ITC color limits" - [edit box] set the upper and lower limit for the
 %              ITC image. 
-%   "plot ITC phase" - [checkbox] check this box plot plot (overlayed on
+%   "plot ITC phase" - [checkbox] check this box plot plot (overlaid on
 %              the ITC amplitude) the polarity of the ITC complex value.
 %   "Bootstrap significance level" - [edit box] use this edit box to enter
 %              the p-value threshold for masking both the ERSP and the ITC
 %              image for significance (masked values appear as light green)
 %   "FDR correct" - [checkbox] this correct the p-value for multiple comparisons
-%              (accross all time and frequencies) using the False Discovery
+%              (across all time and frequencies) using the False Discovery
 %              Rate method. See the fdr.m function for more details.
 %   "Optional newtimef arguments" - [edit box] addition argument for the
 %              newtimef function may be entered here in the 'key', value

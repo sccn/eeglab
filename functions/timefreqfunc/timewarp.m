@@ -87,7 +87,7 @@ function M=timewarp(evLatency, newLatency)
 % $$$     k = k-1;
     
     if k == 0
-      % Check wether i == ts(1) and i == 1
+      % Check whether i == ts(1) and i == 1
       % In that case, M(1,1) = 1
       M(1,1) = 1;
     else

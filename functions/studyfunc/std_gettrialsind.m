@@ -89,7 +89,7 @@ catch
     disp('std_gettrialsind() error: calling convention {''key'', value, ... } error'); return;
 end
 
-% Checking if fisrt entry is string or struct
+% Checking if first entry is string or struct
 if isstruct(filename)
     if isfield(filename,'trialinfo')
         trialinfo = filename.trialinfo;
@@ -156,7 +156,7 @@ for iVar = 1 :  length(varnames)
     end
 end
 
-% Retreiving overlapped values
+% Retrieving overlapped values
 hits = sum(hits,2);
 trialindsx = find(hits == length(varnames));
 if ~isempty(eventvals)

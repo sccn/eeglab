@@ -209,7 +209,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     cb_del      = 'pop_study(''delclust'' , gcbf, ''showwarning'');';
     cb_dipole   = 'pop_study(''dipselect'', gcbf, ''showwarning'');';
 
-	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use exsiting STUDY set to import dataset information -- pop_study()''); ' ... 
+	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use existing STUDY set to import dataset information -- pop_study()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''usestudy_file''), ''string'', [filepath filename]);' ];
 	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
@@ -464,7 +464,7 @@ else % internal command
             realindex = guiindex+(page-1)*10;
             datasetinfo(realindex).condition   = varargin{2};
             if get(findobj(hdl, 'tag', 'copy_to_dataset'), 'value')
-                ALLEEG(realindex).conditon     = varargin{2};
+                ALLEEG(realindex).condition     = varargin{2};
             end
             allcom = { allcom{:}, { 'index' realindex 'condition' varargin{2} } };
             userdat{1} = ALLEEG;
@@ -720,7 +720,7 @@ if nargin < 5
 end
 	
 if length(Prompt) ~= length(DefAns)
-	error('inputdlg2: prompt and default answer cell array must have the smae size');
+	error('inputdlg2: prompt and default answer cell array must have the same size');
 end
 
 geometry = {};

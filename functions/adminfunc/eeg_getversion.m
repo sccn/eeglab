@@ -1,4 +1,4 @@
-% eeg_getversion() - obtain EEGLAB version number (version is embeded in
+% eeg_getversion() - obtain EEGLAB version number (version is embedded in
 %                    the script, edit the function to see the version).
 %
 % Usage:

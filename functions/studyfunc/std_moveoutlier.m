@@ -69,5 +69,5 @@ if outlier_clust == 0 %no such cluster exist
     outlier_clust = length(STUDY.cluster);
 end
 
-%move the compnents to the outliers cluster
+%move the components to the outliers cluster
 STUDY = std_movecomp(STUDY, ALLEEG, old_clus, outlier_clust, comps);   

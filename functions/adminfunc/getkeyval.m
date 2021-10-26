@@ -11,8 +11,8 @@
 %   mode       - if the value extracted is an integer array, the
 %                'mode' variable can contain a subset of indexes to return.
 %                If mode is 'present', then either 0 or 1 is returned
-%                depending on wether the variable is present.
-%   defaultval - default value if the varible is not found
+%                depending on whether the variable is present.
+%   defaultval - default value if the variable is not found
 %
 % Outputs:
 %   val  - a value for the variable

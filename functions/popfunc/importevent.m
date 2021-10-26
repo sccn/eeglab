@@ -7,7 +7,7 @@
 % Input:
 %   event     - [ 'filename'|array ] Filename of a text file, or name of
 %               Matlab array in the global workspace containing an
-%               array of events in the folowing format: The first column of
+%               array of events in the following format: The first column of
 %               the cell array is the type of the event, the second the latency. 
 %               The others are user-defined. The function can read 
 %               either numeric or text entries in ascii files.
@@ -21,7 +21,7 @@
 %  'fields'   - [Cell array] List of the name of each user-defined column, 
 %               optionally followed by a description. Ex: { 'type',
 %               'latency' }
-%  'skipline' - [Interger] Number of header rows to skip in the text file 
+%  'skipline' - [Integer] Number of header rows to skip in the text file 
 %  'timeunit' - [ latency unit rel. to seconds ]. Default unit is 1 = seconds. 
 %               NaN indicates that the latencies are given in time points.
 %  'delim'    - [string] String of delimiting characters in the input file. 
@@ -256,12 +256,12 @@ for curfield = tmpfields'
       end
 end
 
-if isempty(event) % usefull 0xNB empty structure
+if isempty(event) % useful 0xNB empty structure
     event = [];
 end
 
-%% remove the events wit out-of-bound latencies
-% --------------------------------------------
+%% remove the events with out-of-bound latencies
+% ---------------------------------------------
 if isfield(event, 'latency') && latencypresent
     try 
         res = cellfun('isempty', { event.latency });

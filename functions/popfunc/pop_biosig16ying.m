@@ -83,7 +83,7 @@ if nargin < 1
         disp('We highly recommend that you choose a reference channel IF these are Biosemi data');
         disp('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!');
     end
-    uilist = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
+    uilist = { { 'style' 'text' 'String' 'Channel list (default all):' } ...
                  { 'style' 'edit' 'string' '' } ...
                  { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
                  { 'style' 'edit' 'string' '' } ...
@@ -111,7 +111,7 @@ else
     options = varargin;
 end
 
-% decode imput parameters
+% decode input parameters
 % -----------------------
 g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
                             'channels'    'integer' [0 Inf]    [];
@@ -249,7 +249,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % $$$     end
 % $$$     EEG = eeg_checkset(EEG, 'eventconsistency');
 % $$$ else 
-% $$$     disp('Warning: no event found. Events might be embeded in a data channel.');
+% $$$     disp('Warning: no event found. Events might be embedded in a data channel.');
 % $$$     disp('         To extract events, use menu File > Import Event Info > From data channel');
 % $$$ end
 

@@ -149,7 +149,7 @@ for index = 1:length(allfiles)
     copyfile(tmpp, fullfile(outputfolder, 'help', allfiles{index}));
 end
 
-% copy MCR file and visual C++ librairies
+% copy MCR file and visual C++ libraries
 % ---------------------------------------
 if strcmpi(comp(1:2), 'PC')
     copyfile(fullfile(matlabroot, 'toolbox', 'compiler', 'deploy', 'win32', 'MCRInstaller.exe'), fullfile(outputfolder, 'MCRInstaller.exe'));
@@ -203,6 +203,6 @@ return
 
 %histforexe(allfiles1, 'help');
 
-% help for lisence
+% help for license
 % 
 

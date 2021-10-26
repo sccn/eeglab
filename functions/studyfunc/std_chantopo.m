@@ -25,7 +25,7 @@
 %  'datatype'    - ['erp'|'spec'] data type {default: 'erp'}
 %  'titles'      - [cell array of string] titles for each of the subplots. 
 %                  { default: none}
-%  'subplotpos'  - [addr addc posr posc] perform ploting in existing figure.
+%  'subplotpos'  - [addr addc posr posc] perform plotting in existing figure.
 %                  Add "addr" rows, "addc" columns and plot the scalp
 %                  topographies starting at position (posr,posc).
 %
@@ -110,7 +110,7 @@ if nc >= ng, opt.transpose = 'on';
 else         opt.transpose = 'off';
 end
 
-% plotting paramters
+% plotting parameters
 % ------------------
 if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end
 if nc > 1 && ~isempty(opt.condstats ), addr = 1; else addr = 0; end
@@ -188,7 +188,7 @@ for c = 1:nc
             axis off;
         end
 
-        % statistics accross groups
+        % statistics across groups
         % -------------------------
         if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && c == 1)
             if g == ng && ng > 1 && ~isempty(opt.groupstats)
@@ -215,7 +215,7 @@ if isempty(opt.caxis)
 end
 
 for g = 1:ng
-    % statistics accross conditions
+    % statistics across conditions
     % -----------------------------
     if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && g == 1)
         if ~isempty(opt.condstats) && nc > 1
@@ -229,7 +229,7 @@ for g = 1:ng
     end
 end
 
-% statistics accross group and conditions
+% statistics across group and conditions
 % ---------------------------------------
 if ~isempty(opt.condstats) && ~isempty(opt.groupstats) && ng > 1 && nc > 1 && ~isempty(pinterplot)
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, nc+addr, ng+1, opt.transpose);

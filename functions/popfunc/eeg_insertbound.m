@@ -92,7 +92,7 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     rmEvent           = [];
 	for iRegion = 1:size(regions,1) % sorted in decreasing order
 
-        % find event succeding boundary to insert event
+        % find event succeeding boundary to insert event
         % at the correct location in the event structure
         % ----------------------------------------------
         tmpind    = find( eventLatencies - regions(iRegion,1) > 0 );
@@ -133,7 +133,7 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
 
     
 % look for nested events
-% retrun indices of nested events and
+% return indices of nested events and
 % their total length
 % -----------------------------------
 function [ indEvents, addlen ] = findnested(event, eventlat, region)

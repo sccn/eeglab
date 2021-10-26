@@ -10,8 +10,8 @@
 %   a,b       = data consisting of UNPAIRED arrays to be compared. The last 
 %               dimension of the data array is used to compute the t-test.
 %   'inhomogenous' = use computation for the degree of freedom using 
-%                    inhomogenous variance. By default the computation of
-%                    the degree of freedom is done with homogenous
+%                    inhomogeneous variance. By default the computation of
+%                    the degree of freedom is done with homogeneous
 %                    variances.
 %
 % Outputs:
@@ -36,7 +36,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005
 %         (thank you to G. Rousselet for providing the formula for 
-%         inhomogenous variances).
+%         inhomogeneous variances).
 %
 % Reference:
 %   Schaum's outlines in statistics (3rd edition). 1999. Mc Graw-Hill.
@@ -76,19 +76,19 @@ function [tval, df] = ttest2_cell(a,b,c) % assumes equal variances
         return;
     end
     
-    homogenous = 'homogenous';
+    homogeneous = 'homogeneous';
     if nargin > 1 && ischar(b)
-        homogenous = b;
+        homogeneous = b;
     end
     if nargin > 2 && ischar(c)
-        homogenous = c;
+        homogeneous = c;
     end
     if iscell(a), 
         b = a{2}; 
         a = a{1}; 
     end
-    if ~strcmpi(homogenous, 'inhomogenous') && ~strcmpi(homogenous, 'homogenous')
-        error('Value for homogenous parameter can only be ''homogenous'' or ''inhomogenous''');
+    if ~strcmpi(homogeneous, 'inhomogenous') && ~strcmpi(homogeneous, 'homogeneous')
+        error('Value for homogeneous parameter can only be ''homogeneous'' or ''inhomogenous''');
     end
 
     nd    = myndims(a);
@@ -97,8 +97,8 @@ function [tval, df] = ttest2_cell(a,b,c) % assumes equal variances
     meana = mymean(a, nd);
     meanb = mymean(b, nd);
     
-    if strcmpi(homogenous, 'inhomogenous')
-        % inhomogenous variance from Howel, 2009, "Statistical Methods for Psychology"
+    if strcmpi(homogeneous, 'inhomogenous')
+        % inhomogeneous variance from Howel, 2009, "Statistical Methods for Psychology"
         % thank you to G. Rousselet for providing these formulas
         m  = meana - meanb;
         s1 = var(a,0,nd) ./ na;

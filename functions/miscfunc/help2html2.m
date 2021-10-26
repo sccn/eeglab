@@ -246,10 +246,10 @@ while (str(1) == '%')
                vartext = str;
             else	
                if ~isempty(varname) 
-               	    vartext = [ vartext ' ' str]; % espace if in array
+               	    vartext = [ vartext ' ' str]; % space if in array
                else 
                		if all(vartext(	end-2:end) == '.')
-               			vartext = [ deblank2(vartext(1:end-3)) ' ' str]; % espace if '...'
+               			vartext = [ deblank2(vartext(1:end-3)) ' ' str]; % space if '...'
                		else
                     	vartext = [ vartext '<BR>' str];    % CR otherwise
                     end;	
@@ -380,7 +380,7 @@ function strout = formatstr( str, refcall );
 		end
 return;	
 
-% final formating
+% final formatting
 function str = finalformat(str); % bold text in bracket if just in the beginning
     tmploc = sort(union(find(str == '['), find(str == ']')));
     if ~isempty(tmploc) && str(1) == '['

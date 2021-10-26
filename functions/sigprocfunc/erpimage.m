@@ -1143,7 +1143,7 @@ if ~isempty(auxvar)
 elseif exist('timeStretchRef') && ~isempty(timeStretchRef)
     if ~isnan(aligntime)
         fprintf(['\nerpimage(): options "align" and ' ...
-            '"timewarp" are not compatiable.\n']);
+            '"timewarp" are not compatible.\n']);
         return;
     end
     
@@ -2047,7 +2047,7 @@ if ~isempty(i)
 end
 
 %
-%% %%%%%%%%%%% Determine coherence freqeuncy %%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%% Determine coherence frequency %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if length(coherfreq) == 2 && coherfreq(1) ~= coherfreq(2) && freq <= 0
     % find max frequency in specified band - should use Matlab pwelch()?

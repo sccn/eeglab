@@ -10,7 +10,7 @@
 %           [freqs x times x trials] or [channels x freqs x times x trials)
 %   itctype  - ['coher'|'phasecoher'|'phasecoher2'] Compute either linear
 %              coherence ('coher') or phase coherence ('phasecoher').
-%              Originall called 'phase-locking factor' {default: 'phasecoher'}
+%              Originally called 'phase-locking factor' {default: 'phasecoher'}
 %
 % Outputs:
 %   itc - (nfreqs,timesout) matrix of complex inter-trial coherencies.
