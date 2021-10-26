@@ -115,6 +115,9 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
             tmpcfg2 = tmpcfg;
             tmpcfg  = rmfield(tmpcfg, 'label'); % first input must not be data
             tmpcfg2 = rmfield(tmpcfg2, 'method'); % second input must not be method
+            if isfield(tmpcfg, 'trialinfo')
+                tmpcfg  = rmfield(tmpcfg, 'trialinfo'); % first input must not be data
+            end
             % tmpcfg = rmfield(tmpcfg, 'label');
             % --> removing label seems to make ft_prepare_neighbours to crash
             cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg2);
