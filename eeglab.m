@@ -1115,8 +1115,8 @@ else
         if ~exist('mff_import', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
             cb_mff = [ 'if ~plugin_askinstall(''mffmatlabio'', ''mff_import''), return; end;' ...
-                       'eval(char(get(findobj(''label'', ''Import Magstim EGI .mff file''), ''callback'')));' ];
-            eegmenu( false,  neuro_m, 'Label', 'Import Magstim EGI .mff file', 'CallBack', cb_mff, 'separator', 'on');
+                       'eval(char(get(findobj(''label'', ''Import Magstim/EGI .mff file''), ''callback'')));' ];
+            eegmenu( false,  neuro_m, 'Label', 'Import Magstim/EGI .mff file', 'CallBack', cb_mff, 'separator', 'on');
         end
         if ~exist('eegplugin_neuroscanio', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
