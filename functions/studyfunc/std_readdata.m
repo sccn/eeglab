@@ -131,8 +131,8 @@ end
 % options
 % -------
 opts = {};
-if ~isempty(opt.timerange), opts = { 'timelimits', opt.timerange }; end
-if ~isempty(opt.freqrange), opts = { 'freqlimits', opt.freqrange }; end
+if ~isempty(opt.timerange), opts = { opts{:} 'timelimits', opt.timerange }; end
+if ~isempty(opt.freqrange), opts = { opts{:} 'freqlimits', opt.freqrange }; end
 opts = { opts{:} 'singletrials' opt.singletrials };
 fprintf('Reading subjects'' data or looking up measure values in EEGLAB cache\n');
 
