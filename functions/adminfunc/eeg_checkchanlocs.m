@@ -154,7 +154,7 @@ end
 % check channel labels
 if isfield(chanedit, 'labels')
     % prefix (EDF format specification)?
-    if any(contains({chanedit.labels}, 'EEG'))
+    if strfind([chanedit.labels], 'EEG') % `contains() is not back compatible
         disp('Detected/removing ''EEG'' prefix from channel labels')
         chanprefixes = {'EEG-', 'EEG ', 'EEG'}; % order matters
         tmp = {chanedit.labels};
