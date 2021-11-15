@@ -150,19 +150,28 @@ if ~isequal(fieldnames(chanedit)',fields)
     catch, end
 end
 
-% check if duplicate channel label
-% --------------------------------
+
+% check channel labels
 if isfield(chanedit, 'labels')
+    % prefix (EDF format specification)?
+    if strfind([chanedit.labels], 'EEG') % `contains() is not back compatible
+        disp('Detected/removing ''EEG'' prefix from channel labels')
+        chanprefixes = {'EEG-', 'EEG ', 'EEG'}; % order matters
+        tmp = {chanedit.labels};
+        for idx = 1:length(chanprefixes)
+            tmp = strrep(tmp, chanprefixes(idx), '');
+        end
+        [chanedit.labels] = deal(tmp{:});
+    end
+        
+    % duplicate labels?
     tmp = sort({chanedit.labels});
     if any(strcmp(tmp(1:end-1),tmp(2:end)))
         disp('Warning: some channels have the same label'); 
     end
-end
-
-% check for empty channel label
-% -----------------------------
-if isfield(chanedit, 'labels')
-    indEmpty = find(cellfun(@isempty, {chanedit.labels}));
+    
+    % empty labels?
+     indEmpty = find(cellfun(@isempty, {chanedit.labels}));
     if ~isempty(indEmpty)
         tmpWarning = warning('backtrace'); 
         warning backtrace off;
@@ -171,7 +180,7 @@ if isfield(chanedit, 'labels')
         for index = indEmpty
             chanedit(index).labels = sprintf('E%d', index);
         end
-    end
+    end   
 end
 
 % remove fields
