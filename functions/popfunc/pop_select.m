@@ -197,10 +197,7 @@ if isfield(EEG.etc,'amica') && isfield(EEG.etc.amica,'prob_added')
     for index = 1:2:length(args)
        if strcmpi(args{index}, 'channel')
            args{index+1} = [ args{index+1} EEG.nbchan-(0:2*EEG.etc.amica.num_models-1)];
-           
        end
-       
-       
     end
 end
 %--------------------------------------------------------------------
@@ -238,10 +235,13 @@ else
     end    
     g.trial = g.trial(sort(q));
 end
-
-if isempty(g.channel) && ~iscell(g.nochannel) && ~iscell(chanlist)
-    g.channel = [1:EEG.nbchan];
+if ~isempty(g.nochannel) && ~iscell(g.nochannel)
+    g.channel(g.nochannel) = [];
 end
+% 
+% if isempty(g.channel) && ~iscell(g.nochannel) && ~iscell(chanlist)
+%     g.channel = [1:EEG.nbchan];
+% end
 
 if iscell(g.channel) && ~iscell(g.nochannel) && ~isempty(EEG.chanlocs)
      noChannelAsCell = {};
@@ -577,20 +577,27 @@ if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3)
     end
 end
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end
-EEG.trials    = length(g.trial);
-EEG.pnts      = size(EEG.data,2);
-EEG.nbchan    = length(g.channel);
 if ~isempty(EEG.chanlocs)
     if ~isfield(EEG.chaninfo, 'removedchans')
         EEG.chaninfo.removedchans = [];
     end
     try 
-        EEG.chaninfo.removedchans = [ EEG.chaninfo.removedchans EEG.chanlocs(diff1) ]; 
+        diff1 = setdiff_bc([1:EEG.nbchan], g.channel);
+        fields = fieldnames(EEG.chanlocs);
+        for iChan = diff1(:)'
+            EEG.chaninfo.removedchans(end+1).(fields{1}) = EEG.chanlocs(iChan).(fields{1});
+            for iField = 1:length(fields)
+                EEG.chaninfo.removedchans(end).(fields{iField}) = EEG.chanlocs(iChan).(fields{iField});
+            end
+        end
     catch
         disp('There was an issue storing removed channels in pop_select');
     end
     EEG.chanlocs = EEG.chanlocs(g.channel);
 end
+EEG.trials    = length(g.trial);
+EEG.pnts      = size(EEG.data,2);
+EEG.nbchan    = length(g.channel);
 if ~isempty(EEG.epoch)
    EEG.epoch = EEG.epoch( g.trial );
 end
