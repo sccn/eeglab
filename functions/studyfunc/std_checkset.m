@@ -192,9 +192,10 @@ if isfield(STUDY.cluster, 'sets'),
     if max(STUDY.cluster(1).sets(:)) > length(STUDY.datasetinfo)
         disp('Warning: Some datasets had been removed from the STUDY, clusters have been reinitialized');
         STUDY.cluster = []; modif = 1;
-    end
-	if isempty(STUDY.cluster(1).sets)
-        STUDY.cluster = []; modif = 1;
+    else
+    	if isempty(STUDY.cluster(1).sets)
+            STUDY.cluster = []; modif = 1;
+        end
     end
 end
 if ~studywasempty
