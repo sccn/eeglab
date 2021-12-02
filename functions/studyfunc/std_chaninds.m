@@ -42,7 +42,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function finalinds = std_chaninds(instruct, channames);
+function finalinds = std_chaninds(instruct, channames)
 
     finalinds   = [];
     if isfield(instruct, 'chanlocs')
