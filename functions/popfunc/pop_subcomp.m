@@ -224,7 +224,7 @@ try
     EEG.dipfit.model = EEG.dipfit.model(goodinds);
 catch, end
 
-com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(components), plotag);
+com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(components(:)'), plotag);
 if isempty( components )
     com = [ com ' % [] means removing components flagged for rejection' ];
 end
