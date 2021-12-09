@@ -63,13 +63,13 @@ end
 com = '';
 invertsel = 0;
 
-if isempty(EEG.event)
+if isempty(EEG(1).event)
     error( [ 'No event. This function removes data' 10 'based on event latencies' ]);
 end
-if isempty(EEG.trials)
+if isempty(EEG(1).trials)
     error( [ 'This function only works with continuous data' ]);
 end
-if ~isfield(EEG.event, 'latency')
+if ~isfield(EEG(1).event, 'latency')
     error( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
 end
 
