@@ -302,7 +302,6 @@ uniqueSessions = unique(allSessions);
 % by default we create a design matrix with all condition
 factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
 
-index = 1;
 for iSubj = 1:nb_subjects
     for iSess = 1:length(uniqueSessions)
         inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
@@ -313,14 +312,14 @@ for iSubj = 1:nb_subjects
             if length(inds) == 1
                 order{iSubj}(iSess) = str2num(allSessions{inds(1)});
             else
-                error([ 'Cannot calculate contrast because more than 1 dataset per session.' 10 ...
-                    'Merge datasets for each subject and try again' ]);
+                error([ 'Cannot calculate contrast because more than 1 dataset per session' 10 ...
+                    'per subject. Merge datasets for each subject and try again.' ]);
             end
             
             % make file-up
-            [~,subname] = fileparts(STUDY.datasetinfo(index).filename);
+            [~,subname] = fileparts(STUDY.datasetinfo(inds).filename);
             if isfield(ALLEEG,'filename')
-                if ~strcmp(subname,ALLEEG(index).filename(1:end-4))
+                if ~strcmp(subname,ALLEEG(inds).filename(1:end-4))
                     error('STUDY and ALLEEG mismatch, can''t figure out which file to use')
                 end
             else
@@ -336,37 +335,37 @@ for iSubj = 1:nb_subjects
             % Creating fields for limo
             % ------------------------
             fprintf('pulling trials for %s ... \n',filename)
-            EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(index), index,'datatype',model.defaults.type,'format', 'cell');
-            ALLEEG                     = eeg_store(ALLEEG, EEGTMP, index);
-            file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
-            model.set_files{index}     = fullfile(file_fullpath , filename);
+            EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(inds), inds,'datatype',model.defaults.type,'format', 'cell');
+            ALLEEG                     = eeg_store(ALLEEG, EEGTMP, inds);
+            file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(inds).filepath);
+            model.set_files{inds}      = fullfile(file_fullpath , filename);
 
             OUTEEG = [];
-            if all([ALLEEG(index).trials] == 1)
+            if all([ALLEEG(inds).trials] == 1)
                 OUTEEG.trials = 1;
             else
-                OUTEEG.trials = sum([ALLEEG(index).trials]);
+                OUTEEG.trials = sum([ALLEEG(inds).trials]);
             end
 
-            filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
+            filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(inds).filepath);
             OUTEEG.filepath            = filepath_tmp;
             OUTEEG.filename            = filename;
-            OUTEEG.srate               = ALLEEG(index).srate;
-            OUTEEG.icaweights          = ALLEEG(index).icaweights;
-            OUTEEG.icasphere           = ALLEEG(index).icasphere;
-            OUTEEG.icawinv             = ALLEEG(index).icawinv;
-            OUTEEG.icachansind         = ALLEEG(index).icachansind;
-            OUTEEG.etc                 = ALLEEG(index).etc;
-            OUTEEG.times               = ALLEEG(index).times;
+            OUTEEG.srate               = ALLEEG(inds).srate;
+            OUTEEG.icaweights          = ALLEEG(inds).icaweights;
+            OUTEEG.icasphere           = ALLEEG(inds).icasphere;
+            OUTEEG.icawinv             = ALLEEG(inds).icawinv;
+            OUTEEG.icachansind         = ALLEEG(inds).icachansind;
+            OUTEEG.etc                 = ALLEEG(inds).etc;
+            OUTEEG.times               = ALLEEG(inds).times;
             if any(interpolated)
                 OUTEEG.chanlocs        = mergedChanlocs;
-                OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(index).chanlocs.labels }));
+                OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(inds).chanlocs.labels }));
             else
-                OUTEEG.chanlocs        = ALLEEG(index).chanlocs;
+                OUTEEG.chanlocs        = ALLEEG(inds).chanlocs;
             end
 
             % update EEG.etc
-            OUTEEG.etc.merged{1}       = ALLEEG(index).filename;
+            OUTEEG.etc.merged{1}       = ALLEEG(inds).filename;
 
             % Def fields
             OUTEEG.etc.datafiles.daterp   = [];
@@ -425,8 +424,8 @@ for iSubj = 1:nb_subjects
             end
 
             % copy results
-            model.cat_files{index}                 = catMat;
-            model.cont_files{index}                = contMat;
+            model.cat_files{inds}                 = catMat;
+            model.cont_files{inds}                = contMat;
             if isfield(limodesign, 'categorical')
                 STUDY.limo.categorical = limodesign.categorical;
             else
@@ -437,10 +436,9 @@ for iSubj = 1:nb_subjects
             else
                 STUDY.limo.continuous = {};
             end
-            STUDY.limo.subjects(index).subject     = STUDY.datasetinfo(inds(1)).subject;
-            STUDY.limo.subjects(index).cat_file    = catMat;
-            STUDY.limo.subjects(index).cont_file   = contMat;
-            index = index +1;
+            STUDY.limo.subjects(inds).subject     = STUDY.datasetinfo(inds(1)).subject;
+            STUDY.limo.subjects(inds).cat_file    = catMat;
+            STUDY.limo.subjects(inds).cont_file   = contMat;
         end
     end % exit session
 end % exit subject

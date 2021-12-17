@@ -1,10 +1,11 @@
 % std_lm_seteegfields() - set limo fields in eeg sets
 %
 % Usage:
-%   >>   EEG = std_lm_seteegfields(STUDY,index,'datatype','Channels','format', 'cell')
+%   >>   EEG = std_lm_seteegfields(STUDY,EEG,index,'datatype','Channels','format', 'cell')
 %
 % Inputs:
 %      STUDY    - studyset structure containing some or all files in EEG
+%      EEG      - EEG dataset
 %      index    - index of dataset in STUDY.datasetinfo
 %
 % Optional inputs:
