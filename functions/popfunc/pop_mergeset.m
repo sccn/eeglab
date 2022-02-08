@@ -280,6 +280,9 @@ else % INEEG is an EEG struct
                 INEEG2event = INEEG2.event;
                 % update urevent index in INEEG2.event
                 tmpevents = INEEG2.event;
+                if ~isfield(tmpevents, 'urevent')
+                    tmpevents(1).urevent = [];
+                end
                 nonemptymask = ~cellfun('isempty',{tmpevents.urevent});
                 [tmpevents(nonemptymask).urevent] = celldeal(num2cell([INEEG2event.urevent]+orilen));
                 INEEG2.event = tmpevents;
