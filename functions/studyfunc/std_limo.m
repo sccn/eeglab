@@ -327,9 +327,17 @@ for iSubj = 1:nb_subjects
             end
 
             if strcmp(subname(1:4),'sub-')
-                filename = [subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
+                if contains(subname,['ses-' num2str(iSess)])
+                    filename = [subname '_design' num2str(design_index) '.set'];
+                else
+                    filename = [subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
+                end
             else
-                filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
+                if contains(subname,['ses-' num2str(iSess)])
+                    filename = ['sub-' subname '_design' num2str(design_index) '.set'];
+                else
+                    filename = ['sub-' subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
+                end
             end
 
             % Creating fields for limo
