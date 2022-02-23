@@ -327,13 +327,13 @@ for iSubj = 1:nb_subjects
             end
 
             if strcmp(subname(1:4),'sub-')
-                if contains(subname,['ses-' num2str(iSess)])
+                if contains(subname,'ses-')
                     filename = [subname '_design' num2str(design_index) '.set'];
                 else
                     filename = [subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
                 end
             else
-                if contains(subname,['ses-' num2str(iSess)])
+                if contains(subname,'ses-')
                     filename = ['sub-' subname '_design' num2str(design_index) '.set'];
                 else
                     filename = ['sub-' subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
