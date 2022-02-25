@@ -1,4 +1,5 @@
 # ignore everything in plugin folders, but keep track of plugin submodules 
+*.asv
 /plugins/**
 !/plugins/clean_rawdata
 !/plugins/dipfit
