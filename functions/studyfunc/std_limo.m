@@ -327,9 +327,17 @@ for iSubj = 1:nb_subjects
             end
 
             if strcmp(subname(1:4),'sub-')
-                filename = [subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
+                if contains(subname,'ses-')
+                    filename = [subname '_design' num2str(design_index) '.set'];
+                else
+                    filename = [subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
+                end
             else
-                filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
+                if contains(subname,'ses-')
+                    filename = ['sub-' subname '_design' num2str(design_index) '.set'];
+                else
+                    filename = ['sub-' subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
+                end
             end
 
             % Creating fields for limo
@@ -570,7 +578,7 @@ contrast_session = cell(1,nb_subjects);
 index = 1:length(find(order{1}));
 for s = 1:nb_subjects
     if length(find(order{s})) > 1
-        fprintf('computing between sessions contrasts, subject %g\n',s)
+        fprintf('computing between sessions contrasts, subject %g/%g\n',s,nb_subjects)
         pairs = nchoosek(1:length(find(order{s})),2); % do all session pairs
         for p=size(pairs,1):-1:1
             strpair = num2str([order{s}(pairs(p,1)) order{s}(pairs(p,2))]);
@@ -639,10 +647,10 @@ end
 cd(STUDY.filepath);
 STUDY      = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
 keep_files = 'no';
-if sum(procstatus) == nb_subjects
+if all(procstatus)
     disp('All subjects have been successfully processed.')
 else
-    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tell the user
+    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
         errordlg2('all subjects failed to process, check limo batch report')
     else
         warndlg2('some subjects failed to process, check limo batch report')
