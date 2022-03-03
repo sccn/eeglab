@@ -50,6 +50,8 @@ end
 if nargin >= 2
     EEG = pop_fileio(header, data, evt);
 else
+    fprintf(2, 'fieldtrip2eeglab: Use 2-input argument, header and data to use the fileio API to convert Fieldtrip data\n')
+
     if isfield(header, 'hdr')
         % use the hdr field in the data
         hdr = header.hdr;
