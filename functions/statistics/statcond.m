@@ -49,7 +49,7 @@
 %   'variance' = ['homegenous'|'inhomogenous'] this option is exclusively
 %                for parametric statistics using unpaired t-test. It allows
 %                to compute a more accurate value for the degree of freedom
-%                using the formula for inhomogeneous variance (see
+%                using the formula for inhomogenous variance (see
 %                ttest2_cell function). Default is 'inhomegenous'.
 %   'surrog'   = surrogate data array (see output).
 %   'stats'    = F- or T-value array (see output).
@@ -559,11 +559,11 @@ function [f, df] = anova1_cell_select( res, paired)
 
 % compute t-test
 % -------------------
-function [t, df] = ttest_cell_select( res, paired, homogeneous)
+function [t, df] = ttest_cell_select( res, paired, homogenous)
     if strcmpi(paired,'on')
         [t, df] = ttest_cell( res{1}, res{2});
     else
-        [t, df] = ttest2_cell( res{1}, res{2}, homogeneous);
+        [t, df] = ttest2_cell( res{1}, res{2}, homogenous);
     end
 
 % function to compute the number of dimensions
