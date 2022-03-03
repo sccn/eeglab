@@ -7,7 +7,10 @@
 %    header   - Fieldtrip data header 
 %    rawdata  - Fieldtrip raw data
 %    evt      - Fieldtrip event structure (optional)
-%    data     - Fieldtrip data out of ft_preprocessing
+%    data     - Fieldtrip data out of ft_preprocessing. Note that this uses
+%               a legacy conversion method. It is better to use 
+%               fieldtrip2eeglab(data.hdr, data.trial) to use the default
+%               FileIO API.
 %
 % Output:
 %    EEG     - EEGLAB structure
