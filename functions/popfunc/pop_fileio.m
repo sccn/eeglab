@@ -229,9 +229,13 @@ if isfield(dat, 'label') && ~isempty(dat.label)
     %If more formats, add them below
     try
         if isfield(dat,'elec')
-            eegchanindx = find(ft_chantype(dat, 'eeg') | ft_chantype(dat, 'pns') );
+            eegchanindx = find(ft_chantype(dat, 'eeg') );
             for ichan = 1:length(eegchanindx)
-                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' chanType});
+                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'EEG'});
+            end
+            eegchanindx = find(ft_chantype(dat, 'pns') );
+            for ichan = 1:length(eegchanindx)
+                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'PNS'});
             end
         end
     catch

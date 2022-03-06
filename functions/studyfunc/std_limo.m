@@ -578,7 +578,7 @@ contrast_session = cell(1,nb_subjects);
 index = 1:length(find(order{1}));
 for s = 1:nb_subjects
     if length(find(order{s})) > 1
-        fprintf('computing between sessions contrasts, subject %g/%g\n',s,nb_subjects)
+        fprintf('std_limo, computing additional between sessions contrasts, subject %g/%g\n',s,nb_subjects)
         pairs = nchoosek(1:length(find(order{s})),2); % do all session pairs
         for p=size(pairs,1):-1:1
             strpair = num2str([order{s}(pairs(p,1)) order{s}(pairs(p,2))]);
