@@ -198,13 +198,27 @@ end
 
 % convert to seconds for sread
 % ----------------------------
-EEG.srate           = dat.Fs;
-EEG.nbchan          = dat.nChans;
-EEG.data            = alldata;
-EEG.setname 		= '';
-EEG.comments        = [ 'Original file: ' filename ];
-EEG.xmin = -dat.nSamplesPre/EEG.srate; 
-EEG.trials = dat.nTrials;
+if isfield(dat, 'hdr') && ~isfield(dat, 'Fs')
+    if isfield(dat, 'fsample') EEG.srate = dat.fsample; else EEG.srate = dat.hdr.Fs; end
+    EEG.nbchan          = dat.hdr.nChans;
+    EEG.data            = alldata;
+    if iscell(EEG.data)
+        EEG.data = [ EEG.data{:} ];
+    end
+    EEG.setname 		= '';
+    EEG.comments        = [ 'Original file: ' filename ];
+    EEG.xmin = -dat.hdr.nSamplesPre/EEG.srate; 
+    dat.nTrials = dat.hdr.nTrials;
+    EEG.trials = dat.hdr.nTrials;    
+else
+    EEG.srate           = dat.Fs;
+    EEG.nbchan          = dat.nChans;
+    EEG.data            = alldata;
+    EEG.setname 		= '';
+    EEG.comments        = [ 'Original file: ' filename ];
+    EEG.xmin = -dat.nSamplesPre/EEG.srate; 
+    EEG.trials = dat.nTrials;
+end
 if size(alldata,3) > 1
     EEG.trials = size(alldata,3);
     EEG.pnts   = size(alldata,2);
