@@ -308,10 +308,7 @@ for iSubj = 1:nb_subjects
         inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
         inds  = intersect(inds1, inds2);
         if ~isempty(inds)
-            % record allows unbalance in the number of sessions - reuse for contrasts
-            if length(inds) == 1
-                order{iSubj}(iSess) = str2num(allSessions{inds(1)});
-            else
+            if length(inds) ~= 1
                 error([ 'Cannot calculate contrast because more than 1 dataset per session' 10 ...
                     'per subject. Merge datasets for each subject and try again.' ]);
             end
@@ -574,51 +571,45 @@ end
 
 % generate between session contrasts
 % ----------------------------------
-contrast_session = cell(1,nb_subjects);
-index = 1:length(find(order{1}));
-for s = 1:nb_subjects
-    if length(find(order{s})) > 1
-        fprintf('std_limo, computing additional between sessions contrasts, subject %g/%g\n',s,nb_subjects)
-        pairs = nchoosek(1:length(find(order{s})),2); % do all session pairs
-        for p=size(pairs,1):-1:1
-            strpair = num2str([order{s}(pairs(p,1)) order{s}(pairs(p,2))]);
-            strpair(isspace(strpair)) = []; % remove spaces
-            filesout{p} = limo_contrast_sessions(cell2mat(LIMO_files.mat(index(pairs(p,1)))), ...
-                cell2mat(LIMO_files.mat(index(pairs(p,2)))),strpair);
-        end
-        contrast_session{s} = filesout;
-        clear filesout
-    end
-
-    if s<nb_subjects-1
-        index = [1:length(find(order{s+1}))] + index(end); %#ok<NBRAK>
-    end
-end
-
-% make a list of those files
 index = 1;
 for s = 1:nb_subjects
-    for c=1:length(contrast_session{s})
-        for f = 1:length(contrast_session{s}{c})
-            allcon{index} = contrast_session{s}{c}{f};
-            index = index +1;
+   sess_index = find(cellfun(@(x) strcmpi(x,uniqueSubjects{s}), allSubjects));
+   % matches sess_index = find(contains(LIMO_files.mat,uniqueSubjects{s}))
+   if length(sess_index) > 1
+        fprintf('std_limo, computing additional between sessions contrasts for subject %s\n',uniqueSubjects{s})
+        sess_name = allSessions(sess_index);
+        pairs = nchoosek(1:length(sess_index),2); % do all session pairs
+        parfor p=1:size(pairs,1)
+            strpair = [cell2mat(sess_name(pairs(p,1))) cell2mat(sess_name(pairs(p,2)))];
+            strpair(isspace(strpair)) = []; % remove spaces
+            filesout{p} = limo_contrast_sessions(cell2mat(LIMO_files.mat(sess_index(pairs(p,1)))), ...
+                cell2mat(LIMO_files.mat(sess_index(pairs(p,2)))),strpair);
         end
+        
+        for f=1:length(filesout)
+            for ff=1:length(filesout{f})
+                allcon{index} = filesout{f}{ff};
+                index = index +1;
+            end
+        end
+        clear filesout
     end
 end
 
+% use same glm_name as limo_batch
 design_name = STUDY.design(STUDY.currentdesign).name;
 design_name(isspace(design_name)) = [];
 if findstr(design_name,'STUDY.')
     design_name = design_name(7:end);
 end
-glm_name = [design_name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
+glm_name = [STUDY.filename(1:end-6) '_' design_name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
 
 % further split that list per regressor and group
 if exist('allcon','var')
     maxcon = max(cellfun(@(x) str2double(x(strfind(x,'con_')+4:strfind(x,'sess_')-1)),allcon));
     for con=1:maxcon
         index = find(cellfun(@(x) ~isempty(x),cellfun(@(x) strfind(x,['con_' num2str(con)]),allcon','UniformOutput',false)));
-        cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) glm_name '.txt'], allcon(index)');
+        cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) '_' glm_name '.txt'], allcon(index)');
         if length(STUDY.group) > 1
             for g= 1:length(STUDY.group)
                 % find subjects of group g
@@ -630,8 +621,12 @@ if exist('allcon','var')
                 % find subjects of group g and contrast con
                 subcon = [];
                 for s = 1:length(sub)
-                    subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,['sub-' sub{s} ]),allcon','UniformOutput',false)))); % subject s group g
-                    subcon = [subcon intersect(index,subindex)];
+                    if strfind(sub{s},'sub-')
+                        subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,sub{s}),allcon','UniformOutput',false)))); % subject s group g
+                    else
+                        subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,['sub-' sub{s} ]),allcon','UniformOutput',false)))); % subject s group g
+                    end
+                    subcon = [subcon;intersect(index,subindex)];
                 end
                 % save
                 if ~isempty(subcon)
