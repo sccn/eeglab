@@ -163,7 +163,7 @@ end
 
 if skip_chanlocs == 0
     if ~exist('ft_prepare_neighbours','file')
-        warndlg('std_limo error: Fieldtrip extension should be installed - chanlocs NOT generated');
+        warndlg('std_limo error: Fieldtrip extension should be installed - chanlocs NOT generated', '', 'non-modal');
         skip_chanlocs = 1;
     else
         if ~exist('eeglab2fieldtrip','file')
@@ -190,7 +190,7 @@ end
 % -------------------------------------------------------------------------
 if strcmp(model.defaults.type,'Components')
     if isempty(STUDY.cluster(1).child)
-        warndlg2(sprintf('Components have not been clustered,\nLIMO will not match them across subjects'))
+        warndlg2(sprintf('Components have not been clustered,\nLIMO will not match them across subjects'), '', 'non-modal')
         model.defaults.icaclustering = 0;
     else
         model.defaults.icaclustering = 1;
@@ -212,7 +212,7 @@ if skip_chanlocs == 0
                 chanlocname = 'limo_gp_level_chanlocs.mat';
             catch neighbors_error
                 limoChanlocs = []; chanloc_created = 0;
-                warndlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created')
+                warndlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created', 'non-modal')
             end
         else
             limoChanlocs = []; chanloc_created = 0;
@@ -648,7 +648,7 @@ else
     if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
         errordlg2('all subjects failed to process, check limo batch report')
     else
-        warndlg2('some subjects failed to process, check limo batch report')
+        warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
     end
     % cleanup temp files - except for subjects with errors?
     keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
