@@ -188,6 +188,7 @@ end
 % get fields to read
 % ------------------
 v6Flag = testv6([ fileBaseName fileExt ]);
+v6Flag = 1;
 if v6Flag || strcmpi(opt.measure, 'topo')
     if ~isempty(opt.channels)
         fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
@@ -316,8 +317,9 @@ else
         measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
         eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
     else
+        trialselectOri = trialselect;
         for iField = 1:length(designvar(1).value)
-            trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
+            trialselect = { trialselectOri{:} designvar(1).label designvar(1).value{iField} };
             [ tmpMeasureData, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
             measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
             eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
