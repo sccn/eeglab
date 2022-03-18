@@ -411,7 +411,7 @@ for i = 1:length(g.options)
         end
     end
 end
-if pca_ind
+if pca_opt
     fprintf([ 'Warning: you have used PCA to reduce dimensionality so ICA\n' ...
         '         is not modeling the entire data, only the PCA-reduced data.\n' ]);
 end
