@@ -117,8 +117,9 @@ if iscell(fileBaseName)
         
         measureData = cell(size(measureDataTmp{1}));
         for iCell = 1:length(measureDataTmp{1}(:))
+            ndim1 = cellfun(@(x)size(x{1},1), measureDataTmp);
             ndim2 = cellfun(@(x)size(x{1},2), measureDataTmp);
-            measureData{iCell} = zeros(size(measureDataTmp{1}{1}, 1), sum(ndim2), size(measureDataTmp{1}{1}, 3));
+            measureData{iCell} = zeros(max(ndim1), sum(ndim2), size(measureDataTmp{1}{1}, 3));
         end
 
         % combine arrays
