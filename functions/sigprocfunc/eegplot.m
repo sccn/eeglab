@@ -341,15 +341,15 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.data2;            catch, g.data2      = []; end
    try, g.plotdata2;        catch, g.plotdata2 = 'off'; end
    try, g.mocap;		    catch, g.mocap		= 'off'; end % nima
-   try, g.selectcommand;     catch, g.selectcommand     = { defdowncom defmotioncom defupcom }; end
+   try, g.selectcommand;    catch, g.selectcommand     = { defdowncom defmotioncom defupcom }; end
    try, g.ctrlselectcommand; catch, g.ctrlselectcommand = { defctrldowncom defctrlmotioncom defctrlupcom }; end
    try, g.datastd;          catch, g.datastd = []; end %ozgur
-   try, g.normed;            catch, g.normed = 0; end %ozgur
-   try, g.envelope;          catch, g.envelope = 0; end %ozgur
-   try, g.maxeventstring;    catch, g.maxeventstring = 10; end % JavierLC
-   try, g.isfreq;            catch, g.isfreq = 0;    end % Ramon
+   try, g.normed;           catch, g.normed = 0; end %ozgur
+   try, g.envelope;         catch, g.envelope = 0; end %ozgur
+   try, g.maxeventstring;   catch, g.maxeventstring = 10; end % JavierLC
+   try, g.isfreq;           catch, g.isfreq = 0;    end % Ramon
    try, g.noui;             catch, g.noui = 'off'; end
-      
+   try, g.time;             catch, g.time = []; end 
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -362,7 +362,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqs' 'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
                'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' ...
-               'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq' 'noui'},;
+               'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq' 'noui' 'time' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end
    end
@@ -371,41 +371,41 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    
    if length(g.srate) > 1
    		disp('Error: srate must be a single number'); return;
-   end;	
+   end
    if length(g.spacing) > 1
    		disp('Error: ''spacing'' must be a single number'); return;
-   end;	
+   end
    if length(g.winlength) > 1
    		disp('Error: winlength must be a single number'); return;
-   end;	
+   end
    if ischar(g.title) > 1
    		disp('Error: title must be is a string'); return;
-   end;	
+   end
    if ischar(g.command) > 1
    		disp('Error: command must be is a string'); return;
-   end;	
+   end
    if ischar(g.tag) > 1
    		disp('Error: tag must be is a string'); return;
-   end;	
+   end
    if length(g.position) ~= 4
    		disp('Error: position must be is a 4 elements array'); return;
-   end;	
+   end
    switch lower(g.xgrid)
 	   case { 'on', 'off' },; 
 	   otherwise disp('Error: xgrid must be either ''on'' or ''off'''); return;
-   end;	
+   end
    switch lower(g.ygrid)
 	   case { 'on', 'off' },; 
 	   otherwise disp('Error: ygrid must be either ''on'' or ''off'''); return;
-   end;	
+   end
    switch lower(g.submean)
 	   case { 'on' 'off' };
 	   otherwise disp('Error: submean must be either ''on'' or ''off'''); return;
-   end;	
+   end
    switch lower(g.scale)
 	   case { 'on' 'off' };
 	   otherwise disp('Error: scale must be either ''on'' or ''off'''); return;
-   end;	
+   end
    
    if ~iscell(g.color)
 	   switch lower(g.color)
@@ -414,7 +414,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 		otherwise 
 		 disp('Error: color must be either ''on'' or ''off'' or a cell array'); 
                 return;
-	   end;	
+	   end
    end
    if length(g.dispchans) > size(data,1)
 	   g.dispchans = size(data,1);
@@ -424,6 +424,9 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    end
    if g.maxeventstring>20 % JavierLC
         disp('Error: maxeventstring must be equal or lesser than 20'); return;
+   end
+   if isempty(g.time)
+        g.time = fastif(g.trialstag(1) == -1, 0, 1);
    end
 
    % max event string;  JavierLC
@@ -458,7 +461,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 		stds = mean(stds(2:end-1)); 
 	else
 		stds = mean(stds);
-	end;	
+	end
     g.spacing = stds*3;  
     if g.spacing > 10
       g.spacing = round(g.spacing);
@@ -476,7 +479,6 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
   [g.chans,g.frames,tmpnb] = size(data);   
   g.frames = g.frames*tmpnb;
   g.nbdat = 1; % deprecated
-  g.time  = 0;
   g.elecoffset = 0;
   
   % %%%%%%%%%%%%%%%%%%%%%%%%
@@ -600,7 +602,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Position', posbut(5,:), ...
 	'Style','edit', ...
 	'Tag','EPosition',...
-	'string', fastif(g.trialstag(1) == -1, '0', '1'),...
+	'string', num2str(g.time),...
 	'Callback', 'eegplot(''drawp'',0);' );
   u(3) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
@@ -1508,7 +1510,7 @@ else
     % 	for tmptag = trialtag
 	%		if tmptag >= lowlim & tmptag <= highlim
 	%			plot([tmptag-lowlim tmptag-lowlim], [0 1], 'b--');
-   	%		end;	
+   	%		end
     %	end
     %end
 
