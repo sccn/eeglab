@@ -210,6 +210,9 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
       
       
      case 'string'
+      if isstring(tmpval)
+          tmpval = convertStringsToChars(tmpval);
+      end
       if ~ischar(tmpval) && ~isempty(tmpval)
           g = [ callfunc 'error: argument ''' fieldname ''' must be a string' ]; return;
       end
