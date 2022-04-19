@@ -322,6 +322,7 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
                 ALLEEG(dats{index}(idat)).saved = 'no';
                 pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
                 ALLEEG(dats{index}(idat)).saved = 'yes';
+                ALLEEG(dats{index}(idat)) = update_datafield(ALLEEG(dats{index}(idat)));
             end
         end
     end
@@ -623,4 +624,11 @@ function tmprank2 = getrank(tmpdata, pca_opt)
         tmprank2 = max(tmprank, tmprank2);
     end
             
-            
+function EEG = update_datafield(EEG)
+    if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end
+    if ~isempty(EEG.datfile)
+        EEG.data = EEG.datfile;
+    else 
+        EEG.data = 'in set file';
+    end
+    EEG.icaact = [];            
