@@ -3,6 +3,11 @@ function nameout = cleanvarname(namein)
 % Routine to remove unallowed characters from strings
 % nameout can be use as a variable or field in a structure
 
+% custom change
+if strcmp(namein,'#')
+    namein = 'nb';
+end
+
 % 1st char must be a letter
 for l=1:length(namein)
     if isletter(namein(l))
@@ -27,6 +32,7 @@ stringcheck = [strfind(namein,'('), ...
     strfind(namein,'&') ...
     strfind(namein,'@') ...
     ];
+
 if ~isempty(stringcheck)
     nameout(stringcheck) = [];
 end
