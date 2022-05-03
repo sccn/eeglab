@@ -118,6 +118,12 @@ if ~isempty(chanedit)
             % existing fields
             % ---------------
             allvals = {chanedit.(fields{index})};
+            if isnumeric(allvals{1}) && any(cellfun(@(x)~isempty(x) & all(isnan(x)), allvals))
+                posNaNs = find(cellfun(@(x)~isempty(x) & all(isnan(x)), allvals));
+                for iPos = 1:length(posNaNs)
+                    chanedit = setfield(chanedit, {posNaNs(iPos)}, fields{index}, []);
+                end
+            end
             if strcmpi(fieldtype{index}, 'num')
                 if ~all(cellfun('isclass',allvals,'double'))
                     numok = cellfun(@isnumeric, allvals);

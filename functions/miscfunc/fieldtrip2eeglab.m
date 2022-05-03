@@ -7,7 +7,10 @@
 %    header   - Fieldtrip data header 
 %    rawdata  - Fieldtrip raw data
 %    evt      - Fieldtrip event structure (optional)
-%    data     - Fieldtrip data out of ft_preprocessing
+%    data     - Fieldtrip data out of ft_preprocessing. Note that this uses
+%               a legacy conversion method. It is better to use 
+%               fieldtrip2eeglab(data.hdr, data.trial) to use the default
+%               FileIO API.
 %
 % Output:
 %    EEG     - EEGLAB structure
@@ -50,6 +53,8 @@ end
 if nargin >= 2
     EEG = pop_fileio(header, data, evt);
 else
+    fprintf(2, 'fieldtrip2eeglab: Use 2-input argument, header and data to use the fileio API to convert Fieldtrip data\n')
+
     if isfield(header, 'hdr')
         % use the hdr field in the data
         hdr = header.hdr;

@@ -159,6 +159,13 @@
 
 function [chansout, chaninfo, urchans, com] = pop_chanedit(chans, orichaninfo, varargin);
 
+% process multiple datasets
+% -------------------------
+if length(chans) > 1 && isfield(chans, 'setname') && nargin > 2
+    [ chansout, com ] = eeg_eval( 'pop_chanedit', chans, 'params', { orichaninfo, varargin{:} } );
+    return;
+end
+
 urchans  = [];
 com ='';
 if nargin < 1

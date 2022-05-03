@@ -54,23 +54,24 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, com] = pop_rmdat( EEG, events, timelims, invertsel );
+function [EEG, com] = pop_rmdat( EEG, events, timelims, invertsel )
 
 if nargin < 1
    help pop_rmdat;
 	return;
-end;	
+end
 com = '';
+invertsel = 0;
 
-if isempty(EEG.event)
+if isempty(EEG(1).event)
     error( [ 'No event. This function removes data' 10 'based on event latencies' ]);
 end
-if isempty(EEG.trials)
+if isempty(EEG(1).trials)
     error( [ 'This function only works with continuous data' ]);
 end
-if ~isfield(EEG.event, 'latency'),
+if ~isfield(EEG(1).event, 'latency')
     error( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
-end;    
+end
 
 if nargin < 3
 	% popup window parameters
@@ -121,6 +122,17 @@ if nargin < 3
    timelims = eval( [ '[' result{2} ']' ] );
    invertsel = result{3}-1;
  
+end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 3
+        [ EEG, com ] = eeg_eval( 'pop_rmdat', EEG, 'warning', 'on', 'params', { events, timelims, invertsel } );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_rmdat', EEG, 'params', { events, timelims, invertsel } );
+    end
+    return;
 end
 
 tmpevent = EEG.event;

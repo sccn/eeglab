@@ -54,11 +54,11 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [newlat,flag] = eeg_lat2point( lat_array, epoch_array, srate, timewin, timeunit, varargin);
-% -------------------------------------------------------------------------
+function [newlat,flag] = eeg_lat2point( lat_array, epoch_array, srate, timewin, timeunit, varargin)
+
 try
     options = varargin;
-    if ~isempty( varargin ),
+    if ~isempty( varargin )
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
@@ -66,15 +66,16 @@ try
 catch
     error('std_checkdatasession() error: calling convention {''key'', value, ... } error');
 end
- try, g.outrange; catch, g.outrange = 1; end; %
- 
- flag = 0;
-% -------------------------------------------------------------------------
+try
+    g.outrange; 
+catch, g.outrange = 1; end
+
+flag = 0;
 
 if nargin <4
     help eeg_lat2point;
     return;
-end;    
+end
 if nargin <5 || isempty(timeunit)
 	timeunit = 1;
 end
@@ -109,7 +110,7 @@ if  and(~isempty(newlat),~isempty(epoch_array)) && max(newlat(:)) > max((epoch_a
         IndxOut = find(newlat(:) > max((epoch_array)*pnts));
         newlat(IndxOut) = max((epoch_array)*pnts);
         flag = 1;
-        warning('eeg_lat2point(): Points out of range detected. Points replaced with maximum value');
+        disp('eeg_lat2point(): Points out of range detected. Points replaced with maximum value');
     elseif g.outrange == 0
         error('Error in eeg_lat2point(): Points out of range detected');
     end

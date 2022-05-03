@@ -381,7 +381,10 @@ if strcmpi(g.erpim, 'on')
     
     for iSubj = 1:length(uniqueSubjects)
         for iSess = 1:length(uniqueSessions)
-            inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
+            inds  = intersect(inds1, inds2);
+
             filepath = STUDY.datasetinfo(inds(1)).filepath;
             trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
             filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
@@ -434,7 +437,10 @@ if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
     
     for iSubj = 1:length(uniqueSubjects) % parfor inside function
         for iSess = 1:length(uniqueSessions)
-            inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
+            inds  = intersect(inds1, inds2);
+
             filepath = STUDY.datasetinfo(inds(1)).filepath;
             trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
             filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);

@@ -163,7 +163,7 @@ end
 
 if skip_chanlocs == 0
     if ~exist('ft_prepare_neighbours','file')
-        warndlg('std_limo error: Fieldtrip extension should be installed - chanlocs NOT generated');
+        warndlg('std_limo error: Fieldtrip extension should be installed - chanlocs NOT generated', '', 'non-modal');
         skip_chanlocs = 1;
     else
         if ~exist('eeglab2fieldtrip','file')
@@ -190,7 +190,7 @@ end
 % -------------------------------------------------------------------------
 if strcmp(model.defaults.type,'Components')
     if isempty(STUDY.cluster(1).child)
-        warndlg2(sprintf('Components have not been clustered,\nLIMO will not match them across subjects'))
+        warndlg2(sprintf('Components have not been clustered,\nLIMO will not match them across subjects'), '', 'non-modal')
         model.defaults.icaclustering = 0;
     else
         model.defaults.icaclustering = 1;
@@ -212,7 +212,7 @@ if skip_chanlocs == 0
                 chanlocname = 'limo_gp_level_chanlocs.mat';
             catch neighbors_error
                 limoChanlocs = []; chanloc_created = 0;
-                warndlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created')
+                warndlg2(neighbors_error.message,'limo_gp_level_chanlocs.mat not created', 'non-modal')
             end
         else
             limoChanlocs = []; chanloc_created = 0;
@@ -302,25 +302,21 @@ uniqueSessions = unique(allSessions);
 % by default we create a design matrix with all condition
 factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
 
-index = 1;
 for iSubj = 1:nb_subjects
     for iSess = 1:length(uniqueSessions)
         inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
         inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
         inds  = intersect(inds1, inds2);
         if ~isempty(inds)
-            % record allows unbalance in the number of sessions - reuse for contrasts
-            if length(inds) == 1
-                order{iSubj}(iSess) = str2num(allSessions{inds(1)});
-            else
-                error([ 'Cannot calculate contrast because more than 1 dataset per session.' 10 ...
-                    'Merge datasets for each subject and try again' ]);
+            if length(inds) ~= 1
+                error([ 'Cannot calculate contrast because more than 1 dataset per session' 10 ...
+                    'per subject. Merge datasets for each subject and try again.' ]);
             end
             
             % make file-up
-            [~,subname] = fileparts(STUDY.datasetinfo(index).filename);
+            [~,subname] = fileparts(STUDY.datasetinfo(inds).filename);
             if isfield(ALLEEG,'filename')
-                if ~strcmp(subname,ALLEEG(index).filename(1:end-4))
+                if ~strcmp(subname,ALLEEG(inds).filename(1:end-4))
                     error('STUDY and ALLEEG mismatch, can''t figure out which file to use')
                 end
             else
@@ -328,45 +324,53 @@ for iSubj = 1:nb_subjects
             end
 
             if strcmp(subname(1:4),'sub-')
-                filename = [subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
+                if contains(subname,'ses-')
+                    filename = [subname '_design' num2str(design_index) '.set'];
+                else
+                    filename = [subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
+                end
             else
-                filename = ['sub-' subname '_design' num2str(design_index)   '_sess' num2str(iSess) '.set'];
+                if contains(subname,'ses-')
+                    filename = ['sub-' subname '_design' num2str(design_index) '.set'];
+                else
+                    filename = ['sub-' subname '_ses-' num2str(iSess) '_design' num2str(design_index) '.set'];
+                end
             end
 
             % Creating fields for limo
             % ------------------------
             fprintf('pulling trials for %s ... \n',filename)
-            EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(index), index,'datatype',model.defaults.type,'format', 'cell');
-            ALLEEG                     = eeg_store(ALLEEG, EEGTMP, index);
-            file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
-            model.set_files{index}     = fullfile(file_fullpath , filename);
+            EEGTMP                     = std_lm_seteegfields(STUDY,ALLEEG(inds), inds,'datatype',model.defaults.type,'format', 'cell');
+            ALLEEG                     = eeg_store(ALLEEG, EEGTMP, inds);
+            file_fullpath              = rel2fullpath(STUDY.filepath,ALLEEG(inds).filepath);
+            model.set_files{inds}      = fullfile(file_fullpath , filename);
 
             OUTEEG = [];
-            if all([ALLEEG(index).trials] == 1)
+            if all([ALLEEG(inds).trials] == 1)
                 OUTEEG.trials = 1;
             else
-                OUTEEG.trials = sum([ALLEEG(index).trials]);
+                OUTEEG.trials = sum([ALLEEG(inds).trials]);
             end
 
-            filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(index).filepath);
+            filepath_tmp               = rel2fullpath(STUDY.filepath,ALLEEG(inds).filepath);
             OUTEEG.filepath            = filepath_tmp;
             OUTEEG.filename            = filename;
-            OUTEEG.srate               = ALLEEG(index).srate;
-            OUTEEG.icaweights          = ALLEEG(index).icaweights;
-            OUTEEG.icasphere           = ALLEEG(index).icasphere;
-            OUTEEG.icawinv             = ALLEEG(index).icawinv;
-            OUTEEG.icachansind         = ALLEEG(index).icachansind;
-            OUTEEG.etc                 = ALLEEG(index).etc;
-            OUTEEG.times               = ALLEEG(index).times;
+            OUTEEG.srate               = ALLEEG(inds).srate;
+            OUTEEG.icaweights          = ALLEEG(inds).icaweights;
+            OUTEEG.icasphere           = ALLEEG(inds).icasphere;
+            OUTEEG.icawinv             = ALLEEG(inds).icawinv;
+            OUTEEG.icachansind         = ALLEEG(inds).icachansind;
+            OUTEEG.etc                 = ALLEEG(inds).etc;
+            OUTEEG.times               = ALLEEG(inds).times;
             if any(interpolated)
                 OUTEEG.chanlocs        = mergedChanlocs;
-                OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(index).chanlocs.labels }));
+                OUTEEG.etc.interpolatedchannels = setdiff(1:length(OUTEEG.chanlocs), std_chaninds(OUTEEG, { ALLEEG(inds).chanlocs.labels }));
             else
-                OUTEEG.chanlocs        = ALLEEG(index).chanlocs;
+                OUTEEG.chanlocs        = ALLEEG(inds).chanlocs;
             end
 
             % update EEG.etc
-            OUTEEG.etc.merged{1}       = ALLEEG(index).filename;
+            OUTEEG.etc.merged{1}       = ALLEEG(inds).filename;
 
             % Def fields
             OUTEEG.etc.datafiles.daterp   = [];
@@ -425,8 +429,8 @@ for iSubj = 1:nb_subjects
             end
 
             % copy results
-            model.cat_files{index}                 = catMat;
-            model.cont_files{index}                = contMat;
+            model.cat_files{inds}                 = catMat;
+            model.cont_files{inds}                = contMat;
             if isfield(limodesign, 'categorical')
                 STUDY.limo.categorical = limodesign.categorical;
             else
@@ -437,10 +441,9 @@ for iSubj = 1:nb_subjects
             else
                 STUDY.limo.continuous = {};
             end
-            STUDY.limo.subjects(index).subject     = STUDY.datasetinfo(inds(1)).subject;
-            STUDY.limo.subjects(index).cat_file    = catMat;
-            STUDY.limo.subjects(index).cont_file   = contMat;
-            index = index +1;
+            STUDY.limo.subjects(inds).subject     = STUDY.datasetinfo(inds(1)).subject;
+            STUDY.limo.subjects(inds).cat_file    = catMat;
+            STUDY.limo.subjects(inds).cont_file   = contMat;
         end
     end % exit session
 end % exit subject
@@ -568,51 +571,45 @@ end
 
 % generate between session contrasts
 % ----------------------------------
-contrast_session = cell(1,nb_subjects);
-index = 1:length(find(order{1}));
-for s = 1:nb_subjects
-    if length(find(order{s})) > 1
-        fprintf('computing between sessions contrasts, subject %g\n',s)
-        pairs = nchoosek(1:length(find(order{s})),2); % do all session pairs
-        for p=size(pairs,1):-1:1
-            strpair = num2str([order{s}(pairs(p,1)) order{s}(pairs(p,2))]);
-            strpair(isspace(strpair)) = []; % remove spaces
-            filesout{p} = limo_contrast_sessions(cell2mat(LIMO_files.mat(index(pairs(p,1)))), ...
-                cell2mat(LIMO_files.mat(index(pairs(p,2)))),strpair);
-        end
-        contrast_session{s} = filesout;
-        clear filesout
-    end
-
-    if s<nb_subjects-1
-        index = [1:length(find(order{s+1}))] + index(end); %#ok<NBRAK>
-    end
-end
-
-% make a list of those files
 index = 1;
 for s = 1:nb_subjects
-    for c=1:length(contrast_session{s})
-        for f = 1:length(contrast_session{s}{c})
-            allcon{index} = contrast_session{s}{c}{f};
-            index = index +1;
+   sess_index = find(cellfun(@(x) strcmpi(x,uniqueSubjects{s}), allSubjects));
+   % matches sess_index = find(contains(LIMO_files.mat,uniqueSubjects{s}))
+   if length(sess_index) > 1
+        fprintf('std_limo, computing additional between sessions contrasts for subject %s\n',uniqueSubjects{s})
+        sess_name = allSessions(sess_index);
+        pairs = nchoosek(1:length(sess_index),2); % do all session pairs
+        parfor p=1:size(pairs,1)
+            strpair = [cell2mat(sess_name(pairs(p,1))) cell2mat(sess_name(pairs(p,2)))];
+            strpair(isspace(strpair)) = []; % remove spaces
+            filesout{p} = limo_contrast_sessions(cell2mat(LIMO_files.mat(sess_index(pairs(p,1)))), ...
+                cell2mat(LIMO_files.mat(sess_index(pairs(p,2)))),strpair);
         end
+        
+        for f=1:length(filesout)
+            for ff=1:length(filesout{f})
+                allcon{index} = filesout{f}{ff};
+                index = index +1;
+            end
+        end
+        clear filesout
     end
 end
 
+% use same glm_name as limo_batch
 design_name = STUDY.design(STUDY.currentdesign).name;
 design_name(isspace(design_name)) = [];
 if findstr(design_name,'STUDY.')
     design_name = design_name(7:end);
 end
-glm_name = [design_name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
+glm_name = [STUDY.filename(1:end-6) '_' design_name '_GLM_' model.defaults.type '_' model.defaults.analysis '_' model.defaults.method];
 
 % further split that list per regressor and group
 if exist('allcon','var')
     maxcon = max(cellfun(@(x) str2double(x(strfind(x,'con_')+4:strfind(x,'sess_')-1)),allcon));
     for con=1:maxcon
         index = find(cellfun(@(x) ~isempty(x),cellfun(@(x) strfind(x,['con_' num2str(con)]),allcon','UniformOutput',false)));
-        cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) glm_name '.txt'], allcon(index)');
+        cell2csv([LIMO_files.LIMO filesep 'Between_sessions_con_' num2str(con) '_' glm_name '.txt'], allcon(index)');
         if length(STUDY.group) > 1
             for g= 1:length(STUDY.group)
                 % find subjects of group g
@@ -624,8 +621,12 @@ if exist('allcon','var')
                 % find subjects of group g and contrast con
                 subcon = [];
                 for s = 1:length(sub)
-                    subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,['sub-' sub{s} ]),allcon','UniformOutput',false)))); % subject s group g
-                    subcon = [subcon intersect(index,subindex)];
+                    if strfind(sub{s},'sub-')
+                        subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,sub{s}),allcon','UniformOutput',false)))); % subject s group g
+                    else
+                        subindex = find(cellfun(@(x) ~isempty(x),(cellfun(@(x) strfind(x,['sub-' sub{s} ]),allcon','UniformOutput',false)))); % subject s group g
+                    end
+                    subcon = [subcon;intersect(index,subindex)];
                 end
                 % save
                 if ~isempty(subcon)
@@ -641,13 +642,13 @@ end
 cd(STUDY.filepath);
 STUDY      = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
 keep_files = 'no';
-if sum(procstatus) == nb_subjects
+if all(procstatus)
     disp('All subjects have been successfully processed.')
 else
-    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tell the user
+    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
         errordlg2('all subjects failed to process, check limo batch report')
     else
-        warndlg2('some subjects failed to process, check limo batch report')
+        warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
     end
     % cleanup temp files - except for subjects with errors?
     keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');

@@ -105,9 +105,9 @@ end
 % -------------------------
 if length(EEG) > 1
     if nargin < 2
-        [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
+        [ EEG, command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
     else
-        [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'params', { freq } );
+        [ EEG, command ] = eeg_eval( 'pop_resample', EEG, 'params', { freq } );
     end
     return;
 end
@@ -345,11 +345,11 @@ function tmpeeglab = myresample(data, p, q, usesigproc, fc, df)
 %         XX = linspace( 1, lastpointval, nbnewpoints2);
 
         % New time axis scaling, May 06, 2015, AW
-        X = 0:length(data) - 1;
-        newpnts  = ceil(length(data) * p / q);
+        X = 0:size(data,1) - 1;
+        newpnts  = ceil(size(data,1) * p / q);
         XX = (0:newpnts - 1) / (p / q);
 
-        cs = spline( X, data);
+        cs = spline( X, data');
         tmpeeglab = ppval(cs, XX)';
 
         if p > q % Upsampling, anti-imaging filter

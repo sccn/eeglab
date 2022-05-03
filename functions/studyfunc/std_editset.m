@@ -279,7 +279,8 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).index     = currentind;    
         otherwise
             % running custom command
-            STUDY.datasetinfo(currentind).(g.commands{k}) = g.commands{k+1};
+            cleanname = cleanvarname(g.commands{k});
+            STUDY.datasetinfo(currentind).(cleanname) = g.commands{k+1};
     end
 end
 

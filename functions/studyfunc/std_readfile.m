@@ -99,36 +99,35 @@ if iscell(fileBaseName)
         for iFile = 1:length(fileBaseName)
             [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
         end
-        
-        % combine arrays (old code, slow)
-%         measureData2 = measureDataTmp{1};
-%         events = eventsTmp{1};
-%         for iData = 2:length(measureDataTmp)
-%             for iCell = 1:length(measureDataTmp{iData}(:)) % all cells should contain the same number of elements
-%                 if ~isempty(measureDataTmp{iData}{iCell})
-%                     if ndims(measureDataTmp{iData}{iCell}) == 2
-%                         measureData2{iCell} = [ measureData2{iCell} measureDataTmp{iData}{iCell} ];
-%                     elseif ndims(measureDataTmp{iData}{iCell}) == 3
-%                         measureData2{iCell}(:, end+1:end+size(measureDataTmp{iData}{iCell},2),:) = measureDataTmp{iData}{iCell};
-%                     end
-%                 end
-%             end
-%         end
-        
-        measureData = cell(size(measureDataTmp{1}));
-        for iCell = 1:length(measureDataTmp{1}(:))
-            ndim2 = cellfun(@(x)size(x{1},2), measureDataTmp);
-            measureData{iCell} = zeros(size(measureDataTmp{1}{1}, 1), sum(ndim2), size(measureDataTmp{1}{1}, 3));
+    
+        % get the size of each session cond x group and sum 3rd dim (trials) for each cond and group
+        % ignore empty cells; these are always trials, even when processing subjects
+        measureData = cell(size(measureDataTmp{1})); % cond x group
+        sz          = cell(size(measureDataTmp{1})); % cond x group
+        for iSess = 1:length(measureDataTmp) % scan session
+            szTmp = cellfun(@size, measureDataTmp{iSess}, 'uniformoutput', false); 
+            for iCond = 1:length(sz(:))
+                if szTmp{iCond}(1) ~= 0
+                    if isempty(sz{iCond})
+                        sz{iCond} = szTmp{iCond};
+                    else
+                        sz{iCond}(end) = sz{iCond}(end)+szTmp{iCond}(end);
+                    end
+                end
+            end
+        end
+        for iCond = 1:length(sz(:))
+            measureData{iCond} = zeros(sz{iCond});
         end
 
         % combine arrays
         events = eventsTmp{1};
-        for iCell = 1:length(measureDataTmp{1}(:)) % all cells should contain the same number of elements
-            pointer = 1;
-            for iData = 1:length(measureDataTmp)
-                if ~isempty(measureDataTmp{iData}{iCell})
-                    measureData{iCell}(:, pointer:pointer+size(measureDataTmp{iData}{iCell},2)-1,:) = measureDataTmp{iData}{iCell};
-                    pointer = pointer + size(measureDataTmp{iData}{iCell},2);
+        for iCond = 1:length(measureDataTmp{1}(:))
+            pointer = 1; 
+            for iSess = 1:length(measureDataTmp)
+                if ~isempty(measureDataTmp{iSess}{iCond})
+                    measureData{iCond}(:, pointer:pointer+size(measureDataTmp{iSess}{iCond},2)-1,:,:) = measureDataTmp{iSess}{iCond};
+                    pointer = pointer + size(measureDataTmp{iSess}{iCond},2);
                 end
             end
         end
@@ -188,6 +187,7 @@ end
 % get fields to read
 % ------------------
 v6Flag = testv6([ fileBaseName fileExt ]);
+v6Flag = 1;
 if v6Flag || strcmpi(opt.measure, 'topo')
     if ~isempty(opt.channels)
         fileData = load('-mat', [ fileBaseName fileExt ], 'labels');
@@ -316,8 +316,9 @@ else
         measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
         eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
     else
+        trialselectOri = trialselect;
         for iField = 1:length(designvar(1).value)
-            trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
+            trialselect = { trialselectOri{:} designvar(1).label designvar(1).value{iField} };
             [ tmpMeasureData, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
             measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
             eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);

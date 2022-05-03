@@ -198,13 +198,27 @@ end
 
 % convert to seconds for sread
 % ----------------------------
-EEG.srate           = dat.Fs;
-EEG.nbchan          = dat.nChans;
-EEG.data            = alldata;
-EEG.setname 		= '';
-EEG.comments        = [ 'Original file: ' filename ];
-EEG.xmin = -dat.nSamplesPre/EEG.srate; 
-EEG.trials = dat.nTrials;
+if isfield(dat, 'hdr') && ~isfield(dat, 'Fs')
+    if isfield(dat, 'fsample') EEG.srate = dat.fsample; else EEG.srate = dat.hdr.Fs; end
+    EEG.nbchan          = dat.hdr.nChans;
+    EEG.data            = alldata;
+    if iscell(EEG.data)
+        EEG.data = [ EEG.data{:} ];
+    end
+    EEG.setname 		= '';
+    EEG.comments        = [ 'Original file: ' filename ];
+    EEG.xmin = -dat.hdr.nSamplesPre/EEG.srate; 
+    dat.nTrials = dat.hdr.nTrials;
+    EEG.trials = dat.hdr.nTrials;    
+else
+    EEG.srate           = dat.Fs;
+    EEG.nbchan          = dat.nChans;
+    EEG.data            = alldata;
+    EEG.setname 		= '';
+    EEG.comments        = [ 'Original file: ' filename ];
+    EEG.xmin = -dat.nSamplesPre/EEG.srate; 
+    EEG.trials = dat.nTrials;
+end
 if size(alldata,3) > 1
     EEG.trials = size(alldata,3);
     EEG.pnts   = size(alldata,2);
@@ -229,9 +243,13 @@ if isfield(dat, 'label') && ~isempty(dat.label)
     %If more formats, add them below
     try
         if isfield(dat,'elec')
-            eegchanindx = find(ft_chantype(dat, 'eeg') | ft_chantype(dat, 'pns') );
+            eegchanindx = find(ft_chantype(dat, 'eeg') );
             for ichan = 1:length(eegchanindx)
-                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' chanType});
+                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'EEG'});
+            end
+            eegchanindx = find(ft_chantype(dat, 'pns') );
+            for ichan = 1:length(eegchanindx)
+                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'PNS'});
             end
         end
     catch

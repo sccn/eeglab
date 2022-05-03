@@ -322,6 +322,7 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
                 ALLEEG(dats{index}(idat)).saved = 'no';
                 pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
                 ALLEEG(dats{index}(idat)).saved = 'yes';
+                ALLEEG(dats{index}(idat)) = update_datafield(ALLEEG(dats{index}(idat)));
             end
         end
     end
@@ -410,6 +411,10 @@ for i = 1:length(g.options)
             pca_ind = i;
         end
     end
+end
+if pca_opt
+    fprintf([ 'Warning: you have used PCA to reduce dimensionality so ICA\n' ...
+        '         is not modeling the entire data, only the PCA-reduced data.\n' ]);
 end
 
 %------------------------------
@@ -613,10 +618,17 @@ function tmprank2 = getrank(tmpdata, pca_opt)
     rankTolerance = 1e-7;
     tmprank2=sum (diag (D) > rankTolerance);
     if tmprank ~= tmprank2
-        if pca_opt ~= 0
+        if nargin >= 2 && pca_opt ~= 0
             fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab\n', tmprank, tmprank2);
         end
         tmprank2 = max(tmprank, tmprank2);
     end
             
-            
+function EEG = update_datafield(EEG)
+    if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end
+    if ~isempty(EEG.datfile)
+        EEG.data = EEG.datfile;
+    else 
+        EEG.data = 'in set file';
+    end
+    EEG.icaact = [];            
