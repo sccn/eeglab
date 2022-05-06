@@ -39,5 +39,5 @@ end
 
 % last check
 if ~isvarname(nameout)
-    error('the variuable name to use is still invalid, check chars to remove')
+    error('the variable name to use is still invalid, check chars to remove')
 end
