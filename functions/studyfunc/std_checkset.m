@@ -180,39 +180,9 @@ if length( unique( [ ALLEEG.srate ] )) > 1
     disp('********************************************************************');
 end
 
-% check cluster array
-% -------------------
-rebuild_design = 0;
-if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end
-if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end
-if isempty(STUDY.changrp) && isempty(STUDY.cluster)
-    rebuild_design = 1;
-end
-if isfield(STUDY.cluster, 'sets'),
-    if max(STUDY.cluster(1).sets(:)) > length(STUDY.datasetinfo)
-        disp('Warning: Some datasets had been removed from the STUDY, clusters have been reinitialized');
-        STUDY.cluster = []; modif = 1;
-    else
-    	if isempty(STUDY.cluster(1).sets)
-            STUDY.cluster = []; modif = 1;
-        end
-    end
-end
-if ~studywasempty
-    if isempty(STUDY.cluster)
-        modif = 1;
-        [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
-    end
-    if length(STUDY.cluster(1).child) == length(STUDY.cluster)-1 && length(STUDY.cluster) > 1
-        newchild = { STUDY.cluster(2:end).name };
-        if ~isequal(STUDY.cluster(1).child, newchild)
-            STUDY.cluster(1).child = newchild;
-        end
-    end
-end
-
 % create STUDY design if it is not present
 % ----------------------------------------
+rebuild_design = 0;
 if ~studywasempty
     if isfield(STUDY.datasetinfo, 'trialinfo')
         alltrialinfo = { STUDY.datasetinfo.trialinfo };
@@ -340,12 +310,17 @@ if ~studywasempty
     end
     
     % check that ICA is present and if it is update STUDY.datasetinfo
-    allcompsSTUDY  = { STUDY.datasetinfo.comps };
-    allcompsALLEEG = { ALLEEG.icaweights };
-    if all(cellfun(@isempty, allcompsSTUDY)) && ~all(cellfun(@isempty, allcompsALLEEG))
-        for index = 1:length(STUDY.datasetinfo)
+    recreateclusters = 0;
+    for index = 1:length(STUDY.datasetinfo)
+        if length(STUDY.datasetinfo(index).comps) ~= size(ALLEEG(index).icaweights,1)
             STUDY.datasetinfo(index).comps = [1:size(ALLEEG(index).icaweights,1)];
+            recreateclusters = 1;
+            modif = 1;
         end
+    end
+    if recreateclusters
+        fprintf('Recreating empty clusters because ICA has changed for some datasets\n');
+        STUDY.cluster = [];
     end
     
     % make channel groups
@@ -353,6 +328,36 @@ if ~studywasempty
     if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
         STUDY = std_changroup(STUDY, ALLEEG);
         modif = 1;
+    end
+end
+
+% check cluster array
+% -------------------
+if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end
+if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end
+if isempty(STUDY.changrp) && isempty(STUDY.cluster)
+    rebuild_design = 1;
+end
+if isfield(STUDY.cluster, 'sets'),
+    if max(STUDY.cluster(1).sets(:)) > length(STUDY.datasetinfo)
+        disp('Warning: Some datasets had been removed from the STUDY, clusters have been reinitialized');
+        STUDY.cluster = []; modif = 1;
+    else
+    	if isempty(STUDY.cluster(1).sets)
+            STUDY.cluster = []; modif = 1;
+        end
+    end
+end
+if ~studywasempty
+    if isempty(STUDY.cluster)
+        modif = 1;
+        [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
+    end
+    if length(STUDY.cluster(1).child) == length(STUDY.cluster)-1 && length(STUDY.cluster) > 1
+        newchild = { STUDY.cluster(2:end).name };
+        if ~isequal(STUDY.cluster(1).child, newchild)
+            STUDY.cluster(1).child = newchild;
+        end
     end
 end
 
