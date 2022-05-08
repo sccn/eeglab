@@ -183,6 +183,8 @@ end
 % create STUDY design if it is not present
 % ----------------------------------------
 rebuild_design = 0;
+if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end
+if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end
 if ~studywasempty
     if isfield(STUDY.datasetinfo, 'trialinfo')
         alltrialinfo = { STUDY.datasetinfo.trialinfo };
@@ -333,8 +335,6 @@ end
 
 % check cluster array
 % -------------------
-if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end
-if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end
 if isempty(STUDY.changrp) && isempty(STUDY.cluster)
     rebuild_design = 1;
 end
