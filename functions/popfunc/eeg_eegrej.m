@@ -100,17 +100,6 @@ catch
     warning(warnmsg)
 end
 
-
-if isfield(EEG.event, 'latency'),
-   	 tmpevent = EEG.event;
-     
-     tmpdata = EEG.data; % REMOVE THIS, THIS IS FOR DEBUGGING %
-     
-     tmpalllatencies = [ tmpevent.latency ];
-
-else tmpalllatencies = []; 
-end
-
 % handle regions from eegplot
 % ---------------------------
 if size(regions,2) > 2, regions = regions(:, 3:4); end
@@ -155,6 +144,7 @@ end
 % the function that insert boundary events and recompute latency is
 % delicate so we do it twice using different methods and check
 % the results. It is longer, but accuracy is paramount.
+eeglab_options;
 if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     % assess difference between old and new event latencies
     [ eventtmp ] = eeg_insertboundold(oldEEGevents, oldEEGpnts, regions);
@@ -162,7 +152,8 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
         [~,indEvent] = sort([ eventtmp.latency ]);
         eventtmp = eventtmp(indEvent);
     end
-    if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && isequal(eventtmp(1).type, 'boundary')
+    if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && ...
+        ( isequal(eventtmp(1).type, 'boundary') || (option_boundary99 && isequal(eventtmp(1).type, -99) ) )
         eventtmp(1) = [];
     end
     if isfield(eventtmp, 'duration')
@@ -176,14 +167,22 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
         eventtmp(end) = [];
     end
     % add initial event to eventtmp when missing
-    if ~isempty(eventtmp) && ~isempty(EEG.event) && ...
-            strcmpi(EEG.event(1).type, 'boundary') && EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
+    firstEventBoundary = isequal(eventtmp(1).type, 'boundary');
+    if option_boundary99 && isnumeric(eventtmp(1).type)
+        firstEventBoundary = eventtmp(1).type == -99;
+    end
+    if ~isempty(eventtmp) && ~isempty(EEG.event) && firstEventBoundary && ...
+            EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
         if size(eventtmp,2) > 1
             eventtmp = [ eventtmp(1) eventtmp(1:end) ];
         else
             eventtmp = [ eventtmp(1) eventtmp(1:end)' ];
         end
-        eventtmp(1).type = 'boundary';
+        if option_boundary99 && isnumeric(eventtmp.type)
+            eventtmp(1).type = -99;
+        else
+            eventtmp(1).type = 'boundary';
+        end
         eventtmp(1).latency = 0.5;
         eventtmp(1).duration = EEG.event(1).duration;
     end
@@ -216,8 +215,13 @@ end
 % double check boundary event latencies
 if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) && isfield(EEG.event, 'duration') && isfield(event2, 'duration')
     try
-        indBound1 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { EEG.event(:).type }));
-        indBound2 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { event2(:).type }));
+        if ~isempty(EEG.event) && ischar(EEG.event(1).type)
+            indBound1 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { EEG.event(:).type }));
+            indBound2 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { event2(:).type }));
+        else
+            indBound1 = find([ EEG.event(:).type ] == -99);
+            indBound2 = find([ event2(:).type ] == -99);
+        end
         duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
         duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
         if ~isequal(duration1, duration2)

@@ -393,8 +393,8 @@ for inddataset = 1:length(ALLEEG)
                     % remove the events which latency are out of boundary
                     % ---------------------------------------------------
                     if isfield(EEG.event, 'latency')
-                        if isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
-                            if strcmpi(EEG.event(1).type, 'boundary') && isfield(EEG.event, 'duration')
+                        if isfield(EEG.event, 'type')
+                            if (isequal(EEG.event(1).type, 'boundary') || (option_boundary99 && isequal(EEG.event(1).type, -99))) && isfield(EEG.event, 'duration')
                                 if EEG.event(1).duration < 1
                                     EEG.event(1) = [];
                                 elseif EEG.event(1).latency > 0 && EEG.event(1).latency < 1
@@ -492,12 +492,15 @@ for inddataset = 1:length(ALLEEG)
                     % ---------------------
                     tmpevent = EEG.event;
                     if isfield(tmpevent, 'type') && ~isnumeric(tmpevent(1).type)
-                        allEventTypes = { tmpevent.type };
-                        boundsInd = strmatch('boundary', allEventTypes);
-                        if ~isempty(boundsInd),
+                        if ischar(EEG.event(1).type) || ~option_boundary99
+                            boundsInd = strmatch('boundary', { tmpevent.type });
+                        else
+                            boundsInd = find([ tmpevent.type ] == -99);
+                        end
+                        if ~isempty(boundsInd)
                             bounds = [ tmpevent(boundsInd).latency ];
                             % remove last event if necessary
-                            if EEG.trials==1;%this if block added by James Desjardins (Jan 13th, 2014)
+                            if EEG.trials==1 %this if block added by James Desjardins (Jan 13th, 2014)
                                 if round(bounds(end)-0.5+1) >= size(EEG.data,2), EEG.event(boundsInd(end)) = []; bounds(end) = []; end; % remove final boundary if any
                             end
                             % The first boundary below need to be kept for
@@ -536,10 +539,12 @@ for inddataset = 1:length(ALLEEG)
                     % ----------------------------------------
                     if isfield(EEG.event, 'duration')
                         tmpevent = EEG.event;
-                        try,   valempt = cellfun('isempty'  , { tmpevent.duration });
-                        catch, valempt = mycellfun('isempty', { tmpevent.duration });
+                        try
+                            valempt = cellfun('isempty'  , { tmpevent.duration });
+                        catch
+                            valempt = mycellfun('isempty', { tmpevent.duration });
                         end
-                        if any(valempt),
+                        if any(valempt)
                             for index = find(valempt)
                                 EEG.event(index).duration = 0;
                             end
@@ -549,7 +554,7 @@ for inddataset = 1:length(ALLEEG)
                     % resort events
                     % -------------
                     if isfield(EEG.event, 'latency')
-                        try,
+                        try
                             if isfield(EEG.event, 'epoch')
                                 TMPEEG = pop_editeventvals(EEG, 'sort', { 'epoch' 0 'latency' 0 });
                             else
@@ -559,7 +564,7 @@ for inddataset = 1:length(ALLEEG)
                                 EEG = TMPEEG;
                                 disp('Event resorted by increasing latencies.');
                             end
-                        catch,
+                        catch
                             disp('eeg_checkset: problem when attempting to resort event latencies.');
                         end
                     end

@@ -22,6 +22,7 @@ option_rememberfolder = 1 ;  % If set, when browsing to open a new dataset assum
 option_donotusetoolboxes = 0 ;  % If set, do not use Matlab additional toolboxes functions even if they are present (need to restart EEGLAB).
 % EEGLAB connectivity and support
 option_showadvanced      = 0 ;  % If set, show advanced options (close and reopen this GUI to effect changes)
+option_boundary99        = 0 ;  % If set, use type "-99" for boundary events when processing numerical event types (ERPLAB compatibility)
 option_showpendingplugins = 0 ;  % If set, show plugins pending approval instead of approved plugins (for developers only) 
 option_allmenus          = 0 ;  % If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.
 option_checkversion      = 1 ;  % If set, check for new version of EEGLAB and EEGLAB extensions at startup.

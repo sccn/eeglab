@@ -218,6 +218,7 @@ try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [
 
 % transform string events into a int array of column indices
 % ----------------------------------------------------------
+eeglab_options;
 tmpevent = EEG.event;
 tmpeventlatency = [ tmpevent(:).latency ];
 [tmpeventlatency Itmp] = sort(tmpeventlatency);
@@ -294,12 +295,17 @@ end
 % change boundaries in rare cases when limits do not include time-locking events
 % ------------------------------------------------------------------------------
 tmpevents = EEG.event;
-if lim(1) > 0 && ischar(EEG.event(1).type)
+if lim(1) > 0
    % go through all onset latencies
    for Z1 = length(alllatencies):-1:1
-      % if there is any event in between trigger and epoch onset which are boundary events
-      selEvt = find([tmpevents.latency] > alllatencies(Z1) & [tmpevents.latency] < alllatencies(Z1) + lim(1) * EEG.srate);
-      selEvt = selEvt(strcmp({tmpevents(selEvt).type}, 'boundary'));
+       % if there is any event in between trigger and epoch onset which are boundary events
+       selEvt = find([tmpevents.latency] > alllatencies(Z1) & [tmpevents.latency] < alllatencies(Z1) + lim(1) * EEG.srate);
+       if ischar(tmpevent(1).type) || ~option_boundary99
+           selEvt = selEvt(strcmp({tmpevents(selEvt).type}, 'boundary'));
+       else
+           selEvt = selEvt([ tmpevent(selEvt).type ] == -99);
+       end
+
       if any(selEvt)
           if sum([tmpevents(selEvt).duration]) > lim(1) * EEG.srate
               alllatencies(Z1) = [];
@@ -310,12 +316,16 @@ if lim(1) > 0 && ischar(EEG.event(1).type)
       end
    end
 end
-if lim(2) < 0 && ischar(EEG.event(1).type)
+if lim(2) < 0
    % go through all onset latencies
    for Z1 = length(alllatencies):-1:1
       % if there is any event in between trigger and epoch onset which are boundary events
       selEvt = find([tmpevents.latency] < alllatencies(Z1) & [tmpevents.latency] > alllatencies(Z1) + lim(2) * EEG.srate);
-      selEvt = selEvt(strcmp({tmpevents(selEvt).type}, 'boundary'));
+      if ischar(tmpevent(1).type) || ~option_boundary99
+          selEvt = selEvt(strcmp({tmpevents(selEvt).type}, 'boundary'));
+      else
+          selEvt = selEvt([ tmpevent(selEvt).type ] == -99);
+      end
       if any(selEvt)
           if sum([tmpevents(selEvt).duration]) > -lim(2) * EEG.srate
               alllatencies(Z1) = [];
@@ -394,7 +404,11 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 disp('pop_epoch(): checking epochs for data discontinuity');
 if ~isempty(EEG.event) && ischar(EEG.event(1).type)
     tmpevent = EEG.event;
-	boundaryindex = strmatch('boundary', { tmpevent.type });
+    if ischar(tmpevent(1).type) || ~option_boundary99
+	    boundaryindex = strmatch('boundary', { tmpevent.type });
+    else
+	    boundaryindex = find([ tmpevent.type ] == -99);
+    end
 	if ~isempty(boundaryindex)
 		indexepoch = [];
 		for tmpindex = boundaryindex

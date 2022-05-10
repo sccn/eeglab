@@ -86,7 +86,6 @@ else
 end
 
 fprintf('Merging datasets...\n');
-
 if ~isstruct(INEEG2) % if INEEG2 is a vector of ALLEEG indices
     indices = INEEG2;
 
@@ -135,6 +134,17 @@ else % INEEG is an EEG struct
         end
     end
     
+    % type of boundary event
+    eeglab_options;
+    boundaryType = 'boundary';
+    if option_boundary99 && ~(isempty(INEEG1.event) && isempty(INEEG2.event))
+        cond1 = isempty(INEEG1.event) || (isfield(INEEG1.event, 'type') && isnumeric(INEEG1.event(1).type));
+        cond2 = isempty(INEEG2.event) || (isfield(INEEG2.event, 'type') && isnumeric(INEEG2.event(1).type));
+        if cond1 && cond2
+            boundaryType = -99;
+        end
+    end
+
     % Merge the epoch field
     % ---------------------
     if INEEG1.trials > 1 || INEEG2.trials > 1
@@ -232,7 +242,7 @@ else % INEEG is an EEG struct
         % boundary event
         % -------------
         disp('Inserting boundary event...');
-        INEEG1.event(end+1).type    = 'boundary';     % add boundary event between datasets
+        INEEG1.event(end+1).type    = boundaryType;     % add boundary event between datasets
         INEEG1.event(end  ).latency = INEEG1pnts+0.5; % make boundary halfway between last,first pts
 
         % check urevents
@@ -245,7 +255,7 @@ else % INEEG is an EEG struct
         % add boundary urevent
         % --------------------
         disp('Inserting boundary urevent...');
-        INEEG1.urevent(end+1).type    = 'boundary';
+        INEEG1.urevent(end+1).type    = boundaryType;
 
         if length(INEEG1.urevent) > 1 % if previous INEEG1 urevents
             INEEG1.urevent(end  ).latency = max(INEEG1pnts, INEEG1.urevent(end-1).latency)+0.5;
@@ -263,7 +273,7 @@ else % INEEG is an EEG struct
                 % insert boundary event
                 % ---------------------
                 disp('Inserting boundary event...');
-                INEEG1.urevent(end+1).type    = 'boundary';
+                INEEG1.urevent(end+1).type    = boundaryType;
                 try
                     INEEG1.urevent(end  ).latency = max(INEEG1pnts, INEEG1.urevent(end-1).latency)+0.5;
                 catch
@@ -312,7 +322,7 @@ else % INEEG is an EEG struct
         % -------------------------------------
         if INEEG1trials  == 1 && INEEG2trials == 1
             disp('Adding boundary event...');
-            INEEG1.event(end+1).type    = 'boundary'; 
+            INEEG1.event(end+1).type    = boundaryType; 
             INEEG1.event(end  ).latency = INEEG1pnts+0.5; 
             INEEG1.event(end  ).duration = NaN; 
             orilen = orilen+1;

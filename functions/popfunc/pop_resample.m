@@ -123,10 +123,19 @@ oldpnts  = EEG.pnts;
 
 % resample for multiple channels
 % -------------------------
-if isfield(EEG, 'event') && ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
+eeglab_options
+if isfield(EEG, 'event') && ~isempty(EEG.event) && isfield(EEG.event, 'type') 
     tmpevent = EEG.event;
-    bounds = strmatch('boundary', { tmpevent.type });
-    if ~isempty(bounds),
+    if ischar(EEG.event(1).type)
+        bounds = strmatch('boundary', { tmpevent.type });
+    else
+        if option_boundary99
+            bounds = find([tmpevent.type] == -99);
+        else
+            bounds = [];
+        end
+    end
+    if ~isempty(bounds)
         disp('Data break detected and taken into account for resampling');
         bounds = [ tmpevent(bounds).latency ];
         bounds(bounds <= 0 | bounds > size(EEG.data,2)) = []; % Remove out of range boundaries
@@ -215,8 +224,15 @@ if isfield(EEG.event, 'latency')
             % Blocker for boundary events.
             % Old version EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
 
+            isBoundaryEvent = false;
+            if ischar( EEG.event(iEvt).type )
+                isBoundaryEvent = strcmpi(EEG.event(iEvt).type, 'boundary');
+            elseif option_boundary99
+                isBoundaryEvent = EEG.event(iEvt).type == -99;
+            end
+
             % Recompute event latencies relative to segment onset
-            if strcmpi(EEG.event(iEvt).type, 'boundary') && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+            if isBoundaryEvent && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
                 iBnd = sum(EEG.event(iEvt).latency + 0.5 >= bounds);
                 EEG.event(iEvt).latency = indices(iBnd) - 0.5;
             else
@@ -234,8 +250,15 @@ if isfield(EEG.event, 'latency')
         if isfield(EEG, 'urevent') && isfield(EEG.urevent, 'latency')
             try
                 for iUrevt = 1:length(EEG.urevent)
+
+                    isBoundaryEvent = false;
+                    if ischar( EEG.urevent(iUrevt).type )
+                        isBoundaryEvent = strcmpi(EEG.urevent(iUrevt).type, 'boundary');
+                    elseif option_boundary99
+                        isBoundaryEvent = EEG.urevent(iUrevt).type == -99;
+                    end
                     % Recompute urevent latencies relative to segment onset
-                    if strcmpi(EEG.urevent(iUrevt).type, 'boundary') && mod(EEG.urevent(iUrevt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+                    if isBoundaryEvent && mod(EEG.urevent(iUrevt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
                         iBnd = sum(EEG.urevent(iUrevt).latency + 0.5 >= bounds);
                         EEG.urevent(iUrevt).latency = indices(iBnd) - 0.5;
                     else

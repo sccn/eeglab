@@ -1177,6 +1177,11 @@ u(22) = uicontrol('Parent',figh, ...
           for index = 1:length(g.eventtypes)
               if strcmpi(g.eventtypes{index}, 'boundary'), indexwidth(index) = 1; end
           end
+      else
+          eeglab_options;
+          if option_boundary99
+              indexwidth = [ g.eventtypes == -99 ];
+          end
       end
       g.eventtypewidths = g.eventwidths (mod(indexwidth([1:length(g.eventtypes)])-1 ,length(g.eventwidths))+1);
       g.eventwidths     = g.eventwidths (mod(indexwidth(indexcolor)-1               ,length(g.eventwidths))+1);

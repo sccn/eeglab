@@ -464,19 +464,26 @@ if strcmp(g.select, 'inverse')
 end
 
 % checking if trying to remove boundary events (in continuous data)
-if isfield(EEG.event, 'type')
+eeglab_options;
+if ~isempty(EEG.event) && isfield(EEG.event, 'type')
     if ischar(EEG.event(1).type) && EEG.trials == 1 
         Ieventrem = setdiff_bc([1:length(EEG.event)], Ievent );
         tmpevent  = EEG.event;
-        boundaryindex = strmatch('boundary', { tmpevent(Ieventrem).type });
+        if ischar(tmpevent(1).type) || ~option_boundary99
+            boundaryindex = strmatch('boundary', { tmpevent(Ieventrem).type });
+        else
+            boundaryindex = find( [ tmpevent(Ieventrem).type ] == -99);
+        end
         if ~isempty(boundaryindex)
             boundaryindex = Ieventrem(boundaryindex);
             Ievent = [ Ievent boundaryindex ];
         end
         Ievent = sort(Ievent);
-    else boundaryindex = [];
+    else 
+        boundaryindex = [];
     end
-else boundaryindex = [];
+else 
+    boundaryindex = [];
 end
 
 % rename events if necessary

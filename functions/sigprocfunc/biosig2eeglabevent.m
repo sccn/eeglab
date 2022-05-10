@@ -55,6 +55,7 @@ disp('Importing data events...');
 EVT=sopen('eventcodes.txt');sclose(EVT);
 
 % If the interval variable is empty, import all events.
+eeglab_options;
 if isempty(interval)
     if isfield(EVENT, 'Teeg')
         event = EVENT.Teeg;
@@ -78,7 +79,11 @@ if isempty(interval)
                 end
                 if eType == 32766 || eType == 32767
                     event(index).edfplustype = event(index).type;
-                    event(index).type = 'boundary';
+                    if ischar(event(index).type) || ~option_boundary99
+                        event(index).type = 'boundary';
+                    else
+                        event(index).type = -99;
+                    end
                 end
             else
                 event(index).type = eType;
@@ -120,11 +125,19 @@ elseif isfield(EVENT,'POS')
                         event(index).type = EVENT.CodeDesc{eType};
                         event(index).edftype = eType;
                     elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
-                        event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
-                        event(index).edftype = eType;
+                        try
+                            event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
+                            event(index).edftype = eType;
+                        catch
+                            event(index).type = eType;
+                        end
                         if eType == 32766 || eType == 32767
                             event(index).edfplustype = event(index).type;
-                            event(index).type = 'boundary';
+                            if ischar(event(index).type) || ~option_boundary99
+                                event(index).type = 'boundary';
+                            else
+                                event(index).type = -99;
+                            end
                         end
                     else
                         event(index).type = eType;
