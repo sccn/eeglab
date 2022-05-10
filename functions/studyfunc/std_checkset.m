@@ -314,7 +314,7 @@ if ~studywasempty
     % check that ICA is present and if it is update STUDY.datasetinfo
     recreateclusters = 0;
     for index = 1:length(STUDY.datasetinfo)
-        if length(STUDY.datasetinfo(index).comps) ~= size(ALLEEG(index).icaweights,1)
+        if max(STUDY.datasetinfo(index).comps) > size(ALLEEG(index).icaweights,1)
             STUDY.datasetinfo(index).comps = [1:size(ALLEEG(index).icaweights,1)];
             recreateclusters = 1;
             modif = 1;
