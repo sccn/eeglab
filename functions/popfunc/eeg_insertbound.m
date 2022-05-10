@@ -143,7 +143,7 @@ function [ indEvents, addlen ] = findnested(event, eventlat, region)
     indEvents = find( eventlat > region(1) & eventlat < region(2));
 
     if ~isempty(event) && isfield(event,'type') && isfield(event, 'duration')
-        boundaryInd = eeg_findbooundaries( event(indEvents) );
+        boundaryInd = eeg_findboundaries( event(indEvents) );
         addlen      = sum( [ event(indEvents(boundaryInd)).duration ] );
     else
         addlen = 0;
