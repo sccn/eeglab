@@ -152,8 +152,7 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
         [~,indEvent] = sort([ eventtmp.latency ]);
         eventtmp = eventtmp(indEvent);
     end
-    if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && ...
-        ( isequal(eventtmp(1).type, 'boundary') || (option_boundary99 && isequal(eventtmp(1).type, -99) ) )
+    if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && eeg_isboundary(eventtmp(1))
         eventtmp(1) = [];
     end
     if isfield(eventtmp, 'duration')
@@ -167,22 +166,14 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
         eventtmp(end) = [];
     end
     % add initial event to eventtmp when missing
-    firstEventBoundary = isequal(eventtmp(1).type, 'boundary');
-    if option_boundary99 && isnumeric(eventtmp(1).type)
-        firstEventBoundary = eventtmp(1).type == -99;
-    end
-    if ~isempty(eventtmp) && ~isempty(EEG.event) && firstEventBoundary && ...
+    if ~isempty(eventtmp) && ~isempty(EEG.event) && eeg_isboundary(eventtmp(1)) && ...
             EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
         if size(eventtmp,2) > 1
             eventtmp = [ eventtmp(1) eventtmp(1:end) ];
         else
             eventtmp = [ eventtmp(1) eventtmp(1:end)' ];
         end
-        if option_boundary99 && isnumeric(eventtmp.type)
-            eventtmp(1).type = -99;
-        else
-            eventtmp(1).type = 'boundary';
-        end
+        eventtmp(1).type = eeg_boundarytype(eventtmp);
         eventtmp(1).latency = 0.5;
         eventtmp(1).duration = EEG.event(1).duration;
     end

@@ -106,11 +106,7 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
         rmEvent = [ rmEvent tmpnest ];
         %if regions(iRegion,1) % do not remove first event
 
-            if ischar(eventin(1).type) || ~option_boundary99
-                eventin(end+1).type   = 'boundary';
-            else
-                eventin(end+1).type   = -99;
-            end
+            eventin(end+1).type   = eeg_boundarytype(eventin);
             eventin(end).latency  = regions(iRegion,1)-sum(lengths(1:iRegion-1))-0.5;
             eventin(end).duration = lengths(iRegion,1)+addlength;
         %end
@@ -146,13 +142,8 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
 function [ indEvents, addlen ] = findnested(event, eventlat, region)
     indEvents = find( eventlat > region(1) & eventlat < region(2));
 
-    eeglab_options;
     if ~isempty(event) && isfield(event,'type') && isfield(event, 'duration')
-        if ischar(event(1).type) || ~option_boundary99
-            boundaryInd = strmatch('boundary', { event(indEvents).type });
-        else
-            boundaryInd = find( [ event(indEvents).type ] == -99 );
-        end
+        boundaryInd = eeg_findbooundaries( event(indEvents) );
         addlen      = sum( [ event(indEvents(boundaryInd)).duration ] );
     else
         addlen = 0;

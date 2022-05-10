@@ -469,11 +469,7 @@ if ~isempty(EEG.event) && isfield(EEG.event, 'type')
     if ischar(EEG.event(1).type) && EEG.trials == 1 
         Ieventrem = setdiff_bc([1:length(EEG.event)], Ievent );
         tmpevent  = EEG.event;
-        if ischar(tmpevent(1).type) || ~option_boundary99
-            boundaryindex = strmatch('boundary', { tmpevent(Ieventrem).type });
-        else
-            boundaryindex = find( [ tmpevent(Ieventrem).type ] == -99);
-        end
+        boundaryindex = eeg_findboundaries(tmpevent(Ieventrem));
         if ~isempty(boundaryindex)
             boundaryindex = Ieventrem(boundaryindex);
             Ievent = [ Ievent boundaryindex ];

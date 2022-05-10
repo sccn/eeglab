@@ -63,7 +63,6 @@ function [eventout,indnew] = eeg_insertboundold( eventin, pnts, regions, lengths
         return;
     end
 
-    eeglab_options;
     if size(regions,2) ~= 1 && exist('lengths') ~= 1
         lengths = regions(:,2)-regions(:,1)+1;
         regions = regions(:,1);
@@ -115,22 +114,14 @@ function [eventout,indnew] = eeg_insertboundold( eventin, pnts, regions, lengths
             % insert event at tmpind2
             % -----------------------
             if ~isempty(tmpind2)
-                if isempty(eventout) || ischar(eventout(1).type) || ~option_boundary99
-                    eventout(end+1).type = 'boundary';
-                else
-                    eventout(end+1).type = -99;
-                end
+                eventout(end+1).type = eeg_boundarytype(eventout);
                 tmp = eventout(end);
                 eventout(tmpind2+1:end) = eventout(tmpind2:end-1);
                 eventout(tmpind2) = tmp;
                 indnew(tmpind2:end) = indnew(tmpind2:end)+1;
             else
                 tmpind2 = length(eventout)+1;
-                if isempty(eventout) || ischar(eventout(1).type) || ~option_boundary99
-                    eventout(tmpind2).type = 'boundary';
-                else
-                    eventout(tmpind2).type = -99;
-                end
+                eventout(tmpind2).type = eeg_boundarytype(eventout);
             end
             eventout(tmpind2).latency  = boundevents(tmpindex);
             eventout(tmpind2).duration = lengths(tmpindex); % just to create field
@@ -167,10 +158,9 @@ function [ indnested, addlen ] = findnested(event, ind)
     addlen = 0;
     tmpind = ind+1;
 
-    eeglab_options;
     while tmpind <= length(event) && ...
         event(tmpind).latency < event(ind).latency+event(ind).duration
-        if isequal(event(tmpind).type, 'boundary') || (option_boundary99 && isequal(events(1).type, -99))
+        if eeg_isboundary(event(tmpind))
             if ~isempty( event(tmpind).duration )
                 addlen    = addlen + event(tmpind).duration;
                 % otherwise old event duration or merge data discontinuity

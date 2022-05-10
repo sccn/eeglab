@@ -79,11 +79,7 @@ if isempty(interval)
                 end
                 if eType == 32766 || eType == 32767
                     event(index).edfplustype = event(index).type;
-                    if ischar(event(index).type) || ~option_boundary99
-                        event(index).type = 'boundary';
-                    else
-                        event(index).type = -99;
-                    end
+                    event(index).type = eeg_boundarytype(event);
                 end
             else
                 event(index).type = eType;
@@ -133,11 +129,7 @@ elseif isfield(EVENT,'POS')
                         end
                         if eType == 32766 || eType == 32767
                             event(index).edfplustype = event(index).type;
-                            if ischar(event(index).type) || ~option_boundary99
-                                event(index).type = 'boundary';
-                            else
-                                event(index).type = -99;
-                            end
+                            event(index).type = eeg_boundarytype(event);
                         end
                     else
                         event(index).type = eType;

@@ -299,12 +299,7 @@ end
 % ----------------------------------
 if EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type')
 	tmpevent = EEG.event;
-    eeglab_options;
-    if ischar(tmpevent(1).type) || ~option_boundary99
-        boundaries = strmatch('boundary', {tmpevent.type});
-    else
-        boundaries = find( [ tmpevent.type ] == -99);
-    end
+    boundaries = eeg_findboundaries(tmpevent);
 	if ~isempty(boundaries)
 		if exist('pointrange')
 			boundaries = [ tmpevent(boundaries).latency ] - 0.5-pointrange(1)+1;

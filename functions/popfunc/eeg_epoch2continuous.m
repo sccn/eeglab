@@ -49,11 +49,7 @@ EEG.data = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3)
 
 eeglab_options;
 for index = 1:EEG.trials-1
-    if isempty(EEG.event) || ischar(EEG.event(1).type) || ~option_boundary99
-        EEG.event(end+1).type     = 'boundary';
-    else
-        EEG.event(end+1).type     = -99;
-    end
+    EEG.event(end+1).type = eeg_boundarytype(EEG);
     EEG.event(end  ).latency  = index*EEG.pnts-0.5;
     EEG.event(end  ).duration = NaN;
 end

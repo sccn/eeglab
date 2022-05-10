@@ -71,13 +71,7 @@ g = finputcheck(varargin, { 'blank'      'string'  {'on','off' }             'of
 
 if isstr(g), error(g); end
 
-eeglab_options;
-if isempty(CLEANEDEEG.event) || ischar(CLEANEDEEG.event(1).type) || ~option_boundary99
-    boundEvents = strmatch('boundary', { CLEANEDEEG.event.type }, 'exact');
-else
-    boundEvents = find( [ CLEANEDEEG.event.type ] == -99 );
-end
-
+boundEvents = eeg_findboundaries(CLEANEDEEG);
 boundloc = [ CLEANEDEEG.event(boundEvents).latency ];
 dur      = [ CLEANEDEEG.event(boundEvents).duration ];
 cumdur   = cumsum(dur);
@@ -85,11 +79,7 @@ boundloc = boundloc + [0 cumdur(1:end-1) ];
 boundloc = [ boundloc; boundloc+dur-1]';
 if strcmpi(g.blank, 'off')
     EEG = eeg_eegrej(EEG, ceil(boundloc));
-    if isempty(EEG.event) || ischar(EEG.event(1).type) || ~option_boundary99
-        boundEvents = strmatch('boundary', { EEG.event.type }, 'exact');
-    else
-        boundEvents = find( [ EEG.event.type ] == -99 );
-    end    
+    boundEvents = eeg_findboundaries(EEG.event);
     boundLat    = [ EEG.event(boundEvents).latency ];
 else
     boundloc = round(boundloc);

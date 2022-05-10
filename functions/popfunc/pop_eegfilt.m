@@ -170,7 +170,7 @@ end
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
-    [ EEG com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
+    [ EEG, com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
         { locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz, firtype, causal} );
     return;
 end
@@ -188,13 +188,7 @@ eeglab_options;
 if EEG.trials == 1
     if ~isempty(EEG.event) && isfield(EEG.event, 'type')
         tmpevent = EEG.event;
-        if ischar(tmpevent(1).type)
-            boundaries = strmatch('boundary', { tmpevent.type });
-        elseif ~option_boundary99
-            boundaries = find([ tmpevent.type ] == -99);
-        else
-            boundaries = [];
-        end
+        boundaries = eeg_findboundaries(tmpevent);
         if isempty(boundaries)
             if ~usefft
                 [EEG.data, b] = eegfilt( EEG.data, options{:});
@@ -230,7 +224,7 @@ if EEG.trials == 1
                     end
                 end
             end
-            try, warning on MATLAB:divideByZero
+            try warning on MATLAB:divideByZero
             catch, end
         end
     else

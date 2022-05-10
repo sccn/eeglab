@@ -394,7 +394,7 @@ for inddataset = 1:length(ALLEEG)
                     % ---------------------------------------------------
                     if isfield(EEG.event, 'latency')
                         if isfield(EEG.event, 'type')
-                            if (isequal(EEG.event(1).type, 'boundary') || (option_boundary99 && isequal(EEG.event(1).type, -99))) && isfield(EEG.event, 'duration')
+                            if eeg_isboundary(EEG.event(1)) && isfield(EEG.event, 'duration')
                                 if EEG.event(1).duration < 1
                                     EEG.event(1) = [];
                                 elseif EEG.event(1).latency > 0 && EEG.event(1).latency < 1
@@ -492,11 +492,7 @@ for inddataset = 1:length(ALLEEG)
                     % ---------------------
                     tmpevent = EEG.event;
                     if isfield(tmpevent, 'type') && ~isnumeric(tmpevent(1).type)
-                        if ischar(EEG.event(1).type) || ~option_boundary99
-                            boundsInd = strmatch('boundary', { tmpevent.type });
-                        else
-                            boundsInd = find([ tmpevent.type ] == -99);
-                        end
+                        boundsInd = eeg_findboundaries(EEG);
                         if ~isempty(boundsInd)
                             bounds = [ tmpevent(boundsInd).latency ];
                             % remove last event if necessary

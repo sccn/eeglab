@@ -135,15 +135,7 @@ else % INEEG is an EEG struct
     end
     
     % type of boundary event
-    eeglab_options;
-    boundaryType = 'boundary';
-    if option_boundary99 && ~(isempty(INEEG1.event) && isempty(INEEG2.event))
-        cond1 = isempty(INEEG1.event) || (isfield(INEEG1.event, 'type') && isnumeric(INEEG1.event(1).type));
-        cond2 = isempty(INEEG2.event) || (isfield(INEEG2.event, 'type') && isnumeric(INEEG2.event(1).type));
-        if cond1 && cond2
-            boundaryType = -99;
-        end
-    end
+    boundaryType = eeg_boundarytype(INEEG1, INEEG2);
 
     % Merge the epoch field
     % ---------------------

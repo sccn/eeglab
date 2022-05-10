@@ -189,17 +189,11 @@ if isempty(opt.precompstruct)
     % -------------------------
     tmpevent = NEWEEG.event;
     if ~isempty(tmpevent)
-        if isnumeric( tmpevent(1).type )
-            eeglab_options;
-            if option_boundary99
-                boundEvent = find( [ tmpevent.type ] == -99);
-                NEWEEG.event = NEWEEG.event(boundEvent);
-            else
-                NEWEEG.event = [];
-            end
-        else
-            boundEvent = strmatch('boundary', { tmpevent.type }, 'exact');
+        boundEvent = eeg_findboundaries( tmpevent );
+        if ~isempty(boundEvent)
             NEWEEG.event = NEWEEG.event(boundEvent);
+        else
+            NEWEEG.event = [];
         end
     end
 
