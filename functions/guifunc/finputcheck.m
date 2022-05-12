@@ -245,9 +245,12 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
 function cella = removedup(cella, verbose)
 % make sure if all the values passed to unique() are strings, if not, exist
 %try
-    [tmp indices] = unique_bc(cella(1:2:end));
-    if length(tmp) ~= length(cella)/2
-        myfprintf(verbose,'Note: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
+    allFields = cella(1:2:end);
+    [tmp, indices, X] = unique_bc(allFields);
+    if length(tmp) ~= length(allFields)
+        Y = hist(X,unique(X));
+        fieldDuplicates = allFields(Y > 1);
+        myfprintf(verbose,'Note: duplicate ''%s'' parameter(s), keeping the last one(s)\n', fieldDuplicates{1});
     end
     cella = cella(sort(union(indices*2-1, indices*2)));
 %catch
