@@ -189,7 +189,7 @@ end
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if ischar(g), error(g); end
-if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
+if isempty(g.trialindices), g.trialindices = cell(1, length(EEG)); end
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
 if ~strcmpi(g.specmode, 'fft') && strcmpi(g.output, 'ftt'), error('FFT option only valid when computing FFT'); end
 if isfield(EEG,'icaweights')
