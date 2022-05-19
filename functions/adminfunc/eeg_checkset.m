@@ -803,6 +803,16 @@ for inddataset = 1:length(ALLEEG)
         end
     end
     
+    % xmin must be 0 for continuous data or
+    % pop_select does not behave correctly when
+    % removing data points
+    % --------------------
+    if EEG.trials == 1 && EEG.xmin ~= 0
+        EEG.xmin = 0;
+        fprintf( 'eeg_checkset note: xmin set to 0 for continuous data\n');
+        res = com;
+    end
+
     % parameters consistency 
     % -------------------------
     if round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts
