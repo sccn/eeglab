@@ -239,7 +239,8 @@ for iSubj = 1:length(subjectList)
                 if all(isnan(eventsTmp{iSubj}{iCond})), eventsTmp{iSubj}{iCond} = []; end
                 [dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}] = processerpim(dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}, xvals, params);
             end
-            yvals = 1:size(dataTmp{iSubj}{1},1);
+            nonEmptyCell = find( cellfun(@isempty, dataTmp{iSubj}) == 0);
+            yvals = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
         elseif strcmpi(opt.datatype, 'custom')
             disp('Nothing to do for custom data');
         else

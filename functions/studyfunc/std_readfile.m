@@ -430,7 +430,7 @@ function v6 = testv6(x)
 
 fid=fopen(x);
 if fid == -1
-    error('File %s not found', x);
+    error('File %s not found - this could be because your STUDY contains data files with relative path, try changing your MATLAB path to the STUDY folder', x);
 end
 txt=char(fread(fid,20,'uchar')');
 tmp = fclose(fid);
