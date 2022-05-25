@@ -232,7 +232,7 @@ uniqueSessions = unique(allSessions);
 eeglab_options;
 if ~option_parallel
     if ~exist('gcp')
-        disp('Parallel toolbox not found');
+        disp('Parallel toolbox not found - nothing to worry about (except slower computation in some cases)');
         parstatus_changed = 0;
     else
         delete(gcp('nocreate'));

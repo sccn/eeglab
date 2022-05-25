@@ -37,8 +37,6 @@
 %                  computed and saved. Only selected channels 
 %                  are returned by the function to Matlab
 %                  {default|[] -> none}
-%   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
-%                  already on disk.
 %   'recompute'  - ['on'|'off'] force recomputing data file even if it is 
 %                  already on disk.
 %   'rmcomps'    - [integer array] remove artifactual components (this entry
@@ -245,7 +243,7 @@ end
 
 % Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
-if exist( filenameersp ) && strcmpi(g.recompute, 'off')
+if exist( filenametrials ) && strcmpi(g.recompute, 'off')
     fprintf('Use existing file for ERSP: %s; check the ''recompute checkbox'' to force recomputing.\n', filenameersp);
     return;
 end
