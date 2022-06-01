@@ -159,13 +159,6 @@
 
 function [chansout, chaninfo, urchans, com] = pop_chanedit(chans, orichaninfo, varargin);
 
-% process multiple datasets
-% -------------------------
-if length(chans) > 1 && isfield(chans, 'setname') && nargin > 2
-    [ chansout, com ] = eeg_eval( 'pop_chanedit', chans, 'params', { orichaninfo, varargin{:} } );
-    return;
-end
-
 urchans  = [];
 com ='';
 if nargin < 1
@@ -194,14 +187,22 @@ if isempty(chans) || all(~ishandle(chans))
             
             % pop up GUI for first dataset
             EEG = chans(1);
-            [chansout, chaninfo, urchans, com] = pop_chanedit(EEG, orichaninfo, varargin{:});
-            chans(1) = chansout;
+            [~, chaninfo, urchans, com] = pop_chanedit(EEG, orichaninfo, varargin{:});
             
-            % pop up GUI for first dataset
-            for iDat = 2:length(chans)
+            % Apply to all datasets and resave if necessary
+            eeglab_options
+            for iDat = 1:length(chans)
                 EEG = chans(iDat);
                 eval(com);
-                chans(iDat) = EEG;
+                EEG.saved = 'no';
+                if option_storedisk
+                    EEG = pop_saveset(EEG, 'savemode', 'resave');
+                    EEG = update_datafield(EEG);
+                end
+                chans = eeg_store(chans, EEG, iDat);
+                if option_storedisk
+                    chans(iDat).saved = 'yes'; % eeg_store by default set it to no
+                end
             end
             chansout = chans;
             return;
@@ -1038,3 +1039,14 @@ switch lower(ButtonName),
     case 'cancel', num = 0;
     case 'yes',    num = 1;
 end
+
+% for multiple dataset processing
+% -------------------------------
+function EEG = update_datafield(EEG)
+    if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end
+    if ~isempty(EEG.datfile)
+        EEG.data = EEG.datfile;
+    else 
+        EEG.data = 'in set file';
+    end
+    EEG.icaact = [];
