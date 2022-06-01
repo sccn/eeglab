@@ -188,9 +188,7 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     if 100*differs/length(EEG.event) > 50
         db = dbstack;
         if length(db) > 1 
-            fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF EEGLAB (<2017)\n' ...
-                'TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA, EVENTS MIGHT HAVE\n' ...
-                'BEEN CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
+            fprintf(['bug 1971 warning for scritps older than 2017: see https://sccn.ucsd.edu/wiki/EEGLAB_bug1971\n' ]);
         end
     end
     
@@ -198,7 +196,7 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     if ~isempty(event2)
         otherlatencies = [event2.latency];
         if ~isequal(alllats, otherlatencies)
-            warning([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+            warning([ 'Minor discrepency when recomputing event latency.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]);
         end
     end
 end
@@ -218,7 +216,7 @@ if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) 
         if ~isequal(duration1, duration2)
             duration1(duration1 == 0) = [];
             if ~isequal(duration1, duration2)
-                warning(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
+                warning(['Inconsistency in boundary event duration.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]); 
             end
         end
     catch, warning('Unknown error when checking event latency - please send us your dataset');
