@@ -403,7 +403,7 @@ if ~isempty(EEG.icaweights)
         newICAchaninds = zeros(orinbchan, size(EEG.icawinv,2));
         newICAchaninds(EEG.icachansind,:) = EEG.icawinv;
         
-        [newICAchaninds newchanlocs] = reref(newICAchaninds, ref, optionscall{:});
+        [newICAchaninds, newchanlocs] = reref(newICAchaninds, ref, optionscall{:});
         
         % convert channel indices in icachanlocs (uses channel labels)
         % ------------------------------------------------------------
@@ -413,9 +413,12 @@ if ~isempty(EEG.icaweights)
             oldLabel    = orichanlocs(icachansind(i)).labels;
             newLabelPos = strmatch(oldLabel, { newchanlocs.labels }, 'exact');
             
+            if length(newLabelPos) > 1
+                warning('More than one match for specified channel reference; this may cause eratic behavior. If the 2 channels are identical, delete one of them.');
+            end
             if ~isempty( newLabelPos )
-                icachansind(i) = newLabelPos;
-                rminds(find(icachansind(i) == rminds)) = [];
+                icachansind(i) = newLabelPos(1);
+                rminds(icachansind(i) == rminds) = [];
             else
                 icachansind(i) = [];
             end
