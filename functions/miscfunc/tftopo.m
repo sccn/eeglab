@@ -500,7 +500,9 @@ else
     imagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1:4)]);
 end
-caxis([g.limits(5:6)]);
+if length(unique(g.limits(5:6))) > 1
+    caxis([g.limits(5:6)]);
+end
 hold on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
