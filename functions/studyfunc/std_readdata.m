@@ -440,7 +440,7 @@ function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
     
     % remove all fields and create new parameter list
     fieldList = { 'nlines' 'smoothing' 'sorttype' 'sortwin' 'sortfield' 'channels' ...
-                  'interp' 'trialinfo' 'concatenate' 'savetrials' 'recompute' 'fileout' 'events'};
+                  'interp' 'trialinfo' 'concatenate' 'savetrials' 'recompute' 'fileout' 'events' 'rmcomps'};
     params = {};
     fieldN = fieldnames(g);
     for iField = 1:length(fieldN)
