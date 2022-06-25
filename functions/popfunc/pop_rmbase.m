@@ -177,7 +177,7 @@ if EEG.trials == 1 && ~isempty(EEG.event) ...
                      && isfield(EEG.event, 'type') ...
                         && ischar(EEG.event(1).type)
     tmpevent = EEG.event;
-	boundaries = strmatch('boundary', {tmpevent.type});
+    boundaries = eeg_findboundaries(tmpevent);
 	if ~isempty(boundaries) % this is crashing
         fprintf('Pop_rmbase(): finding continuous data discontinuities\n');
         boundaries = round([ tmpevent(boundaries).latency ] -0.5-pointrange(1)+1);

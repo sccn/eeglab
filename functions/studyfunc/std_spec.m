@@ -189,7 +189,7 @@ end
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if ischar(g), error(g); end
-if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
+if isempty(g.trialindices), g.trialindices = cell(1, length(EEG)); end
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
 if ~strcmpi(g.specmode, 'fft') && strcmpi(g.output, 'ftt'), error('FFT option only valid when computing FFT'); end
 if isfield(EEG,'icaweights')
@@ -272,7 +272,7 @@ if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
         TMP = eeg_checkset(TMP);
         if TMP.trials > 1
             % epoch data - need to re-extract data
-            TMP = pop_select(TMP, 'trials', [epochCount:(epochCount+EEG(iEEG).trials-1)]);
+            TMP = pop_select(TMP, 'trial', [epochCount:(epochCount+EEG(iEEG).trials-1)]);
             epochCount = epochCount+EEG(iEEG).trials;
             TMP = eeg_epoch2continuous(TMP);
         else

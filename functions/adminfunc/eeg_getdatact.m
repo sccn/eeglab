@@ -97,7 +97,8 @@ if iscell(EEG) || (~ischar(EEG) && length(EEG) > 1)
             data       = tmpdata;
             boundaries = datboundaries;
         else
-            if size(tmpdata,3) == 1 && size(data,2) ~= size(tmpdata,2) % continuous data (if same number of data points, consider 1 trial dataset)
+            if (isstruct(EEG) && all([EEG.trials] == 1)) || size(tmpdata,3) == 1 || size(data,2) ~= size(tmpdata,2) % continuous data (if same number of data points, consider 1 trial dataset)
+                if size(tmpdata,3) ~= 1 || size(data,3) ~= 1, error('Trying to concatenate continuous and epoched datasets'); end
                 if size(data,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end
 
                 % adding boundaries

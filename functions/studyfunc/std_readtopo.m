@@ -92,6 +92,7 @@ end
 for k = 1:length(comps)
 
     if length(comps) < 3
+        lastwarn('', '');
         try
             topo = load( '-mat', filename, ...
                          [ 'comp' int2str(comps(k)) '_grid'], ...
@@ -99,6 +100,10 @@ for k = 1:length(comps)
                          [ 'comp' int2str(comps(k)) '_y'] );
         catch
             error( [ 'Cannot read file ''' filename '''' ]);
+        end
+        [~, warnId] = lastwarn();
+        if ~isempty(warnId)
+            error( 'Cannot find component %d in file %s', comps(k),  filename );
         end
     elseif k == 1
         try
@@ -108,9 +113,9 @@ for k = 1:length(comps)
         end
     end
     
-    try,
+    try
         tmp =  getfield(topo, [ 'comp' int2str(comps(k)) '_grid' ]);
-    catch,
+    catch
         error([ 'Empty scalp topography file - also necessary for ERP polarity' 10 'Try recomputing scalp topographies for components' ]);
     end
         

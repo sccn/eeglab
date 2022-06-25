@@ -1,4 +1,3 @@
-function H = textsc(x,y,txt);
 % textsc() - places text in screen coordinates and places
 %            a title at the top of the figure.
 %
@@ -7,7 +6,8 @@ function H = textsc(x,y,txt);
 %   at the normalized coordinates X and Y.  H is the
 %   handle to the text object.
 %
-%   H = textsc(TXT,'title') places a title at the top
+%   H = textsc(TXT) or H = textsc(TXT,'title') or 
+%   H = textsc('title', TXT) places a title at the top
 %   of the figure window.  This is useful when you
 %   want to place a single title above multiple
 %   subplots.
@@ -26,8 +26,14 @@ function H = textsc(x,y,txt);
 % All Rights Reserved  January 21, 1994
 % LDM031695jlg
 
+function H = textsc(x,y,txt)
+
 % Basic error checking
 if nargin < 2
+    y = 'title';
+end
+if isstr(x) && strcmpi(x, 'title')
+    x = y;
     y = 'title';
 end
 

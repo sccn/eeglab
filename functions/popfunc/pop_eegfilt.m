@@ -116,9 +116,9 @@ if nargin < 2
     else filtorder    = eval( result{3} );
     end
     revfilt = 0;
-    if result{4},
+    if result{4}
         revfilt = 1;
-        if locutoff == 0 || hicutoff == 0,
+        if locutoff == 0 || hicutoff == 0
             error('Need both lower and higher edge for notch filter');
         end
     end
@@ -170,7 +170,7 @@ end
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
-    [ EEG com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
+    [ EEG, com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
         { locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz, firtype, causal} );
     return;
 end
@@ -184,10 +184,11 @@ end
 
 options = {options{:} revfilt firtype causal};
 
+eeglab_options;
 if EEG.trials == 1
-    if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
+    if ~isempty(EEG.event) && isfield(EEG.event, 'type')
         tmpevent = EEG.event;
-        boundaries = strmatch('boundary', { tmpevent.type });
+        boundaries = eeg_findboundaries(tmpevent);
         if isempty(boundaries)
             if ~usefft
                 [EEG.data, b] = eegfilt( EEG.data, options{:});
@@ -223,7 +224,7 @@ if EEG.trials == 1
                     end
                 end
             end
-            try, warning on MATLAB:divideByZero
+            try warning on MATLAB:divideByZero
             catch, end
         end
     else

@@ -151,16 +151,21 @@ filename = filenameshort;
 
 % ERP information found in datasets
 % ---------------------------------
-if exist(filename) && strcmpi(g.recompute, 'off') && nargout > 0
+if exist(filename) && strcmpi(g.recompute, 'off')
 
     fprintf('File "%s" found on disk, no need to recompute\n', filenameshort);
-    setinfo.filebase = filename;
-    if strcmpi(prefix, 'comp')
-        [X tmp t] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
+
+    if nargout > 0
+        setinfo.filebase = filename;
+        if strcmpi(prefix, 'comp')
+            [X tmp t] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
+        else
+            [X tmp t] = std_readfile(setinfo, 'channels', g.channels,  'timelimits', g.timerange, 'measure', 'erp');
+        end
+        if ~isempty(X), return; end
     else
-        [X tmp t] = std_readfile(setinfo, 'channels', g.channels,  'timelimits', g.timerange, 'measure', 'erp');
+        return; 
     end
-    if ~isempty(X), return; end
     
 end 
    

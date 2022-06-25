@@ -32,7 +32,7 @@
 %                  ('off') computes an ERPimage for each subject and then
 %                  averages these ERPimages. This allows to perform
 %                  statistics (the 'on' options does not allow statistics).
-%   'smoothing'  - Smoothing parameter (number of trials). {Default: 10}
+%   'smoothing'  - Smootmeter (number of trials). {Default: 10}
 %                  erpimage() equivalent: 'avewidth'
 %   'nlines'     - Number of lines for ERPimage. erpimage() equivalent is 
 %                  'decimate'. Note that this parameter must be larger than

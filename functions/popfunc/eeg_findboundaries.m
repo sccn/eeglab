@@ -1,17 +1,21 @@
-% eeg_epoch2continuous() - convert epoched dataset to continuous dataset
-%                          with data epochs separated by boundary events.
+% eeg_findboundaries() - return indices of boundary events
+%
 % Usage:
-%           >> EEGOUT = eeg_epoch2continuous(EEGIN);
+%   >> boundaryIndices = eeg_boundaryevent(INEEG);
+%   >> boundaryIndices = eeg_boundaryevent(INEEG.event);
 %
 % Inputs:
-%   EEGIN  - a loaded epoched EEG dataset structure.
+%   INEEG         - input EEG dataset structure. Used to check if event
+%                   types are string or numerical.
 %
-% Inputs:
-%   EEGOUT - a continuous EEG dataset structure.
+% Outputs:
+%   boundaryIndices - indices of boundary events
 %
-% Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2012
+% Author: Arnaud Delorme, 2022
+% 
+% see also: eeglab()
 
-% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2012, arno@sccn.ucsd.edu
+% Copyright (C) 2022 Arnaud Delorme
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -38,26 +42,30 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = eeg_epoch2continuous(EEG)
+function boundaries = eeg_findboundaries(EEG)
 
-if nargin < 1
-    help eeg_epoch2continuous;
-    return;
-end
+    if nargin < 1
+        help eeg_findboundaries;
+        return
+    end
 
-EEG.data = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3));
+    if isempty(EEG)
+        boundaries = [];
+        return;
+    end
 
-eeglab_options;
-for index = 1:EEG.trials-1
-    EEG.event(end+1).type = eeg_boundarytype(EEG);
-    EEG.event(end  ).latency  = index*EEG.pnts-0.5;
-    EEG.event(end  ).duration = NaN;
-end
+    if isfield(EEG, 'event') && isfield(EEG, 'setname')
+        tmpevent = EEG.event;
+    else
+        tmpevent = EEG;
+    end
 
-EEG.pnts   = size(EEG.data,2);
-EEG.trials = 1;
-if ~isempty(EEG.event) && isfield(EEG.event, 'epoch')
-    EEG.event = rmfield(EEG.event, 'epoch');
-end
-
-EEG = eeg_checkset(EEG);
+    % type of boundary event
+    eeglab_options;
+    if ischar(tmpevent(1).type)
+        boundaries = strmatch('boundary', { tmpevent.type });
+    elseif option_boundary99
+        boundaries = find([ tmpevent.type ] == -99);
+    else
+        boundaries = [];
+    end

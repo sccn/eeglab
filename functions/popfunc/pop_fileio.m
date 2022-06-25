@@ -131,6 +131,7 @@ if nargin < 1
     if ~isempty(result{4}), options = { options{:} 'dataformat' formats{result{4}} }; end
     if result{5}, options = { options{:} 'memorymapped' fastif(result{5}, 'on', 'off') }; end
 else
+    ft_defaults;
     if ~isstruct(filename)
         dat = ft_read_header(filename);
         options = varargin;
@@ -147,6 +148,7 @@ end
 
 % decode input parameters
 % -----------------------
+ft_defaults;
 g = struct(options{:});
 if ~isfield(g, 'samples'), g.samples = []; end
 if ~isfield(g, 'trials'), g.trials = []; end

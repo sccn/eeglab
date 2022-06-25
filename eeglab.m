@@ -1046,11 +1046,19 @@ else
         % ----------------
         if ~isempty(pluginVersion) || ~isempty(funcname)
             if isempty(funcname)
-                disp([ 'EEGLAB: adding "' pluginName '" to the path; subfolders (if any) might be missing from the path' ]);
+                fprintf([ 'EEGLAB: adding "' pluginName '" v' pluginVersion ' to the path' ]);
                 pluginlist(plugincount).plugin     = pluginName;
                 pluginlist(plugincount).version    = pluginVersion;
                 pluginlist(plugincount).foldername = dircontent(index).name;
                 pluginlist(plugincount).status     = 'ok';
+                indPlugin = strmatch(lower(pluginlist(plugincount).plugin), lower(pluginstats.name), 'exact');
+                if length(indPlugin) == 1
+                    if ~strcmpi(pluginVersion, pluginstats.version{indPlugin})
+                        fprintf(2, ' - new version %s available\n', pluginstats.version{indPlugin});
+                    else 
+                        fprintf('\n');
+                    end
+                end
                 plugincount = plugincount+1;
             else
                 pluginlist(plugincount).plugin     = pluginName;

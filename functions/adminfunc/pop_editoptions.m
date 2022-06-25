@@ -147,6 +147,7 @@ optionsToShow = {
     'option_allmenus'  ...
     'option_checkversion' ...
     'option_showadvanced' ...
+    'option_boundary99' ...
     'option_cachesize' };
 
 % remove advanced options if necessary
@@ -201,6 +202,8 @@ if nargin < 2
             
         elseif strcmpi(opt(index).varname, 'option_memmapdata')
             cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2(strvcat(''Matlab memory is beta, use at your own risk'')); end;' ];
+        elseif strcmpi(opt(index).varname, 'option_boundary99')
+            cb_nomodif = [ 'warndlg2(strvcat(''This function is for ERPLAB compatility. If you do not have numerical events,'', ''it will have no effect. If you have numerical events, type -99 will be used as boundary'', ''event type throughout EEGLAB. If you use this option to process some datasets and then'', ''unset it, EEGLAB will no longer detect type -99 boundaries, so be careful!'' ));' ];
         elseif strcmpi(opt(index).varname, 'option_donotusetoolboxes')
             cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2([''You have selected the option to disable'' 10 ''Matlab toolboxes. Use with caution.'' 10 ''Matlab toolboxes will be removed from'' 10 ''your path. Unlicking this option later will not'' 10 ''add back the toolboxes. You will need'' 10 ''to add them back manually. If you are unsure'' 10 ''if you want to disable Matlab toolboxes'' 10 ''deselect the option now.'' ]); end;' ];
         else

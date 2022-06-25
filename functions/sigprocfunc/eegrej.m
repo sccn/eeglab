@@ -127,9 +127,9 @@ for iRegion1=1:size(regions,1)
     duration(iRegion1)    = regions(iRegion1,2)-regions(iRegion1,1)+1;
     
     % add nested boundary events
-    if ~isempty(events) && isfield(events, 'type') && ischar(events(1).type) && isfield(events, 'duration')
+    if ~isempty(events) && isfield(events, 'type') && isfield(events, 'duration')
         selectedEvent = oriEvents(rejectedEvents{iRegion1});
-        indBound      = strmatch('boundary', { selectedEvent.type });
+        indBound = eeg_findboundaries(selectedEvent);
         duration(iRegion1) = duration(iRegion1) + sum([selectedEvent(indBound).duration]);
     end
     
@@ -182,9 +182,11 @@ end
 
 % insert boundary events
 % ----------------------
+boundType = eeg_boundarytype(events);
 for iRegion1=1:length(boundevents)
     if boundevents(iRegion1) > 0 && boundevents(iRegion1) < size(indata,2)
-        events(end+1).type = 'boundary';
+        eeglab_options;
+        events(end+1).type = boundType;
         events(end).latency  = boundevents(iRegion1);
         events(end).duration = duration(iRegion1);
     end

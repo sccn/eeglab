@@ -74,12 +74,12 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab1 = { bad_elec.labels };
         tmpchanlocs = EEG.chanlocs;
         lab2 = { tmpchanlocs.labels };
-        [tmp tmpchan] = setdiff_bc( lab2, lab1);
+        [~, tmpchan] = setdiff_bc( lab2, lab1);
         tmpchan = sort(tmpchan);
         
         % From 'bad_elec' using only fields present on EEG.chanlocs
         fields = fieldnames(bad_elec);
-        [tmp, indx1] = setxor(fields,fieldnames(EEG.chanlocs)); clear tmp;
+        [~, indx1] = setxor(fields,fieldnames(EEG.chanlocs)); clear tmp;
         if ~isempty(indx1)
             bad_elec = rmfield(bad_elec,fields(indx1));
             fields = fieldnames(bad_elec);
@@ -103,15 +103,15 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab1 = { bad_elec.labels };
         tmpchanlocs = EEG.chanlocs;
         lab2 = { tmpchanlocs.labels };
-        [tmp badchans] = setdiff_bc( lab1, lab2);
+        [~, badchans] = setdiff_bc( lab1, lab2);
         fprintf('Interpolating %d channels...\n', length(badchans));
-        if length(badchans) == 0, return; end
+        if isempty(badchans), return; end
         goodchans      = sort(setdiff(1:length(bad_elec), badchans));
        
         % re-order good channels
         % ----------------------
-        [tmp1 tmp2 neworder] = intersect_bc( lab1, lab2 );
-        [tmp1 ordertmp2] = sort(tmp2);
+        [~, tmp2, neworder] = intersect_bc( lab1, lab2 );
+        [~, ordertmp2] = sort(tmp2);
         neworder = neworder(ordertmp2);
         EEG.data = EEG.data(neworder, :, :);
 
@@ -124,7 +124,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         % ---------------------------------------
         if ~isempty(EEG.icasphere)
             
-            [tmp sorti] = sort(neworder);
+            [~, sorti] = sort(neworder);
             EEG.icachansind = sorti(EEG.icachansind);
             EEG.icachansind = goodchans(EEG.icachansind);
             EEG.chaninfo.icachansind = EEG.icachansind;

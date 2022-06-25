@@ -1,17 +1,20 @@
-% eeg_epoch2continuous() - convert epoched dataset to continuous dataset
-%                          with data epochs separated by boundary events.
+% eeg_isboundary() - check if an event is a boundary event
+%
 % Usage:
-%           >> EEGOUT = eeg_epoch2continuous(EEGIN);
+%   >> logical = eeg_boundaryevent(INEEG);
+%   >> logical = eeg_isboundary(event);
 %
 % Inputs:
-%   EEGIN  - a loaded epoched EEG dataset structure.
+%   event         - EEGLAB event
 %
-% Inputs:
-%   EEGOUT - a continuous EEG dataset structure.
+% Outputs:
+%   logical - true or false
 %
-% Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2012
+% Author: Arnaud Delorme, 2022
+% 
+% see also: eeglab()
 
-% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2012, arno@sccn.ucsd.edu
+% Copyright (C) 2022 Arnaud Delorme
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -38,26 +41,26 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = eeg_epoch2continuous(EEG)
+function logi = eeg_isboundary(tmpevent)
 
-if nargin < 1
-    help eeg_epoch2continuous;
-    return;
-end
+    if nargin < 1
+        help eeg_isboundary;
+        return
+    end
 
-EEG.data = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3));
-
-eeglab_options;
-for index = 1:EEG.trials-1
-    EEG.event(end+1).type = eeg_boundarytype(EEG);
-    EEG.event(end  ).latency  = index*EEG.pnts-0.5;
-    EEG.event(end  ).duration = NaN;
-end
-
-EEG.pnts   = size(EEG.data,2);
-EEG.trials = 1;
-if ~isempty(EEG.event) && isfield(EEG.event, 'epoch')
-    EEG.event = rmfield(EEG.event, 'epoch');
-end
-
-EEG = eeg_checkset(EEG);
+    logi = false;
+    if isempty(tmpevent) || ~isfield(tmpevent, 'type')
+        return;
+    else
+        % type of boundary event
+        eeglab_options;
+        if ischar(tmpevent(1).type)
+            if strcmpi('boundary', tmpevent(1).type)
+                logi = true;
+            end
+        elseif option_boundary99
+            if tmpevent(1).type == -99
+                logi = true;
+            end
+        end
+    end

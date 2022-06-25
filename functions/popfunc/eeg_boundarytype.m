@@ -1,17 +1,21 @@
-% eeg_epoch2continuous() - convert epoched dataset to continuous dataset
-%                          with data epochs separated by boundary events.
+% eeg_boundarytype() - return boundary event. It is usually "boundary". 
+%                Based on EEGLAB options, it can be -99.
 % Usage:
-%           >> EEGOUT = eeg_epoch2continuous(EEGIN);
+%   >> boundaryType = eeg_boundarytype(INEEG);
 %
 % Inputs:
-%   EEGIN  - a loaded epoched EEG dataset structure.
+%   INEEG         - input EEG dataset structure. Used to check if event
+%                   types are string or numerical.
 %
-% Inputs:
-%   EEGOUT - a continuous EEG dataset structure.
+% Outputs:
+%   boundaryType - boundary event type. Usually "boundary" but based on EEGLAB
+%                   preferences can be -99 if event types are numerical.
 %
-% Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2012
+% Author: Arnaud Delorme, 2022
+% 
+% see also: eeglab()
 
-% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2012, arno@sccn.ucsd.edu
+% Copyright (C) 2022 Arnaud Delorme
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -38,26 +42,27 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = eeg_epoch2continuous(EEG)
+function boundaryType = eeg_boundarytype(INEEG1, INEEG2)
 
-if nargin < 1
-    help eeg_epoch2continuous;
-    return;
-end
+    if nargin < 1
+        help eeg_boundarytype;
+        return
+    end
 
-EEG.data = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3));
+    if nargin < 2 
+        INEEG2 = INEEG1;
+    end
 
-eeglab_options;
-for index = 1:EEG.trials-1
-    EEG.event(end+1).type = eeg_boundarytype(EEG);
-    EEG.event(end  ).latency  = index*EEG.pnts-0.5;
-    EEG.event(end  ).duration = NaN;
-end
+    if isfield(INEEG1, 'event') && isfield(INEEG1, 'setname') tmpevent1 = INEEG1.event; else tmpevent1 = INEEG1; end
+    if isfield(INEEG2, 'event') && isfield(INEEG2, 'setname') tmpevent2 = INEEG2.event; else tmpevent2 = INEEG2; end
 
-EEG.pnts   = size(EEG.data,2);
-EEG.trials = 1;
-if ~isempty(EEG.event) && isfield(EEG.event, 'epoch')
-    EEG.event = rmfield(EEG.event, 'epoch');
-end
-
-EEG = eeg_checkset(EEG);
+    % type of boundary event
+    eeglab_options;
+    boundaryType = 'boundary';
+    cond1 = isempty(tmpevent1) || (isfield(tmpevent1, 'type') && isnumeric(tmpevent1(1).type));
+    cond2 = isempty(tmpevent2) || (isfield(tmpevent2, 'type') && isnumeric(tmpevent2(1).type));
+    if option_boundary99 && ~(isempty(tmpevent1) && isempty(tmpevent2))
+        if cond1 && cond2
+            boundaryType = -99;
+        end
+    end
