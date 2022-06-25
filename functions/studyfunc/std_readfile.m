@@ -111,7 +111,7 @@ if iscell(fileBaseName)
                     if isempty(sz{iCond})
                         sz{iCond} = szTmp{iCond};
                     else
-                        sz{iCond}(end) = sz{iCond}(end)+szTmp{iCond}(end);
+                        sz{iCond}(2) = sz{iCond}(2)+szTmp{iCond}(2);
                     end
                 end
             end
@@ -126,6 +126,7 @@ if iscell(fileBaseName)
             pointer = 1; 
             for iSess = 1:length(measureDataTmp)
                 if ~isempty(measureDataTmp{iSess}{iCond})
+                    % when trials concatenate them
                     measureData{iCond}(:, pointer:pointer+size(measureDataTmp{iSess}{iCond},2)-1,:,:) = measureDataTmp{iSess}{iCond};
                     pointer = pointer + size(measureDataTmp{iSess}{iCond},2);
                 end
