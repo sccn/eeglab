@@ -443,6 +443,13 @@ else
     % ------------------------
     for curfield = 1:2:length(args)
         switch lower(args{curfield})
+            case 'cleanlabels'
+                for iChan = 1:length(chans)
+                    posMinus = find(chans(iChan).labels == '-');
+                    if ~isempty(posMinus)
+                        chans(iChan).labels = chans(iChan).labels(1:posMinus(1)-1);
+                    end
+                end
             case 'rplurchanloc'
                 if flag_replurchan, urchans = eeg_checkchanlocs(chans, chaninfo); end
                 args{curfield}     = 'rplurchanloc';
