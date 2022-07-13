@@ -32,7 +32,7 @@
 %                  cannot be edited. To change data reference, use menu 
 %                  Tools > Re-reference calling function pop_reref(). The reference 
 %                  can be a string, 'common' indicating an unknown common reference, 
-%                  'averef' indicating average reference, or an array of integer 
+%                  'average' indicating average reference, or an array of integer 
 %                  containing the indices of the reference channels.
 %   "Subject code" - [Edit box] subject code. For example, 'S01'. The command
 %                    line equivalent is 'subject'.
@@ -93,7 +93,7 @@
 %                  is automatically calculated.
 %                   {default: length of the data -> continuous data assumed}
 %   'srate'      - [real] Data sampling rate in Hz {default: 1Hz}
-%   'ref'        - [string or integer] reference channel indices. 'averef' indicates
+%   'ref'        - [string or integer] reference channel indices. 'average' indicates
 %                  average reference. Note that this does not perform referencing
 %                  but only sets the initial reference when the data is imported.
 %   'icaweight'  - [matrix] ICA weight matrix. 

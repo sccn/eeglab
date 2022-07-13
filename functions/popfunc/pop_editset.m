@@ -23,7 +23,7 @@
 %                  cannot be edited. To change the data reference, use menu item,
 %                  'Tools > Re-reference', calling function pop_reref(). The 
 %                  reference can be either a string (channel name), 'common', 
-%                  indicating an unknown common reference, 'averef' indicating 
+%                  indicating an unknown common reference, 'average' indicating 
 %                  average reference, or an array of integers containing indices 
 %                  of the reference channel(s).
 %   "Subject code" - [Edit box] subject code. For example, 'S01'. The command 
@@ -96,7 +96,7 @@
 %                  data trials is automatically calculated.
 %                   {default: length of the data -> continuous data assumed}
 %   'srate'      - [real] Data sampling rate in Hz {default: 1Hz}
-%   'ref'        - [string or integer] reference channel indices; 'averef' 
+%   'ref'        - [string or integer] reference channel indices; 'average' 
 %                  indicates average reference. Note that this does not perform 
 %                  referencing but only sets the initial reference when the data 
 %                  are imported.
