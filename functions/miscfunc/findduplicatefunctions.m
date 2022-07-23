@@ -30,7 +30,6 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-matlabRoot = fileparts(fileparts(fileparts(fileparts(which('ispc')))));
 folders = path;
 delim = find(folders == ':');
 delim = [ 0 delim length(folders)+1 ];
@@ -40,7 +39,7 @@ for iFolder = 1:length(delim)-1
     
     folderContent = dir(currentFolder);
     
-    if isempty(findstr(matlabRoot, currentFolder))
+    if ~contains( currentFolder, matlabroot)
         
         rmpath(currentFolder);
         folderContent = { folderContent.name };
@@ -51,9 +50,17 @@ for iFolder = 1:length(delim)-1
             if length(currentFile) > 2 && strcmpi(currentFile(end-1:end), '.m')
                 
                 if ~strcmpi(currentFile, 'Contents.m')
-                    if ~isempty(which(currentFile))
+                    tmp = which(currentFile);
+
+                    if ~isempty(tmp)
                         fullFileName1 = fullfile(currentFolder, currentFile);
                         fullFileName2 = which(currentFile);
+                        %                         cond1 = contains(fullFileName1, 'toolbox/matlab') || contains(fullFileName1, 'toolbox\matlab');
+                        cond1 = contains(fullFileName1, matlabroot);
+                        if cond1
+                            sadffdas
+                        end
+                        %                         if ~cond1
                         fprintf('Potential conflict between %s and %s\n', fullFileName1, fullFileName2);
                     end
                 end
