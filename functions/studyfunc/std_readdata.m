@@ -486,20 +486,24 @@ function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
 function filebase = getfilename(filepath, subj, sess, fileSuffix, onlyOneSession)
 if onlyOneSession
     filebase = fullfile(filepath{1}, [ subj fileSuffix ] );
-else
-    if isempty(sess)
-        sess = { '1' };
+    if exist(filebase, 'file')
+        return;
     end
-    for iSess = 1:length(sess)
-        if isnumeric(sess{iSess})
-            sesStr   = [ '0' num2str(sess{iSess}) ];
-        else
-            sesStr   = [ '0' sess{iSess} ];
-        end
-        filebase{iSess} = fullfile(filepath{iSess}, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
+    clear filebase;
+end
+
+if isempty(sess)
+    sess = { '1' };
+end
+for iSess = 1:length(sess)
+    if isnumeric(sess{iSess})
+        sesStr   = [ '0' num2str(sess{iSess}) ];
+    else
+        sesStr   = [ '0' sess{iSess} ];
     end
-    if length(unique(filebase)) < length(filebase)
-        filebase = unique(filebase); % order is not important
-    end
-end    
+    filebase{iSess} = fullfile(filepath{iSess}, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
+end
+if length(unique(filebase)) < length(filebase)
+    filebase = unique(filebase); % order is not important
+end
     
