@@ -146,7 +146,7 @@ if ~isempty(ref)
     end
 end
 
-[dim1 dim2 dim3] = size(data);
+[dim1, dim2, dim3] = size(data);
 data = reshape(data, dim1, dim2*dim3);
 
 % single reference not present in the data

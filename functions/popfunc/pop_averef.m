@@ -35,7 +35,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, com] = pop_averef( EEG, confirm);
+function [EEG, com] = pop_averef( EEG, confirm)
 
 [EEG, com] = pop_reref(EEG, []);
 return;
@@ -44,7 +44,7 @@ com = '';
 if nargin < 1
    help pop_averef;
    return;
-end;   
+end
 if isempty(EEG.data)
     error('Pop_averef: cannot process empty data');
 end
@@ -55,7 +55,7 @@ if nargin < 2 || confirm == 1
 	 ButtonName=questdlg2( strvcat('Convert the data to average reference?', ...
 								   'Note: ICA activations will also be converted if they exist...'), ...
 	        'Average reference confirmation -- pop_averef()', 'Cancel', 'Yes','Yes');
-	 switch lower(ButtonName),
+	 switch lower(ButtonName)
 	      case 'cancel', return;
 	 end
 	 confirm = 0;
@@ -74,9 +74,9 @@ if ~isempty(EEG.icaweights)
 	end
 else
 	EEG.data = averef(EEG.data);
-end;	
+end
 EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
-EEG.averef = 'Yes';
+EEG.ref = 'average';
 EEG.icaact = [];
 EEG = eeg_checkset(EEG);
 

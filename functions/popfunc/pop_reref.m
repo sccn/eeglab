@@ -371,8 +371,8 @@ end
 % --------------------
 if isfield(EEG, 'ref')
     if strcmpi(EEG.ref, 'common') && isempty(ref)
-        EEG.ref = 'averef';
-    elseif strcmpi(EEG.ref, 'averef') && ~isempty(ref)
+        EEG.ref = 'average';
+    elseif strcmpi(EEG.ref, 'average') && ~isempty(ref)
         EEG.ref = 'common';
     end
 end

@@ -259,7 +259,7 @@ if isfield(dat, 'label') && ~isempty(dat.label)
     end
     try
         if isfield(dat,'grad')
-            eegchanindx = find(ft_chantype(dat, 'refmag') | ft_chantype(dat, 'gradmag') );
+            eegchanindx = find(ft_chantype(dat, 'refmag') | ft_chantype(dat, 'gradmag') | ft_chantype(dat, 'meggrad') );
             for ichan = 1:length(eegchanindx)
                 chanType = 'EEG';
                 EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.grad.chanpos(ichan,1) 'Y' dat.grad.chanpos(ichan,2) 'Z' dat.grad.chanpos(ichan,3) });

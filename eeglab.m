@@ -1379,44 +1379,6 @@ set(W_MAIN, 'visible', 'on');
     
 return;
 
-% eeglab(''redraw'')() - Update EEGLAB menus based on values of global variables.
-%
-% Usage: >> eeglab(''redraw'')( );
-%
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
-%
-% See also: eeg_global(), eeglab()
-
-% WHEN THIS FUNCTION WAS SEPARATED
-% Revision 1.21  2002/04/23 19:09:25  arno
-% adding automatic dataset search
-% Revision 1.20  2002/04/18 20:02:23  arno
-% retrIeve
-% Revision 1.18  2002/04/18 16:28:28  scott
-% EEG.averef printed as 'Yes' or 'No' -sm
-% Revision 1.16  2002/04/18 16:03:15  scott
-% edited "Events/epoch info (nb) -> Events  -sm
-% Revision 1.14  2002/04/18 14:46:58  scott
-% edited main window help msg -sm
-% Revision 1.10  2002/04/18 03:02:17  scott
-% edited opening instructions -sm
-% Revision 1.9  2002/04/11 18:23:33  arno
-% Oups, typo which crashed EEGLAB
-% Revision 1.8  2002/04/11 18:07:59  arno
-% adding average reference variable
-% Revision 1.7  2002/04/11 17:49:40  arno
-% corrected operator precedence problem
-% Revision 1.6  2002/04/11 15:36:55  scott
-% added parentheses to final ( - && - ), line 84. ARNO PLEASE CHECK -sm
-% Revision 1.5  2002/04/11 15:34:50  scott
-% put isempty(CURRENTSET) first in line ~80 -sm
-% Revision 1.4  2002/04/11 15:31:47  scott
-% added test isempty(CURRENTSET) line 78 -sm
-% Revision 1.3  2002/04/11 01:41:27  arno
-% checking dataset ... and intelligent menu update
-% Revision 1.2  2002/04/09 20:47:41  arno
-% introducing event number into gui
-
 function updatemenu()
 eeg_global;
 

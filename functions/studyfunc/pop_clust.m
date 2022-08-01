@@ -326,7 +326,7 @@ else %command line call
         case 'neural network'
             [IDX,C] = neural_net(clustdata,clus_num);
             [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm',  {'Neural Network', clus_num});
-        case 'Affinity Propagation'           
+        case 'affinity propagation'           
              [IDX,C,sumd] = std_apcluster(clustdata,'maxits',maxiter);
              [STUDY]      = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Affinity Propagation',size(C,1)});
         otherwise

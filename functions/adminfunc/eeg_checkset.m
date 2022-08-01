@@ -1039,20 +1039,24 @@ for inddataset = 1:length(ALLEEG)
         % reference (use EEG structure)
         % ---------
         if ~isfield(EEG, 'ref')
-            EEG.ref = '';
+                EEG.ref = '';
+        end
+        if isequal(EEG.ref, 'averef')
+                EEG.ref = 'average';
+                res = com;
+        end
+        if isequal(EEG.ref, 'average')
+                ref = 'average';
+        else    ref = '';
+        end
+        if ~isfield( EEG.chanlocs, 'ref')
+            EEG.chanlocs(1).ref = ref;
         end
         if isfield(EEG.chanlocs, 'ref') && ~isempty(EEG.chanlocs(1).ref)
             if ~isequal(EEG.chanlocs(1).ref, EEG.ref)
                 EEG.ref = EEG.chanlocs(1).ref; 
                 res = com;
             end
-        end
-        if strcmpi(EEG.ref, 'averef')
-            ref = 'average';
-        else ref = '';
-        end
-        if ~isfield( EEG.chanlocs, 'ref')
-            EEG.chanlocs(1).ref = ref;
         end
         charrefs = cellfun('isclass',{EEG.chanlocs.ref},'char');
         if any(charrefs) ref = ''; end
