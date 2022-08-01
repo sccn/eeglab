@@ -45,7 +45,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [ factor factorvals subjects paired ] = std_getindvar(STUDY, mode, scandesign)
+function [ factor, factorvals, subjects, paired ] = std_getindvar(STUDY, mode, scandesign)
 
 if nargin < 1
     help std_getindvar;
