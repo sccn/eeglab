@@ -5,7 +5,7 @@
 %
 % see also: pop_clean_rawdata
 
-% Copyright (C) 2022 Arnaud Delorme, Salk Institute, arno@salk.edu
+% Copyright (C) 2022 Arnaud Delorme, UCSD
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -44,6 +44,8 @@ if length(EEG) ==  1
 end
 
 % find common datasets
+% same code below as for pop_runica
+% ---------------------------------
 allsubjects = { EEG.subject };
 allsessions = { EEG.session };
 alltags     = zeros(1,length(allsubjects));
@@ -55,9 +57,6 @@ if any(cellfun('isempty', allsubjects))
         '"Dataset info (condition, group, ...) differs from study info..."' ]);
     return;
 end
-
-% same code below as for pop_runica
-% ---------------------------------
 dats = {};
 for index = 1:length(allsubjects)
     if ~alltags(index)
@@ -79,6 +78,7 @@ end
 eeglab_options;
 for index = 1:length(dats)
     if length(dats{index}) == 1
+        TMPALLEEG = EEG(dats{index}(1));
         if ~isempty(TMPALLEEG(1).session)
             fprintf('Skipping selecting common channels accross datasets for subject %s session %s (only 1 dataset)\n', TMPALLEEG(1).subject, num2str(TMPALLEEG(1).session));
         else
