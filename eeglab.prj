@@ -100,7 +100,7 @@ If it is defined, set it to the concatenation of these strings:
       <file>${PROJECT_ROOT}\plugins\ANTeepimport1.13</file>
       <file>${PROJECT_ROOT}\plugins\bids-matlab-tools6.1</file>
       <file>${PROJECT_ROOT}\plugins\bids-matlab-tools6.1\JSONIO</file>
-      <file>${PROJECT_ROOT}\plugins\bva-io1.7</file>
+      <file>${PROJECT_ROOT}\plugins\bva-io1.71</file>
       <file>${PROJECT_ROOT}\plugins\clean_rawdata</file>
       <file>${PROJECT_ROOT}\plugins\dipfit</file>
       <file>${PROJECT_ROOT}\plugins\egilegacy1.0</file>
@@ -122,6 +122,7 @@ If it is defined, set it to the concatenation of these strings:
       <file>${PROJECT_ROOT}\plugins\scd1.0</file>
       <file>${PROJECT_ROOT}\plugins\snapmaster1.0</file>
       <file>${PROJECT_ROOT}\plugins\VisEd1.05</file>
+      <file>${PROJECT_ROOT}\plugins\xdfimport1.18</file>
       <file>${PROJECT_ROOT}\plugins\xdfimport1.18\xdf</file>
       <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.0</file>
       <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.0\MFF-1.2.2-jar-with-dependencies.jar</file>
