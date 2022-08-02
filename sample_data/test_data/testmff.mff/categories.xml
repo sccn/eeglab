@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<categories xmlns="http://www.egi.com/categories_mff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <cat>
+      <name>LRND</name>
+      <segments>
+         <seg status="">
+            <name>Average</name>
+            <beginTime>1200000</beginTime>
+            <endTime>2400000</endTime>
+            <evtBegin>1402002</evtBegin>
+            <evtEnd>1402002</evtEnd>
+            <keys>
+               <key>
+                  <keyCode>#seg</keyCode>
+                  <description/>
+                  <data dataType="long">15</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_001_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_002_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_003_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_004_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_006_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_009_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_010_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_012_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_013_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_014_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_16_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_18_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_019_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_20_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_022_01</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_001_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_002_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_003_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_004_1_fil_seg_ave_blc_bcr_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_006_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_009_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_010_1_fil_seg_ave_blc_bcr_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_012_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_013_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_014_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_16_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_18_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_19_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_20_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_022_01_fil_seg_ave_blc_ref.mff</data>
+               </key>
+            </keys>
+         </seg>
+      </segments>
+   </cat>
+   <cat>
+      <name>ULRN</name>
+      <segments>
+         <seg status="">
+            <name>Average</name>
+            <beginTime>0</beginTime>
+            <endTime>1200000</endTime>
+            <evtBegin>202002</evtBegin>
+            <evtEnd>202002</evtEnd>
+            <keys>
+               <key>
+                  <keyCode>#seg</keyCode>
+                  <description/>
+                  <data dataType="long">15</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_001_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_002_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_003_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_004_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_006_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_009_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_010_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_012_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_013_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_014_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_16_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_18_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_019_01</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_20_1</data>
+               </key>
+               <key>
+                  <keyCode>subj</keyCode>
+                  <description/>
+                  <data dataType="person">GNG_F_022_01</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_001_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_002_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_003_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_004_1_fil_seg_ave_blc_bcr_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_006_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_009_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_010_1_fil_seg_ave_blc_bcr_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_012_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_013_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_014_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_16_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_18_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_19_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_20_1_fil_seg_ave_blc_ref.mff</data>
+               </key>
+               <key>
+                  <keyCode>FILE</keyCode>
+                  <description/>
+                  <data dataType="fileReference">GNG_F_022_01_fil_seg_ave_blc_ref.mff</data>
+               </key>
+            </keys>
+         </seg>
+      </segments>
+   </cat>
+</categories>
