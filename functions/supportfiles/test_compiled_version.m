@@ -12,6 +12,18 @@ if strcmpi(res, 'No')
 end
 
 try
+    % test binary files
+    if isdeployed
+        TMP = pop_loadxdf( fullfile('sample_data', 'test_data', 'test.xdf') );
+        TMP = pop_loadbv( fullfile('sample_data', 'test_data'), 'testbva.vhdr' );
+        TMP = pop_loadcnt( fullfile('sample_data', 'test_data', 'test.cnt') );
+        TMP = pop_musemonitor( fullfile('sample_data', 'test_data', 'testmusemonitor.csv') );
+        TMP = pop_mffimport( fullfile(pwd, 'sample_data', 'test_data', 'testmff.mff'), 'code' );
+        TMP = pop_biosig( fullfile('sample_data', 'test_data', 'test.edf') );
+        TMP = pop_biosig( fullfile('sample_data', 'test_data', 'test.bdf') );
+        [TMP,TMP2] = pop_importbids( fullfile('sample_data', 'test_data', 'BIDS_test'), 'bidsevent', 'off' );
+    end
+
     % EEGLAB history file generated on the 08-Jul-2020
     % ------------------------------------------------
     EEG = pop_loadset( 'filename', 'eeglab_data.set', 'filepath', 'sample_data');
