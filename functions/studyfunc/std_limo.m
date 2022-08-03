@@ -420,7 +420,7 @@ for iSubj = 1:nb_subjects
             trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
             % [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', opt.splitreg, 'interaction', opt.interaction);
             [catMat,contMat,limodesign] = std_limodesign(factors, trialinfo, 'splitreg', 'off', 'interaction', opt.interaction);
-            if strcmpi(opt.splitreg,'on')
+            if strcmpi(opt.splitreg,'on') && ~isempty(contMat)
                 for c=size(contMat,2):-1:1
                     splitreg{c} = limo_split_continuous(catMat,contMat(:,c)); % std_limodesign does something else when splitting regressors
                 end
