@@ -8,6 +8,7 @@
 %   ALLEEG     - vector of the EEG datasets included in the STUDY structure 
 %
 % Optional inputs:
+%   'datinds'     - [integer array] indices of datasets to remove
 %   'pntsrange'   - [min max] minimum and maximum of samples. Default is
 %                   [0 Inf] (no constraint)
 %   'chanrange'   - [min max] minimum and maximum of channels. Default is
@@ -64,6 +65,7 @@ if nargin < 3
 end
 
 g = finputcheck( varargin, { ...
+    'datinds'         'integer'  {} []; ...
     'chanrange'       'integer'  {} [0 Inf]; ...
     'pntsrange'       'integer'  {} [0 Inf]; ...
     'sraterange'      'float'    {} [0 Inf]; ...
@@ -76,12 +78,16 @@ if isstr(g)
 end
 
 allPnts   = [ALLEEG.pnts];
-allSrate  = [ALLEEG.pnts];
+allSrate  = [ALLEEG.srate];
 allChans  = [ALLEEG.nbchan];
 allTrials = [ALLEEG.trials];
 
 % check pnts range
-rmDats = g.pntsrange(1)  > allPnts   | allPnts   > g.pntsrange(2);
+rmDats = zeros(1, length(allPnts));
+if ~isempty(g.datinds)
+    rmDats(g.datInds) = 1;
+end
+rmDats = g.pntsrange(1)  > allPnts   | allPnts   > g.pntsrange(2)  | rmDats;
 rmDats = g.sraterange(1) > allSrate  | allSrate  > g.sraterange(2) | rmDats;
 rmDats = g.chanrange(1)  > allChans  | allChans  > g.chanrange(2)  | rmDats;
 rmDats = g.trialrange(1) > allTrials | allTrials > g.trialrange(2) | rmDats;
