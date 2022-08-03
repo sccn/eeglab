@@ -1,0 +1,16 @@
+name	type	units
+Fp1	EEG	microV
+AF7	EEG	microV
+AF3	EEG	microV
+F1	EEG	microV
+F3	EEG	microV
+F5	EEG	microV
+F7	EEG	microV
+FT7	EEG	microV
+FC5	EEG	microV
+FC3	EEG	microV
+FC1	EEG	microV
+C1	EEG	microV
+C3	EEG	microV
+C5	EEG	microV
+T7	EEG	microV

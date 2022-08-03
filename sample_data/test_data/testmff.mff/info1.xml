@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dataInfo xmlns="http://www.egi.com/info_n_mff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <generalInformation>
+      <fileDataType>
+         <EEG>
+            <EEGFile/>
+            <sensorLayoutName>HydroCel GSN 256 1.0 Average Reference</sensorLayoutName>
+            <montageName>Average Reference</montageName>
+         </EEG>
+      </fileDataType>
+   </generalInformation>
+</dataInfo>
