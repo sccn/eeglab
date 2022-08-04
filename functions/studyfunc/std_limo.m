@@ -651,7 +651,10 @@ else
         warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
     end
     % cleanup temp files - except for subjects with errors?
-    keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
+    db = dbstack;
+    if length(db) <= 2
+        keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
+    end
 end
 
 % delete
