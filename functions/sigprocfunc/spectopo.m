@@ -571,6 +571,7 @@ if strcmpi(g.plot, 'on')
     set(xl,'fontsize',AXES_FONTSIZE_L);
     % yl=ylabel('Rel. Power (dB)');
     yl=ylabel('Log Power Spectral Density 10*log_{10}(\muV^{2}/Hz)');%yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
+    legend(g.chanlocs.labels)
     set(yl,'fontsize',AXES_FONTSIZE_L);
     set(gca,'fontsize',AXES_FONTSIZE_L)
     box off;
@@ -630,7 +631,7 @@ if ~isempty(g.weights)
                 end
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
-                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f ± %3.2f\n', ...
+                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f Â± %3.2f\n', ...
                         g.icacomps(index), resvar(index), stdvar(index));
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
