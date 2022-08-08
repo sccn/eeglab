@@ -190,7 +190,7 @@ end
 % -------------------------------------------------------------------------
 if strcmp(model.defaults.type,'Components')
     if isempty(STUDY.cluster(1).child)
-        warndlg2(sprintf('Components have not been clustered,\nLIMO will not match them across subjects'), '', 'non-modal')
+        warning('Components have not been clustered, LIMO will not match them across subjects');
         model.defaults.icaclustering = 0;
     else
         model.defaults.icaclustering = 1;
@@ -395,6 +395,8 @@ for iSubj = 1:nb_subjects
                     OUTEEG.etc.datafiles.datersp = single_trials_filename;
                 elseif strcmpi(measureflags.datitc,'on')
                     OUTEEG.etc.datafiles.datitc = single_trials_filename;
+                elseif strcmpi(measureflags.dattimef,'on')
+                    OUTEEG.etc.datafiles.dattimef = single_trials_filename;
                 elseif strcmpi(measureflags.icaerp,'on')
                     OUTEEG.etc.datafiles.icaerp = single_trials_filename;
                 elseif strcmpi(measureflags.icaspec,'on')
@@ -403,8 +405,8 @@ for iSubj = 1:nb_subjects
                     OUTEEG.etc.datafiles.icaersp = single_trials_filename;
                 elseif strcmpi(measureflags.icaitc,'on')
                     OUTEEG.etc.datafiles.icaitc = single_trials_filename;
-                elseif strcmpi(measureflags.dattimef,'on')
-                    OUTEEG.etc.datafiles.dattimef = single_trials_filename;
+                elseif strcmpi(measureflags.icatimef,'on')
+                    OUTEEG.etc.datafiles.icatimef = single_trials_filename;
                 end
             end
 
@@ -477,8 +479,6 @@ if all(cellfun(@isempty, model.cont_files)), model.cont_files = []; end
 
 % set model.defaults - all conditions no bootstrap
 % -----------------------------------------------------------------
-% to update passing the timing/frequency from STUDY - when computing measures
-% -----------------------------------------------------------------
 if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     model.defaults.analysis = 'Time';
     for s=nb_subjects:-1:1
@@ -517,7 +517,8 @@ elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     model.defaults.start    = [];
     model.defaults.end      = [];
 
-elseif strcmp(Analysis,'dattimef') || strcmp(Analysis,'icaersp')
+elseif strcmp(Analysis,'dattimef') || any(strcmp(Analysis,{'icatimef','icaersp'}))
+    
     model.defaults.analysis = 'Time-Frequency';
     for s=nb_subjects:-1:1
         vs(s) = ALLEEG(s).xmin*1000;
@@ -555,7 +556,6 @@ else
     contrast.mat = limocontrast;
     [LIMO_files, procstatus] = limo_batch('both',model,contrast,STUDY);
     if exist(fullfile([STUDY.filepath filesep 'derivatives']),'dir')
- %       save(fullfile([STUDY.filepath filesep 'derivatives']),[STUDY.design(opt.design).name '_contrast.mat']),'limocontrast'));
         save(fullfile([STUDY.filepath filesep 'derivatives'],[STUDY.design(opt.design).name '_contrast.mat']),'limocontrast');
     else
         save(fullfile(STUDY.filepath,[STUDY.design(opt.design).name '_contrast.mat']),'limocontrast');
@@ -650,7 +650,7 @@ else
     else
         warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
     end
-    % cleanup temp files - except for subjects with errors?
+    % cleanup temp files - except for subjects without errors
     db = dbstack;
     if length(db) <= 2
         keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
