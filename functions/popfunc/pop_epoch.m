@@ -224,6 +224,9 @@ tmpeventlatency = [ tmpevent(:).latency ];
 [tmpeventlatency Itmp] = sort(tmpeventlatency);
 EEG.event = EEG.event(Itmp);  % sort by ascending time 
 Ievent = g.eventindices;
+if ischar(EEG.data)
+    EEG = eeg_checkset(EEG, 'loaddata'); % just in case
+end
 
 if ~isempty( events )
     % select the events for epoching

@@ -225,7 +225,7 @@ if ~isempty(g.sort)
 end
 if strcmpi(g.sorttrial, 'on')
     g.trial = sort(setdiff( g.trial, g.notrial ));
-    if isempty(g.trial), error('Error: dataset is empty'); end
+    if isempty(g.trial), error('Error: dataset %s is empty',EEG.filename); end
 else
     g.trial(ismember(g.trial,g.notrial)) = [];
     % still warn about & remove duplicate trials (may be removed in the future)

@@ -187,7 +187,11 @@ if isempty(chans) || all(~ishandle(chans))
             
             % pop up GUI for first dataset
             EEG = chans(1);
-            [~, chaninfo, urchans, com] = pop_chanedit(EEG, orichaninfo, varargin{:});
+            if isempty(varargin)
+                [~, chaninfo, urchans, com] = pop_chanedit(EEG, orichaninfo, varargin{:});
+            else
+                com = sprintf('EEG = pop_chanedit(EEG, ''%s'', %s);', orichaninfo, vararg2str(varargin));
+            end
             
             % Apply to all datasets and resave if necessary
             eeglab_options

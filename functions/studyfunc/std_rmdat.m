@@ -8,10 +8,15 @@
 %   ALLEEG     - vector of the EEG datasets included in the STUDY structure 
 %
 % Optional inputs:
+%   'datinds'     - [integer array] indices of datasets to remove
 %   'pntsrange'   - [min max] minimum and maximum of samples. Default is
+%                   [0 Inf] (no constraint)
+%   'chanrange'   - [min max] minimum and maximum of channels. Default is
 %                   [0 Inf] (no constraint)
 %   'sraterange'  - [min max] minimum and maximum for sampling rate. Default is
 %                   [0 Inf] (no constraint)
+%   'trialrange'  - [min max] minimum and maximum of trials. Default is
+%                   [1 Inf]
 %   'rmvarvalues' - {'string' range} remove datasets having variable value
 %                   in the selected range. May also be {'string' 'value'}
 %                   for non-numerical variables.
@@ -60,8 +65,11 @@ if nargin < 3
 end
 
 g = finputcheck( varargin, { ...
+    'datinds'         'integer'  {} []; ...
+    'chanrange'       'integer'  {} [0 Inf]; ...
     'pntsrange'       'integer'  {} [0 Inf]; ...
     'sraterange'      'float'    {} [0 Inf]; ...
+    'trialrange'      'float'    {} [1 Inf]; ...
     'checkeventtype'  ''         {} []; ...
     'numeventrange'    'integer'  {} 1; ...
     'rmvarvalues'     'cell' {} {} }, 'std_rmdat');
@@ -69,12 +77,20 @@ if isstr(g)
     error(g);
 end
 
-allPnts = [ALLEEG.pnts];
-allSrate = [ALLEEG.pnts];
+allPnts   = [ALLEEG.pnts];
+allSrate  = [ALLEEG.srate];
+allChans  = [ALLEEG.nbchan];
+allTrials = [ALLEEG.trials];
 
 % check pnts range
-rmDats = g.pntsrange(1)  > allPnts  | allPnts  > g.pntsrange(2);
-rmDats = g.sraterange(1) > allSrate | allSrate > g.sraterange(2) | rmDats;
+rmDats = zeros(1, length(allPnts));
+if ~isempty(g.datinds)
+    rmDats(g.datInds) = 1;
+end
+rmDats = g.pntsrange(1)  > allPnts   | allPnts   > g.pntsrange(2)  | rmDats;
+rmDats = g.sraterange(1) > allSrate  | allSrate  > g.sraterange(2) | rmDats;
+rmDats = g.chanrange(1)  > allChans  | allChans  > g.chanrange(2)  | rmDats;
+rmDats = g.trialrange(1) > allTrials | allTrials > g.trialrange(2) | rmDats;
 
 % check variable name values
 if ~isempty(g.rmvarvalues)
