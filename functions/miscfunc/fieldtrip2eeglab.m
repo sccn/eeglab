@@ -106,4 +106,5 @@ else
     end
     EEG.xmin = EEG.times(1);
     EEG.xmax = EEG.times(end);
+    EEG = eeg_checkset(EEG);
 end   
