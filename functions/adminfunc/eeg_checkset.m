@@ -921,9 +921,7 @@ for inddataset = 1:length(ALLEEG)
             EEG.icachansind = [1:EEG.nbchan]; res = com;
         end
     elseif isempty(EEG.icachansind)
-        if isempty(EEG.icaweights)
-            EEG.icachansind = []; res = com;
-        else
+        if ~isempty(EEG.icaweights)
             EEG.icachansind = [1:EEG.nbchan]; res = com;
         end
     end
@@ -1169,7 +1167,7 @@ for inddataset = 1:length(ALLEEG)
         
     % DIPFIT structure
     % ----------------
-    if ~isfield(EEG,'dipfit') || isempty(EEG.dipfit)
+    if ~isfield(EEG,'dipfit')
         EEG.dipfit = []; res = com;
     else
         try
