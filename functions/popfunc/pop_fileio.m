@@ -183,6 +183,8 @@ if strcmpi(g.memorymapped, 'off') || ~isempty(alldata)
     if ~isempty(g.channels), dataopts = { dataopts{:} 'chanindx', g.channels }; end
     if isempty(alldata)
         alldata = ft_read_data(filename, 'header', dat, dataopts{:});
+    elseif isstruct(alldata) && isfield(alldata, 'trial')
+        alldata = alldata.trial;
     end
 else
     % read memory mapped file
@@ -233,25 +235,31 @@ else
 end
 if isfield(dat, 'label') && ~isempty(dat.label)
     EEG.chanlocs = struct('labels', dat.label);
-    % channel type
-    if isfield(dat,'chantype')
-        for ichan = 1:length(dat.chantype)
-            EEG.chanlocs(ichan).type = dat.chantype{ichan};
-        end
-    end
+    EEG.nbchan   = length(dat.label);
     
     % START ----------- Extracting EEG channel location
     % Note: Currently for extensions where FT is able to generate valid 'labels' and 'elec' structure (e.g. FIF)
     %If more formats, add them below
     try
         if isfield(dat,'elec')
-            eegchanindx = find(ft_chantype(dat, 'eeg') );
-            for ichan = 1:length(eegchanindx)
-                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'EEG'});
+            if isfield(dat.elec, 'chanpos')
+                fieldpos = 'chanpos';
+            else
+                fieldpos = 'elecpos';
             end
-            eegchanindx = find(ft_chantype(dat, 'pns') );
-            for ichan = 1:length(eegchanindx)
-                EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' 'PNS'});
+            if isfield(dat, 'label')
+                for iChan = 1:length(dat.label)
+                    indLabel = strmatch(dat.label{iChan}, dat.elec.label, 'exact');
+                    EEG.chanlocs(iChan).label = dat.label{iChan};
+                    if ~isempty(indLabel) && ~isnan(dat.elec.(fieldpos)(iChan,1))
+                        EEG.chanlocs(iChan).X = dat.elec.(fieldpos)(iChan,1);
+                        EEG.chanlocs(iChan).Y = dat.elec.(fieldpos)(iChan,2);
+                        EEG.chanlocs(iChan).Z = dat.elec.(fieldpos)(iChan,3);
+                        if isfield(dat.elec, 'chantype')
+                            EEG.chanlocs(iChan).type = dat.elec.chantype{iChan};
+                        end
+                    end
+                end
             end
         end
     catch
