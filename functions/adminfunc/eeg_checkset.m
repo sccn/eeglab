@@ -1018,9 +1018,9 @@ for inddataset = 1:length(ALLEEG)
             EEG.icaact     = [];
         end
     else
-        if ~isempty( EEG.icaweights ), EEG.icaweights = []; res = com; end
-        if ~isempty( EEG.icawinv ),    EEG.icawinv = []; res = com; end
-        if ~isempty( EEG.icaact ),     EEG.icaact = []; res = com; end
+        if ~isfield(EEG, 'icaweights') || ~isempty( EEG.icaweights ), EEG.icaweights = []; res = com; end
+        if ~isfield(EEG, 'icawinv')    || ~isempty( EEG.icawinv ),    EEG.icawinv = []; res = com; end
+        if ~isfield(EEG, 'icaact')     || ~isempty( EEG.icaact ),     EEG.icaact = []; res = com; end
     end
     if isempty(EEG.icaact)
         EEG.icaact = [];
