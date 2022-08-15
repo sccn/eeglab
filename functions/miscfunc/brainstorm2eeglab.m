@@ -1,10 +1,12 @@
 % brainstorm2eeglab - convert Brainstorm structures to EEGLAB dataset
 %
-% EEG = brainstorm2eeglab(bst);
+% EEG = brainstorm2eeglab(bst, epochType);
 %
 % Inputs:
 %    bst - Brainstorm string for a folder containing data epoch files or Brainstorm 
 %          data epoch structure
+%    epochType - [string] epoch type. Only import these epochs which
+%                Comment field contains this string
 %
 % Limitations:
 %   - Only import data epochs
@@ -42,11 +44,14 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = brainstorm2eeglab(bst)
+function EEG = brainstorm2eeglab(bst, epochType)
 
 if nargin < 1
     help brainstorm2eeglab;
     return;
+end
+if nargin < 2
+    epochType = '';
 end
 
 if ischar(bst)
@@ -83,7 +88,14 @@ for iEpoch = 1:length(bst)
     if ~isequal(bst(iEpoch).name, 'brainstormstudy.mat')
         epochStruct = load('-mat', fullfile(bst(iEpoch).folder, bst(iEpoch).name));
         % epochStruct.Comment(1) contain the type of event
-        allEpochs{end+1} = epochStruct.F;
+        % events not imported (in epochStruct.event)
+        if ~isempty(epochType)
+            if contains(epochStruct.Comment, epochType)
+                allEpochs{end+1} = epochStruct.F;
+            end
+        else
+            allEpochs{end+1} = epochStruct.F;
+        end
     end
 end
 data = reshape([allEpochs{:}], size(allEpochs{1},1), size(allEpochs{1},2), length(allEpochs));
@@ -91,7 +103,8 @@ data = reshape([allEpochs{:}], size(allEpochs{1},1), size(allEpochs{1},2), lengt
 % create EEG structure
 EEG = eeg_emptyset;
 EEG.srate = mean(1./diff(epochStruct.Time));
-EEG.data  = data;
+EEG.data  = data; % microvolts
+EEG.xmin  = epochStruct.Time(1);
 
 % channel locations
 if isempty(oriBst)
@@ -113,3 +126,14 @@ if exist(chanFile, 'file')
     EEG.chanlocs = convertlocs(EEG.chanlocs, 'cart2all');
 end
 EEG = eeg_checkset(EEG);
+
+% rescale data to microvolts
+if ~isempty(EEG.chanlocs)
+   chanTypes = strmatch('EEG', { EEG.chanlocs.type });
+   if ~isempty(chanTypes)
+       EEG.data(chanTypes,:,:) = EEG.data(chanTypes,:,:)*1e6; % assumes volt (this code should not be reached as channel types should always be defined)
+   end
+else
+    EEG.data = EEG.data*1e6; % assumes volt (this code should not be reached as channel types should always be defined)
+end
+
