@@ -58,6 +58,9 @@ else
     if isfield(header, 'hdr')
         % use the hdr field in the data
         hdr = header.hdr;
+        if isfield(header, 'label')
+            hdr.label = header.label;
+        end
     else
         % create a minimal header
         hdr.nChans  = numel(header.label);
@@ -82,7 +85,7 @@ else
         
     end
     
-    EEG = pop_fileio(hdr, header.trial);
+    EEG = pop_fileio(hdr, header);
     if iscell(EEG.data) && length(EEG.data) == 1
         EEG.data  = EEG.data{1};
         EEG.times = header.time{1};
@@ -94,17 +97,21 @@ else
         % EEG.data = [ EEG.data{:} ];
         EEG.data = cat(3, EEG.data{:});
         EEG.pnts = len(1);
-        EEG.times = header.time{1};
     else
         % error('Unknown fieldtrip data format');
         % the trial field was a 3D matrix
         EEG.data  = permute(EEG.data, [2 3 1]);
-        EEG.times = header.time; 
         
         % overrule the previously created metadata
         [EEG.nbchan, EEG.pnts, EEG.trials] = size(EEG.data);
     end
-    EEG.xmin = EEG.times(1);
-    EEG.xmax = EEG.times(end);
+    if iscell(header.time) % assuming uniformity of trials
+        EEG.xmin = header.time{1}(1);
+        EEG.xmax = header.time{1}(end);
+    else
+        EEG.xmin = header.time(1);
+        EEG.xmax = header.time(end);
+    end
+    EEG.trials = size(EEG.data,3);
     EEG = eeg_checkset(EEG);
 end   
