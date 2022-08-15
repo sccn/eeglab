@@ -244,8 +244,9 @@ if typeplot
     pos = round( (arg2/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
     nanpos = find(isnan(pos));
     pos(nanpos) = 1;
-    SIGTMPAVG = mean(SIGTMP(:,pos,:),3);
-    SIGTMPAVG(:, nanpos) = NaN;
+    nonEmptyChans = find(~cellfun(@isempty, { EEG.chanlocs.X}));
+    SIGTMPAVG = mean(SIGTMP(nonEmptyChans,pos,:),3);
+    SIGTMPAVG(nonEmptyChans, nanpos) = NaN;
     if isempty(maplimits)
         maxlim = max(SIGTMPAVG(:));
         minlim = min(SIGTMPAVG(:));
