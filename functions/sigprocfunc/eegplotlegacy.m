@@ -1229,6 +1229,10 @@ else
     data = get(ax1,'UserData');
     ESpacing = findobj('tag','ESpacing','parent',figh);   % ui handle
     EPosition = findobj('tag','EPosition','parent',figh); % ui handle
+    Pushbutton1 = findobj('tag','Pushbutton1','parent',figh);
+    Pushbutton2 = findobj('tag','Pushbutton2','parent',figh);
+    Pushbutton3 = findobj('tag','Pushbutton3','parent',figh);
+    Pushbutton4 = findobj('tag','Pushbutton4','parent',figh);
     if ~isempty(EPosition) && ~isempty(ESpacing)
         if g.trialstag(1) == -1
             g.time    = str2num(get(EPosition,'string'));
@@ -1257,12 +1261,29 @@ else
     
     % Update edit box
     % ---------------
-    g.time = max(0,min(g.time,ceil((g.frames-1)/multiplier)-g.winlength));
+    editboxmax = ceil((g.frames-1)/multiplier)-g.winlength;
+    g.time = max(0,min(g.time,editboxmax));
     if g.trialstag(1) == -1
         set(EPosition,'string',num2str(g.time)); 
     else 
         set(EPosition,'string',num2str(g.time+1)); 
     end
+    
+    % Update navigation buttons
+    % ---------------
+    if g.time == 0
+        set(Pushbutton1,'enable','off');
+        set(Pushbutton2,'enable','off');
+    elseif g.time < editboxmax
+        set(Pushbutton1,'enable','on');
+        set(Pushbutton2,'enable','on');
+        set(Pushbutton3,'enable','on');
+        set(Pushbutton4,'enable','on');
+    else
+        set(Pushbutton3,'enable','off');
+        set(Pushbutton4,'enable','off');
+    end
+    
     set(figh, 'userdata', g);
 
     lowlim = round(g.time*multiplier+1);
