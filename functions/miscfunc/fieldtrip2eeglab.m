@@ -91,8 +91,26 @@ else
         EEG.times = header.time{1};
     elseif iscell(EEG.data)
         len = cellfun(@(x)size(x,2), EEG.data);
-        if length(unique(len)) > 1
-            error('Cannot convert epochs of different length');
+        unLen = unique(len);
+        if length(unLen) > 1
+            if length(unLen) > 2 || diff(unLen) > 1
+                error('Epochs of different length, conversion is not possible');
+            else
+                fprintf(2, 'Epochs of different length, but small difference in sample\n');
+                fprintf(2, 'Assuming outlier due to fractional sample limits and selecting the most common epoch length\n');
+                e1 = sum(len == unLen(1));
+                e2 = sum(len == unLen(2));
+                if min(e1, e2) > 5
+                    error('Too many epochs to remove, check data');
+                end
+                if e1 > e2
+                    fprintf(2, 'Removing %d epochs\n', e2);
+                    EEG.data(len == unLen(2)) = [];
+                else
+                    fprintf(2, 'Removing %d epochs\n', e1);
+                    EEG.data(len == unLen(2)) = [];
+                end
+            end
         end
         % EEG.data = [ EEG.data{:} ];
         EEG.data = cat(3, EEG.data{:});
