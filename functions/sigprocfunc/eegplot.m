@@ -1971,17 +1971,17 @@ else
           nleg = length(g.eventtypes);
           fig2 = figure('numbertitle', 'off', 'name', '', 'visible', 'off', 'menubar', 'none', 'color', DEFAULT_FIG_COLOR);
           pos = get(fig2, 'position');
-          set(fig2, 'position', [ pos(1) pos(2) 130 14*nleg+20]);
+          set(fig2, 'position', [ pos(1) pos(2) 200 14*nleg+20]);
           
           for index = 1:nleg
               plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}, 'linestyle', ...
                           g.eventtypestyle{ index }, 'linewidth', g.eventtypewidths( index )); hold on;
               if iscell(g.eventtypes)
                   th=text(35, (index-0.5)*10, g.eventtypes{index}, ...
-                                    'color', g.eventtypecolors{index});
+                                    'color', g.eventtypecolors{index}, 'interpreter', 'none');
               else
                   th=text(35, (index-0.5)*10, num2str(g.eventtypes(index)), ...
-                                    'color', g.eventtypecolors{index});
+                                    'color', g.eventtypecolors{index}, 'interpreter', 'none');
               end
           end
           xlim([0 130]);
