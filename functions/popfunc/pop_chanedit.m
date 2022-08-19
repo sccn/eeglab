@@ -182,7 +182,7 @@ if isempty(chans) || all(~ishandle(chans))
         if length(chans) > 1
             sameAsFirst = arrayfun(@(x)isequaln(chans(1).chanlocs, x.chanlocs), chans(2:end));
             if ~all(sameAsFirst)
-                error( [ 'All datasets need to have the exact same channel structure.' 10 'If you want to look up channel location for all datasets,' 10 'do so for the first one and write a loop' ] );
+                warning( [ 'Datasets do not have the exact same channel structure.' ] );
             end
             
             % pop up GUI for first dataset
