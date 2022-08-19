@@ -439,6 +439,12 @@ if ~strcmpi(g.icatype, 'binica')
 end
 switch lower(g.icatype)
     case 'runica' 
+        % make sure we are using the correct ICA function
+        runicaCurrentLoc = fileparts(which('runica'));
+        runicaDesiredLoc = fullfile(fileparts(fileparts(which('pop_runica'))), 'sigprocfunc');
+        if ~isequal(runicaCurrentLoc, runicaDesiredLoc)
+            addpath(runicaDesiredLoc); % put back to the beginning of the path
+        end
         try if ismatlab, g.options = {  g.options{:}, 'interrupt', 'on' }; end; catch, end
         if tmprank == size(tmpdata,1) || pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001,  g.options{:} );
