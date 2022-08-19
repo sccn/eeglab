@@ -105,8 +105,8 @@ function ALLEEG = std_loadalleeg(varargin)
             end
         end
         
-        [sub2 sub1] = fileparts(char(paths{dset}));
-        [sub3 sub2] = fileparts(sub2);
+        [sub2, sub1] = fileparts(char(paths{dset}));
+        [sub3, sub2] = fileparts(sub2);
         
         % priority is given to relative path of the STUDY if STUDY has moved
         if ~isempty(oldgenpath) && oldgenpath(end) == filesep
@@ -117,10 +117,12 @@ function ALLEEG = std_loadalleeg(varargin)
             if  ~isempty(strfind(char(paths{dset}), oldgenpath))
                 relativePath = char(paths{dset}(length(oldgenpath)+1:end));
                 relativePath = fullfile(genpath, relativePath);
+            elseif isempty(paths{dset})
+                relativePath = '';
             else
-                disp('Important warning: relative path cannot calculated, make sure the correct data files are loaded');
+                disp('Important warning: study moved, you could be loading data files from the old location, make sure the correct data files are loaded');
                 relativePath = char(paths{dset});
-            end;   
+            end
             
             % fix issue when datasets are in a parent folder of the STUDY
             if dset == 1
