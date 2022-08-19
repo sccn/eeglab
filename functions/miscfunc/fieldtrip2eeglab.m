@@ -104,11 +104,16 @@ else
                     error('Too many epochs to remove, check data');
                 end
                 if e1 > e2
-                    fprintf(2, 'Removing %d epochs\n', e2);
-                    EEG.data(len == unLen(2)) = [];
+                    fprintf(2, 'Truncating %d epochs\n', e2);
+                    epochsToTruncate = find(len == unLen(2));
+                    truncateLen = unLen(1);
                 else
-                    fprintf(2, 'Removing %d epochs\n', e1);
-                    EEG.data(len == unLen(2)) = [];
+                    fprintf(2, 'Truncating %d epochs\n', e1);
+                    epochsToTruncate = find(length == unLen(1));
+                    truncateLen = unLen(2);
+                end
+                for iEpoch = 1:length(epochsToTruncate)
+                    EEG.data{epochsToTruncate(iEpoch)} = EEG.data{epochsToTruncate(iEpoch)}(:,1:end-1);
                 end
             end
         end
