@@ -49,10 +49,9 @@ if nargin < 1
 	help pop_delset;
 	return;
 end
-if isempty( ALLSET )
-	error('Cannot delete dataset. Restart eeglab to clear all dataset information');
-    return;
-end;    
+if length( ALLSET ) < 2
+	error( [ 'Cannot delete dataset when there is only one of them. Restart EEGLAB' 10 'or use the menu item in the File menu to clear all datasets' ]);
+end
 
 if nargin < 2 || (length(set_in)==1 && set_in < 0)
 	% which set to delete
@@ -71,7 +70,7 @@ end
 
 if isempty(set_in)
 	return;
-end;	
+end
 
 A = fieldnames( ALLSET );
 A(:,2) = cell(size(A));
