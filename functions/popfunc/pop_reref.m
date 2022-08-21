@@ -390,8 +390,8 @@ if ~isempty(EEG.icaweights)
         EEG.icaweights = [];
         EEG.icasphere  = [];
     elseif length(EEG.icachansind) ~= nchans - length(g.exclude)
-        disp('Error: some channels not used for ICA decomposition are used for rereferencing');
-        disp('       the ICA decomposition has been removed');
+        disp('Warning: some channels not used for ICA decomposition are used for rereferencing');
+        disp('         the ICA decomposition has been removed');
         EEG.icaweights = [];
         EEG.icasphere  = [];
     else
