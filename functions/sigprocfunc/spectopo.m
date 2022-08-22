@@ -630,7 +630,7 @@ if ~isempty(g.weights)
                 end
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
-                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f ± %3.2f\n', ...
+                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f Â± %3.2f\n', ...
                         g.icacomps(index), resvar(index), stdvar(index));
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
@@ -892,7 +892,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 %         winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
 %         winlength = min(winlength, 512);
 %         winlength = max(winlength, 256);
-        winlength = min(srate, frames);
+        winlength = min(round(srate), frames);
     else
         winlength = g.winsize;
     end
