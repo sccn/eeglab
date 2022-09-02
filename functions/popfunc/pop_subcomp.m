@@ -113,14 +113,12 @@ if nargin < 2
         if ~isempty(EEG.reject.gcompreject)
             components = find(EEG.reject.gcompreject == 1);
             components = components(:)';
-            promptstr    = { ['Component(s) to remove from the data ([] = marked comps.)'] };
             %promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
         else
             components = [];
-            promptstr    = { ['Component(s) to remove from data:'] };
         end
         uilist    = { { 'style' 'text' 'string' 'Note: for group level analysis, remove components in STUDY' } ...
-                      { 'style' 'text' 'string' ['List of component(s) to remove from data'] } ...
+                      { 'style' 'text' 'string' 'List of component(s) to remove from data' } ...
                       { 'style' 'edit' 'string' int2str(components) } ...
                       { 'style' 'text' 'string' 'Or list of component(s) to retain' } ...
                       { 'style' 'edit' 'string' '' } ...
@@ -131,7 +129,11 @@ if nargin < 2
         if length(result) == 0 return; end
         components   = eval( [ '[' result{1} ']' ] );
         if ~isempty(result{2})
+            componentsOld = components;
             components   = eval( [ '[' result{2} ']' ] );
+            if isequal(components, componentsOld)
+                components = [];
+            end
             keepflag = 1; %components  = setdiff_bc([1:size(EEG.icaweights,1)], components); 
         end
     end
@@ -151,6 +153,7 @@ if length(EEG) > 1
     return;
 end
 
+componentsOri = components;
 if isempty(components)
     if ~isempty(EEG.reject.gcompreject)
         components = find(EEG.reject.gcompreject == 1);
@@ -224,7 +227,7 @@ try
     EEG.dipfit.model = EEG.dipfit.model(goodinds);
 catch, end
 
-com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(components(:)'), plotag);
+com = sprintf('EEG = pop_subcomp( EEG, [%s], %d);', int2str(componentsOri(:)'), plotag);
 if isempty( components )
     com = [ com ' % [] means removing components flagged for rejection' ];
 end
