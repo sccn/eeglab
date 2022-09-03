@@ -83,7 +83,7 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                 % get subject for each factor value
                 intersectSubject = { setinfo(:).subject };
                 for c = 1:length(tmpvals)
-                    eval( [ 'datind = strmatch(tmpvals{c}, { setinfo.' ff{index} '}, ''exact'');' ] );
+                    datind = strmatch(tmpvals{c}, allSetinfoVals, 'exact');
                     subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
                     intersectSubject = intersect(intersectSubject, subjects{  countfact}{c});
                 end

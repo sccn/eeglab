@@ -196,7 +196,7 @@ for c = 1:nc
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, c+centerc, ng + 1, opt.transpose);
                 pgroupplot{c}(pgroupplot{c} <0) = 0;
                 topoplot( pgroupplot{c}, opt.chanlocs, opt.ptopoopt{:});
-                title(opt.titles{c,g+1});
+                title(opt.titles{c,g+1}, 'interpreter', 'none');
                 caxis([-maxplot maxplot]);
             end
         end
@@ -223,7 +223,7 @@ for g = 1:ng
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, nc+addr, g+centerg, opt.transpose);
             pcondplot{g}(pcondplot{g} < 0) = 0;
             topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
-            title(opt.titles{nc+1,g});
+            title(opt.titles{nc+1,g}, 'interpreter', 'none');
             caxis([-maxplot maxplot]);
         end
     end
@@ -235,7 +235,7 @@ if ~isempty(opt.condstats) && ~isempty(opt.groupstats) && ng > 1 && nc > 1 && ~i
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, nc+addr, ng+1, opt.transpose);
     pinterplot(pinterplot<0) = 0;
     topoplot( pinterplot, opt.chanlocs, opt.ptopoopt{:});
-    title(opt.titles{nc+1,ng+1}); 
+    title(opt.titles{nc+1,ng+1}, 'interpreter', 'none');  
     caxis([-maxplot maxplot]);
 end    
 

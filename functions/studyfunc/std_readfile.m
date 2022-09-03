@@ -117,7 +117,11 @@ if iscell(fileBaseName)
             end
         end
         for iCond = 1:length(sz(:))
-            measureData{iCond} = zeros(sz{iCond});
+            if isempty(sz{iCond})
+                measureData{iCond} = [];
+            else
+                measureData{iCond} = zeros(sz{iCond});
+            end
         end
 
         % combine arrays

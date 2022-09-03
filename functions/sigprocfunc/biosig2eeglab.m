@@ -76,7 +76,7 @@ EEG = eeg_emptyset;
 
 % convert to seconds for sread
 % ----------------------------
-if max(dat.InChanSelect) > size(DAT,1)
+if ~isfield(dat, 'InChanSelect') && max(dat.InChanSelect) > size(DAT,1)
     dat.InChanSelect = [1:size(DAT,1)];
 end
 EEG.nbchan          = length(dat.InChanSelect); %= size(DAT,1);
