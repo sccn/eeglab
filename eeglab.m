@@ -1053,12 +1053,14 @@ else
                 pluginlist(plugincount).status     = 'ok';
                 if ~isempty(pluginstats)
                     indPlugin = strmatch(lower(pluginlist(plugincount).plugin), lower(pluginstats.name), 'exact');
-                    if length(indPlugin) == 1
-                        if ~strcmpi(pluginVersion, pluginstats.version{indPlugin})
-                            fprintf(2, ' - new version %s available\n', pluginstats.version{indPlugin});
-                        else 
-                            fprintf('\n');
-                        end
+                else
+                    indPlugin = [];
+                end
+                if length(indPlugin) == 1
+                    if ~strcmpi(pluginVersion, pluginstats.version{indPlugin})
+                        fprintf(2, ' - new version %s available\n', pluginstats.version{indPlugin});
+                    else 
+                        fprintf('\n');
                     end
                 else
                     fprintf('\n');
