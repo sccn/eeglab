@@ -97,9 +97,6 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         bad_elec = userdata.chans;
         
         com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
-        if ~isempty(findstr('nodatchans', userdata.chanstr))
-            eval( [ userdata.chanstr '=[];' ] );
-        end
         
     elseif ischar(EEG)
         command = EEG;
@@ -167,6 +164,12 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
             end
         end
         return;
+    end
+    
+    % remove from nodatchans if interpolated
+    if ~isempty(EEG.chaninfo.nodatchans) && isstruct(bad_elec)
+        [~, nodatchans_indices] = ismember([bad_elec.urchan], [EEG.chaninfo.nodatchans.urchan]);
+        EEG.chaninfo.nodatchans(nonzeros(nodatchans_indices)) = [];
     end
     
     EEG = eeg_interp(EEG, bad_elec, method);
