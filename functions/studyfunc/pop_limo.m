@@ -118,7 +118,10 @@ if nargin > 2
 else
     measureflagindx = 1;
 end
-    
+
+% check that channel location are present
+ALLEEG = eeg_checkset(ALLEEG, 'chanloc');
+
 if nargin < 4
     dataMeasures = { 'ERP' 'Spectrum' 'ERSP'};
     fileMeasures = { 'daterp' 'datspec' 'dattimef'; 'icaerp' 'icaspec' 'icatimef'};
