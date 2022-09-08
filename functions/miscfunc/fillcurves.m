@@ -40,8 +40,6 @@
 
 function h = fillcurves(X, Y1, Y2, color, transparent, legends)
     
-    plotBoundaryLines = false;
-
     if nargin < 2
         help fillcurves;
         return;
@@ -84,12 +82,10 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
             fillcurves(X, Y1(:,index)', Y2(:,index)', color{index}, transparent);
             hold on;
         end
-        yl = ylim;
-        xl = xlim;
-        if plotBoundaryLines
-            line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
-            line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
-        end
+%         yl = ylim;
+%         xl = xlim;
+%         line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
+%         line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
         
         % write legend and add transparency to it
         % ---------------------------------------
@@ -121,12 +117,10 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
 
     % replot lines at boundaries
     % --------------------------
-    if plotBoundaryLines
-        parent = dbstack;
-        if length(parent) == 1 || ~strcmpi(parent(2).name, 'fillcurves')
-            yl = ylim;
-            xl = xlim;
-            line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
-            line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
-        end
-    end
+%     parent = dbstack;
+%     if length(parent) == 1 || ~strcmpi(parent(2).name, 'fillcurves')
+%         yl = ylim;
+%         xl = xlim;
+%         line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
+%         line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
+%     end
