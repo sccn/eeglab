@@ -565,6 +565,7 @@ end
 STUDY.limo.model         = model;
 STUDY.limo.datatype      = Analysis;
 STUDY.limo.chanloc       = limoChanlocs;
+STUDY.limo.betas         = pop_listfactors(STUDY, 'gui', 'off', 'level', 'one', 'splitreg', opt.splitreg, 'interaction', opt.interaction);
 if exist('limocontrast','var')
     STUDY.limo.contrast      = limocontrast;
 end
