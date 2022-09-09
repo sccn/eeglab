@@ -74,6 +74,7 @@ for iDes = 1:length(des)
     for iVar = 1:length(des(iDes).variable)
         if strcmpi(des(iDes).variable(iVar).vartype, 'continuous')
             allFactors{count} = sprintf('%s - continuous variable', des(iDes).variable(iVar).label);
+            allFactorsStruct(count).description = allFactors{count};
             allFactorsStruct(count).vartype = 'continuous';
             allFactorsStruct(count).label = des(iDes).variable(iVar).label;
             allFactorsStruct(count).level = des(iDes).variable(iVar).level;
@@ -90,6 +91,7 @@ for iDes = 1:length(des)
                 else
                     allFactors{count} = sprintf('%s - %s', des(iDes).variable(iVar).label, strVals{iSubVal});
                 end
+                allFactorsStruct(count).description = allFactors{count};
                 count = count+1;
             end
         end
