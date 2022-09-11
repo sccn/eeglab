@@ -82,11 +82,14 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                    { } ...
                    { 'style' 'text'  'string' 'Interpolation method'} ...
                    { 'style' 'popupmenu'  'string' 'Spherical|Planar (slow)'  'tag' 'method' } ...
+                   { } ...
+                   { 'Style', 'text', 'string', 'Time range [min max] (s)', 'fontangle', fastif(length(EEG)>1, 'italic', 'normal') } ...
+                   { 'Style', 'edit', 'string', '', 'enable', fastif(length(EEG)>1, 'off', 'on') } ...
                    {} { 'Style' 'text' 'string' 'Note: for group level analysis, interpolate in STUDY' } ...
                    };
                
-        geom     = { 1 1 1 1 1 1 1 [1.1 1] 1   1 };
-        geomvert = [ 1 1 1 1 1 1 1 1       0.5 1 ];
+        geom     = { 1 1 1 1 1 1 1 [1.1 1] 1 [1.1 1] 1   1 };
+        geomvert = [ 1 1 1 1 1 1 1 1       0.5 1      0.5  1 ];
         [res userdata tmp restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'geomvert', geomvert, 'helpcom', 'pophelp(''pop_interp'')');
         if isempty(res) || isempty(userdata), return; end
         
@@ -95,6 +98,22 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         else method = 'invdist';
         end
         bad_elec = userdata.chans;
+        
+        time_interval = res{2};
+        if isempty(time_interval)
+            time_interval = [EEG.xmin EEG.xmax];
+        else
+            time_interval = eval( [ '[' time_interval ']' ] );
+        end
+        if size(time_interval,2) ~= 2
+            error('Time/point range must contain 2 columns exactly');
+        end
+        if floor(max(time_interval)) > EEG.xmax 
+            error('Time/point range exceed upper data limits');
+        end
+        if min(time_interval) < EEG.xmin
+            error('Time/point range exceed lower data limits');
+        end
         
         com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
         if ~isempty(findstr('nodatchans', userdata.chanstr))
@@ -169,6 +188,6 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         return;
     end
     
-    EEG = eeg_interp(EEG, bad_elec, method);
+    EEG = eeg_interp(EEG, bad_elec, method, time_interval);
     
     
