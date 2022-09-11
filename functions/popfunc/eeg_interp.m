@@ -48,7 +48,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = eeg_interp(ORIEEG, bad_elec, method)
+function EEG = eeg_interp(ORIEEG, bad_elec, method, time_interval)
 
     if nargin < 2
         help eeg_interp;
@@ -59,6 +59,10 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     if nargin < 3
         disp('Using spherical interpolation');
         method = 'spherical';
+    end
+    
+    if nargin < 4
+        time_interval = [ORIEEG.xmin ORIEEG.xmax];
     end
 
     % check channel structure
@@ -259,6 +263,15 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     if length(size(tmpdata))==3
         badchansdata = reshape(badchansdata,length(badchans),size(tmpdata,2),size(tmpdata,3));
     end
+    t_start = time_interval(1);
+    t_end = time_interval(2);
+    if t_start~=ORIEEG.xmin || t_end~=ORIEEG.xmax
+        if length(size(tmpdata))==2
+            times_2b_ignored = [1:floor(t_start*ORIEEG.srate), floor(t_end*ORIEEG.srate):floor(ORIEEG.xmax*ORIEEG.srate)];
+            badchansdata(:, times_2b_ignored) = ORIEEG.data(badchans, times_2b_ignored);
+        end
+    end
+    
     tmpdata(badchans,:,:) = badchansdata;
     EEG.data = tmpdata;
     EEG.nbchan = size(EEG.data,1);
