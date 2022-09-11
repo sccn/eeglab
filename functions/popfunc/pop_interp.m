@@ -1,6 +1,6 @@
 % pop_interp() - interpolate data channels
 %
-% Usage: EEGOUT = pop_interp(EEG, badchans, method);
+% Usage: EEGOUT = pop_interp(EEG, badchans, method, t_range);
 %
 % Inputs: 
 %     EEG      - EEGLAB dataset
@@ -15,6 +15,9 @@
 %                'spherical' uses superfast spherical interpolation. 
 %                'spacetime' uses griddata3 to interpolate both in space 
 %                and time (very slow and cannot be interrupted).
+%     t_range  - [integer array with just two elements] time interval of the
+%                badchans which should be interpolated. First element is
+%                the start time and the second element is the end time.
 % Output: 
 %     EEGOUT   - data set with bad electrode data replaced by
 %                interpolated data
@@ -115,22 +118,22 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         end
         bad_elec = userdata.chans;
         if numel(res) > 1
-            time_interval = res{2};
+            t_range = res{2};
         else
-            time_interval = '';
+            t_range = '';
         end
-        if isempty(time_interval)
-            time_interval = [EEG.xmin EEG.xmax];
+        if isempty(t_range)
+            t_range = [EEG.xmin EEG.xmax];
         else
-            time_interval = eval( [ '[' time_interval ']' ] );
+            t_range = eval( [ '[' t_range ']' ] );
         end
-        if size(time_interval,2) ~= 2
+        if size(t_range,2) ~= 2
             error('Time/point range must contain 2 columns exactly');
         end
-        if floor(max(time_interval)) > EEG.xmax 
+        if floor(max(t_range)) > EEG.xmax 
             error('Time/point range exceed upper data limits');
         end
-        if min(time_interval) < EEG.xmin
+        if min(t_range) < EEG.xmin
             error('Time/point range exceed lower data limits');
         end
         
@@ -207,6 +210,6 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         return;
     end
     
-    EEG = eeg_interp(EEG, bad_elec, method, time_interval);
+    EEG = eeg_interp(EEG, bad_elec, method, t_range);
     
     

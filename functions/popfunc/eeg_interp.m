@@ -1,6 +1,6 @@
 % eeg_interp() - interpolate data channels
 %
-% Usage: EEGOUT = eeg_interp(EEG, badchans, method);
+% Usage: EEGOUT = eeg_interp(EEG, badchans, method, t_range);
 %
 % Inputs: 
 %     EEG      - EEGLAB dataset
@@ -15,6 +15,9 @@
 %                'spherical' uses superfast spherical interpolation. 
 %                'spacetime' uses griddata3 to interpolate both in space 
 %                and time (very slow and cannot be interrupted).
+%     t_range  - [integer array with just two elements] time interval of the
+%                badchans which should be interpolated. First element is
+%                the start time and the second element is the end time.
 % Output: 
 %     EEGOUT   - data set with bad electrode data replaced by
 %                interpolated data
@@ -48,7 +51,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = eeg_interp(ORIEEG, bad_elec, method, time_interval)
+function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
 
     if nargin < 2
         help eeg_interp;
@@ -62,7 +65,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, time_interval)
     end
     
     if nargin < 4
-        time_interval = [ORIEEG.xmin ORIEEG.xmax];
+        t_range = [ORIEEG.xmin ORIEEG.xmax];
     end
 
     % check channel structure
@@ -263,8 +266,8 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, time_interval)
     if length(size(tmpdata))==3
         badchansdata = reshape(badchansdata,length(badchans),size(tmpdata,2),size(tmpdata,3));
     end
-    t_start = time_interval(1);
-    t_end = time_interval(2);
+    t_start = t_range(1);
+    t_end = t_range(2);
     if t_start~=ORIEEG.xmin || t_end~=ORIEEG.xmax
         if length(size(tmpdata))==2
             times_2b_ignored = [1:floor(t_start*ORIEEG.srate), floor(t_end*ORIEEG.srate):floor(ORIEEG.xmax*ORIEEG.srate)];
