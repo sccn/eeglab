@@ -165,7 +165,7 @@
 % 01-26-02 chandeg events and trial condition format -ad
 % 01-27-02 debug when trial condition is empty -ad
 % 02-15-02 remove icawinv recompute for pop_epoch -ad & ja
-% 02-16-02 remove last modification and test icawinv separatelly -ad
+% 02-16-02 remove last modification and test icawinv separately -ad
 % 02-16-02 empty event and epoch check -ad
 % 03-07-02 add the eeglab options -ad
 % 03-07-02 corrected typos and rate/point calculation -ad & ja

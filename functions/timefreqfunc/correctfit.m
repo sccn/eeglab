@@ -10,7 +10,7 @@
 %
 % Optional inputs:
 %    'allpval'   - [float array] collection of p values drawn from random
-%                  distributions (theoritically uniform).
+%                  distributions (theoretically uniform).
 %    'gamparams' - [phat pci zerofreq] parameter for gamma function fitting.
 %                  zerofreq is the frequency of occurrence of p=0.
 %    'zeromode'  - ['on'|'off'] enable estimation of frequency of pval=0

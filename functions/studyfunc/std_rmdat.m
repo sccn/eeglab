@@ -1,4 +1,4 @@
-% std_rmdat() - remvoe datasets from STUDY
+% std_rmdat() - remove datasets from STUDY
 %
 % Usage: 
 %   >> STUDY = std_rmdat(STUDY, ALLEEG, 'key', val);  

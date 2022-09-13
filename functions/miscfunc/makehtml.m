@@ -133,7 +133,7 @@ if strcmpi( g.mainonly, 'on')
 end
 
 % ------------------------------------------- 
-% scrips which generate a web page for eeglab
+% scripts which generate a web page for eeglab
 % ------------------------------------------- 
 STYLEHEADER = '<BR><a name="%s"></a><H2>%s</H2>\n'; 
 OPENWIN = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10 ... 

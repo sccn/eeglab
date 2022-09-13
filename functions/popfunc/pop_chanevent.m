@@ -51,7 +51,7 @@
 %                    at each time point (returning 1 if the data channel value 
 %                    is larger than 3, and 0 otherwise). You may also use 
 %                    any function (Ex: 'myfunction(X)'). If an equal character
-%                    is not present, this function preprend 'X=' to your 
+%                    is not present, this function prepend 'X=' to your 
 %                    expression before evaluating it. Otherwise it just 
 %                    evaluate the expression. For example, one may use
 %                    'if X(1)>100,X(1)=0;end; X(find(X>100))=X(find(X>100)-1);'

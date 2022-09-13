@@ -80,17 +80,17 @@ for index = 1:length(dats)
     if length(dats{index}) == 1
         TMPALLEEG = EEG(dats{index}(1));
         if ~isempty(TMPALLEEG(1).session)
-            fprintf('Skipping selecting common channels accross datasets for subject %s session %s (only 1 dataset)\n', TMPALLEEG(1).subject, num2str(TMPALLEEG(1).session));
+            fprintf('Skipping selecting common channels across datasets for subject %s session %s (only 1 dataset)\n', TMPALLEEG(1).subject, num2str(TMPALLEEG(1).session));
         else
-            fprintf('Skipping selecting common channels accross datasets for subject %s (only 1 dataset)\n', TMPALLEEG(1).subject);
+            fprintf('Skipping selecting common channels across datasets for subject %s (only 1 dataset)\n', TMPALLEEG(1).subject);
         end
     else
         TMPALLEEG = EEG(dats{index});
         commonChans = myintersect(TMPALLEEG.chanlocs);
         if ~isempty(TMPALLEEG(1).session)
-            fprintf('Selecting common channels accross datasets for subject %s session %s ***************\n', TMPALLEEG(1).subject, num2str(TMPALLEEG(1).session));
+            fprintf('Selecting common channels across datasets for subject %s session %s ***************\n', TMPALLEEG(1).subject, num2str(TMPALLEEG(1).session));
         else
-            fprintf('Selecting common channels accross datasets for subject %s ***************\n', TMPALLEEG(1).subject);
+            fprintf('Selecting common channels across datasets for subject %s ***************\n', TMPALLEEG(1).subject);
         end
         for iSet = 1:length(TMPALLEEG)
             if length(commonChans) ~= TMPALLEEG(iSet).nbchan

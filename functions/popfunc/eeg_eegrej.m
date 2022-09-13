@@ -188,7 +188,7 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     if 100*differs/length(EEG.event) > 50
         db = dbstack;
         if length(db) > 1 
-            fprintf(['bug 1971 warning for scritps older than 2017: see https://sccn.ucsd.edu/wiki/EEGLAB_bug1971\n' ]);
+            fprintf(['bug 1971 warning for scripts older than 2017: see https://sccn.ucsd.edu/wiki/EEGLAB_bug1971\n' ]);
         end
     end
     
@@ -196,7 +196,7 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     if ~isempty(event2)
         otherlatencies = [event2.latency];
         if ~isequal(alllats, otherlatencies)
-            warning([ 'Minor discrepency when recomputing event latency.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]);
+            warning([ 'Minor discrepancy when recomputing event latency.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]);
         end
     end
 end

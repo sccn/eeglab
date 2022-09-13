@@ -181,7 +181,7 @@
 % 02-28-00 added NOTE on formula derivation below -sm
 % 03-16-00 added axcopy() feature -sm & tpj
 % 04-16-00 added multiple marktimes loop -sm
-% 04-20-00 fixed ITC cbar limits when spcified in input -sm
+% 04-20-00 fixed ITC cbar limits when specified in input -sm
 % 07-29-00 changed frequencies displayed msg -sm
 % 10-12-00 fixed bug in freqs when cycles>0 -sm
 % 02-07-01 fixed inconsistency in BASE_BOOT use -sm
