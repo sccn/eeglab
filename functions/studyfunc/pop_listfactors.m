@@ -57,14 +57,19 @@ end
 g = finputcheck(varargin, { 'gui'         'string' { 'on' 'off' } 'on';
     'splitreg'    'string' { 'on','off' } 'off';
     'contrast'    'string' { 'on','off' } 'off';
+    'constant'    'string' { 'on','off' } 'on';
     'level'       'string' { 'one','two','both'} 'both';
+    'vartype'     'string' { 'categorical','continuous','both'} 'both';
     'interaction' 'string' { 'on','off' } 'off' });
 if ischar(g)
     error(g);
 end
 
 if isfield(des,'design')
+    STUDY = des;
     des = des.design;
+else
+    STUDY = [];
 end
 
 allFactors = {}; % (strings) still used to find unique values
@@ -106,6 +111,24 @@ if length(allFactors) ~= length(unique(allFactors))
     allFactorsStruct = allFactorsStruct(inds);
 end
 
+% second level
+if ~isempty(STUDY)
+    [indvar, indvarvals] = std_getindvar(STUDY, 'datinfo');
+    % remove non numerical values
+    for iVar = length(indvar):-1:1
+        allFactorsStruct(end+1).label = indvar{iVar};
+        allFactorsStruct(end  ).level = 'two';
+        if ~isnumeric(indvarvals{iVar}{1})
+            allFactorsStruct(end).vartype = 'categorical';
+            allFactorsStruct(end).value   = indvarvals{iVar}; % multiple values
+            allFactorsStruct(end).description = [ allFactorsStruct(end).label ' - categorical (several values)'];
+        else
+            allFactorsStruct(end).vartype = 'continuous';
+            allFactorsStruct(end).description = [ allFactorsStruct(end).label ' - continuous'];
+        end
+    end
+end
+
 % filter first or second level
 if ~strcmpi(g.level, 'both')
     allFactorsStruct = filterlevel(allFactorsStruct, g.level);
@@ -128,20 +151,20 @@ if strcmpi(g.gui, 'on')
     end
     
     % generate categorical labels
-    allLabels1 = getlabels(des1);
-    allLabels2 = getlabels(des2);
-    
+    allLabels1 = getlabels_l1(des1);
+    allLabels2 = getlabels_l2(des1, des2);
+
     listui = {};
     if ~isempty(des2)
-        listui{2,1} = { 'Style', 'text', 'string' '2nd-level variables' 'fontweight' 'bold' };
-        listui{2,2} = { 'Style', 'text', 'string' '(inter participant)' };
+        listui{2,1} = { 'Style', 'text', 'string' '2nd-level available statistics' 'fontweight' 'bold' };
+        listui{2,2} = { 'Style', 'text', 'string' '(inter subject)' };
         for index = 1:length(allLabels2)
             listui{2,index+2} = { 'Style', 'text', 'string' allLabels2{index} };
         end
     end
     if ~isempty(des1)
         listui{1,1} = { 'Style', 'text', 'string' '1st-level variables' 'fontweight' 'bold' };
-        listui{1,2} = { 'Style', 'text', 'string' '(intra participant)' };
+        listui{1,2} = { 'Style', 'text', 'string' '(intra subject)' };
         for index = 1:length(allLabels1)
             listui{1,index+2} = { 'Style', 'text', 'string' allLabels1{index} };
         end
@@ -195,12 +218,24 @@ if strcmpi(g.gui, 'on')
         waitfor( fig, 'userdata');
     end
     
-    try,
+    try
         result = get(fig, 'userdata');
         close(fig);
         drawnow;
     end
     
+end
+
+% add the constant level one
+if ~strcmpi(g.level, 'two') && strcmpi(g.constant, 'on')
+    allFactorsStruct(end+1).label = 'constant';
+    allFactorsStruct(end  ).level = 'one';
+    allFactorsStruct(end  ).vartype = 'categorical';
+    allFactorsStruct(end  ).description = 'Constant';
+end
+if ~strcmpi(g.vartype, 'both')
+    inds = strmatch(g.vartype, {allFactorsStruct.vartype});
+    allFactorsStruct = allFactorsStruct(inds);
 end
 
 % convert nested values to linear sequence
@@ -227,7 +262,10 @@ for iItem = 1:2:length(cellVal)
         tmpFactor = sprintf('%s (continuous)', cellVal{iItem});
     elseif isnumeric(cellVal{iItem+1})
         tmpFactor = sprintf('%s = %d', cellVal{iItem}, cellVal{iItem+1});
-    else tmpFactor = sprintf('%s = %s', cellVal{iItem}, cellVal{iItem+1});
+    elseif iscell(cellVal{iItem+1})
+        tmpFactor = sprintf('%s', cellVal{iItem});
+    else
+        tmpFactor = sprintf('%s = %s', cellVal{iItem}, cellVal{iItem+1});
     end
     if iItem == 1
         str = tmpFactor;
@@ -245,8 +283,10 @@ for ind = 1:length(allFactorsStruct)
 end
 allFactorsStruct(rmInd) = [];
 
-% get labels for design
-function allLabels = getlabels(des)
+% -------
+% level 1
+% -------
+function allLabels = getlabels_l1(des)
 allLabels = {};
 count     = 1;
 if isempty(des), return; end
@@ -264,4 +304,51 @@ for iCont = 1:length(des.continuous)
     end
     count = count+1;
 end
+% add constant
 allLabels{count} = [ int2str(count) '. Constant' ];
+
+% -------
+% level 2
+% -------
+function allLabels = getlabels_l2(des1, des2)
+allLabels = {};
+count     = 1;
+if isempty(des2), return; end
+allLabels{count} = '* One-sample t-test on 1st level var.'; count = count+1;
+if ~isempty(des1.categorical)
+    allLabels{count} = '* Paire/unpaired t-test on 1st level var.'; count = count+1;
+end
+if any(cellfun(@length, des1.categorical) > 2)
+    allLabels{count} = '* ANOVA on 1st level var.'; count = count+1;
+end
+if length(des1.categorical) > 1 && length(des1.continuous) > 1 
+    allLabels{count} = '* ANCOVA on 1st level var.'; count = count+1;
+end
+for iCat = 1:length(des2.categorical)
+    for iVal = 1:length(des2.categorical{iCat})
+        if ~isempty(des2.continuous)
+            allLabels{count} = [ '* t-test/ANOVA/ANCOVA using ' formatcond(des2.categorical{iCat}{iVal}) ];
+        else
+            allLabels{count} = [ '* t-test/ANOVA using ' formatcond(des2.categorical{iCat}{iVal}) ];
+        end
+        count = count+1;
+    end
+end
+for iCont = 1:length(des2.continuous)
+    if ~isempty(des2.continuous)
+        allLabels{count} = [ '* Regression/ANCOVA using ' des2.continuous{iCont}{1} ];
+    else
+        allLabels{count} = [ '* Regression using ' formatcond(des2.continuous{iCont}) ];
+    end
+    count = count+1;
+end
+% allLabels{count} = '* Use STUDY "group" for subjects'' groups'; count = count+1;
+allLabels{count} = '* Regression/ANOVA/ANCOVA with text file'; count = count+1;
+allLabels{count} = '  (text file must have 1 row per subject)'; count = count+1;
+if length(allLabels) > 15
+    allLabels(16:end) = [];
+    allLabels{16} = '...';
+end
+
+
+
