@@ -1404,6 +1404,10 @@ catch, return; end
 index = 1;
 indexmenu = 1;
 MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
+if MAX_SET > 200
+    disp('Updating menu, allowing selection of the first 200 datasets only to speed up display...')
+    MAX_SET = 200;
+end
 
 tmp = warning;
 warning off;
