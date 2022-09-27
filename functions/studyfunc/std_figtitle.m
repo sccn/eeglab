@@ -237,14 +237,14 @@ if ~isempty(alllegends)
 
     % convert legends to string if necessary
     % --------------------------------------
-    for ileg = 1:length(alllegends), 
+    for ileg = 1:length(alllegends)
         alllegends{ileg} = value2str(alllegends{ileg}); 
     end
 end
 
 % statistic titles
 % ----------------
-if isnan(opt.threshold), 
+if isnan(opt.threshold)
     basicstat = '(p-value)';
 else
     if length(opt.threshold) >= 1
@@ -267,7 +267,7 @@ if strcmpi(opt.factor1stat, 'on')
             all_titles{rown, c2} = [ value2str(opt.factor2vals{c2}) ' ' basicstat ];
         end
     else
-        all_titles{rown, 1} = [ opt.factor1 ' ' basicstat ]; 
+        all_titles{rown, 1} = [ opt.factor2 ' ' basicstat ]; 
     end
 end
 coln = size(all_titles,2);
@@ -278,14 +278,14 @@ if strcmpi(opt.factor2stat, 'on')
             all_titles{c1, coln} = [ value2str(opt.factor1vals{c1}) ' ' basicstat ];   
         end
     else
-        all_titles{1, coln} = [ opt.factor2 ' ' basicstat ];   
+        all_titles{1, coln} = [ opt.factor1 ' ' basicstat ];   
     end
 end
 if ~strcmpi(opt.effect, 'marginal') && (strcmpi(opt.factor1stat, 'on') && strcmpi(opt.factor2stat, 'on') && rown > 1 && coln > 1)
    all_titles{rown, coln} = [ 'Interaction ' basicstat ];   
 end
 
-function pres = thresh_pres(thresh_pres);
+function pres = thresh_pres(thresh_pres)
     if (round(thresh_pres*100)-thresh_pres*100) == 0
         pres = 2;
     elseif (round(thresh_pres*1000)-thresh_pres*1000) == 0
@@ -316,8 +316,12 @@ function str = value2str(value)
         end
     else % cell array
         str = value{1};
-        for ind = 2:length(value)
-            str = [ str ' & ' value{ind} ];
+        if length(value) <= 5
+            for ind = 2:length(value)
+                str = [ str ' & ' value{ind} ];
+            end
+        else
+            str = [ str ' & ' num2str(value{2}) ' & ...' ];
         end
     end
     
