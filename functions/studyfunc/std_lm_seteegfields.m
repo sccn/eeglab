@@ -97,7 +97,8 @@ end
 %  --------------
 path_tmp = rel2fullpath(STUDY.filepath,STUDY.datasetinfo(index).filepath); 
 name = fullfile(path_tmp, STUDY.datasetinfo(index).subject);
-if ~isempty(STUDY.datasetinfo(index).session)
+name2 = '';
+if ~isempty(STUDY.datasetinfo(index).session) && length(STUDY.session) > 1
     name2 = name;
     name  = fullfile(path_tmp, [ STUDY.datasetinfo(index).subject sprintf('_ses-%2.2d',  STUDY.datasetinfo(index).session) ]);
 end
