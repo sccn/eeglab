@@ -194,6 +194,7 @@ if isempty(chans) || all(~ishandle(chans))
             end
             
             % Apply to all datasets and resave if necessary
+            if isempty(com), return; end
             eeglab_options
             for iDat = 1:length(chans)
                 EEG = chans(iDat);

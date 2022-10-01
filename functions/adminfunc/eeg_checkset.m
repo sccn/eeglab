@@ -189,6 +189,11 @@ if ~isfield(EEG, 'data'), return; end
 % checking multiple datasets
 % --------------------------
 if length(EEG) > 1
+
+    if length(EEG) > 5000
+        disp('Too many datasets, abording check')
+        return;
+    end
     
     if nargin > 1
         switch varargin{1}

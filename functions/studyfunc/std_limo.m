@@ -300,7 +300,7 @@ allSessions    = cellfun(@num2str, allSessions, 'uniformoutput', false);
 uniqueSessions = unique(allSessions);
 
 % by default we create a design matrix with all condition
-factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
+factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one', 'constant', 'off');
 
 for iSubj = 1:nb_subjects
     for iSess = 1:length(uniqueSessions)
@@ -548,7 +548,7 @@ model.defaults.tfce             = 0;                 % only for single subject a
 model.defaults.method           = opt.method;        % default is OLS - to be updated to 'WLS' once validated
 model.defaults.Level            = 1;                 % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % option can be multivariate (work in progress)
-
+model.defaults.labels           = pop_listfactors(STUDY, 'gui', 'off', 'level', 'one', 'splitreg', opt.splitreg, 'interaction', opt.interaction);
 
 if ~exist('limocontrast','var')
     [LIMO_files, procstatus] = limo_batch('model specification',model,[],STUDY);
@@ -580,7 +580,7 @@ for s = 1:nb_subjects
         fprintf('std_limo, computing additional between sessions contrasts for subject %s\n',uniqueSubjects{s})
         sess_name = allSessions(sess_index);
         pairs = nchoosek(1:length(sess_index),2); % do all session pairs
-        parfor p=1:size(pairs,1)
+        for p=1:size(pairs,1)
             strpair = [cell2mat(sess_name(pairs(p,1))) cell2mat(sess_name(pairs(p,2)))];
             strpair(isspace(strpair)) = []; % remove spaces
             filesout{p} = limo_contrast_sessions(cell2mat(LIMO_files.mat(sess_index(pairs(p,1)))), ...
