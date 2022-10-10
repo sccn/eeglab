@@ -18,6 +18,9 @@
 %                   and better across subjects than across trials.
 %  'design'       - [integer] design index to process. Default is the current
 %                   design stored in STUDY.currentdesign.
+%  'contnan'      - ['on'|'off'] NaN for continuous variables. When 'on'
+%                   NaNs are allowed (and trials removed). When NaNs are 
+%                   replaced with 0s.
 %  'erase'        - ['on'|'off'] erase previous files. Default is 'on'.
 %  'neighboropt'  - [cell] cell array of options for the function computing
 %                   the channel neighbox matrix std_prepare_chanlocs(). The file
@@ -110,6 +113,7 @@ else
         'erase'          'string'  { 'on','off' }   'off';
         'splitreg'       'string'  { 'on','off' }   'off';
         'interaction'    'string'  { 'on','off' }   'off';
+        'contnan'        'string'  { 'on','off' }   'off';
         'freqlim'        'real'    []               [] ;
         'timelim'        'real'    []               [] ;
         'neighboropt'    'cell'    {}               {} ;
@@ -427,6 +431,11 @@ for iSubj = 1:nb_subjects
                 end
                 contMat    = cell2mat(splitreg);
                 opt.zscore = 0; % regressors are now zscored
+            end
+
+            % remplace NaNs if necessary
+            if strcmpi(opt.contnan, 'off')
+                contMat(isnan(contMat)) = 0;
             end
 
             % copy results
