@@ -178,7 +178,7 @@ elseif strcmpi(opt.measure, 'spec')
     indFiltered = find(mean(measure) < -20);
     if ~isempty(indFiltered) && indFiltered(1) > 11, 
         measure = measure(:,1:indFiltered(1)-10); 
-        myfprintf('Removing spectrum data below -20dB (most likelly filtered out)\n'); 
+        myfprintf('Removing spectrum data below -20dB (most likely filtered out)\n'); 
     end
     meanSpec = mean(measure);
     stdSpec  = std( measure);

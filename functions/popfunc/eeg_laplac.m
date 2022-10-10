@@ -103,7 +103,7 @@ time = toc;
 %---------------------------------------------------------------------
 % internal functions g2 gm_1
 function valor=g2(r1,r2,r3,r4)
-%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la tecnical note del
+%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la technical note del
 %Electrical Geodesics, salvo que esta esta bien
 
 x=cos(r1).*cos(r2).*cos(r3).*cos(r4) + ...
@@ -134,7 +134,7 @@ end
     valor = 1/4/pi*sum(aux2.*P);
  %-----------------------------------------------------   
 function valor=gm_1(r1,r2,r3,r4)
-%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la tecnical note del
+%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la technical note del
 %Electrical Geodesics
 
 x=cos(r1).*cos(r2).*cos(r3).*cos(r4) + ...

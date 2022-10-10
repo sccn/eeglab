@@ -9,7 +9,7 @@
 % Outputs:
 %   CHANLOCS       - [structure] EEGLAB channel location data structure. See
 %                    help readlocs()
-%   labels         - [cell arrya] channel labels
+%   labels         - [cell array] channel labels
 %   theta          - [float array]array containing 3-D theta angle electrode
 %                    position (in degree)
 %   phi            - [float array]array containing 3-D phi angle electrode

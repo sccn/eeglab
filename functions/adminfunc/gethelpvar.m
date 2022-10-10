@@ -10,7 +10,7 @@
 %
 % Outputs:
 %   vartext     - variable text
-%   varnames    - name of the varialbe returned;
+%   varnames    - name of the variable returned;
 %
 % Notes: see help2html() for file format
 %

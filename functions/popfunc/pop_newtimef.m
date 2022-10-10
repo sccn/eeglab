@@ -16,7 +16,7 @@
 %   "Sub-epoch time limits" - [edit box] sub epochs may be extracted (note that
 %              this function aims at plotting data epochs not continuous data).
 %              You may select the new epoch limits in this edit box.
-%   "Use n time points" - [muliple choice list] this is the number of time
+%   "Use n time points" - [multiple choice list] this is the number of time
 %              points to use for the time-frequency decomposition. The more
 %              time points, the longer the time-frequency decomposition
 %              takes to compute.
@@ -25,7 +25,7 @@
 %              of limits, you may also enter a sequence of frequencies. For
 %              example to compute the time-frequency decomposition at all
 %              frequency between 5 and 50 hertz with 1 Hz increment, enter "1:50"
-%   "Use limits, padding n" - [muliple choice list] "using limits" means
+%   "Use limits, padding n" - [multiple choice list] "using limits" means
 %              to use the upper and lower limits in "Frequency limits" with
 %              a specific padding ratio (padratio argument of newtimef).
 %              The last option "use actual frequencies" forces newtimef to
@@ -35,7 +35,7 @@
 %              frequencies. Note that this is only relevant if you specify
 %              frequency limits (in case you specify actual frequencies,
 %              this parameter is ignored).
-%   "Use divisive baseline" - [muliple choice list] there are two types of
+%   "Use divisive baseline" - [multiple choice list] there are two types of
 %              baseline correction, additive (the baseline is subtracted)
 %              or divisive (the data is divided by the baseline values).
 %              The choice is yours. There is also the option to perform 

@@ -36,7 +36,7 @@
 %                  coordinates, import either in EEGLAB format (nose pointing toward +X). 
 %                  This may not always be possible since EEGLAB might not be able to 
 %                  determine the nose direction for scanned electrode files. 'native' import
-%                  original carthesian coordinates (user can then specify the position of
+%                  original cartesian coordinates (user can then specify the position of
 %                  the nose when calling the topoplot() function; in EEGLAB the position
 %                  of the nose is stored in the EEG.chaninfo structure). {default 'eeglab'}
 %   'format'    -  [cell array] Format of a 'custom' channel location file (see above).

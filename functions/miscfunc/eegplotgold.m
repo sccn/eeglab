@@ -12,7 +12,7 @@
 %   yscaling   - initial y scaling factor (0 - default is 300)
 %   range      - how many seconds to display in window (0 -> 10)
 %
-% Note: this version of eegplotgold() reguires that your data matrix 
+% Note: this version of eegplotgold() requires that your data matrix 
 %       be defined as a global variable before running this routine. 
 %
 % Example:  >> global dataname

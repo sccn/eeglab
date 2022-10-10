@@ -2,7 +2,7 @@
 %                  properties for a STUDY set. 
 %                  Displays mean cluster scalp map, ERP, ERSP; 
 %                  dipole model, spectrum, and ITC in one figure 
-%                  per cluster. Only meaasures computed during 
+%                  per cluster. Only measures computed during 
 %                  pre-clustering (by pop_preclust() or std_preclust()) 
 %                  are plotted. Called by pop_clustedit().
 %                  Leaves the plotted grand mean cluster measures 

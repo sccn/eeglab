@@ -111,7 +111,7 @@
 %       'wletmethod' = ['dftfilt'|'dftfilt2'|'dftfilt3'] Wavelet type to use.
 %                     'dftfilt2' -> Morlet-variant wavelets, or Hanning DFT.
 %                     'dftfilt3' -> Morlet wavelets.  See the timefreq() function 
-%                     for more detials {default: 'dftfilt3'}
+%                     for more details {default: 'dftfilt3'}
 %       'cycleinc'    ['linear'|'log'] mode of cycles increase when [min max] cycles 
 %                     are provided in 'cycle' parameter. Applies only to 
 %                     'wletmethod','dftfilt'  {default: 'linear'}
@@ -366,7 +366,7 @@
 % 02-28-00 added NOTE on formula derivation below -sm
 % 03-16-00 added axcopy() feature -sm && tpj
 % 04-16-00 added multiple marktimes loop -sm
-% 04-20-00 fixed ITC cbar limits when spcified in input -sm
+% 04-20-00 fixed ITC cbar limits when specified in input -sm
 % 07-29-00 changed frequencies displayed msg -sm
 % 10-12-00 fixed bug in freqs when cycles>0 -sm
 % 02-07-01 fixed inconsistency in BASE_BOOT use -sm

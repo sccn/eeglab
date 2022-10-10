@@ -21,7 +21,7 @@
 %                {default: 'all'}.
 %   'mode'     - ['together'|'apart'|'multicolor'] Display all requested cluster on one 
 %                figure ('together') or separate figures ('apart'). 
-%                'together'-> plot all 'clusters' individuall in one multi-pane figure (without the gui).
+%                'together'-> plot all 'clusters' individually in one multi-pane figure (without the gui).
 %                'apart'   -> plot each cluster in a separate figure. 
 %                'multicolor' -> plot all clusters in one figure, 
 %                Note that this parameter has no effect if the 'comps' option (above) is used.

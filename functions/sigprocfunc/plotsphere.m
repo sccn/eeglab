@@ -20,7 +20,7 @@
 %   'colormap' - [real] sphere colormap { default: jet }
 %
 % Output:
-%   handle    - sphere graphic handle(s). If projected sphere are ploted
+%   handle    - sphere graphic handle(s). If projected sphere are plotted
 %               handles of plotted projected spheres are also returned.
 %
 % Example:

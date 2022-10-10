@@ -414,7 +414,7 @@ if ~isempty(EEG.icaweights)
             newLabelPos = strmatch(oldLabel, { newchanlocs.labels }, 'exact');
             
             if length(newLabelPos) > 1
-                warning('More than one match for specified reference channel; First one selected. This may cause eratic behavior. If the 2 channels are identical, delete one of them.');
+                warning('More than one match for specified reference channel; First one selected. This may cause erratic behavior. If the 2 channels are identical, delete one of them.');
             end
             if ~isempty( newLabelPos )
                 icachansind(i) = newLabelPos(1);

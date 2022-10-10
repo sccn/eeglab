@@ -448,7 +448,7 @@ return;
     end
 
 % this shuffling preserve the number of -1 and 1
-% for cloumns and rows (assuming matrix size is multiple of 2
+% for columns and rows (assuming matrix size is multiple of 2
 % -----------------------------------------------------------
 function array = supershuffle(array, dim)
     if size(array, 1) == 1 || size(array,2) == 1

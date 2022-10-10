@@ -20,7 +20,7 @@ BinaryFormat=IEEE_FLOAT_32
 [Channel Infos]
 ; Each entry: Ch<Channel number>=<Name>,<Reference channel name>,
 ; <Resolution in microvolts>,<Future extensions..
-; Fields are delimited by commas, some fields might be omited (empty).
+; Fields are delimited by commas, some fields might be omitted (empty).
 ; Commas in channel names are coded as "\1".
 Ch1=Fp1,,
 Ch2=Fp2,,

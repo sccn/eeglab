@@ -33,7 +33,7 @@
 %                percentile of sortvar values (and associated data) before
 %                computing statistics. Default is [0 100].
 %   'align'    - [float] same as 'align' parameter of erpimage(). This 
-%                parameter is used to contrain the 'times' parameter so
+%                parameter is used to constrain the 'times' parameter so
 %                correlation with data trials containing 0-values (as a
 %                result of data alignment) are avoided: computing these
 %                correlations would produce spurious significant results.

@@ -40,7 +40,7 @@ ncopies = 0;
 if ~isempty(stack)
     % check if we are in a different workspace
     if ~isequal(stack, obj.workspace)
-        % if subfunction, must be a copie
+        % if subfunction, must be a copy
         if ~isempty(obj.workspace) && strcmpi(stack(end).file, obj.workspace(end).file) && ...
                 ~strcmpi(stack(end).name, obj.workspace(end).name)
             % We are within a subfunction. The MMO must have

@@ -36,7 +36,7 @@
 %                 Default is 'on'.
 %   'mixfact'   - [float] factor for mixing the background image with the
 %                 array3d information. Default is 0.5.
-%   'mixmode'   - ['add'|'overwrite'] 'add' will allow for trasnparency
+%   'mixmode'   - ['add'|'overwrite'] 'add' will allow for transparency
 %                 while 'overwrite' will preserve the original MRI image 
 %                 and overwrite the pixel showind density changes.
 %
@@ -406,7 +406,7 @@ function [newprob3d maxdens] = prepare_dens(prob3d, g, col);
     maxdens = max(prob3d(:));
     ncolors = size(g.cmap,1);
     
-    prob3d    = round((prob3d-g.cmin)/(g.cmax - g.cmin)*(ncolors-1))+1; % project desnity image into the color space: [1:ncolors]
+    prob3d    = round((prob3d-g.cmin)/(g.cmax - g.cmin)*(ncolors-1))+1; % project density image into the color space: [1:ncolors]
     prob3d( find(prob3d > ncolors) ) = ncolors;
     prob3d( find(prob3d < 1))        = 1; % added by Makoto
     newprob3d = zeros(size(prob3d,1), size(prob3d,2), size(prob3d,3), 3);

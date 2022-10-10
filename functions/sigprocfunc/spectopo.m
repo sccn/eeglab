@@ -43,7 +43,7 @@
 %   'blckhn'   = [integer] Parameter to scale the windows length when Blackman-Harris 
 %                windows is used in 'wintype' {default: 2}
 %   'reref'    = ['averef'|'off'] convert data to average reference {default: 'off'}
-%   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
+%   'mapnorm'  = [float vector] If 'data' contain the activity of an independent 
 %                component, this parameter should contain its scalp map. In this case
 %                the spectrum amplitude will be scaled to component RMS scalp power.
 %                Useful for comparing component strengths {default: none}
@@ -72,7 +72,7 @@
 %   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectra of
 %                individual ICA components, the function computes the spectrum of
 %                the data minus their contributions {default: 'normal'}
-%   'icamaps'  = [integer array] force plotting of selected ICA compoment maps 
+%   'icamaps'  = [integer array] force plotting of selected ICA component maps 
 %                {default: [] = the 'nicamaps' largest contributing components}.
 %   'icawinv'  = [float array] inverse component weight or mixing matrix. Normally,
 %                this is computed by inverting the ICA unmixing matrix 'weights' (above).
@@ -422,7 +422,7 @@ else
         if strcmp(g.memory, 'high') && strcmp(g.icamode, 'normal')
             myfprintf(g.verbose, 'Computing component spectra: ')
             [compeegspecdB freqs] = spectcomp( newweights*data(:,:), frames, srate, epoch_subset, g);
-        else % in case out of memory error, multiply conmponent sequencially
+        else % in case out of memory error, multiply conmponent sequentially
             if strcmp(g.icamode, 'sub') && ~isempty(g.plotchan) && g.plotchan == 0
                 % scan all electrodes
                 myfprintf(g.verbose, 'Computing component spectra at each channel: ')
@@ -695,7 +695,7 @@ if ~isempty(g.freq) &&  strcmpi(g.plot, 'on')
 			[realpos(index) allaxuse] = closestplot( freqnormpos, allaxcoords, allaxuse );
 		end
 	
-		% put the channel plot a liitle bit higher
+		% put the channel plot a little bit higher
 		tmppos = get(headax(realpos(1)), 'position');
 		tmppos(2) = tmppos(2)+0.04;
 		set(headax(realpos(1)), 'position', tmppos);
@@ -918,7 +918,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     
     if ~usepwelch
         myfprintf(g.verbose, '\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
-        myfprintf(g.verbose, 'function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
+        myfprintf(g.verbose, 'function from Octave which is supposedly 100%% compatible with the Matlab pwelch function\n');
     end
     myfprintf(g.verbose,' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
         
