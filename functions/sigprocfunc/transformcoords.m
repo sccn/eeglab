@@ -100,7 +100,7 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
         % pitch roll yaw rotation
         % -----------------------
         % pitch (x-axis); roll = y axis rotation; yaw = z axis
-        % see http://bishopw.loni.ucla.edu/AIR5/homogeneous.html
+        % see http://bishopw.loni.ucla.edu/AIR5/homogenous.html
         cp = cos(pitch); sp = sin(pitch);
         cr = cos(roll);  sr = sin(roll);
         cy = cos(yaw);   sy = sin(yaw);
