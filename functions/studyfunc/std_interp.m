@@ -106,12 +106,12 @@ for index = 1:length(STUDY.datasetinfo)
    
    if length(interplocs) ~= length(tmplocs)
        
-       % search for position of electrode in backup structure
+       % search for position of electrode in removed channels
        % ----------------------------------------------
        extrachans = [];
-       if isfield(ALLEEG(tmpind).chaninfo, 'nodatchans')
-            if isfield(ALLEEG(tmpind).chaninfo.nodatchans, 'labels')
-                extrachans = ALLEEG(tmpind).chaninfo.nodatchans;
+       if isfield(ALLEEG(tmpind).chaninfo, 'removedchans')
+            if isfield(ALLEEG(tmpind).chaninfo.removedchans, 'labels')
+                extrachans = ALLEEG(tmpind).chaninfo.removedchans;
             end
        end
        tmplabels = { tmplocs.labels };
@@ -120,7 +120,7 @@ for index = 1:length(STUDY.datasetinfo)
            if ~isempty(ind)
                interplocs(i) = tmplocs(ind); % this is necessary for polhemus
            elseif ~isempty(extrachans)
-               ind = strmatch( interplocs(i).labels, { extrachans.labels }, 'exact');
+               ind = strmatch( lower(interplocs(i).labels), lower({ extrachans.labels }), 'exact');
                if ~isempty(ind)
                     fprintf('Found position of %s in chaninfo structure\n', interplocs(i).labels);
                     interplocs(i) = extrachans(ind);
