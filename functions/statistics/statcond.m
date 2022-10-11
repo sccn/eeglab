@@ -46,11 +46,11 @@
 %   'naccu'    = [integer] Number of surrogate data copies to use in 'perm' 
 %                 or 'bootstrap' method estimation (see above) {default: 200}.
 %   'verbose'  = ['on'|'off'] print info on the command line {default: 'on'}.
-%   'variance' = ['homegenous'|'inhomogenous'] this option is exclusively
+%   'variance' = ['homogeneous'|'inhomogeneous'] this option is exclusively
 %                for parametric statistics using unpaired t-test. It allows
 %                to compute a more accurate value for the degree of freedom
-%                using the formula for inhomogenous variance (see
-%                ttest2_cell function). Default is 'inhomegenous'.
+%                using the formula for inhomogeneous variance (see
+%                ttest2_cell function). Default is 'inhomogeneous'.
 %   'surrog'   = surrogate data array (see output).
 %   'stats'    = F- or T-value array (see output).
 %   'tail'     = ['one'|'two'] run one-tailed (F-test) or two tailed
@@ -172,17 +172,17 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         g = finputcheck( varargin, { 'naccu'      'integer'   [1 Inf]             200;
                                      'method'     'string'    { 'param','parametric','perm','permutation','bootstrap' }  'param';
                                      'mode'       'string'    { }                 '';
-                                     'paired'     'string'    { 'on','off','auto' }      'auto'; 
-                                     'surrog'     { 'real','cell' }      []       []; 
-                                     'stats'      { 'real','cell' }      []       []; 
-                                     'structoutput' 'string'  { 'on','off' }      'off'; 
-                                     'forceanova'   'string'  { 'on','off' }      'off'; 
-                                     'arraycomp'  'string'    { 'on','off' }      'on'; 
-                                     'cluster'    'string'    { 'on','off' }      'off'; 
+                                     'paired'     'string'    { 'on','off','auto' }      'auto';
+                                     'surrog'     { 'real','cell' }      []       [];
+                                     'stats'      { 'real','cell' }      []       [];
+                                     'structoutput' 'string'  { 'on','off' }      'off';
+                                     'forceanova'   'string'  { 'on','off' }      'off';
+                                     'arraycomp'  'string'    { 'on','off' }      'on';
+                                     'cluster'    'string'    { 'on','off' }      'off';
                                      'alpha'      'real'      []                  NaN;
-                                     'tail'       'string'    { 'one','both','upper','lower'}    'both'; 
-                                     'variance'   'string'    { 'homogenous','inhomogenous' }    'inhomogenous'; 
-                                     'returnresamplingarray' 'string'    { 'on','off' }      'off'; 
+                                     'tail'       'string'    { 'one','both','upper','lower'}    'both';
+                                     'variance'   'string'    { 'homogeneous','inhomogeneous', 'homogenous','inhomogenous' }    'inhomogeneous';
+                                     'returnresamplingarray' 'string'    { 'on','off' }      'off';
                                      'verbose'    'string'    { 'on','off' }      'on' }, 'statcond');
         if ischar(g), error(g); end
     else
@@ -195,7 +195,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         if ~isfield(g, 'arraycomp'), g.arraycomp = 'on'; end
         if ~isfield(g, 'verbose'),   g.verbose = 'on'; end
         if ~isfield(g, 'tail'),      g.tail = 'both'; end
-        if ~isfield(g, 'variance'),  g.variance = 'homogenous'; end
+        if ~isfield(g, 'variance'),  g.variance = 'inhomogeneous'; end
         if ~isfield(g, 'structoutput'), g.structoutput = 'on'; end
         if ~isfield(g, 'returnresamplingarray'),   g.returnresamplingarray = 'off'; end
     end
@@ -213,6 +213,8 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                '            Running nonparametric permutation tests\n.']);
       g.method = 'perm';
     end
+    if strcmpi(g.variance, 'homogenous'), g.variance = 'homogeneous'; end
+    if strcmpi(g.variance, 'inhomogenous'), g.variance = 'inhomogeneous'; end
     g.naccu = round(g.naccu);
     
     % pairing
@@ -559,11 +561,11 @@ function [f, df] = anova1_cell_select( res, paired)
 
 % compute t-test
 % -------------------
-function [t, df] = ttest_cell_select( res, paired, homogenous)
+function [t, df] = ttest_cell_select( res, paired, homogeneous)
     if strcmpi(paired,'on')
         [t, df] = ttest_cell( res{1}, res{2});
     else
-        [t, df] = ttest2_cell( res{1}, res{2}, homogenous);
+        [t, df] = ttest2_cell( res{1}, res{2}, homogeneous);
     end
 
 % function to compute the number of dimensions
