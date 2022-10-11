@@ -1,4 +1,4 @@
-% corrcoef_cell() - compute pairwise correlations using arrays and 
+% CORRCOEF_CELL - compute pairwise correlations using arrays and 
 %                   cell array inputs.
 %
 % Usage:

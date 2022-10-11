@@ -1,4 +1,4 @@
-%  anova2_cell() - compute F-values in cell array using ANOVA.
+%  ANOVA2_CELL - compute F-values in cell array using ANOVA.
 %
 % Usage:
 %    >> [FC FR FI dfc dfr dfi] = anova2_cell( data );
@@ -17,7 +17,7 @@
 % Note: the advantage over the ANOVA2 function of Matlab statistical
 %       toolbox is that this function works on arrays (see examples). Note
 %       also that you still need the statistical toolbox to assess
-%       significance using the fcdf() function. The other advantage is that
+%       significance using the FCDF function. The other advantage is that
 %       this function will work with complex numbers.
 %
 % Example:

@@ -1,4 +1,4 @@
-% ttest2_cell() - compute unpaired t-test. Allow fast computation of 
+% TTEST2_CELL - compute unpaired t-test. Allow fast computation of 
 %                 multiple t-test using matrix manipulation.
 %
 % Usage:

@@ -1,7 +1,7 @@
-% statcond()  - compare two or more data conditions statistically using 
+% STATCOND  - compare two or more data conditions statistically using 
 %               standard parametric or nonparametric permutation-based ANOVA 
 %               (1-way or 2-way) or t-test methods. Parametric testing uses 
-%               fcdf() from the Matlab Statistical Toolbox.
+%               FCDF from the Matlab Statistical Toolbox.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 %
@@ -91,7 +91,7 @@
 %         [t df pvals] = statcond(a);        % perform paired t-test
 %           pvals =                  
 %              5.2807e-04 % standard t-test probability value
-%         % Note: for different rand() outputs, results will differ.
+%         % Note: for different RAND outputs, results will differ.
 %
 %         [t df pvals surog] = statcond(a, 'method', 'perm', 'naccu', 2000); 
 %           pvals =
@@ -118,7 +118,7 @@
 %         With thanks to Robert Oostenveld for fruitful discussions 
 %         and advice on this function.
 %
-% See also: anova1_cell(), anova2_cell(), anova2rm_cell, fcdf()
+% See also: ANOVA1_CELL, ANOVA2_CELL, ANOVA2RM_CELL, FCDF
 
 % perform a paired t-test
 % -----------------------

@@ -1,4 +1,4 @@
-% ttest_cell() - compute paired t-test. Allow fast computation of 
+% TTEST_CELL - compute paired t-test. Allow fast computation of 
 %                multiple t-test using matrix manipulation.
 %
 % Usage:

@@ -1,4 +1,4 @@
-%  anova1rm_cell() - compute F-values in cell array using repeated measure
+%  ANOVA1RM_CELL - compute F-values in cell array using repeated measure
 %                    ANOVA.
 %
 % Usage:
