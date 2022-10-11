@@ -1,4 +1,4 @@
-% errordlg2() - Makes a popup dialog box with the specified message and (optional)
+% ERRORDLG2 - Makes a popup dialog box with the specified message and (optional)
 %               title.
 %
 % Usage:
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002
 %
-% See also: inputdlg2(), questdlg2()
+% See also: INPUTDLG2, QUESTDLG2
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %

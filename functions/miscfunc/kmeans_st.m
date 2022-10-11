@@ -27,7 +27,7 @@ function [centr,clst,sse] = kmeans_st(X,k,restarts)
 
 % RE Strauss, 8/26/98
 %   8/21/99 -  changed misc statements for Matlab v5.
-%   10/14/00 - use means() rather than mean() to update cluster centers;
+%   10/14/00 - use MEANS rather than MEAN to update cluster centers;
 %                remove references to TRUE and FALSE.
 
   if (nargin<3) restarts = []; end

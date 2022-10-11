@@ -1,11 +1,11 @@
-% chanproj() - make a detailed plot of data returned from plotproj() 
+% CHANPROJ - make a detailed plot of data returned from PLOTPROJ 
 %              for given channel. Returns the data plotted.
 % Usage:
 %  >> [chandata] = chanproj(projdata,chan);
 %  >> [chandata] = chanproj(projdata,chan,ncomps,framelist,limits,title,colors);
 %
 % Inputs:
-%   projdata    = data returned from plotproj() 
+%   projdata    = data returned from PLOTPROJ 
 %   chan        = single channel to plot
 %   ncomps      = number of component projections in projdata
 %
@@ -47,11 +47,11 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % 11-30-96 Scott Makeig  CNL / Salk Institute, La Jolla as plotprojchan.m
-% 03-19-97 changed var() to diag(cov()) -sm
+% 03-19-97 changed VAR to diag(COV) -sm
 % 03-26-97 fix (== -> =) -sm
 % 04-03-97 allow framelist to be a col vector, allow 32 traces, fix pvaf, made
 %           ncomps mandatory  -sm
-% 04-04-97 shortened name to chanproj() -sm
+% 04-04-97 shortened name to CHANPROJ -sm
 % 05-20-97 added read of icadefs.m -sm
 % 11-05-97 disallowed white traces unless default axis color is white -sm & ch
 % 11-13-97 rm'ed errcode variable -sm

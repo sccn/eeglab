@@ -1,4 +1,4 @@
-% varimax() - Perform orthogonal Varimax rotation on rows of a data 
+% VARIMAX - Perform orthogonal Varimax rotation on rows of a data 
 %             matrix.
 %
 % Usage: >> V = varimax(data); 
@@ -17,7 +17,7 @@
 %
 % Author: Sigurd Enghoff - CNL / Salk Institute, La Jolla 6/18/98
 %
-% See also: runica(), pcasvd(), promax()
+% See also: RUNICA, PCASVD, PROMAX
 
 % Copyright (C) Sigurd Enghoff - CNL / Salk Institute, La Jolla 6/18/98
 %

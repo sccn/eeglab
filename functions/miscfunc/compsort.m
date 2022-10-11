@@ -1,4 +1,4 @@
-% compsort() - reorder ICA components, first largest to smallest by the size 
+% COMPSORT - reorder ICA components, first largest to smallest by the size 
 %             of their maximum variance in the single-component projections, 
 %             then (if specified) the nlargest component projections are 
 %             reordered by the (within-epoch) time point at which they reach 
@@ -9,12 +9,12 @@
 %                          = compsort(data,weights,sphere,datamean, ...
 %                                                 frames,nlargest,chanlist);
 % Inputs:
-%   data     = (chans,frames*epochs) the input data set decomposed by runica()
-%   weights  = ica weight matrix returned by runica() 
-%   sphere   = sphering matrix returned by runica() 
+%   data     = (chans,frames*epochs) the input data set decomposed by RUNICA
+%   weights  = ica weight matrix returned by RUNICA 
+%   sphere   = sphering matrix returned by RUNICA 
 %
 % Optional:
-%   datamean = means removed from each row*epoch in runica() 
+%   datamean = means removed from each row*epoch in RUNICA 
 %              (Note: 0 -> input data means are distributed among components
 %              : 1 -> input data means are removed from the components (default))
 %   frames   = frames per epoch in data (0 -> all)
@@ -31,7 +31,7 @@
 %
 % Authors: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1996 
 %
-% See also: runica()
+% See also: RUNICA
 
 % Copyright (C) 1996 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -63,10 +63,10 @@
 % 11-30-96 as compsort.m
 % 12-19-96 moved def of epochs below default frames def -sm
 % 02-18-97 added chanlist -sm
-% 03-11-97 added default chanlist=0 -> all chans, fixed datamean and var() -sm
+% 03-11-97 added default chanlist=0 -> all chans, fixed datamean and VAR -sm
 % 03-17-97 made nlargest default -> nlargest=0 -sm
 % 04-03-97 fixed problems and removed permweights, permcomps outputs -sm 
-% 04-04-97 shortened name to compsort() -sm
+% 04-04-97 shortened name to COMPSORT -sm
 % 06-05-97 corrected variance computation -sm
 % 06-07-97 changed order of args to conform to runica -sm
 % 06-10-97 fixed recent bug in maxvar order -sm
@@ -217,7 +217,7 @@ fprintf('\n');
 windex   = windex(wrows:-1:1)';    % reverse order
 maxvar   = maxvar(wrows:-1:1)';    % make each returned vector a column vector
 
-% Note: maxvar reordered by sort() above
+% Note: maxvar reordered by SORT above
 maxframe = maxframe(windex);       % reorder maxframes
 maxepoch = maxepoch(windex);       % reorder maxepoch
 maxmap   = maxmap(:,windex);       % reorder maxmap columns

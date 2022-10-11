@@ -1,12 +1,12 @@
-% envproj() - plot envelopes of projections of selected ICA component 
+% ENVPROJ - plot envelopes of projections of selected ICA component 
 %             projections against envelope of the original data
 %
 % Usage:    >> [envdata] = envproj(data,weights,compnums);
 %           >> [envdata] = envproj(data,weights,compnums, ...
 %                                  title,limits,chanlist,compnames,colors);
 % Inputs:
-%   data      = runica() input data (chans,frames) <- best one epoch only!
-%   weights   = unmixing weight matrix (runica() weights*sphere)
+%   data      = RUNICA input data (chans,frames) <- best one epoch only!
+%   weights   = unmixing weight matrix (RUNICA weights*sphere)
 %   compnums  = list of component numbers to project and plot
 %
 % Optional inputs:
@@ -24,7 +24,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1/1997 
 %
-% See also: envtopo()
+% See also: ENVTOPO
 
 % Copyright (C) 01-23-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -53,9 +53,9 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 03-19-97 use datamean instead of frames/baseframes, diag(cov()) for var() -sm
-% 04-03-97 changed name to envproj() -sm
-% 05-20-97 used sum-of-squares for var instead of diag() to allow long data 
+% 03-19-97 use datamean instead of frames/baseframes, diag(COV) for VAR -sm
+% 04-03-97 changed name to ENVPROJ -sm
+% 05-20-97 used sum-of-squares for var instead of DIAG to allow long data 
 %          read MAXPLOTDATACHANS from icadefs.m -sm
 % 06-07-97 changed order of args to conform to runica -sm
 % 06-18-97 read MAXENVPLOTCHANS instead of MAXPLOTDATACHANS -sm
@@ -77,7 +77,7 @@
 % 06-05-98 made NEG_UP optional -sm
 % 02-22-99 added FILL mode default when numcomps==1 -sm
 % 03-14-99 made envelope finding code more efficient -sm
-% 12-19-00 updated icaproj() args -sm
+% 12-19-00 updated ICAPROJ args -sm
 % 01-25-02 reformated help & license, added links -ad 
 
 function [envdata] = envproj(data,weights,compnums,titl,limits,chanlist,compnames,colors)

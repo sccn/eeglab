@@ -1,14 +1,14 @@
-% questdlg2() - questdlg function clone with coloring and help for 
-%               eeglab().
+% QUESTDLG2 - questdlg function clone with coloring and help for 
+%               EEGLAB.
 %
-% Usage: same as questdlg()
+% Usage: same as QUESTDLG
 %
 % Warning: 
 % Case of button text and result might be changed by the function
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 11 August 2002
 %
-% See also: inputdlg2(), errordlg2(), supergui(), inputgui()
+% See also: INPUTDLG2, ERRORDLG2, SUPERGUI, INPUTGUI
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %

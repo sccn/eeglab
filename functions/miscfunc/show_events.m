@@ -1,5 +1,5 @@
-% show_events() - Display events in epochs. Events selected by 
-%                 make_timewarp() function can be optionally highlighted.
+% SHOW_EVENTS - Display events in epochs. Events selected by 
+%                 MAKE_TIMEWARP function can be optionally highlighted.
 %                 Each epoch is visualized as a row in the output image with
 %                 events marked by colored rectangles.
 %
@@ -25,7 +25,7 @@
 %
 %   'timeWarp'            - a structure with latencies (time-warp matrix
 %                           for newtimef function) and epochs with correct
-%                           sequence created by make_timewarp() function.
+%                           sequence created by MAKE_TIMEWARP function.
 %                           the subsets {default: false|0)
 % Outputs:
 %
@@ -37,14 +37,14 @@
 %   % To display all events in data structure EEG
 %   >> show_events(EEG);
 %
-%   % To highlight events selected by make_timewarp() function with thin
+%   % To highlight events selected by MAKE_TIMEWARP function with thin
 %   %  event markers
 %  >> show_events(EEG, 'eventThicknessCoef', 0.5, 'eventNames', timeWarp.eventSequence,
 %   'timeWarp', timeWarp);
 %
 % Version 1.1
 % Author: Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
-% See also: make_timewarp(), newtimef()
+% See also: MAKE_TIMEWARP, NEWTIMEF
 
 % Copyright (C) Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
 %

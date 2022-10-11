@@ -1,5 +1,5 @@
-% runpca() -  perform principal component analysis (PCA) using singular value 
-%             decomposition (SVD) using Matlab svd() or svds()
+% RUNPCA -  perform principal component analysis (PCA) using singular value 
+%             decomposition (SVD) using Matlab SVD or SVDS
 %                        >> inv(eigvec)*data = pc;
 % Usage:
 %    >> [pc,eigvec,sv] = runpca(data);
@@ -17,7 +17,7 @@
 %
 % Author: Colin Humphries, CNL / Salk Institute, 1997
 %
-% See also: runica()
+% See also: RUNICA
 
 % Copyright (C) Colin Humphries, CNL / Salk Institute, Aug, 1997
 %
@@ -46,7 +46,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 01/31/00 renamed runpca() and improved usage message -sm
+% 01/31/00 renamed RUNPCA and improved usage message -sm
 % 01-25-02 reformated help & license, added links -ad 
 
 function [pc,A,sv]= runpca2(data,K,dosym)

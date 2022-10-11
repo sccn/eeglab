@@ -1,4 +1,4 @@
-% textgui() - make sliding vertical window. This window contain text
+% TEXTGUI - make sliding vertical window. This window contain text
 %             with optional function calls at each line.
 %
 % Usage:

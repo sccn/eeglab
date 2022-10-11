@@ -1,4 +1,4 @@
-% compdsp() - Display standard info figures for a data decomposition
+% COMPDSP - Display standard info figures for a data decomposition
 %             Creates four figure windows showing: Component amplitudes,
 %             scalp maps, activations and activation spectra.
 % Usage:
@@ -6,7 +6,7 @@
 %
 % Inputs:
 %   data     = data matrix used to train the decomposition
-%   weights  = the unmixing matrix (e.g., weights*sphere from runica())
+%   weights  = the unmixing matrix (e.g., weights*sphere from RUNICA)
 %
 % Optional:
 %   locfile  = 2-d electrode locations file (as in >> topoplot example)
@@ -16,9 +16,9 @@
 %              {default|'': none}
 %   compnums = optional vector of component numbers to display 
 %              {default|[] -> all}
-%   amps     = all component amplitudes (from runica()) 
+%   amps     = all component amplitudes (from RUNICA) 
 %              {default|[]->recompute}
-%   act      = activations matrix (from runica())
+%   act      = activations matrix (from RUNICA)
 %              {default|[]->recompute}
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
@@ -50,7 +50,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 02-01-01  replaced std() with rms() -sm
+% 02-01-01  replaced STD with RMS -sm
 % 02-10-01  made srate optional -sm
 % 01-25-02 reformated help & license -ad 
 
@@ -196,7 +196,7 @@ compmap(winv,locfile,compnums,[titl ' Scalp Maps'],0,compnums);
 fprintf('\n');
 
 %
-%%%%%%%%%%%%%%%%%%%%%% III. eegplot() activations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% III. EEGPLOT activations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if frames/srate < 10
   dispsecs = ceil(frames/srate);
@@ -225,7 +225,7 @@ while stact <= size(act,1)
 end
 
 %
-%%%%%%%%%%%%%%%%%%%%%%% IV. plotdata() spectra %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% IV. PLOTDATA spectra %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 pos = [620,40,550,400]; figure('Position',pos);
 

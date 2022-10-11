@@ -1,4 +1,4 @@
-% fillcurves() - fill the space between 2 curves
+% FILLCURVES - fill the space between 2 curves
 %
 % Usage:
 %   h=fillcurves( Y1, Y2);

@@ -1,4 +1,4 @@
-% pophelp() - Same as matlab HTHELP but does not crash under windows.
+% POPHELP - Same as matlab HTHELP but does not crash under windows.
 %
 % Usage: >> pophelp( function );
 %        >> pophelp( function, nonmatlab );
@@ -10,7 +10,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab() 
+% See also: EEGLAB 
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

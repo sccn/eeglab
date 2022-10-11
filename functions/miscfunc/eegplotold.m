@@ -1,4 +1,4 @@
-% eegplotold() - display data in a horizontal scrolling fashion 
+% EEGPLOTOLD - display data in a horizontal scrolling fashion 
 %                with (optional) gui controls (version 2.3)
 % Usage: 
 %   >> eegplotold(data,srate,spacing,eloc_file,windowlength,title)
@@ -17,9 +17,9 @@
 %
 % Author: Colin Humphries, CNL, Salk Institute, La Jolla, 5/98
 %
-% See also: eegplot(), eegplotgold(), eegplotsold()
+% See also: EEGPLOT, EEGPLOTGOLD, EEGPLOTSOLD
 
-% Copyright (C) Colin Humphries, CNL, Salk Institute 3/97 from eegplotold()
+% Copyright (C) Colin Humphries, CNL, Salk Institute 3/97 from EEGPLOTOLD
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.

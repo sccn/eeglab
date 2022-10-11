@@ -1,8 +1,8 @@
-% warndlg2() - same as warndlg for eeglab()
+% WARNDLG2 - same as warndlg for EEGLAB
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002
 %
-% See also: inputdlg2(), questdlg2()
+% See also: INPUTDLG2, QUESTDLG2
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %

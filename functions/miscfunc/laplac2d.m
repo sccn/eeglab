@@ -1,4 +1,4 @@
-% laplac2d() - generate a 2 dimensional laplacian matrice
+% LAPLAC2D - generate a 2 dimensional laplacian matrice
 %
 % Usage :
 %    >> [ gaussmatrix ] = laplac2d( rows, columns, sigma, ...
@@ -20,7 +20,7 @@
 %       research. For a more rigorous validated approach use the freely 
 %       available Current Source Density Matlab toolbox.
 %
-% See also: eeg_laplac()
+% See also: EEG_LAPLAC
 %
 % Author: Arnaud Delorme, CNL, Salk Institute, 2001
 

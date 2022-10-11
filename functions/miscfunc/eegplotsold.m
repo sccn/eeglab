@@ -1,4 +1,4 @@
-% eegplotsold() - display data in a clinical format without scrolling
+% EEGPLOTSOLD - display data in a clinical format without scrolling
 %
 % Usage:
 %  >> eegplotsold(data, srate, 'chanfile', 'title', ...
@@ -7,8 +7,8 @@
 % Inputs:
 %   data       - data matrix (chans,frames) 
 %   srate      - EEG sampling rate in Hz (0 -> 256 Hz)
-%   'chanfile' - file of channel info, topoplot() style, (0 -> chan nos)
-%   'title'    - plot title string {0 -> 'eegplotsold()'}
+%   'chanfile' - file of channel info, TOPOPLOT style, (0 -> chan nos)
+%   'title'    - plot title string {0 -> 'EEGPLOTSOLD'}
 %   yscaling   - initial y scaling factor (0 -> 300)
 %   epoch      - how many seconds to display in window (0 -> 10 sec)
 %   linecolor  - color of eeg (0 -> 'y')
@@ -17,9 +17,9 @@
 %
 % Author: Colin Humphries, CNL, Salk Institute, La Jolla, 3/97
 %
-% See also: eegplot(), eegplotold(), eegplotgold()
+% See also: EEGPLOT, EEGPLOTOLD, EEGPLOTGOLD
 
-% Copyright (C) Colin Humphries, CNL, Salk Institute 3/97 from eegplotold()
+% Copyright (C) Colin Humphries, CNL, Salk Institute 3/97 from EEGPLOTOLD
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.

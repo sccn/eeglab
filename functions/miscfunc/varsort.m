@@ -1,13 +1,13 @@
-% varsort() - reorder ICA components, largest to smallest, by 
+% VARSORT - reorder ICA components, largest to smallest, by 
 %             the size of their MEAN projected variance 
 %             across all time points
 % Usage:
 %   >> [windex,meanvar] = varsort(activations,weights,sphere);
 %
 % Inputs:
-%   activations = (chans,framestot) the runica() activations
-%   weights     = ica weight matrix from runica() 
-%   sphere      = sphering matrix from runica() 
+%   activations = (chans,framestot) the RUNICA activations
+%   weights     = ica weight matrix from RUNICA 
+%   sphere      = sphering matrix from RUNICA 
 %
 % Outputs:
 %   windex   = order of projected component mean variances (large to small)
@@ -15,7 +15,7 @@
 %
 % Author: Scott Makeig & Martin McKeown, SCCN/INC/UCSD, La Jolla, 09-01-1997 
 %
-% See also: runica()
+% See also: RUNICA
 
 % Copyright (C) 9-01-1997 Scott Makeig & Martin McKeown, SCCN/INC/UCSD, 
 % scott@sccn.ucsd.edu
@@ -47,8 +47,8 @@
 
 % 03-19-97 simplified, replaced grandmean with datamean info in calculation, 
 %          made function return mean projected variance across the data, 
-%          changed var() to diag(cov()) -sm
-% 05-20-97 use sum-of-squares instead of diag() to allow long data sets -sm
+%          changed VAR to diag(COV) -sm
+% 05-20-97 use sum-of-squares instead of DIAG to allow long data sets -sm
 % 06-07-97 changed order of args to conform to runica, fixed meanvar computation -sm
 % 07-25-97 removed datamean -sm
 % 01-25-02 reformated help & license, added link -ad 

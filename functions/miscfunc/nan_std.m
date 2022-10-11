@@ -1,4 +1,4 @@
-% nan_std() - std, not considering NaN values
+% NAN_STD - std, not considering NaN values
 %
 % Usage: std across the first dimension
 

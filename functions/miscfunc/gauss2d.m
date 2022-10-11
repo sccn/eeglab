@@ -1,4 +1,4 @@
-% gauss2d() - generate a 2-dimensional gaussian matrix
+% GAUSS2D - generate a 2-dimensional gaussian matrix
 %
 % Usage:
 %   >> [ gaussmatrix ] = gauss2d( rows, columns, ...

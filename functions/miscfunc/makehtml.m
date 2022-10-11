@@ -1,4 +1,4 @@
-% makehtml() - generate .html function-index page and function help pages 
+% MAKEHTML - generate .html function-index page and function help pages 
 %              composed automatically from formatted Matlab function help messages
 %
 % Usage: 
@@ -28,8 +28,8 @@
 % Optional inputs:
 %   'outputfile' - Output file name. {default: 'index.html'}
 %   'header'     - Command to insert in the header of all .html files (e.g., javascript 
-%                  declaration or meta-tag). {default: javascript 'openhelp()' 
-%                  function. See help2htm() code for details.}
+%                  declaration or meta-tag). {default: javascript 'OPENHELP' 
+%                  function. See HELP2HTM code for details.}
 %   'footer'     - Command to insert at the end of all .html files (e.g., back
 %                  button. {default: reference back to the function-index file}
 %   'refcall'    - Syntax format to call references. {default is  
@@ -54,7 +54,7 @@
 %             { { 'toolbox', 'toolbox2' } 'Signal processing functions' 'adminfunc/eeg_helpsigproc.m' }}, ...
 %            '/home/www/eeglab/allfunctions', 'mainheader', '/data/common/matlab/indexfunchdr.txt');          
 %
-% See also: help2html2()
+% See also: HELP2HTML2
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 2002
 %

@@ -1,4 +1,4 @@
-% del2map() - compute the discrete laplacian of an EEG distribution.
+% DEL2MAP - compute the discrete laplacian of an EEG distribution.
 %
 % Usage:
 % >> [ laplac ] = del2map( map, filename, draw );

@@ -1,4 +1,4 @@
-% finputcheck() - check Matlab function {'key','value'} input argument pairs
+% FINPUTCHECK - check Matlab function {'key','value'} input argument pairs
 %
 % Usage: >> result = finputcheck( varargin, fieldlist );
 %        >> [result varargin] = finputcheck( varargin, fieldlist, ... 
@@ -243,7 +243,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
 % remove duplicates in the list of parameters
 % -------------------------------------------
 function cella = removedup(cella, verbose)
-% make sure if all the values passed to unique() are strings, if not, exist
+% make sure if all the values passed to UNIQUE are strings, if not, exist
 %try
     allFields = cella(1:2:end);
     [tmp, indices, X] = unique_bc(allFields);

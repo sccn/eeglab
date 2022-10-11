@@ -1,6 +1,6 @@
-% averef() - convert common-reference EEG data to average reference
+% AVEREF - convert common-reference EEG data to average reference
 %            Note that this old function is not being used in EEGLAB. The
-%            function used by EEGLAB is reref().
+%            function used by EEGLAB is REREF.
 %
 % Usage:
 %   >> data = averef(data);
@@ -13,7 +13,7 @@
 % Outputs:
 %   data_out - Input data converted to average reference.
 %   W_out    - ICA weight matrix converted to average reference
-%   S_out    - ICA sphere matrix converted to eye()
+%   S_out    - ICA sphere matrix converted to EYE
 %   meandata - (1,dataframes) mean removed from each data frame (point)
 %
 % Note: If 2 args, also converts the weight matrix W to average reference:
@@ -24,7 +24,7 @@
 %
 % Authors: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 1999 
 %
-% See also: reref()
+% See also: REREF
 
 % Copyright (C) 1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

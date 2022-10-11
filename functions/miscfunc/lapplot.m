@@ -1,4 +1,4 @@
-% lapplot() -  Compute the discrete laplacian of EEG scalp distribution(s)
+% LAPPLOT -  Compute the discrete laplacian of EEG scalp distribution(s)
 %                
 % Usage:
 %   >> laplace = lapplot(map,eloc_file,draw)
@@ -12,11 +12,11 @@
 % Output:
 %    laplace    - Laplacian map, size (nelectrodes,nmaps)
 %
-% Note: uses del2()
+% Note: uses DEL2
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1998 
 %
-% See also: topoplot(), gradplot()
+% See also: TOPOPLOT, GRADPLOT
 
 % Copyright (C) Scott Makeig, SCCN/INC/UCSD, La Jolla, 1998 
 %

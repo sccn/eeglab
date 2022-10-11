@@ -1,4 +1,4 @@
-% caliper() - Measure a set of spatial components of a given data epoch relative to 
+% CALIPER - Measure a set of spatial components of a given data epoch relative to 
 %           a reference epoch and decomposition. 
 % Usage: 
 %   >> [amp,window]=caliper(newepoch,refepoch,weights,compnums,filtnums,times,'noplot');
@@ -17,7 +17,7 @@
 %     windows = (length(compnums)),length(times)) matrix of tapering windows used
 %
 % Notes:
-%   Function caliper() works as follows: First the reference epoch is decomposed using 
+%   Function CALIPER works as follows: First the reference epoch is decomposed using 
 %   the given weight matrix (may be ICA, PCA, or etc). Next, the time course of the 
 %   main lobe of the activation in the reference epoch (from max to 1st min, forward 
 %   and backward in time from abs max, optionally after bandpass filtering) is used 
@@ -60,7 +60,7 @@
 
 % Edit History:
 % 12/05/00 -- added fig showing data, ref activation, and window vector -mw
-% 12/19/00 -- adjusted new icaproj() args -sm
+% 12/19/00 -- adjusted new ICAPROJ args -sm
 % 01-25-02 reformated help & license -ad 
 
 function [amps,windows] = caliper(newepoch,refepoch,weights,compnums,filtnums,times,noplot)

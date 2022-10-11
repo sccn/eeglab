@@ -1,4 +1,4 @@
-% compheads() - plot multiple topoplot() maps of ICA component topographies
+% COMPHEADS - plot multiple TOPOPLOT maps of ICA component topographies
 %
 % Usage:
 %       >> compheads(winv,'spline_file',compnos,'title',rowscols,labels,view)
@@ -9,7 +9,7 @@
 %                defined in the eloc_file. Normally, winv = inv(weights*sphere).
 %  spline_file - Name of the eloctrode position file in BESA spherical coords.
 %   compnos    - Vector telling which (order of) component maps to show
-%                Indices <0 tell compheads() to invert a map; = 0 leave blank subplot 
+%                Indices <0 tell COMPHEADS to invert a map; = 0 leave blank subplot 
 %                Example [1 0 -2 3 0 -6] {default|0 -> 1:columns_in_winv}
 %  'title'     - Title string for each page {default|0 -> 'ICA Component Maps'}
 %   rowscols   - Vector of the form [m,n] where m is total vertical tiles and n 
@@ -17,14 +17,14 @@
 %                multiple figures will be produced {def|0 -> one near-square page}.
 %   labels     - Vector of numbers or a matrix of strings to use as labels for
 %                each map {default|0 -> 1:ncolumns_in_winv}
-%   view       - topoplot() view, either [az el] or keyword ('top',...)
-%                See >> help topoplot() for options.
+%   view       - TOPOPLOT view, either [az el] or keyword ('top',...)
+%                See >> help TOPOPLOT for options.
 %
 % Note: Map scaling is to +/-max(abs(data); green = 0
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 4-28-1998 
 %
-% See also: topoplot()
+% See also: TOPOPLOT
 
 % Copyright (C) 4-28-98 from compmap.m Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

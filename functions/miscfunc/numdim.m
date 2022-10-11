@@ -1,4 +1,4 @@
-% numdim() - estimate a lower bound on the (minimum) number of discrete sources 
+% NUMDIM - estimate a lower bound on the (minimum) number of discrete sources 
 %            in the data via their second-order statistics.
 % Usage:
 %   >> num = numdim( data );

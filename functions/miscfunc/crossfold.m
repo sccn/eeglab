@@ -1,4 +1,4 @@
-% crossf() - Returns estimates and plot of event-related coherence (ERC) changes
+% CROSSF - Returns estimates and plot of event-related coherence (ERC) changes
 %            between data from two input channels. The lower panel gives the
 %            coherent phase difference between the processes. In this panel, for Ex.
 %               -90 degrees (blue) means xdata leads ydata by a quarter cycle.
@@ -60,7 +60,7 @@
 %
 % Authors: Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD, La Jolla, 1998 
 %
-% See also: timef()
+% See also: TIMEF
 
 % Copyright (C) 8/1/98 Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
 %
@@ -94,9 +94,9 @@
 % 06-29-99 fixed constant-Q freq indexing -se
 % 08-13-99 added cohangle plotting -sm
 % 08-20-99 made bootstrap more efficient -sm
-% 08-24-99 allow nan values introduced by possible eventlock() preproc. -sm
+% 08-24-99 allow nan values introduced by possible EVENTLOCK preproc. -sm
 % 03-16-00 added lead/lag interpretation to help msg - sm & eric visser
-% 03-16-00 added axcopy() feature -sm & tpj
+% 03-16-00 added AXCOPY feature -sm & tpj
 % 04-20-00 fixed Rangle sign for wavelets, added verts array -sm
 % 01-22-01 corrected help msg when nargin<2 -sm & arno delorme
 % 01-25-02 reformated help & license, added links -ad 

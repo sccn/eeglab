@@ -1,4 +1,4 @@
-% imagescloglog() - make an imagesc(0) plot with log y-axis and
+% IMAGESCLOGLOG - make an imagesc(0) plot with log y-axis and
 %                   x-axis values
 %
 % Usage:  >> imagescloglog(times,freqs,data);

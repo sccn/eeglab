@@ -1,4 +1,4 @@
-% getallmenuseeglab() - get all submenus of a window or a menu and return 
+% GETALLMENUSEEGLAB - get all submenus of a window or a menu and return 
 %                 a tree. The function will also look for callback.
 %
 % Usage:

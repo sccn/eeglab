@@ -1,4 +1,4 @@
-% scanfold() - scan folder content
+% SCANFOLD - scan folder content
 %
 % Usage:    
 %    >> [cellres textres] = scanfold(foldname);

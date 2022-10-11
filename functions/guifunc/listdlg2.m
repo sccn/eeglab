@@ -1,11 +1,11 @@
-% listdlg2() - listdlg function clone with coloring and help for 
-%               eeglab().
+% LISTDLG2 - listdlg function clone with coloring and help for 
+%               EEGLAB.
 %
-% Usage: same as listdlg()
+% Usage: same as LISTDLG
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 16 August 2002
 %
-% See also: inputdlg2(), errordlg2(), supergui(), inputgui()
+% See also: INPUTDLG2, ERRORDLG2, SUPERGUI, INPUTGUI
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %

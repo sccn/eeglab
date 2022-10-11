@@ -1,6 +1,6 @@
-% pcsquash() - compress data using Principal Component Analysis (PCA)
+% PCSQUASH - compress data using Principal Component Analysis (PCA)
 %              into a principal component subspace.  To project back 
-%              into the original channel space, use pcexpand()
+%              into the original channel space, use PCEXPAND
 %
 % Usage: 
 %        >> [eigenvectors,eigenvalues] = pcsquash(data,ncomps);
@@ -21,7 +21,7 @@
 %
 % Author: Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, La Jolla, 6-97 
 %
-% See also: pcexpand(), svd()
+% See also: PCEXPAND, SVD
 
 % Copyright (C) 2000 Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, 
 % scott@sccn.ucsd.edu

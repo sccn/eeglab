@@ -1,4 +1,4 @@
-% gauss3d() - generate a 3-dimensional gaussian matrix
+% GAUSS3D - generate a 3-dimensional gaussian matrix
 %
 % Usage:
 %   >> [ gaussmatrix ] = gauss2d( nX, nY, nZ);

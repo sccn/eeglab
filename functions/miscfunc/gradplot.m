@@ -1,4 +1,4 @@
-% gradplot() - Compute the gradient of EEG scalp map(s) on a square grid
+% GRADPLOT - Compute the gradient of EEG scalp map(s) on a square grid
 %
 % Usage:
 %            >> [gradX, gradY] = gradplot(maps,eloc_file,draw)
@@ -12,11 +12,11 @@
 %   gradX  - Gradients in X direction
 %   gradY  - Gradients in Y directions 
 %
-% Note: Use cart2pol() to convert to polar (amp, direction) coordinates).
+% Note: Use CART2POL to convert to polar (amp, direction) coordinates).
 %
 % Authors: Marissa Westerfield & Arnaud Delorme, CNL/Salk Institute, La Jolla 3/10/01
 %
-% See also: topoplot(), lapplot()
+% See also: TOPOPLOT, LAPPLOT
 
 % Copyright (C) 3/10/01 Marissa Westerfield & Arnaud Delorme, CNL/Salk Institute, La Jolla
 %
