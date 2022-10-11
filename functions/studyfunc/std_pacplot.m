@@ -1,4 +1,4 @@
-% std_pacplot() - Commandline function to plot cluster PAC 
+% STD_PACPLOT - Commandline function to plot cluster PAC 
 %                (phase-amplitude coupling).
 %
 % Usage:    
@@ -8,13 +8,13 @@
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the datasets in the STUDY. 
-%                Note: ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                Note: ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %
 % Additional help:
-% Inputs and output of this function are strictly identical to the std_erspplot(). 
+% Inputs and output of this function are strictly identical to the STD_ERSPPLOT. 
 % See the help message of this function for more information.
 %
-% See also: std_erspplot(), pop_clustedit(), pop_preclust()
+% See also: STD_ERSPPLOT, POP_CLUSTEDIT, POP_PRECLUST
 %
 % Authors: Arnaud Delorme, CERCO, July, 2009-
 

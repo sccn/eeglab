@@ -1,4 +1,4 @@
-% pop_rejtrend() - Measure linear trends in EEG data; reject data epochs 
+% POP_REJTREND - Measure linear trends in EEG data; reject data epochs 
 %                  containing strong trends.
 % Usage:
 %   >> pop_rejtrend( INEEG, typerej); % pop up an interactive window
@@ -46,13 +46,13 @@
 %
 % Outputs:
 %   OUTEEG     - output dataset with rejected trials marked for rejection
-%     Note: When eegplot() is called, modifications are applied to the current 
-%     dataset at the end of the call to eegplot() (e.g., when the user presses 
+%     Note: When EEGPLOT is called, modifications are applied to the current 
+%     dataset at the end of the call to EEGPLOT (e.g., when the user presses 
 %     the 'Reject' button).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: rejtrend(), eeglab(), eegplot(), pop_rejepoch() 
+% See also: REJTREND, EEGLAB, EEGPLOT, POP_REJEPOCH 
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

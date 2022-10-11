@@ -1,4 +1,4 @@
-% pop_resample() - resample dataset (pop up window).
+% POP_RESAMPLE - resample dataset (pop up window).
 %
 % Usage:
 %   >> [OUTEEG] = pop_resample( INEEG ); % pop up interactive window
@@ -25,11 +25,11 @@
 %
 % Author: Arnaud Delorme, CNL/Salk Institute, 2001
 %
-% Note: uses the resample() function from the signal processing toolbox
+% Note: uses the RESAMPLE function from the signal processing toolbox
 %       if present. Otherwise use griddata interpolation method (it should be
 %       reprogrammed using spline interpolation for speed up).
 %
-% See also: resample(), eeglab()
+% See also: RESAMPLE, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -365,7 +365,7 @@ function tmpeeglab = myresample(data, p, q, usesigproc, fc, df)
 
     end
     
-% firfiltdcpadded() - Pad data with DC constant and filter
+% FIRFILTDCPADDED - Pad data with DC constant and filter
 %
 % Usage:
 %   >> data = firfiltdcpadded(data, b, causal);

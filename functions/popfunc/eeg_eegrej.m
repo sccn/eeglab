@@ -1,4 +1,4 @@
-% eeg_eegrej() - reject porition of continuous data in an EEGLAB 
+% EEG_EEGREJ - reject porition of continuous data in an EEGLAB 
 %                dataset
 %
 % Usage:
@@ -17,7 +17,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 8 August 2002
 %
-% See also: eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

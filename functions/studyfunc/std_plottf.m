@@ -1,4 +1,4 @@
-% std_plottf() - plot ERSP/ITC images a component
+% STD_PLOTTF - plot ERSP/ITC images a component
 %              or channel cluster in a STUDY. Also allows plotting scalp
 %              maps.
 % Usage:
@@ -51,7 +51,7 @@
 %                  might be inaccurate {default: 'auto'}
 %
 % ITC/ERSP image plotting options:
-%  'tftopoopt'   - [cell array] tftopo() plotting options (ERSP and ITC)
+%  'tftopoopt'   - [cell array] TFTOPO plotting options (ERSP and ITC)
 %  'caxis'       - [min max] color axis (ERSP, ITC, scalp maps)
 %
 % Scalp map plotting options:
@@ -59,7 +59,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
+% See also: POP_ERSPPARAMS, POP_ERPPARAMS, POP_SPECPARAMS, STATCOND
 
 % Copyright (C) 2006 Arnaud Delorme
 %

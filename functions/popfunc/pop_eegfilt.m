@@ -1,4 +1,4 @@
-% pop_eegfilt() - interactively filter EEG dataset data using eegfilt()
+% POP_EEGFILT - interactively filter EEG dataset data using EEGFILT
 %
 % Usage:
 %   >> EEGOUT = pop_eegfilt( EEG, locutoff, hicutoff, filtorder);
@@ -34,7 +34,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegfilt(), eegfiltfft(), eeglab()
+% See also: EEGFILT, EEGFILTFFT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

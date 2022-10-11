@@ -1,4 +1,4 @@
-% pop_autorej() - perform automatic artifact epoch detection and rejection 
+% POP_AUTOREJ - perform automatic artifact epoch detection and rejection 
 %
 % Usage:
 %   >> [EEG, rmepochs] = pop_autorej( EEG, 'key', 'val');
@@ -29,7 +29,7 @@
 %   rmepochs     - [integer] rejected trial indices
 %
 % Function description: 
-%     pop_autorej() first detects extremely large potential fluctuations;
+%     POP_AUTOREJ first detects extremely large potential fluctuations;
 %     this is mostly to detect artifacts from electrical surges or other 
 %     unreasonably large amplitude events. Then it applies the following.
 %     The function rejects data epochs containing data values outside a 

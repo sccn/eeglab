@@ -1,4 +1,4 @@
-% eegplot2event() - convert EEGPLOT rejections into events
+% EEGPLOT2EVENT - convert EEGPLOT rejections into events
 %                   compatible with the eeg_eegrej function for rejecting 
 %                   continuous portions of datasets.
 %
@@ -21,7 +21,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegplot(), eeg_multieegplot(), eegplot2trial(), eeglab()
+% See also: EEGPLOT, EEG_MULTIEEGPLOT, EEGPLOT2TRIAL, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

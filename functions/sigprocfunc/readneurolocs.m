@@ -1,4 +1,4 @@
-% readneurolocs() - read neuroscan polar location file (.asc)
+% READNEUROLOCS - read neuroscan polar location file (.asc)
 %
 % Usage:
 %   >> CHANLOCS = readneurolocs( filename );
@@ -8,18 +8,18 @@
 %   filename       - file name or matlab cell array { names x_coord y_coord }
 %
 % Optional inputs:
-%   same as caliblocs()
+%   same as CALIBLOCS
 %   note that if no optional input are provided, re-centering will be
 %   performed automatically and re-scaling of coordinates will be
 %   performed for '.asc' files (not '.dat' files).
 %
 % Outputs:
 %   CHANLOCS       - EEGLAB channel location data structure. See
-%                    help readlocs()
+%                    help READLOCS
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 4 March 2003
 %
-% See also: readlocs()
+% See also: READLOCS
 
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

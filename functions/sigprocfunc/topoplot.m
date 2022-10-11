@@ -1,4 +1,4 @@
-% topoplot() - plot a topographic map of a scalp data field in a 2-D circular view 
+% TOPOPLOT - plot a topographic map of a scalp data field in a 2-D circular view 
 %              (looking down at the top of the head) using interpolation on a fine 
 %              cartesian grid. Can also show specified channel location(s), or return 
 %              an interpolated value at an arbitrary scalp location (see 'noplot').
@@ -103,7 +103,7 @@
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                       model has radius 1). If several rows, plot one dipole per row.
-%                       Coordinates returned by dipplot() may be used. Can accept
+%                       Coordinates returned by DIPPLOT may be used. Can accept
 %                       an EEG.dipfit.model structure (See >> help dipplot).
 %                       Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
 %   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'on'}.
@@ -141,7 +141,7 @@
 % Authors: Andy Spydell, Colin Humphries, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001 -
 %
-% See also: timtopo(), envtopo()
+% See also: TIMTOPO, ENVTOPO
 
 % Deprecated options: 
 %           'shrink' - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
@@ -887,7 +887,7 @@ if length(pltchans) < length(Rd) && strcmpi(VERBOSE, 'on')
 end;	
 
 
-% fprintf('topoplot(): plotting %d channels\n',length(pltchans));
+% fprintf('TOPOPLOT: plotting %d channels\n',length(pltchans));
 if ~isempty(EMARKER2CHANS)
     if strcmpi(STYLE,'blank')
        error('emarker2 not defined for style ''blank'' - use marking channel numbers in place of data');

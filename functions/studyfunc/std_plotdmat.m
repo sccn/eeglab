@@ -1,4 +1,4 @@
-% std_plodtmat() - plot design matrix and info associated with the study for
+% STD_PLODTMAT - plot design matrix and info associated with the study for
 %                  each subject. Designed to be used directly (as a callback 
 %                  function of button plot) from pop_studydesign
 % Usage:

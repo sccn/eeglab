@@ -1,4 +1,4 @@
-% env() - return envelope of rows of a data matrix, or optionally
+% ENV - return envelope of rows of a data matrix, or optionally
 %         of the data interpolated to a different sampling rate.
 % Usage:
 %   >> envdata = env(data);
@@ -19,7 +19,7 @@
 %
 % Author: Scott Makeig & Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: envtopo()
+% See also: ENVTOPO
 
 % Copyright (C) Scott Makeig & Arnaud Delorme - CNL / Salk Institute, La Jolla 8/8/97
 %

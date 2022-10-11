@@ -1,4 +1,4 @@
-% pop_newset() - Edit/save EEG dataset structure information.
+% POP_NEWSET - Edit/save EEG dataset structure information.
 %
 % Usage:
 %   >> [ALLEEG EEG CURRENTSET] = pop_newset( ALLEEG, EEG, CURRENTSET,...
@@ -16,12 +16,12 @@
 %   'savenew'     - ['filename'] filename in which to save the new dataset
 %   'retrieve'    - [index] retrieve the old dataset (ignore recent changes)
 %
-% Note: Calls eeg_store() which may modify the variable ALLEEG 
+% Note: Calls EEG_STORE which may modify the variable ALLEEG 
 %       containing the current dataset(s).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 23 Arpil 2002
 %
-% See also: eeg_store(), pop_editset(), eeglab()
+% See also: EEG_STORE, POP_EDITSET, EEGLAB
 
 % Copyright (C) 23 Arpil 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

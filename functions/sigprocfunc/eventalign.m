@@ -1,4 +1,4 @@
-% eventalign - function called by pop_importevent() to find the best
+% eventalign - function called by POP_IMPORTEVENT to find the best
 %              sampling rate ratio to align 2 arrays of data events.
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, Dec 2003

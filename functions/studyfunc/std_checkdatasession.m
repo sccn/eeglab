@@ -1,4 +1,4 @@
-% std_checkdatasession() - Check/fill session field in STUDY. Based in the
+% STD_CHECKDATASESSION - Check/fill session field in STUDY. Based in the
 % name and IC decomposition of datases, the function determine which
 % ones are coming from the same sessions. 
 % It will assign the same index number to the sets from the same subject coming

@@ -1,4 +1,4 @@
-% pop_biosig() - import data files into EEGLAB using BIOSIG toolbox
+% POP_BIOSIG - import data files into EEGLAB using BIOSIG toolbox
 %
 % Usage:
 %   >> OUTEEG = pop_biosig; % pop up window

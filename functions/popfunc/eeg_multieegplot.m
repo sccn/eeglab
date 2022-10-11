@@ -1,4 +1,4 @@
-% eeg_multieegplot() - Produce an eegplot() of a the average of an epoched dataset 
+% EEG_MULTIEEGPLOT - Produce an EEGPLOT of a the average of an epoched dataset 
 %                  (with optional pre-labelling of specific trials).
 % Usage:
 %   >> eeg_multieegplot( data,trialrej, elecrej, ...
@@ -12,13 +12,13 @@
 %   oldelecrej  - array of 0s and 1s (depicting electrodes rejected in 
 %                 all trials) (size nbelectrodes x sweeps )
 %
-% Note: 1) {'Key', value } Arguments are passed on to eegplot() 
+% Note: 1) {'Key', value } Arguments are passed on to EEGPLOT 
 %       2) To ignore previous rejections simply set 'oldtrialrej' and
 %          'oldelecrej' arguments to empty ([]).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegplot(), eegplot2event(), eegplot2trial(), eeglab()
+% See also: EEGPLOT, EEGPLOT2EVENT, EEGPLOT2TRIAL, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% std_chantopo() - plot ERP/spectral/ERSP topoplot at a specific
+% STD_CHANTOPO - plot ERP/spectral/ERSP topoplot at a specific
 %                  latency/frequency. 
 % Usage:
 %          >> std_chantopo( data, 'key', 'val', ...)
@@ -42,7 +42,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
+% See also: POP_ERSPPARAMS, POP_ERPPARAMS, POP_SPECPARAMS, STATCOND
 
 % Copyright (C) 2006 Arnaud Delorme
 %

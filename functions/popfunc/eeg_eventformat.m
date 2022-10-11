@@ -1,4 +1,4 @@
-% eeg_eventformat() - Convert the event information of a dataset from struct
+% EEG_EVENTFORMAT - Convert the event information of a dataset from struct
 %                 to array or vice versa.
 %
 % Usage: >> [eventout fields] = eeg_eventformat( event, 'format', fields );
@@ -38,7 +38,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002
 %
-% See also: eeglab(), pop_selectevent(), pop_importevent()
+% See also: EEGLAB, POP_SELECTEVENT, POP_IMPORTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002, arno@salk.edu
 %

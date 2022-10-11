@@ -1,4 +1,4 @@
-% rejtrend() - detect linear trends in EEG activity and reject the  
+% REJTREND - detect linear trends in EEG activity and reject the  
 %                  epoched trials based on the accuracy of the linear
 %                  fit.
 % Usage:
@@ -29,7 +29,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

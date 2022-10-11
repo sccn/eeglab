@@ -1,4 +1,4 @@
-% std_findsameica() - find groups of datasets with identical ICA decomposiotions
+% STD_FINDSAMEICA - find groups of datasets with identical ICA decomposiotions
 %                     (search identical weight*sphere matrices)
 %
 % Usage: 

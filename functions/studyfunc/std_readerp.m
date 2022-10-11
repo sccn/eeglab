@@ -1,7 +1,7 @@
-% std_readerp() - load ERP measures for data channels or 
+% STD_READERP - load ERP measures for data channels or 
 %                  for all components of a specified cluster.
 %                  Called by plotting functions
-%                  std_envtopo(), std_erpplot(), std_erspplot(), ...
+%                  STD_ENVTOPO, STD_ERPPLOT, STD_ERSPPLOT, ...
 % Usage:
 %         >> [STUDY, datavals, times, setinds, cinds] = ...
 %                   std_readerp(STUDY, ALLEEG, varargin);

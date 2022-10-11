@@ -1,4 +1,4 @@
-% phasecoher() - Implements inter-trial amp/coherence using Gaussian wavelets.
+% PHASECOHER - Implements inter-trial amp/coherence using Gaussian wavelets.
 %                Returns same data length as input frames.
 %                Plots results when nargin>6. Outputs have flat ends 
 %                at data indices [1:halfwin] and [frames-halfwin:frames].
@@ -32,7 +32,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 5-5-98 
 %
-% See also: erpimage()
+% See also: ERPIMAGE
 
 % Copyright (C) 5-5-98 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -66,7 +66,7 @@
 % 10-27-98 added cohsig, alpha -sm
 % 07-24-99 added allamps -sm
 % 02-29-00 added ampsig -sm
-% 12-05-00 changed complex abs() to sqrt( .^2+ .^2) to avoid possible i ambiguity -sm & tpj
+% 12-05-00 changed complex ABS to sqrt( .^2+ .^2) to avoid possible i ambiguity -sm & tpj
 % 12-31-00 added ...20...40... frames fprinting -sm
 % 08-17-01 added allphs option -sm
 % 08-18-01 debugged cohsig plotting line (302) -sm

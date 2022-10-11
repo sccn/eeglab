@@ -1,4 +1,4 @@
-% std_topo() - uses topoplot() to get the interpolated Cartesian grid of the 
+% STD_TOPO - uses TOPOPLOT to get the interpolated Cartesian grid of the 
 %               specified component topo maps. The topo map grids are saved
 %               into a (.icatopo) file and a pointer to the file is stored 
 %               in the EEG structure. If such a file already exists, 
@@ -30,7 +30,7 @@
 %  
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 %
-% See also  topoplot(), std_erp(), std_ersp(), std_spec(), std_preclust()
+% See also  TOPOPLOT, STD_ERP, STD_ERSP, STD_SPEC, STD_PRECLUST
 
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %

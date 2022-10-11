@@ -1,5 +1,5 @@
 %
-% envtopo() - Plot the envelope of a multichannel data epoch, plus envelopes and 
+% ENVTOPO - Plot the envelope of a multichannel data epoch, plus envelopes and 
 %             scalp maps of specified or largest-contributing components. If a 3-D 
 %             input matrix, operates on the mean of the data epochs. Click on 
 %             individual axes to examine them in detail. The black lines represent 
@@ -47,7 +47,7 @@
 %                  'mp', sort components by maximum mean back-projected power 
 %                  in the 'limcontrib' time range: mp(comp) = max(Mean(back_proj.^2));
 %                  where back_proj = comp_map * comp_activation(t) for t in 'limcontrib'
-%                  'pv', sort components by percent variance accounted for (eeg_pvaf())
+%                  'pv', sort components by percent variance accounted for (EEG_PVAF)
 %                    pvaf(comp) = 100-100*mean(var(data - back_proj))/mean(var(data));
 %                  'pp', sort components by percent power accounted for (ppaf) 
 %                    ppaf(comp) = 100-100*Mean((data - back_proj).^2)/Mean(data.^2);
@@ -56,7 +56,7 @@
 %  'title'     = [string] plot title {default|[] -> none}
 %  'plotchans' = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
-%                  {default|[] -> all}, by calling topoplot().
+%                  {default|[] -> all}, by calling TOPOPLOT.
 %  'voffsets'  = [float array] vertical line extensions above the data max to 
 %                  disentangle plot lines (left->right heads, values in y-axis units) 
 %                  {default|[] -> none}
@@ -87,7 +87,7 @@
 %                  in the designated (limcontrib) interval. 'off' -> scale scalp maps 
 %                  individually using +/- max(abs(map value)) {default: 'off'}
 %  'dispmaps'  = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
-%  'topoplotkey','val' = optional additional topoplot() arguments {default: none}
+%  'topoplotkey','val' = optional additional TOPOPLOT arguments {default: none}
 %  'axisoff'   = [real] percent of the figure y-dimension to be covered by the axis
 %                 for the envelopes. Values are restricted to the range [0.60 1]{default: 0.6}
 %
@@ -113,7 +113,7 @@
 %
 % Authors: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/1998 
 %
-% See also: timtopo() axcopy()
+% See also: TIMTOPO AXCOPY
 
 % Copyright (C) 3-10-98 from timtopo.m Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -146,7 +146,7 @@
 % 3-18-98 fixed bug in LineStyle for fifth component, topoplot maxproj with 
 %         correct orientations, give specified component number labels -sm
 % 4-28-98 plot largest components, ranked by max projected variance -sm
-% 4-30-98 fixed bug found in icademo() -sm
+% 4-30-98 fixed bug found in ICADEMO -sm
 % 5-08-98 fixed bug found by mw () -sm
 % 5-23-98 made vert. line styles for comps 6 & 11 correct -sm
 % 5-30-98 added 'envtopo.labels' option -sm
@@ -162,11 +162,11 @@
 % 12-27-99 improved help msg, moved new version to distribution -sm
 % 01-21-00 added 'bold' option for colorfile arg -sm
 % 02-28-00 added fill_comp_env arg -sm
-% 03-16-00 added axcopy() -sm & tpj
+% 03-16-00 added AXCOPY -sm & tpj
 % 05-02-00 added vert option -sm
 % 05-30-00 added option to show "envelope" of only 1 channel -sm
 % 09-07-00 added [-n] option for compnums, added BOLD_COLORS as default -sm
-% 12-19-00 updated icaproj() args -sm
+% 12-19-00 updated ICAPROJ args -sm
 % 12-22-00 trying 'axis square' for topoplots -sm
 % 02-02-01 fixed bug in printing component 6 env line styles -sm
 % 04-11-01 added [] default option for args -sm

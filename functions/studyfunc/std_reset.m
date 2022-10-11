@@ -1,4 +1,4 @@
-% std_reset() - Remove all preloaded measures from STUDY
+% STD_RESET - Remove all preloaded measures from STUDY
 %
 % Usage:
 %   >> STUDY = std_reset(STUDY);

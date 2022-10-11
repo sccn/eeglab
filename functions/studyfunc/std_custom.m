@@ -1,4 +1,4 @@
-% std_custom() - Returns custom measure for a dataset.
+% STD_CUSTOM - Returns custom measure for a dataset.
 %
 % Usage:    
 %           >> [spec freqs] = std_custom(EEG, func, 'key', 'val', ...);

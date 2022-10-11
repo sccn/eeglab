@@ -1,5 +1,5 @@
-% eeg_lat2point() - convert latencies in time units relative to the
-%                   time locking event of an eeglab() data epoch to 
+% EEG_LAT2POINT - convert latencies in time units relative to the
+%                   time locking event of an EEGLAB data epoch to 
 %                   latencies in data points (assuming concatenated epochs).
 % Usage:
 %       >> [newlat] = eeg_lat2point( lat_array, epoch_array,...
@@ -20,12 +20,12 @@
 %
 % Outputs:
 %   newlat      - converted latency values in points assuming concatenated
-%                 data epochs (see eeglab() event structure)
+%                 data epochs (see EEGLAB event structure)
 %   flag        - 1 if any point out of range was replaced.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2 Mai 2002
 %
-% See also: eeg_point2lat(), eeglab()
+% See also: EEG_POINT2LAT, EEGLAB
 
 % Copyright (C) 2 Mai 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

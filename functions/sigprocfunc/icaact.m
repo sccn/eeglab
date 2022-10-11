@@ -1,10 +1,10 @@
-% icaact() - compute ICA activation waveforms = weights*sphere*(data-meandata)
+% ICAACT - compute ICA activation waveforms = weights*sphere*(data-meandata)
 %
 % Usage: >> [activations] = icaact(data,weights,datamean);
 %
 % Inputs:  
 %     data     = input data (chans,frames)
-%     weights  = unmixing matrix (runica() weights*sphere)
+%     weights  = unmixing matrix (RUNICA weights*sphere)
 %     datamean = 0 or mean(data')  (default 0);
 %
 % Note:  If datamean==0, data means are distributed over activations.
@@ -15,7 +15,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 4-3-97 
 %
-% See also: runica(), icaproj(), icavar()
+% See also: RUNICA, ICAPROJ, ICAVAR
 
 % Copyright (C) 4-3-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

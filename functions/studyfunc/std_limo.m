@@ -1,4 +1,4 @@
-% std_limo() - Export and run in LIMO the EEGLAB STUDY design.
+% STD_LIMO - Export and run in LIMO the EEGLAB STUDY design.
 %           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
 %
 % Usage:
@@ -23,7 +23,7 @@
 %                   replaced with 0s.
 %  'erase'        - ['on'|'off'] erase previous files. Default is 'on'.
 %  'neighboropt'  - [cell] cell array of options for the function computing
-%                   the channel neighbox matrix std_prepare_chanlocs(). The file
+%                   the channel neighbox matrix STD_PREPARE_CHANLOCS. The file
 %                   is saved automatically if channel location are present.
 %                   This option allows to overwrite the defaults when computing
 %                   the channel neighbox matrix.

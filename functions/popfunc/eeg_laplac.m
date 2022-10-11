@@ -1,9 +1,9 @@
-% eeg_laplac() - gives the laplacian for the data contained in EEG
+% EEG_LAPLAC - gives the laplacian for the data contained in EEG
 % for the values 1:stepl:end with electrodes position given by EEG.chanlocs. 
 % Step must be a number between 1 and length(EEG.data) 
 % The method used for computig the laplacian is the described by Perrin et al.
 % 1989 using a spline interpolation between the electrodes. This function 
-% requires the functions g2() and gm_1() to be in the path or in the same dir. 
+% requires the functions G2 and GM_1 to be in the path or in the same dir. 
 % Usage:
 %        >>  [laplac time] = eeg_laplac(EEG, step);
 %        >>  laplac = eeg_laplac(EEG, step);
@@ -15,7 +15,7 @@
 %   laplac     - A matrix containing the value of laplacian for the data
 %   time       - Time spent in calculation  
 %
-% See also: del2map()
+% See also: DEL2MAP
 %
 % Author: Juan Sebastian Gonzalez, DFI / Universidad de Chile
 % 

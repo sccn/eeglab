@@ -1,4 +1,4 @@
-% kurt() - return kurtosis of input data distribution
+% KURT - return kurtosis of input data distribution
 %
 % Usage:
 %   >> k=kurt(data)

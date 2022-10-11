@@ -1,4 +1,4 @@
-% eeg_findboundaries() - return indices of boundary events
+% EEG_FINDBOUNDARIES - return indices of boundary events
 %
 % Usage:
 %   >> boundaryIndices = eeg_findboundaries(INEEG);
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, 2022
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2022 Arnaud Delorme
 %

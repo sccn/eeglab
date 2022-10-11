@@ -1,4 +1,4 @@
-% std_detachplots() -  Given a figure with subplots and several lines per axis, will add a callback to
+% STD_DETACHPLOTS -  Given a figure with subplots and several lines per axis, will add a callback to
 % each axis specified in the 'figtitles' input. The callback consist in a figure with all the detached
 % individuals lines.
 %

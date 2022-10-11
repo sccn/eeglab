@@ -1,4 +1,4 @@
-% spher() - return the sphering matrix for given input data
+% SPHER - return the sphering matrix for given input data
 %
 % Usage:
 %        >> sphere_matrix = spher(data);

@@ -1,4 +1,4 @@
-% eegfiltfft() -  (high|low|band)-pass filter data using inverse fft 
+% EEGFILTFFT -  (high|low|band)-pass filter data using inverse fft 
 %                 (without using the Matlab signal processing toolbox)
 % Usage:
 %  >> [smoothdata] = eegfiltfft(data,srate,locutoff,hicutoff);
@@ -12,7 +12,7 @@
 %
 % Optional inputs:
 %   epochframes = frames per epoch (filter each epoch separately {def/0: data is 1 epoch}
-%   filtorder   = argument not used (but required for symmetry with eegfilt() function).
+%   filtorder   = argument not used (but required for symmetry with EEGFILT function).
 %   revfilt     = [0|1] reverse filter (i.e. bandpass filter to notch filter). {0}
 %
 % Outputs:
@@ -23,7 +23,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2003
 %
-% See also: eegfilt()
+% See also: EEGFILT
 
 % inspired from a google group message
 % http://groups.google.com/groups?q=without+%22the+signal+processing+toolbox%22&hl=en&lr=&ie=UTF-8&oe=UTF-8&selm=f56893ae.0311141025.3069d4f8%40posting.google.com&rnum=8

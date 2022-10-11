@@ -1,5 +1,5 @@
-% std_selectdesign() - select an existing STUDY design. 
-%                      Use std_makedesign() to add a new STUDY.design.
+% STD_SELECTDESIGN - select an existing STUDY design. 
+%                      Use STD_MAKEDESIGN to add a new STUDY.design.
 %
 % Usage:
 %   >> [STUDY] = std_selectdesign(STUDY, ALLEEG, designind);

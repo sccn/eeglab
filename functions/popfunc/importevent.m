@@ -1,4 +1,4 @@
-% importevent() - Import experimental events from data file or Matlab
+% IMPORTEVENT - Import experimental events from data file or Matlab
 %                 array into a structure.
 %
 % Usage: >> eventstruct = importevent( event, oldevent, srate);
@@ -67,7 +67,7 @@
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 2004
 %
-% See also: pop_importevent()
+% See also: POP_IMPORTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 2004, arno@salk.edu
 %

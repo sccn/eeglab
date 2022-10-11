@@ -1,5 +1,5 @@
-% pop_reref() - Convert an EEG dataset to average reference or to a
-%               new common reference channel (or channels). Calls reref().
+% POP_REREF - Convert an EEG dataset to average reference or to a
+%               new common reference channel (or channels). Calls REREF.
 % Usage:
 %       >> EEGOUT = pop_reref( EEG ); % pop up interactive window
 %       >> EEGOUT = pop_reref( EEG, ref, 'key', 'val' ...);
@@ -51,11 +51,11 @@
 %   EEGOUT      - re-referenced output dataset
 %
 % Notes:
-%                 For other options, call reref() directly. See >> help reref
+%                 For other options, call REREF directly. See >> help reref
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 Nov 2002
 %
-% See also: reref(), eeglab()
+% See also: REREF, EEGLAB
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

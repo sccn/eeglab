@@ -1,4 +1,4 @@
-% pop_importevent() - Import events into an EEG dataset. If the EEG dataset
+% POP_IMPORTEVENT - Import events into an EEG dataset. If the EEG dataset
 %              is the only input, a window pops up to ask for the relevant 
 %              parameter values.
 %
@@ -93,7 +93,7 @@
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 9 Feb 2002
 %
-% See also: importevent(), pop_editeventfield(), pop_selectevent()
+% See also: IMPORTEVENT, POP_EDITEVENTFIELD, POP_SELECTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 9 Feb 2002, arno@salk.edu
 %

@@ -1,5 +1,5 @@
-% POP_RUNICA - Run an ICA decomposition of an EEG dataset using runica(), 
-%                binica(), or another ICA or other linear decomposition. 
+% POP_RUNICA - Run an ICA decomposition of an EEG dataset using RUNICA, 
+%                BINICA, or another ICA or other linear decomposition. 
 % Usage:
 %   >> OUT_EEG = pop_runica( EEG ); % pops-up a data entry window
 %   >> OUT_EEG = pop_runica( EEG, 'key', 'val' ); % no pop_up
@@ -16,8 +16,8 @@
 %   'icatype'   - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
 %                 to use for the ICA decomposition. The nature of any 
 %                 differences in the results of these algorithms have 
-%                 not been well characterized. {default: binica(), if
-%                 found, else runica()}
+%                 not been well characterized. {default: BINICA, if
+%                 found, else RUNICA}
 %   'dataset'   - [integer array] dataset index or indices.
 %   'chanind'   - [integer array or cell array] subset of channel indices 
 %                 for running the ICA decomposition. Alternatively, you may
@@ -47,12 +47,12 @@
 %    on Tony Bell's infomax algorithm as implemented for automated use by 
 %    Scott Makeig et al. using the natural gradient of Amari et al. It can 
 %    also extract sub-Gaussian sources using the (recommended) 'extended' option 
-%    of Lee and Girolami. Function runica() is the all-Matlab version; function 
-%    binica() calls the (1.5x faster) binary version (a separate download) 
-%    translated into C from runica() by Sigurd Enghoff.
-% 2) jader() calls the JADE algorithm of Jean-Francois Cardoso. This is 
+%    of Lee and Girolami. Function RUNICA is the all-Matlab version; function 
+%    BINICA calls the (1.5x faster) binary version (a separate download) 
+%    translated into C from RUNICA by Sigurd Enghoff.
+% 2) JADER calls the JADE algorithm of Jean-Francois Cardoso. This is 
 %    included in the EEGLAB toolbox by his permission. See >> help jader
-% 3) To run fastica(), download the fastICA toolbox from its website,
+% 3) To run FASTICA, download the fastICA toolbox from its website,
 %    http://www.cis.hut.fi/projects/ica/fastica/, and make it available 
 %    in your Matlab path. According to its authors, default parameters
 %    are not optimal: Try args 'approach', 'sym' to estimate components 

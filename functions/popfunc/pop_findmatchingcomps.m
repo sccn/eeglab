@@ -1,4 +1,4 @@
-% pop_findmatchingcomps() - Find components with the highest 
+% POP_FINDMATCHINGCOMPS - Find components with the highest 
 %                absolute scalp map correlation to components provided or tagged for
 %                rejection in another dataset.
 %
@@ -14,7 +14,7 @@
 %                  marked manually in the other dataset using menu item
 %                  "Tools > Reject data using ICA > Reject components by map")
 %                  Else, ALLEEG index (integer) of another such dataset.
-%   'corrthresh'   - [0<float<=1] minimal absolute ÔmatchingÕ correlation.
+%   'corrthresh'   - [0<float<=1] minimal absolute matching correlation.
 %                  Default is 0.92.
 %   'matchcomps'   - [float array] scalp maps (as in icawinv) of components
 %                  from another decomposition or dataset to be matched to the

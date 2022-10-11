@@ -1,4 +1,4 @@
-% eeg_addnewevents() Add new events to EEG structure. Both EEG.event and
+% EEG_ADDNEWEVENTS Add new events to EEG structure. Both EEG.event and
 % EEG.urevent are updated.
 %
 % Usage:

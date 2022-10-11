@@ -1,4 +1,4 @@
-% readegi() - read EGI Simple Binary datafile (versions 2,3,4,5,6,7).
+% READEGI - read EGI Simple Binary datafile (versions 2,3,4,5,6,7).
 %	      Return header info, EEG data, and any event data.
 % Usage:
 %   >> [head, TrialData, EventData, CatIndex] = readegi(filename, dataChunks, forceversion)
@@ -15,7 +15,7 @@
 %                file header.  This has been occasionally necessary in cases where
 %                the file format was incorrectly indicated in the header.
 % Outputs:
-%   head = struct containing header info (see readegihdr() )
+%   head = struct containing header info (see READEGIHDR )
 %   TrialData = EEG channel data
 %   EventData = event codes
 %   CatIndex  = segment category indices
@@ -25,7 +25,7 @@
 % Note: code derived from C source code written by
 %       Tom Renner at EGI, Inc.
 %
-% See also: readegihdr()
+% See also: READEGIHDR
 
 % Copyright (C) 2002 , Salk Institute, arno@salk.edu
 %
@@ -215,7 +215,7 @@ end
 head.eventcode = char(head.eventcode);
 
 
-%--------------------------- isvector() ---------------
+%--------------------------- ISVECTOR ---------------
 function retval = isvector(V)
 
    s = size(V);

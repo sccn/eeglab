@@ -1,4 +1,4 @@
-% std_changroup() - Create channel groups for plotting.
+% STD_CHANGROUP - Create channel groups for plotting.
 %
 % Usage:    
 %                >> STUDY = std_changroup(STUDY, ALLEEG);   
@@ -6,7 +6,7 @@
 % Inputs:
 %   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
 %                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
-%                pop_loadstudy(), or in creating a new STUDY, using pop_createstudy().  
+%                POP_LOADSTUDY, or in creating a new STUDY, using POP_CREATESTUDY.  
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   chanlocs   - EEGLAB channel structure. Only construct the STUDY.changrp
 %                structure for a subset of channels.

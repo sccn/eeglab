@@ -1,4 +1,4 @@
-% pop_editeventvals() - Edit events contained in an EEG dataset structure. 
+% POP_EDITEVENTVALS - Edit events contained in an EEG dataset structure. 
 %               If the dataset is the only input, a window pops up 
 %               allowing the user to insert the relevant parameter values.
 %
@@ -33,7 +33,7 @@
 %
 % Author: Arnaud Delorme & Hilit Serby, SCCN, UCSD, 15 March 2002
 %
-% See also: pop_selectevent(), pop_importevent()
+% See also: POP_SELECTEVENT, POP_IMPORTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 15 March 2002, arno@salk.edu
 %

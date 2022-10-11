@@ -1,4 +1,4 @@
-% pop_savestudy() - save a STUDY structure to a disk file
+% POP_SAVESTUDY - save a STUDY structure to a disk file
 %
 % Usage:
 %   >> STUDY = pop_savestudy( STUDY, EEG ); % pop up and interactive window 

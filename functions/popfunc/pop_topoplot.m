@@ -1,8 +1,8 @@
-% pop_topoplot() - Plot scalp map(s) in a figure window. If number of input
+% POP_TOPOPLOT - Plot scalp map(s) in a figure window. If number of input
 %                  arguments is less than 3, pop up an interactive query window.
-%                  Makes (possibly repeated) calls to topoplot().
+%                  Makes (possibly repeated) calls to TOPOPLOT.
 % 
-%                  If field 'EEG.chanmatrix' exists, will use the topoplot() 'plotgrid' option 
+%                  If field 'EEG.chanmatrix' exists, will use the TOPOPLOT 'plotgrid' option 
 %                  to plot the data on the indicated channel matrix instead of plotting 
 %                  on the head (see 'plotgrid' in >> help topoplot).
 
@@ -33,7 +33,7 @@
 %                classification of the IC maps. Option is functional only
 %                when plotting IC maps and ICLabel has been computed for
 %                the EEG set provided
-%   options   - optional topoplot() arguments. Separate using commas. 
+%   options   - optional TOPOPLOT arguments. Separate using commas. 
 %               Example 'style', 'straight'. See >> help topoplot
 %               for further details. {default: none}
 %
@@ -44,7 +44,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: topoplot(), eeglab()
+% See also: TOPOPLOT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

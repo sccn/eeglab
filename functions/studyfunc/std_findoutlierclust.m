@@ -1,7 +1,7 @@
-% std_findoutlierclust() - determine whether an outlier cluster already exists 
+% STD_FINDOUTLIERCLUST - determine whether an outlier cluster already exists 
 %                 for a specified cluster. If so, return the outlier cluster index.  
 %                 If not, return zero. This helper function is called by 
-%                 pop_clustedit(), std_moveoutlier(), std_renameclust(). 
+%                 POP_CLUSTEDIT, STD_MOVEOUTLIER, STD_RENAMECLUST. 
 
 % Copyright (C) 2006 UCDS
 %

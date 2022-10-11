@@ -1,4 +1,4 @@
-% uigetfile2() - same as uigetfile but remember folder location.
+% UIGETFILE2 - same as uigetfile but remember folder location.
 %
 % Usage: >> uigetfile2(...)
 %

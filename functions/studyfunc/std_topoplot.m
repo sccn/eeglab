@@ -1,18 +1,18 @@
-% std_topoplot() - Command line function to plot cluster component and mean scalp maps. 
+% STD_TOPOPLOT - Command line function to plot cluster component and mean scalp maps. 
 %                  Displays either mean cluster/s scalp map/s, or all cluster/s components
 %                  scalp maps with the mean cluster/s scsalp map in one figure.
 %                  The scalp maps can be visualized only if component scalp maps     
 %                  were calculated and saved in the EEG datasets in the STUDY.
 %                  These can be computed during pre-clustering using the GUI-based function
-%                  pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                  and eeg_preclust(). A pop-function that calls this function is 
-%                  pop_clustedit().
+%                  POP_PRECLUST or the equivalent commandline functions EEG_CREATEDATA 
+%                  and EEG_PRECLUST. A pop-function that calls this function is 
+%                  POP_CLUSTEDIT.
 % Usage:    
 %              >> [STUDY] = std_topoplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in 
-%                the STUDY. ALLEEG for a STUDY set is typically created using load_ALLEEG().
+%                the STUDY. ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.
 % Optional inputs:
 %   'clusters'   - [numeric vector| 'all']  -> specific cluster numbers to plot.
 %                  'all' -> plot all clusters in STUDY.
@@ -38,7 +38,7 @@
 %              % Plot the mean scalp maps for clusters 1 through 20 on the same figure. 
 %           >> [STUDY] = std_topoplot(STUDY,ALLEEG, 'clusters', [1:20], 'mode', 'together');
 %
-%  See also  pop_clustedit(), pop_preclust()
+%  See also  POP_CLUSTEDIT, POP_PRECLUST
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -223,19 +223,19 @@ if strcmpi(mode, 'together')
     axcopy
 end        
 
-% std_plotcompmap() - Commandline function, to visualizing cluster components scalp maps. 
+% STD_PLOTCOMPMAP - Commandline function, to visualizing cluster components scalp maps. 
 %                   Displays the scalp maps of specified cluster components on separate figures. 
 %                   The scalp maps can be visualized only if component scalp maps     
 %                   were calculated and saved in the EEG datasets in the STUDY.
 %                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+%                   POP_PRECLUST or the equivalent commandline functions EEG_CREATEDATA 
+%                   and EEG_PRECLUST. A pop-function that calls this function is POP_CLUSTEDIT.
 % Usage:    
 %                   >> [STUDY] = std_plotcompmap(STUDY, ALLEEG, cluster, comps);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                     ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %   cluster     - single cluster number.  
 %
 % Optional inputs:

@@ -1,4 +1,4 @@
-% std_gettrialsind() - return the index of the trials that comply with the 
+% STD_GETTRIALSIND - return the index of the trials that comply with the 
 %                      defined values from trialinfo
 %
 % Usage:

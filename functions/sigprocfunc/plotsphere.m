@@ -1,4 +1,4 @@
-% plotsphere() - This function is used to plot a sphere and
+% PLOTSPHERE - This function is used to plot a sphere and
 %                project them onto specific surfaces. This may
 %                be used for plotting dipoles for instance.
 %

@@ -1,4 +1,4 @@
-% eeg_boundarytype() - return boundary event. It is usually "boundary". 
+% EEG_BOUNDARYTYPE - return boundary event. It is usually "boundary". 
 %                Based on EEGLAB options, it can be -99.
 % Usage:
 %   >> boundaryType = eeg_boundarytype(INEEG);
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, 2022
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2022 Arnaud Delorme
 %

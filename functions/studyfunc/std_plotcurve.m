@@ -1,4 +1,4 @@
-% std_plotcurve() - plot ERP or spectral traces for a STUDY component 
+% STD_PLOTCURVE - plot ERP or spectral traces for a STUDY component 
 %                   or channel cluster 
 % Usage:
 %          >> std_plotcurve( axvals, data, 'key', 'val', ...)
@@ -70,7 +70,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
+% See also: POP_ERSPPARAMS, POP_ERPPARAMS, POP_SPECPARAMS, STATCOND
 
 % Copyright (C) 2006 Arnaud Delorme
 %

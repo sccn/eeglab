@@ -1,13 +1,13 @@
-% mri3dplot() - plot 3-D density image translucently on top of the mean MR 
-%               brain image used in dipplot(). Plot brain slices in directions
+% MRI3DPLOT - plot 3-D density image translucently on top of the mean MR 
+%               brain image used in DIPPLOT. Plot brain slices in directions
 %               'top' (axial), or 'side' (sagittal), or 'rear' (coronal).
-%               Creates a new figure(). Smoothing uses Matlab smooth3()
+%               Creates a new FIGURE. Smoothing uses Matlab SMOOTH3
 % Usage:
 %      >> [smoothed_3ddens, mriplanes] = mri3dplot(array3d, mri, 'key', 'val', ...);
 %
 % Input: 
 %   array3d     - 3-D array to plot translucently on top of MRI image planes
-%                  (e.g., as returned by dipoledensity(), unit: dipoles/cc).
+%                  (e.g., as returned by DIPOLEDENSITY, unit: dipoles/cc).
 %   mri         - [string or struct] base MR image structure (as returned by 
 %                 dipoledensity.m or mri file (matlab format or file format read 
 %                 by fcdc_read_mri. See dipplot.m help for more information.
@@ -52,7 +52,7 @@
 %   array = gauss3d(91,109,91);
 %   mri3dplot(array, mri);
 %
-% See also: plotmri()
+% See also: PLOTMRI
 
 % Copyright (C) Arnaud Delorme, sccn, INC, UCSD, 2003-
 % 03/29/2013 Makoto. Line 370 added to avoid negative matrix indices.

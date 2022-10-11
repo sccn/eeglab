@@ -1,4 +1,4 @@
-% std_lm_seteegfields() - set limo fields in eeg sets
+% STD_LM_SETEEGFIELDS - set limo fields in eeg sets
 %
 % Usage:
 %   >>   EEG = std_lm_seteegfields(STUDY,EEG,index,'datatype','Channels','format', 'cell')

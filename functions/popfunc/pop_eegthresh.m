@@ -1,4 +1,4 @@
-% pop_eegthresh() - reject artifacts by detecting outlier values.  This has 
+% POP_EEGTHRESH - reject artifacts by detecting outlier values.  This has 
 %                   long been a standard method for selecting data to reject.
 %                   Applied either for electrode data or component activations.
 % Usage:
@@ -45,13 +45,13 @@
 %              marks: 1=immediately reject marked trials. {Default: 1}.
 % Outputs:
 %   Indexes    - index of rejected trials
-%     When eegplot() is called, modifications are applied to the current 
-%     dataset at the end of the call to eegplot() when the user presses 
+%     When EEGPLOT is called, modifications are applied to the current 
+%     dataset at the end of the call to EEGPLOT when the user presses 
 %     the 'Reject' button.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegthresh(), eeglab(), eegplot(), pop_rejepoch() 
+% See also: EEGTHRESH, EEGLAB, EEGPLOT, POP_REJEPOCH 
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

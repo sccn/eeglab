@@ -1,4 +1,4 @@
-% pop_newtimef() - Returns estimates and plots of event-related (log) spectral
+% POP_NEWTIMEF - Returns estimates and plots of event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) phenomena 
 %           timelocked to a set of single-channel input epochs 
 %
@@ -86,20 +86,20 @@
 %                       at all frequencies)
 %
 % Optional inputs:
-%    See the newtimef() function.
+%    See the NEWTIMEF function.
 %    
-% Outputs: Same as newtimef(); no outputs are returned when a
+% Outputs: Same as NEWTIMEF; no outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
 % Saving the ERSP and ITC output values:
 %    Simply look up the history using the eegh function (type eegh).
-%    Then copy and paste the pop_newtimef() command and add output args.
-%    See the newtimef() function for a list of outputs. For instance,
+%    Then copy and paste the POP_NEWTIMEF command and add output args.
+%    See the NEWTIMEF function for a list of outputs. For instance,
 % >> [ersp itc powbase times frequencies] = pop_newtimef( EEG, ....);
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001 
 %
-% See also: newtimef(), eeglab() 
+% See also: NEWTIMEF, EEGLAB 
 
 % Copyright (C) 2002 University of California San Diego
 %

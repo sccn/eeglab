@@ -1,6 +1,6 @@
-% changeunits() - Takes one or more points in one axes and gives its position 
+% CHANGEUNITS - Takes one or more points in one axes and gives its position 
 %                 in another axes. Useful for drawing lines between 
-%                 sbplots (see sbplot()).
+%                 sbplots (see SBPLOT).
 %
 %  Usage: >> newpoint(s) = changeunits(point(s),curaxhandle,newaxhandle)
 %

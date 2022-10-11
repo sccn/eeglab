@@ -1,6 +1,6 @@
-% binica() - Run stand-alone binary version of runica() from the
+% BINICA - Run stand-alone binary version of RUNICA from the
 %            Matlab command line. Saves time and memory relative
-%            to runica().  If stored in a float file, data are not 
+%            to RUNICA.  If stored in a float file, data are not 
 %            read into Matlab, and so may be larger than Matlab
 %            can handle owing to memory limitations.
 %
@@ -58,9 +58,9 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 %
-% See also: runica()
+% See also: RUNICA
 
-% Calls binary translation of runica() by Sigurd Enghoff
+% Calls binary translation of RUNICA by Sigurd Enghoff
 
 % Copyright (C) 2000 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -370,7 +370,7 @@ else
 end
 
 %
-% If created by binica(), rm temporary data file
+% If created by BINICA, rm temporary data file
 % NOTE: doesn't remove the .sc .wts and .fdt files
 
 if ~isempty(tmpdata)

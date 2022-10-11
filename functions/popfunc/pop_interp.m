@@ -1,4 +1,4 @@
-% pop_interp() - interpolate data channels
+% POP_INTERP - interpolate data channels
 %
 % Usage: EEGOUT = pop_interp(EEG, badchans, method);
 %

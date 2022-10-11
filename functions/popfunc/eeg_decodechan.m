@@ -1,4 +1,4 @@
-% eeg_decodechan() - given an input EEG dataset structure, output a new EEG data structure 
+% EEG_DECODECHAN - given an input EEG dataset structure, output a new EEG data structure 
 %                retaining and/or excluding specified time/latency, data point, channel, 
 %                and/or epoch range(s).
 % Usage:
@@ -18,7 +18,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2009-
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

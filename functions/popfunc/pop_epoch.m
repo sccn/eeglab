@@ -1,7 +1,7 @@
-% pop_epoch() - Convert a continuous EEG dataset to epoched data by extracting
+% POP_EPOCH - Convert a continuous EEG dataset to epoched data by extracting
 %               data epochs time locked to specified event types or event indices. 
 %               May also sub-epoch an already epoched dataset (if sub-epochs are 
-%               same size or smaller). This pop_function calls epoch().
+%               same size or smaller). This pop_function calls EPOCH.
 % Usage:
 %   >> OUTEEG = pop_epoch( EEG); % pop-up a data entry window
 %   >> OUTEEG = pop_epoch( EEG, events, timelimits);
@@ -11,14 +11,14 @@
 %   "Time-locking event type(s)" - [edit box] Select 'Edit > Event values' 
 %                to see a list of event.type values; else use the push button.
 %                To use event types containing spaces, enter in single-quotes.
-%                epoch() function command line equivalent: 'typerange' 
+%                EPOCH function command line equivalent: 'typerange' 
 %   "..."      - [push button] scroll event types.
 %   "Epoch limits" - [edit box] epoch latency range [start, end] in seconds relative
-%                to the time-locking events. epoch() function equivalent: 'timelim' 
+%                to the time-locking events. EPOCH function equivalent: 'timelim' 
 %   "Name for the new dataset" - [edit box] 
-%                epoch() function equivalent: 'newname'
+%                EPOCH function equivalent: 'newname'
 %   "Out-of-bounds EEG ..." - [edit box] Rejection limits ([min max], []=none).
-%                epoch() function equivalent: 'valuelim' 
+%                EPOCH function equivalent: 'valuelim' 
 % Inputs:
 %   EEG        - Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.

@@ -1,4 +1,4 @@
-% textsc() - places text in screen coordinates and places
+% TEXTSC - places text in screen coordinates and places
 %            a title at the top of the figure.
 %
 % Usage:

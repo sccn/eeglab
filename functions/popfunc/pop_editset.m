@@ -1,4 +1,4 @@
-% pop_editset() - Edit EEG dataset structure fields.
+% POP_EDITSET - Edit EEG dataset structure fields.
 %
 % Usage:
 %   >> EEGOUT = pop_editset( EEG ); % pops-up a data entry window
@@ -21,7 +21,7 @@
 %                  equivalent: 'nbchan'. This edit box cannot be edited.
 %   "Ref. channel indices or mode" - [edit box] current reference. This edit box
 %                  cannot be edited. To change the data reference, use menu item,
-%                  'Tools > Re-reference', calling function pop_reref(). The 
+%                  'Tools > Re-reference', calling function POP_REREF. The 
 %                  reference can be either a string (channel name), 'common', 
 %                  indicating an unknown common reference, 'average' indicating 
 %                  average reference, or an array of integers containing indices 
@@ -112,14 +112,14 @@
 %
 % Note:
 %   To create a new dataset:
-%   >> EEG = pop_editset( eeg_emptyset ); % eeg_emptyset() returns an empty dataset
+%   >> EEG = pop_editset( eeg_emptyset ); % EEG_EMPTYSET returns an empty dataset
 %
 %   To erase a variable, use '[]'. The following suppresses channel locations:
 %   >> EEG = pop_editset( EEG, 'chanlocs', '[]');
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_importdata(), pop_select(), eeglab()
+% See also: POP_IMPORTDATA, POP_SELECT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% eeg_latencyur() - transform latency of sample point in the continuous 
+% EEG_LATENCYUR - transform latency of sample point in the continuous 
 %                data into latencies in the transformed dataset.
 %
 % Usage:
@@ -15,11 +15,11 @@
 %
 % Note: the function that finds the original (ur) latency in the original
 %       dataset using latencies in the current dataset is called 
-%       eeg_urlatency()
+%       EEG_URLATENCY
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2011-
 % 
-% See also: eeg_urlatency()
+% See also: EEG_URLATENCY
 
 % Copyright (C) 2011 Arnaud Delorme, SCCN, INC, UCSD, arno@ucsd.edu
 %

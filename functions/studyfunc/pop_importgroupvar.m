@@ -1,4 +1,4 @@
-% pop_importgroupvar() - import a group variable from a ASCII file and
+% POP_IMPORTGROUPVAR - import a group variable from a ASCII file and
 % manual entry.
 %
 % Usage:

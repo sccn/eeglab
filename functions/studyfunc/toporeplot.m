@@ -1,9 +1,9 @@
-% toporeplot() - re-plot a saved topoplot() output image (a square matrix) 
+% TOPOREPLOT - re-plot a saved TOPOPLOT output image (a square matrix) 
 %              in a 2-D circular scalp map view (as looking down at the top 
-%              of the head).  May also be used to re-plot a mean topoplot() 
+%              of the head).  May also be used to re-plot a mean TOPOPLOT 
 %              map for a number of subjects and/or components without all 
 %              the constituent maps having the same channel montage.
-%              Nose is at top of plot. Left = left. See topoplot().
+%              Nose is at top of plot. Left = left. See TOPOPLOT.
 % Usage:
 %          >>  toporeplot(topoimage,'plotrad',val1, 'intrad',val2);   
 %                 % Use an existing (or mean) topoplot output image. Give the 
@@ -11,12 +11,12 @@
 %          >>  toporeplot(topoimage,'plotrad',val1,'xsurface', Xi, 'ysurface',Yi );   
 %                 % Use an existing (or mean) topoplot output image. Give the same 
 %                 % 'plotrad' value used to create it. Since 'intrad' was not input 
-%                 % to topoplot(), give the grid axes Xi and Yi as inputs.
+%                 % to TOPOPLOT, give the grid axes Xi and Yi as inputs.
 %          >>  [hfig val ]= toporeplot(topoimage,'plotrad',val1, 'Param1','Value1', ...); 
 %                 % Give one of the two options above plus other optional parameters.
 % Required inputs:
-%   topoimage    - output image matrix (as) from topoplot(). For maximum flexibility, 
-%                  create topoimage using topoplot() options: 'plotrad',1, 'intrad',1 
+%   topoimage    - output image matrix (as) from TOPOPLOT. For maximum flexibility, 
+%                  create topoimage using TOPOPLOT options: 'plotrad',1, 'intrad',1 
 %   'plotrad'    - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                  If plotrad > 0.5, chans with arc_length > 0.5 (i.e. below ears,eyes) 
 %                  are plotted in a circular 'skirt' outside the cartoon head. 
@@ -36,7 +36,7 @@
 %   'electrodes' - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
 %                  options below. {default: 'on' -> mark electrode locations with points
 %                  unless more than 64 channels, then 'off'}. Requires electrode info. 
-%   'intrad'     - [0.15<=float<=1.0] radius of the interpolation area used in topoplot() 
+%   'intrad'     - [0.15<=float<=1.0] radius of the interpolation area used in TOPOPLOT 
 %                  to get the grid. 
 %   'headrad'    - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                  NB: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
@@ -46,14 +46,14 @@
 %                  Do not plot but return interpolated value for channel location.
 %                  Do not plot but return interpolated value for this location. 
 %   'xsurface'   - [Xi- matrix] the Xi grid points for the surface of the plotting
-%                  an output of topoplot().
+%                  an output of TOPOPLOT.
 %   'ysurface'   - [Yi- matrix] the Yi grid points for the surface of the plotting,
-%                  an output of topoplot().
+%                  an output of TOPOPLOT.
 % Dipole plotting:
 %   'dipole'     - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                  from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                  model has radius 1). If several rows, plot one dipole per row.
-%                  Coordinates returned by dipplot() may be used. Can accept
+%                  Coordinates returned by DIPPLOT may be used. Can accept
 %                  an EEG.dipfit.model structure (See >> help dipplot).
 %                  Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
 %   'dipnorm'    - ['on'|'off'] normalize dipole length {default: 'on'}.
@@ -86,7 +86,7 @@
 % Authors: Hilit Serby, Andy Spydell, Colin Humphries, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001- Nov. 2004
 %
-% See also: topoplot(), timtopo(), envtopo()
+% See also: TOPOPLOT, TIMTOPO, ENVTOPO
 
 % Deprecated but still usable;
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 

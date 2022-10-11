@@ -1,14 +1,14 @@
-% pop_chanplot() - graphic user interface (GUI)-based function with plotting 
+% POP_CHANPLOT - graphic user interface (GUI)-based function with plotting 
 %                options for visualizing. Only channel measures (e.g., spectra, 
 %                ERPs, ERSPs, ITCs) that have been computed and saved in the study EEG 
 %                datasets can be visualized. These can be computed using the GUI-based 
-%                pop_precomp().
+%                POP_PRECOMP.
 % Usage:    
 %                >> STUDY = pop_chanplot(STUDY, ALLEEG);   
 % Inputs:
 %   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
 %                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
-%                pop_loadstudy(), or in creating a new STUDY, using pop_createstudy().  
+%                POP_LOADSTUDY, or in creating a new STUDY, using POP_CREATESTUDY.  
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG
 %   datasets in ALLEEG.
 %
@@ -33,16 +33,16 @@
 %                and the spectrum will have different colors for each condition. The ERSP 
 %                and ITC plots will show only the first condition; clicking on the subplot 
 %                will open a new figure with the different conditions displayed together. 
-%                Uses the command line function std_propplot().
+%                Uses the command line function STD_PROPPLOT.
 %  "Plot ERSPs" - [button] Displays the channel channel ERSPs. 
 %                If applied to a channel, channel ERSPs are plotted in one figure  
 %                (per condition) with the channel mean ERSP. If "All # channel centroids" 
 %                option is selected, plots all average ERSPs of the channels in one figure 
 %                per condition. If applied to channels, display the ERSP images of specified 
 %                channel channels in separate figures, using one figure for all conditions.
-%                Uses the command line functions std_erspplot().
+%                Uses the command line functions STD_ERSPPLOT.
 %  "Plot ITCs" - [button] Same as  "Plot ERSPs" but with ITC.
-%                Uses the command line functions std_itcplot().
+%                Uses the command line functions STD_ITCPLOT.
 %  "Plot spectra" - [button] Displays the channel channel spectra.   
 %                If applied to a channel, displays channel spectra plus the average channel 
 %                spectrum in bold. For a specific channel, displays the channel channel 
@@ -52,11 +52,11 @@
 %                conditions (if any) plotted in different colors.  
 %                If applied to channels, displays the spectrum of specified channel 
 %                channels in separate figures using one figure for all conditions.  
-%                Uses the command line functions std_specplot().
+%                Uses the command line functions STD_SPECPLOT.
 %  "Plot ERPs" - [button] Same as "Plot spectra" but for ERPs.
-%                Uses the command line functions std_erpplot().
+%                Uses the command line functions STD_ERPPLOT.
 %  "Plot ERPimage" - [button] Same as "Plot ERP" but for ERPimave.
-%                Uses the command line functions std_erpimplot().
+%                Uses the command line functions STD_ERPIMPLOT.
 %
 % Authors: Arnaud Delorme, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
 

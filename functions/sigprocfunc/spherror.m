@@ -1,4 +1,4 @@
-% spherror() - chancenter() sub function to compute minimum distance
+% SPHERROR - CHANCENTER sub function to compute minimum distance
 %               of Cartesian coordinates to a sphere
 %
 % Author: Scott Makeig, CNL / Salk Institute, 2000

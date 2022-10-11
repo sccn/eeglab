@@ -1,4 +1,4 @@
-% pop_chanevent() - import event latencies from the rising and/or falling 'edge' 
+% POP_CHANEVENT - import event latencies from the rising and/or falling 'edge' 
 %                   latencies of a specified event-marker channel in EEG.data 
 % Usage:
 %   >> OUTEEG = pop_chanevent( INEEG ); % select parameters via a pop-up window
@@ -76,7 +76,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 29 July 2002
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

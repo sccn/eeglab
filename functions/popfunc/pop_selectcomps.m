@@ -1,4 +1,4 @@
-% pop_selectcomps() - Display components with button to visualize their
+% POP_SELECTCOMPS - Display components with button to visualize their
 %                  properties and label them for rejection.
 % Usage:
 %       >> OUTEEG = pop_selectcomps( INEEG, compnum );
@@ -17,7 +17,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_prop(), eeglab()
+% See also: POP_PROP, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

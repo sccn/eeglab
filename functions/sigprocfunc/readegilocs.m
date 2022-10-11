@@ -1,4 +1,4 @@
-% readegilocs() - look up locations for EGI EEG dataset.
+% READEGILOCS - look up locations for EGI EEG dataset.
 %
 % Usage:
 %   >> EEG = readegilocs(EEG);
@@ -15,7 +15,7 @@
 %
 % Author: Arnaud Delorme, SCCN/UCSD
 %
-% See also: pop_readegi(), readegi()
+% See also: POP_READEGI, READEGI
 
 % Copyright (C) 12 Nov 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

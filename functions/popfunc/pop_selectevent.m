@@ -1,4 +1,4 @@
-% pop_selectevent() - Find events in an EEG dataset. If the dataset
+% POP_SELECTEVENT - Find events in an EEG dataset. If the dataset
 %                     is the only input, a window pops up to
 %                     ask for the relevant parameter values.
 %
@@ -54,7 +54,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002-
 %
-% See also: eeg_eventformat(), pop_importevent()
+% See also: EEG_EVENTFORMAT, POP_IMPORTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002, arno@salk.edu
 %

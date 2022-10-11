@@ -1,4 +1,4 @@
-% eeg_insertbound() - insert boundary event in an EEG event structure.
+% EEG_INSERTBOUND - insert boundary event in an EEG event structure.
 %
 % Usage:
 %       >> [eventout indnew] = eeg_insertbound( eventin, pnts, ...
@@ -27,7 +27,7 @@
 % 
 % Author: Arnaud Delorme and Hilit Serby, SCCN, INC, UCSD, April, 19, 2004
 %
-% See also: eeg_eegrej(), pop_mergeset()
+% See also: EEG_EEGREJ, POP_MERGESET
 
 % Copyright (C) 2004 Arnaud Delorme, SCCN, INC, UCSD, arno@salk.edu
 %

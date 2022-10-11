@@ -1,4 +1,4 @@
-% std_maketrialinfo() - create trial information structure using the 
+% STD_MAKETRIALINFO - create trial information structure using the 
 %                       .epoch structure of EEGLAB datasets
 %
 % Usage: 

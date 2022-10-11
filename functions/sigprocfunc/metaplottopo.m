@@ -1,6 +1,6 @@
-% metaplottopo() - plot concatenated multichannel data epochs in a topographic or
+% METAPLOTTOPO - plot concatenated multichannel data epochs in a topographic or
 %               rectangular array. Uses a channel location file with the same
-%               format as topoplot(), or else plots data on a rectangular grid.
+%               format as TOPOPLOT, or else plots data on a rectangular grid.
 %
 % Usage:
 %    >> axes = metaplottopo(data, 'key1', 'val1', 'key2', 'val2')
@@ -11,7 +11,7 @@
 %
 % Optional inputs:
 %  'chanlocs'  = [struct] channel structure or file plot ERPs at channel
-%                locations. See help readlocs() for data channel format.
+%                locations. See help READLOCS for data channel format.
 %  'geom'      = [rows cols] plot ERP in grid (overwrite previous option).
 %                Grid size for rectangular matrix. Example: [6 4].
 %  'title'     = [string] general plot title {def|'' -> none}
@@ -32,7 +32,7 @@
 %
 % Author: Arnaud Delorme, Scott Makeig, CERCO, CNRS, 2007-
 %
-% See also: plottopo()
+% See also: PLOTTOPO
 
 % Copyright (C) 2007, Arnaud Delorme, CERCO, arno@sccn.ucsd.edu
 %

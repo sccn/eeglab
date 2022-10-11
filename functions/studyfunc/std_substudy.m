@@ -1,4 +1,4 @@
-% std_substudy()  - create a sub-STUDY set by removing datasets, conditions, groups, or
+% STD_SUBSTUDY  - create a sub-STUDY set by removing datasets, conditions, groups, or
 %                   subjects.
 % Usage:  
 %  >> [ STUDY ALLEEG ] = std_substudy(STUDY, ALLEEG, 'key', 'val', ...);

@@ -1,4 +1,4 @@
-% std_checkdesign() - Check if STUDY design is compatible with EEGLAB
+% STD_CHECKDESIGN - Check if STUDY design is compatible with EEGLAB
 %                     2-categorical factor statistics
 % Usage:
 %   >> [STUDY] = std_checkdesign(STUDY, designind);

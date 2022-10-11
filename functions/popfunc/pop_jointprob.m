@@ -1,4 +1,4 @@
-% pop_jointprob() - reject artifacts in an EEG dataset using joint 
+% POP_JOINTPROB - reject artifacts in an EEG dataset using joint 
 %                   probability of the recorded electrode or component 
 %                   activities observed at each time point.  e.g., Observing 
 %                   large absolute values at most electrodes or components 
@@ -42,8 +42,8 @@
 %              previous marks using different colors. {Default: 0}.
 %   reject     - 0 = do not reject marked trials (but store the marks: 
 %              1 = reject marked trials {Default: 1}.
-%   vistype    - Visualization type. [0] calls rejstatepoch() and [1] calls
-%              eegplot() default is [0].When added to the command line
+%   vistype    - Visualization type. [0] calls REJSTATEPOCH and [1] calls
+%              EEGPLOT default is [0].When added to the command line
 %              call it will not display the plots if the option 'plotflag'
 %              is not set.
 % topcommand   - [] Deprecated argument , keep to ensure backward compatibility
@@ -61,7 +61,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: jointprob(), rejstatepoch(), eegplot(), eeglab(), pop_rejepoch()  
+% See also: JOINTPROB, REJSTATEPOCH, EEGPLOT, EEGLAB, POP_REJEPOCH  
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

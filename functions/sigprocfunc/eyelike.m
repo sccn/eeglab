@@ -1,5 +1,5 @@
 function [eyelikeres, S, P]= eyelike(E)
-% eyelike() - calculate a permutation matrix P and a scaling (diagonal) maxtrix S
+% EYELIKE - calculate a permutation matrix P and a scaling (diagonal) maxtrix S
 %             such that S*P*E is eyelike (so permutation acts on the rows of E).
 %             E must be a square matrix.
 % Usage:

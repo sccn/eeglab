@@ -1,4 +1,4 @@
-% pop_statparams() - helper function for pop_erspparams, pop_erpparams, and
+% POP_STATPARAMS - helper function for pop_erspparams, pop_erpparams, and
 %                    pop_specparams.
 %
 % Usage:

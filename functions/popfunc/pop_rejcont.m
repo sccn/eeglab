@@ -1,4 +1,4 @@
-% pop_rejcont() - reject continuous portions of data based on spectrum
+% POP_REJCONT - reject continuous portions of data based on spectrum
 %                 thresholding. First, contiguous data epochs are extracted
 %                 and a standard spectrum thresholding algorithm is
 %                 applied. Regions of contiguous epochs larger than a
@@ -56,7 +56,7 @@
 % EEG = pop_rejcont(EEG, 'elecrange',[1:32] ,'freqlimit',[20 40] ,'threshold',...
 %    10,'epochlength',0.5,'contiguous',4,'addlength',0.25, 'taper', 'hamming');
 % 
-% See also: eegthresh()
+% See also: EEGTHRESH
 
 % Copyright (C) 2009 Arnaud Delorme, CERCO, UPS/CNRS
 %

@@ -1,7 +1,7 @@
-% std_precomp() - Precompute measures (ERP, spectrum, ERSP, ITC) for channels or
+% STD_PRECOMP - Precompute measures (ERP, spectrum, ERSP, ITC) for channels or
 %                 components in a  study. If channels are interpolated before
 %                 computing the measures, the updated EEG datasets are also saved
-%                 to disk. Called by pop_precomp(). Follow with pop_plotstudy().
+%                 to disk. Called by POP_PRECOMP. Follow with POP_PLOTSTUDY.
 %                 See Example below.
 % Usage:
 % >> [STUDY ALLEEG customRes] = std_precomp(STUDY, ALLEEG, chanorcomp, 'key', 'val', ...);
@@ -65,7 +65,7 @@
 %
 % Outputs:
 %   STUDY        - the input STUDY set with pre-clustering data added,
-%                  for use by pop_clust()
+%                  for use by POP_CLUST
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified
 %                  by adding preprocessing data as pointers to Matlab files that
 %                  hold the pre-clustering component measures.
@@ -82,7 +82,7 @@
 %
 %           % This prepares, channels 'cz' and 'oz' in the STUDY datasets.
 %           % If a data channel is missing in one dataset, it will be
-%           % interpolated (see eeg_interp()). The ERP, spectrum, ERSP, and
+%           % interpolated (see EEG_INTERP). The ERP, spectrum, ERSP, and
 %           % ITC for each dataset is then computed.
 %
 % Example of custom call:

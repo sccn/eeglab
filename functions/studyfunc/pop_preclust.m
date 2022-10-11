@@ -1,17 +1,17 @@
-% pop_preclust() - prepare STUDY components' location and activity measures for later clustering.
+% POP_PRECLUST - prepare STUDY components' location and activity measures for later clustering.
 %                  Collect information in an interactive pop-up query window. To pre-cluster
-%                  from the commandline, use std_preclust(). After data entry into the pop window,
+%                  from the commandline, use STD_PRECLUST. After data entry into the pop window,
 %                  selected measures (one or more from options: ERP, dipole locations, spectra,
 %                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
-%                  and saved in the STUDY datasets, a PCA  matrix (by runica() with 'pca' option) 
+%                  and saved in the STUDY datasets, a PCA  matrix (by RUNICA with 'pca' option) 
 %                  is constructed (this is the feature reduction step). This matrix will be used 
-%                  as input to the clustering  algorithm in pop_clust(). pop_preclust() allows 
+%                  as input to the clustering  algorithm in POP_CLUST. POP_PRECLUST allows 
 %                  selection of a subset of components to cluster. This subset may either be 
 %                  user-specified, all components with dipole model residual variance lower than 
-%                  a defined threshold (see dipfit()), or components from an already existing cluster 
+%                  a defined threshold (see DIPFIT), or components from an already existing cluster 
 %                  (for hierarchical clustering). The EEG datasets in the ALLEEG structure are 
-%                  updated; then the updated EEG sets are saved to disk.  Calls std_preclust().
+%                  updated; then the updated EEG sets are saved to disk.  Calls STD_PRECLUST.
 % Usage:    
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG); % pop up interactive window
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG, clustind); % sub-cluster 
@@ -24,13 +24,13 @@
 %                  hemisphere sub-clusters. Should be empty for whole STUDY (top level) clustering 
 %                  {default: []}
 % Outputs:
-%   STUDY        - the input STUDY set with added pre-clustering data for use by pop_clust() 
+%   STUDY        - the input STUDY set with added pre-clustering data for use by POP_CLUST 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding 
 %                  pre-clustering data (pointers to .mat files that hold cluster measure information).
 %
 % Authors: Arnaud Delorme, Hilit Serby & Scott Makeig, SCCN, INC, UCSD, May 13, 2004-
 %
-% See also: std_preclust()
+% See also: STD_PRECLUST
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, May 13,2004, hilit@sccn.ucsd.edu
 %

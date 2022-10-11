@@ -1,4 +1,4 @@
-% std_readtopoclust() - Compute and return cluster component scalp maps. 
+% STD_READTOPOCLUST - Compute and return cluster component scalp maps. 
 %                  Automatically inverts the polarity of component scalp maps 
 %                  to best match the polarity of the cluster mean scalp map.
 % Usage:    
@@ -15,7 +15,7 @@
 %                to allow quick replotting. 
 %   clsstruct  - STUDY.cluster structure array for the modified clusters.
 %
-% See also  std_topoplot(), pop_clustedit()
+% See also  STD_TOPOPLOT, POP_CLUSTEDIT
 %
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, 2007
 

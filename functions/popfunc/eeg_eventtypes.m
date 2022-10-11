@@ -1,4 +1,4 @@
-% eeg_eventtypes()  - return a list of event or urevent types in a dataset and 
+% EEG_EVENTTYPES  - return a list of event or urevent types in a dataset and 
 %                     the respective number of events of each type. Output event 
 %                     types are sorted in reverse order of their number. If no 
 %                     outputs, print this list on the commandline instead.

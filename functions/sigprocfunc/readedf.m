@@ -1,4 +1,4 @@
-% readedf() - read eeg data in EDF format.
+% READEDF - read eeg data in EDF format.
 %
 % Usage: 
 %    >> [data,header] = readedf(filename);

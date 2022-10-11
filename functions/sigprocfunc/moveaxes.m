@@ -1,4 +1,4 @@
-% moveaxes() - move, resize, or copy Matlab axes using the mouse
+% MOVEAXES - move, resize, or copy Matlab axes using the mouse
 %
 % Usage: >> moveaxes
 %        >> moveaxes(fig)

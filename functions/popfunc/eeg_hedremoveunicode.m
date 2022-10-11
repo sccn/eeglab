@@ -1,4 +1,4 @@
-% eeg_hedremoveunicode() - remove unicode characters in HED strings.
+% EEG_HEDREMOVEUNICODE - remove unicode characters in HED strings.
 %
 % Usage:
 %   >> EEGOUT = eeg_hedremoveunicode(EEGIN);

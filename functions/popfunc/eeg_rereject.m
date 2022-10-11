@@ -1,4 +1,4 @@
-% eeg_rereject() - reject the same data portion as the ones defined
+% EEG_REREJECT - reject the same data portion as the ones defined
 %                  in a reference dataset. This function is useful when
 %                  have filtered a dataset and want to reject again the
 %                  same portions of data.
@@ -23,11 +23,11 @@
 %
 % Author: Arnaud Delorme, 2020
 %
-% Note: uses the resample() function from the signal processing toolbox
+% Note: uses the RESAMPLE function from the signal processing toolbox
 %       if present. Otherwise use griddata interpolation method (it should be
 %       reprogrammed using spline interpolation for speed up).
 %
-% See also: resample(), eeglab()
+% See also: RESAMPLE, EEGLAB
 
 % Copyright (C) 2020 Arnaud Delorme
 %

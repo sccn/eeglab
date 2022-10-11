@@ -1,4 +1,4 @@
-% pop_editeventfield() - Add/remove/rename/modify a field in the event structure 
+% POP_EDITEVENTFIELD - Add/remove/rename/modify a field in the event structure 
 %              of an EEG dataset. Can also be used to append new events to the end of the 
 %              event structure or to delete all current events. If the dataset is 
 %              the only input, a window pops up to ask for relevant parameter values.
@@ -75,7 +75,7 @@
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 9 Feb 2002-
 %
-% See also: pop_importevent(), eeg_eventformat(), pop_selectevent()
+% See also: POP_IMPORTEVENT, EEG_EVENTFORMAT, POP_SELECTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 9 Feb 2002, arno@salk.edu
 %

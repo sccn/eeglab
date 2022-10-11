@@ -1,4 +1,4 @@
-% pop_mergeset() - Merge two or more datasets. If only one argument is given,
+% POP_MERGESET - Merge two or more datasets. If only one argument is given,
 %                  a window pops up to ask for more arguments.
 % Usage:
 %   >> OUTEEG = pop_mergeset( ALLEEG ); % use a pop-up window
@@ -22,7 +22,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

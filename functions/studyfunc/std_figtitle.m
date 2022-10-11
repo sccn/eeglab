@@ -1,4 +1,4 @@
-% std_figtitle() - Generate plotting figure titles in a cell array
+% STD_FIGTITLE - Generate plotting figure titles in a cell array
 %
 % Usage:    
 %   >> celltxt = std_figtitle(key1, val1, key2, val2);  

@@ -1,5 +1,5 @@
 function [H,S,D]=acsobiro(X,n,p)
-% acsobiro() - A. Chickocki's robust Second-Order Blind Identification (SOBI) 
+% ACSOBIRO - A. Chickocki's robust Second-Order Blind Identification (SOBI) 
 %              by joint diagonalization of the time-delayed covariance matrices. 
 %              NOTE: THIS CODE ASSUMES TEMPORALLY CORRELATED SIGNALS.
 %              Thus, the estimated time-delayed covariance matrices 

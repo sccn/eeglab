@@ -1,11 +1,11 @@
-% std_rejectoutliers()  - Commandline function, to reject outlier component(s) from clusters. 
+% STD_REJECTOUTLIERS  - Commandline function, to reject outlier component(s) from clusters. 
 %                            Reassign the outlier component(s) to an outlier cluster specific to each cluster. 
 % Usage:    
 %                   >> [STUDY] = std_rejectoutliers(STUDY, ALLEEG, clusters, th);   
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                       ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                       ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 % Optional inputs:
 %   clusters        - [numeric vector| 'all' ] specific cluster numbers (or 'all' clusters), which outliers  
 %                        will be rejected from. {default:'all'}.   

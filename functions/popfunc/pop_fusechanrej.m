@@ -1,4 +1,4 @@
-% pop_fusechanrej() - Make sure the same subject and session have the same
+% POP_FUSECHANREJ - Make sure the same subject and session have the same
 %                     removed. If not remove channel not in common. 
 % Usage:
 %   >>  ALLEEG = pop_fusechanrej(ALLEEG);

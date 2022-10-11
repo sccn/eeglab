@@ -1,5 +1,5 @@
-% cart2topo() - convert xyz-cartesian channel coordinates 
-%               to polar topoplot() coordinates. Input data
+% CART2TOPO - convert xyz-cartesian channel coordinates 
+%               to polar TOPOPLOT coordinates. Input data
 %               are points on a sphere centered at (0,0,0)
 %               or at optional input 'center'. This function
 %               is now DEPRECATED! See Important warning below.
@@ -20,20 +20,20 @@
 %
 % Example: >> [th r] = cart2topo(xyz,[1 0 4]);
 %
-% Notes: topoplot() does not plot channels with radius>0.5
+% Notes: TOPOPLOT does not plot channels with radius>0.5
 %        Shrink radii to within this range to plot all channels.
 %        [x y z] are returned after the optimization of the center
 %        and optionally squeezing r towards it by factor 'squeeze'
 %
 % Important: 
-%   DEPRECATED: cart2topo() should NOT be used if elevation angle is less than 0 
+%   DEPRECATED: CART2TOPO should NOT be used if elevation angle is less than 0 
 %   (for electrodes below zero plane) since then it returns INACCURATE results. 
-%   SUBSTITUTE: Use cart2topo = cart2sph() -> sph2topo().
+%   SUBSTITUTE: Use cart2topo = CART2SPH -> SPH2TOPO.
 %
 % Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
 %
-% See also: topo2sph(), sph2topo(), chancenter()
+% See also: TOPO2SPH, SPH2TOPO, CHANCENTER
 
 % Copyright (C) 11/1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

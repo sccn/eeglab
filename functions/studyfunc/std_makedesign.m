@@ -1,4 +1,4 @@
-% std_makedesign() - create a new or edit an existing STUDY.design by 
+% STD_MAKEDESIGN - create a new or edit an existing STUDY.design by 
 %                    selecting specific factors to include in subsequent 
 %                    1x2 or 2x2 STUDY measures and statistical computations 
 %                    for this design. A STUDY may have many factors 
@@ -63,7 +63,7 @@
 %               two conditions that will be considered are 'b' and 'c' 
 %               (which is then equivalent to using 'variable1vals' to specify
 %               values for the 'condition' factor. Calls function 
-%               std_selectdataset() {default: select all datasets}
+%               STD_SELECTDATASET {default: select all datasets}
 %  'subjselect' - {cell array} subject codes of specific subjects to include 
 %               in the STUDY design {default: all subjects in the specified 
 %               conditions, groups, etc.} If 'datselect' is also specified,

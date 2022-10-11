@@ -1,4 +1,4 @@
-% std_checkconsist() - Create channel groups for plotting.
+% STD_CHECKCONSIST - Create channel groups for plotting.
 %
 % Usage:    
 %                >> boolval = std_checkconsist(STUDY, 'uniform', 'condition');   

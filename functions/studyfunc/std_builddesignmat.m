@@ -1,4 +1,4 @@
-% std_builddesignmat() - Build the design matrix for an specific design
+% STD_BUILDDESIGNMAT - Build the design matrix for an specific design
 % specified in the structure ''design'' provided as input
 %
 % Usage:

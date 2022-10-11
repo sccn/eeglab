@@ -1,4 +1,4 @@
-% std_stat() - compute statistics for ERP/spectral traces or ERSP/ITC images
+% STD_STAT - compute statistics for ERP/spectral traces or ERSP/ITC images
 %              of a component or channel cluster in a STUDY.
 % Usage:
 %          >> [pcond, pgroup, pinter, statscond, statsgroup, statsinter] = std_stat( data, 'key', 'val', ...)
@@ -68,7 +68,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: statcond()
+% See also: STATCOND
 
 % Copyright (C) Arnaud Delorme
 %

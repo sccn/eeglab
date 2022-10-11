@@ -1,4 +1,4 @@
-% pop_subcomp() - remove specified components from an EEG dataset.
+% POP_SUBCOMP - remove specified components from an EEG dataset.
 %                 and subtract their activities from the data. Else,
 %                 remove components already marked for rejection. When used
 %                 with the options 'keepcomp', the function will retain [1]
@@ -35,7 +35,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: compvar()
+% See also: COMPVAR
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

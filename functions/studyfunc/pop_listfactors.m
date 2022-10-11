@@ -1,4 +1,4 @@
-% pop_listfactors() - list independent variables factors for a given design
+% POP_LISTFACTORS - list independent variables factors for a given design
 %
 % Usage:
 %  >> factors = pop_listfactors(STUDY);

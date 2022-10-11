@@ -1,4 +1,4 @@
-% pop_importerplab() - import ERPLAB event list file and bin file into
+% POP_IMPORTERPLAB - import ERPLAB event list file and bin file into
 %                      EEGLAB event structure for use in STUDY processing
 %
 % Usage:

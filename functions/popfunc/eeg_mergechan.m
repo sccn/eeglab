@@ -1,4 +1,4 @@
-% eeg_mergechan() - merge channel structure while preserving channel
+% EEG_MERGECHAN - merge channel structure while preserving channel
 %                   order
 %
 % >> mergelocs = eeg_mergechan(locs1, locs2);

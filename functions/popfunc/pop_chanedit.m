@@ -1,4 +1,4 @@
-% pop_chanedit() - Edit the channel locations structure of an EEGLAB dataset,
+% POP_CHANEDIT - Edit the channel locations structure of an EEGLAB dataset,
 %                  EEG.chanlocs. For structure location and file formats, 
 %                  see >> help readlocs  
 % 
@@ -15,7 +15,7 @@
 %                   contents for the current channel. Command line equivalent
 %                   to modify these fields: 'transform'
 %   "Opt. 3D center" - [button] optimally re-center 3-D channel coordinates. Uses
-%                 chancenter(). Command line equivalent: 'convert', { 'chancenter'
+%                 CHANCENTER. Command line equivalent: 'convert', { 'chancenter'
 %                 [xc yc zc] }, [xc yc zc] being the center of the sphere. Use []
 %                 to find the center of the best fitting sphere.
 %   "Rotate axis" - [button] force one electrode to one position and rotate the other
@@ -43,23 +43,23 @@
 %   ">>" - [button] scroll channel forward by 10.
 %   "Append chan" - [button] append channel after the current channel.
 %                 Command line equivalent: 'append'.
-%   "Plot 2D"     - [button] plot channel locations in 2-D using topoplot()
+%   "Plot 2D"     - [button] plot channel locations in 2-D using TOPOPLOT
 %   "Plot radius [value (0.2-1.0), []=auto)" - [edit box] default plotting radius
 %                 in 2-D polar views. This does NOT affect channel locations; it
 %                 is only used for visualization. This parameter is attached to the
 %                 chanlocs structure and is then used in all 2-D scalp topoplots.
 %                 Default -> to data limits. Command line equivalent: 'plotrad'.
 %   "Nose along +X" - [list] Indicate the direction of the nose. This information
-%                 is used in functions like topoplot(), headplot() and dipplot().
+%                 is used in functions like TOPOPLOT, HEADPLOT and DIPPLOT.
 %                 Command line equivalent: 'nosedir'.
-%   "Plot 3D"     - [button] plot channel positions in 3-D using plotchans3d()
-%   "Read locations" - [button] read location file using readlocs()
+%   "Plot 3D"     - [button] plot channel positions in 3-D using PLOTCHANS3D
+%   "Read locations" - [button] read location file using READLOCS
 %                 Command line equivalent: 'load'.
-%   "Read help"   - [button] display readlocs() function help.
+%   "Read help"   - [button] display READLOCS function help.
 %   "Save .ced"   - [button] save channel locations in native EEGLAB ".ced" format.
 %                 Command line equivalent: 'save'.
 %   "Save others" - [button] save channel locations in other formats using
-%                 pop_writelocs() (see readlocs() for available channel formats).
+%                 POP_WRITELOCS (see READLOCS for available channel formats).
 %   "Cancel"      - [button] cancel all editing.
 %   "Help"        - [button] display this help message.
 %   "OK"          - [button] save edits and propagate to parent.
@@ -94,14 +94,14 @@
 %                   same as 'insert' (above) but insert the the new channel after
 %                   the current channel number.
 %   'delete'      - [int_vector] Vector of channel numbers to delete.
-%   'forcelocs'   - [cell] call forcelocs() to force a particular channel to be at a
+%   'forcelocs'   - [cell] call FORCELOCS to force a particular channel to be at a
 %                   particular location on the head sphere; rotate other channels
 %                   accordingly.
 %   'skirt'       - Topographical polar skirt factor (see >> help topoplot)
 %   'shrink'      - Topographical polar shrink factor (see >> help topoplot)
 %   'load'        - [filename|{filename, 'key', 'val'}] Load channel location file
 %                   optional arguments (such as file format) to the function
-%                   readlocs() can be specified if the input is a cell array.
+%                   READLOCS can be specified if the input is a cell array.
 %   'save'        - 'filename' Save text file with channel info.
 %   'eval'        - [string] evaluate string ('chantmp' is the name of the channel
 %                   location structure).
@@ -121,11 +121,11 @@
 % Ex:    EEG = pop_chanedit(EEG,'load', { 'dummy.elp' 'elp' }, 'delete', [3 4], ...
 %                       'convert', { 'xyz->polar' [] -1 1 }, 'save', 'mychans.loc' )
 %        % Load polhemus file, delete two channels, convert to polar (see
-%        % cart2topo() for arguments) and save into 'mychans.loc'.
+%        % CART2TOPO for arguments) and save into 'mychans.loc'.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 April 2002
 %
-% See also: readlocs()
+% See also: READLOCS
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 15 March 2002, arno@salk.edu
 %

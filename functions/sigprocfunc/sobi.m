@@ -1,5 +1,5 @@
 function [H,S,D]=sobi(X,n,p)
-% sobi() - Second Order Blind Identification (SOBI) by joint diagonalization of
+% SOBI - Second Order Blind Identification (SOBI) by joint diagonalization of
 %          correlation  matrices. THIS CODE ASSUMES TEMPORALLY CORRELATED SIGNALS,
 %          and uses correlations across times in performing the signal separation.
 %          Thus, estimated time delayed covariance matrices must be nonsingular

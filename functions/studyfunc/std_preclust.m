@@ -1,11 +1,11 @@
-% std_preclust() - select measures to be included in computation of a preclustering array.
-%                    This array is used by pop_clust() to find component clusters from a
+% STD_PRECLUST - select measures to be included in computation of a preclustering array.
+%                    This array is used by POP_CLUST to find component clusters from a
 %                    specified parent cluster.
 %                    Selected measures (dipole location, ERPs, spectra, scalp maps, ERSPs,
-%                    and/or ITCs) should already be precomputed using pop-precomp(). Each 
+%                    and/or ITCs) should already be precomputed using pop-PRECOMP. Each 
 %                    feature dimension is reduced by PCA decomposition. These PCA matrices 
 %                    (one per measure) are concatenated and used as input to the clustering
-%                    algorithm in pop_clust(). Follow with pop_clust(). 
+%                    algorithm in POP_CLUST. Follow with POP_CLUST. 
 %                    See Example below:
 %
 %  >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG); % prepare to cluster all comps 
@@ -31,11 +31,11 @@
 %                    'dipoles' = cluster on the component [X Y Z] dipole locations
 %                    'spec'    = cluster on the component log activity spectra (in dB)
 %                                  (with the baseline mean dB spectrum subtracted).
-%                    'scalp'   = cluster on component (topoplot()) scalp maps 
+%                    'scalp'   = cluster on component (TOPOPLOT) scalp maps 
 %                                  (or on their absolute values),
-%                    'scalpLaplac' = cluster on component (topoplot()) laplacian scalp maps
+%                    'scalpLaplac' = cluster on component (TOPOPLOT) laplacian scalp maps
 %                                  (or on their absolute values),
-%                    'scalpGrad' = cluster on the (topoplot()) scalp map gradients 
+%                    'scalpGrad' = cluster on the (TOPOPLOT) scalp map gradients 
 %                                  (or on their absolute values),
 %                    'ersp'    = cluster on components ERSP. (requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
@@ -55,7 +55,7 @@
 %                                   spectrum, 'ersp', and 'itc' measures.  
 %                    'timewindow' = [min max] time window (in sec) to include in 'erp',
 %                                   'ersp', and 'itc' measures.  
-%                    'abso'    =  [0|1] 1 = use absolute values of topoplot(), gradient, or 
+%                    'abso'    =  [0|1] 1 = use absolute values of TOPOPLOT, gradient, or 
 %                                   Laplacian maps {default: 1}
 %                    'erpfilter' = [double] Perform low pass filter on ERPs
 %                                  at the frequency provided. This is done ONLY for
@@ -63,7 +63,7 @@
 %                    'funarg'  =  [cell array] optional function arguments for mean spectrum 
 %                                   calculation (>> help spectopo) {default: none}
 % Outputs:
-%   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
+%   STUDY        - the input STUDY set with pre-clustering data added, for use by POP_CLUST 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
 %                  data as pointers to Matlab files that hold the pre-clustering component measures.
 %
@@ -81,7 +81,7 @@
 %                          
 %                   % This prepares, for initial clustering, all components in the STUDY datasets
 %                   % except components with dipole model residual variance (see function 
-%                   % std_editset() for how to select such components).
+%                   % STD_EDITSET for how to select such components).
 %                   % Clustering will be based on the components' mean spectra in the [3 25] Hz 
 %                   % frequency range, on the components' ERPs in the [350 500] ms time window, 
 %                   % on the (absolute-value) component scalp maps, on the equivalent dipole 
@@ -441,9 +441,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
 
 return
 
-% erspdownsample() - down samples component ERSP/ITC images if the
+% ERSPDOWNSAMPLE - down samples component ERSP/ITC images if the
 %        PCA operation in the clustering feature reduction step fails.
-%        This is a helper function called by eeg_preclust().
+%        This is a helper function called by EEG_PRECLUST.
 
 function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
     len = length(freqs)*length(times); %size of ERSP

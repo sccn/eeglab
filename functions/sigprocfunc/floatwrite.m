@@ -1,4 +1,4 @@
-% floatwrite() - Write data matrix to float file.
+% FLOATWRITE - Write data matrix to float file.
 %
 % Usage: >> floatwrite(data,filename, 'format') 
 %
@@ -11,7 +11,7 @@
 %
 % Author: Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998 
 %
-% See also: floatread(), fopen()
+% See also: FLOATREAD, FOPEN
 
 % Copyright (C) Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998
 %

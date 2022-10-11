@@ -1,7 +1,7 @@
-% spectopo() - Plot the power spectral density (PSD) of winsize length segments of data 
+% SPECTOPO - Plot the power spectral density (PSD) of winsize length segments of data 
 %              epochs at all channels as a bundle of traces. At specified frequencies,
 %              plot the relative topographic distribution of PSD. If available, uses
-%              pwelch() from the Matlab signal processing toolbox, else the EEGLAB spec()
+%              PWELCH from the Matlab signal processing toolbox, else the EEGLAB SPEC
 %              function. Plots the mean spectrum for all of the supplied data, not just
 %              the pre-stimulus baseline.
 % Usage:
@@ -87,7 +87,7 @@
 %   'freqdata' = [freq] array of frequencies
 % 
 % Topoplot options:
-%    other 'key','val' options are propagated to topoplot() for map display
+%    other 'key','val' options are propagated to TOPOPLOT for map display
 %                (See >> help topoplot)
 %
 % Outputs:
@@ -102,7 +102,7 @@
 %        specstd  = spectrum standard deviation in dB
 %
 % Notes: The original input format is still functional for backward compatibility.
-%        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
+%        PSD has been replaced by PWELCH (see Matlab note 24750 on their web site)
 %
 % Non-backward compatible change (Nov 15 2015):
 %   Default winsize was set to the sampling rate (giving a default window
@@ -115,7 +115,7 @@
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
 %          SCCN/INC/UCSD, La Jolla, 3/01 
 %
-% See also: timtopo(), envtopo(), tftopo(), topoplot()
+% See also: TIMTOPO, ENVTOPO, TFTOPO, TOPOPLOT
 
 % Copyright (C) 3/01 Scott Makeig & Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, 
 % scott@sccn.ucsd.edu
@@ -153,7 +153,7 @@
 % 03-27-02 downsampling factor exact calculation -ad
 % 04-03-02 added axcopy -sm
 
-% Uses: MATLAB pwelch(), changeunits(), topoplot(), textsc()
+% Uses: MATLAB PWELCH, CHANGEUNITS, TOPOPLOT, TEXTSC
 
 function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,srate,varargin) 
 

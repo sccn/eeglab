@@ -1,4 +1,4 @@
-% icadefs() - function to read in a set of EEGLAB system-wide (i.e. lab-wide)
+% ICADEFS - function to read in a set of EEGLAB system-wide (i.e. lab-wide)
 %             or working directory-wide constants and preferences. Change the 
 %             way these are defined in the master icadefs.m file (usually
 %             in dir eeglab/functions/sigprocfunc) or make a custom copy of 

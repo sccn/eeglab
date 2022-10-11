@@ -1,4 +1,4 @@
-% std_pac() - Compute or read PAC data (Phase Amplitude Coupling).
+% STD_PAC - Compute or read PAC data (Phase Amplitude Coupling).
 %
 % Usage:  
 %   >> [X times logfreqs ] = std_pac(EEG, 'key', 'val', ...);
@@ -38,7 +38,7 @@
 %                  {default: 'off'}
 %
 % Other optional inputs:
-%   This function will take any of the newtimef() optional inputs (for instance
+%   This function will take any of the NEWTIMEF optional inputs (for instance
 %   to compute log-space frequencies)...
 %
 % Outputs:
@@ -53,7 +53,7 @@
 % OR for channels
 %              [dataset_filename].datpac   <-- saved channel PAC
 %
-% See also: timef(), std_itc(), std_erp(), std_spec(), std_topo(), std_preclust()
+% See also: TIMEF, STD_ITC, STD_ERP, STD_SPEC, STD_TOPO, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, July, 2009-
 

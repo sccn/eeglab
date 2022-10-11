@@ -1,4 +1,4 @@
-% transformcoords() - Select nazion and inion in anatomical MRI images.
+% TRANSFORMCOORDS - Select nazion and inion in anatomical MRI images.
 %
 % Usage:
 %   mewcoords = transformcoords(coords, rotate, scale, center, reverse);

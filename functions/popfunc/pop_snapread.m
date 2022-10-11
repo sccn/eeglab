@@ -1,4 +1,4 @@
-% pop_snapread() - load an EEG SnapMaster file (pop out window if no arguments).
+% POP_SNAPREAD - load an EEG SnapMaster file (pop out window if no arguments).
 %
 % Usage:
 %   >> [dat] = pop_snapread( filename, gain);
@@ -18,7 +18,7 @@
 %                   (note that if the voltage range is not the same for all channels
 %                   or if the CONVERSION.POLY field in the file header
 %                   is not "0 + 1x" for all channels,  you will have to load the data 
-%                   using snapread() and scale manually all channels, then import
+%                   using SNAPREAD and scale manually all channels, then import
 %                   the Matlab array into EEGLAB).
 %
 % Inputs:
@@ -30,7 +30,7 @@
 %
 % Author: Arnaud Delorme, CNL/Salk Institute, 13 March 2002
 %
-% See also: eeglab(), snapread()
+% See also: EEGLAB, SNAPREAD
 
 % Copyright (C) 13 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

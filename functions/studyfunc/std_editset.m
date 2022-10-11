@@ -1,4 +1,4 @@
-% std_editset() - modify a STUDY set structure.
+% STD_EDITSET - modify a STUDY set structure.
 %
 % Usage: 
 %             >> [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, key1, val1, ...);  
@@ -55,8 +55,8 @@
 %                plus additional information from the optional inputs above. 
 %   ALLEEG     - a vector of EEG datasets included in the STUDY structure 
 %
-%  See also:  pop_createstudy(), std_loadalleeg(), pop_clust(), pop_preclust(), 
-%             eeg_preclust(), eeg_createdata()
+%  See also:  POP_CREATESTUDY, STD_LOADALLEEG, POP_CLUST, POP_PRECLUST, 
+%             EEG_PRECLUST, EEG_CREATEDATA
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN/INC/UCSD, October , 2004-
 

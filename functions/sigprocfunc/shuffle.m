@@ -1,4 +1,4 @@
-% shuffle() - shuffle a given dimension in an array
+% SHUFFLE - shuffle a given dimension in an array
 %
 % Usage: >> Y = shuffle(X)
 %        >> [Y = shuffle(X, DIM)

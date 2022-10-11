@@ -1,7 +1,7 @@
-% pop_importdata() - import data from a Matlab variable or disk file by calling
-%                    importdata().
+% POP_IMPORTDATA - import data from a Matlab variable or disk file by calling
+%                    IMPORTDATA.
 % Usage:
-%   >> EEGOUT = pop_importdata(); % pop-up a data entry window 
+%   >> EEGOUT = POP_IMPORTDATA; % pop-up a data entry window 
 %   >> EEGOUT = pop_importdata( 'key', val,...); % no pop-up window
 %
 % Graphic interface (refer to a previous version of the GUI):
@@ -30,7 +30,7 @@
 %                  equivalent: 'nbchan'. This edit box cannot be edited.
 %   "Ref. channel indices or mode" - [edit box] current reference. This edit box
 %                  cannot be edited. To change data reference, use menu 
-%                  Tools > Re-reference calling function pop_reref(). The reference 
+%                  Tools > Re-reference calling function POP_REREF. The reference 
 %                  can be a string, 'common' indicating an unknown common reference, 
 %                  'average' indicating average reference, or an array of integer 
 %                  containing the indices of the reference channels.
@@ -105,11 +105,11 @@
 % Outputs:
 %   EEGOUT      - modified EEG dataset structure
 %
-% Note: This function calls pop_editset() to modify parameter values.
+% Note: This function calls POP_EDITSET to modify parameter values.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_editset(), pop_select(), eeglab()
+% See also: POP_EDITSET, POP_SELECT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

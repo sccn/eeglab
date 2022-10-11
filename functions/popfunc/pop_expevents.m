@@ -1,4 +1,4 @@
-% pop_expevents() - export events to tab separated text file
+% POP_EXPEVENTS - export events to tab separated text file
 %
 % Usage:
 %   >> pop_expevents(EEG);

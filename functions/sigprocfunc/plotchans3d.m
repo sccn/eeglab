@@ -1,4 +1,4 @@
-% plotchans3d() -  Plots the 3-D configuration from a Polhemus ELP
+% PLOTCHANS3D -  Plots the 3-D configuration from a Polhemus ELP
 %                  file. The axes of the Cartesian coordinate system are
 %                  plotted. The nose is plotted as a bold red segment.
 % Usage:
@@ -16,8 +16,8 @@
 %
 % Author: Luca A. Finelli, SCCN/INC/UCSD, La Jolla, 02/2002
 %  
-% See also: topoplot(), readlocs(), readelp(), 
-%           polhemus2topo(), pop_chanedit()
+% See also: TOPOPLOT, READLOCS, READELP, 
+%           POLHEMUS2TOPO, POP_CHANEDIT
         
 % Copyright (C) 2002 UCSD
 %
