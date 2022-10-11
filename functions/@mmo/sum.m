@@ -1,4 +1,4 @@
-% sum() - sum of memory mapped underlying array
+% SUM - sum of memory mapped underlying array
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

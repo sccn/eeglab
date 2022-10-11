@@ -1,4 +1,4 @@
-% subsasgn() - define index assignment for eegdata objects
+% SUBSASGN - define index assignment for eegdata objects
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

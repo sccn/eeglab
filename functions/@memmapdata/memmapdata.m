@@ -1,4 +1,4 @@
-% memmapdata() - create a memory-mapped data class
+% MEMMAPDATA - create a memory-mapped data class
 %
 % Usage:
 %   >> data_class = memmapdata(data);
