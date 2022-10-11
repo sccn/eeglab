@@ -1,4 +1,4 @@
-% rsadjust() - adjust l-values (Ramberg-Schmeiser distribution) 
+% RSADJUST - adjust l-values (Ramberg-Schmeiser distribution) 
 %                with respect to signal mean and variance
 %
 % Usage: p = rsadjust(l3, l4, m, var, skew)
@@ -21,7 +21,7 @@
 %
 % Author: Arnaud Delorme, SCCN, 2003
 %
-% See also: rsfit(), rsget()
+% See also: RSFIT, RSGET
 %
 % Reference: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F.
 %            A probability distribution and its uses in fitting data. 

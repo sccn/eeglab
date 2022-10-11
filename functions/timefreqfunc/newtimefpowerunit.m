@@ -1,4 +1,4 @@
-% newtimefpowerunit() - Find power unit for y-axis based on input structure.
+% NEWTIMEFPOWERUNIT - Find power unit for y-axis based on input structure.
 %
 % Usage:    
 %   >>  str = newtimefpowerunit(paramstruct); 

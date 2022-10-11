@@ -1,4 +1,4 @@
-% pac_cont() - compute phase-amplitude coupling (power of first input
+% PAC_CONT - compute phase-amplitude coupling (power of first input
 %         correlation with phase of second). There is no graphical output
 %         to this function.
 %

@@ -1,4 +1,4 @@
-% correct_mc() - compute an upper limit for the number of independent 
+% CORRECT_MC - compute an upper limit for the number of independent 
 %                time-frequency estimate in a given time-frequency image. 
 %                This number can be used to correct for multiple comparisons.
 %
@@ -7,7 +7,7 @@
 %
 % Inputs: 
 %    EEG       - EEGLAB structure
-%    cycles    - [float] same as the cycle input to timef(). Default is [3 0.5].
+%    cycles    - [float] same as the cycle input to TIMEF. Default is [3 0.5].
 %    freqrange - [float] minimum and maximum frequency. Default is [2 50] Hz.
 %    timesout  - [integer] array of number of time points to test. 
 %

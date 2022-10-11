@@ -1,4 +1,4 @@
-% rspdfsolv() - sub-function used by rsfit() to searc for optimal
+% RSPDFSOLV - sub-function used by RSFIT to searc for optimal
 %               parameter for Ramberg-Schmeiser distribution
 %
 % Usage: res = rspdfsolv(l, l3, l4)
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, SCCN, 2003
 %
-% See also: rsget()
+% See also: RSGET
 %
 % Reference: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F.
 %            A probability distribution and its uses in fitting data. 

@@ -1,4 +1,4 @@
-% rsget() - get the p-value for a given collection of l-values
+% RSGET - get the p-value for a given collection of l-values
 %            (Ramberg-Schmeiser distribution)
 %
 % Usage: p = getfit(l, val)
@@ -12,7 +12,7 @@
 %
 % Author: Arnaud Delorme, SCCN, 2003
 %
-% see also: rspfunc()
+% see also: RSPFUNC
 %
 % Reference: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F.
 %            A probability distribution and its uses in fitting data. 

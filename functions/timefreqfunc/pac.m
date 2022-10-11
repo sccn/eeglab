@@ -1,4 +1,4 @@
-% pac() - compute phase-amplitude coupling (power of first input
+% PAC - compute phase-amplitude coupling (power of first input
 %         correlation with phase of second). There is no graphical output
 %         to this function.
 %
@@ -77,7 +77,7 @@
 %                    (ITC) from x and y. This computes the  'intrinsic' coherence
 %                     x and y not arising from common synchronization to 
 %                     experimental events. See notes. {default: 'off'}
-%       'itctype'   = ['coher'|'phasecoher'] For use with 'subitc', see timef()
+%       'itctype'   = ['coher'|'phasecoher'] For use with 'subitc', see TIMEF
 %                     for more details {default: 'phasecoher'}.
 %       'subwin'    = [min max] sub time window in ms (this windowing is
 %                     performed after the spectral decomposition).
@@ -95,7 +95,7 @@
 %
 % Ref: Testing for Nested Oscilations (2008) J Neuro Methods 174(1):50-61
 %
-% See also: timefreq(), crossf()
+% See also: TIMEFREQ, CROSSF
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

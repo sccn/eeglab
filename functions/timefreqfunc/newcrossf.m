@@ -1,4 +1,4 @@
-% newcrossf() - Returns estimates and plots event-related coherence (ERCOH) 
+% NEWCROSSF - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input data time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel: 
 %        In the plot output by   > newcrossf(x,y,...);
@@ -137,7 +137,7 @@
 %                    either subtract complex spectral values' absolute vales 
 %                    ('abs'), angles ('angles') or the complex values themselves
 %                    ('complex').     {default: 'abs'}
-%       'rboot'    = Input bootstrap coherence limits (e.g., from newcrossf()) 
+%       'rboot'    = Input bootstrap coherence limits (e.g., from NEWCROSSF) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
 % Optional scalp map plot:
@@ -189,7 +189,7 @@
 %   Assuming both 'plotamp' and 'plotphase' options are 'on' (=default), the upper panel
 %   presents the magnitude of either phase coherence or linear coherence, depending on 
 %   the 'type' parameter (above). The lower panel presents the coherence phase difference 
-%   (in degrees). Click on any plot to pop up a new window (using 'axcopy()').
+%   (in degrees). Click on any plot to pop up a new window (using 'AXCOPY').
 %   -- The upper left marginal panel shows mean coherence during the baseline period
 %      (blue), and when significance is set, the significance threshold (dotted black-green).
 %   -- The horizontal panel under the coherence magnitude image indicates the maximum 
@@ -215,7 +215,7 @@
 % Authors: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
-% See also: timef()
+% See also: TIMEF
 
 % NOTE: one hidden parameter 'savecoher', 0 or 1
 
@@ -251,9 +251,9 @@
 % 06-29-99 fixed constant-Q freq indexing  -se 
 % 08-13-99 added cohangle plotting -sm
 % 08-20-99 made bootstrap more efficient -sm
-% 08-24-99 allow nan values introduced by possible eventlock() preproc. -sm
+% 08-24-99 allow nan values introduced by possible EVENTLOCK preproc. -sm
 % 03-16-00 added lead/lag interpretation to help msg - sm & eric visser
-% 03-16-00 added axcopy() feature -sm & tpj
+% 03-16-00 added AXCOPY feature -sm & tpj
 % 04-20-00 fixed Rangle sign for wavelets, added verts array -sm
 % 01-22-01 corrected help msg when nargin<2 -sm & arno delorme
 % 01-25-02 reformated help & license, added links -ad 
@@ -1404,7 +1404,7 @@ end
 %   case 'phasecoher',
 %      Coher.R = Coher.R + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
 %      Coher.Rn(trial,:) = 1;
-%end % ~any(isnan())
+%end % ~any(ISNAN)
 
 function [Coher,tmptrialcoh] = cohercomp(Coher, tmpX, tmpY, trial, time);
 tmptrialcoh = tmpX.*conj(tmpY);

@@ -1,4 +1,4 @@
-% correctfit() - correct fit using observed p-values. Use this function
+% CORRECTFIT - correct fit using observed p-values. Use this function
 %                if for some reason, the distribution of p values is
 %                not uniform between 0 and 1
 %
@@ -18,13 +18,13 @@
 %
 % Outputs:
 %    p          - corrected p value.
-%    phat       - phat gamfit() parameter.
-%    pci        - phat gamfit() parameter.
+%    phat       - phat GAMFIT parameter.
+%    pci        - phat GAMFIT parameter.
 %    zerofreq   - frequency of occurrence of p=0.
 %
 % Authors: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2003-
 %
-% See also: bootstat()
+% See also: BOOTSTAT
 
 % Copyright (C) 7/02/03  Arnaud Delorme, SCCN/INC/UCSD
 %

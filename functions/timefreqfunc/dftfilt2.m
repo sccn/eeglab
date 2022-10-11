@@ -1,4 +1,4 @@
-% dftfilt2() - discrete complex wavelet filters
+% DFTFILT2 - discrete complex wavelet filters
 %
 % Usage:
 %   >> wavelet = dftfilt2( freqs, cycles, srate, cyclefact)

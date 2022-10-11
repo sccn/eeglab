@@ -1,4 +1,4 @@
-% rspfunc() - sub-function used by rsget()
+% RSPFUNC - sub-function used by RSGET
 %
 % Usage: res = rspfunc(pval, l, rval)
 %
@@ -12,7 +12,7 @@
 %
 % Author: Arnaud Delorme, SCCN, 2003
 %
-% See also: rsget()
+% See also: RSGET
 %
 % Reference: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F.
 %            A probability distribution and its uses in fitting data. 
