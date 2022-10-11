@@ -1,4 +1,4 @@
-% pluguin_uiupdate() - support function for plugin_menu
+% PLUGUIN_UIUPDATE - support function for plugin_menu
 
 % Copyright (C) 2019 Arnaud Delorme
 %

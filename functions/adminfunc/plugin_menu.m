@@ -1,4 +1,4 @@
-% plugin_menu() - main function to install EEGLAB plugins
+% PLUGIN_MENU - main function to install EEGLAB plugins
 %
 % To install plugins from the command line, type in
 %

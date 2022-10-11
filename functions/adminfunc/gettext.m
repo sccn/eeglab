@@ -1,4 +1,4 @@
-% gettext() - This function prints a dialog box on screen and waits for 
+% GETTEXT - This function prints a dialog box on screen and waits for 
 %             the user to enter a string. There is a cancel button which 
 %             returns a value of [].
 % Usage:

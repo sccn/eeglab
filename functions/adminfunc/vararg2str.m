@@ -1,5 +1,5 @@
-% vararg2str() - transform arguments into string for evaluation 
-%                using the eval() command
+% VARARG2STR - transform arguments into string for evaluation 
+%                using the EVAL command
 %
 % Usage:
 %   >> strout = vararg2str( allargs );

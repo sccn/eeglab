@@ -1,4 +1,4 @@
-% eegh() - history function.           
+% EEGH - history function.           
 %
 % Usage:
 %   >> eegh( arg );
@@ -24,7 +24,7 @@
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2001
 %
 % See also:
-%  eeglab() (a graphical interface for eeg plotting, space frequency
+%  EEGLAB (a graphical interface for eeg plotting, space frequency
 %  decomposition, ICA, ... under Matlab for which this command
 %  was designed).
 

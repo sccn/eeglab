@@ -1,5 +1,5 @@
 function bool = is_sccn
-% is_sccn() - returns 1 if computer is located at SCCN (Swartz Center
+% IS_SCCN - returns 1 if computer is located at SCCN (Swartz Center
 % for computational Neuroscience) and 0 otherwise
 
 bool = 0;

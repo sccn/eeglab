@@ -1,4 +1,4 @@
-% eeg_helphelp() - How to use EEGLAB help.
+% EEG_HELPHELP - How to use EEGLAB help.
 %
 % EEGLAB MENU: 
 % Each EEGLAB menu item calls a Matlab function from the commandline. If this 
@@ -14,9 +14,9 @@
 % The advantage of this process is that the same function can be called in 
 % two ways, either in interactive (pop_) mode or directly from the commandline. 
 % This trick allows EEGLAB to build a history of the commands run under an 
-% EEGLAB session. (See the eegh() function for details). The command history allows 
+% EEGLAB session. (See the EEGH function for details). The command history allows 
 % users to build their own EEGLAB macros by copying and pasting commands from 
-% the EEGLAB history (using eegh() and pop_saveh()) into new Matlab script files.
+% the EEGLAB history (using EEGH and POP_SAVEH) into new Matlab script files.
 %
 % EEGLAB HELP WINDOWS:
 % The help message of any function may be called from from the EEGLAB menu 
@@ -25,8 +25,8 @@
 % data (in particular, the 'pop_' functions). To understand their use, look 
 % at the help message for the (non-pop) function they call which actually 
 % processes the data. For example, the menu item % "Plot > Channel ERP image" 
-% calls the function 'pop_erpimage()'. This function in turn serves as a 
-% graphic user interface for the computing and plotting function 'erpimage()'.
+% calls the function 'POP_ERPIMAGE'. This function in turn serves as a 
+% graphic user interface for the computing and plotting function 'ERPIMAGE'.
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

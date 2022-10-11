@@ -1,4 +1,4 @@
-% eeg_hist() - history for EEGLAB dataset.
+% EEG_HIST - history for EEGLAB dataset.
 %
 % Usage:
 %   >> EEGOUT = eeg_hist( EEGIN, command );
@@ -9,7 +9,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, Dec 2003
 %
-% See also: eegh(), eeglab()
+% See also: EEGH, EEGLAB
 
 % Copyright (C) 2003 Arnaud Delorme, SCCN/INC/UCSD, arno@salk.edu
 %

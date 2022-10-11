@@ -1,4 +1,4 @@
-% eeg_readoptions() - Read EEGLAB memory options file (eeg_options) into a
+% EEG_READOPTIONS - Read EEGLAB memory options file (eeg_options) into a
 %                     structure variable (opt).
 %
 % Usage:
@@ -17,7 +17,7 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 %
-% See also: eeg_options(), eeg_editoptions()
+% See also: EEG_OPTIONS, EEG_EDITOPTIONS
 
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2006-
 %

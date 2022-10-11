@@ -1,4 +1,4 @@
-% eeg_checkchanlocs() - Check the consistency of the channel locations structure 
+% EEG_CHECKCHANLOCS - Check the consistency of the channel locations structure 
 %                  of an EEGLAB dataset.
 %
 % Usage:

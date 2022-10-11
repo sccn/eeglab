@@ -1,4 +1,4 @@
-% eeg_eval() - apply eeglab function to a collection of input datasets
+% EEG_EVAL - apply eeglab function to a collection of input datasets
 %
 % Usage:
 %   >> OUTEEG = eeg_eval(funcname, INEEG, 'key1', value1, 'key2', value2 ...);
@@ -18,7 +18,7 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2005 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

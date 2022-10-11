@@ -1,4 +1,4 @@
-% eeglab_update() - assess if EEGLAB new updating and ask user to install
+% EEGLAB_UPDATE - assess if EEGLAB new updating and ask user to install
 %                   new version
 %
 % Usage:
