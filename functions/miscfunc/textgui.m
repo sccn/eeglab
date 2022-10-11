@@ -121,7 +121,7 @@ if ~isempty(g.title)
         divider = g.linesperpage;
     else
         divider = nblines+addlines;
-    end;    
+    end
     ordinate      = topordi-topordi*TOPLINES/divider;
     currentheight = topordi/divider;
     
@@ -140,7 +140,7 @@ if ~isempty(g.title)
         divider = g.linesperpage;
     else
         divider = nblines+addlines;
-    end;    
+    end
 end
 
 maxlen = size(g.title,2);
