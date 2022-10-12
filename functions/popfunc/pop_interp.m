@@ -51,7 +51,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG com] = pop_interp(EEG, bad_elec, method)
+function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
 
     com = '';
     if nargin < 1
@@ -117,10 +117,12 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         else method = 'invdist';
         end
         bad_elec = userdata.chans;
-        if numel(res) > 1
-            t_range = res{2};
-        else
-            t_range = '';
+        if nargin < 4
+            if numel(res) > 1
+                t_range = res{2};
+            else
+                t_range = '';
+            end
         end
         if isempty(t_range)
             t_range = [EEG.xmin EEG.xmax];
@@ -219,7 +221,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
             end
         end
     end
-
+    
     EEG = eeg_interp(EEG, bad_elec, method, t_range);
     
     
