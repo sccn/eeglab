@@ -106,8 +106,9 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                    {} { 'Style' 'text' 'string' 'Note: for group level analysis, interpolate in STUDY' } ...
                    };
                
-        geom     = { 1 1 1 1 1 1 1 [1.1 1] 1   1 };
-        geomvert = [ 1 1 1 1 1 1 1 1       0.5 1 ];
+            geom     = { 1 1 1 1 1 1 1 [1.1 1] 1   1 };
+            geomvert = [ 1 1 1 1 1 1 1 1       0.5 1 ];
+        end
         [res, userdata, ~, restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'geomvert', geomvert, 'helpcom', 'pophelp(''pop_interp'')');
         if isempty(res) || isempty(userdata), return; end
         
