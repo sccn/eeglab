@@ -1,4 +1,4 @@
-% readlocs() - read electrode location coordinates and other information from a file. 
+% READLOCS - read electrode location coordinates and other information from a file. 
 %              Several standard file formats are supported. Users may also specify 
 %              a custom column format. Defined format examples are given below 
 %              (see File Formats).
@@ -25,19 +25,19 @@
 %                          z is toward nose; y is toward left ear; z is toward vertex
 %                  'asc'   Neuroscan polar coordinates.
 %                  'polhemus' or 'polhemusx' - Polhemus electrode location file recorded 
-%                          with 'X' on sensor pointing to subject (see below and readelp()).
+%                          with 'X' on sensor pointing to subject (see below and READELP).
 %                  'polhemusy' - Polhemus electrode location file recorded with 
-%                          'Y' on sensor pointing to subject (see below and readelp()).
+%                          'Y' on sensor pointing to subject (see below and READELP).
 %                  'besa' BESA-'.elp' spherical coordinates. (Not MATLAB spherical -
 %                           see below).
-%                  'chanedit' - EEGLAB channel location file created by pop_chanedit().
+%                  'chanedit' - EEGLAB channel location file created by POP_CHANEDIT.
 %                  'custom' - Ascii file with columns in user-defined 'format' (see below).
 %   'importmode' - ['eeglab'|'native'] for location files containing 3-D cartesian electrode
 %                  coordinates, import either in EEGLAB format (nose pointing toward +X). 
 %                  This may not always be possible since EEGLAB might not be able to 
 %                  determine the nose direction for scanned electrode files. 'native' import
-%                  original carthesian coordinates (user can then specify the position of
-%                  the nose when calling the topoplot() function; in EEGLAB the position
+%                  original cartesian coordinates (user can then specify the position of
+%                  the nose when calling the TOPOPLOT function; in EEGLAB the position
 %                  of the nose is stored in the EEG.chaninfo structure). {default 'eeglab'}
 %   'format'    -  [cell array] Format of a 'custom' channel location file (see above).
 %                  {default: if no file type is defined. The cell array contains
@@ -47,7 +47,7 @@
 %                           'theta'     [real degrees] 2-D angle in polar coordinates.
 %                                       positive => rotating from nose (0) toward left ear
 %                           'radius'    [real] radius for 2-D polar coords; 0.5 is the head
-%                                       disk radius and limit for topoplot() plotting).
+%                                       disk radius and limit for TOPOPLOT plotting).
 %                           'X'         [real] Matlab-Cartesian X coordinate (to nose).
 %                           'Y'         [real] Matlab-Cartesian Y coordinate (to left ear).
 %                           'Z'         [real] Matlab-Cartesian Z coordinate (to vertex).
@@ -113,18 +113,18 @@
 %                           ...
 %   '.elc':
 %               Cartesian 3-D electrode coordinates scanned using the EETrak software. 
-%               See readeetraklocs().
+%               See READEETRAKLOCS.
 %   '.elp':     
 %               Polhemus-.'elp' Cartesian coordinates. By default, an .elp extension is read
 %               as PolhemusX-elp in which 'X' on the Polhemus sensor is pointed toward the 
-%               subject. Polhemus files are not in columnar format (see readelp()).
+%               subject. Polhemus files are not in columnar format (see READELP).
 %   '.elp':
 %               BESA-'.elp' spherical coordinates: Need to specify 'filetype','besa'.
 %               The elevation angle (phi) is measured from the vertical axis. Positive 
 %               rotation is toward right ear. Next, perform azimuthal/horizontal rotation 
 %               (theta): 0 is toward right ear; 90 is toward nose, -90 toward occiput. 
 %               Angles are in degrees.  If labels are absent or weights are given in 
-%               a last column, readlocs() adjusts for this. Default labels are E1, E2, ...
+%               a last column, READLOCS adjusts for this. Default labels are E1, E2, ...
 %               Fields:   Type  label      phi  theta   
 %               Sample:   EEG   Fp1        -92   -72    
 %                         EEG   Fp2         92    72   
@@ -157,7 +157,7 @@
 %                         C4      .719        0          .695  
 %                           ...
 %   '.ced':   
-%               ASCII file saved by pop_chanedit(). Contains multiple MATLAB/EEGLAB formats.
+%               ASCII file saved by POP_CHANEDIT. Contains multiple MATLAB/EEGLAB formats.
 %               Cartesian coordinates are as in the 'xyz' format (above).
 %               Fields:   channum  label  theta  radius   x      y      z    sph_theta   sph_phi  ...
 %               Sample:   1        Fp1     -18    .511   .950   .308  -.035   18         -2       ...
@@ -177,7 +177,7 @@
 %
 % Author: Arnaud Delorme, Salk Institute, 8 Dec 2002
 %
-% See also: readelp(), writelocs(), topo2sph(), sph2topo(), sph2cart()
+% See also: READELP, WRITELOCS, TOPO2SPH, SPH2TOPO, SPH2CART
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 28 Feb 2002
 %
@@ -225,8 +225,8 @@ end
 % 7)  Document the new channel format in the help message above.
 % 8)  After testing, please send the new version of readloca.m to us
 %       at eeglab@sccn.ucsd.edu with a sample locs file.
-% The 'chanformat' structure is also used (automatically) by the writelocs() 
-% and pop_readlocs() functions. You do not need to edit these functions.
+% The 'chanformat' structure is also used (automatically) by the WRITELOCS 
+% and POP_READLOCS functions. You do not need to edit these functions.
 
 chanformat(1).type         = 'polhemus';
 chanformat(1).typestring   = 'Polhemus native .elp file';

@@ -1,4 +1,4 @@
-% eeg_checkset()   - check the consistency of the fields of an EEG dataset
+% EEG_CHECKSET   - check the consistency of the fields of an EEG dataset
 %                    Also: See EEG dataset structure field descriptions below.
 %
 % Usage: >> [EEGOUT,changes] = eeg_checkset(EEG); % perform all checks
@@ -77,7 +77,7 @@
 %                      (before channel rejection)
 %   EEG.chaninfo     - structure containing additional channel info
 %   EEG.ref          - type of channel reference ('common'|'averef'|+/-int]
-%   EEG.splinefile   - location of the spline file used by headplot() to plot
+%   EEG.splinefile   - location of the spline file used by HEADPLOT to plot
 %                      data scalp maps in 3-D
 %
 % The event and epoch sub-structures:
@@ -100,7 +100,7 @@
 %                     Note: [] here means that 'compute_ica' option has been set
 %                     to 0 under 'File > Memory options' In this case,
 %                     component activations are computed only as needed.
-%   EEG.icasplinefile - location of the spline file used by headplot() to plot
+%   EEG.icasplinefile - location of the spline file used by HEADPLOT to plot
 %                     component scalp maps in 3-D
 %   EEG.chaninfo.icachansind  - indices of channels used in the ICA decomposition
 %   EEG.dipfit      - array of structures containing component map dipole models
@@ -132,7 +132,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -165,7 +165,7 @@
 % 01-26-02 chandeg events and trial condition format -ad
 % 01-27-02 debug when trial condition is empty -ad
 % 02-15-02 remove icawinv recompute for pop_epoch -ad & ja
-% 02-16-02 remove last modification and test icawinv separatelly -ad
+% 02-16-02 remove last modification and test icawinv separately -ad
 % 02-16-02 empty event and epoch check -ad
 % 03-07-02 add the eeglab options -ad
 % 03-07-02 corrected typos and rate/point calculation -ad & ja
@@ -189,6 +189,11 @@ if ~isfield(EEG, 'data'), return; end
 % checking multiple datasets
 % --------------------------
 if length(EEG) > 1
+
+    if length(EEG) > 5000
+        disp('Too many datasets, abording check')
+        return;
+    end
     
     if nargin > 1
         switch varargin{1}

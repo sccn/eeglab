@@ -1,4 +1,4 @@
-% pop_biosig() - import data files into EEGLAB using BIOSIG toolbox
+% POP_BIOSIG - import data files into EEGLAB using BIOSIG toolbox
 %
 % Usage:
 %   >> OUTEEG = pop_biosig; % pop up window
@@ -18,7 +18,7 @@
 %  'overflow'    - ['on'|'off'] overflow detection. Default is 'off'
 %  'uncalibrated' - ['on'|'off'] import uncalibrated data. Default is 'off'
 %  'blockepoch'  - ['on'|'off'] force importing continuous data. Default is 'on'
-%  'bdfeventmode' - [interger] see bdf2biosig_events function help. Default is 4.
+%  'bdfeventmode' - [integer] see bdf2biosig_events function help. Default is 4.
 %  'ref'         - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
 %                  allowing easy re-referencing. If more than one
@@ -147,7 +147,7 @@ if nargin < 1
                  { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata 'tag' 'memorymapped' } ...
                  { 'style' 'checkbox' 'String' 'Enable overflow detection' 'value' 0 'tag' 'overflow' } ...
                  { 'style' 'checkbox' 'String' 'Import uncalibrated data' 'value' 0 'tag' 'uncalibrated' } ...
-                 { 'style' 'checkbox' 'string' 'Import EDF+ anotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
+                 { 'style' 'checkbox' 'string' 'Import EDF+ annotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
                  { 'style' 'checkbox' 'string' 'Import using alternative BIOSIG method (mexSLOAD)' 'value' 0 'callback' checkmex 'tag' 'importmex' } };
     geom = { [3 1] [3 1] [3 1] [3 1] [1] [1] [1] [1] [1] [1] [1] };
 

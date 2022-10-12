@@ -1,4 +1,4 @@
-% condstat() - accumulate surrogate data for comparing two data conditions 
+% CONDSTAT - accumulate surrogate data for comparing two data conditions 
 %
 % Usage:
 %     >> [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, ...
@@ -37,7 +37,7 @@
 % Authors: Arnaud Delorme & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
-% See also: timef(), crossf()
+% See also: TIMEF, CROSSF
 
 % Copyright (C) 2002  Arnaud Delorme, Lars Kai Hansen & Scott Makeig, SCCN/INC/UCSD
 %

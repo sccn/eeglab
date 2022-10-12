@@ -1,4 +1,4 @@
-% eeglab_error() - generate an eeglab error.
+% EEGLAB_ERROR - generate an eeglab error.
 %
 % Usage: >>  eeglab_error;
 %
@@ -6,7 +6,7 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 %
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2006 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

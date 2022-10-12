@@ -1,9 +1,9 @@
-% std_readspecgram() - returns the stored mean power spectrogram for an ICA component 
+% STD_READSPECGRAM - returns the stored mean power spectrogram for an ICA component 
 %                  or a data channel in a specified dataset.  The spectrogram is 
 %                  assumed to have been saved in a Matlab file, 
 %                  "[dataset_name].datspecgram", in the same
 %                  directory as the dataset file. If this file doesn't exist,
-%                  use std_specgram() to create it.
+%                  use STD_SPECGRAM to create it.
 % Usage:    
 %  >> [spec, times, freqs] = std_readspecgram(ALLEEG, setindx, component, timerange, freqrange);  
 %
@@ -22,7 +22,7 @@
 %               specified dataset (in dB)
 %   freqs     - vector of spectral frequencies (in Hz)
 %
-%  See also  std_spec(), pop_preclust(), std_preclust()
+%  See also  STD_SPEC, POP_PRECLUST, STD_PRECLUST
 %
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, February, 2008
 

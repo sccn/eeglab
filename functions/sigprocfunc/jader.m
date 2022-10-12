@@ -1,5 +1,5 @@
 function B =  jadeR(X,m)
-% jader() - blind separation of real signals using JADE (v1.5, Dec. 1997).
+% JADER - blind separation of real signals using JADE (v1.5, Dec. 1997).
 %
 % Usage: 
 %   >> B = jader(X);

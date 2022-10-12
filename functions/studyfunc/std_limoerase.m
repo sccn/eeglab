@@ -1,4 +1,4 @@
-% std_limoerase() - erase LIMO files.
+% STD_LIMOERASE - erase LIMO files.
 %
 % Usage:
 %   >> std_limoerase(filepath, filename, subjects, designname)
@@ -11,7 +11,7 @@
 %
 % Author: Ramon Martinez and Arnaud Delorme, SCCN, UCSD, 2018-
 %
-% See also: std_limo()
+% See also: STD_LIMO
 
 % Copyright (C) Ramon Martinez and Arnaud Delorme
 %

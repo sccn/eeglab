@@ -1,4 +1,4 @@
-% std_findgroupvars() - find group vars in STUY structure
+% STD_FINDGROUPVARS - find group vars in STUY structure
 %
 % Usage:
 %   >>  

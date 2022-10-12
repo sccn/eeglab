@@ -1,7 +1,7 @@
-% plottopo() - plot concatenated multichannel data epochs in a topographic
+% PLOTTOPO - plot concatenated multichannel data epochs in a topographic
 % or
 %              rectangular array. Uses a channel location file with the same 
-%              format as topoplot(), or else plots data on a rectangular grid. 
+%              format as TOPOPLOT, or else plots data on a rectangular grid. 
 %              If data are all positive, they are assumed to be spectra.
 % Usage:
 %    >> plottopo(data, 'key1', 'val1', 'key2', 'val2')
@@ -14,7 +14,7 @@
 %
 % Optional inputs:
 %  'chanlocs'  = [struct] channel structure or file plot ERPs at channel 
-%                locations. See help readlocs() for data channel format.
+%                locations. See help READLOCS for data channel format.
 %  'geom'      = [rows cols] plot ERP in grid (overwrite previous option).
 %                Grid size for rectangular matrix. Example: [6 4].
 %  'frames'    = time frames (points) per epoch {def|0 -> data length}
@@ -46,9 +46,9 @@
 %
 % Author: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3-2-98 
 %
-% See also: plotdata(), topoplot()
+% See also: PLOTDATA, TOPOPLOT
 
-% Copyright (C) 3-2-98 from plotdata() Scott Makeig, SCCN/INC/UCSD,
+% Copyright (C) 3-2-98 from PLOTDATA Scott Makeig, SCCN/INC/UCSD,
 % scott@sccn.ucsd.edu
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
@@ -79,8 +79,8 @@
 % 5-11-98 added channels arg -sm
 % 7-15-98 added ydir arg, made pos-up the default -sm
 % 7-23-98 debugged ydir arg and pos-up default -sm
-% 12-22-99 added grid size option, changed to sbplot() order -sm
-% 03-16-00 added axcopy() feature -sm & tpj
+% 12-22-99 added grid size option, changed to SBPLOT order -sm
+% 03-16-00 added AXCOPY feature -sm & tpj
 % 08-21-00 debugged axheight/axwidth setting -sm
 % 01-25-02 reformated help & license, added links -ad 
 % 03-11-02 change the channel names plotting position and cutomize pop-up -ad 
@@ -300,10 +300,10 @@ end
 %         else % ischar(g.chans)
 %             chid = fopen(g.chans,'r');
 %             if chid <3,
-%                 fprintf('plottopo(): cannot open file %s.\n',g.chans);
+%                 fprintf('PLOTTOPO: cannot open file %s.\n',g.chans);
 %                 return
 %             else
-%                 fprintf('plottopo(): opened file %s.\n',g.chans);
+%                 fprintf('PLOTTOPO: opened file %s.\n',g.chans);
 %             end
 % 
 %             %%%%%%%

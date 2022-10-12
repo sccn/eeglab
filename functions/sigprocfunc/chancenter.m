@@ -1,4 +1,4 @@
-% chancenter() - recenter cartesian X,Y,Z channel coordinates
+% CHANCENTER - recenter cartesian X,Y,Z channel coordinates
 %
 % Usage:  >> [x y z newcenter] = chancenter(x,y,z,center); 
 %
@@ -13,7 +13,7 @@
 % Authors: Arnaud Delorme, Luca Finelli & Scott Makeig SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
 %
-% See also: spherror(), cart2topo()
+% See also: SPHERROR, CART2TOPO
 
 % Copyright (C) 11/1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

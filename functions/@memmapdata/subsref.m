@@ -1,4 +1,4 @@
-% subsref() - index eegdata class
+% SUBSREF - index eegdata class
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

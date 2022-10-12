@@ -1,4 +1,4 @@
-% ploterp() - plot a selected multichannel data epoch on a common timebase
+% PLOTERP - plot a selected multichannel data epoch on a common timebase
 %
 % Usage: >> ploterp(data,frames,epoch,[limits],'title',[plotchans]);
 %
@@ -13,9 +13,9 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 6-11-98 
 %
-% See also: timtopo()
+% See also: TIMTOPO
 
-% Copyright (C) 6-11-98 from plotdata() Scott Makeig, SCCN/INC/UCSD,
+% Copyright (C) 6-11-98 from PLOTDATA Scott Makeig, SCCN/INC/UCSD,
 % scott@sccn.ucsd.edu
 %
 % This file is part of EEGLAB, see http://www.eeglab.org

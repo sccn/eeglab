@@ -1,4 +1,4 @@
-% hist2() - draw superimposed histograms
+% HIST2 - draw superimposed histograms
 %
 % Usage:
 %   >> hist2(data1, data2, bins);

@@ -1,4 +1,4 @@
-% std_readerpimage()  - load ERPimage measures for data channels or 
+% STD_READERPIMAGE  - load ERPimage measures for data channels or 
 %                       for all components of a specified cluster.
 % Usage:
 %   >> [STUDY, erpimagedata, times, trials, events] = std_readerpimage(STUDY, ALLEEG, varargin);

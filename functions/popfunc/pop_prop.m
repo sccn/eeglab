@@ -1,4 +1,4 @@
-% pop_prop() - plot the properties of a channel or of an independent
+% POP_PROP - plot the properties of a channel or of an independent
 %              component. 
 % Usage:
 %   >> pop_prop( EEG);           % pops up a query window 
@@ -18,7 +18,7 @@
 %                If non-zero, this parameter is used to back-propagate
 %                the color of the rejection button.
 %   spectopo_options - [cell array] optional cell array of options for 
-%                the spectopo() function. 
+%                the SPECTOPO function. 
 %                For example { 'freqrange' [2 50] }
 % 
 % Note: Type "set(gcf, ''renderer'', ''painter'')" before saving the figure 
@@ -26,7 +26,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_runica(), eeglab()
+% See also: POP_RUNICA, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

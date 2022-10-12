@@ -1,12 +1,12 @@
-% posact() - Make runica() activations all RMS-positive.
+% POSACT - Make RUNICA activations all RMS-positive.
 %            Adjust weights and inverse weight matrix accordingly.
 %
 % Usage: >> [actout,winvout,weightsout] = posact(data,weights,sphere) 
 %
 % Inputs:
-%    data        = runica() input data
-%    weights     = runica() weights
-%    sphere      = runica() sphere {default|0 -> eye()}
+%    data        = RUNICA input data
+%    weights     = RUNICA weights
+%    sphere      = RUNICA sphere {default|0 -> EYE}
 %
 % Outputs:
 %    actout      = activations reoriented to be RMS-positive

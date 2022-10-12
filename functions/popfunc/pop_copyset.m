@@ -1,4 +1,4 @@
-% pop_copyset() - Copy the current EEG dataset into another dataset.
+% POP_COPYSET - Copy the current EEG dataset into another dataset.
 %
 % Usage:
 %   >> ALLEEG = pop_copyset(ALLEEG, index1); % pop-up
@@ -19,7 +19,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeg_store(), pop_delset(), eeglab() 
+% See also: EEG_STORE, POP_DELSET, EEGLAB 
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

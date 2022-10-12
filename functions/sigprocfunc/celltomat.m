@@ -1,4 +1,4 @@
-% celltomat() - convert cell array to matrix
+% CELLTOMAT - convert cell array to matrix
 %
 % Usage: >> M = celltomat( C );
 %

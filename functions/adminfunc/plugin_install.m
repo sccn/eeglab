@@ -1,4 +1,4 @@
-% plugin_install() - install EEGLAB plugin. Called by plugin_askinstall().
+% PLUGIN_INSTALL - install EEGLAB plugin. Called by PLUGIN_ASKINSTALL.
 %
 % Usage:
 %  plugin_install(zipfilelink, name, version, force, size);
@@ -14,7 +14,7 @@
 %
 % plugin_askinstall('xxxxxx', [], true); % with xxxx being the name of the plugin
 %
-% See also: plugin_askinstall()
+% See also: PLUGIN_ASKINSTALL
 
 % Copyright (C) 2012- Arnaud Delorme
 %

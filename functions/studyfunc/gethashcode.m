@@ -1,4 +1,4 @@
-% gethashcode() - get hash code for input array
+% GETHASHCODE - get hash code for input array
 %
 % Usage:
 %         >> md5code = gethashcode(array);

@@ -1,9 +1,9 @@
-% zica() - Z-transform of ICA activations; useful for studying component SNR
+% ZICA - Z-transform of ICA activations; useful for studying component SNR
 %
 % Usage: >> [zact,basesd,maz,mazc,mazf] = zica(activations,frames,baseframes)
 %
 % Inputs:
-%   activations - activations matrix produced by runica()
+%   activations - activations matrix produced by RUNICA
 %   frames      - frames per epoch {0|default ->  length(activations)}
 %   baseframes  - vector of frames in z-defining baseline period {default frames}
 % 
@@ -17,7 +17,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2-25-98 
 %
-% See also: runica()
+% See also: RUNICA
 
 function [zact,basesd,maxabsz,maxc,maxabszf] = zica(activations,frames,baseframes)
 

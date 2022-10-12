@@ -1,11 +1,11 @@
-% std_moveoutlier()  - Commandline function, to reassign specified outlier component(s) 
+% STD_MOVEOUTLIER  - Commandline function, to reassign specified outlier component(s) 
 %                            from a cluster to its outlier cluster. 
 % Usage:    
 %                   >> STUDY = std_moveoutlier(STUDY, ALLEEG, from_cluster, comps);   
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                       ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                       ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %   from_cluster - cluster number, the cluster outlier components are moved from.  
 %   comps          - [numeric vector] component indices in the from_cluster to move.  
 %

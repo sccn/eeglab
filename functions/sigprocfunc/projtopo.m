@@ -1,12 +1,12 @@
-% projtopo() - plot projections of one or more ICA components along with 
+% PROJTOPO - plot projections of one or more ICA components along with 
 %              the original data in a 2-d topographic array. Returns 
 %              the data plotted. Click on subplot to examine separately.
 % Usage:
 %       >> [projdata] = projtopo(data,weights,[compnums],'chan_locs',...
 %                                 'title',[limits],colors,chans);
 % Inputs:
-%   data       = single epoch of runica() input data (chans,frames) 
-%   weights    = unimxing weight matrix (runica() weights*sphere)
+%   data       = single epoch of RUNICA input data (chans,frames) 
+%   weights    = unimxing weight matrix (RUNICA weights*sphere)
 %  [compnums]  = vector of component numbers to project and plot 
 %  'chan_locs' = channel locations file. Example: >> topoplot example  
 %                 Else [rows cols] for rectangular grid array
@@ -20,9 +20,9 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 04-02-98 
 %
-% See also: plotproj(), topoplot()
+% See also: PLOTPROJ, TOPOPLOT
 
-% Copyright (C) 04-02-98 from plotproj() Scott Makeig, SCCN/INC/UCSD,
+% Copyright (C) 04-02-98 from PLOTPROJ Scott Makeig, SCCN/INC/UCSD,
 % scott@sccn.ucsd.edu
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
@@ -53,8 +53,8 @@
 % Without color arg, reads filename for PROJCOLORS from icadefs.m
 
 % 03-15-00 added plotchans arg -sm
-% 03-16-00 added axcopy() feature -sm & tpj
-% 12-19-00 adjusted new icaproj() args -sm
+% 03-16-00 added AXCOPY feature -sm & tpj
+% 12-19-00 adjusted new ICAPROJ args -sm
 % 12-20-00 removed argument "sphere" -sm
 % 07-12-01 fixed nargin test to allow 8 args -sm & cmk
 % 01-25-02 reformated help & license, added links -ad 

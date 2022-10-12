@@ -1,4 +1,4 @@
-% loc_subsets() - Separate channels into maximally evenly-spaced subsets. 
+% LOC_SUBSETS - Separate channels into maximally evenly-spaced subsets. 
 %                 This is achieved by exchanging channels between subsets so as to
 %                 increase the sum of average of distances within each channel subset.
 % Usage:

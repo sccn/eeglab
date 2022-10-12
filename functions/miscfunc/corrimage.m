@@ -1,4 +1,4 @@
-% corrimage() - compute correlation image between an event and amplitude
+% CORRIMAGE - compute correlation image between an event and amplitude
 %               and phase in the time-frequency domain.
 %
 % Usage: 
@@ -32,14 +32,14 @@
 %                to retain. i.e. [5 95] remove the 5 lowest and highest 
 %                percentile of sortvar values (and associated data) before
 %                computing statistics. Default is [0 100].
-%   'align'    - [float] same as 'align' parameter of erpimage(). This 
-%                parameter is used to contrain the 'times' parameter so
+%   'align'    - [float] same as 'align' parameter of ERPIMAGE. This 
+%                parameter is used to constrain the 'times' parameter so
 %                correlation with data trials containing 0-values (as a
 %                result of data alignment) are avoided: computing these
 %                correlations would produce spurious significant results.
 %                Default is no alignment.
-%   'method'   - ['erpimage'|timefreq'] use either the erpimage() function
-%                of the timefreq() function to compute spectral decomposition.
+%   'method'   - ['erpimage'|timefreq'] use either the ERPIMAGE function
+%                of the TIMEFREQ function to compute spectral decomposition.
 %                Default is 'timefreq' for speed reasons (note that both 
 %                methods should return the same results).
 %   'erpout'   - [min max] regress out ERP using the selected time-window [min
@@ -85,7 +85,7 @@
 % Author: Arnaud Delorme & Scott Makeig, SCCN UCSD, 
 %         and CNL Salk Institute, 18 April 2003
 %
-% See also: erpimage()
+% See also: ERPIMAGE
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 

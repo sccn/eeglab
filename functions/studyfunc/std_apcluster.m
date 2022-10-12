@@ -1,4 +1,4 @@
-% std_apcluster() - Affinity propagation cluster for eeglab STUDY
+% STD_APCLUSTER - Affinity propagation cluster for eeglab STUDY
 %                   Wrapper for function provided by (Frey/Dueck, Science 2007)
 %
 % Usage:

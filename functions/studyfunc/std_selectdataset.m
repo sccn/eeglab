@@ -1,4 +1,4 @@
-% std_selectdataset() - select datasets and trials for a given independent
+% STD_SELECTDATASET - select datasets and trials for a given independent
 %                       variable with a given set of values.
 %
 % Usage:

@@ -1,4 +1,4 @@
-% eeg_topoplot() - plot scalp map
+% EEG_TOPOPLOT - plot scalp map
 %
 % eeg_topoplot( vals, chanlocs, 'key', 'val');
 %

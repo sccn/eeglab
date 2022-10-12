@@ -1,12 +1,12 @@
-% timefdetails() - details of the timef() function for time/frequency analysis 
+% TIMEFDETAILS - details of the TIMEF function for time/frequency analysis 
 %                  of multiple epochs of single-channel event-related data.
 %
 % Global Description:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% timef() performs normalized time/frequency averaging using either 
+% TIMEF performs normalized time/frequency averaging using either 
 % FFT-, wavelet-, or multitaper DFT estimates. The wavelets are N-cycle 
-% Hanning-windowed sinusoids. (Note: To substitute for hanning() windowing 
-% gauss() or other windowing, replace the timef.m reference to hanning()).
+% Hanning-windowed sinusoids. (Note: To substitute for HANNING windowing 
+% GAUSS or other windowing, replace the timef.m reference to HANNING).
 %
 % By default, the two image panels of the output plot show, respectively, the
 % event-related spectral perturbation (ERSP) and inter-trial coherence (ITC)
@@ -72,7 +72,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % NOTE:
-% * Left-click on subplots to view and zoom in separate windows (uses axcopy()).
+% * Left-click on subplots to view and zoom in separate windows (uses AXCOPY).
 %
 % Required Inputs:
 %   data        = Single-channel data vector (1,frames*ntrials) (required)
@@ -171,8 +171,8 @@
 %   'elocs'     = Electrode location file for scalp map   {no default}
 %                     File should be ascii in format of  >> topoplot example   
 %  This is an optional map-plotting feature. Given an input map vector 
-%  (one weight at each channel, and a electrode location file, timef() plots
-%  a topoplot()-style 2-d scalp map on the left side of the figure. See
+%  (one weight at each channel, and a electrode location file, TIMEF plots
+%  a TOPOPLOT-style 2-d scalp map on the left side of the figure. See
 %  >> topoplot example % for the format of the electrode location file.
 %
 % Other Optional Plotting Parameters:
@@ -184,8 +184,8 @@
 %   'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
 %   'title'     = Optional figure title                              {none}
 %
-%   'pboot'     = Bootstrap power limits (e.g., from timef())   {from data}
-%   'rboot'     = Bootstrap ITC limits (e.g., from timef())     {from data}
+%   'pboot'     = Bootstrap power limits (e.g., from TIMEF)   {from data}
+%   'rboot'     = Bootstrap ITC limits (e.g., from TIMEF)     {from data}
 %  These are useful if you want to apply significance limits from another condition 
 %  to new data. {default|NaN, compute from data}
 %
@@ -211,9 +211,9 @@
 %  Plot description:
 %    Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). The upper panel
 %    presents the data ERSP (Event-Related Spectral Perturbation) in dB, with mean baseline
-%    spectral activity (in dB) subtracted. Use "'baseline', NaN" to prevent timef() from
+%    spectral activity (in dB) subtracted. Use "'baseline', NaN" to prevent TIMEF from
 %    removing the baseline. The lower panel presents the data ITC (Inter-Trial Coherence).
-%    Click on any plot axes to pop up a new window (using 'axcopy()')
+%    Click on any plot axes to pop up a new window (using 'AXCOPY')
 %    -- Upper left marginal panel presents the mean spectrum during the baseline period
 %       (blue), and when significance is set, the significance threshold at each frequency
 %       (dotted green-black trace).
@@ -227,12 +227,12 @@
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
-% See also: crossf() - event-related cross-spectral coherence between two input
+% See also: CROSSF - event-related cross-spectral coherence between two input
 %                      time series.
 %
 % History: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% timef() was coded by Sigurd Enghoff and Scott Makeig at The Salk 
+% TIMEF was coded by Sigurd Enghoff and Scott Makeig at The Salk 
 % Institute, La Jolla CA in August, 1998, using methods developed 
 % in Makeig, 1993. Arno Delorme added the multitaper option, recoded
 % the function to use 'keyword','parameter' argument pairs, and added the

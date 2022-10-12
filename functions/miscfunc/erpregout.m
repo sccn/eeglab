@@ -1,4 +1,4 @@
-% erpregout() - regress out the ERP from the data
+% ERPREGOUT - regress out the ERP from the data
 %
 % Usage:
 %   newdata = erpregout(data);

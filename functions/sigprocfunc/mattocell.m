@@ -1,4 +1,4 @@
-% mattocell() - convert matrix to cell array
+% MATTOCELL - convert matrix to cell array
 %
 % Usage: >> C = mattocell( M );
 %

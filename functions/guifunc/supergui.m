@@ -1,4 +1,4 @@
-% supergui() - a comprehensive gui automatic builder. This function help
+% SUPERGUI - a comprehensive gui automatic builder. This function help
 %              to create GUI very fast without bothering about the 
 %              positions of the elements. After creating a geometry, 
 %              elements just place themselves into the predefined 
@@ -34,7 +34,7 @@
 %   'uilist'   - list of uicontrol lists describing elements properties
 %               { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %               uicontrol arguments such as { 'style', 'radiobutton', 
-%               'String', 'hello' }. See Matlab function uicontrol() for details.
+%               'String', 'hello' }. See Matlab function UICONTROL for details.
 %   'borders'  - [left right top bottom] GUI internal borders in normalized
 %               units (0 to 1). Default values are 
 %   'title'    - optional figure title
@@ -71,7 +71,7 @@
 %      
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 2001-
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

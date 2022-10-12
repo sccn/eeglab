@@ -1,12 +1,12 @@
-% eeg_point2lat() - convert latency in data points to latency in ms relative
-%                   to the time locking. Used in eeglab().
+% EEG_POINT2LAT - convert latency in data points to latency in ms relative
+%                   to the time locking. Used in EEGLAB.
 % Usage:
 %       >> [newlat ] = eeg_point2lat( lat_array, [], srate);
 %       >> [newlat ] = eeg_point2lat( lat_array, epoch_array,...
 %                                 srate, timelimits, timeunit);
 % Inputs:
 %   lat_array   - latency array in data points assuming concatenated
-%                 data epochs (see eeglab() event structure)
+%                 data epochs (see EEGLAB event structure)
 %   epoch_array - epoch number corresponding to each latency value
 %   srate       - data sampling rate in Hz
 %   timelimits  - [min max] timelimits in 'timeunit' units (see below)
@@ -29,7 +29,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2 Mai 2002
 %
-% See also: eeg_lat2point(), eeglab(), pop_editieventvals(), pop_loaddat()
+% See also: EEG_LAT2POINT, EEGLAB, POP_EDITIEVENTVALS, POP_LOADDAT
 
 % Copyright (C) 2 Mai 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

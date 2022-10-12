@@ -1,4 +1,4 @@
-% std_chaninds() - look up channel indices in a STUDY
+% STD_CHANINDS - look up channel indices in a STUDY
 %
 % Usage:
 %         >> inds = std_chaninds(STUDY,  channames);

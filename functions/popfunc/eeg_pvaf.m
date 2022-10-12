@@ -1,4 +1,4 @@
-% eeg_pvaf() - Compute EEG.data 'percent variance accounted for' (pvaf) by specified components. 
+% EEG_PVAF - Compute EEG.data 'percent variance accounted for' (pvaf) by specified components. 
 %              Can omit specified components and channels from the computation. Can draw a plot 
 %              of the scalp distribution of pvaf, or progressively compute the pvaf for comps
 %              1:k, where k = 1 -> the total number of components.  Note: pvaf's of spatially

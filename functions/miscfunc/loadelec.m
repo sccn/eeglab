@@ -1,10 +1,10 @@
-% loadelec() - Load electrode names file for eegplot()
+% LOADELEC - Load electrode names file for EEGPLOT
 %
 % Usage:  >> labelmatrix = loadelec('elec_file');
 %
 % Author: Colin Humprhies, CNL / Salk Institute, 1996
 %
-% See also: eegplot()
+% See also: EEGPLOT
 
 % Copyright (C) Colin Humphries, CNL / Salk Institute, Aug, 1996
 %

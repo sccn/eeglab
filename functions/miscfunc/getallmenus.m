@@ -1,4 +1,4 @@
-% getallmenus() - get all submenus of a window or a menu and return 
+% GETALLMENUS - get all submenus of a window or a menu and return 
 %                 a tree.
 %
 % Usage:

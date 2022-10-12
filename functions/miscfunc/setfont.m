@@ -1,4 +1,4 @@
-% setfont() - Change all the fonts properties of a figure.
+% SETFONT - Change all the fonts properties of a figure.
 %
 % Usage:
 %   >>  newdata = setfont( handle, 'key', 'val');

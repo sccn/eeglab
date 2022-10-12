@@ -1,29 +1,29 @@
-% coregister() -  Co-register measured or template electrode locations with a 
+% COREGISTER -  Co-register measured or template electrode locations with a 
 %                 a reference channel locations file. For instance if you
 %                 want to perform dipole modeling you have to coregister
 %                 (align) your channel electrodes with the model (and the
 %                 easiest way to do that is to coregister your channel
 %                 electrodes with the electrodes file associated with the
-%                 model. To use coregister(), one may for instance use the default 
+%                 model. To use COREGISTER, one may for instance use the default 
 %                 MNI head and 10-5 System locations from Robert Oostenveld, used in  
-%                 the dipfit2() dipole modeling function as a reference. 
-%                 Use coregister() to linearly align or nonlinearly warp 
+%                 the DIPFIT2 dipole modeling function as a reference. 
+%                 Use COREGISTER to linearly align or nonlinearly warp 
 %                 subsequently recorded or nominally identified (e.g., 'Cz') sets of 
 %                 channel head locations to the reference locations. 
 %                 Both channel locations and/or fiducial (non-electrode) 
-%                 locations can then be used by coregister() to linearly align 
+%                 locations can then be used by COREGISTER to linearly align 
 %                 or nonlinearly warp a given or measured montage to the reference 
-%                 locations. In its (default) manual mode, coregister() produces 
+%                 locations. In its (default) manual mode, COREGISTER produces 
 %                 an interactive gui showing the imported and reference channel 
 %                 locations on the imported head mesh (if any), allowing the user 
 %                 to make additional manual adjustments using gui text entry boxes, 
 %                 and to rotate the display using the mouse.
 % Usage:
-%        >>  coregister(EEG.chanlocs); % Show channel locations in the coregister() 
+%        >>  coregister(EEG.chanlocs); % Show channel locations in the COREGISTER 
 %                 % gui, for align, warp, or manual mode co-registration with the 
-%                 % dipfit2() model head mesh and 10-5 System reference locations.
+%                 % DIPFIT2 model head mesh and 10-5 System reference locations.
 %                 % Note: May need to scale channel x,y,z positions by 100 to see 
-%                 % the imported locations in the default dipfit2() head mesh.
+%                 % the imported locations in the default DIPFIT2 head mesh.
 %
 %        >> [chanlocs_out transform] = coregister( chanlocs, reflocs, 'key', 'val' )
 %                 % Perform custom co-registration to a reference locations and
@@ -41,12 +41,12 @@
 %                 or {points triangles normals} (see >> help plotmesh 
 %                 for details). May also be the name of a head mesh .mat
 %                 file (several formats recognized). By default, loads the 
-%                 dipfit2() MNI head mesh file. Compare 'mheadnew.mat', the 
-%                 mesh used by headplot(); 'mesh',[] shows no head mesh.
+%                 DIPFIT2 MNI head mesh file. Compare 'mheadnew.mat', the 
+%                 mesh used by HEADPLOT; 'mesh',[] shows no head mesh.
 %   'warpmethod' - ['rigidbody'|'globalrescale'|'traditional'|'nonlin1'|
 %                 'nonlin2'|'nonlin3'|'nonlin4'|'nonlin5']
-%                 'traditional' calls the dipfit2.* function traditionaldipfit()
-%                 all others are enacted by electrodenormalize()
+%                 'traditional' calls the dipfit2.* function TRADITIONALDIPFIT
+%                 all others are enacted by ELECTRODENORMALIZE
 %                 {default: 'traditional}
 %   'transform' - [real array] homogeneous transformation matrix (>>help 
 %                 electrodenormalize) or a 1x9 matrix containing traditional 
@@ -65,7 +65,7 @@
 %                 Default is 'off'.
 %
 % Optional 'keywords' for MANUAL MODE (default):
-%   'manual'    - ['on'|'off'|'show'] Pops up the coregister() gui window to 
+%   'manual'    - ['on'|'off'|'show'] Pops up the COREGISTER gui window to 
 %                 allow viewing the current alignment, performing 'alignfid' or 
 %                 'warp' mode co-registration,  and making manual
 %                 adjustments. Default if 'on'. 'off' does not pop up any 
@@ -96,16 +96,16 @@
 %
 % Outputs:
 %  chanlocs_out - transformed input channel locations (chanlocs) structure
-%  transform    - transformation matrix. Use traditionaldipfit() to convert
+%  transform    - transformation matrix. Use TRADITIONALDIPFIT to convert
 %                 this to a homogeneous transformation matrix used in
-%                 3-D plotting functions such as headplot().
+%                 3-D plotting functions such as HEADPLOT.
 %
 % Note on how to create a template:
 %                 (1) Extract a head mesh from a subject MRI (possibly in 
 %                 Matlab using the function isosurface). 
 %                 (2) Measure reference locations on the subject's head. 
 %                 (3) Align these locations to the extracted subject head mesh 
-%                 (using the coregister() graphic interface). The aligned locations 
+%                 (using the COREGISTER graphic interface). The aligned locations 
 %                 then become reference locations for this mesh.
 %
 % Example:
@@ -119,7 +119,7 @@
 %   [newlocs transform] = coregister(EEG.chanlocs, template_models(2).chanfile, ...
 %        'mesh', template_models(2).hdmfile);
 %
-% See also: traditionaldipfit(), headplot(), plotmesh(), electrodenormalize(). 
+% See also: TRADITIONALDIPFIT, HEADPLOT, PLOTMESH, ELECTRODENORMALIZE. 
 %
 % Note: Calls Robert Oostenveld's FieldTrip coregistration functions for
 %       automatic coregistration.

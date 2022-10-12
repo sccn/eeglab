@@ -1,4 +1,4 @@
-% dftfilt() - discrete Fourier filter
+% DFTFILT - discrete Fourier filter
 %
 % Usage:
 %   >> b = dftfilt(n,W,c,k,q)

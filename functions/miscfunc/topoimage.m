@@ -1,6 +1,6 @@
-% topoimage() - plot concatenated multichannel time/frequency images 
+% TOPOIMAGE - plot concatenated multichannel time/frequency images 
 %               in a topographic format
-%               Uses a channel location file with the same format as topoplot() 
+%               Uses a channel location file with the same format as TOPOPLOT 
 %               or else plots data on a rectangular grid of axes.
 %               Click on individual images to examine separately.
 %
@@ -27,7 +27,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 12-10-1999
 %
-% See also: topoplot(), timef() 
+% See also: TOPOPLOT, TIMEF 
 
 % Copyright (C) 12-10-99 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -57,8 +57,8 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % 1-16-00  debugged help msg and improved presentation -sm
-% 3-16-00  added axcopy() -sm
-% 8-07-00  added logimagesc() via 'LOGIT' -sm
+% 3-16-00  added AXCOPY -sm
+% 8-07-00  added LOGIMAGESC via 'LOGIT' -sm
 % 9-02-00  added RMBASE option below, plus colorbar to key image -sm ???
 % 1-25-02  reformated help & license, added link -ad 
 

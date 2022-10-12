@@ -1,4 +1,4 @@
-% pop_timtopo() - call the timtopo() function for epoched EEG datasets. 
+% POP_TIMTOPO - call the TIMTOPO function for epoched EEG datasets. 
 %                 Plots the epoch mean for each channel on a single axis,
 %                 plus scalp maps of the data at specified latencies.
 % Usage:
@@ -8,15 +8,15 @@
 %   EEG         - input dataset
 %   timerange   - [min max] epoch time range (in ms) to plot 
 %   topotimes   - array of times to plot scalp maps {Default: NaN 
-%                 = display scalp map at frame of max var()}
+%                 = display scalp map at frame of max VAR}
 %
 % Optional inputs:
 %   title       - optional plot title
-%   'key','val' - optional topoplot() arguments (see >> help topoplot)
+%   'key','val' - optional TOPOPLOT arguments (see >> help topoplot)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: timtopo()
+% See also: TIMTOPO
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

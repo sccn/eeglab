@@ -1,4 +1,4 @@
-% pop_chanevent() - import event latencies from the rising and/or falling 'edge' 
+% POP_CHANEVENT - import event latencies from the rising and/or falling 'edge' 
 %                   latencies of a specified event-marker channel in EEG.data 
 % Usage:
 %   >> OUTEEG = pop_chanevent( INEEG ); % select parameters via a pop-up window
@@ -51,7 +51,7 @@
 %                    at each time point (returning 1 if the data channel value 
 %                    is larger than 3, and 0 otherwise). You may also use 
 %                    any function (Ex: 'myfunction(X)'). If an equal character
-%                    is not present, this function preprend 'X=' to your 
+%                    is not present, this function prepend 'X=' to your 
 %                    expression before evaluating it. Otherwise it just 
 %                    evaluate the expression. For example, one may use
 %                    'if X(1)>100,X(1)=0;end; X(find(X>100))=X(find(X>100)-1);'
@@ -76,7 +76,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 29 July 2002
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

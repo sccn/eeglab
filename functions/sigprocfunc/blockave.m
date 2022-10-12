@@ -1,4 +1,4 @@
-% blockave() - make block average of concatenated data sets of same size 
+% BLOCKAVE - make block average of concatenated data sets of same size 
 %              Each data set is assumed to be of size (chans,frames).  
 % Usage: 
 %        >> aveout = blockave(data,frames) 

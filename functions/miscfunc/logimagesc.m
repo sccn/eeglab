@@ -1,4 +1,4 @@
-% logimagesc() - make an imagesc(0) plot with log y-axis values (ala semilogy())
+% LOGIMAGESC - make an imagesc(0) plot with log y-axis values (ala SEMILOGY)
 %
 % Usage:  >> [logfreqs,dataout] = logimagesc(times,freqs,data);
 %
@@ -10,7 +10,7 @@
 % Optional Input:
 %   plot = ['on'|'off'] plot image or return output (default 'on').
 %
-% Note: Entering text() onto the image requires specifying (x,log(y)).
+% Note: Entering text onto the image requires specifying (x,log(y)).
 
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 4/2000 
 

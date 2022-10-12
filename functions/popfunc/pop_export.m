@@ -1,4 +1,4 @@
-% pop_export() - export EEG dataset
+% POP_EXPORT - export EEG dataset
 %
 % Usage:
 %   >> com = pop_export(EEG);   % a window pops up

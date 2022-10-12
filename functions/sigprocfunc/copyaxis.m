@@ -1,6 +1,6 @@
-% copyaxis() - helper function for axcopy()
+% COPYAXIS - helper function for AXCOPY
 %
-% Usage: >> copyaxis();
+% Usage: >> COPYAXIS;
 %        >> copyaxis( command );
 % 
 % Note: The optional command option (a string that will be evaluated
@@ -8,7 +8,7 @@
 %
 % Author: Tzyy-Ping Jung, SCCN/INC/UCSD, La Jolla, 2000 
 %
-% See also: axcopy()
+% See also: AXCOPY
 
 % Copyright (C) 3-16-2000 Tzyy-Ping Jung, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

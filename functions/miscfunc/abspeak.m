@@ -1,4 +1,4 @@
-% abspeak() - find peak amps/latencies in each row of a single-epoch data matrix 
+% ABSPEAK - find peak amps/latencies in each row of a single-epoch data matrix 
 %
 % Usage:
 %        >> [amps,frames,signs] = abspeak(data);

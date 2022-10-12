@@ -1,4 +1,4 @@
-% eeg_regepochs() - Convert a continuous dataset into consecutive epochs of 
+% EEG_REGEPOCHS - Convert a continuous dataset into consecutive epochs of 
 %                   a specified regular length by adding dummy events of type 
 %                   and epoch the data around these events. Alternatively
 %                   only insert events for extracting these epochs.
@@ -34,7 +34,7 @@
 %     EEGout              - the input EEG structure separated into consecutive 
 %                           epochs.
 %
-% See also: pop_editeventvals(), pop_epoch(), rmbase();
+% See also: POP_EDITEVENTVALS, POP_EPOCH, RMBASE
 %
 % Authors: Hilit Serby, Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, Sep 02, 2005
 

@@ -1,4 +1,4 @@
-% readegihdr() - read header information from EGI (versions 2,3,4,5,6,7) data file.
+% READEGIHDR - read header information from EGI (versions 2,3,4,5,6,7) data file.
 %
 % Usage:
 %   >> [head] = readegihdr(fid,forceversion)
@@ -28,7 +28,7 @@
 % Note: this code derived from C source code written by 
 %       Tom Renner at EGI, Inc. (www.egi.com)
 %
-% See also: readegi()
+% See also: READEGI
 
 % Copyright (C) 2002 , Salk Institute, arno@salk.edu
 %

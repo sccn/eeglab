@@ -1,5 +1,5 @@
-% pop_reref() - Convert an EEG dataset to average reference or to a
-%               new common reference channel (or channels). Calls reref().
+% POP_REREF - Convert an EEG dataset to average reference or to a
+%               new common reference channel (or channels). Calls REREF.
 % Usage:
 %       >> EEGOUT = pop_reref( EEG ); % pop up interactive window
 %       >> EEGOUT = pop_reref( EEG, ref, 'key', 'val' ...);
@@ -51,11 +51,11 @@
 %   EEGOUT      - re-referenced output dataset
 %
 % Notes:
-%                 For other options, call reref() directly. See >> help reref
+%                 For other options, call REREF directly. See >> help reref
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 Nov 2002
 %
-% See also: reref(), eeglab()
+% See also: REREF, EEGLAB
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -122,16 +122,16 @@ if nargin < 2
                   'end;' ];
     cb_chansel1 = 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''reref''   ), ''string'',tmpval); clear tmpEEG tmpchanlocs tmp tmpval';
     cb_chansel2 = 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''exclude'' ), ''string'',tmpval); clear tmpEEG tmpchanlocs tmp tmpval';
-    cb_chansel3 = [ 'tmpEEG = get(gcbf, ''userdata''); if ~isfield(tmpEEG(1).chaninfo, ''nodatchans''), ' ...
+    cb_chansel3 = [ 'tmpEEG = get(gcbf, ''userdata''); if ~isfield(tmpEEG(1).chaninfo, ''removedchans''), ' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
-                    'elseif isempty(tmpEEG(1).chaninfo.nodatchans),' ...
+                    'elseif isempty(tmpEEG(1).chaninfo.removedchans),' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
-                    'elseif isfield(tmpEEG(1).chaninfo.nodatchans, ''type''),' ...
-                    '   fidType = ismember(cellfun(@char, {  tmpEEG(1).chaninfo.nodatchans.type}, ''UniformOutput'', false), ''FID'');' ...
+                    'elseif isfield(tmpEEG(1).chaninfo.removedchans, ''type''),' ...
+                    '   fidType = ismember(cellfun(@char, {  tmpEEG(1).chaninfo.removedchans.type}, ''UniformOutput'', false), ''FID'');' ...
                     '   if sum(fidType == 0) == 0,' ...
                     '      warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
                     '   else,' ...
-                    '      tmpchaninfo = tmpEEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.nodatchans(~fidType).labels}, ''withindex'', ''on'');' ...
+                    '      tmpchaninfo = tmpEEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.removedchans(~fidType).labels}, ''withindex'', ''on'');' ...
                     '      set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval);' ...
                     '   end;' ...
                     'end;' ...
@@ -185,13 +185,13 @@ if nargin < 2
     if ~isempty(restag.refloc)
          try
              tmpchaninfo = EEG(1).chaninfo;
-             tmpallchans = lower({ tmpchaninfo.nodatchans.labels });
+             tmpallchans = lower({ tmpchaninfo.removedchans.labels });
              allelecs = parsetxt(lower(restag.refloc));
              chanind  = [];
              for iElec = 1:length(allelecs)
                  chanind = [chanind strmatch( allelecs{iElec}, tmpallchans, 'exact') ];
              end
-             options = { options{:} 'refloc' EEG(1).chaninfo.nodatchans(chanind) }; 
+             options = { options{:} 'refloc' EEG(1).chaninfo.removedchans(chanind) }; 
          catch, disp('Error with old reference: ignoring it');
          end
     end
@@ -336,32 +336,32 @@ nchans = EEG.nbchan; % retrieve number of channels for ICA bussines
 % deal with reference
 % -------------------
 if ~isempty(refchan)
-    if ~isfield(EEG.chaninfo, 'nodatchans')
-        EEG.chaninfo.nodatchans = refchan;
-    elseif isempty(EEG.chaninfo.nodatchans)
-        EEG.chaninfo.nodatchans = refchan;
+    if ~isfield(EEG.chaninfo, 'removedchans')
+        EEG.chaninfo.removedchans = refchan;
+    elseif isempty(EEG.chaninfo.removedchans)
+        EEG.chaninfo.removedchans = refchan;
     else
         allf = fieldnames(refchan);
-        n    = length(EEG.chaninfo.nodatchans);
+        n    = length(EEG.chaninfo.removedchans);
         for iRef = 1:length(refchan)
             for ind = 1:length(allf)
-                EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n+iRef }, ...
+                EEG.chaninfo.removedchans = setfield(EEG.chaninfo.removedchans, { n+iRef }, ...
                     allf{ind}, getfield(refchan(iRef), allf{ind}));
             end
         end
     end
 end
 if ~isempty(g.refloc) 
-    if isfield(EEG.chaninfo, 'nodatchans') && ~isempty(EEG.chaninfo.nodatchans)
+    if isfield(EEG.chaninfo, 'removedchans') && ~isempty(EEG.chaninfo.removedchans)
         allinds = [];
         tmpchaninfo = EEG.chaninfo;
         for iElec = 1:length(g.refloc)
-            if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
+            if isempty(tmpchaninfo) || isempty(tmpchaninfo.removedchans)
                 error('Missing reference channel information. Edit channels and add reference first.');
             end
-            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
+            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.removedchans.labels }) ];
         end
-        EEG.chaninfo.nodatchans(allinds) = [];
+        EEG.chaninfo.removedchans(allinds) = [];
     else
         error('Missing reference channel information. Edit channels and add reference first.');
     end
@@ -414,7 +414,7 @@ if ~isempty(EEG.icaweights)
             newLabelPos = strmatch(oldLabel, { newchanlocs.labels }, 'exact');
             
             if length(newLabelPos) > 1
-                warning('More than one match for specified reference channel; First one selected. This may cause eratic behavior. If the 2 channels are identical, delete one of them.');
+                warning('More than one match for specified reference channel; First one selected. This may cause erratic behavior. If the 2 channels are identical, delete one of them.');
             end
             if ~isempty( newLabelPos )
                 icachansind(i) = newLabelPos(1);

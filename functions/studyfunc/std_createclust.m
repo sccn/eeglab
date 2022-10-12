@@ -1,11 +1,11 @@
-% std_createclust()  - dreate a new empty cluster.  After creation, components 
-%                      may be (re)assigned to it using std_movecomp().
+% STD_CREATECLUST  - dreate a new empty cluster.  After creation, components 
+%                      may be (re)assigned to it using STD_MOVECOMP.
 % Usage:
 %                    >> [STUDY] = std_createclust(STUDY, ALLEEG, 'key', val);
 % Inputs:
 %   STUDY    - STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG   - vector of EEG datasets included in the STUDY, typically created 
-%              using load_ALLEEG().
+%              using LOAD_ALLEEG.
 %
 % Optional inputs:
 %   'name'     - ['string'] name of the new cluster {default: 'Cls #', where 
@@ -31,7 +31,7 @@
 %   % Create a new cluster named 'eye_movements' with components 2, 4, and
 %   % of 6 the default parent cluster defined in 
 %
-%  See also  pop_clustedit(), std_movecomp()
+%  See also  POP_CLUSTEDIT, STD_MOVECOMP
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 

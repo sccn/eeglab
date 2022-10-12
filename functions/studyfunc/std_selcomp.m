@@ -1,5 +1,5 @@
-% std_selcomp() - Helper function for std_erpplot(), std_specplot() 
-%                       and std_erspplot() to select specific
+% STD_SELCOMP - Helper function for STD_ERPPLOT, STD_SPECPLOT 
+%                       and STD_ERSPPLOT to select specific
 %                       components prior to plotting. 
 % Usage:
 %  >> std_selcomp( STUDY, data, cluster, setinds, compinds, comps)
@@ -30,7 +30,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 % 
-% See also: std_erpplot(), std_specplot() and std_erspplot()
+% See also: STD_ERPPLOT, STD_SPECPLOT and STD_ERSPPLOT
 
 % Copyright (C) 2006 Arnaud Delorme
 %

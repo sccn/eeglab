@@ -1,4 +1,4 @@
-% pophelp() - Same as matlab HTHELP but does not crash under windows.
+% POPHELP - Same as matlab HTHELP but does not crash under windows.
 %
 % Usage: >> pophelp( function );
 %        >> pophelp( function, nonmatlab );
@@ -10,7 +10,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab() 
+% See also: EEGLAB 
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -39,7 +39,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function pophelp( funct, nonmatlab );
+function pophelp( funct, nonmatlab )
 
 if nargin <1
 	help pophelp;
@@ -81,12 +81,18 @@ if exist('help2html')
         end
     end
 else
+    if exist('OCTAVE_VERSION','builtin') == 0
+        doc(funct);
+        return;
+    end
+
     if isempty(funct), return; end
     doc1 = readfunc(funct, nonmatlab);
     if length(funct) > 4 && strcmpi(funct(1:4), 'pop_')
         try,
             doc2 = readfunc(funct(5:end), nonmatlab);
-            doc1 = { doc1{:} ' _________________________________________________________________ ' ...
+            doc1 = { doc1{:} ' ' ...
+                ' _________________________________________________________________ ' ...
                            ' ' ...
                            ' The ''pop'' function above calls the eponymous Matlab function below, ' ...
                            ' which may contain more information for some parameters. '...
@@ -103,18 +109,44 @@ else
         end
         return
     end
-    textgui(doc1);
-    h = findobj('parent', gcf, 'style', 'slider');
-    try, icadefs; catch, 
-        GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
-        GUITEXTCOLOR   = 'k'; 
+
+    % write file for help only
+    icadefs;
+    if ~isempty(EEGOPTION_PATH) % in icadefs above
+        homefolder = EEGOPTION_PATH;
+    elseif ispc
+        homefolder = getenv('USERPROFILE');
+    else homefolder = '~';
     end
-    set(h, 'backgroundcolor', GUIBUTTONCOLOR);
-    h = findobj('parent', gcf, 'style', 'pushbutton');
-    set(h, 'backgroundcolor', GUIBUTTONCOLOR);
-    h = findobj('parent', gca);
-    set(h, 'color', GUITEXTCOLOR);
-    set(gcf, 'color', BACKCOLOR);
+        
+    [~,funct] = fileparts(funct);
+    fileTmp = fullfile(homefolder, [ funct '_doc.m' ]);
+    fid = fopen(fileTmp, 'w');
+    if fid ~= -1 
+        for iDoc = 1:length(doc1)
+            fprintf(fid, '%%%s\n', doc1{iDoc});
+        end
+        fclose(fid);
+        doc(fileTmp);
+        drawnow; pause(2);
+        delete(fileTmp);
+    else
+        textgui(doc1);
+        h = findobj('parent', gcf, 'style', 'slider');
+        try 
+            icadefs; 
+        catch
+            GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
+            GUITEXTCOLOR   = 'k'; 
+        end
+        set(h, 'backgroundcolor', GUIBUTTONCOLOR);
+        h = findobj('parent', gcf, 'style', 'pushbutton');
+        set(h, 'backgroundcolor', GUIBUTTONCOLOR);
+        h = findobj('parent', gca);
+        set(h, 'color', GUITEXTCOLOR);
+        set(gcf, 'color', BACKCOLOR);
+    end
+
 end
 return;
 

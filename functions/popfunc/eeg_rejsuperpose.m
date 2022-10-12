@@ -1,4 +1,4 @@
-% eeg_rejsuperpose() - superpose rejections of a EEG dataset.
+% EEG_REJSUPERPOSE - superpose rejections of a EEG dataset.
 %
 % Usage:
 %   >> EEGOUT = eeg_rejsuperpose( EEGIN, typerej, Rmanual, Rthres, ...
@@ -18,7 +18,7 @@
 % Outputs:
 %   EEGOUT     - with rejglobal and rejglobalE fields updated
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

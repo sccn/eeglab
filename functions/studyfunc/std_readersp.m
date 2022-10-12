@@ -1,4 +1,4 @@
-% std_readersp() - load ERSP measures for data channels or  for all 
+% STD_READERSP - load ERSP measures for data channels or  for all 
 %                  components of a specified cluster. This function is 
 %                  also being used to read ITC and ERPimage data.
 % Usage:

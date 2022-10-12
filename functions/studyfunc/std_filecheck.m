@@ -1,4 +1,4 @@
-% std_filecheck() - Check if ERSP or SPEC file contain specific parameters.
+% STD_FILECHECK - Check if ERSP or SPEC file contain specific parameters.
 %                  This file must contain a Matlab structure with a field 
 %                  named 'parameter'. The content of this field will be
 %                  compared to the 'params' input. If they are identical

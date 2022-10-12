@@ -1,4 +1,4 @@
-% eeg_urlatency() - find the original (ur) latency of a time point in 
+% EEG_URLATENCY - find the original (ur) latency of a time point in 
 %                   the original continuous data.
 %
 % Usage:
@@ -14,11 +14,11 @@
 %   lat_out     - output latency
 %
 % Note: the function that finds the latency in the current dataset using (ur)
-%       original latencies as input is eeg_latencyur()
+%       original latencies as input is EEG_LATENCYUR
 % 
 % Author: Arnaud Delorme, SCCN, INC, UCSD, April, 15, 2004
 %
-% See also: eeg_latencyur()
+% See also: EEG_LATENCYUR
 
 % Copyright (C) 2004 Arnaud Delorme, SCCN, INC, UCSD, arno@salk.edu
 %

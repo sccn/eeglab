@@ -1,4 +1,4 @@
-% eegrej() - reject/excise arbitrary periods from continuous EEG data 
+% EEGREJ - reject/excise arbitrary periods from continuous EEG data 
 %            (e.g., EEG.data).
 %
 % Usage:
@@ -10,7 +10,7 @@
 %                the function use the disk to perform the rejection
 %   regions    - array of regions to suppress. [beg end] x number of 
 %                regions. 'beg' and 'end' are expressed in term of points
-%                in the input dataset. The size() of the array should be
+%                in the input dataset. The SIZE of the array should be
 %                (2, number of regions).
 %   timelength - length in time (s) of the input data. Only used to compute 
 %                new total data length after rejections (newt).

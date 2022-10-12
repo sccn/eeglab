@@ -1,4 +1,4 @@
-% pop_compareerps() - Compare the (ERP) averages of two datasets.
+% POP_COMPAREERPS - Compare the (ERP) averages of two datasets.
 %
 % Usage:
 %       >> pop_compareerps( ALLEEG, datasetlist, chansubset, title);
@@ -10,7 +10,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab(), plottopo()
+% See also: EEGLAB, PLOTTOPO
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

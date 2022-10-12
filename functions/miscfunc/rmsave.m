@@ -1,4 +1,4 @@
-% rmsave() - return the RMS in each channel, epoch
+% RMSAVE - return the RMS in each channel, epoch
 %
 % Usage:
 %         >> ave = rmsave(data,frames);

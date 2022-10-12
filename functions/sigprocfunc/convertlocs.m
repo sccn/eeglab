@@ -1,4 +1,4 @@
-% convertlocs() - Convert electrode locations between coordinate systems
+% CONVERTLOCS - Convert electrode locations between coordinate systems
 %                 using the EEG.chanlocs structure.
 %
 % Usage: >> newchans = convertlocs( chanlocs, 'command');
@@ -25,7 +25,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002
 %
-% See also: readlocs()
+% See also: READLOCS
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002, arno@salk.edu
 %

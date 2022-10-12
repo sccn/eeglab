@@ -1,4 +1,4 @@
-% std_erp() -   Constructs and returns channel or ICA activation ERPs for a dataset. 
+% STD_ERP -   Constructs and returns channel or ICA activation ERPs for a dataset. 
 %               Saves the ERPs into a Matlab file, [dataset_name].icaerp, for
 %               data channels or [dataset_name].icaerp for ICA components, 
 %               in the same directory as the dataset file.  If such a file 
@@ -56,7 +56,7 @@
 % OR
 %    [dataset_file].daterp     % channel erp file
 %
-% See also: std_spec(), std_ersp(), std_topo(), std_preclust()
+% See also: STD_SPEC, STD_ERSP, STD_TOPO, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 

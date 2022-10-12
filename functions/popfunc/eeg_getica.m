@@ -1,4 +1,4 @@
-% eeg_getica() - get ICA component activation. Recompute if necessary.
+% EEG_GETICA - get ICA component activation. Recompute if necessary.
 %
 % >> mergelocs = eeg_getica(EEG, comp);
 %

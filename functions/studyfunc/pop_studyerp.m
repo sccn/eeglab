@@ -1,4 +1,4 @@
-% pop_studyerp() - create a simple design for ERP analysis
+% POP_STUDYERP - create a simple design for ERP analysis
 %
 % Usage:
 %       >> [STUDY ALLEEG] = pop_studyerp; % pop up interface
@@ -9,7 +9,7 @@
 %
 % Author: Arnaud Delorme, SCCN, UCSD, 2011-
 %
-% See also: eeg_checkset()
+% See also: EEG_CHECKSET
 
 % Copyright (C) 15 Feb 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

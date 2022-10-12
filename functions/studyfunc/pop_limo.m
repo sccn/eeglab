@@ -1,4 +1,4 @@
-% pop_limo() - prepare and convert EEGLAB data and structure to be
+% POP_LIMO - prepare and convert EEGLAB data and structure to be
 %              processed by LIMO.
 %
 % Usage:
@@ -12,7 +12,7 @@
 %   'dat'|'ica'  - show the interface for data channels or for ICA. The
 %                  default is to use data.
 %
-% Optional inputs: same as std_limo()
+% Optional inputs: same as STD_LIMO
 %
 % Graphical interface:
 %   "See GLM factors" - [push button] See all the GLM factors or columns in
@@ -69,7 +69,7 @@
 % Author: Arnaud Delorme, SCCN, UCSD, 2015-
 %         Cyril Pernet, LIMO Team - edit info and defaults
 %
-% See also: std_limo()
+% See also: STD_LIMO
 
 % Copyright (C) Arnaud Delorme
 %
@@ -132,7 +132,7 @@ if nargin < 4
                      '   set(findobj(gcbf, ''tag'', ''options''), ''string'', ''''''freqlim'''', [1 25]'');' ...
                      'end;' ];
     cb_listfactors = [ 'pop_listfactors(STUDY, ''gui'', ''on'', ' ...
-                               '''level'', ''one'',' ...
+                               '''level'', ''both'',' ...
                                '''splitreg''   , fastif(get(findobj(gcbf, ''tag'', ''splitreg''   ), ''value''), ''on'', ''off''),' ...
                                '''interaction'', fastif(get(findobj(gcbf, ''tag'', ''interaction''), ''value''), ''on'', ''off''));' ];
     uilist = { ...

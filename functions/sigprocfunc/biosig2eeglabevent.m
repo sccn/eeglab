@@ -1,4 +1,4 @@
-% biosig2eeglabevent() - convert biosig events to EEGLAB event structure
+% BIOSIG2EEGLABEVENT - convert biosig events to EEGLAB event structure
 %
 % Usage:
 %   >> eeglabevent = biosig2eeglabevent( biosigevent, interval)

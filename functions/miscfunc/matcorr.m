@@ -1,6 +1,6 @@
-% matcorr() - Find matching rows in two matrices and their corrs.
+% MATCORR - Find matching rows in two matrices and their corrs.
 %             Uses the Hungarian (default), VAM, or maxcorr assignment methods.
-%             (Follow with matperm() to permute and sign x -> y).
+%             (Follow with MATPERM to permute and sign x -> y).
 %
 % Usage: >> [corr,indx,indy,corrs] = matcorr(x,y,rmmean,method,weighting);
 %
@@ -17,7 +17,7 @@
 %               2= Max Abs Corr Method - find pairs in order of max abs corr 
 %               Note that the methods 0 and 1 require matrices to be square.
 %   weighting = An optional weighting matrix size(weighting) = size(corrs) that 
-%               weights the corrs matrix before pair assignment {def: 0/[]->ones()}
+%               weights the corrs matrix before pair assignment {def: 0/[] -> ones}
 % Outputs:
 %   corr  = a column vector of correlation coefficients between 
 %           best-correlating rows of matrice x and y

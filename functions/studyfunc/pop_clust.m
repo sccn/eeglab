@@ -1,7 +1,7 @@
-% pop_clust() - select and run a clustering algorithm on components from an EEGLAB STUDY 
+% POP_CLUST - select and run a clustering algorithm on components from an EEGLAB STUDY 
 %               structure of EEG datasets. Clustering data should be prepared beforehand using 
-%               pop_preclust() and/or std_preclust(). The number of clusters must be
-%               specified in advance. If called in gui mode, the pop_clustedit() window
+%               POP_PRECLUST and/or STD_PRECLUST. The number of clusters must be
+%               specified in advance. If called in gui mode, the POP_CLUSTEDIT window
 %               appears when the clustering is complete to display clustering results
 %               and allow the user to review and edit them.
 % Usage: 
@@ -38,7 +38,7 @@
 %  "Save STUDY"         - [check box] check to save the updated STUDY after clustering 
 %                         is performed. If no file entered, overwrites the current STUDY. 
 %
-%  See also  pop_clustedit(), pop_preclust(), std_preclust(), pop_clust()
+%  See also  POP_CLUSTEDIT, POP_PRECLUST, STD_PRECLUST, POP_CLUST
 %
 % Authors:  Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004
 

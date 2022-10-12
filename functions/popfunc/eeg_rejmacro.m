@@ -1,9 +1,9 @@
-% eeg_rejmacro() - Internal EEGLAB macro for all pop_ functions that
+% EEG_REJMACRO - Internal EEGLAB macro for all pop_ functions that
 %                  perform data rejection.   
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

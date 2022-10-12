@@ -1,4 +1,4 @@
-% crossfreq() - compute cross-frequency coherences. Power of first input
+% CROSSFREQ - compute cross-frequency coherences. Power of first input
 %               correlation with phase of second.
 %
 % Usage:
@@ -76,7 +76,7 @@
 %                    (ITC) from x and y. This computes the  'intrinsic' coherence
 %                     x and y not arising from common synchronization to 
 %                     experimental events. See notes. {default: 'off'}
-%       'itctype'   = ['coher'|'phasecoher'] For use with 'subitc', see timef()
+%       'itctype'   = ['coher'|'phasecoher'] For use with 'subitc', see TIMEF
 %                     for more details {default: 'phasecoher'}.
 %       'subwin'    = [min max] sub time window in ms (this windowing is
 %                     performed after the spectral decomposition).
@@ -97,7 +97,7 @@
 %                     or trials only using a separate bootstrap for each time window
 %                     ('trials'). Option 'times' is not recommended but requires less
 %                     memory {default 'timestrials'}
-%       'rboot'     = Input bootstrap coherence limits (e.g., from crossfreq())
+%       'rboot'     = Input bootstrap coherence limits (e.g., from CROSSFREQ)
 %                     The bootstrap type should be identical to that used
 %                     to obtain the input limits. {default: compute from data}
 %
@@ -126,7 +126,7 @@
 %
 % Ref: Testing for Nested Oscilations (2008) J Neuro Methods 174(1):50-61
 %
-% See also: timefreq(), crossf()
+% See also: TIMEFREQ, CROSSF
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

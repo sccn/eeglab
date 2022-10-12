@@ -1,5 +1,5 @@
-% pop_plottopo() - plot one or more concatenated multichannel data epochs 
-%                  in a topographic array format using plottopo()
+% POP_PLOTTOPO - plot one or more concatenated multichannel data epochs 
+%                  in a topographic array format using PLOTTOPO
 % Usage:
 %   >> pop_plottopo( EEG ); % pop-up
 %   >> pop_plottopo( EEG, channels );
@@ -18,7 +18,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 March 2002
 %
-% See also: plottopo()
+% See also: PLOTTOPO
 
 % Copyright (C) 10 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% inputgui() - A comprehensive gui automatic builder. This function helps
+% INPUTGUI - A comprehensive gui automatic builder. This function helps
 %              to create GUI very quickly without bothering about the 
 %              positions of the elements. After creating a geometry, 
 %              elements just place themselves in the predefined 
@@ -22,7 +22,7 @@
 %   'uilist'     - list of uicontrol lists describing elements properties
 %                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %                  uicontrol arguments such as { 'style', 'radiobutton', 
-%                  'String', 'hello' }. See Matlab function uicontrol() for details.
+%                  'String', 'hello' }. See Matlab function UICONTROL for details.
 %   'helpcom'    - optional help command 
 %   'helpbut'    - text for help button
 %   'title'      - optional figure title
@@ -67,7 +67,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 1 Feb 2002
 %
-% See also: supergui(), eeglab()
+% See also: SUPERGUI, EEGLAB
 
 % Copyright (C) Arnaud Delorme, CNL/Salk Institute, 27 Jan 2002, arno@salk.edu
 %

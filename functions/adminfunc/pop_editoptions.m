@@ -1,4 +1,4 @@
-% pop_editoptions() - Edit memory-saving eeglab() options. These are stored in 
+% POP_EDITOPTIONS - Edit memory-saving EEGLAB options. These are stored in 
 %                     a file 'eeg_options.m'. With no argument, pop up a window 
 %                     to allow the user to set/unset these options. Store
 %                     user choices in a new 'eeg_options.m' file in the 
@@ -45,13 +45,13 @@
 %   and 'option_savematlab'  are updated, and a new 'eeg_options.m' file may be
 %   written to the working directory. The copy of 'eeg_options.m' placed in your 
 %   working directory overwrites system defaults whenever EEGLAB operates in this
-%   directory (assuming your working directory is in your MATLABPATH - see path()).
+%   directory (assuming your working directory is in your MATLABPATH - see PATH).
 %   To adjust these options system-wide, edit the master "eeg_options.m" file in the
 %   EEGLAB directory hierarchy.
 %
 % Author: Arnaud Delorme, SCCN / INC / UCSD, March 2002
 %
-% See also: eeg_options(), eeg_readoptions()
+% See also: EEG_OPTIONS, EEG_READOPTIONS
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 09 March 2002, arno@salk.edu
 %

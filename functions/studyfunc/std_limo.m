@@ -1,5 +1,4 @@
-
-% std_limo() - Export and run in LIMO the EEGLAB STUDY design.
+% STD_LIMO - Export and run in LIMO the EEGLAB STUDY design.
 %           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
 %
 % Usage:
@@ -19,9 +18,12 @@
 %                   and better across subjects than across trials.
 %  'design'       - [integer] design index to process. Default is the current
 %                   design stored in STUDY.currentdesign.
+%  'contnan'      - ['on'|'off'] NaN for continuous variables. When 'on'
+%                   NaNs are allowed (and trials removed). When NaNs are 
+%                   replaced with 0s.
 %  'erase'        - ['on'|'off'] erase previous files. Default is 'on'.
 %  'neighboropt'  - [cell] cell array of options for the function computing
-%                   the channel neighbox matrix std_prepare_chanlocs(). The file
+%                   the channel neighbox matrix STD_PREPARE_CHANLOCS. The file
 %                   is saved automatically if channel location are present.
 %                   This option allows to overwrite the defaults when computing
 %                   the channel neighbox matrix.
@@ -111,6 +113,7 @@ else
         'erase'          'string'  { 'on','off' }   'off';
         'splitreg'       'string'  { 'on','off' }   'off';
         'interaction'    'string'  { 'on','off' }   'off';
+        'contnan'        'string'  { 'on','off' }   'off';
         'freqlim'        'real'    []               [] ;
         'timelim'        'real'    []               [] ;
         'neighboropt'    'cell'    {}               {} ;
@@ -300,7 +303,7 @@ allSessions    = cellfun(@num2str, allSessions, 'uniformoutput', false);
 uniqueSessions = unique(allSessions);
 
 % by default we create a design matrix with all condition
-factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one');
+factors = pop_listfactors(STUDY.design(opt.design), 'gui', 'off', 'level', 'one', 'constant', 'off');
 
 for iSubj = 1:nb_subjects
     for iSess = 1:length(uniqueSessions)
@@ -430,6 +433,11 @@ for iSubj = 1:nb_subjects
                 opt.zscore = 0; % regressors are now zscored
             end
 
+            % remplace NaNs if necessary
+            if strcmpi(opt.contnan, 'off')
+                contMat(isnan(contMat)) = 0;
+            end
+
             % copy results
             model.cat_files{inds}                 = catMat;
             model.cont_files{inds}                = contMat;
@@ -548,7 +556,7 @@ model.defaults.tfce             = 0;                 % only for single subject a
 model.defaults.method           = opt.method;        % default is OLS - to be updated to 'WLS' once validated
 model.defaults.Level            = 1;                 % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % option can be multivariate (work in progress)
-
+model.defaults.labels           = pop_listfactors(STUDY, 'gui', 'off', 'level', 'one', 'splitreg', opt.splitreg, 'interaction', opt.interaction);
 
 if ~exist('limocontrast','var')
     [LIMO_files, procstatus] = limo_batch('model specification',model,[],STUDY);
@@ -580,7 +588,7 @@ for s = 1:nb_subjects
         fprintf('std_limo, computing additional between sessions contrasts for subject %s\n',uniqueSubjects{s})
         sess_name = allSessions(sess_index);
         pairs = nchoosek(1:length(sess_index),2); % do all session pairs
-        parfor p=1:size(pairs,1)
+        for p=1:size(pairs,1)
             strpair = [cell2mat(sess_name(pairs(p,1))) cell2mat(sess_name(pairs(p,2)))];
             strpair(isspace(strpair)) = []; % remove spaces
             filesout{p} = limo_contrast_sessions(cell2mat(LIMO_files.mat(sess_index(pairs(p,1)))), ...

@@ -1,10 +1,10 @@
-% std_propplot() - Command line function to plot component cluster 
+% STD_PROPPLOT - Command line function to plot component cluster 
 %                  properties for a STUDY set. 
 %                  Displays mean cluster scalp map, ERP, ERSP; 
 %                  dipole model, spectrum, and ITC in one figure 
-%                  per cluster. Only meaasures computed during 
-%                  pre-clustering (by pop_preclust() or std_preclust()) 
-%                  are plotted. Called by pop_clustedit().
+%                  per cluster. Only measures computed during 
+%                  pre-clustering (by POP_PRECLUST or STD_PRECLUST) 
+%                  are plotted. Called by POP_CLUSTEDIT.
 %                  Leaves the plotted grand mean cluster measures 
 %                  in STUDY.cluster for quick replotting.
 % Usage:    
@@ -12,7 +12,7 @@
 % Inputs:
 %   STUDY      - STUDY set including some or all EEG datasets in ALLEEG.
 %   ALLEEG     - vector of EEG dataset structures including the datasets 
-%                in the STUDY. Yypically created using load_ALLEEG().  
+%                in the STUDY. Yypically created using LOAD_ALLEEG.  
 %
 % Optional inputs:
 %   clusters   - [numeric vector | 'all'] -> cluster numbers to plot.
@@ -26,7 +26,7 @@
 %              % Plot mean properties of Cluster 5 in one figure. 
 %              >> [STUDY] = std_propplot(STUDY,ALLEEG, 5);
 %
-% See also:  pop_clustedit() 
+% See also:  POP_CLUSTEDIT 
 %
 % Authors:  Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN/INC/UCSD, 2005
 

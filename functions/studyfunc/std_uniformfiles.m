@@ -1,4 +1,4 @@
-% std_uniformfiles() - Check uniform channel distribution across data files
+% STD_UNIFORMFILES - Check uniform channel distribution across data files
 %
 % Usage:    
 %     >> boolval = std_uniformfiles(STUDY, ALLEEG);   

@@ -1,4 +1,4 @@
-% size() - size of memory mapped underlying array
+% SIZE - size of memory mapped underlying array
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

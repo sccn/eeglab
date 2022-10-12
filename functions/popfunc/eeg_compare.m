@@ -9,7 +9,7 @@
 %
 % Author: Arnaud Delorme, 2020
 %
-% See also: eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2020 Arnaud Delorme
 %

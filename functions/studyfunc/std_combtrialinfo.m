@@ -1,4 +1,4 @@
-% std_combtrialinfo() - Combine and integrate all the info into the
+% STD_COMBTRIALINFO - Combine and integrate all the info into the
 %                       field trialinfo
 %
 % Usage:

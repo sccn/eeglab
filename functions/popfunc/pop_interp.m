@@ -1,4 +1,4 @@
-% pop_interp() - interpolate data channels
+% POP_INTERP - interpolate data channels
 %
 % Usage: EEGOUT = pop_interp(EEG, badchans, method, t_range);
 %
@@ -70,8 +70,8 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         disp('editor and declare such channels as non-data channels'); 
          
         enablenondat = 'off';
-        if isfield(EEG.chaninfo, 'nodatchans')
-            if ~isempty(EEG.chaninfo.nodatchans)
+        if isfield(EEG.chaninfo, 'removedchans')
+            if ~isempty(EEG.chaninfo.removedchans)
                 enablenondat = 'on';
             end
         end
@@ -96,7 +96,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         else
             uilist = { { 'Style' 'text' 'string' 'What channel(s) do you want to interpolate' 'fontweight' 'bold' } ...
                    { 'style' 'text' 'string' 'none selected' 'tag' 'chanlist' } ...
-                   { 'style' 'pushbutton' 'string' 'Select from removed channels' 'callback' 'pop_interp(''nondatchan'',gcbf);' 'enable' enablenondat } ...                   
+                   { 'style' 'pushbutton' 'string' 'Select from removed channels' 'callback' 'pop_interp(''removedchans'',gcbf);' 'enable' enablenondat } ...                   
                    { 'style' 'pushbutton' 'string' 'Select from data channels'    'callback' 'pop_interp(''datchan'',gcbf);' } ...                   
                    { 'style' 'pushbutton' 'string' 'Use specific channels of other dataset' 'callback' 'pop_interp(''selectchan'',gcbf);'} ...
                    { 'style' 'pushbutton' 'string' 'Use all channels from other dataset' 'callback' 'pop_interp(''uselist'',gcbf);'} ...
@@ -106,10 +106,9 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                    {} { 'Style' 'text' 'string' 'Note: for group level analysis, interpolate in STUDY' } ...
                    };
                
-            geom     = { 1 1 1 1 1 1 1 [1.1 1] 1   1 };
-            geomvert = [ 1 1 1 1 1 1 1 1       0.5 1 ];
-        end
-        [res userdata tmp restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'geomvert', geomvert, 'helpcom', 'pophelp(''pop_interp'')');
+        geom     = { 1 1 1 1 1 1 1 [1.1 1] 1   1 };
+        geomvert = [ 1 1 1 1 1 1 1 1       0.5 1 ];
+        [res, userdata, ~, restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'geomvert', geomvert, 'helpcom', 'pophelp(''pop_interp'')');
         if isempty(res) || isempty(userdata), return; end
         
         if restag.method == 1
@@ -138,7 +137,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         end
         
         com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
-        if ~isempty(findstr('nodatchans', userdata.chanstr))
+        if ~isempty(findstr('removedchans', userdata.chanstr))
             eval( [ userdata.chanstr '=[];' ] );
         end
         
@@ -148,13 +147,13 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         fig = bad_elec;
         userdata = get(fig, 'userdata');
         
-        if strcmpi(command, 'nondatchan')
+        if strcmpi(command, 'removedchans')
             global EEG;
             tmpchaninfo = EEG.chaninfo;
-            [chanlisttmp chanliststr] = pop_chansel( { tmpchaninfo.nodatchans.labels } );
+            [chanlisttmp chanliststr] = pop_chansel( { tmpchaninfo.removedchans.labels } );
             if ~isempty(chanlisttmp),
-                userdata.chans   = EEG.chaninfo.nodatchans(chanlisttmp);
-                userdata.chanstr = [ 'EEG.chaninfo.nodatchans([' num2str(chanlisttmp) '])' ];
+                userdata.chans   = EEG.chaninfo.removedchans(chanlisttmp);
+                userdata.chanstr = [ 'EEG.chaninfo.removedchans([' num2str(chanlisttmp) '])' ];
                 set(fig, 'userdata', userdata);
                 set(findobj(fig, 'tag', 'chanlist'), 'string', chanliststr);
             end
@@ -210,6 +209,16 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         return;
     end
     
+    % remove from removedchans if interpolated
+    if isfield(EEG.chaninfo, 'removedchans') && ~isempty(EEG.chaninfo.removedchans) && isstruct(bad_elec)
+        for iChan = 1:length(bad_elec)
+            ind = strmatch(lower(bad_elec(iChan).labels), lower({EEG.chaninfo.removedchans.labels}), 'exact');
+            if ~isempty(ind)
+                EEG.chaninfo.removedchans(ind) = [];
+            end
+        end
+    end
+
     EEG = eeg_interp(EEG, bad_elec, method, t_range);
     
     

@@ -1,5 +1,5 @@
-% spec() - power spectrum. This function replaces psd() function if the signal
-%          processing toolbox is not present. It uses the timef() function.
+% SPEC - power spectrum. This function replaces PSD function if the signal
+%          processing toolbox is not present. It uses the TIMEF function.
 %
 % Usage:
 %   >> [power freqs] = spec(X);
@@ -16,7 +16,7 @@
 %   power  - spectral estimate (amplitude not dB)
 %   freqs  - frequency array
 %
-% Note: this function is just an approximation of the psd() (not pwelch) 
+% Note: this function is just an approximation of the PSD (not pwelch) 
 %       method. We strongly recommend to use the psd function if you have 
 %       access to it.
 %

@@ -1,4 +1,4 @@
-% std_plottf() - plot ERSP/ITC images a component
+% STD_PLOTTF - plot ERSP/ITC images a component
 %              or channel cluster in a STUDY. Also allows plotting scalp
 %              maps.
 % Usage:
@@ -51,7 +51,7 @@
 %                  might be inaccurate {default: 'auto'}
 %
 % ITC/ERSP image plotting options:
-%  'tftopoopt'   - [cell array] tftopo() plotting options (ERSP and ITC)
+%  'tftopoopt'   - [cell array] TFTOPO plotting options (ERSP and ITC)
 %  'caxis'       - [min max] color axis (ERSP, ITC, scalp maps)
 %
 % Scalp map plotting options:
@@ -59,7 +59,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
+% See also: POP_ERSPPARAMS, POP_ERPPARAMS, POP_SPECPARAMS, STATCOND
 
 % Copyright (C) 2006 Arnaud Delorme
 %
@@ -200,13 +200,13 @@ if strcmpi(opt.effect, 'marginal') || ng == 1 || nc == 1
     end
 elseif strcmpi(opt.effect, 'main') && ~isempty(opt.interstats)
     if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
-        pcondplot  = { opt.interstats{1} };
-        pgroupplot = { opt.interstats{2} };
+        pcondplot  = { opt.interstats{2} };
+        pgroupplot = { opt.interstats{1} };
         pinterplot = opt.interstats{3};
         maxplot = 1;
     else
-        if ~isempty(opt.interstats{1}), pcondplot  = { -log10(opt.interstats{1}) }; end
-        if ~isempty(opt.interstats{2}), pgroupplot = { -log10(opt.interstats{2}) }; end
+        if ~isempty(opt.interstats{2}), pcondplot  = { -log10(opt.interstats{2}) }; end
+        if ~isempty(opt.interstats{1}), pgroupplot = { -log10(opt.interstats{1}) }; end
         if ~isempty(opt.interstats{3}), pinterplot = -log10(opt.interstats{3}); end
         maxplot = 3;
     end

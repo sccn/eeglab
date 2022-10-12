@@ -1,4 +1,4 @@
-% eeg_isboundary() - check if an event is a boundary event
+% EEG_ISBOUNDARY - check if an event is a boundary event
 %
 % Usage:
 %   >> logical = eeg_boundaryevent(INEEG);
@@ -12,7 +12,7 @@
 %
 % Author: Arnaud Delorme, 2022
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2022 Arnaud Delorme
 %

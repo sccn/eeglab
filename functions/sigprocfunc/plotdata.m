@@ -1,4 +1,4 @@
-% plotdata() - plot concatenated multichannel data epochs in two-column format
+% PLOTDATA - plot concatenated multichannel data epochs in two-column format
 %
 % Usage:   >> plotdata(data)
 %          >> plotdata(data,frames)
@@ -12,7 +12,7 @@
 %  [limits]    = [xmin xmax ymin ymax]  (x's in ms) 
 %                {default|0 (or both y's 0) -> use data limits)
 %  'title'     = plot title {default|0 -> none}
-%  'channames' = channel location file or structure (see readlocs())
+%  'channames' = channel location file or structure (see READLOCS)
 %                {default|0 -> channel numbers}
 %  'colors'    = file of color codes, 3 chars per line  
 %                ( '.' = space) {default|0 -> default color order}
@@ -23,7 +23,7 @@
 % Authors: Scott Makeig, Arnaud Delorme, Tzyy-Ping Jung, 
 %          SCCN/INC/UCSD, La Jolla, 05-01-96 
 %
-% See also: plottopo(), timtopo(), envtopo(), headplot(), compmap(), eegmovie()
+% See also: PLOTTOPO, TIMTOPO, ENVTOPO, HEADPLOT, COMPMAP, EEGMOVIE
 
 % Copyright (C) 05-01-96 Scott Makeig, Arnaud Delorme & Tzyy-Ping Jung, 
 % SCCN/INC/UCSD, scott@sccn.ucsd.edu
@@ -200,7 +200,7 @@ end
   end;       
 %    chid = fopen(channels,'r');
 %    if chid <3,
-%        fprintf('plotdata(): cannot open file %s.\n',channels);
+%        fprintf('PLOTDATA: cannot open file %s.\n',channels);
 %        return
 %     end
 %     if isempty( findstr( lower(channels), '.loc') )

@@ -1,4 +1,4 @@
-% cbar() - Display full or partial color bar
+% CBAR - Display full or partial color bar
 %
 % Usage:
 %    >> cbar % create a vertical cbar on the right side of a figure
@@ -26,7 +26,7 @@
 %
 % Author: Colin Humphries, Arnaud Delorme, CNL / Salk Institute, Feb. 1998-
 %
-% See also: colorbar()
+% See also: COLORBAR
 
 % Copyright (C) Colin Humphries, CNL / Salk Institute, Feb. 1998 
 %
@@ -153,7 +153,7 @@ else
 end
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Draw colorbar using image()
+% Draw colorbar using IMAGE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if exist('DEFAULT_COLORMAP', 'var')
     map = colormap(eval( [ DEFAULT_COLORMAP '(' int2str(max(size(colormap,1), max(colors))) ')' ]));

@@ -1,4 +1,4 @@
-% pop_topochansel() - pop up a topographic interface to select channels
+% POP_TOPOCHANSEL - pop up a topographic interface to select channels
 %
 % Pops up a topographic interface to select multiple channels with the
 % mouse. Click a polygon around the electrodes you wish to select. Right
@@ -8,7 +8,7 @@
 %   >> [chanlist] = pop_topochansel(chanlocs,selection);
 %
 % Inputs:
-%   chanstruct     - channel structure. See readlocs()
+%   chanstruct     - channel structure. See READLOCS
 %                    (optional if EEG structure with chanlocs in caller or
 %                    base workspace)
 %   selection      - currently selected electrodes.
@@ -161,7 +161,7 @@ indexnr=ev_in;
 
 function nb = chnb(channame, varargin)
 
-% chnb() - return channel number corresponding to channel names in an EEG
+% CHNB - return channel number corresponding to channel names in an EEG
 %           structure
 %
 % Usage:

@@ -1,4 +1,4 @@
-% plugin_search() - support function for plugin_menu
+% PLUGIN_SEARCH - support function for plugin_menu
 
 % Copyright (C) 2019 Arnaud Delorme
 %

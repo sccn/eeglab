@@ -1,4 +1,4 @@
-% readelp() - read electrode locations from an .elp (electrode positions)
+% READELP - read electrode locations from an .elp (electrode positions)
 %             file as generated, for example, by a Polhemus tracking device 
 % Usage:
 %   >> [eloc, elocnames, X, Y, Z] = readelp(filename);
@@ -14,9 +14,9 @@
 % Author: Arnaud Delorme, CNL / Salk Institute, 28 Feb 2002
 %
 % Note: ignores comments and the sensor type field
-% Note: convert output XYZ locations to polar coordinates using cart2pol()
+% Note: convert output XYZ locations to polar coordinates using CART2POL
 %
-% See also: readlocs(), snapread(), floatread(), cart2pol()
+% See also: READLOCS, SNAPREAD, FLOATREAD, CART2POL
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 28 Feb 2002
 %

@@ -1,16 +1,16 @@
-% std_dipplot() - Commandline function to plot cluster component dipoles. Dipoles for each
+% STD_DIPPLOT - Commandline function to plot cluster component dipoles. Dipoles for each
 %                 named cluster is displayed in a separate figure. To view all the clustered 
 %                 components in the STUDY on the same figure (in a separate subplot), all 
 %                 STUDY clusters must be requested.
 %                 To visualize dipoles, they first must be stored in the EEG dataset structures
-%                 using dipfit(). Only components that have dipole locations will be displayed,
+%                 using DIPFIT. Only components that have dipole locations will be displayed,
 %                 along with the cluster mean dipole (in red). 
 % Usage:    
 %                 >> [STUDY] = std_dipplot(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in 
-%                the STUDY. ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                the STUDY. ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %
 % Optional inputs:
 %   'clusters' - [numeric vector | 'all']  -> specific cluster numbers to plot.
@@ -21,7 +21,7 @@
 %                {default: 'all'}.
 %   'mode'     - ['together'|'apart'|'multicolor'] Display all requested cluster on one 
 %                figure ('together') or separate figures ('apart'). 
-%                'together'-> plot all 'clusters' individuall in one multi-pane figure (without the gui).
+%                'together'-> plot all 'clusters' individually in one multi-pane figure (without the gui).
 %                'apart'   -> plot each cluster in a separate figure. 
 %                'multicolor' -> plot all clusters in one figure, 
 %                Note that this parameter has no effect if the 'comps' option (above) is used.
@@ -45,7 +45,7 @@
 %                % Plot cluster-5 component dipoles (in blue), plus their mean dipole (in red), 
 %                % on an existing (gui-less) figure. 
 %
-%  See also  pop_clustedit(), dipplot()        
+%  See also  POP_CLUSTEDIT, DIPPLOT        
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 %          'groups' added by Makoto Miyakoshi on June 2012.
@@ -531,18 +531,18 @@ end % multicolor. Supporting functions at end of file
 
 % ========================================================================================
 
-% std_plotcompdip() - Commandline function, to visualizing cluster components dipoles. 
+% STD_PLOTCOMPDIP - Commandline function, to visualizing cluster components dipoles. 
 %                   Displays the dipoles of specified cluster components with the cluster mean 
 %                   dipole on separate figures. 
 %                   To visualize dipoles they first must be stored in the EEG dataset structures
-%                   using dipfit(). Only components that have a dipole locations will be displayed,
+%                   using DIPFIT. Only components that have a dipole locations will be displayed,
 %                   along with the cluster mean dipole in red. 
 % Usage:    
 %                   >> [STUDY] = std_plotcompdip(STUDY, ALLEEG, cluster, comps);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                     ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %   cluster     - single cluster number.  
 %
 % Optional inputs:

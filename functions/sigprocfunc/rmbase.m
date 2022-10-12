@@ -1,4 +1,4 @@
-% rmbase() - subtract basevector channel means from multi-epoch data matrix
+% RMBASE - subtract basevector channel means from multi-epoch data matrix
 %
 % Usage:
 %       >> [dataout] = rmbase(data); % remove whole-data channel means
@@ -39,7 +39,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 07-30-97 converted to rmbase() -sm
+% 07-30-97 converted to RMBASE -sm
 % 09-30-97 fixed! -sm
 % 05-10-01 caught empty input data -sm
 % 06-03-01 added test for length-1 basevector, added [] defaults -sm

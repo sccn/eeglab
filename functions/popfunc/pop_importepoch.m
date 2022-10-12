@@ -1,4 +1,4 @@
-% pop_importepoch() - Export epoch and/or epoch event information to the event 
+% POP_IMPORTEPOCH - Export epoch and/or epoch event information to the event 
 %                     structure array of an EEG dataset. If the dataset is 
 %                     the only input, a window pops up to ask for the relevant 
 %                     parameter values.
@@ -95,7 +95,7 @@
 %
 % Authors: Arnaud Delorme & Scott Makeig, CNL/Salk Institute, 11 March 2002
 %
-% See also: eeglab()
+% See also: EEGLAB
  
 % Copyright (C) 15 Feb 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% qrtimax() -  perform Quartimax rotation of rows of a data matrix.
+% QRTIMAX -  perform Quartimax rotation of rows of a data matrix.
 %
 % Usage: >> [Q,B] = qrtimax(data);   
 %        >> [Q,B] = qrtimax(data,tol,'[no]reorder');

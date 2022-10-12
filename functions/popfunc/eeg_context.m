@@ -1,9 +1,9 @@
-% eeg_context() - returns (in output 'delays') a matrix giving, for each event of specified 
+% EEG_CONTEXT - returns (in output 'delays') a matrix giving, for each event of specified 
 %                 ("target") type(s), the latency (in ms) to the Nth preceding and/or following
 %                 urevents (if any) of specified ("neighbor") type(s). Return the target event 
 %                 and urevent numbers, the neighbor urevent numbers, and the values of specified 
 %                 urevent field(s) for each of the neighbor urevents. Uses the EEG.urevent 
-%                 structure, plus EEG.event().urevent pointers to it. If epoched data, also 
+%                 structure, plus EEG.EVENT.urevent pointers to it. If epoched data, also 
 %                 uses the EEG.epoch structure. For use in event-handling scripts and functions.
 % Usage:
 %             >>  [targs,urnbrs,urnbrtypes,delays,tfields,urnfields] = ...

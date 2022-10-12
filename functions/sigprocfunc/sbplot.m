@@ -1,4 +1,4 @@
-% sbplot() - create axes in arbitrary subplot grid positions and sizes
+% SBPLOT - create axes in arbitrary subplot grid positions and sizes
 %
 % Usage:  >> axis_handle = sbplot(v,h,index)  
 %         >> axis_handle = sbplot(v,h,[index1 index2])
@@ -9,8 +9,8 @@
 %   v,h    - Integers giving the vertical and horizontal ranks of the tiling.
 %   index  - Either a single subplot index, in which case the command 
 %            is equivalent to subplot, or a two-element vector giving 
-%            the indices of two corners of the sbplot() area according 
-%            to subplot() convention (e.g., left-to-right, top-to-bottom).
+%            the indices of two corners of the SBPLOT area according 
+%            to SUBPLOT convention (e.g., left-to-right, top-to-bottom).
 %   axprop - Any axes property(s), e.g., >> sbplot(3,3,3,'color','w')
 %   handle - Following keyword 'ax', sbplot tiles the given axes handle
 %            instead of the whole figure
@@ -20,7 +20,7 @@
 %
 % Note:
 %   sbplot is essentially the same as the subplot command except that 
-%   sbplot axes may span multiple tiles. Also, sbplot() will not erase 
+%   sbplot axes may span multiple tiles. Also, SBPLOT will not erase 
 %   underlying axes. 
 %  
 %  Examples: >> sbplot(3,3,6);plot(rand(1,10),'g');

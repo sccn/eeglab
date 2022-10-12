@@ -1,5 +1,5 @@
-% pop_runica() - Run an ICA decomposition of an EEG dataset using runica(), 
-%                binica(), or another ICA or other linear decomposition. 
+% POP_RUNICA - Run an ICA decomposition of an EEG dataset using RUNICA, 
+%                BINICA, or another ICA or other linear decomposition. 
 % Usage:
 %   >> OUT_EEG = pop_runica( EEG ); % pops-up a data entry window
 %   >> OUT_EEG = pop_runica( EEG, 'key', 'val' ); % no pop_up
@@ -16,8 +16,8 @@
 %   'icatype'   - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
 %                 to use for the ICA decomposition. The nature of any 
 %                 differences in the results of these algorithms have 
-%                 not been well characterized. {default: binica(), if
-%                 found, else runica()}
+%                 not been well characterized. {default: BINICA, if
+%                 found, else RUNICA}
 %   'dataset'   - [integer array] dataset index or indices.
 %   'chanind'   - [integer array or cell array] subset of channel indices 
 %                 for running the ICA decomposition. Alternatively, you may
@@ -47,12 +47,12 @@
 %    on Tony Bell's infomax algorithm as implemented for automated use by 
 %    Scott Makeig et al. using the natural gradient of Amari et al. It can 
 %    also extract sub-Gaussian sources using the (recommended) 'extended' option 
-%    of Lee and Girolami. Function runica() is the all-Matlab version; function 
-%    binica() calls the (1.5x faster) binary version (a separate download) 
-%    translated into C from runica() by Sigurd Enghoff.
-% 2) jader() calls the JADE algorithm of Jean-Francois Cardoso. This is 
+%    of Lee and Girolami. Function RUNICA is the all-Matlab version; function 
+%    BINICA calls the (1.5x faster) binary version (a separate download) 
+%    translated into C from RUNICA by Sigurd Enghoff.
+% 2) JADER calls the JADE algorithm of Jean-Francois Cardoso. This is 
 %    included in the EEGLAB toolbox by his permission. See >> help jader
-% 3) To run fastica(), download the fastICA toolbox from its website,
+% 3) To run FASTICA, download the fastICA toolbox from its website,
 %    http://www.cis.hut.fi/projects/ica/fastica/, and make it available 
 %    in your Matlab path. According to its authors, default parameters
 %    are not optimal: Try args 'approach', 'sym' to estimate components 
@@ -64,7 +64,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: runica(), binica(), jader(), fastica()
+% See also: RUNICA, BINICA, JADER, SOBI, FASTICA.
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -108,22 +108,56 @@ end
 
 % find available algorithms
 % -------------------------
-allalgs   = { 'runica' 'binica' 'jader' 'jadeop' 'jade_td_p' 'MatlabshibbsR' 'fastica' ...
-              'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'evd24' 'sons' 'sobi' 'ng_ol' ...
-              'acsobiro' 'acrsobibpf' 'pearson_ica' 'egld_ica' 'eeA' 'tfbss' 'icaML' 'icaMS' 'picard' }; % do not use egld_ica => too slow
-selectalg = {};
-linenb    = 1;
-count     = 1;
+allalgs(1).name = 'runica';
+allalgs(1).description = 'Infomax (runica function)';
+allalgs(1).options     = '''extended'', 1';
+allalgs(end+1).name = 'runica';
+allalgs(end).description = 'Infomax conservative (runica)';
+allalgs(end).options     = '''extended'', 1, ''lrate'', 1e-5, ''maxstep'', 2000';
+allalgs(end).help        = 'See this <a href="https://sccn.ucsd.edu/wiki/Makoto%27s_useful_EEGLAB_code#How_to_obtain_practically_reproducible_ICA_results_.2809.2F26.2F2022_added.29">reference</a> for ICA conservative parameters ';
+allalgs(end+1).name = 'picard';
+allalgs(end).description = 'Infomax (picard function)';
+allalgs(end).options     = '''maxiter'', 500, ''mode'', ''standard''';
+allalgs(end).help        = 'See this <a href="https://github.com/pierreablin/picard">page</a> for Picard parameters ';
+allalgs(end+1).name = 'picard';
+allalgs(end).description = 'FastICA (picard function)';
+allalgs(end).options     = '''maxiter'', 500';
+allalgs(end).help        = 'See this <a href="https://github.com/pierreablin/picard">page</a> for Picard parameters ';
+
+allalgs(end+1).name = 'sobi'; allalgs(end).description = 'SOBI (sobi function)';
+allalgs(end+1).name = 'acsobiro'; allalgs(end).description = 'SOBI (acsobiro function)';
+allalgs(end+1).name = 'pearson_ica'; allalgs(end).description = 'Pearson (pearson_ica function)';
+allalgs(end+1).name = 'jader';     allalgs(end).description = 'Jade (jader function)';
+allalgs(end+1).name = 'jadeop';    allalgs(end).description = 'Jade (jadeop function)';
+allalgs(end+1).name = 'jade_td_p'; allalgs(end).description = 'Jade (jade_td_p function)';
+allalgs(end+1).name = 'MatlabshibbsR'; allalgs(end).description = 'MatlabshibbsR';
+allalgs(end+1).name = 'fastica'; allalgs(end).description = 'FastICA (fastica function)';
+allalgs(end+1).name = 'tica'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'simbec'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'unica'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'amuse'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'fobi'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'evd'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'evd24'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'sons'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'ng_ol'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'acrsobibpf'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'egld_ica'; allalgs(end).description = allalgs(end).name; % do not use egld_ica => too slow
+allalgs(end+1).name = 'eeA'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'tfbss'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'icaML'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'icaMS'; allalgs(end).description = allalgs(end).name;
+defaultopts = allalgs(1).options;
+
 for index = length(allalgs):-1:1
-    if exist(allalgs{index}) ~= 2 && exist(allalgs{index}) ~= 6
+    if ~exist(allalgs(index).name, 'file')
         allalgs(index) = [];
     end
 end
 
-% special AMICA
+% special AMICA (deprecated use the pop_runamica function)
 % -------------
 selectamica = 0;
-defaultopts = [ '''extended'', 1' ] ;
 if nargin > 1
     if ischar(varargin{1})
         if strcmpi(varargin{1}, 'selectamica')
@@ -158,29 +192,34 @@ if nargin < 2 || selectamica
                    '    warndlg2(''No channel type'', ''No channel type'');' ...
                    'end;' ...
 				   'clear tmps tmpv tmpstr tmptype tmpchans;' ];
-    cb_ica = [ 'if get(gcbo, ''value'') < 3, ' ...
-               '     set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''extended'''', 1'');' ...
-               'else,' ...
-               '    tmpStr =  get(gcbo, ''string'');' ....
-               '    tmpAlgo = tmpStr(get(gcbo, ''value''));' ...
-               '    if strcmpi(tmpAlgo, ''picard''),' ...
-               '        set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''maxiter'''', 500'');' ...
-               '    else,' ...
-               '        set(findobj(gcbf, ''tag'', ''params''), ''string'', '''');' ...
-               '    end;' ...
-               'end;' ];
+    cb_ica = ['tmpalgos = get(gcbf, ''userdata'');' ...
+              'tmpalgos = tmpalgos{3};' ...
+              'set(findobj(gcbf, ''tag'', ''params''), ''string'',  tmpalgos( get(gcbo, ''value'') ).options );' ... 
+              'disp(char(tmpalgos( get(gcbo, ''value'') ).help));' ...
+              'clear tmpalgos;' ];
+%     [ 'if get(gcbo, ''value'') < 3, ' ...
+%                '     set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''extended'''', 1'');' ...
+%                'else,' ...
+%                '    tmpStr =  get(gcbo, ''string'');' ....
+%                '    tmpAlgo = tmpStr(get(gcbo, ''value''));' ...
+%                '    if strcmpi(tmpAlgo, ''picard''),' ...
+%                '        set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''maxiter'''', 500'');' ...
+%                '    else,' ...
+%                '        set(findobj(gcbf, ''tag'', ''params''), ''string'', '''');' ...
+%                '    end;' ...
+%                'end;' ];
                
-    promptstr    = { { 'style' 'text'       'string' 'ICA algorithm to use (click to select)' } ...
-                     { 'style' 'listbox'    'string' allalgs 'callback', cb_ica } ...
+    promptstr    = { { 'style' 'text'       'string' [ 'ICA algorithm to use (click to select)' 10 ] } ...
+                     { 'style' 'listbox'    'string' { allalgs.description } 'callback', cb_ica } ...
                      { 'style' 'text'       'string' 'Commandline options (See help messages)' } ...
                      { 'style' 'edit'       'string' defaultopts 'tag' 'params' } ...
                      { 'style'  'checkbox'  'string' 'Reorder components by variance (if that''s not already the case)' 'value' 1 } ...
-                     { 'style' 'text'       'string' 'Channel type(s) or channel indices' } ...
+                     { 'style' 'text'       'string' 'Use only channel type(s) or indices' } ...
                      { 'style' 'edit'       'string' '' 'tag' 'chantype' }  ...
                      { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
                      { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
     geometry = { [2 1.5] [2 1.5] [1] [2 1 1 1] };
-    geomvert = [ 1.5 1 1 1];
+    geomvert = [ 2 1 1 1];
     if length(ALLEEG) > 1
         cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
         cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
@@ -224,9 +263,9 @@ if nargin < 2 || selectamica
     % ---
     result       = inputgui( 'geometry', geometry, 'geomvert', geomvert, 'uilist', promptstr, ...
                              'helpcom', 'pophelp(''pop_runica'')', ...
-                             'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes } );
+                             'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes allalgs } );
     if length(result) == 0 return; end      
-    options = { 'icatype' allalgs{result{1}} 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) 'reorder' fastif(result{3}, 'on', 'off') };
+    options = { 'icatype' allalgs(result{1}).name 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) 'reorder' fastif(result{3}, 'on', 'off') };
     if ~isempty(result{4})
         if ~isempty(str2num(result{4})), options = { options{:} 'chanind' str2num(result{4}) };
         else                             options = { options{:} 'chanind' parsetxt(result{4}) }; 

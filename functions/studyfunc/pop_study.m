@@ -1,4 +1,4 @@
-% pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
+% POP_STUDY  - create a new STUDY set structure defining a group of related EEG datasets. 
 %                The STUDY set also contains information about each of the datasets: the 
 %                subject code, subject group, experimental condition, and session. This can 
 %                be provided interactively in a pop-up window or be automatically filled 
@@ -16,7 +16,7 @@
 %   ALLEEG               - vector of EEG dataset structures to be included in the STUDY. 
 %
 % Optional Inputs:
-%   All "'key', 'val'" inputs of std_editset() may be used.
+%   All "'key', 'val'" inputs of STD_EDITSET may be used.
 %
 % Outputs:
 %   STUDY                - new STUDY set comprising some or all of the datasets in 
@@ -47,7 +47,7 @@
 %                          structure to disk. If no filename is provided, a window will 
 %                          pop up to ask for it. 
 %
-% See also: std_editset, pop_loadstudy(), pop_preclust(), pop_clust()
+% See also: std_editset, POP_LOADSTUDY, POP_PRECLUST, POP_CLUST
 %
 % Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN, INC, UCSD, July 22, 2005
 

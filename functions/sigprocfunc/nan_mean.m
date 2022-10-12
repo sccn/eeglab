@@ -1,6 +1,6 @@
-% nan_mean() - Average, not considering NaN values
+% NAN_MEAN - Average, not considering NaN values
 %
-% Usage: same as mean()
+% Usage: same as MEAN
 
 % Author: Arnaud Delorme, CNL / Salk Institute, 16 Oct 2002
 

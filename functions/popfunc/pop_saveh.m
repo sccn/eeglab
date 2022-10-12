@@ -1,4 +1,4 @@
-% pop_saveh() - save the EEGLAB session command history stored in ALLCOM
+% POP_SAVEH - save the EEGLAB session command history stored in ALLCOM
 %               or in the 'history' field of the current dataset
 %
 % Usage:
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 March 2002
 %
-% See also: eegh(), eeglab()
+% See also: EEGH, EEGLAB
 
 % Copyright (C) 22 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

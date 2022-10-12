@@ -1,4 +1,4 @@
-% headplot() - plot a spherically-splined EEG field map on a semi-realistic 
+% HEADPLOT - plot a spherically-splined EEG field map on a semi-realistic 
 %              3-D head model. Can 3-D rotate the head image using the left 
 %              mouse button.
 % Example:
@@ -14,9 +14,9 @@
 %
 % Required Setup-mode Inputs: 
 %
-%   elocs         - file of electrode locations (compatible with readlocs()),
+%   elocs         - file of electrode locations (compatible with READLOCS),
 %                   or EEG.chanlocs channel location structure. If the channel 
-%                   file extension is not standard, use readlocs() to load the 
+%                   file extension is not standard, use READLOCS to load the 
 %                   data file, e.g.
 %                      >> headplot('setup', ...
 %                            readlocs('myfile.xxx', 'filetype', 'besa'),...
@@ -46,7 +46,7 @@
 %                    [shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ]
 %                   The transform is applied in the order shift(rotate(scale(elocs)))
 %                   by the dipfit2.* plugin function traditionaldipfit.m
-%                   This array is returned by coregister().
+%                   This array is returned by COREGISTER.
 %  'plotmeshonly' - [string] plot only mesh and electrode positions. Options are
 %                   'head' to plot the standard head mesh; 'sphere' to plot the
 %                   texture of the head on a sphere; 'off' not to plot anything.
@@ -100,7 +100,7 @@
 %   'transform'  - [real array] homogeneous transformation matrix to apply
 %                  to the original locations ('orilocs') before plotting them.
 %
-% Note: if an error is generated, headplot() may close the current figure
+% Note: if an error is generated, HEADPLOT may close the current figure
 %
 % Authors: Arnaud Delorme, Colin Humphries, Scott Makeig, SCCN/INC/UCSD, 
 %          La Jolla, 1998-
@@ -141,7 +141,7 @@
 % 12-13-98 implemented colorbar option using enhanced cbar -sm 
 % 12-13-98 implemented 'setup' comment option -sm 
 % 03-20-00 added cartesian electrode locations option -sm
-% 07-14-00 fixed line in calgx() -sm from -ch
+% 07-14-00 fixed line in CALGX -sm from -ch
 % 03-23-01 documented 'cartesian' locfile option -sm
 % 01-25-02 reformated help & license, added links -ad 
 % 03-21-02 added readlocs and the use of eloc input structure -ad 
@@ -694,7 +694,7 @@ else
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  calcgx() - function used in 'setup'
+%  CALCGX - function used in 'setup'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [out] = calcgx(in)
@@ -736,7 +736,7 @@ if ismatlab
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  distance() - function used in 'setup'
+%  DISTANCE - function used in 'setup'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [out] = distance(w,p)

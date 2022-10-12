@@ -1,4 +1,4 @@
-% std_checkset() - check STUDY set consistency
+% STD_CHECKSET - check STUDY set consistency
 %
 % Usage: >> [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);
 %

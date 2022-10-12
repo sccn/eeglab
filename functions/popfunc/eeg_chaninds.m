@@ -1,4 +1,4 @@
-% std_chaninds() - look up channel indices in a EEG structure
+% STD_CHANINDS - look up channel indices in a EEG structure
 %
 % Usage:
 %         >> inds = std_chaninds(EEG, channames);

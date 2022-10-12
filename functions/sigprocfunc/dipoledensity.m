@@ -1,4 +1,4 @@
-% dipoledensity() - compute and optionally plot a measure of the 3-D spatial 
+% DIPOLEDENSITY - compute and optionally plot a measure of the 3-D spatial 
 %                   (in)homogeneity of a specified (large) set of 1- or 2-dipole 
 %                   component models, either as physical dipole density or as 
 %                   dipole-position entropy across subjects. In either case, 
@@ -7,14 +7,14 @@
 %                   or if 'plot','on', paints a 3-D density|entropy brain image 
 %                   on slices of the Montreal Neurological Institute (MNI) mean 
 %                   MR brain image ('standard_BESA/avg152t1.mat'). Calls
-%                   dipplot(), 
-%                   mri3dplot(), and Fieldtrip function ft_inside_headmodel(). 
+%                   DIPPLOT, 
+%                   MRI3DPLOT, and Fieldtrip function FT_INSIDE_HEADMODEL. 
 % Usage:
 %               >> [dens3d mri] = dipoledensity( dipoles, 'key',val, ... );
 %
 % Inputs: 
 %    dipoles - this may be either the same dipole structure given as input to 
-%              the dipplot() function, a 3 by n array of dipole localization or
+%              the DIPPLOT function, a 3 by n array of dipole localization or
 %              a cell array containing arguments for the dipplot function. Note that
 %              the 'coordformat' option below defines the coordinate space for these
 %              dipoles (default is MNI). See help dipplot for more information.
@@ -40,7 +40,7 @@
 %                 to include {defaults: 20 mm | 20 dipoles }
 % 'subsample'   - [integer] subsampling of native MNI image {default: 2 -> 2x2x2}
 % 'weight'      - [(1,ncomps) array] for 'distance'|'alldistance' methods, the 
-%                 relative weight of each component dipole {default: ones()}
+%                 relative weight of each component dipole {default: ONES}
 % 'coordformat' - ['mni'|'spherical'] coordinate format if dipole location or 
 %                 a structure is given as input. Default is 'mni'.
 % 'subjind'     - [(1,ncomps) array] subject index for each dipole model. If two 
@@ -52,7 +52,7 @@
 %                 {default: 'on' if no output arguments, else 'off'}
 % 'dipplot'     - ['on'|'off'] plot the dipplot image (used for converting
 %                 coordinates (default is 'off')
-% 'plotargs'    - {cell array} plotting arguments for mri3dplot() function.
+% 'plotargs'    - {cell array} plotting arguments for MRI3DPLOT function.
 % 'volmesh_fname' - [string] precomputed mesh volume file name. If not
 %                 given as input the function will recompute it (it can take from
 %                 five to 20 minutes). By default this function save the volume file 
@@ -65,7 +65,7 @@
 % Outputs:
 %  dens3d       - [3-D num array] density in dipoles per cubic centimeter. If output
 %                 is returned, no plot is produced unless 'plot','on' is specified. 
-%  mri          - {MRI structure} used in mri3dplot().
+%  mri          - {MRI structure} used in MRI3DPLOT.
 %
 % Example: 
 %         >> fakedipoles = (rand(3,10)-0.5)*80;
@@ -82,7 +82,7 @@
 % ------------------------------------
 %
 % See also:
-%           EEGLAB: dipplot(), mri3dplot(), Fieldtrip: ft_inside_headmodel() 
+%           EEGLAB: DIPPLOT, MRI3DPLOT, Fieldtrip: FT_INSIDE_HEADMODEL 
 %
 % Authors: Arnaud Delorme & Scott Makeig SCCN, INC, UCSD
 % Modified by: Makoto Miyakoshi

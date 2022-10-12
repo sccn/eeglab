@@ -1,4 +1,4 @@
-% eegplotgold() - display EEG data in a clinical format
+% EEGPLOTGOLD - display EEG data in a clinical format
 %
 % Usage:
 % >> eegplotgold('dataname', samplerate, 'chanfile', 'title', yscaling, range)
@@ -6,13 +6,13 @@
 % Inputs:
 %   'dataname' - quoted name of a desktop global variable (see Ex. below)
 %   samplerate - EEG sampling rate in Hz (0 -> default 256 Hz)
-%   'chanfile' - file of channel info in topoplot() style
+%   'chanfile' - file of channel info in TOPOPLOT style
 %                                        (0 -> channel numbers)
-%   'title'    - plot title string       (0 -> 'eegplotgold()')
+%   'title'    - plot title string       (0 -> 'EEGPLOTGOLD')
 %   yscaling   - initial y scaling factor (0 - default is 300)
 %   range      - how many seconds to display in window (0 -> 10)
 %
-% Note: this version of eegplotgold() reguires that your data matrix 
+% Note: this version of EEGPLOTGOLD requires that your data matrix 
 %       be defined as a global variable before running this routine. 
 %
 % Example:  >> global dataname
@@ -20,9 +20,9 @@
 %
 % Author: Colin Humphries, CNL, Salk Institute, La Jolla, 3/97
 %
-% See also: eegplot(), eegplotold(), eegplotsold()
+% See also: EEGPLOT, EEGPLOTOLD, EEGPLOTSOLD
 
-% Copyright (C) Colin Humphries, CNL, Salk Institute 3/97 from eegplotold()
+% Copyright (C) Colin Humphries, CNL, Salk Institute 3/97 from EEGPLOTOLD
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -49,7 +49,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 4-4-97 shortened name to eegplotgold() -sm
+% 4-4-97 shortened name to EEGPLOTGOLD -sm
 % 5-20-97 added read of icadefs.m for MAXEEGPLOTCHANS -sm
 % 8-10-97 Clarified chanfile type -sm
 % 01-25-02 reformated help & license, added links -ad 

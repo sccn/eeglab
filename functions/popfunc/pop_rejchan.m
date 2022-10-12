@@ -1,4 +1,4 @@
-% pop_rejchan() - reject artifacts channels in an EEG dataset using joint 
+% POP_REJCHAN - reject artifacts channels in an EEG dataset using joint 
 %                  probability of the recorded electrode.
 %
 % Usage:
@@ -17,8 +17,8 @@
 %   'measure'  - ['prob'|'kurt'|'spec'] compute probability 'prob', kurtosis 'kurt'
 %                or spectrum 'spec' for each channel. Default is 'kurt'.
 %   'norm'     - ['on'|'off'] normalize measure above (using trimmed 
-%                normalization as described in the function jointprob()
-%                and rejkurt(). Default is 'off'.
+%                normalization as described in the function JOINTPROB
+%                and REJKURT. Default is 'off'.
 %   'precomp'  - [float array] use this array instead of computing the 'prob' 
 %                or 'kurt' measures.
 %   'freqrange' - [min max] frequency range for spectrum computation.
@@ -34,7 +34,7 @@
 %
 % Author: Arnaud Delorme, CERCO, UPS/CNRS, 2008-
 %
-% See also: jointprob(), rejkurt()
+% See also: JOINTPROB, REJKURT
 
 % Copyright (C) 2008 Arnaud Delorme, CERCO, UPS/CNRS
 %
@@ -178,7 +178,7 @@ elseif strcmpi(opt.measure, 'spec')
     indFiltered = find(mean(measure) < -20);
     if ~isempty(indFiltered) && indFiltered(1) > 11, 
         measure = measure(:,1:indFiltered(1)-10); 
-        myfprintf('Removing spectrum data below -20dB (most likelly filtered out)\n'); 
+        myfprintf('Removing spectrum data below -20dB (most likely filtered out)\n'); 
     end
     meanSpec = mean(measure);
     stdSpec  = std( measure);

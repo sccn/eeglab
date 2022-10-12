@@ -1,4 +1,4 @@
-% loadtxt() - load ascii text file into numeric or cell arrays
+% LOADTXT - load ascii text file into numeric or cell arrays
 %
 % Usage:
 %   >> array = loadtxt( filename, 'key', 'val' ...);

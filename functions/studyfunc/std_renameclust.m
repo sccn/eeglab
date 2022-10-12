@@ -1,10 +1,10 @@
-% std_renameclust()  - Commandline function, to rename clusters using specified (mnemonic) names. 
+% STD_RENAMECLUST  - Commandline function, to rename clusters using specified (mnemonic) names. 
 % Usage:    
 %                   >> [STUDY] = std_renameclust(STUDY, ALLEEG, cluster, new_name);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                     ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %   cluster     - single cluster number.  
 %   new_name  - [string] mnemonic cluster name.
 %

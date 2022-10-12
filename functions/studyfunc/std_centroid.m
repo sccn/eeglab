@@ -1,4 +1,4 @@
-% std_centroid() - compute cluster centroid in EEGLAB dataset STUDY.
+% STD_CENTROID - compute cluster centroid in EEGLAB dataset STUDY.
 %                  Compute and store the centroid(s) (i.e., mean(s)) 
 %                  for some combination of six measures on specified
 %                  clusters in a STUDY. Possible measures include: scalp
@@ -10,7 +10,7 @@
 % Inputs:
 %   STUDY        - STUDY set 
 %   ALLEEG       - ALLEEG dataset vector (else an EEG dataset) containing the STUDY
-%                  datasets, typically created using load_ALLEEG().
+%                  datasets, typically created using LOAD_ALLEEG.
 %   clusters     - [vector] of cluster indices. Computes measure means for the 
 %                  specified clusters. {deffault|[]: compute means for all 
 %                  STUDY clusters} 
@@ -31,7 +31,7 @@
 %                  to a different cluster requested in 'clusters' (above).
 %                  fields of 'centroid' may include centroid.erp, centroid.dipole,
 %                  etc. (as above). The structure is similar as the output
-%                  of the std_readdata() function (with some fields
+%                  of the STD_READDATA function (with some fields
 %                  about the cluster name and index missing).
 % Examples:
 %

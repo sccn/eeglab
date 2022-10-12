@@ -1,4 +1,4 @@
-% pop_loadset() - load an EEG dataset. If no arguments, pop up an input window.
+% POP_LOADSET - load an EEG dataset. If no arguments, pop up an input window.
 %
 % Usage:
 %   >> EEGOUT = pop_loadset; % pop up window to input arguments
@@ -24,7 +24,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001; SCCN/INC/UCSD, 2002-
 %
-% See also: eeglab(), pop_saveset()
+% See also: EEGLAB, POP_SAVESET
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

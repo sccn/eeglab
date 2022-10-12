@@ -1,4 +1,4 @@
-% biosig2eeglab() - convert BIOSIG structure to EEGLAB structure
+% BIOSIG2EEGLAB - convert BIOSIG structure to EEGLAB structure
 %
 % Usage:
 %   >> OUTEEG = pop_biosig2eeglab(hdr, data, interval);

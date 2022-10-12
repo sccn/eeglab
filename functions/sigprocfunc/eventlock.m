@@ -1,5 +1,5 @@
-% eventlock() - DEPRECATED: Please use eegalign() instead.
-% eventlock() - Time lock data epochs to specified event frames or event x-values.
+% EVENTLOCK - DEPRECATED: Please use EEGALIGN instead.
+% EVENTLOCK - Time lock data epochs to specified event frames or event x-values.
 %               Use to timelock existing data epochs to reaction times or other events
 %
 % Usage:
@@ -26,7 +26,7 @@
 %                 (Note: shift > 0 means shift forward|right)
 %
 % Note: Missing values are filled with NaN. Some toolbox functions
-%       ( timef(), crossf(), crosscoher() ) handle NaNs correctly. 
+%       ( TIMEF, CROSSF, CROSSCOHER ) handle NaNs correctly. 
 %       To truncate to non-NaN values, use
 %       >> dataout = matsel(dataout,frames,...
 %              1+max(shifts(find(shifts>=0))):frames+min(shifts(find(shifts<=0))));

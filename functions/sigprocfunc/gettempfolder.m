@@ -1,4 +1,4 @@
-% gettempfolder() - return the temporary folder
+% GETTEMPFOLDER - return the temporary folder
 %
 % Usage: >> folder = gettempfolder;
 %

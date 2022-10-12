@@ -1,4 +1,4 @@
-% convolve() - convolve two matrices (normalize by the sum of convolved 
+% CONVOLVE - convolve two matrices (normalize by the sum of convolved 
 %              elements to compensate for border effects).
 %
 % Usage:
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: conv2(), conv()
+% See also: CONV2, CONV
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

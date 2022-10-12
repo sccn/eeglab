@@ -1,4 +1,4 @@
-% std_ersp() - Compute ERSP and/or ITC transforms for ICA components 
+% STD_ERSP - Compute ERSP and/or ITC transforms for ICA components 
 %              or data channels of a dataset. Save results into Matlab 
 %              float files. 
 %
@@ -83,7 +83,7 @@
 %                  computation as single trial spectral decompositions are stored.
 %
 % Other optional inputs:
-%   This function will take any of the newtimef() optional inputs (for instance
+%   This function will take any of the NEWTIMEF optional inputs (for instance
 %   to compute log-space frequencies)...
 %
 % Outputs:
@@ -114,7 +114,7 @@
 %            >> [Xersp, times, logfreqs] = std_ersp(EEG, ...
 %                       'type', 'ersp', 'freqs', [3 50], 'cycles', [3 0.5]);
 %
-% See also: timef(), std_itc(), std_erp(), std_spec(), std_topo(), std_preclust()
+% See also: TIMEF, STD_ITC, STD_ERP, STD_SPEC, STD_TOPO, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, January, 2005-
 

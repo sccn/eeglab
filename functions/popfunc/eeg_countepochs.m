@@ -1,4 +1,4 @@
-% eeg_countepochs() Count how many epochs there are of each type
+% EEG_COUNTEPOCHS Count how many epochs there are of each type
 %
 % Usage:
 %  >> eeg_countepochs(EEG);

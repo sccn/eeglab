@@ -1,4 +1,4 @@
-% trial2eegplot() - convert eeglab format to eeplot format of rejection window
+% TRIAL2EEGPLOT - convert eeglab format to eeplot format of rejection window
 %
 % Usage:
 %   >> eegplotarray = trial2eegplot(rej, rejE, points, color);
@@ -8,15 +8,15 @@
 %   rejE  - electrode rejection array (size nb_elec x trials) also
 %           made of 0 and 1.
 %   points - number of points per trials
-%   color  - color of the windows for eegplot()
+%   color  - color of the windows for EEGPLOT
 %
 % Outputs:
 %   eegplotarray - array defining windows which is compatible with 
-%                  the function eegplot()
+%                  the function EEGPLOT
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegtresh(), eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGTRESH, EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

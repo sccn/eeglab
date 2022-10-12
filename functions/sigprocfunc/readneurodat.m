@@ -1,4 +1,4 @@
-% readneurodat() - read neuroscan location file (.dat)
+% READNEURODAT - read neuroscan location file (.dat)
 %
 % Usage:
 %   >> [ CHANLOCS labels theta theta ] = readneurodat( filename );
@@ -8,8 +8,8 @@
 %
 % Outputs:
 %   CHANLOCS       - [structure] EEGLAB channel location data structure. See
-%                    help readlocs()
-%   labels         - [cell arrya] channel labels
+%                    help READLOCS
+%   labels         - [cell array] channel labels
 %   theta          - [float array]array containing 3-D theta angle electrode
 %                    position (in degree)
 %   phi            - [float array]array containing 3-D phi angle electrode
@@ -17,7 +17,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 28 Nov 2003
 %
-% See also: readlocs(), readneurolocs()
+% See also: READLOCS, READNEUROLOCS
 
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

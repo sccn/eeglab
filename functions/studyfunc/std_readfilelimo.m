@@ -1,4 +1,4 @@
-% std_readlimofile()- Read limo file into eeglab structure
+% STD_READLIMOFILE- Read limo file into eeglab structure
 %
 % Usage:   
 %   >> [MeasureData, parameters, MeasureRange1, MeasureRange2] = std_readfilelimo(filestruct,'key', val)

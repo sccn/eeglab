@@ -1,5 +1,5 @@
 function f=loglike(W, S)
-% loglike() - log likehood function to estimate dependence between components
+% LOGLIKE - log likehood function to estimate dependence between components
 %
 % Usage: f = loglike(W, S);
 % 

@@ -1,4 +1,4 @@
-% tutorial() - Bring up the ICA / electrophysiology toolbox tutorial
+% TUTORIAL - Bring up the ICA / electrophysiology toolbox tutorial
 %              in a browser window (see docopt.m in the toolbox dir).
 %              Tutorial URL: http://www.sccn.ucsd.edu/tutorial/
 %              Download: See http://www.sccn.ucsd.edu/ica.html

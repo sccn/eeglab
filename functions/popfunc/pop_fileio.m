@@ -1,4 +1,4 @@
-% pop_fileio() - import data files into EEGLAB using FileIO 
+% POP_FILEIO - import data files into EEGLAB using FileIO 
 %
 % Usage:
 %   >> OUTEEG = pop_fileio; % pop up window

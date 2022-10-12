@@ -1,4 +1,4 @@
-% eeg_retrieve() - Retrieve an EEG dataset from the variable
+% EEG_RETRIEVE - Retrieve an EEG dataset from the variable
 %                  containing all datasets (standard: ALLEEG).
 %
 % Usage: >> EEG = eeg_retrieve( ALLEEG, index );
@@ -13,11 +13,11 @@
 %   CURRENTSET - workspace variable index of the current dataset
 %
 % Note: The function performs >> EEG = ALLEEG(index);
-%       It also runs eeg_checkset() on it.
+%       It also runs EEG_CHECKSET on it.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeg_store(), eeglab()
+% See also: EEG_STORE, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

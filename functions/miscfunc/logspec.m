@@ -1,5 +1,5 @@
-% logspec() - plot mean log power spectra of submitted data on loglog scale
-%             using plotdata() or plottopo() formats 
+% LOGSPEC - plot mean log power spectra of submitted data on loglog scale
+%             using PLOTDATA or PLOTTOPO formats 
 %
 % Usage:
 %        >> [spectra,freqs] = logspec(data,frames,srate);
@@ -12,13 +12,13 @@
 %    'title' = plot title {default: none}
 %    [loHz-hiHz] = [loHz hiHz] plotting limits 
 %       {default: [srate/fftlength srate/2]}
-%    'chan_locs' = channel location file (ala topoplot()) 
+%    'chan_locs' = channel location file (ala TOPOPLOT) 
 %                   Else [rows cols] to plot data in a grid array
 %    rm_mean = [0/1] 1 -> remove log mean spectrum from all
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 11-07-97 
 %
-% See also: plotdata(), plottopo()
+% See also: PLOTDATA, PLOTTOPO
 
 % Copyright (C) 11-07-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -47,7 +47,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% Changed plotdata() below to plottopo() 11/12/99 -sm
+% Changed PLOTDATA below to PLOTTOPO 11/12/99 -sm
 % Mentioned new grid array option 12/22/99 -sm
 % 01-25-02 reformated help & license, added links -ad 
 

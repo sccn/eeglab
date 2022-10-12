@@ -1,6 +1,6 @@
-% eeg_options() - eeglab option script 
+% EEG_OPTIONS - eeglab option script 
 %
-% Note: DO NOT EDIT, instead use pop_editoptions() or the menu
+% Note: DO NOT EDIT, instead use POP_EDITOPTIONS or the menu
 %       /File/Maximize memory in EEGLAB gui
 
 % STUDY options (set these checkboxes if you intend to work with studies)

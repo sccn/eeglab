@@ -1,7 +1,7 @@
-% std_rmdat() - remvoe datasets from STUDY
+% STD_RMDAT - remove datasets from STUDY
 %
 % Usage: 
-%   >> STUDY = std_rmdat(STUDY, ALLEEG, 'key', val);  
+%   >> [STUDY,ALLEEG] = std_rmdat(STUDY, ALLEEG, 'key', val);  
 %
 % Inputs:
 %   STUDY      - EEGLAB STUDY set
@@ -20,6 +20,12 @@
 %   'rmvarvalues' - {'string' range} remove datasets having variable value
 %                   in the selected range. May also be {'string' 'value'}
 %                   for non-numerical variables.
+%   'keepvarvalues' - {'string' range} keep datasets having variable value
+%                   in the selected range. May also be {'string' 'value'}
+%                   for non-numerical variables.
+%   'subjectind'  - [integer array] keep only specific subject indices in 
+%                   STUDY.subject. To remove or keep specificy subjects, 
+%                   use 'rmvarvalues' and 'keepvarvalues'
 %   'checkeventtype' - [cell|array|string] check event type are present.
 %   'numeventrange' - [min max] range for number of event of type above.
 %                    Default is [1 Inf].
@@ -71,8 +77,10 @@ g = finputcheck( varargin, { ...
     'sraterange'      'float'    {} [0 Inf]; ...
     'trialrange'      'float'    {} [1 Inf]; ...
     'checkeventtype'  ''         {} []; ...
-    'numeventrange'    'integer'  {} 1; ...
-    'rmvarvalues'     'cell' {} {} }, 'std_rmdat');
+    'numeventrange'   'integer'  {} 1; ...
+    'subjectind'   'integer'     {} []; ...
+    'rmvarvalues'     'cell'     {} {}; ...
+    'keepvarvalues'   'cell'     {} {} }, 'std_rmdat');
 if isstr(g)
     error(g);
 end
@@ -92,7 +100,17 @@ rmDats = g.sraterange(1) > allSrate  | allSrate  > g.sraterange(2) | rmDats;
 rmDats = g.chanrange(1)  > allChans  | allChans  > g.chanrange(2)  | rmDats;
 rmDats = g.trialrange(1) > allTrials | allTrials > g.trialrange(2) | rmDats;
 
+% check subject indices
+% ---------------------
+if ~isempty(g.subjectind)
+    if ~isempty(g.keepvarvalues)
+        error('Cannot use ''subjectind'' and ''keepvarvalues'' at the same time')
+    end
+    g.keepvarvalues = { 'subject' STUDY.subject(g.subjectind) };
+end
+
 % check variable name values
+% --------------------------
 if ~isempty(g.rmvarvalues)
     varName   = g.rmvarvalues{1};
     varValues = g.rmvarvalues{2};
@@ -100,6 +118,33 @@ if ~isempty(g.rmvarvalues)
     if ischar(varValues)
         allValues = cellfun(@num2str, allValues, 'uniformoutput', false);
         rmDats = rmDats | cellfun(@(x)isequal(x, varValues),  allValues);
+    elseif iscell(varValues)
+        for iCell = 1:length(varValues)
+            allValues = cellfun(@num2str, allValues, 'uniformoutput', false);
+            rmDats = rmDats | cellfun(@(x)isequal(x, varValues{iCell}),  allValues);
+        end
+    elseif length(varValues) ~= 2
+        error('When providing nmumerical input for variable selection, there must be 2 values - min and max');
+    else
+        allValues = cellfun(@(x)fastif(ischar(x), str2double(x), x), allValues);
+        rmVals = varValues(1) <= allValues & allValues <= varValues(2); % to deal with NaNs
+        rmDats = rmDats | rmVals;
+    end
+end  
+if ~isempty(g.keepvarvalues)
+    varName   = g.keepvarvalues{1};
+    varValues = g.keepvarvalues{2};
+    allValues = { STUDY.datasetinfo.(varName) };
+    if ischar(varValues)
+        allValues = cellfun(@num2str, allValues, 'uniformoutput', false);
+        rmDats = rmDats | ~cellfun(@(x)isequal(x, varValues),  allValues);
+    elseif iscell(varValues)
+        keepDats = zeros(1, length(allPnts));
+        for iCell = 1:length(varValues)
+            allValues = cellfun(@num2str, allValues, 'uniformoutput', false);
+            keepDats = keepDats | cellfun(@(x)isequal(x, varValues{iCell}),  allValues);
+        end
+        rmDats = rmDats | ~keepDats;
     elseif length(varValues) ~= 2
         error('When providing nmumerical input for variable selection, there must be 2 values - min and max');
     else
@@ -107,9 +152,10 @@ if ~isempty(g.rmvarvalues)
         keepVals = varValues(1) <= allValues & allValues <= varValues(2); % to deal with NaNs
         rmDats = rmDats | ~keepVals;
     end
-end     
+end  
 
 % check event type present
+% --------------------------
 if ~isempty(g.checkeventtype)
     if ischar(g.checkeventtype) g.checkeventtype = { g.checkeventtype }; end
     rmDatEvents = zeros(1, length(ALLEEG));

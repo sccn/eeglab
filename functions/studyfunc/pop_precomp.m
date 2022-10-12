@@ -1,5 +1,5 @@
-% pop_precomp() - precompute measures (spectrum, ERP, ERSP) for a collection of data
-%                 channels.  Calls std_precomp().
+% POP_PRECOMP - precompute measures (spectrum, ERP, ERSP) for a collection of data
+%                 channels.  Calls STD_PRECOMP.
 % Usage:    
 %                >> [STUDY, ALLEEG] = pop_precomp(STUDY, ALLEEG); % pop up interactive window
 % Inputs:
@@ -7,13 +7,13 @@
 %   ALLEEG       - ALLEEG vector of EEG structures, else a single EEG dataset.
 %
 % Outputs:
-%   STUDY        - the input STUDY set with added pre-clustering data for use by pop_clust() 
+%   STUDY        - the input STUDY set with added pre-clustering data for use by POP_CLUST 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding 
 %                  pre-clustering data (pointers to .mat files that hold cluster measure information).
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: std_precomp()
+% See also: STD_PRECOMP
 
 % Copyright (C) Arnaud Delorme, CERCO, CNRS, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% runica() - Perform Independent Component Analysis (ICA) decomposition
+% RUNICA - Perform Independent Component Analysis (ICA) decomposition
 %            of input data using the logistic infomax ICA algorithm of
 %            Bell & Sejnowski (1995) with the natural gradient feature
 %            of Amari, Cichocki & Yang, or optionally the extended-ICA
@@ -17,7 +17,7 @@
 %                  >> data = rmbase(data,frames,basevector);
 %
 % Optional keywords [argument]:
-% 'extended'  = [N] perform tanh() "extended-ICA" with sign estimation
+% 'extended'  = [N] perform TANH "extended-ICA" with sign estimation
 %               N training blocks. If N > 0, automatically estimate the
 %               number of sub-Gaussian sources. If N < 0, fix number of
 %               sub-Gaussian comps to -N [faster than N>0] (default|0 -> off)
@@ -26,8 +26,8 @@
 % 'ncomps'    = [N] number of ICA components to compute (default -> chans or 'pca' arg)
 %               using rectangular ICA decomposition
 % 'sphering'  = ['on'/'off'] flag sphering of data      (default -> 'on')
-% 'weights'   = [W] initial weight matrix               (default -> eye())
-%                            (Note: if 'sphering' 'off', default -> spher())
+% 'weights'   = [W] initial weight matrix               (default -> EYE)
+%                            (Note: if 'sphering' 'off', default -> SPHER)
 % 'lrate'     = [rate] initial ICA learning rate (<< 1) (default -> heuristic)
 % 'block'     = [N] ICA block size (<< datalength)      (default -> heuristic)
 % 'anneal'    = annealing constant (0,1] (defaults -> 0.90, or 0.98, extended)
@@ -50,8 +50,8 @@
 % sphere      = data sphering matrix (chans,chans) = spher(data)
 %               Note that unmixing_matrix = weights*sphere {if sphering off -> eye(chans)}
 % compvars    = back-projected component variances   [RO]
-% bias        = vector of final (ncomps) online bias [RO]    (default = zeros())
-% signs       = extended-ICA signs for components    [RO]    (default = ones())
+% bias        = vector of final (ncomps) online bias [RO]    (default = ZEROS)
+% signs       = extended-ICA signs for components    [RO]    (default = ONES)
 %                   [ -1 = sub-Gaussian; 1 = super-Gaussian]
 % lrates      = vector of learning rates used at each training step [RO]
 % activations = activation time courses of the output components (ncomps,frames*epochs)
@@ -60,7 +60,7 @@
 % Tzyy-Ping Jung, Sigurd Enghoff, Michael Zibulevsky, Delorme Arnaud,
 % CNL/The Salk Institute, La Jolla, 1996-
 
-% Uses: posact()
+% Uses: POSACT
 
 % Reference (please cite):
 %
@@ -110,23 +110,23 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Edit history %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  runica()  - by Scott Makeig with contributions from Tony Bell, Te-Won Lee
+%  RUNICA  - by Scott Makeig with contributions from Tony Bell, Te-Won Lee
 %              Tzyy-Ping Jung, Sigurd Enghoff, Michael Zibulevsky et al.
 %                            CNL / Salk Institute 1996-00
 %  04-30-96 built from icatest.m and ~jung/.../wtwpwica.m -sm
-%  07-28-97 new runica(), adds bias (default on), momentum (default off),
+%  07-28-97 new RUNICA, adds bias (default on), momentum (default off),
 %           extended-ICA (Lee & Sejnowski, 1997), cumulative angledelta
 %           (until lrate drops), keywords, signcount for speeding extended-ICA
-%  10-07-97 put acos() outside verbose loop; verbose 'off' wasn't stopping -sm
+%  10-07-97 put ACOS outside verbose loop; verbose 'off' wasn't stopping -sm
 %  11-11-97 adjusted help msg -sm
 %  11-30-97 return eye(chans) if sphering 'off' or 'none' (undocumented option) -sm
-%  02-27-98 use pinv() instead of inv() to rank order comps if ncomps < chans -sm
+%  02-27-98 use PINV instead of INV to rank order comps if ncomps < chans -sm
 %  04-28-98 added 'posact' and 'pca' flags  -sm
-%  07-16-98 reduced length of randperm() for kurtosis subset calc. -se & sm
+%  07-16-98 reduced length of RANDPERM for kurtosis subset calc. -se & sm
 %  07-19-98 fixed typo in weights def. above -tl & sm
 %  12-21-99 added 'specgram' option suggested by Michael Zibulevsky, UNM -sm
-%  12-22-99 fixed rand() sizing inefficiency on suggestion of Mike Spratling, UK -sm
-%  01-11-00 fixed rand() sizing bug on suggestion of Jack Foucher, Strasbourg -sm
+%  12-22-99 fixed RAND sizing inefficiency on suggestion of Mike Spratling, UK -sm
+%  01-11-00 fixed RAND sizing bug on suggestion of Jack Foucher, Strasbourg -sm
 %  12-18-00 test for existence of Sig Proc Tlbx function 'specgram'; improve
 %           'specgram' option arguments -sm
 %  01-25-02 reformated help & license -ad

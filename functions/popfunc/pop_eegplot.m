@@ -1,4 +1,4 @@
-% pop_eegplot() - Visually inspect EEG data using a scrolling display.
+% POP_EEGPLOT - Visually inspect EEG data using a scrolling display.
 %                 Perform rejection or marking for rejection of visually 
 %                 (and/or previously) selected data portions (i.e., stretches 
 %                 of continuous data or whole data epochs).
@@ -37,7 +37,7 @@
 %                    'Update Marks' to store the data portions marked for rejection 
 %                    (stretches of continuous data or whole data epochs). No 'Reject' button 
 %                    is present, so data marked for rejection cannot be actually rejected 
-%                    from this eegplot() window. 
+%                    from this EEGPLOT window. 
 %                1 = Reject marked trials. After inspecting/selecting data portions for
 %                    rejection, press button 'Reject' to reject (remove) them from the EEG 
 %                    dataset (i.e., those portions plottted on a colored background. 
@@ -46,14 +46,14 @@
 %  topcommand   -  Input deprecated.  Kept for compatibility with other function calls
 % Outputs:
 %   Modifications are applied to the current EEG dataset at the end of the
-%   eegplot() call, when the user presses the 'Update Marks' or 'Reject' button.
+%   EEGPLOT call, when the user presses the 'Update Marks' or 'Reject' button.
 %   NOTE: The modifications made are not saved into EEGLAB history. As of v4.2,
 %   events contained in rejected data portions are remembered in the EEG.urevent
 %   structure (see EEGLAB tutorial).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% rejkurt()  - calculation of kutosis of a 1D, 2D or 3D array and
+% REJKURT  - calculation of kutosis of a 1D, 2D or 3D array and
 %              rejection of outliers values of the input data array   
 %              using the discrete kutosis of the values in that dimension.
 %
@@ -32,7 +32,7 @@
 %   matlab toolbox. If the statistical toolbox is not installed, 
 %   it uses the 'kurt' function of the ICA/EEG toolbox.
 %
-% See also: kurt(), kurtosis()
+% See also: KURT, KURTOSIS
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

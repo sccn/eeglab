@@ -1,8 +1,8 @@
-% eeg_findboundaries() - return indices of boundary events
+% EEG_FINDBOUNDARIES - return indices of boundary events
 %
 % Usage:
-%   >> boundaryIndices = eeg_boundaryevent(INEEG);
-%   >> boundaryIndices = eeg_boundaryevent(INEEG.event);
+%   >> boundaryIndices = eeg_findboundaries(INEEG);
+%   >> boundaryIndices = eeg_findboundaries(INEEG.event);
 %
 % Inputs:
 %   INEEG         - input EEG dataset structure. Used to check if event
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, 2022
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2022 Arnaud Delorme
 %
@@ -49,8 +49,8 @@ function boundaries = eeg_findboundaries(EEG)
         return
     end
 
+    boundaries = [];
     if isempty(EEG)
-        boundaries = [];
         return;
     end
 
@@ -60,6 +60,10 @@ function boundaries = eeg_findboundaries(EEG)
         tmpevent = EEG;
     end
 
+    if ~isfield(tmpevent, 'type')
+        return;
+    end
+    
     % type of boundary event
     eeglab_options;
     if ischar(tmpevent(1).type)

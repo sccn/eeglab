@@ -1,4 +1,4 @@
-% std_addvarlevel() - add design variable level
+% STD_ADDVARLEVEL - add design variable level
 %
 % Usage:
 %   >> [STUDY] = std_makedesign(STUDY);   

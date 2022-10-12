@@ -1,7 +1,7 @@
-% std_readdata() - load measures for data channels or 
+% STD_READDATA - load measures for data channels or 
 %                  for all components of a specified cluster.
 %                  Called by plotting functions
-%                  std_envtopo(), std_erpplot(), std_erspplot(), ...
+%                  STD_ENVTOPO, STD_ERPPLOT, STD_ERSPPLOT, ...
 % Usage:
 %         >> [STUDY, datavals, times, setinds, cinds] = ...
 %                   std_readdata(STUDY, ALLEEG, varargin);

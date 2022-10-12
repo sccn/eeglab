@@ -1,4 +1,4 @@
-% std_limodesign() - create LIMO design matrices for categorical and 
+% STD_LIMODESIGN - create LIMO design matrices for categorical and 
 %                    continuous variables.
 %
 % Usage:
@@ -9,9 +9,9 @@
 %   factors      - [struct] list of factors (structure containing fields
 %                  'label' [string], 'value' [string or int] and 'vartype'
 %                  ('categorical' or 'continuous'). Structure returned by
-%                  function pop_listfactors().
+%                  function POP_LISTFACTORS.
 %   trialinfo    - [struct] trial information structure as returned by
-%                  std_combtrialinfo().
+%                  STD_COMBTRIALINFO.
 %
 % Optional inputs:
 %   filepath     - [string] file path. If not empty, categorical_variables.txt
@@ -31,7 +31,7 @@
 %
 % Author: Arnaud Delorme, SCCN, UCSD, 2018-
 %
-% See also: std_limo()
+% See also: STD_LIMO
 
 % Copyright (C) Arnaud Delorme
 %
@@ -94,6 +94,7 @@ end
 % -----------------------------------------
 alloptions = {};
 limodesign.categorical = {};
+alloptionsinter = {};
 if ~isempty(catVar)
     for iVar = 1:length(catVarLabel)
         indVals = find(cellfun(@(x)strcmpi(x, catVarLabel{iVar} ), { factors.label }));

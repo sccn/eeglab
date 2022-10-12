@@ -1,4 +1,4 @@
-% getchanlist() - Obtain indices of specified channel types. 
+% GETCHANLIST - Obtain indices of specified channel types. 
 %
 % Usage:
 %       >> chanlist = getchanlist(chanlocs, type)
@@ -16,7 +16,7 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2004
 %
-% See also: pop_chanedit()
+% See also: POP_CHANEDIT
 
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2004
 %

@@ -1,4 +1,4 @@
-% eegplot2trial() - convert EEGPLOT rejections into trial and electrode
+% EEGPLOT2TRIAL - convert EEGPLOT rejections into trial and electrode
 %                   rejections compatible with EEGLAB format.
 %
 % Usage:
@@ -22,7 +22,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegplot(), eeg_multieegplot(), eegplot2event(), eeglab()
+% See also: EEGPLOT, EEG_MULTIEEGPLOT, EEGPLOT2EVENT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

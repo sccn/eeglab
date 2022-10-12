@@ -1,10 +1,10 @@
-% std_mergeclust()  - Commandline function, to merge several clusters. 
+% STD_MERGECLUST  - Commandline function, to merge several clusters. 
 % Usage:    
 %                   >> [STUDY] = std_mergeclust(STUDY, ALLEEG, mrg_cls, name);   
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                       ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                       ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %   mrg_cls        - clusters indexes to merge.  
 % Optional inputs:
 %   name           - [string] a mnemonic cluster name for the merged cluster. 

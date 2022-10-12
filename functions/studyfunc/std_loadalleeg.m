@@ -1,7 +1,7 @@
-% std_loadalleeg() - constructs an ALLEEG structure, given the paths and file names 
+% STD_LOADALLEEG - constructs an ALLEEG structure, given the paths and file names 
 %                    of all the EEG datasets that will be loaded into the ALLEEG 
 %                    structure. The EEG datasets may be loaded without their EEG.data 
-%                    (see the pop_editoptions() function), so many datasets can be 
+%                    (see the POP_EDITOPTIONS function), so many datasets can be 
 %                    loaded simultaneously. The loaded EEG datasets have dataset 
 %                    information and a (filename) pointer to the data. 
 % Usage:    
@@ -21,7 +21,7 @@
 %          >> datasets = { 'visattS1', 'visattS2', 'visattS3', 'visattS4'};
 %          >> ALLEEG = std_loadalleeg(paths,datasets) ; 
 %                
-% See also: pop_loadstudy(), pop_study()
+% See also: POP_LOADSTUDY, POP_STUDY
 %
 % Authors: Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004
 

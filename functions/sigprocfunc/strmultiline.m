@@ -1,4 +1,4 @@
-% strmultiline() - format a long string as a multi-line string. 
+% STRMULTILINE - format a long string as a multi-line string. 
 %
 % Usage:
 %   >> strout = strmultiline( strin, maxlen, delimiter);
@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2005
 %
-% See also: eegfilt(), eegfiltfft(), eeglab()
+% See also: EEGFILT, EEGFILTFFT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

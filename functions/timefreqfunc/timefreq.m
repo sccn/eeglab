@@ -1,7 +1,7 @@
-% timefreq() - compute time/frequency decomposition of data trials. This 
+% TIMEFREQ - compute time/frequency decomposition of data trials. This 
 %              function is a compute-only function called by
-%              the more complete time/frequency functions newtimef()
-%              and newcrossf() which also plot timefreq() results.
+%              the more complete time/frequency functions NEWTIMEF
+%              and NEWCROSSF which also plot TIMEFREQ results.
 %
 % Usage:
 %     >> [tf, freqs, times]          = timefreq(data, srate);
@@ -30,15 +30,15 @@
 %                   wavelets (1) and FFT (0). The exact number of cycles
 %                   at the highest frequency is indicated on the command line.
 %       'wavelet' = DEPRECATED, please use 'cycles'. This function does not 
-%                   support multitaper. For multitaper, use timef().
+%                   support multitaper. For multitaper, use TIMEF.
 %       'wletmethod' = ['dftfilt2'|'dftfilt3'] Wavelet method/program to use.
 %                   {default: 'dftfilt3'}
-%                   'dftfilt'  DEPRECATED. Method used in regular timef()
+%                   'dftfilt'  DEPRECATED. Method used in regular TIMEF
 %                              program. Not available any more.
-%                   'dftfilt2' Morlet-variant or Hanning DFT (calls dftfilt2()
+%                   'dftfilt2' Morlet-variant or Hanning DFT (calls DFTFILT2
 %                              to generate wavelets).
 %                   'dftfilt3' Morlet wavelet or Hanning DFT (exact Tallon 
-%                              Baudry). Calls dftfilt3().
+%                              Baudry). Calls DFTFILT3.
 %       'ffttaper' = ['none'|'hanning'|'hamming'|'blackmanharris'] FFT tapering
 %                   function. Default is 'hanning'. Note that 'hamming' and 
 %                   'blackmanharris' require the signal processing toolbox.
@@ -119,7 +119,7 @@
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %          Fix FFT frequency innacuracy, bug 874 by WuQiang
 %
-% See also: timef(), newtimef(), crossf(), newcrossf()
+% See also: TIMEF, NEWTIMEF, CROSSF, NEWCROSSF
 
 % Note: it is not advised to use a FFT decomposition in a log scale. Output
 %       value are accurate but plotting might not be because of the non-uniform

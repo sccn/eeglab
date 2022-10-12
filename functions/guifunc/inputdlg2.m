@@ -1,5 +1,5 @@
-% inputdlg2() - inputdlg function clone with coloring and help for 
-%               eeglab().
+% INPUTDLG2 - inputdlg function clone with coloring and help for 
+%               EEGLAB.
 %
 % Usage:
 %   >> Answer = inputdlg2(Prompt,Title,LineNo,DefAns,funcname);
@@ -7,7 +7,7 @@
 % Inputs:
 %   Same as inputdlg. Using the optional additional funcname parameter 
 %   the function will create a help button. The help message will be
-%   displayed using the pophelp() function.
+%   displayed using the POPHELP function.
 %
 % Output:
 %   Same as inputdlg
@@ -19,7 +19,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 11 August 2002
 %
-% See also: supergui(), inputgui()
+% See also: SUPERGUI, INPUTGUI
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %
@@ -48,16 +48,32 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [result] = inputdlg2(Prompt,Title,LineNo,DefAns,funcname);
+function [result] = inputdlg2(Prompt,Title,LineNo,DefAns,funcname)
 
-if nargin < 4
+if nargin < 2
    help inputdlg2;
    return;
-end;	
+end
+if nargin < 3
+   LineNo = 1;
+end
+if nargin < 4
+   DefAns = {};
+end
+if nargin < 2
+   help inputdlg2;
+   return;
+end
 if nargin < 5
 	funcname = '';
 end
 	
+if ~iscell(Prompt), Prompt = { Prompt }; end
+if isempty(DefAns)
+    DefAns = cell(1,length(Prompt));
+    DefAns(:) = { '' }; 
+end
+
 if length(Prompt) ~= length(DefAns)
 	error('inputdlg2: prompt and default answer cell array must have the same size');
 end

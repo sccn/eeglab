@@ -1,8 +1,8 @@
-% std_readtopo() - returns the scalp map of a specified ICA component, assumed
+% STD_READTOPO - returns the scalp map of a specified ICA component, assumed
 %                  to have been saved in a Matlab file, [dataset_name].icatopo, 
 %                  in the same directory as the dataset file. If this file does 
-%                  not exist, use std_topo() to create it, else a pre-clustering 
-%                  function that calls it: pop_preclust() or eeg_preclust().  
+%                  not exist, use STD_TOPO to create it, else a pre-clustering 
+%                  function that calls it: POP_PRECLUST or EEG_PRECLUST.  
 % Usage:    
 %   >> [grid, y, x ] = std_readtopo(ALLEEG, setindx, component);  
 %   >> [grid, y, x ] = std_readtopo(ALLEEG, setindx, component, transform, mode);  
@@ -24,11 +24,11 @@
 % Outputs:
 %   grid      - square scalp-map color-value grid for the requested ICA component 
 %               in the specified dataset, an interpolated Cartesian grid as output 
-%               by topoplot(). 
+%               by TOPOPLOT. 
 %   y         - y-axis values for the interpolated grid
 %   x         - x-axis values of the interpolated grid
 %
-%  See also  std_topo(), std_preclust()
+%  See also  STD_TOPO, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 

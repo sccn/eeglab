@@ -1,4 +1,4 @@
-% std_readpac() - read phase-amplitude correlation
+% STD_READPAC - read phase-amplitude correlation
 %
 % Usage:
 %         >> [STUDY, clustinfo] = std_readpac(STUDY, ALLEEG);

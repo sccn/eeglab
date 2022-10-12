@@ -1,4 +1,4 @@
-% eeg_epochformat() - Convert the epoch information of a dataset from struct
+% EEG_EPOCHFORMAT - Convert the epoch information of a dataset from struct
 %                     to array or vice versa.
 %
 % Usage: >> [epochsout fields] = eeg_epochformat( epochs, 'format', fields, events );
@@ -42,7 +42,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 Feb 2002
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 

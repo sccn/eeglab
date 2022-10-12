@@ -1,4 +1,4 @@
-% plugin_status()- Given the name of a plugin(or part of it), returns 
+% PLUGIN_STATUS- Given the name of a plugin(or part of it), returns 
 %                  the status (e.g. [0]not installed, [1]installed)                                                               
 %  Inputs:
 %         pluginname   - {string} Name (or part of it) of plugin of interest

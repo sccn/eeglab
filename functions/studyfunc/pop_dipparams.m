@@ -1,4 +1,4 @@
-% pop_dipparams() - Set plotting parameters for dipoles.
+% POP_DIPPARAMS - Set plotting parameters for dipoles.
 %
 % Usage:    
 %   >> STUDY = pop_dipparams(STUDY, 'key', 'val');   
@@ -14,7 +14,7 @@
 %   'centrline' - ['on'|'off'] Plot centroid's projection line. 
 %                 This option overwrite 'projlines'. Default is 'on'.
 %
-% See also: std_dipplot()
+% See also: STD_DIPPLOT
 %
 % Authors: Arnaud Delorme
 

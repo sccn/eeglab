@@ -1,4 +1,4 @@
-% pop_rejchanspec() - reject artifacts channels in an EEG dataset using 
+% POP_REJCHANSPEC - reject artifacts channels in an EEG dataset using 
 %                  channel spectrum. The average spectrum for all selected
 %                  is computed and a threshold is applied.
 %

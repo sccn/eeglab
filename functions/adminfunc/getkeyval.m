@@ -1,4 +1,4 @@
-% getkeyval() - get variable value from a 'key', 'val' sequence string.
+% GETKEYVAL - get variable value from a 'key', 'val' sequence string.
 %
 % Usage:
 %   >> val = getkeyval( keyvalstr, varname, mode, defaultval);   
@@ -22,7 +22,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 29 July 2002
 %
-% See also: gethelpvar()
+% See also: GETHELPVAR
 
 % Copyright (C) 2002 arno@salk.edu, Arnaud Delorme, CNL / Salk Institute
 %

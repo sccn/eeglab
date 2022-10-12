@@ -1,8 +1,8 @@
-% compute_ERSP_times() - computes the widest possible ERSP/ITC time window,   
+% COMPUTE_ERSP_TIMES - computes the widest possible ERSP/ITC time window,   
 %        which depends on requested ERSP/ITC parameters such as epoch limits, 
 %        frequency range, wavelet parameters, sampling rate and frequency 
-%        resolution that are used by timef(). 
-%        This helper function is called by pop_preclust() & std_ersp(). 
+%        resolution that are used by TIMEF. 
+%        This helper function is called by POP_PRECLUST & STD_ERSP. 
 % Example:
 %    [time_range, winsize] = compute_ersp_times(cycles,  ALLEEG(seti).srate, ...
 %                              [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, freq(1),padratio);

@@ -1,4 +1,4 @@
-% hlp_argstruct2linearcell() - Linearize configation output of arg_guipanel
+% HLP_ARGSTRUCT2LINEARCELL - Linearize configation output of arg_guipanel
 %
 % Usage:
 %   >> cellval = hlp_argstruct2linearcells( cfg );

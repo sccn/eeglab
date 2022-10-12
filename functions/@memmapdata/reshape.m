@@ -1,4 +1,4 @@
-% reshape() - reshape of memory mapped underlying array
+% RESHAPE - reshape of memory mapped underlying array
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

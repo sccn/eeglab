@@ -1,4 +1,4 @@
-% compplot() - plot a data epoch and maps its scalp topography at a given time
+% COMPPLOT - plot a data epoch and maps its scalp topography at a given time
 %
 % Usage: To plot the projection of an ICA component onto the scalp
 %        >> projdata = icaproj(data,weights,compindex);
@@ -9,8 +9,8 @@
 %        >> compplot(data,plotframe,chan_file,xstart,srate,title, splinefile);
 %
 % Inputs:
-%  data        = data returned from icaproj() *ELSE* any EEG/ERP data epoch
-%  plotframe   = frame to plot topographically {default|0 -> frame of max(var())}
+%  data        = data returned from ICAPROJ *ELSE* any EEG/ERP data epoch
+%  plotframe   = frame to plot topographically {default|0 -> frame of max(VAR)}
 %  'chan_file' = chan file, see >> topoplot example {def|0 -> 'chan_file'}
 %  xstart      = start time in seconds {default|0 -> 0}
 %  srate       = data sampling rate in Hz {default|0 -> 256 Hz}
@@ -19,7 +19,7 @@
 %
 % Authors: Colin Humphries & Scott Makeig, SCCN/INC/UCSD, CNL / Salk Institute, 1997 
 %
-% See also: icaproj()
+% See also: ICAPROJ
 
 % Copyright (C) 2000 Colin Humphries & Scott Makeig, SCCN/INC/UCSD
 %
@@ -50,11 +50,11 @@
 
 % 6-07-97 changed order of args in icaproj above -sm
 % Revised for Matlab 5.0.0.4064 11/97 -ch & sm
-% 2-18-98 added undocumented headplot() option -sm
+% 2-18-98 added undocumented HEADPLOT option -sm
 % 3-09-98 added check for chan_file -sm
 % 3-18-98 use new eegplot('noui') -sm
 % 7-25-98 make sure length(hkids) >= 3 on line 122 ff -sm
-% 12-19-00 updated icaproj() call in help msg -sm
+% 12-19-00 updated ICAPROJ call in help msg -sm
 % 1-24-01 corrected input error in header -ad
 % 01-25-02 reformated help & license, added links -ad 
 

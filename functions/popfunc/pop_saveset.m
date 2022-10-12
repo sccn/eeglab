@@ -1,4 +1,4 @@
-% pop_saveset() - save one or more EEG dataset structures
+% POP_SAVESET - save one or more EEG dataset structures
 %
 % Usage:
 %   >> pop_saveset( EEG ); % use an interactive pop-up window 
@@ -30,7 +30,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_loadset(), eeglab()
+% See also: POP_LOADSET, EEGLAB
   
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

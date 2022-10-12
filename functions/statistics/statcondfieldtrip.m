@@ -1,11 +1,11 @@
-% statcondfiledtrip()  - same as statcond except that it uses the fieldtrip
+% STATCONDFILEDTRIP  - same as statcond except that it uses the fieldtrip
 %                        statistical functions. This is useful to perform
 %                        a wider variety of corrections for multiple 
 %                        comparisons for instance.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 % Inputs:
-%   data       = same as for statcond()
+%   data       = same as for STATCOND
 %
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
@@ -49,7 +49,7 @@
 %         With thanks to Robert Oostenveld for fruitful discussions 
 %         and advice on this function.
 %
-% See also: freqanalysis(), statistics_montecarlol()
+% See also: FREQANALYSIS, STATISTICS_MONTECARLOL
 
 % Copyright (C) Arnaud Delorme
 %

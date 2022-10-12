@@ -1,6 +1,6 @@
-% eegmovie() - Compile and view a Matlab movie. 
-%              Uses scripts eegplotold() and topoplot().
-%              Use seemovie() to display the movie.
+% EEGMOVIE - Compile and view a Matlab movie. 
+%              Uses scripts EEGPLOTOLD and TOPOPLOT.
+%              Use SEEMOVIE to display the movie.
 % Usage:
 % >> [Movie,Colormap] = eegmovie(data,srate,elec_locs, 'key', val, ...);
 %
@@ -44,7 +44,7 @@
 %
 % Author: Arnaud Delorme, Colin Humphries & Scott Makeig, CNL, Salk Institute, La Jolla, 3/97
 %
-% See also: seemovie(), eegplotold(), topoplot()
+% See also: SEEMOVIE, EEGPLOTOLD, TOPOPLOT
 
 % Copyright (C)  6/4/97 Colin Humphries & Scott Makeig, CNL / Salk Institute / La Jolla CA
 %
@@ -152,7 +152,7 @@ mframes = length(opt.movieframes);
 fprintf('Making a movie of %d frames\n',mframes)
 Movie    = moviein(mframes,gcf);
 
-%%%%%%%%%%%%%%%%%%%%% eegplot() of data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% EEGPLOT of data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if strcmpi(opt.timecourse, 'on')
     axeegplot = axes('Units','Normalized','Position',[.75 .05 .2 .9]);

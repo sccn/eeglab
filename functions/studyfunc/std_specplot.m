@@ -1,4 +1,4 @@
-% std_specplot() - plot STUDY component cluster spectra, either mean spectra 
+% STD_SPECPLOT - plot STUDY component cluster spectra, either mean spectra 
 %                  for all requested clusters in the same figure, with spectra 
 %                  for different conditions (if any) plotted in different colors, 
 %                  or spectra for each specified cluster in a separate figure 
@@ -6,8 +6,8 @@
 %                  the mean cluster spectrum (in bold). The spectra can be 
 %                  plotted only if component spectra have been computed and 
 %                  saved with the EEG datasets in Matlab files "[datasetname].icaspec" 
-%                  using pop_preclust() or std_preclust(). Called by pop_clustedit(). 
-%                  Calls std_readspec() and internal function std_plotcompspec()
+%                  using POP_PRECLUST or STD_PRECLUST. Called by POP_CLUSTEDIT. 
+%                  Calls STD_READSPEC and internal function STD_PLOTCOMPSPEC
 % Usage:    
 %  >> [STUDY] = std_specplot(STUDY, ALLEEG, key1, val1, key2, val2, ...);  
 %  >> [STUDY specdata specfreqs pgroup pcond pinter] = std_specplot(STUDY, ALLEEG, ...);
@@ -15,7 +15,7 @@
 % Inputs:
 %   STUDY      - STUDY structure comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - vector of EEG dataset structures for the dataset(s) in the STUDY, 
-%                typically created using load_ALLEEG().  
+%                typically created using LOAD_ALLEEG.  
 % Optional inputs for component plotting:
 %   'clusters' - [numeric vector|'all'] indices of clusters to plot.
 %                If no component indices ('comps' below) are given, the average 
@@ -42,9 +42,9 @@
 %   'plotmode'  - ['normal'|'condensed'] 'normal'  -> plot in a new figure; 
 %                 'condensed' -> plot all curves in the current figure in a 
 %                 condensed fashion {default: 'normal'}
-%   'key','val' - All optional inputs to pop_specparams() are also accepted here
+%   'key','val' - All optional inputs to POP_SPECPARAMS are also accepted here
 %                 to plot subset of time, statistics etc. The values used by default
-%                 are the ones set using pop_specparams() and stored in the
+%                 are the ones set using POP_SPECPARAMS and stored in the
 %                 STUDY structure.
 % Outputs:
 %   STUDY      - the input STUDY set structure with the plotted cluster mean spectra
@@ -53,21 +53,21 @@
 %                size of cell array is [nconds x ngroups]. Size of each element
 %                is [freqs x subjects] for data channels or [freqs x components]
 %                for component clusters. This array may be gicen as input 
-%                directly to the statcond() function or std_stats() function
+%                directly to the STATCOND function or STD_STATS function
 %                to compute statistics.
 %   specfreqs  - [array] Sprectum point frequency values.
 %   pgroup     - [array or cell] p-values group statistics. Output of the 
-%                statcond() function.
-%   pcond      - [array or cell] condition statistics. Output of the statcond() 
+%                STATCOND function.
+%   pcond      - [array or cell] condition statistics. Output of the STATCOND 
 %                function.
 %   pinter     - [array or cell] groups x conditions statistics. Output of
-%                statcond() function.
+%                STATCOND function.
 %   Example:
 %            >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'apart');
 %               % Plot component spectra for STUDY cluster 2, plus the mean cluster 
 %               % spectrum (in bold). 
 %
-%  See also  pop_clustedit(), pop_preclust() std_preclust(), pop_clustedit(), std_readspec()
+%  See also  POP_CLUSTEDIT, POP_PRECLUST STD_PRECLUST, POP_CLUSTEDIT, STD_READSPEC
 %
 % Authors: Arnaud Delorme, CERCO, August, 2006
 

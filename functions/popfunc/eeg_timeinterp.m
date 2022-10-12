@@ -1,6 +1,6 @@
-% eeg_timeinterp() - perform spline interpolation of a portion
+% EEG_TIMEINTERP - perform spline interpolation of a portion
 %                    of data based on prior and post activity. See
-%                    eeg_interp() for interpolation of bad channels.
+%                    EEG_INTERP for interpolation of bad channels.
 %
 % Usage:
 %   >> OUTEEG = eeg_timeinterp( INEEG, samples, 'key', 'val');

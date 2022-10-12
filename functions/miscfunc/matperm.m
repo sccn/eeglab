@@ -1,13 +1,13 @@
-% matperm() - transpose and sign rows of x to match y (run after matcorr() )
+% MATPERM - transpose and sign rows of x to match y (run after MATCORR )
 %
 % Usage: >> [permx indperm] = matperm(x,y,indx,indy,corr);
 %
 % Inputs:
 %   x     = first input matrix 
 %   y     = matrix with same number of columns as x
-%   indx  = column containing row indices for x (from matcorr())
-%   indy  = column containing row indices for y (from matcorr())
-%   corr  = column of correlations between indexed rows of x,y (from matcorr())
+%   indx  = column containing row indices for x (from MATCORR)
+%   indy  = column containing row indices for y (from MATCORR)
+%   corr  = column of correlations between indexed rows of x,y (from MATCORR)
 %           (used only for its signs, +/-) 
 % Outputs:
 %   permx   = the matrix x permuted and signed according to (indx, indy,corr) 

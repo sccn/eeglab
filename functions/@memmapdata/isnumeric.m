@@ -1,4 +1,4 @@
-% isnumeric() - returns 1 
+% ISNUMERIC - returns 1 
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

@@ -1,4 +1,4 @@
-% std_getdataset() - Constructs and returns EEG dataset from STUDY design.
+% STD_GETDATASET - Constructs and returns EEG dataset from STUDY design.
 %
 % Usage:    
 %     >> EEG = std_getdataset(STUDY, ALLEEG, 'key', 'val', ...);

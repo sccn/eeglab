@@ -1,4 +1,4 @@
-% eeg_interp() - interpolate data channels
+% EEG_INTERP - interpolate data channels
 %
 % Usage: EEGOUT = eeg_interp(EEG, badchans, method, t_range);
 %

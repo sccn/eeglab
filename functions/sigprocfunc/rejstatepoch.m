@@ -1,4 +1,4 @@
-% rejstatepoch() - reject bad eeg trials based a statistical measure. Can 
+% REJSTATEPOCH - reject bad eeg trials based a statistical measure. Can 
 %                 be applied either to the raw eeg data or the ICA 
 %                 component activity. This is an interactive function.
 %
@@ -48,7 +48,7 @@
 %   threshold   - percentage error threshold 
 %   thresholdg  - percentage error threshold for global rejection 
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Algorithm:
 %   normalise the measure given as input and reject trials based on 

@@ -1,4 +1,4 @@
-% eeg_eventtable() - returns all events contained in the EEG structure (and
+% EEG_EVENTTABLE - returns all events contained in the EEG structure (and
 %                    optionally exports them to a CSV file)
 %
 % Usage:

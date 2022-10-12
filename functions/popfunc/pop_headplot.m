@@ -1,4 +1,4 @@
-% pop_headplot() - plot one or more spherically-splined EEG field maps 
+% POP_HEADPLOT - plot one or more spherically-splined EEG field maps 
 %                  using a semi-realistic 3-D head model. Requires a
 %                  spline file, which is created first if not found.
 %                  This may take some time, but does not need to be 
@@ -43,7 +43,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 March 2002
 %
-% See also: headplot(), eegplot(), traditional()
+% See also: HEADPLOT, EEGPLOT, TRADITIONAL
 
 % Copyright (C) 20 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

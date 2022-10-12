@@ -1,4 +1,4 @@
-% pop_select() - given an input EEG dataset structure, output a new EEG data structure 
+% POP_SELECT - given an input EEG dataset structure, output a new EEG data structure 
 %                retaining and/or excluding specified time/latency, data point, channel, 
 %                and/or epoch range(s).
 % Usage:
@@ -32,9 +32,9 @@
 %   "Channel range" - [checkbox] EXCLUDE the indicated channels.
 %                  Command line equivalent: [if checked] 'nochannel' 
 %   "..." - [button] select channels by name.
-%   "Scroll dataset" - [button] call the eegplot() function to scroll the
+%   "Scroll dataset" - [button] call the EEGPLOT function to scroll the
 %                  channel activities in a new window for visual inspection.
-%                  Commandline equivalent: eegplot() - see its help for details.
+%                  Commandline equivalent: EEGPLOT - see its help for details.
 % Inputs:
 %   INEEG         - input EEG dataset structure
 %
@@ -75,7 +75,7 @@
 % 
 % Author: Arnaud Delorme, CNL/Salk Institute, 2001; SCCN/INC/UCSD, 2002-
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

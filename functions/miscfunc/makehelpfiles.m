@@ -1,4 +1,4 @@
-% makehelpfiles() - generate function help pages 
+% MAKEHELPFILES - generate function help pages 
 %
 % Usage: 
 %   >> makehelpfiles(list);

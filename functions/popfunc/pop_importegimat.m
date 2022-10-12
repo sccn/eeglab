@@ -1,4 +1,4 @@
-% pop_importegimat() - import EGI Matlab segmented file
+% POP_IMPORTEGIMAT - import EGI Matlab segmented file
 %
 % Usage:    
 %   >> EEG = pop_importegimat(filename, srate, latpoint0); 

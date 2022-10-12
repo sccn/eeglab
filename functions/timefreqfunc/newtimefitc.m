@@ -1,4 +1,4 @@
-% newtimefitc() - Function to compute inter-trial coherence (phase locking
+% NEWTIMEFITC - Function to compute inter-trial coherence (phase locking
 %                 factor is another name for it) from single trial spectral
 %                 estimates.
 %

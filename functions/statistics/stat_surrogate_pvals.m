@@ -5,7 +5,7 @@
 % (a) are larger than the observed sample (one-sided test)
 % (b) are larger or smaller than the observed sample (two-sided test).
 %
-% This function is based on Arnaud Delorme's statcond:compute_pvals()
+% This function is based on Arnaud Delorme's statcond:COMPUTE_PVALS
 % function from EEGLAB
 % 
 % Inputs:

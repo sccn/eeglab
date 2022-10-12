@@ -1,18 +1,18 @@
-% icavar() - project ICA component activations through the ICA weight matrices 
+% ICAVAR - project ICA component activations through the ICA weight matrices 
 %            to reconstitute the observed data using selected ICA components. 
 %            Returns time course of variance on scalp for each component.
 %
 % Usage: >> [srcvar] = icavar(data,weights,sphere,compnums);
 %
 % Inputs:
-%   data     - data matrix returned by runica()
-%   weights  - weight matrix returned by runica()
-%   sphere   - sphere matrix returned by runica() (default|0 -> eye(ncomps))
+%   data     - data matrix returned by RUNICA
+%   weights  - weight matrix returned by RUNICA
+%   sphere   - sphere matrix returned by RUNICA (default|0 -> eye(ncomps))
 %   compnums - list of component numbers (default|0 -> all)
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 11-30-1996 
 %
-% See also: runica()
+% See also: RUNICA
 
 % Copyright (C) 11-30-1996 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -47,7 +47,7 @@
 % 07-23-97  do not add back datamean to projections -sm
 % 12-23-97  added compnums -sm
 % 02-25-98  changed activations input to data -sm
-% 07-20-98  use pinv() for inverting non-square weights -sm
+% 07-20-98  use PINV for inverting non-square weights -sm
 % 01-25-02 reformated help & license, added links -ad 
 
 function [srcvar] = icavar(data,weights,sphere,compnums)

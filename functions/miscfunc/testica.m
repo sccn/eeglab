@@ -1,4 +1,4 @@
-% testica() - Test the runica() function's ability to separate synthetic sources. 
+% TESTICA - Test the RUNICA function's ability to separate synthetic sources. 
 %             Use the input variables to estimate the (best) decomposition accuracy
 %             for a given data set size.
 % Usage:
@@ -16,7 +16,7 @@
 %
 % Authors: Scott Makeig & Te-Won Lee, SCCN/INC/UCSD, La Jolla, 2-27-1997 
 %
-% See also: runica()
+% See also: RUNICA
 
 % Copyright (C) 2-27-97 Scott Makeig & Te-Won Lee, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -46,12 +46,12 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % 2-28-97 added source, shape and exppow parameters, kurtosis -sm
-% 4-03-97 shortened name to testica() -sm
-% 4-14-97 changed call to runica() to use new variable order -sm
+% 4-03-97 shortened name to TESTICA -sm
+% 4-14-97 changed call to RUNICA to use new variable order -sm
 % 4-16-97 prints max and min abs corr -sm
-% 7-10-97 changed to newrunica(), added surf() plot -sm
-% 7-30-97 altered runica() call to fit version 3.0 -sm
-% 3-02-00 replaced idit() call with call to Benjamin Blankertz' eyeLike() -sm
+% 7-10-97 changed to NEWRUNICA, added SURF plot -sm
+% 7-30-97 altered RUNICA call to fit version 3.0 -sm
+% 3-02-00 replaced IDIT call with call to Benjamin Blankertz' EYELIKE -sm
 % 3-08-00 added kurt and exppow plots, changed defaults, added plot labels -sm
 % 01-25-02 reformated help & license, added links -ad 
 
@@ -59,7 +59,7 @@ function [testresult] = testica(channels,frames,sources,exppow,shape)
 
 icadefs; % read BACKCOLOR
 
-% Default runica() parameter values:
+% Default RUNICA parameter values:
 
 block = 0;   % default block size 
 lrate = 0;   % default starting lrate 
@@ -210,7 +210,7 @@ testid = weights*sphere*forward(:,1:channels);
                               % identity matrix
 testresult = eyelike(testid); % permute output matrix rows to rememble eye()
                               % using Benjamin Blankertz eyeLike() - 3/2/00
-% testresult = idit(testid);  % permute output matrix rows to rememble eye()
+% testresult = idit(testid);  % permute output matrix rows to rememble EYE
                               % scale to make max column elements all = 1
 
 tmp = corrcoef(activations');

@@ -1,7 +1,7 @@
 echo off;
 
-% eeglab_options() - handle EEGLAB options. This script (not function)
-%                    set the various options in the eeg_options() file.
+% EEGLAB_OPTIONS - handle EEGLAB options. This script (not function)
+%                    set the various options in the EEG_OPTIONS file.
 %
 % Usage:
 %   eeglab_options;

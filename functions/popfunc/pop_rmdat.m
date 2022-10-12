@@ -1,4 +1,4 @@
-% pop_rmdat() - Remove continuous data around specific events
+% POP_RMDAT - Remove continuous data around specific events
 %
 % Usage:
 %   >> OUTEEG = pop_rmdat( EEG); % pop-up a data entry window

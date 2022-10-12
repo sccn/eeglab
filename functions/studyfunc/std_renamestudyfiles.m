@@ -1,4 +1,4 @@
-% std_renamestudyfiles() - rename files for design 1 if necessary. In design
+% STD_RENAMESTUDYFILES - rename files for design 1 if necessary. In design
 %                          1, for backward compatibility, files could have
 %                          legacy names. For consistency these files now
 %                          need to be renamed. Note that the STUDY is

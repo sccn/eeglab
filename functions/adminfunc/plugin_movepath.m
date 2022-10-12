@@ -1,4 +1,4 @@
-%plugin_movepath()- Given a path to a plugin folder, this function will
+%PLUGIN_MOVEPATH- Given a path to a plugin folder, this function will
 %                     put the plugin at the bottom of the path.
 %
 % Usage:

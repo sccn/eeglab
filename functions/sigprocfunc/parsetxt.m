@@ -1,4 +1,4 @@
-% parsetxt() - parse text input into cell array
+% PARSETXT - parse text input into cell array
 %
 % Usage: >> cellarray = parsetxt( txt, delims );
 %

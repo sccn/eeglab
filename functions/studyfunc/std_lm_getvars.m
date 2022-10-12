@@ -1,4 +1,4 @@
-% std_lm_getvars() - Retrieve categorical or continuous variables from a
+% STD_LM_GETVARS - Retrieve categorical or continuous variables from a
 %                    design in the STUDY structure to build the regressors
 %
 % Usage:

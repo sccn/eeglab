@@ -1,5 +1,5 @@
 function [C,T]=hungarian(A)
-% hungarian() - Solve the assignment problem using the Hungarian method.
+% HUNGARIAN - Solve the assignment problem using the Hungarian method.
 % 
 % Usage: >> [C,T]=hungarian(A)
 %

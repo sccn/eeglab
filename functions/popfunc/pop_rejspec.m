@@ -1,4 +1,4 @@
-% pop_rejspec() - rejection of artifact in a dataset using 
+% POP_REJSPEC - rejection of artifact in a dataset using 
 %                 thresholding of frequencies in the data.
 % Usage:
 %   >>  pop_rejspec(INEEG, typerej); % pop-up interactive window mode
@@ -52,13 +52,13 @@
 % Outputs:
 %   OUTEEG     - output dataset with updated spectrograms
 %   Indices    - index of rejected trials
-%   Note: When eegplot() is called, modifications are applied to the current 
-%   dataset at the end of the call to eegplot() (e.g., when the user presses 
+%   Note: When EEGPLOT is called, modifications are applied to the current 
+%   dataset at the end of the call to EEGPLOT (e.g., when the user presses 
 %   the 'Reject' button).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001-
 %
-% See also: eegthresh(), eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGTHRESH, EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

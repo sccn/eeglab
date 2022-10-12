@@ -1,10 +1,10 @@
-% pop_stdwarn() - check memory options and issue warning for studies.
+% POP_STDWARN - check memory options and issue warning for studies.
 %
 % Usage: >> pop_stdwarn;
 %
 % Author: Arnaud Delorme, CERCO, 2007
 %
-% See also: eeg_options()
+% See also: EEG_OPTIONS
 
 % Copyright (C) Arnaud Delorme, CERCO, 2007, arno@salk.edu
 %

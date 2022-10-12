@@ -1,5 +1,5 @@
 function outvec = gauss(frames,sds)
-% gauss() - return a smooth Gaussian window
+% GAUSS - return a smooth Gaussian window
 %
 % Usage:
 %   >> outvector = gauss(frames,sds);

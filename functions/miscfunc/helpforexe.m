@@ -1,4 +1,4 @@
-% helpforexe() - Write help files for exe version
+% HELPFOREXE - Write help files for exe version
 %
 % Usage:
 %   histtoexe( mfile, folder)
@@ -12,7 +12,7 @@
 %
 % Author: Arnaud Delorme, 2006
 %
-% See also: eeglab() 
+% See also: EEGLAB 
 
 % Copyright (C) 2006 Arnaud Delorme
 %

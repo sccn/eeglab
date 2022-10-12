@@ -1,4 +1,4 @@
-% bootstat() - accumulate surrogate data to assess significance by permutation of some 
+% BOOTSTAT - accumulate surrogate data to assess significance by permutation of some 
 %              measure of two input variables. 
 %
 %              If 'distfit','on', fits the psd with a 4th-order polynomial using the 
@@ -56,7 +56,7 @@
 %                   rsignif returns the p-values. Requires 'distfit' (see above).
 %                   This option currently implemented only for 1-D data.
 %   'correctp'    - [phat pci zerofreq] parameters for correcting for a biased probability 
-%                   distribution (requires 'distfit' above). See help of correctfit().
+%                   distribution (requires 'distfit' above). See help of CORRECTFIT.
 % Outputs: 
 %    rsignif      - significance arrays. 2 values (low high) for each point (use
 %                   'alpha' to change these limits).
@@ -64,7 +64,7 @@
 %
 % Authors: Arnaud Delorme, Bhaktivedcanta Institute, Mumbai, India, Nov 2004
 %
-% See also: timef()
+% See also: TIMEF
 
 % NOTE: There is an undocumented parameter, 'savecoher', [0|1]
 % HELP TEXT REMOVED:  (Ex: Using option 'both', coherence during baseline would be 
@@ -448,7 +448,7 @@ return;
     end
 
 % this shuffling preserve the number of -1 and 1
-% for cloumns and rows (assuming matrix size is multiple of 2
+% for columns and rows (assuming matrix size is multiple of 2
 % -----------------------------------------------------------
 function array = supershuffle(array, dim)
     if size(array, 1) == 1 || size(array,2) == 1

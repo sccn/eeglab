@@ -1,4 +1,4 @@
-% gabor2d() - generate a two-dimensional gabor matrice.
+% GABOR2D - generate a two-dimensional gabor matrice.
 %
 % Usage:
 %   >> [ matrix ] = gabor2d(rows, columns);

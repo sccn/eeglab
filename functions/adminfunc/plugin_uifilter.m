@@ -1,4 +1,4 @@
-% plugin_uifilter() - support function for plugin_menu
+% PLUGIN_UIFILTER - support function for plugin_menu
 
 % Copyright (C) 2019 Arnaud Delorme
 %

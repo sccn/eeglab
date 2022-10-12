@@ -1,4 +1,4 @@
-% eegthresh() -  reject trials with out-of-bounds channel values within a
+% EEGTHRESH -  reject trials with out-of-bounds channel values within a
 %                specified epoch time range.
 %
 % Usage:
@@ -32,7 +32,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_eegthresh(), eeglab()
+% See also: POP_EEGTHRESH, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

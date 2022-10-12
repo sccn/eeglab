@@ -1,4 +1,4 @@
-% plotsphere() - This function is used to plot a sphere and
+% PLOTSPHERE - This function is used to plot a sphere and
 %                project them onto specific surfaces. This may
 %                be used for plotting dipoles for instance.
 %
@@ -20,7 +20,7 @@
 %   'colormap' - [real] sphere colormap { default: jet }
 %
 % Output:
-%   handle    - sphere graphic handle(s). If projected sphere are ploted
+%   handle    - sphere graphic handle(s). If projected sphere are plotted
 %               handles of plotted projected spheres are also returned.
 %
 % Example:

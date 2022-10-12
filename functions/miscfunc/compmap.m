@@ -1,4 +1,4 @@
-% compmap() - Plot multiple topoplot() maps of ICA component topographies
+% COMPMAP - Plot multiple TOPOPLOT maps of ICA component topographies
 %             Click on an individual map to view separately. 
 % Usage:
 %       >> compmap (winv,'eloc_file',compnos,'title',rowscols,labels,printflag)
@@ -25,9 +25,9 @@
 %
 % Author: Colin Humphries, CNL / Salk Institute, Aug, 1996
 %
-% See also: topoplot()
+% See also: TOPOPLOT
 
-% This function calls topoplot(). and cbar().
+% This function calls TOPOPLOT. and CBAR.
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %
@@ -62,19 +62,19 @@
 %          improved help msg; added figure offsets -Scott Makeig & CH
 % 11-13-97 fixed compnos<0 bug -sm
 % 11-18-97 added test for labels=comps -sm 
-% 12-08-97 added test for colorbar_tp() -sm
+% 12-08-97 added test for COLORBAR_TP -sm
 % 12-15-97 added axis('square'), see SQUARE below -sm
 % 03-09-98 added test for eloc_file, fixed size checking for labels -sm
 % 02-09-00 added test for ' ' for srclabels(1,1) -sm
 % 02-23-00 added srclabels==' ' -> no labels -sm
-% 03-16-00 added axcopy() -sm & tpj
+% 03-16-00 added AXCOPY -sm & tpj
 % 02-25-01 added test for max(compnos) -sm
 % 05-24-01 added HEADPLOT logical flag below -sm
 % 01-25-02 reformated help & license -ad 
 
 % NOTE: 
-% There is a minor problem with the Matlab function colorbar().
-% Use the toolbox cbar() instead.
+% There is a minor problem with the Matlab function COLORBAR.
+% Use the toolbox CBAR instead.
 
 function compmap(Winv,eloc_file,compnos,titleval,pagesize,srclabels,printlabel,caxis)
 

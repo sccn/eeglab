@@ -1,4 +1,4 @@
-% std_readfile() - Read data file containing STUDY measures.
+% STD_READFILE - Read data file containing STUDY measures.
 %
 % Usage:
 %   >>  [data param range1 range2] = std_readfile(filename, 'key', val);

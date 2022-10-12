@@ -1,4 +1,4 @@
-% eeg_getdatact() - get EEG data from a specified dataset or
+% EEG_GETDATACT - get EEG data from a specified dataset or
 %                  component activity
 %
 % Usage:
@@ -29,7 +29,7 @@
 %
 % Author: Arnaud Delorme, SCCN & CERCO, CNRS, 2008-
 %
-% See also: eeg_checkset()
+% See also: EEG_CHECKSET
 
 % Copyright (C) 15 Feb 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

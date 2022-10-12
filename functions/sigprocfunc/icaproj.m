@@ -1,4 +1,4 @@
-% icaproj() - project ICA component activations through the
+% ICAPROJ - project ICA component activations through the
 %             associated weight matrices to reconstitute the
 %             observed data using only the selected ICA components.
 % Usage:
@@ -6,18 +6,18 @@
 %
 % Inputs:
 %   data        - data matrix (chans, frames*epochs)
-%   weights     - unmixing weight matrix (e.g., weights*sphere from runica())
+%   weights     - unmixing weight matrix (e.g., weights*sphere from RUNICA)
 %   compindex   - vector of ICA component indices to project
 %
 % Optional inputs:
-%   datamean    - Optional ICA row means (for each epoch) from runica() 
+%   datamean    - Optional ICA row means (for each epoch) from RUNICA 
 %                 {default 0 -> distribute data offsets among the ICA components}
 %   chansout    - Optional vector of channel indices to output {default: all}
 %
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 11-30-96 
 %
-% See also: icavar(), runica()
+% See also: ICAVAR, RUNICA
 
 % Copyright (C) 11-30-96 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -51,7 +51,7 @@
 % 2-11-97  use outer product math when only one component in compindex -sm
 % 3-11-97  remove row means instead of grand mean -sm
 % 3-19-97  used datamean argument instead of frames/baseframes -sm
-% 4-03-97  changed name to icaproj() -sm
+% 4-03-97  changed name to ICAPROJ -sm
 % 6-07-97  changed order of args to conform to runica -sm
 % 6-10-97  fixed data mean handling -sm
 % 6-23-97  trying pseudo-inverse for non-square weights -sm

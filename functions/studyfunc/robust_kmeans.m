@@ -1,6 +1,6 @@
-% robust_kmeans() - an extension of Matlab kmeans() that removes outlier 
+% ROBUST_KMEANS - an extension of Matlab KMEANS that removes outlier 
 %        components from all clusters. 
-%        This is a helper function called from pop_clust(). 
+%        This is a helper function called from POP_CLUST. 
 
 % Copyright (C) 2006 UCSD
 %

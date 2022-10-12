@@ -1,4 +1,4 @@
-% crossf() - Returns estimates and plots event-related coherence (ERCOH) 
+% CROSSF - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input data time series (X,Y). A lower panel (optionally) 
 %        shows the coherence phase difference between the processes. 
 %        In this panel, output by   > crossf(X,Y,...);
@@ -77,7 +77,7 @@
 %       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch) 
 %                    If no baseline is given (NaN), extent of bootstrap shuffling 
 %                    is the whole epoch                         {default: 0}
-%       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
+%       'rboot'    = Input bootstrap coherence limits (e.g., from CROSSF) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
 % Optional Scalp Map:
@@ -150,7 +150,7 @@
 % Authors: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
-% See also: timef()
+% See also: TIMEF
 
 % Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
 %
@@ -184,10 +184,10 @@
 % 06-29-99 fixed constant-Q freq indexing -se
 % 08-13-99 added cohangle plotting -sm
 % 08-20-99 made bootstrap more efficient -sm
-% 08-24-99 allow nan values introduced by possible eventlock() preproc. -sm
+% 08-24-99 allow nan values introduced by possible EVENTLOCK preproc. -sm
 % 03-05-2007 eventlock.m deprecated to eegalign.m. -tf
 % 03-16-00 added lead/lag interpretation to help msg - sm & eric visser
-% 03-16-00 added axcopy() feature -sm & tpj
+% 03-16-00 added AXCOPY feature -sm & tpj
 % 04-20-00 fixed Rangle sign for wavelets, added verts array -sm
 % 01-22-01 corrected help msg when nargin<2 -sm & arno delorme
 % 01-25-02 reformated help & license, added links -ad 
@@ -890,7 +890,7 @@ Tfy = permute(Tfy.tmpall, [3 2 1]);
 return; % end crossf() *************************************************
 
 %
-% crossf() plotting functions
+% CROSSF plotting functions
 % ----------------------------------------------------------------------
 function plotall(R, Rboot, Rsignif, times, freqs, mbase, dispf, g) 
 
@@ -1259,7 +1259,7 @@ end
 %   case 'phasecoher',
 %      Coher.R = Coher.R + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
 %      Coher.Rn(trial,:) = 1;
-% end % ~any(isnan())
+% end % ~any(ISNAN)
 
 function [Coher,tmptrialcoh] = cohercomp(Coher, tmpX, tmpY, trial, time);
 tmptrialcoh = tmpX.*conj(tmpY);

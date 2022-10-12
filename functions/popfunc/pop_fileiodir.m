@@ -1,4 +1,4 @@
-% pop_fileiodir() - import directory into EEGLAB using FileIO 
+% POP_FILEIODIR - import directory into EEGLAB using FileIO 
 %
 % Usage:
 %   >> OUTEEG = pop_fileiodir; % pop up window

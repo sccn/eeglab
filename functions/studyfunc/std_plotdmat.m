@@ -1,4 +1,4 @@
-% std_plodtmat() - plot design matrix and info associated with the study for
+% STD_PLODTMAT - plot design matrix and info associated with the study for
 %                  each subject. Designed to be used directly (as a callback 
 %                  function of button plot) from pop_studydesign
 % Usage:
@@ -243,7 +243,7 @@ set(handles.popup_sort,'String'   , [ ' ' allLabels ] );
 check = find(sum(isnan(tmpdmat),2));
 tmpdmat(check,:) = [];
 
-% Checking checbox to sort/unsort
+% Checking checkbox to sort/unsort
 dmatsortindex = 1:size(tmpdmat, 1);
 if get(handles.popup_sort, 'Value') ~= 1
     [tmp,dmatsortindex] = sortrows(tmpdmat,get(handles.popup_sort, 'Value')-1);

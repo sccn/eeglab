@@ -1,4 +1,4 @@
-% axcopy() - Copy a Matlab figure axis and its graphic objects to a new pop-up window 
+% AXCOPY - Copy a Matlab figure axis and its graphic objects to a new pop-up window 
 %            using the left mouse button.
 %
 % Usage:  >> axcopy

@@ -1,4 +1,4 @@
-% std_pvaf() - Compute 'percent variance accounted for' (pvaf) by specified 
+% STD_PVAF - Compute 'percent variance accounted for' (pvaf) by specified 
 %              ICA component clusters. This function computes eeg_pvaf on each
 %              of the component of the cluster and then average them. See 
 %              eeg_pvaf for more information. This function uses the
@@ -18,7 +18,7 @@
 %   'interp'     - [struct] channel location structure containing electrode
 %                  to interpolate ((this entry is ignored when plotting 
 %                  components). Default is no interpolation.
-%   Other optional inputs are the same as eeg_pvaf()
+%   Other optional inputs are the same as EEG_PVAF
 %
 % Outputs:
 %    pvaf      - (real) percent total variance accounted for by the summed 

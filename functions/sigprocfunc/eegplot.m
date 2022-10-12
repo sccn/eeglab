@@ -1,4 +1,4 @@
-% eegplot() - Scroll (horizontally and/or vertically) through multichannel data.
+% EEGPLOT - Scroll (horizontally and/or vertically) through multichannel data.
 %             Allows vertical scrolling through channels and manual marking 
 %             and unmarking of data stretches or epochs for rejection.
 % Usage: 
@@ -18,13 +18,13 @@
 %                  Clicked on a marked region to unmark it. Called from the
 %                  command line, marked data stretches or epochs are returned in 
 %                  the TMPREJ variable in the global workspace *if/when* the "Reject" 
-%                  button is pressed (see Outputs); called from pop_eegplot() or 
-%                  eeglab(), the marked data portions are removed from the current
+%                  button is pressed (see Outputs); called from POP_EEGPLOT or 
+%                  EEGLAB, the marked data portions are removed from the current
 %                  dataset, and the dataset is automatically updated.
 %     "Display > Marking color > Choose color" - [menu] Change the background marking 
 %                  color. The marking color(s) of previously marked trials are preserved. 
-%                  Called from command line, subsequent functions eegplot2event() or 
-%                  eegplot2trials() allow processing trials marked with different colors 
+%                  Called from command line, subsequent functions EEGPLOT2EVENT or 
+%                  EEGPLOT2TRIALS allow processing trials marked with different colors 
 %                  in the TMPREJ output variable. Command line equivalent: 'wincolor'.
 %     "Display > Grid > ..." - [menu] Toggle (on or off) time and/or channel axis grids 
 %                  in the activity plot. Submenus allow modifications to grid aspects.
@@ -43,8 +43,8 @@
 %                  user may scroll through channels using the slider on the left 
 %                  of the activity plot. Command line equivalent: 'dispchans'
 %     "Settings > Channel labels > ..."  - [menu] Use numbers as channel labels or load
-%                  a channel location file from disk. If called from the eeglab() menu or
-%                  pop_eegplot(), the channel labels of the dataset will be used. 
+%                  a channel location file from disk. If called from the EEGLAB menu or
+%                  POP_EEGPLOT, the channel labels of the dataset will be used. 
 %                  Command line equivalent: 'eloc_file'
 %     "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off for time and
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
@@ -118,7 +118,7 @@
 %                   clicked. The 'REJECT' button is visible only if this parameter is 
 %                   not empty. As explained in the "Output" section below, the variable 
 %                   'TMPREJ' contains the rejected windows (see the functions 
-%                   eegplot2event() and eegplot2trial()).
+%                   EEGPLOT2EVENT and EEGPLOT2TRIAL).
 %    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
 %                    for rejection, each row indicating a different period
@@ -134,9 +134,9 @@
 %    'events'     - [struct] EEGLAB event structure (EEG.event) to use to show events.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
-%    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
-%                    keeping track of several simultaneous eegplot() windows). 
-%    'children'   - [integer] Figure handle of a *dependent* eegplot() window. Scrolling
+%    'tag'        - [string] Matlab object tag to identify this EEGPLOT window (allows 
+%                    keeping track of several simultaneous EEGPLOT windows). 
+%    'children'   - [integer] Figure handle of a *dependent* EEGPLOT window. Scrolling
 %                    horizontally in the master window will produce the same scroll in 
 %                    the dependent window. Allows comparison of two concurrent datasets,
 %                    or of channel and component data from the same dataset.
@@ -157,11 +157,11 @@
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
 %                    the global workspace (only) when the REJECT button is clicked. 
 %                    The command specified in the 'command' keyword argument can use 
-%                    this variable. (See eegplot2trial() and eegplot2event()). 
+%                    this variable. (See EEGPLOT2TRIAL and EEGPLOT2EVENT). 
 %
 % Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/INC/UCSD, 1998-2001
 %
-% See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
+% See also: EEG_MULTIEEGPLOT, EEGPLOT2EVENT, EEGPLOT2TRIAL, EEGLAB
 
 % deprecated 
 %    'colmodif'   - nested cell array of window colors that may be marked/unmarked. Default

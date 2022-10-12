@@ -1,4 +1,4 @@
-% qqdiagram() - Empirical quantile-quantile diagram.
+% QQDIAGRAM - Empirical quantile-quantile diagram.
 %
 % Description:
 %               The quantiles (percentiles) of the input distribution Y are plotted (Y-axis)
@@ -30,7 +30,7 @@
 % Reference: Stahel W., Statistische Datenanalyse, Vieweg, Braunschweig/Wiesbaden, 1995
 %
 % See also: 
-%   quantile(), signalstat(), eeglab() 
+%   QUANTILE, SIGNALSTAT, EEGLAB 
 
 % Copyright (C) 2002 Luca Finelli, Salk/SCCN, La Jolla, CA
 %

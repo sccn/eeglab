@@ -1,4 +1,4 @@
-% pop_erpparams() - Set plotting and statistics parameters for cluster ERP 
+% POP_ERPPARAMS - Set plotting and statistics parameters for cluster ERP 
 %                   plotting
 % Usage:    
 %   >> STUDY = pop_erpparams(STUDY, 'key', 'val');   
@@ -26,7 +26,7 @@
 %   'averagechan' - ['rms'|'on'|'off'] average data channels when several are
 %                  selected ('on') or compute root mean square ('rms').
 %
-% See also: std_erpplot()
+% See also: STD_ERPPLOT
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 

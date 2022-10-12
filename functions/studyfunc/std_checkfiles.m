@@ -1,4 +1,4 @@
-% std_checkfiles() - Check all STUDY files consistency
+% STD_CHECKFILES - Check all STUDY files consistency
 %
 % Usage:    
 %                >> boolval = std_checkfiles(STUDY, ALLEEG);

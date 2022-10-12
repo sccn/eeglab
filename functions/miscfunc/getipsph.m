@@ -1,4 +1,4 @@
-% getipsph() - Compute "in place" (m by n) sphering or quasi-sphering matrix for an (n by t) 
+% GETIPSPH - Compute "in place" (m by n) sphering or quasi-sphering matrix for an (n by t) 
 %              input data matrix. Quasi-sphering reduces dimensionality of the data, while
 %              maintaining approximately the "original" positions of the axes. That is, 
 %              quasi-sphering "rotates back" as much as possible into the original channel 

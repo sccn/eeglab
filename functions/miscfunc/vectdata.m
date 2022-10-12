@@ -1,4 +1,4 @@
-% vectdata() - vector data interpolation with optional moving 
+% VECTDATA - vector data interpolation with optional moving 
 %              average.
 %
 % Usage:
@@ -32,7 +32,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 Oct 2002
 %
-% See also: griddata()
+% See also: GRIDDATA
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% eeg_epoch2continuous() - convert epoched dataset to continuous dataset
+% EEG_EPOCH2CONTINUOUS - convert epoched dataset to continuous dataset
 %                          with data epochs separated by boundary events.
 % Usage:
 %           >> EEGOUT = eeg_epoch2continuous(EEGIN);

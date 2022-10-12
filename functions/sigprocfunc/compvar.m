@@ -1,4 +1,4 @@
-% compvar()   - project selected components and compute the variance of
+% COMPVAR   - project selected components and compute the variance of
 %               the original data they account for.
 %
 % Usage:

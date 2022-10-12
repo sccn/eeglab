@@ -1,4 +1,4 @@
-% pop_adjustevents() - Adjust event offset of all (or specified) events
+% POP_ADJUSTEVENTS - Adjust event offset of all (or specified) events
 %
 % Usage:
 % >> EEG = pop_adjustevent(EEG); % launch a GUI
