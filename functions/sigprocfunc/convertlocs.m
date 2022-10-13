@@ -61,7 +61,7 @@ if nargin < 1
    return;
 end
 
-if ~isfield(chans, 'theta') && ~isfield(chans, 'X') && ~isfield(chans, 'radius') && ~isfield(chans, 'sph_radius')
+if ~isfield(chans, 'theta') && ~isfield(chans, 'X') && ~isfield(chans, 'radius') && ~isfield(chans, 'sph_theta_besa')
     return
 end
 
