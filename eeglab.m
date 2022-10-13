@@ -1551,7 +1551,7 @@ end
 
 % test if dataset has changed
 % ---------------------------
-if length(EEG) == 1
+if length(EEG) == 1 && length(CURRENTSET) == 1
     if ~isempty(ALLEEG) && CURRENTSET~= 0 &&  ~isequal(EEG.data, ALLEEG(CURRENTSET).data)
         if exist('isequaln','builtin') ~= 5, isequalfunc = @isequal; else  isequalfunc = @isequaln; end
         if isequalfunc(EEG.data, ALLEEG(CURRENTSET).data)
@@ -1563,6 +1563,8 @@ if length(EEG) == 1
             eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
         end
     end
+else
+    EEG = ALLEEG(CURRENTSET);
 end
 
 % print some information on the main figure
