@@ -538,6 +538,10 @@ if ~isdeployed
         %disp('  EEGLAB function will prevail and call the Fieldtrip one when appropriate');
         addpath(ptopoplot);
     end
+    pcheck  = fileparts(mywhich('finputcheck'));
+    if ~contains(pcheck, 'guifunc')
+        rmpath(fileparts(pcheck));
+    end
 end
 
 cb_importdata  = [ nocheck '[EEG LASTCOM] = pop_importdata;'   e_newset ];
