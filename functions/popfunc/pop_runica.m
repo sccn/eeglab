@@ -109,29 +109,33 @@ end
 % find available algorithms
 % -------------------------
 allalgs(1).name = 'runica';
-allalgs(1).description = 'Infomax (runica function)';
+allalgs(1).description = 'Infomax runica.m (default)';
 allalgs(1).options     = '''extended'', 1';
 allalgs(end+1).name = 'runica';
-allalgs(end).description = 'Infomax conservative (runica)';
+allalgs(end).description = 'Infomax runica.m conservative (slow)';
 allalgs(end).options     = '''extended'', 1, ''lrate'', 1e-5, ''maxstep'', 2000';
 allalgs(end).help        = 'See this <a href="https://sccn.ucsd.edu/wiki/Makoto%27s_useful_EEGLAB_code#How_to_obtain_practically_reproducible_ICA_results_.2809.2F26.2F2022_added.29">reference</a> for ICA conservative parameters ';
+allalgs(end+1).name = 'amica';
+allalgs(end).description = 'AMICA (slowest)';
+allalgs(end).options     = '''maxiter'', 2000';
+allalgs(end).help        = 'See this <a href="https://github.com/sccn/amica/wiki/AMICA">reference</a> for AMICA';
 allalgs(end+1).name = 'picard';
-allalgs(end).description = 'Infomax (picard function)';
+allalgs(end).description = 'Infomax picard.m';
 allalgs(end).options     = '''maxiter'', 500, ''mode'', ''standard''';
 allalgs(end).help        = 'See this <a href="https://github.com/pierreablin/picard">page</a> for Picard parameters ';
 allalgs(end+1).name = 'picard';
-allalgs(end).description = 'FastICA (picard function)';
+allalgs(end).description = 'FastICA picard.m (fastest)';
 allalgs(end).options     = '''maxiter'', 500';
 allalgs(end).help        = 'See this <a href="https://github.com/pierreablin/picard">page</a> for Picard parameters ';
 
-allalgs(end+1).name = 'sobi'; allalgs(end).description = 'SOBI (sobi function)';
-allalgs(end+1).name = 'acsobiro'; allalgs(end).description = 'SOBI (acsobiro function)';
-allalgs(end+1).name = 'pearson_ica'; allalgs(end).description = 'Pearson (pearson_ica function)';
-allalgs(end+1).name = 'jader';     allalgs(end).description = 'Jade (jader function)';
-allalgs(end+1).name = 'jadeop';    allalgs(end).description = 'Jade (jadeop function)';
-allalgs(end+1).name = 'jade_td_p'; allalgs(end).description = 'Jade (jade_td_p function)';
+allalgs(end+1).name = 'sobi'; allalgs(end).description = 'SOBI (sobi.m function)';
+allalgs(end+1).name = 'acsobiro'; allalgs(end).description = 'SOBI (acsobiro.m function)';
+allalgs(end+1).name = 'pearson_ica'; allalgs(end).description = 'Pearson (pearson_ica.m function)';
+allalgs(end+1).name = 'jader';     allalgs(end).description = 'Jade (jader.m function)';
+allalgs(end+1).name = 'jadeop';    allalgs(end).description = 'Jade (jadeop.m function)';
+allalgs(end+1).name = 'jade_td_p'; allalgs(end).description = 'Jade (jade_td_p.m function)';
 allalgs(end+1).name = 'MatlabshibbsR'; allalgs(end).description = 'MatlabshibbsR';
-allalgs(end+1).name = 'fastica'; allalgs(end).description = 'FastICA (fastica function)';
+allalgs(end+1).name = 'fastica'; allalgs(end).description = 'FastICA (fastica.m function)';
 allalgs(end+1).name = 'tica'; allalgs(end).description = allalgs(end).name;
 allalgs(end+1).name = 'simbec'; allalgs(end).description = allalgs(end).name;
 allalgs(end+1).name = 'unica'; allalgs(end).description = allalgs(end).name;
@@ -219,7 +223,7 @@ if nargin < 2 || selectamica
                      { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
                      { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
     geometry = { [2 1.5] [2 1.5] [1] [2 1 1 1] };
-    geomvert = [ 2 1 1 1];
+    geomvert = [ 3 1 1 1];
     if length(ALLEEG) > 1
         cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
         cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
@@ -523,22 +527,22 @@ switch lower(g.icatype)
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end
     case 'amica' 
-        tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
-        fprintf('Now Running AMICA\n');
-        if length(g.options) > 1
-            if ischar(g.options{2})
-                fprintf('See folder %s for outputs\n', g.options{2});
-            end
-        end
-        fprintf('To import results, use menu item "Tools > Run AMICA > Load AMICA components\n');
-        modres = runamica( tmpdata, [], size(tmpdata,1), size(tmpdata,2), g.options{:} );
-        if ~isempty(modres)
-            EEG.icaweights = modres.W;
-            EEG.icasphere  = modres.S;
-        else
-            return;
-        end
+         if ~exist('pop_runamica')
+             if nargin < 2
+                 errordlg2('You must install the AMICA plugin first to use AMICA');
+             else
+                error('You must install the AMICA plugin first to use AMICA');
+             end
+         end
+         EEG = pop_runamica(EEG, g.options{:});
      case 'picard' 
+         if ~exist('picard')
+             if nargin < 2
+                 errordlg2('You must install the picard plugin first to use Picard');
+             else
+                error('You must install the picard plugin first to use Picard');
+             end
+         end
          options2 = g.options;
          if pca_opt
              if g.options{pca_ind+1} < 0
