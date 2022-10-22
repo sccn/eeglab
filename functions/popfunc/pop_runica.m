@@ -285,7 +285,7 @@ end
 
 % decode input arguments
 % ----------------------
-[ g, addoptions ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
+[ g, addoptions ] = finputcheck( options, { 'icatype'        'string'  unique({ allalgs.name })   'runica'; ...
                             'dataset'        'integer' []        [1:length(ALLEEG)];
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on','off' }   'off';
