@@ -54,6 +54,7 @@
 function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
 
     com = '';
+    t_range = '';
     if nargin < 1
         help pop_interp;
         return;
