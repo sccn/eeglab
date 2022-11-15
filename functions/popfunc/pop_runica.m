@@ -116,7 +116,7 @@ allalgs(end).description = 'Infomax runica.m conservative (slow)';
 allalgs(end).options     = '''extended'', 1, ''lrate'', 1e-5, ''maxstep'', 2000';
 allalgs(end).help        = 'See this <a href="https://sccn.ucsd.edu/wiki/Makoto%27s_useful_EEGLAB_code#How_to_obtain_practically_reproducible_ICA_results_.2809.2F26.2F2022_added.29">reference</a> for ICA conservative parameters ';
 allalgs(end+1).name = 'amica';
-allalgs(end).description = 'AMICA (slowest)';
+allalgs(end).description = 'AMICA (slowest; best)';
 allalgs(end).options     = '''maxiter'', 2000';
 allalgs(end).help        = 'See this <a href="https://github.com/sccn/amica/wiki/AMICA">reference</a> for AMICA';
 allalgs(end+1).name = 'picard';
@@ -151,6 +151,7 @@ allalgs(end+1).name = 'eeA'; allalgs(end).description = allalgs(end).name;
 allalgs(end+1).name = 'tfbss'; allalgs(end).description = allalgs(end).name;
 allalgs(end+1).name = 'icaML'; allalgs(end).description = allalgs(end).name;
 allalgs(end+1).name = 'icaMS'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'binica'; allalgs(end).description = 'Executable runica';
 defaultopts = allalgs(1).options;
 
 for index = length(allalgs):-1:1
