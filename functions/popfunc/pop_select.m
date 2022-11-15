@@ -45,7 +45,7 @@
 %                   separated by semicolons. Example: "5 10; 12 EEG.xmax" will retain 
 %                   the indicated times ranges, removing data  outside the indicated ranges 
 %                   e.g. here from 0 to 5 s and from 10 s to 12 s. (See also, 'notime')
-%   'notime'      - [min max] in seconds. Epoch latency or continuous dataset time range 
+%   'rmtime'      - [min max] in seconds. Epoch latency or continuous dataset time range 
 %                   to exclude from the new dataset. For continuous data, may be 
 %                   [min1 max1; min2 max2; ...] to exclude several time ranges. For epoched 
 %                   data, the latency range must include an epoch boundary, as latency 
@@ -55,23 +55,26 @@
 %                   to retain several point ranges. (Notes: If both 'point'/'nopoint' and 
 %                   'time' | 'notime' are specified, the 'point' limit values take precedence. 
 %                   The 'point' argument was originally a point vector, now deprecated).
-%   'nopoint'     - [min max] epoch or continuous data point range to exclude in the new dataset. 
+%   'rmpoint'     - [min max] epoch or continuous data point range to exclude in the new dataset. 
 %                   For epoched data, the point range must include either the first (0) 
 %                   or the last point (EEG.pnts), as a central point range cannot be removed. 
-%   'trial'       - array of trial indices to retain in the new dataset
-%   'notrial'     - array of trial indices to exclude from the new dataset
+%   'trial'       - [integer array] array of trial indices to retain in the new dataset
+%   'rmtrial'     - [integer array] array of trial indices to exclude from the new dataset
 %   'sorttrial'   - ['on'|'off'] sort trial indices before extracting them (default: 'on').
 %   'channel'     - vector of channel indices to retain in the new 
 %                   dataset. Can also be a cell array of channel names.
-%   'nochannel'   - vector of channel indices to exclude from the new
+%   'rmchannel'   - vector of channel indices to exclude from the new
 %                   dataset. Can also be a cell array of channel names.
+%   'chantype'    - [string|cell] list of channel types to keep
+%   'rmchantype'  - [string|cell] list of channel types to remove
 %
 % Outputs:
 %   OUTEEG        - new EEG dataset structure
 %
 % Note: This function performs a conjunction (AND) of all its optional inputs.
 %       Using negative counterparts of all options, any logical combination is
-%       possible.
+%       possible. Legacy input 'notrial', 'notime', 'nochannel', 'nopoint'
+%       are still supported.
 % 
 % Author: Arnaud Delorme, CNL/Salk Institute, 2001; SCCN/INC/UCSD, 2002-
 % 
@@ -202,17 +205,20 @@ if isfield(EEG.etc,'amica') && isfield(EEG.etc.amica,'prob_added')
 end
 %--------------------------------------------------------------------
         
-if isempty(EEG.chanlocs), chanlist = [1:EEG.nbchan];
-else                      chanlocs = EEG.chanlocs; chanlist = { chanlocs.labels };
-end
 g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'notime'  'real'      []         []; ...
+                        'rmtime'  'real'      []         []; ...
                         'trial'   'integer'   []         [1:EEG.trials]; ...
                         'notrial' 'integer'   []         []; ...
+                        'rmtrial' 'integer'   []         []; ...
                         'point'   'integer'   []         []; ...
                         'nopoint' 'integer'   []         []; ...
-                        'channel'   { 'integer','cell' }  []  chanlist;
+                        'rmpoint' 'integer'   []         []; ...
+                        'channel'   { 'integer','cell' }  []   [];
                         'nochannel' { 'integer','cell' }   []  [];
+                        'rmchannel' { 'integer','cell' }   []  [];
+                        'chantype'    { 'string','cell' }    []  {};
+                        'rmchantype'  { 'string','cell' }    []  {};
                         'trialcond'   'integer'   []         []; ...
                         'notrialcond' 'integer'   []         []; ...
                         'sort'        'integer'   []         []; ...
@@ -235,64 +241,59 @@ else
     end    
     g.trial = g.trial(sort(q));
 end
-if ~isempty(g.nochannel) && ~iscell(g.nochannel)
-    g.channel(g.nochannel) = [];
-end
-% 
-% if isempty(g.channel) && ~iscell(g.nochannel) && ~iscell(chanlist)
-%     g.channel = [1:EEG.nbchan];
-% end
 
-if iscell(g.channel) && ~iscell(g.nochannel) && ~isempty(EEG.chanlocs)
-     noChannelAsCell = {};
-     for nochanId = 1:length(g.nochannel)
-         noChannelAsCell{nochanId} = EEG.chanlocs(g.nochannel(nochanId)).labels;
-     end
-     g.nochannel =   noChannelAsCell; 
-end
+% rename parameters
+% -----------------
+if ~isempty(g.rmtime)    g.notime    = g.rmtime; end
+if ~isempty(g.rmpoint)   g.nopoint   = g.rmpoint; end
+if ~isempty(g.rmtrial)   g.notrial   = g.rmtrial; end
+if ~isempty(g.rmchannel) g.nochannel = g.rmchannel; end
 
-if strcmpi(g.sorttrial, 'on')
-    if iscell(g.channel)
-         g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
-    else g.channel = sort(setdiff( g.channel, g.nochannel ));
+% decode channels
+% ---------------
+if ~isempty(g.channel) || ~isempty(g.nochannel)
+    % find channels by name
+    if ~isempty(g.channel)
+        if ~isempty(g.chantype) || ~isempty(g.rmchantype)
+            error('You can select channels by name or by type but not both');
+        end
+        inds = eeg_decodechan(EEG, g.channel);
+        chanFlag = zeros(1, EEG.nbchan);
+        chanFlag(inds) = 1;
+    else
+        chanFlag = ones(1, EEG.nbchan);
+    end
+    if ~isempty(g.nochannel)
+        if ~isempty(g.chantype) || ~isempty(g.rmchantype)
+            error('You can select channels by name or by type but not both');
+        end
+        inds = eeg_decodechan(EEG, g.nochannel);
+        chanFlag(inds) = 0;
     end
 else
-    g.channel(ismember(lower(g.channel),lower(g.nochannel))) = [];
-    % still warn about & remove duplicate channels (may be removed in the future)
-    [p,q] = unique_bc(g.channel);
-    if length(p) ~= length(g.channel)
-        disp('Warning: channel selection contained duplicated elements, which were removed.'); 
-    end    
-    g.channel = g.channel(sort(q));    
-end
-
-if ~isempty(EEG.chanlocs)
-    if strcmpi(g.sorttrial, 'on')
-        g.channel = eeg_decodechan(EEG.chanlocs, g.channel);
+    % find channels by type
+    if ~isempty(g.chantype)
+        inds = eeg_decodechan(EEG, g.chantype, 'type');
+        chanFlag = zeros(1, EEG.nbchan);
+        chanFlag(inds) = 1;
     else
-        % we have to protect the channel order against changes by eeg_decodechan
-        if iscell(g.channel)
-            % translate channel names into indices
-            [inds,names] = eeg_decodechan(EEG.chanlocs, g.channel);
-            % and sort the indices back into the original order of channel names
-            [tmp,I] = ismember_bc(lower(g.channel),lower(names)); 
-            g.channel = inds(I);
-        end
+        chanFlag = ones(1, EEG.nbchan);
+    end
+    if ~isempty(g.rmchantype)
+        inds = eeg_decodechan(EEG, g.rmchantype, 'type');
+        chanFlag(inds) = 0;
     end
 end
+g.channel = find(chanFlag);
 
+% time selection
+% --------------
 if ~isempty(g.time) && (g.time(1) < EEG.xmin*1000) && (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
 end
 if min(g.trial) < 1 || max( g.trial ) > EEG.trials  
    error('Wrong trial range');
 end
-if ~isempty(g.channel)
-    if min(double(g.channel)) < 1 || max(double(g.channel)) > EEG.nbchan  
-        error('Wrong channel range');
-    end
-end
-
 if size(g.point,2) > 2
     g.point = [g.point(1) g.point(end)];
     disp('Warning: vector format for point range is deprecated');
@@ -355,20 +356,21 @@ end
 % select trial values
 %--------------------
 if ~isempty(g.trialcond)
-   try, tt = struct( g.trialcond{:} ); catch
-      error('Trial conditions format error');
+   try 
+        tt = struct( g.trialcond{:} ); catch
+        error('Trial conditions format error');
    end
    ttfields = fieldnames (tt);
    for index = 1:length(ttfields)
         if ~isfield( EEG.epoch, ttfields{index} )
             error([ ttfields{index} 'is not a field of EEG.epoch' ]);
-        end;    
+        end    
         tmpepoch = EEG.epoch;
 	    eval( [ 'Itriallow  = find( [ tmpepoch(:).' ttfields{index} ' ] >= tt.' ttfields{index} '(1) );' ] );
 	    eval( [ 'Itrialhigh = find( [ tmpepoch(:).' ttfields{index} ' ] <= tt.' ttfields{index} '(end) );' ] );
 	    Itrialtmp = intersect_bc(Itriallow, Itrialhigh);
 	    g.trial = intersect_bc( g.trial(:)', Itrialtmp(:)');
-   end;	   
+   end
 end
 
 if isempty(g.trial)
