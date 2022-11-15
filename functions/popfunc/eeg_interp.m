@@ -76,6 +76,14 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
     
     if isstruct(bad_elec)
        
+        % remove duplicate channel labels
+        % -------------------------------
+        allLabels = { bad_elec.labels };
+        if length(unique(allLabels)) ~= length(allLabels)
+            [~,uniqueInd] = unique(allLabels);
+            bad_elec = bad_elec(uniqueInd);
+        end
+
         % add missing channels in interpolation structure
         % -----------------------------------------------
         lab1 = { bad_elec.labels };
@@ -266,15 +274,18 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
     if length(size(tmpdata))==3
         badchansdata = reshape(badchansdata,length(badchans),size(tmpdata,2),size(tmpdata,3));
     end
-    t_start = t_range(1);
-    t_end = t_range(2);
-    if t_start~=ORIEEG.xmin || t_end~=ORIEEG.xmax
-        if length(size(tmpdata))==2
-            times_2b_ignored = [1:floor(t_start*ORIEEG.srate), floor(t_end*ORIEEG.srate):floor(ORIEEG.xmax*ORIEEG.srate)];
-            badchansdata(:, times_2b_ignored) = ORIEEG.data(badchans, times_2b_ignored);
+
+    if ~isempty(t_range)
+        t_start = t_range(1);
+        t_end   = t_range(2);
+        if t_start~=ORIEEG.xmin || t_end~=ORIEEG.xmax
+            if length(size(tmpdata))==2
+                times_2b_ignored = [1:floor(t_start*ORIEEG.srate), floor(t_end*ORIEEG.srate):floor(ORIEEG.xmax*ORIEEG.srate)];
+                badchansdata(:, times_2b_ignored) = ORIEEG.data(badchans, times_2b_ignored);
+            end
         end
     end
-    
+
     tmpdata(badchans,:,:) = badchansdata;
     EEG.data = tmpdata;
     EEG.nbchan = size(EEG.data,1);
