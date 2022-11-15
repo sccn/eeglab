@@ -57,6 +57,10 @@ if nargin < 3
     field = 'labels';
 end
 
+if isstruct(chanlocs) && isfield(chanlocs, 'chanlocs')
+    chanlocs = chanlocs.chanlocs;
+end
+
 if isempty(chanlocs) && ischar(chanstr)
     chaninds = str2num(chanstr);
     chanlist = chaninds;
@@ -146,6 +150,9 @@ else
 end
 chaninds = sort(chaninds);
 if ~isempty(chanlocs)
+    if any(chaninds > length(chanlocs)) || any(chaninds <= 0)
+        error('Channel index out of range')
+    end
     chanlist = { chanlocs(chaninds).(field) };
 else
     chanlist = {};
