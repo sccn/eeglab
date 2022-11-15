@@ -108,7 +108,7 @@ if icacomp == 0
 	end
 end
 
-if nargin < 3 && EEG.trials > 1
+if nargin < 3 && EEG.trials > 1 && ~isempty(EEG.event)
 
 	% which set to save
 	% -----------------
