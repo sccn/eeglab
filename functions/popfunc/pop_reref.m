@@ -241,8 +241,10 @@ if ~isequal('off', g.interpchan )
     
     % Case no channel provided, inferring them from urchanlocs field
     if isempty(g.interpchan) 
-        if isfield(EEG.chaninfo, 'removedchans')
+        if isfield(EEG.chaninfo, 'removedchans') && isfield(EEG.chaninfo.removedchans, 'theta')
             chanlocs2interp = EEG.chaninfo.removedchans;
+            emptyChans = cellfun(@isempty, { chanlocs2interp.theta });
+            chanlocs2interp(emptyChans) = [];
             if ~isempty(chanlocs2interp)
                 interpflag = 1;
             end
