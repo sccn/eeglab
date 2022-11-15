@@ -154,8 +154,8 @@ function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
         if strcmpi(command, 'removedchans')
             global EEG;
             tmpchaninfo = EEG.chaninfo;
-            [chanlisttmp chanliststr] = pop_chansel( { tmpchaninfo.removedchans.labels } );
-            if ~isempty(chanlisttmp),
+            [chanlisttmp, chanliststr] = pop_chansel( { tmpchaninfo.removedchans.labels } );
+            if ~isempty(chanlisttmp)
                 userdata.chans   = EEG.chaninfo.removedchans(chanlisttmp);
                 userdata.chanstr = [ 'EEG.chaninfo.removedchans([' num2str(chanlisttmp) '])' ];
                 set(fig, 'userdata', userdata);
@@ -164,8 +164,8 @@ function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
         elseif strcmpi(command, 'datchan')
             global EEG;
             tmpchaninfo = EEG.chanlocs;
-            [chanlisttmp chanliststr] = pop_chansel( { tmpchaninfo.labels } );
-            if ~isempty(chanlisttmp),
+            [chanlisttmp, chanliststr] = pop_chansel( { tmpchaninfo.labels } );
+            if ~isempty(chanlisttmp)
                 userdata.chans   = chanlisttmp;
                 userdata.chanstr = [ '[' num2str(chanlisttmp) ']' ];
                 set(fig, 'userdata', userdata);
@@ -174,10 +174,10 @@ function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
         else
             global ALLEEG EEG;
             tmpanswer = inputdlg2({ 'Dataset index' }, 'Choose dataset', 1, { '' });
-            if ~isempty(tmpanswer),
+            if ~isempty(tmpanswer)
                 tmpanswernum = round(str2num(tmpanswer{1}));
-                if ~isempty(tmpanswernum),
-                    if tmpanswernum > 0 && tmpanswernum <= length(ALLEEG),
+                if ~isempty(tmpanswernum)
+                    if tmpanswernum > 0 && tmpanswernum <= length(ALLEEG)
                         TMPEEG = ALLEEG(tmpanswernum);
                         
                         tmpchans1 = TMPEEG.chanlocs;
@@ -189,8 +189,8 @@ function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
                         
                         % look at what new channels are selected
                         tmpchans2 = EEG.chanlocs;
-                        [tmpchanlist chaninds] = setdiff_bc( { tmpchans1(chanlist).labels }, { tmpchans2.labels } );
-                        if ~isempty(tmpchanlist),
+                        [tmpchanlist, chaninds] = setdiff_bc( { tmpchans1(chanlist).labels }, { tmpchans2.labels } );
+                        if ~isempty(tmpchanlist)
                             if length(chanlist) == length(TMPEEG.chanlocs)
                                 userdata.chans   = TMPEEG.chanlocs;
                                 userdata.chanstr = [ 'ALLEEG(' tmpanswer{1} ').chanlocs' ];
