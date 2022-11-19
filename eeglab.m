@@ -374,6 +374,13 @@ eeg_global;
 while ~isempty(ALLEEG) && isempty(ALLEEG(end).data)
     ALLEEG(end) = [];
 end
+if isempty(CURRENTSET)
+    if isequal(CURRENTSTUDY, 0)
+        CURRENTSET = 1;
+    else
+        CURRENTSET = 1:length(ALLEEG);
+    end
+end
 if ~isempty(ALLEEG) && max(CURRENTSET) > length(ALLEEG)
     CURRENTSET = 1;
     EEG        = eeg_retrieve(ALLEEG, CURRENTSET);
@@ -483,18 +490,18 @@ ifeegnh      =  'if ~isempty(LASTCOM) && ~isempty(EEG) && ~isempty(findstr(''=''
 e_storeall_nh   = [e_catch 'eegh(LASTCOM);' ifeeg storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist_nh       = [e_catch 'eegh(LASTCOM);'];
 
-% same as above but also save history in dataset
-% ----------------------------------------------
-e_newset        = [e_catch 'EEG = eegh(LASTCOM, EEG);' testeegtmp ifeeg   storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store         = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeegnh storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
-e_hist          = [e_catch 'EEG = eegh(LASTCOM, EEG);'];
-e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
-
 % study checking
 % --------------
 e_check_study = 'if length(EEG) > 1 && CURRENTSTUDY == 1, STUDY = std_checkset(STUDY, ALLEEG); eegh(''STUDY = std_checkset(STUDY, ALLEEG);''); end;';
 e_load_study = [e_catch 'if ~isempty(LASTCOM), STUDY = STUDYTMP; STUDY = eegh(LASTCOM, STUDY); ALLEEG = ALLEEGTMP; EEG = ALLEEG; CURRENTSET = [1:length(EEG)]; eegh(''CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = [1:length(EEG)];''); CURRENTSTUDY = 1; disp(''Done.''); end; clear ALLEEGTMP STUDYTMP; eeglab(''redraw'');'];
 e_plot_study = [e_catch 'if ~isempty(LASTCOM), STUDY = STUDYTMP; STUDY = eegh(LASTCOM, STUDY); disp(''Done.''); end; clear ALLEEGTMP STUDYTMP; eeglab(''redraw'');']; % ALLEEG not modified
+
+% same as above but also save history in dataset
+% ----------------------------------------------
+e_newset        = [e_catch 'EEG = eegh(LASTCOM, EEG);' testeegtmp ifeeg   storenewcall 'disp(''Done.''); end; eeglab(''redraw'');' e_check_study ];
+e_store         = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeegnh storecall    'disp(''Done.''); end; eeglab(''redraw'');' e_check_study];
+e_hist          = [e_catch 'EEG = eegh(LASTCOM, EEG);'];
+e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
 % build structures for plugins
 % ----------------------------
