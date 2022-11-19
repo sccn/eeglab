@@ -107,7 +107,7 @@ regions = combineregions(regions);
 
 % remove events within regions
 % ----------------------------
-if ~isempty(EEG.event)
+if ~isempty(EEG.event) && isfield(EEG.event, 'latency')
     allEventLatencies = [ EEG.event.latency];
     allEventFlag      = zeros(1,length(allEventLatencies));
     for iRegion = 1:size(regions,1)
