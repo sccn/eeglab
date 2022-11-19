@@ -126,7 +126,8 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin)
                 NEWEEG(i) = TMPEEG;
                 NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
             else
-                NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
+                NEWEEG(i) = TMPEEG;
+                NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
             end
         end
     else
