@@ -186,7 +186,7 @@ end;
 
 % call std_precomp for ERP (channels)
 % -----------------------------------
-com2 = '[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, ''channels'', ''interpolate'', ''on'', ''recompute'',''on'',''erp'',''on'');';
+com2 = '[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, ''channels'', ''interp'', ''on'', ''recompute'',''on'',''erp'',''on'');';
 [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, 'channels','interp', 'on', 'recompute','on','erp','on');
 
 % call std_erpplot to plot ERPs (channels)
