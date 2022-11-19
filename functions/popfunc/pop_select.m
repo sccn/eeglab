@@ -61,6 +61,8 @@
 %   'trial'       - [integer array] array of trial indices to retain in the new dataset
 %   'rmtrial'     - [integer array] array of trial indices to exclude from the new dataset
 %   'sorttrial'   - ['on'|'off'] sort trial indices before extracting them (default: 'on').
+%   'checkchans'  - ['on'|'off'] check that channels are present before
+%                   rejecting them (default: 'on')
 %   'channel'     - vector of channel indices to retain in the new 
 %                   dataset. Can also be a cell array of channel names.
 %   'rmchannel'   - vector of channel indices to exclude from the new
@@ -148,12 +150,12 @@ if nargin < 2
          { 'Style', 'edit', 'string', '', 'tag', 'chans' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' }, ...
          { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(EEG(1).chanlocs), 'off', 'on') ...
-           'callback' 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG.chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''chans''), ''string'',tmpval); clear tmp tmpEEG tmpchanlocs tmpval' }, ...
+           'callback' 'tmplabels = get(gcbf, ''userdata''); [~, tmpvalchan] = pop_chansel(tmplabels, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''chans''), ''string'',tmpvalchan); clear tmplabels tmpvalchan' }, ...
            { }, { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'enable', fastif(length(EEG)>1, 'off', 'on'), 'callback', ...
                           'eegplot(EEG.data, ''srate'', EEG.srate, ''winlength'', 5, ''limits'', [EEG.xmin EEG.xmax]*1000, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
-   results = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_select'');', 'title', 'Select data -- pop_select()', 'userdata', EEG );
+   chanlocs = eeg_mergelocs(EEG.chanlocs);
+   results = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_select'');', 'title', 'Select data -- pop_select()', 'userdata', { chanlocs.labels} );
    if length(results) == 0, return; end
-
    
    % decode inputs
    % -------------
@@ -174,8 +176,14 @@ if nargin < 2
    end
 
    if ~isempty( results{7} )
-       [ chaninds, chanlist ] = eeg_decodechan(EEG(1).chanlocs, results{7});
-       if isempty(chanlist), chanlist = chaninds; end
+       [ chaninds, chanlist ] = eeg_decodechan(chanlocs, results{7});
+       if isempty(chanlist)
+           if length(EEG) > 1 && length(unique([EEG.nbchan])) > 1
+               error([ 'Cannot use channel indices when processing multiple datasets' 10 ...
+                   'with some channels already removed' ])
+           end
+           chanlist = chaninds; 
+       end
        if ~results{8}, args = { args{:}, 'channel'  , chanlist };
        else            args = { args{:}, 'nochannel', chanlist }; end
    end
@@ -190,7 +198,7 @@ if length(EEG) > 1
     if nargin < 2
         [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
     else
-        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'off', 'params', args);
+        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'off', 'params',args);
     end
     return;
 end
@@ -257,7 +265,7 @@ if ~isempty(g.channel) || ~isempty(g.nochannel)
         if ~isempty(g.chantype) || ~isempty(g.rmchantype)
             error('You can select channels by name or by type but not both');
         end
-        inds = eeg_decodechan(EEG, g.channel);
+        inds = eeg_decodechan(EEG, g.channel, 'labels', true);
         chanFlag = zeros(1, EEG.nbchan);
         chanFlag(inds) = 1;
     else
@@ -267,20 +275,20 @@ if ~isempty(g.channel) || ~isempty(g.nochannel)
         if ~isempty(g.chantype) || ~isempty(g.rmchantype)
             error('You can select channels by name or by type but not both');
         end
-        inds = eeg_decodechan(EEG, g.nochannel);
+        inds = eeg_decodechan(EEG, g.nochannel, 'labels', true);
         chanFlag(inds) = 0;
     end
 else
     % find channels by type
     if ~isempty(g.chantype)
-        inds = eeg_decodechan(EEG, g.chantype, 'type');
+        inds = eeg_decodechan(EEG, g.chantype, 'type', 'labels', true);
         chanFlag = zeros(1, EEG.nbchan);
         chanFlag(inds) = 1;
     else
         chanFlag = ones(1, EEG.nbchan);
     end
     if ~isempty(g.rmchantype)
-        inds = eeg_decodechan(EEG, g.rmchantype, 'type');
+        inds = eeg_decodechan(EEG, g.rmchantype, 'type', 'labels', true);
         chanFlag(inds) = 0;
     end
 end
