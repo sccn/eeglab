@@ -85,9 +85,13 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
     regions        = regions(tmpsort,:);
     lengths = regions(:,2)-regions(:,1)+1;
     
-    if ~isempty(eventin)
+    if ~isempty(eventin) && isfield(eventin, 'latency')
          eventLatencies = [ eventin.latency ]; 
-    else eventLatencies = [];
+         if length(eventLatencies) ~= length(eventin)
+             error('Some events do not have latencies')
+         end
+    else 
+        eventLatencies = [];
     end
     newEventLatencies = eventLatencies;
     oriLen            = length(eventin);
@@ -98,8 +102,10 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
         % at the correct location in the event structure
         % ----------------------------------------------
         tmpind    = find( eventLatencies - regions(iRegion,1) > 0 );
-        newEventLatencies(tmpind) = newEventLatencies(tmpind)-lengths(iRegion);
-        
+        if ~isempty(newEventLatencies)
+            newEventLatencies(tmpind) = newEventLatencies(tmpind)-lengths(iRegion);
+        end
+
         % insert event
         % ------------
         [tmpnest, addlength ]  = findnested(eventin, eventLatencies, regions(iRegion,:));
@@ -114,8 +120,10 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
 
     % copy latencies
     % --------------
-    for iEvent = 1:oriLen
-        eventin(iEvent).latency = newEventLatencies(iEvent);
+    if ~isempty(newEventLatencies)
+        for iEvent = 1:oriLen
+            eventin(iEvent).latency = newEventLatencies(iEvent);
+        end
     end
     eventin(rmEvent) = [];
     
