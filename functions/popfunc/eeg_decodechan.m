@@ -11,6 +11,8 @@
 %               a list of channel types (see below)
 %   field     - ['labels'|'type'] channel field to match. Default is
 %               'labels'
+%   ignoremissing - [true|false] ignore channel in channel list that would
+%               be missing in the dataset.
 %
 % Outputs:
 %   chaninds  - integer array with the list of channel indices
@@ -47,7 +49,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [ chaninds, chanlist ] = eeg_decodechan(chanlocs, chanstr, field)
+function [ chaninds, chanlist ] = eeg_decodechan(chanlocs, chanstr, field, ignoremissing)
 
 if nargin < 2
     help eeg_decodechan;
@@ -56,7 +58,9 @@ end
 if nargin < 3
     field = 'labels';
 end
-
+if nargin < 4
+    ignoremissing = false;
+end
 if isstruct(chanlocs) && isfield(chanlocs, 'chanlocs')
     chanlocs = chanlocs.chanlocs;
 end
@@ -136,14 +140,16 @@ else
                 chaninds(end+1) = indmatch(tmpi);
             end
         else
-            try,
+            try
                 eval([ 'chaninds = ' chanlist{ind} ';' ]);
                 if isempty(chaninds)
                      error([ 'Channel ''' chanlist{ind} ''' not found' ]);
                 else 
                 end
             catch
-                error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                if ~ignoremissing
+                    error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                end
             end
         end
     end
