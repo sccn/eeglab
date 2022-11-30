@@ -99,7 +99,7 @@ end
 rmEvent = [];
 rejectedEvents = {};
 oriEvents = events;
-if ~isempty(events)
+if ~isempty(events) && isfield(events, 'latency')
     eventLatencies = [ events.latency ];
     oriEventLatencies = eventLatencies;
     for i=1:size(regions,1)
