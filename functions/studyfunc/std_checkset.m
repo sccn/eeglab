@@ -327,10 +327,12 @@ if ~studywasempty
     
     % make channel groups
     % -------------------
-    if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
-        STUDY = std_changroup(STUDY, ALLEEG);
+    STUDYTMP = std_changroup(STUDY, ALLEEG);
+    if length(STUDYTMP.changrp) ~= length(STUDY.changrp)
+        STUDY.changrp = STUDYTMP.changrp;
         modif = 1;
     end
+    clear STUDYTMP;
 end
 
 % check cluster array
