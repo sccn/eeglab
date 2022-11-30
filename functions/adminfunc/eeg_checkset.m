@@ -173,7 +173,7 @@
 % 03-15-02 add checking of ICA and epochs with pop_up windows -ad
 % 03-27-02 recorrected rate/point calculation -ad & sm
 
-function [EEG, res] = eeg_checkset( EEG, varargin );
+function [EEGFINAL, res] = eeg_checkset( EEG, varargin )
 msg = '';
 res = 'no';
 com = sprintf('EEG = eeg_checkset( EEG );');
@@ -183,6 +183,7 @@ if nargin < 1
     return;
 end
 
+EEGFINAL = EEG;
 if isempty(EEG), return; end
 if ~isfield(EEG, 'data'), return; end
 
@@ -197,7 +198,7 @@ if length(EEG) > 1
     
     if nargin > 1
         switch varargin{1}
-            case 'epochconsist', % test epoch consistency
+            case 'epochconsist' % test epoch consistency
                 % ----------------------
                 res = 'no';
                 datasettype = unique_bc( [ EEG.trials ] );
@@ -271,7 +272,7 @@ for inddataset = 1:length(ALLEEG)
         for index = 1:length( varargin )
             switch varargin{ index }
                 case 'data',; % already done at the top
-                case 'contdata',;
+                case 'contdata',
                     if EEG.trials > 1
                         errordlg2(strvcat('Error: function only works on continuous data'), 'Error');
                         return;
@@ -1392,17 +1393,16 @@ end
 
 try
     ALLEEGNEW = orderfields(ALLEEGNEW, fieldorder);
-    EEG = ALLEEGNEW;
 catch
     disp('Couldn''t order data set fields properly.');
 end
 
 if exist('ALLEEGNEW','var')
-    EEG = ALLEEGNEW;
+    EEGFINAL = ALLEEGNEW;
 end
 
 if ~isa(EEG, 'eegobj') && option_eegobject
-    EEG = eegobj(EEG);
+    EEGFINAL = eegobj(EEG);
 end
 
 return;
