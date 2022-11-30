@@ -1,5 +1,4 @@
-% STD_CHANINDS - look up channel indices in a STUDY. Function is obsolete.
-%                Use EEG_DECODECHAN instead.
+% STD_CHANINDS - look up channel indices in a STUDY
 %
 % Usage:
 %         >> inds = std_chaninds(STUDY,  channames);
@@ -44,4 +43,29 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 function finalinds = std_chaninds(instruct, channames)
-    finalinds = eeg_decodechan(instruct, channames);
+
+    finalinds   = [];
+    if isfield(instruct, 'chanlocs')
+        EEG = instruct;
+        tmpchanlocs = EEG.chanlocs;
+        tmpallchans = lower({ tmpchanlocs.labels });
+    elseif isfield(instruct, 'filename')
+        tmpallchans = lower({ instruct.changrp.name });
+    else
+        tmpallchans = instruct;
+    end
+    if ~iscell(channames), channames = { channames }; end
+    
+    if isempty(channames), finalinds = [1:length(tmpallchans)]; return; end
+    for c = 1:length(channames)
+        if isnumeric(channames)
+            chanind = channames(c);
+        else
+            chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
+            if isempty(chanind), warning(sprintf([ 'Channel "%s" and maybe others was not' 10 'found in pre-computed data file' ], channames{c})); end
+        end
+        if length(chanind) > 1
+            error(sprintf('Duplicate channel label %s - fix the issue and try again', channames{c}));
+        end
+        finalinds   = [ finalinds chanind ];
+    end
