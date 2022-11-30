@@ -7,7 +7,7 @@
 %
 % Usage:
 %   >> [ outparam ] = inputgui( 'key1', 'val1', 'key2', 'val2', ... );
-%   >> [ outparam userdat strhalt outstruct] = ...
+%   >> [ outparam userdat strhalt outstruct tags] = ...
 %             inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
@@ -51,6 +51,7 @@
 %                the tag of the ui and contain the ui value or string.
 %   instruct   - returns inputs provided in the same format as 'outstruct'
 %                This allow to compare in/outputs more easy.
+%   tags       - uicontrols by tags
 %
 % Note: the function also adds three buttons at the bottom of each 
 %       interactive windows: 'CANCEL', 'HELP' (if callback command
@@ -96,8 +97,12 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [result, userdat, strhalt, resstruct, instruct] = inputgui( varargin);
+function [result, userdat, strhalt, resstruct, instruct, alltags] = inputgui( varargin);
 
+result = [];
+userdat = [];
+strhalt = [];
+resstruct = [];
 if nargin < 2
    help inputgui;
    return;
@@ -189,13 +194,13 @@ if isempty(g.getresult)
         % add the three buttons (CANCEL HELP OK) at the bottom of the GUI
         % ---------------------------------------------------------------
         if ~isempty(g.geom)
-            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos );
+            [~, ~, allobj, alltags] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos);
         elseif isempty(g.geomvert)
-            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos );
+            [~, ~, allobj, alltags] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos);
         else
             if strcmpi(g.skipline, 'on'),  g.geomvert = [g.geomvert(:)' 1]; end
             if strcmpi(g.addbuttons, 'on'),g.geomvert = [g.geomvert(:)' 1]; end
-            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
+            [~, ~, allobj, alltags] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
         end
     else 
         fig = g.mode;
@@ -208,7 +213,7 @@ if isempty(g.getresult)
     % --------------------------------
     if ~isempty(g.eval), eval(g.eval); end
     instruct = outstruct(allobj); % Getting default values in the GUI. 
-    
+
     % create figure and wait for return
     % ---------------------------------
     if ischar(g.mode) && (strcmpi(g.mode, 'plot') || strcmpi(g.mode, 'return') )

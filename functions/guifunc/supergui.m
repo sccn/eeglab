@@ -100,7 +100,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [handlers, outheight, allhandlers] = supergui( varargin);
+function [handlers, outheight, allhandlers, alltags] = supergui( varargin);
 
 % handlers cell format
 % allhandlers linear format
@@ -241,6 +241,7 @@ column = 1; % count the elements
 factmultx = 0;
 factmulty = 0; %zeros(length(g.geomhoriz));
 transformTextUIList = [];
+alltags = [];
 for counter = 1:maxcount
 
 	% init
@@ -274,6 +275,8 @@ for counter = 1:maxcount
                                           [posx posy+(hf1+hf2)/2*height width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers{counter} = nan;
         else
+            currentelemstruct = struct(currentelem{:});
+
             if strcmpi(currentelem{1}, 'width')
                  curwidth = currentelem{2};
                  currentelem(1:2) = [];
@@ -309,15 +312,15 @@ for counter = 1:maxcount
                 posy = posy+height/5;
             end
                 
-            if strcmpi(currentelem{1}, 'function'),
+            if strcmpi(currentelem{1}, 'function')
                 % property grid argument
                 panel = uipanel('Title','','FontSize',12,'BackgroundColor','white','Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = arg_guipanel(panel, currentelem{:});
-            elseif strcmpi(currentelem{1}, 'panel'),
+            elseif strcmpi(currentelem{1}, 'panel')
                 % property grid argument
                 uipanel(currentelem{2:end},'FontSize',12,'Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = nan;
-            elseif strcmpi(currentelem{1}, 'uitable'),
+            elseif strcmpi(currentelem{1}, 'uitable')
                 uitable(g.fig, currentelem{2:end}, 'unit', 'normalized', 'Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = nan;
             else
@@ -393,6 +396,10 @@ for counter = 1:maxcount
                     end
                 end
                 set(allhandlers{counter}, 'string', tmptext);
+            end
+
+            if isfield(currentelemstruct, 'tag')
+                alltags.(currentelemstruct.tag) = allhandlers{counter};
             end
         end
     else 
