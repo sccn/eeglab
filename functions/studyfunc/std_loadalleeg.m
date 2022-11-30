@@ -27,7 +27,7 @@
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
+% This file is part of EEGLAB, see https://eeglab.org
 % for the documentation and details.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -105,35 +105,39 @@ function ALLEEG = std_loadalleeg(varargin)
             end
         end
         
-        [sub2, sub1] = fileparts(char(paths{dset}));
-        [sub3, sub2] = fileparts(sub2);
+        [sub2 sub1] = fileparts(char(paths{dset}));
+        [sub3 sub2] = fileparts(sub2);
         
         % priority is given to relative path of the STUDY if STUDY has moved
         if ~isempty(oldgenpath) && oldgenpath(end) == filesep
              oldgenpath(end) = [];
         end
-        if ~isequal(genpath, oldgenpath) && ~isempty(oldgenpath)
-            disp('Warning: STUDY moved since last saved, trying to load data files using relative path');
-            if  ~isempty(strfind(char(paths{dset}), oldgenpath))
-                relativePath = char(paths{dset}(length(oldgenpath)+1:end));
-                relativePath = fullfile(genpath, relativePath);
-            elseif isempty(paths{dset})
-                relativePath = '';
+        if ~isequal(genpath, oldgenpath) && ~isempty(oldgenpath) %
+            oldgenpath = strrep(oldgenpath, [ filesep filesep ], filesep);
+            if ~isequal(genpath, oldgenpath) && ~isempty(oldgenpath)
+                
+                disp('Warning: STUDY moved since last saved, trying to load data files using relative path');
+                if  ~isempty(strfind(char(paths{dset}), oldgenpath))
+                    relativePath = char(paths{dset}(length(oldgenpath)+1:end));
+                    relativePath = fullfile(genpath, relativePath);
+                else
+                    disp('Important warning: relative path cannot calculated, make sure the correct data files are loaded');
+                    relativePath = char(paths{dset});
+                end
+                
+                % fix issue when datasets are in a parent folder of the STUDY
+                if dset == 1
+                    indCommon = 1;
+                    while indCommon <= length(oldgenpath) && indCommon <= length(paths{1}) && paths{1}(indCommon) == oldgenpath(indCommon)
+                        indCommon = indCommon+1;
+                    end
+                    indCommon = indCommon-1;
+                    if indCommon > 1 && indCommon < length(genpath) % do not change path if nothing in common between the two paths
+                        genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
+                    end
+                end
             else
-                disp('Important warning: study moved, you could be loading data files from the old location, make sure the correct data files are loaded');
                 relativePath = char(paths{dset});
-            end
-            
-            % fix issue when datasets are in a parent folder of the STUDY
-            if dset == 1
-                indCommon = 1;
-                while indCommon <= length(oldgenpath) && indCommon <= length(paths{1}) && paths{1}(indCommon) == oldgenpath(indCommon)
-                    indCommon = indCommon+1;
-                end
-                indCommon = indCommon-1;
-                if indCommon > 1 && indCommon < length(genpath) % do not change path if nothing in common between the two paths
-                    genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
-                end
             end
         else
             relativePath = char(paths{dset});
