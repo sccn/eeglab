@@ -281,14 +281,14 @@ if ~isempty(g.channel) || ~isempty(g.nochannel)
 else
     % find channels by type
     if ~isempty(g.chantype)
-        inds = eeg_decodechan(EEG, g.chantype, 'type', 'labels', true);
+        inds = eeg_decodechan(EEG, g.chantype, 'labels', true);
         chanFlag = zeros(1, EEG.nbchan);
         chanFlag(inds) = 1;
     else
         chanFlag = ones(1, EEG.nbchan);
     end
     if ~isempty(g.rmchantype)
-        inds = eeg_decodechan(EEG, g.rmchantype, 'type', 'labels', true);
+        inds = eeg_decodechan(EEG, g.rmchantype, 'labels', true);
         chanFlag(inds) = 0;
     end
 end
