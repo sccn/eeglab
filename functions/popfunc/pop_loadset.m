@@ -1,4 +1,4 @@
-% POP_LOADSET - load an EEG dataset. If no arguments, pop up an input window.
+% pop_loadset() - load an EEG dataset. If no arguments, pop up an input window.
 %
 % Usage:
 %   >> EEGOUT = pop_loadset; % pop up window to input arguments
@@ -24,11 +24,11 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001; SCCN/INC/UCSD, 2002-
 %
-% See also: EEGLAB, POP_SAVESET
+% See also: eeglab(), pop_saveset()
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
+% This file is part of EEGLAB, see https://urldefense.com/v3/__http://www.eeglab.org__;!!Mih3wA!FEwHgHjctkJ2D0Ove-79slevEDsE1K2jouFDmdOkovvn1Kvf81VoHnoq4zw64tfGlyoLA0vXGN7Y$ 
 % for the documentation and details.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -137,6 +137,10 @@ else
             end
         else
             TMPVAR = load('-mat', filename);
+            if isstruct(TMPVAR) && isfield(TMPVAR, 'data') && isequal(TMPVAR.data, 'in set file')
+                fprintf(2, 'Something is wrong with the data file, trying to use the associated .fdt file\n');
+                TMPVAR.data = TMPVAR.datfile;
+            end
         end
 
         % variable not found
