@@ -25,5 +25,6 @@ option_showadvanced      = 0 ;  % If set, show advanced options (close and reope
 option_boundary99        = 0 ;  % If set, use type "-99" for boundary events when processing numerical event types (ERPLAB compatibility)
 option_showpendingplugins = 0 ;  % If set, show plugins pending approval instead of approved plugins (for developers only) 
 option_allmenus          = 0 ;  % If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.
+option_htmlingraphics    = 1 ;  % If set, allow HTML in graphics (can be slow on Windows).
 option_checkversion      = 1 ;  % If set, check for new version of EEGLAB and EEGLAB extensions at startup.
 option_cachesize         = 500 ;  % Size of cache in Mbytes for EEGLAB STUDY cache in RAM.
