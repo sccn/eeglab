@@ -293,7 +293,8 @@ elseif strcmpi(mode, 'gui') % GUI mode
     fig_arg{3} = 1;           % page
     fig_arg{4} = {};          % all commands
     fig_arg{5} = (length(STUDY.cluster) > 1); % are cluster present
-    fig_arg{6} = STUDY; % are cluster present
+    fig_arg{6} = STUDY;       % are cluster present
+    fig_arg{7} = [];          % tags
     
     % generate GUI
     % ------------
@@ -301,14 +302,22 @@ elseif strcmpi(mode, 'gui') % GUI mode
                   'uilist'  , guispec, ...
                   'helpcom' , 'pophelp(''pop_study'')', ...
                   'title'   , 'Create a new STUDY set -- pop_study()', ...
-                  'userdata', fig_arg, ...
-                  'eval'    , 'pop_study(''delclust'', gcf); pop_study(''redraw'', gcf);' };
-	[result, userdat2, strhalt, outstruct, instruct] = inputgui( 'mode', 'noclose', optiongui{:});
-    if isempty(result), return; end
-    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end
+                  'userdata', fig_arg };
+	[~, ~, ~, ~, instruct, alltags] = inputgui( 'mode', 'plot', optiongui{:}); % plot only to get tags
+
+    % save tags
+    currentfig = gcf;
+    fig_arg{7} = alltags; 
+    set(currentfig, 'userdata', fig_arg);
     
+    % update GUI and wait for user input
+    pop_study('delclust', currentfig);
+    pop_study('redraw', currentfig);
+    [result, userdat2, ~, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
+    if isempty(result), return; end
+
     while test_wrong_parameters(currentfig)
-    	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
+    	[result, userdat2, ~, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
         if isempty(result), return; end
     end
     close(currentfig);
@@ -404,6 +413,7 @@ else % internal command
     allcom      = userdat{4};
     clusterpresent = userdat{5};
     STUDY       = userdat{6};
+    tags        = userdat{7};
 
     switch  com
         case 'subject'
@@ -590,17 +600,17 @@ else % internal command
             if clusterpresent
                 if ~get(findobj(hdl, 'tag', 'delclust'), 'value')
                     for k = 1:10
-                        set(findobj('parent', hdl, 'tag',['set'   num2str(k)]), 'style', 'text');
-                        set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'enable', 'off');
-                        set(findobj('parent', hdl, 'tag',['sess'  num2str(k)]), 'enable', 'off');
-                        set(findobj('parent', hdl, 'tag',['brw'   num2str(k)]), 'enable', 'off');
+                        set(tags.(['set'   num2str(k)]), 'style', 'text');
+                        set(tags.(['comps' num2str(k)]), 'enable', 'off');
+                        set(tags.(['sess'  num2str(k)]), 'enable', 'off');
+                        set(tags.(['brw'   num2str(k)]), 'enable', 'off');
                     end
                 else
                     for k = 1:10
-                        set(findobj('parent', hdl, 'tag',['set'   num2str(k)]), 'style', 'edit');
-                        set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'enable', 'on');
-                        set(findobj('parent', hdl, 'tag',['sess'  num2str(k)]), 'enable', 'on');
-                        set(findobj('parent', hdl, 'tag',['brw'   num2str(k)]), 'enable', 'on');
+                        set(tags.(['set'   num2str(k)]), 'style', 'edit');
+                        set(tags.(['comps' num2str(k)]), 'enable', 'on');
+                        set(tags.(['sess'  num2str(k)]), 'enable', 'on');
+                        set(tags.(['brw'   num2str(k)]), 'enable', 'on');
                     end
                 end
             else 
@@ -614,30 +624,30 @@ else % internal command
             for k = 1:10
                 kk = k+(page-1)*10; % real index
                 if kk > length(datasetinfo)
-                    set(findobj('parent', hdl, 'tag',['num' num2str(k)]), 'string', int2str(kk));
-                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', '');
-                    set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['run'  num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string','');
+                    set(tags.(['num' num2str(k)]), 'string', int2str(kk));
+                    set(tags.(['set' num2str(k)]), 'string', '');
+                    set(tags.(['sub' num2str(k)]), 'string','');
+                    set(tags.(['sess' num2str(k)]), 'string','');
+                    set(tags.(['run'  num2str(k)]), 'string','');
+                    set(tags.(['cond' num2str(k)]), 'string','');
+                    set(tags.(['comps' num2str(k)]), 'string','');
+                    set(tags.(['group' num2str(k)]), 'string','');
                 else
-                    set(findobj('parent', hdl, 'tag',['num' num2str(k)]), 'string', int2str(kk));
-                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', fullfile(char(datasetinfo(kk).filepath), char(datasetinfo(kk).filename)));
-                    set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string', char(datasetinfo(kk).subject));
-                    set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string', int2str(datasetinfo(kk).session));
-                    set(findobj('parent', hdl, 'tag',['run' num2str(k)]),  'string', int2str(datasetinfo(kk).run));
-                    set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string', char(datasetinfo(kk).condition));
-                    set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string', formatbut(datasetinfo(kk).comps));
-                    set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string', char(datasetinfo(kk).group));
+                    set(tags.(['num' num2str(k)]), 'string', int2str(kk));
+                    set(tags.(['set' num2str(k)]), 'string', fullfile(char(datasetinfo(kk).filepath), char(datasetinfo(kk).filename)));
+                    set(tags.(['sub' num2str(k)]), 'string', char(datasetinfo(kk).subject));
+                    set(tags.(['sess' num2str(k)]), 'string', int2str(datasetinfo(kk).session));
+                    set(tags.(['run' num2str(k)]),  'string', int2str(datasetinfo(kk).run));
+                    set(tags.(['cond' num2str(k)]), 'string', char(datasetinfo(kk).condition));
+                    set(tags.(['comps' num2str(k)]), 'string', formatbut(datasetinfo(kk).comps));
+                    set(tags.(['group' num2str(k)]), 'string', char(datasetinfo(kk).group));
                 end
             end
             if page<10
                  pagestr =  [ ' Page ' int2str(page) ];
             else pagestr =  [ 'Page ' int2str(page) ];
             end
-            set(findobj('parent', hdl, 'tag','page'), 'string', pagestr );
+            set(tags.('page'), 'string', pagestr );
     end
 end
 
