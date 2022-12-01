@@ -141,10 +141,15 @@ else
             end
         else
             try
-                eval([ 'chaninds = ' chanlist{ind} ';' ]);
-                if isempty(chaninds)
+                eval([ 'chantmp = ' chanlist{ind} ';' ]);
+                if isempty(chantmp)
                      error([ 'Channel ''' chanlist{ind} ''' not found' ]);
                 else 
+                    if chantmp <= length(chanlist)
+                        chaninds(end+1) = chantmp;
+                    elseif ~ignoremissing 
+                        error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                    end
                 end
             catch
                 if ~ignoremissing
