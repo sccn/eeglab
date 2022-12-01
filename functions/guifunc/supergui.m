@@ -399,7 +399,9 @@ for counter = 1:maxcount
             end
 
             if isfield(currentelemstruct, 'tag')
-                alltags.(currentelemstruct.tag) = allhandlers{counter};
+                try
+                    alltags.(currentelemstruct.tag) = allhandlers{counter};
+                catch, end
             end
         end
     else 
