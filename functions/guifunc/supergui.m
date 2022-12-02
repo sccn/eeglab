@@ -275,7 +275,6 @@ for counter = 1:maxcount
                                           [posx posy+(hf1+hf2)/2*height width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers{counter} = nan;
         else
-            currentelemstruct = struct(currentelem{:});
 
             if strcmpi(currentelem{1}, 'width')
                  curwidth = currentelem{2};
@@ -398,11 +397,10 @@ for counter = 1:maxcount
                 set(allhandlers{counter}, 'string', tmptext);
             end
 
-            if isfield(currentelemstruct, 'tag')
-                try
-                    alltags.(currentelemstruct.tag) = allhandlers{counter};
-                catch, end
-            end
+            try
+                currentelemstruct = struct(currentelem{:});
+                alltags.(currentelemstruct.tag) = allhandlers{counter};
+            catch, end
         end
     else 
         allhandlers{counter} = nan;
