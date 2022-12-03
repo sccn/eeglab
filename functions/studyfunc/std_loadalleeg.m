@@ -143,8 +143,14 @@ function ALLEEG = std_loadalleeg(varargin)
             relativePath = char(paths{dset});
         end
         
-        % load data files
-        if exist(fullfile(relativePath, datasets{dset})) == 2
+        % load files with a variety of extension using file-io
+        [~,~,ext] = fileparts(datasets{dset});
+        if ~isequal(lower(ext), '.set')
+            disp('Importing binary file and resaving with a .set file extension as an EEGLAB dataset');
+            EEG = pop_fileio(fullfile(relativePath, datasets{dset}));
+            [pathTmp,fileTmp,ext] = fileparts(fullfile(relativePath, datasets{dset}));
+            EEG = pop_saveset(EEG, fullfile(pathTmp, [ fileTmp '.set' ]));
+        elseif exist(fullfile(relativePath, datasets{dset})) == 2
             EEG = pop_loadset('filename', datasets{dset}, 'filepath', relativePath, 'loadmode', 'info', 'check', 'off');
         elseif exist(fullfile(char(paths{dset}), datasets{dset})) == 2
             EEG = pop_loadset('filename', datasets{dset}, 'filepath', char(paths{dset}), 'loadmode', 'info', 'check', 'off');
