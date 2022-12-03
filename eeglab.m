@@ -8,8 +8,8 @@
 %
 % Authors: Arnaud Delorme and Scott Makeig, with substantial contributions
 %   from Colin Humphries, Sigurd Enghoff, Tzyy-Ping Jung, plus
-%   contributions 
-%   from Tony Bell, Te-Won Lee, Luca Finelli and many other contributors. 
+%   contributions from Tony Bell, Te-Won Lee, Luca Finelli and many 
+%   other contributors. 
 %
 % Description:
 %   EEGLAB is Matlab-based software for processing continuous or event-related 
