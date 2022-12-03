@@ -374,34 +374,38 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
               vararg2str({ 'icatype' g.icatype 'concatcond' 'on' 'options' g.options }) );
     return;
 else
-    disp('Concatenating datasets...');
-    EEG = ALLEEG(g.dataset(1));
-    
-    if isfield(EEG.etc, 'ic_classification')
-        EEG.etc = rmfield(EEG.etc, 'ic_classification');
-    end
-    
-    % compute total data size
-    % -----------------------
-    totalpnts = 0;
-    for i = g.dataset
-        totalpnts = totalpnts+ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
-    end
-    EEG.data = zeros(EEG.nbchan, totalpnts);
-    
     % copy data
     % ---------
-    cpnts = 1;
-    for i = g.dataset
-        tmplen = ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
-        TMP = eeg_checkset(ALLEEG(g.dataset(i)), 'loaddata');
-        EEG.data(:,cpnts:cpnts+tmplen-1) = reshape(TMP.data, size(TMP.data,1), size(TMP.data,2)*size(TMP.data,3));
-        cpnts = cpnts+tmplen;
+    if all([ALLEEG(g.dataset).trials] == 1)
+        EEG = eeg_checkset(ALLEEG, 'loaddata');
+        EEG = pop_mergeset(EEG, 1:length(EEG));
+    else
+        disp('Concatenating datasets...');
+        EEG = ALLEEG(g.dataset(1));
+        EEG.data = zeros(EEG.nbchan, totalpnts);
+        
+        cpnts = 1;
+        % compute total data size
+        % -----------------------
+        totalpnts = 0;
+        for i = g.dataset
+            totalpnts = totalpnts+ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
+        end
+            
+        for i = g.dataset
+            tmplen = ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
+            TMP = eeg_checkset(ALLEEG(g.dataset(i)), 'loaddata');
+            EEG.data(:,cpnts:cpnts+tmplen-1) = reshape(TMP.data, size(TMP.data,1), size(TMP.data,2)*size(TMP.data,3));
+            cpnts = cpnts+tmplen;
+        end
     end
     EEG.icaweights = [];
     EEG.trials = 1;
     EEG.pnts   = size(EEG.data,2);
     EEG.saved  = 'no';
+    if isfield(EEG.etc, 'ic_classification')
+        EEG.etc = rmfield(EEG.etc, 'ic_classification');
+    end
 end
 
 % Store and then remove current EEG ICA weights and sphere
