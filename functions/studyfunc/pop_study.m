@@ -29,6 +29,9 @@
 %  "STUDY set notes"     - [edit box] notes about the experiment, the datasets, the STUDY, 
 %                          or anything else to store with the rest of the STUDY information 
 %                          {default: ''}   
+%  "dataset filename/browse" - Load dataset from specified filename. It may be 
+%                          an EEGLAB dataset or any file supported by File-IO (if 
+%                          it is installed from the plugin manager).
 %  "subject"             - [edit box] subject code associated with the dataset. If no 
 %                          subject code is provided, each dataset will assumed to be from 
 %                          a different subject {default: 'S1', 'S2', ..., 'Sn'}

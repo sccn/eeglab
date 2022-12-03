@@ -43,7 +43,9 @@
 %   'condition' - [string] dataset condition. 
 %   'session '  - [integer] dataset session number.
 %   'group'     - [string] dataset group.
-%   'load'      - [filename] load dataset from specified filename 
+%   'load'      - [filename] load dataset from specified filename. Can be 
+%                 an EEGLAB dataset or any file supported by File-IO (if 
+%                 it is installed from the plugin manager).
 %   'dipselect' - [float<1] select components for clustering from all STUDY 
 %                 datasets with dipole model residual var. below this value. 
 %   'inbrain'   - ['on'|'off'] same as above. This option may also be
