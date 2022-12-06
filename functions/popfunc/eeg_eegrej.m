@@ -46,7 +46,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, com] = eeg_eegrej( EEG, regions);
+function [EEG, com] = eeg_eegrej( EEG, regions)
 
 com = '';
 if nargin < 2
@@ -107,14 +107,16 @@ regions = combineregions(regions);
 
 % remove events within regions
 % ----------------------------
-if ~isempty(EEG.event) && isfield(EEG.event, 'latency')
-    allEventLatencies = [ EEG.event.latency];
-    allEventFlag      = zeros(1,length(allEventLatencies));
-    for iRegion = 1:size(regions,1)
-        allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
-    end
-    EEG.event(allEventFlag) = [];
-end
+% if ~isempty(EEG.event) && isfield(EEG.event, 'latency')
+%     allEventLatencies = [ EEG.event.latency];
+%     allEventFlag      = zeros(1,length(allEventLatencies));
+%     for iRegion = 1:size(regions,1)
+%         allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
+%     end
+%     EEG.event(allEventFlag) = [];
+% else
+%     allEventFlag = [];
+% end
 
 % reject data
 % -----------
@@ -131,72 +133,25 @@ if length(event2) > 2 && event2(end).latency == event2(end-1).latency
     end
 end
 
-
 % add boundary events
 % -------------------
 [ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
 EEG = eeg_checkset(EEG, 'eventconsistency');
-if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency > EEG.pnts
+if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency-0.5 > EEG.pnts
     EEG.event(end) = []; % remove last event if necessary
 end
 
 % double check event latencies
 % the function that insert boundary events and recompute latency is
 % delicate so we do it twice using different methods and check
-% the results. It is longer, but accuracy is paramount.
+% the results. It takes longer, but accuracy is paramount.
 eeglab_options;
 if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
-    % assess difference between old and new event latencies
-    [ eventtmp ] = eeg_insertboundold(oldEEGevents, oldEEGpnts, regions);
-    if ~isempty(eventtmp)
-        [~,indEvent] = sort([ eventtmp.latency ]);
-        eventtmp = eventtmp(indEvent);
-    end
-    if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && eeg_isboundary(eventtmp(1))
-        eventtmp(1) = [];
-    end
-    if isfield(eventtmp, 'duration')
-        for iEvent=1:length(eventtmp)
-            if isempty(eventtmp(iEvent).duration)
-                eventtmp(iEvent).duration = 0;
-            end
-        end
-    end
-    if ~isempty(eventtmp) && eventtmp(end).latency > EEG.pnts
-        eventtmp(end) = [];
-    end
-    % add initial event to eventtmp when missing
-    if ~isempty(eventtmp) && ~isempty(EEG.event) && eeg_isboundary(eventtmp(1)) && ...
-            EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
-        if size(eventtmp,2) > 1
-            eventtmp = [ eventtmp(1) eventtmp(1:end) ];
-        else
-            eventtmp = [ eventtmp(1) eventtmp(1:end)' ];
-        end
-        eventtmp(1).type = eeg_boundarytype(eventtmp);
-        eventtmp(1).latency = 0.5;
-        eventtmp(1).duration = EEG.event(1).duration;
-    end
-        
-    differs = 0;
-    for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
-        if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
-            differs = differs+1;
-        end
-    end
-    
-    if 100*differs/length(EEG.event) > 50
-        db = dbstack;
-        if length(db) > 1 
-            fprintf(['bug 1971 warning for scripts older than 2017: see https://sccn.ucsd.edu/wiki/EEGLAB_bug1971\n' ]);
-        end
-    end
-    
     alllats = [ EEG.event.latency ];
     if ~isempty(event2)
         otherlatencies = [event2.latency];
         if ~isequal(alllats, otherlatencies)
-            warning([ 'Minor discrepancy when recomputing event latency.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]);
+            warning([ 'Discrepancy when recomputing event latencies.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]);
         end
     end
 end

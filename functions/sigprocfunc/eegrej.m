@@ -8,7 +8,7 @@
 % Inputs:
 %   indata     - input data (channels, frames). If indata is a string, 
 %                the function use the disk to perform the rejection
-%   regions    - array of regions to suppress. [beg end] x number of 
+%   regions    - array of regions to remove. [beg end] x number of 
 %                regions. 'beg' and 'end' are expressed in term of points
 %                in the input dataset. The SIZE of the array should be
 %                (2, number of regions).
@@ -176,7 +176,7 @@ for iBound = length(boundevents):-1:2
         duration(iBound) = [];
     end
 end
-if ~isempty(boundevents) && boundevents(end) > size(indata,2)
+if ~isempty(boundevents) && boundevents(end) >= size(indata,2)+1
     boundevents(end) = [];
 end
 
@@ -184,7 +184,7 @@ end
 % ----------------------
 boundType = eeg_boundarytype(events);
 for iRegion1=1:length(boundevents)
-    if boundevents(iRegion1) > 0 && boundevents(iRegion1) < size(indata,2)
+    if boundevents(iRegion1) > 0 && boundevents(iRegion1) < size(indata,2)+1
         eeglab_options;
         events(end+1).type = boundType;
         events(end).latency  = boundevents(iRegion1);
