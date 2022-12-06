@@ -250,13 +250,14 @@ if isfield(dat, 'label') && ~isempty(dat.label)
             if isfield(dat, 'label')
                 for iChan = 1:length(dat.label)
                     indLabel = strmatch(dat.label{iChan}, dat.elec.label, 'exact');
-                    EEG.chanlocs(iChan).label = dat.label{iChan};
-                    if ~isempty(indLabel) && ~isnan(dat.elec.(fieldpos)(iChan,1))
-                        EEG.chanlocs(iChan).X = dat.elec.(fieldpos)(iChan,1);
-                        EEG.chanlocs(iChan).Y = dat.elec.(fieldpos)(iChan,2);
-                        EEG.chanlocs(iChan).Z = dat.elec.(fieldpos)(iChan,3);
+                    EEG.chanlocs(iChan).labels = dat.label{iChan};
+                    if ~isempty(indLabel) && ~isnan(dat.elec.(fieldpos)(indLabel,1))
+                        EEG.chanlocs(iChan).labels = dat.elec.label{indLabel};
+                        EEG.chanlocs(iChan).X = dat.elec.(fieldpos)(indLabel,1);
+                        EEG.chanlocs(iChan).Y = dat.elec.(fieldpos)(indLabel,2);
+                        EEG.chanlocs(iChan).Z = dat.elec.(fieldpos)(indLabel,3);
                         if isfield(dat.elec, 'chantype')
-                            EEG.chanlocs(iChan).type = dat.elec.chantype{iChan};
+                            EEG.chanlocs(iChan).type = dat.chantype{iChan};
                         end
                     end
                 end
