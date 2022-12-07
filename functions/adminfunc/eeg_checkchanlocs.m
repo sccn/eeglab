@@ -65,6 +65,48 @@ if isfield(chans, 'data')
     tmpEEG = chans;
     chans = tmpEEG.chanlocs;
     chaninfo = tmpEEG.chaninfo;
+
+    % force Nosedir to +X (done here because of DIPFIT)
+    % -------------------
+    if isfield(tmpEEG.chaninfo, 'nosedir')
+        if ~strcmpi(tmpEEG.chaninfo.nosedir, '+x') && all(isfield(tmpEEG.chanlocs,{'X','Y','theta','sph_theta'}))
+            disp(['Note for expert users: Nose direction is now set from ''' upper(tmpEEG.chaninfo.nosedir)  ''' to default +X in EEG.chanlocs']);
+            [tmp chaninfo chans] = eeg_checkchanlocs(tmpEEG.chanlocs, tmpEEG.chaninfo); % Merge all channels for rotation (FID and data channels)
+            if strcmpi(chaninfo.nosedir, '+y')
+                rotate = 270/360*pi;
+            elseif strcmpi(chaninfo.nosedir, '-x')
+                rotate = 180/360*pi;
+            else
+                rotate = 90/360*pi;
+            end
+            for index = 1:length(chans)
+                rotategrad = rotate/180*pi;
+                coord = (chans(index).Y + chans(index).X*sqrt(-1))*exp(sqrt(-1)*-rotategrad);
+                chans(index).Y = real(coord);
+                chans(index).X = imag(coord);
+
+                if ~isempty(chans(index).theta)
+                    chans(index).theta     = chans(index).theta    -rotate;
+                    chans(index).sph_theta = chans(index).sph_theta+rotate;
+                    if chans(index).theta    <-180, chans(index).theta    =chans(index).theta    +360; end
+                    if chans(index).sph_theta>180 , chans(index).sph_theta=chans(index).sph_theta-360; end
+                end
+            end
+
+            if isfield(tmpEEG, 'dipfit')
+                if isfield(tmpEEG.dipfit, 'coord_transform')
+                    if isempty(tmpEEG.dipfit.coord_transform)
+                        tmpEEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
+                    end
+                    tmpEEG.dipfit.coord_transform(6) = tmpEEG.dipfit.coord_transform(6)+rotategrad;
+                end
+            end
+
+            chaninfo.originalnosedir = chaninfo.nosedir;
+            chaninfo.nosedir = '+X';
+            [tmpEEG.chanlocs, tmpEEG.chaninfo] = eeg_checkchanlocs(chans, chaninfo); % Update FID in chaninfo and remove them from chanlocs
+        end
+    end
 end
 
 if ~isfield(chans, 'datachan')
@@ -161,13 +203,15 @@ end
 if isfield(chanedit, 'labels')
     % prefix (EDF format specification)?
     if strfind([chanedit.labels], 'EEG') % `contains() is not back compatible
-        disp('Detected/removing ''EEG'' prefix from channel labels')
         chanprefixes = {'EEG-', 'EEG ', 'EEG'}; % order matters
         tmp = {chanedit.labels};
-        for idx = 1:length(chanprefixes)
-            tmp = strrep(tmp, chanprefixes(idx), '');
+        if sum(~isnan(str2double( strrep(tmp, 'EEG', '')))) < 30 % more than 30 numerical channels, i.e., EEG001, do nothing
+            disp('Detected/removing ''EEG'' prefix from channel labels')
+            for idx = 1:length(chanprefixes)
+                tmp = strrep(tmp, chanprefixes(idx), '');
+            end
+            [chanedit.labels] = deal(tmp{:});
         end
-        [chanedit.labels] = deal(tmp{:});
     end
         
     % duplicate labels?

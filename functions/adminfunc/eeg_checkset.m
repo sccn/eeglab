@@ -1093,47 +1093,6 @@ for inddataset = 1:length(ALLEEG)
             end
         end
         
-        % force Nosedir to +X (done here because of DIPFIT)
-        % -------------------
-        if isfield(EEG.chaninfo, 'nosedir')
-            if ~strcmpi(EEG.chaninfo.nosedir, '+x') && all(isfield(EEG.chanlocs,{'X','Y','theta','sph_theta'})) 
-                disp(['Note for expert users: Nose direction is now set from ''' upper(EEG.chaninfo.nosedir)  ''' to default +X in EEG.chanlocs']);
-                [tmp chaninfo chans] = eeg_checkchanlocs(EEG.chanlocs, EEG.chaninfo); % Merge all channels for rotation (FID and data channels)
-                if strcmpi(chaninfo.nosedir, '+y')
-                    rotate = 270;
-                elseif strcmpi(chaninfo.nosedir, '-x')
-                    rotate = 180;
-                else
-                    rotate = 90;
-                end
-                for index = 1:length(chans)
-                    rotategrad = rotate/180*pi;
-                    coord = (chans(index).Y + chans(index).X*sqrt(-1))*exp(sqrt(-1)*-rotategrad);
-                    chans(index).Y = real(coord);
-                    chans(index).X = imag(coord);
-
-                    if ~isempty(chans(index).theta)
-                        chans(index).theta     = chans(index).theta    -rotate;
-                        chans(index).sph_theta = chans(index).sph_theta+rotate;
-                        if chans(index).theta    <-180, chans(index).theta    =chans(index).theta    +360; end
-                        if chans(index).sph_theta>180 , chans(index).sph_theta=chans(index).sph_theta-360; end
-                    end
-                end
-                
-                if isfield(EEG, 'dipfit')
-                    if isfield(EEG.dipfit, 'coord_transform')
-                        if isempty(EEG.dipfit.coord_transform)
-                            EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
-                        end
-                        EEG.dipfit.coord_transform(6) = EEG.dipfit.coord_transform(6)+rotategrad;
-                    end
-                end
-                
-                chaninfo.nosedir = '+X';
-                [EEG.chanlocs EEG.chaninfo] = eeg_checkchanlocs(chans, chaninfo); % Update FID in chaninfo and remove them from chanlocs
-            end;            
-        end
-        
         % general checking of channels
         % ----------------------------
         EEG = eeg_checkchanlocs(EEG);
