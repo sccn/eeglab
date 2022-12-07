@@ -58,7 +58,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [rej, rejE] = rejtrend( signal, pointrange, maxslope, minstd, step);
+function [rej, rejE] = rejtrend( signal, pointrange, maxslope, minstd, step)
 
 % This is to avoid divide-by-zero and machine errors.
 SST_TOLERANCE = 1000*pointrange*1.1921e-07;
@@ -66,11 +66,11 @@ SST_TOLERANCE = 1000*pointrange*1.1921e-07;
 if nargin < 3
 	help rejtrend
 	return;
-end;	
+end
 if nargin < 5
 	step = pointrange;
-end;	
-[chans pnts trials] = size(signal);
+end	
+[chans, pnts, trials] = size(signal);
 rejE   = zeros( chans, trials);
 
 x = linspace( 1/pointrange, 1, pointrange );

@@ -42,4 +42,8 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 function finalinds = eeg_chaninds(EEG, channames, errorifnotfound)
-    finalinds = eeg_decodechan(EEG.chanlocs, channames);
+    if isfield(EEG, 'labels')
+        finalinds = eeg_decodechan(EEG, channames);
+    else
+        finalinds = eeg_decodechan(EEG.chanlocs, channames);
+    end

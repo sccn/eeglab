@@ -78,22 +78,22 @@
 % 02-16-02 added axcopy -ad & sm
 % 03-18-02 added title -ad & sm
 
-function com = pop_topoplot( EEG, typeplot, arg2, topotitle, rowcols, varargin);
+function com = pop_topoplot( EEG, typeplot, arg2, topotitle, rowcols, varargin)
 
 com = '';
 if nargin < 1
    help pop_topoplot;
    return;
-end;   
+end
 if nargin < 2   
    typeplot = 1;
 end
 if typeplot == 0 && isempty(EEG.icasphere)
    disp('Error: no ICA data for this set, first run ICA'); return;
-end;   
+end 
 if isempty(EEG.chanlocs) && ~isfield(EEG, 'chanmatrix')
    disp('Error: cannot plot topography without channel location file'); return;
-end;   
+end
 
 if nargin < 3
 	% which set to save
@@ -107,8 +107,8 @@ if nargin < 3
 		txtwhat2plot1 = 'Component numbers';
 		txtwhat2plot2 = '(negate index to invert component polarity; NaN -> empty subplot; Ex: -1 NaN 3)';
         editwhat2plot = ['1:' int2str(size(EEG.icaweights,1))];
- 	end;	
-        if EEG.nbchan > 64, 
+    end
+        if EEG.nbchan > 64
             elecdef = ['''electrodes'', ''off''']; 
         else, 
             elecdef = ['''electrodes'', ''on''']; 
@@ -161,12 +161,12 @@ if nargin < 3
         plotdip     = result{4};
         try, options      = eval( [ '{ ' result{5} ' }' ]);
         catch, error('Invalid scalp map options'); end
-    end;        
-    if length(arg2) == 1, 
+    end       
+    if length(arg2) == 1
       figure('paperpositionmode', 'auto'); curfig=gcf; 
       try, icadefs; 
          set(curfig, 'color', BACKCOLOR); 
-      catch, end; 
+      catch, end
     end
 else
     if ~isempty(varargin) && isnumeric(varargin{1})
@@ -217,11 +217,11 @@ end
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')
     topotitle = '';
-end;    
+end
 if ~exist('rowcols') || isempty(rowcols) || rowcols(1) == 0
     rowcols(2) = ceil(sqrt(nbgraph));
     rowcols(1) = ceil(nbgraph/rowcols(2));
-end;    
+end
 
 SIZEBOX = 150;
 
@@ -244,9 +244,17 @@ if typeplot
     pos = round( (arg2/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
     nanpos = find(isnan(pos));
     pos(nanpos) = 1;
-    nonEmptyChans = find(~cellfun(@isempty, { EEG.chanlocs.X}));
+    if ~isempty(EEG.chanlocs) && isfield(EEG.chanlocs, 'X')
+        nonEmptyChans = find(~cellfun(@isempty, { EEG.chanlocs.X}));
+    else
+        nonEmptyChans = [];
+    end
+    if isempty(nonEmptyChans)
+        nonEmptyChans = 1:EEG.nbchan;
+    end
     SIGTMPAVG = mean(SIGTMP(nonEmptyChans,pos,:),3);
     SIGTMPAVG(nonEmptyChans, nanpos) = NaN;
+
     if isempty(maplimits)
         maxlim = max(SIGTMPAVG(:));
         minlim = min(SIGTMPAVG(:));
@@ -282,7 +290,7 @@ for index = 1:size(arg2(:),1)
 			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
 			set(curfig,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end
-        end;    
+        end
 		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1,'Parent',curfig);
         set(curax, 'visible', 'off')
     end
@@ -422,11 +430,11 @@ if colorbar_switch
     end
 end
 
-if nbgraph> 1, 
+if nbgraph> 1
    figure(curfig); a = textsc(0.5, 0.05, topotitle); 
    set(a, 'fontweight', 'bold'); 
 end
-if nbgraph== 1, 
+if nbgraph== 1
    com = 'figure;'; 
 end
 set(allobj(1:countobj-1), 'visible', 'on');
