@@ -73,11 +73,11 @@ if isfield(chans, 'data')
             disp(['Note for expert users: Nose direction is now set from ''' upper(tmpEEG.chaninfo.nosedir)  ''' to default +X in EEG.chanlocs']);
             [tmp chaninfo chans] = eeg_checkchanlocs(tmpEEG.chanlocs, tmpEEG.chaninfo); % Merge all channels for rotation (FID and data channels)
             if strcmpi(chaninfo.nosedir, '+y')
-                rotate = 270/360*pi;
+                rotate = 270;
             elseif strcmpi(chaninfo.nosedir, '-x')
-                rotate = 180/360*pi;
+                rotate = 180;
             else
-                rotate = 90/360*pi;
+                rotate = 90;
             end
             for index = 1:length(chans)
                 rotategrad = rotate/180*pi;
@@ -104,7 +104,6 @@ if isfield(chans, 'data')
 
             chaninfo.originalnosedir = chaninfo.nosedir;
             chaninfo.nosedir = '+X';
-            [tmpEEG.chanlocs, tmpEEG.chaninfo] = eeg_checkchanlocs(chans, chaninfo); % Update FID in chaninfo and remove them from chanlocs
         end
     end
 end
