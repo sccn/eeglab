@@ -297,55 +297,63 @@ for index = 1:size(arg2(:),1)
 
 	% add dipole location if present
     % ------------------------------
+        
     dipoleplotted = 0;
     if plotdip && typeplot == 0
         if isfield(EEG, 'dipfit') && isfield(EEG.dipfit, 'model')
-            if length(EEG.dipfit.model) >= index && ~strcmpi(EEG.dipfit.coordformat, 'CTF')
-                %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
-                curpos = EEG.dipfit.model(arg2(index)).posxyz;
-                curmom = EEG.dipfit.model(arg2(index)).momxyz;
-                try,
-                    select = EEG.dipfit.model(arg2(index)).select;
-                catch select = 0;
-                end
-                if ~isempty(curpos)
-                    if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
-                        transform = pinv( sph2spm );
-                        tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
-                        tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
-                        try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end
-                        try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end
+            if isfield(EEG.chanlocs, 'type') && ~isempty(strfind(char(EEG.chanlocs(1).type), 'meg'))
+                disp('Cannot plot dipoles on scalp topography for MEG data')
+            else
+                if length(EEG.dipfit.model) >= index && ~strcmpi(EEG.dipfit.coordformat, 'CTF')
+                    %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
+                    curpos = EEG.dipfit.model(arg2(index)).posxyz;
+                    curmom = EEG.dipfit.model(arg2(index)).momxyz;
+                    try,
+                        select = EEG.dipfit.model(arg2(index)).select;
+                    catch select = 0;
                     end
-                    curpos = curpos / 85;
-                    if size(curpos,1) > 1 && length(select) == 2
-                        dipole_index = find(strcmpi('dipole',options),1);
-                        if  ~isempty(dipole_index) % if 'dipoles' is already defined in options{:}
-                            options{dipole_index+1} = [ curpos(:,1:2) curmom(:,1:3) ];
-                        else
-                            options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
+                    if ~isempty(curpos)
+                        
+    
+                        if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
+                            transform = pinv( sph2spm );
+                            tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
+                            tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
+                            try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end
+                            try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end
                         end
-                        dipoleplotted = 1;
-                    else
-                        if any(curpos(1,:) ~= 0)
+                            
+                        curpos = curpos / 85;
+                        if size(curpos,1) > 1 && length(select) == 2
                             dipole_index = find(strcmpi('dipole',options),1);
                             if  ~isempty(dipole_index) % if 'dipoles' is already defined in options{:}
-                                options{dipole_index+1} = [ curpos(1,1:2) curmom(1,1:3) ];
+                                options{dipole_index+1} = [ curpos(:,1:2) curmom(:,1:3) ];
                             else
-                                options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
+                                options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
                             end
                             dipoleplotted = 1;
+                        else
+                            if any(curpos(1,:) ~= 0)
+                                dipole_index = find(strcmpi('dipole',options),1);
+                                if  ~isempty(dipole_index) % if 'dipoles' is already defined in options{:}
+                                    options{dipole_index+1} = [ curpos(1,1:2) curmom(1,1:3) ];
+                                else
+                                    options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
+                                end
+                                dipoleplotted = 1;
+                            end
                         end
                     end
-                end
-                if nbgraph ~= 1
-                    dipscale_index = find(strcmpi('dipscale',options),1);
-                    if ~isempty(dipscale_index) % if 'dipscale' is already defined in options{:}
-                        options{dipscale_index+1} = 0.6;
-                    else
-                        options = {  options{:} 'dipscale' 0.6 };
+                    if nbgraph ~= 1
+                        dipscale_index = find(strcmpi('dipscale',options),1);
+                        if ~isempty(dipscale_index) % if 'dipscale' is already defined in options{:}
+                            options{dipscale_index+1} = 0.6;
+                        else
+                            options = {  options{:} 'dipscale' 0.6 };
+                        end
                     end
+                    %options = { options{:} 'dipsphere' max(EEG.dipfit.vol.r) };
                 end
-                %options = { options{:} 'dipsphere' max(EEG.dipfit.vol.r) };
             end
         end
     end
