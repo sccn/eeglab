@@ -63,8 +63,7 @@ processingEEGstruct = 0;
 if isfield(chans, 'data')
     processingEEGstruct = 1;
     tmpEEG = chans;
-    chans = tmpEEG.chanlocs;
-    chaninfo = tmpEEG.chaninfo;
+    [chans, chaninfo,complicated] = insertchans(tmpEEG.chanlocs, tmpEEG.chaninfo);
 
     % force Nosedir to +X (done here because of DIPFIT)
     % -------------------
@@ -106,13 +105,15 @@ if isfield(chans, 'data')
             chaninfo.nosedir = '+X';
         end
     end
-end
-
-if ~isfield(chans, 'datachan')
-    [chanedit,dummy,complicated] = insertchans(chans, chaninfo);
-else
     chanedit = chans;
     complicated = true;
+else
+    if ~isfield(chans, 'datachan')
+        [chanedit,dummy,complicated] = insertchans(chans, chaninfo);
+    else
+        chanedit = chans;
+        complicated = true;
+    end
 end
 
 nosevals       = { '+X' '-X' '+Y' '-Y' };
@@ -191,6 +192,7 @@ if ~isempty(chanedit)
         end
     end
 end
+
 if ~isequal(fieldnames(chanedit)',fields)
     try
         chanedit = orderfields(chanedit, fields);
@@ -262,6 +264,28 @@ if complicated
 else
     chans = rmfield(chanedit,'datachan');
     chaninfo.nodatchans = [];
+end
+
+% check scaling for MEG channels
+% ------------------------------
+if isfield(chans, 'type') && ~isempty(strfind(char(chans(1).type), 'meg'))
+    if isfield(chaninfo, 'nodatchans') && ~isempty(chaninfo.nodatchans) && isfield(chaninfo.nodatchans, 'X') 
+        scaleXFiducials = [ chaninfo.nodatchans.X ];
+        scaleXMEG       = [ chans.X ];
+        scaleXFiducials(abs(scaleXFiducials)<0.1) = [];
+        scaleXMEG(scaleXMEG == 0) = [];
+
+        if ~isempty(scaleXFiducials) && mean(abs(scaleXFiducials)) > 4*mean(abs(scaleXMEG))
+            disp('Fiducial likely in mm while channels in cm, scaling fiducial down')
+            % scale fiducials to MEG channels (cm instead of mm)
+            for iChan = 1:length(chaninfo.nodatchans)
+                chaninfo.nodatchans(iChan).X = chaninfo.nodatchans(iChan).X/10;
+                chaninfo.nodatchans(iChan).Y = chaninfo.nodatchans(iChan).Y/10;
+                chaninfo.nodatchans(iChan).Z = chaninfo.nodatchans(iChan).Z/10;
+            end
+            chaninfo.nodatchans = convertlocs(chaninfo.nodatchans, 'cart2all');
+        end
+    end
 end
 
 if processingEEGstruct
