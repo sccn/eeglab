@@ -97,7 +97,7 @@ if nargin < 2
 end
 
 if icacomp == 0
-	if isempty( EEG.icasphere )
+	if isempty( EEG(1).icasphere )
 		disp('Error: you must run ICA first'); return;
 	end
 end
@@ -116,11 +116,11 @@ if nargin < 3
                   'End time limit(s) (seconds, Ex 0.2):', ...
                   'Display previous rejection marks', ...
                   'Reject marked trial(s)' };
-    inistr = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], '1:5'), ...
+    inistr = { fastif(icacomp, ['1:' int2str(EEG(1).nbchan)], '1:5'), ...
                fastif(icacomp, '-10', '-20'),  ...
                fastif(icacomp, '10', '20'), ...
-               num2str(EEG.xmin), ...
-               num2str(EEG.xmax), ...
+               num2str(EEG(1).xmin), ...
+               num2str(EEG(1).xmax), ...
                '0', ...
                '0' };
     
@@ -164,6 +164,18 @@ if ischar(elecrange) % convert arguments if they are in text format
     end
 else
     calldisp = 0;
+end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_eegthresh', EEG, 'warning', 'on', 'params', { icacomp, elecrange, negthresh, posthresh, starttime, endtime, superpose, reject } );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_eegthresh', EEG, 'params', { icacomp, elecrange, negthresh, posthresh, starttime, endtime, superpose, reject } );
+    end
+    Irej = [];
+    return;
 end
 
 if any(starttime < EEG.xmin) 
