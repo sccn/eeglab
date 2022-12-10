@@ -88,12 +88,13 @@ mode = 'apart';
 
 STUDY = pop_dipparams(STUDY, 'default');
 
-opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'spheres', 'on', 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
+opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
 
 dipcolor = [];
 dipsize = [];
 %, 'spheres', 'on'
 groupval = 'off';
+nosphere = true;
 for k = 3:2:nargin
     switch varargin{k-2}
         case 'clusters'
@@ -134,7 +135,13 @@ for k = 3:2:nargin
         dipcolor = varargin{k-1};
       case 'dipsize'
         dipsize = varargin{k-1};
+      case 'spheres'
+        opt_dipplot = { opt_dipplot{:}, 'spheres',  varargin{k-1} };  
+        nosphere = false;
     end
+end
+if nosphere
+    opt_dipplot = { opt_dipplot{:}, 'spheres', 'on' };
 end
 
 if strcmpi(mode, 'together')
@@ -639,7 +646,7 @@ for ci = 1:length(comp_ind)
     else
        dipplot(cluster_dip_models, 'meshdata', ALLEEG(abset).dipfit.hdmfile, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
           'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [STUDY.cluster(cls).name ' mean']}, ...
-          'spheres', 'on', 'verbose', 'off', varargin{:});
+          'spheres', 'off', 'verbose', 'off', varargin{:});
     end
     fig_h = gcf;
     set(fig_h,'Name', [subject ' / ' 'IC' num2str(comp) ', ' STUDY.cluster(cls).name],'NumberTitle','off');
