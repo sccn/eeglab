@@ -162,7 +162,7 @@ EEG = eeg_emptyset;
 fprintf('Reading data ...\n');
 dataopts = {};
 % In case of FIF files convert EEG channel units to uV in FT options
-[trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
+[filePath, fileNameNoExt, filext] = fileparts(filename);
 if strcmpi(filext,'.fif')
     eegchanindx = find(strcmpi(dat.chantype,'eeg'));
     if ~isempty(eegchanindx) && isfield (dat,'chanunit')
@@ -241,21 +241,32 @@ if isfield(dat, 'label') && ~isempty(dat.label)
     % Note: Currently for extensions where FT is able to generate valid 'labels' and 'elec' structure (e.g. FIF)
     %If more formats, add them below
     try
+        if isfield(dat,'elec') && ~isfield(dat.elec, 'chanpos')
+            dat.elec.chanpos = dat.elec.elecpos;
+        end
+
+        % fix issue with different units
+        if isfield(dat,'elec') && isfield(dat,'grad')
+            try
+                dat.elec = checkunit(dat.elec); % sometimes the unit is wrong
+                dat.grad = checkunit(dat.grad);
+                if isequal(dat.elec.unit, 'cm') && isequal(dat.grad.unit, 'mm') 
+                    dat.elec.chanpos = dat.elec.chanpos*10;
+                    dat.elec.unit = 'mm';
+                end
+            catch, end
+        end
+
         if isfield(dat,'elec')
-            if isfield(dat.elec, 'chanpos')
-                fieldpos = 'chanpos';
-            else
-                fieldpos = 'elecpos';
-            end
             if isfield(dat, 'label')
                 for iChan = 1:length(dat.label)
                     indLabel = strmatch(dat.label{iChan}, dat.elec.label, 'exact');
                     EEG.chanlocs(iChan).labels = dat.label{iChan};
-                    if ~isempty(indLabel) && ~isnan(dat.elec.(fieldpos)(indLabel,1))
+                    if ~isempty(indLabel) && ~isnan(dat.elec.chanpos(indLabel,1))
                         EEG.chanlocs(iChan).labels = dat.elec.label{indLabel};
-                        EEG.chanlocs(iChan).X = dat.elec.(fieldpos)(indLabel,1);
-                        EEG.chanlocs(iChan).Y = dat.elec.(fieldpos)(indLabel,2);
-                        EEG.chanlocs(iChan).Z = dat.elec.(fieldpos)(indLabel,3);
+                        EEG.chanlocs(iChan).X = dat.elec.chanpos(indLabel,1);
+                        EEG.chanlocs(iChan).Y = dat.elec.chanpos(indLabel,2);
+                        EEG.chanlocs(iChan).Z = dat.elec.chanpos(indLabel,3);
                         if isfield(dat, 'chantype')
                             EEG.chanlocs(iChan).type = dat.chantype{iChan};
                         elseif isfield(dat.elec, 'chantype')
@@ -265,21 +276,26 @@ if isfield(dat, 'label') && ~isempty(dat.label)
                 end
             end
         end
+        if isfield(dat.elec, 'unit')
+            EEG.chaninfo.unit = dat.elec.unit;
+        end
+        if isfield(dat.elec, 'coordsys') && isequal(dat.elec.coordsys, 'ElektaNeuromag')
+            EEG.chaninfo.nosedir = '+Y';
+        end
     catch
         fprintf('pop_fileio: Unable to import EEG channel location\n');
     end
     try
         if isfield(dat,'grad')
-            fieldpos = 'chanpos';
             if isfield(dat, 'label')
                 for iChan = 1:length(dat.label)
                     indLabel = strmatch(dat.label{iChan}, dat.grad.label, 'exact');
                     EEG.chanlocs(iChan).labels = dat.label{iChan};
-                    if ~isempty(indLabel) && ~isnan(dat.grad.(fieldpos)(indLabel,1))
+                    if ~isempty(indLabel) && ~isnan(dat.grad.chanpos(indLabel,1))
                         EEG.chanlocs(iChan).labels = dat.grad.label{indLabel};
-                        EEG.chanlocs(iChan).X = dat.grad.(fieldpos)(indLabel,1);
-                        EEG.chanlocs(iChan).Y = dat.grad.(fieldpos)(indLabel,2);
-                        EEG.chanlocs(iChan).Z = dat.grad.(fieldpos)(indLabel,3);
+                        EEG.chanlocs(iChan).X = dat.grad.chanpos(indLabel,1);
+                        EEG.chanlocs(iChan).Y = dat.grad.chanpos(indLabel,2);
+                        EEG.chanlocs(iChan).Z = dat.grad.chanpos(indLabel,3);
                         if isfield(dat, 'chantype')
                             EEG.chanlocs(iChan).type = dat.chantype{iChan};
                         end
@@ -287,13 +303,35 @@ if isfield(dat, 'label') && ~isempty(dat.label)
                 end
             end
         end
+        if isfield(dat.grad, 'unit')
+            EEG.chaninfo.unit = dat.grad.unit;
+        end
+        if isfield(dat.grad, 'coordsys') && isequal(dat.grad.coordsys, 'ElektaNeuromag')
+            EEG.chaninfo.nosedir = '+Y';
+        end
     catch
         fprintf('pop_fileio: Unable to import EEG channel location\n');
     end
     EEG.etc.fileio_dat = dat;
     EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
     EEG.urchanlocs = EEG.chanlocs;
+
     % END ----------- Extracting EEG channel location
+end
+
+% import fiducial in associated coordsystem file if present
+% ---------------------------------------------------------
+coordSystemFile = dir(fullfile(filePath, [ fileNameNoExt(1:4) '*coordsystem.json' ]));
+if length(coordSystemFile) == 1
+    coordSystemFileName = fullfile(coordSystemFile(1).folder, coordSystemFile(1).name);
+    if ~exist('eeg_importcoordsystemfiles', 'file')
+        fprintf(2, 'BIDS coordsystem file %s detected but not imported, install bids-matlab-tools to import it\n', coordSystemFileName);
+    else
+        fprintf('BIDS coordsystem file detected %s and imported (may contain fiducials)\n', coordSystemFileName);
+        EEG = eeg_importcoordsystemfiles(EEG, coordSystemFileName); % require the bids-matlab-tools plugin
+    end
+elseif length(coordSystemFile) > 1
+    fprintf(2, 'More than one BIDS coordsystem file detected so none imported (may contain fiducials)\n');
 end
 
 % extract events
@@ -348,5 +386,19 @@ if ischar(filename)
         command = sprintf('EEG = pop_fileio(''%s'');', filename);
     else
         command = sprintf('EEG = pop_fileio(''%s'', %s);', filename, vararg2str(options));
+    end
+end
+
+
+% check units (sometimes they are wrong)
+% --------------------------------------
+function sens = checkunit(sens)
+if isfield(sens, 'unit')
+    medX = median(abs(sens.chanpos(:,1)));
+    if medX < 15 && isequal(sens.unit, 'mm')
+        sens.unit = 'cm';
+    end
+    if medX > 15 && isequal(sens.unit, 'cm')
+        sens.unit = 'mm';
     end
 end
