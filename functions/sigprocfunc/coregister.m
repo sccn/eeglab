@@ -193,28 +193,19 @@ if ischar(chanlocs1)
         % ----------------------------------
         dat = get(fid, 'userdata');
         if strcmpi(com, 'fiducials')
-            [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-            try
-                [ ~, transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
-                if ~isempty(transform), dat.transform = transform; end
-            catch
-                warndlg2(strvcat('Transformation failed', lasterr));
-            end
+            method = 'globalrescale';
         elseif strcmpi(com, 'warp')
-            [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
+            method = 'traditional';
+        end
+        [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
 
-            % copy electrode names
-            if ~isempty(clist1)
-                tmpelec2 = dat.elec2;
-                for index = 1:length(clist2)
-                    tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
-                end
-                %try,
-                    [ ~, dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
-                %catch,
-                %    warndlg2(strvcat('Transformation failed', lasterr));
-                %end
+        % copy electrode names
+        if ~isempty(clist1)
+            tmpelec2 = dat.elec2;
+            for index = 1:length(clist2)
+                tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
             end
+            [ ~, dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), method);
         end
         set(fid, 'userdata', dat);
         redrawgui(fid); 
@@ -228,7 +219,7 @@ end
 defaultmesh = 'standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       { 'string','cell' }  { {} {} }      {};
-                            'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5'} 'traditional';
+                            'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5' 'realignfiducial'} 'traditional';
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
                             'transform'  'real'   []      [];
@@ -277,8 +268,18 @@ if ~isempty(g.mesh)
                     dat.meshtri = g.mesh.vol.bnd(1).tri;
                 end
             elseif isfield(g.mesh, 'bnd')
-                dat.meshpnt = g.mesh.bnd(1).pnt;
-                dat.meshtri = g.mesh.bnd(1).tri;
+                if isfield(g.mesh.bnd, 'pnt')
+                    dat.meshpnt = g.mesh.bnd(1).pnt;
+                    dat.meshtri = g.mesh.bnd(1).tri;
+                else
+                    if isfield(g.mesh, 'skin_surface')
+                        dat.meshpnt = g.mesh.bnd(g.mesh.skin_surface).pos;
+                        dat.meshtri = g.mesh.bnd(g.mesh.skin_surface).tri;
+                    else
+                        dat.meshpnt = g.mesh.bnd(1).pos;
+                        dat.meshtri = g.mesh.bnd(1).tri;
+                    end
+                end
             elseif isfield(g.mesh, 'TRI1')
                 dat.meshpnt = g.mesh.POS;
                 dat.meshtri = g.mesh.TRI1;
@@ -364,7 +365,7 @@ elseif ~isempty(elec2)
                     tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
                 end
                 try
-                    [ ~, dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
+                    [ ~, dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), g.warpmethod);
                 catch
                     warndlg2(strvcat('Transformation failed', lasterr));
                 end
@@ -702,12 +703,13 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
                  'leads to a failure in initial objective function evaluation' 10 ...
                  'which means that the correspondence is wrong.' ]);
     end
-    [tmp ind1 ] = intersect_bc( lower(elec1.label), lower(chanlist) );
-    [tmp ind2 ] = intersect_bc( lower(elec2.label), lower(chanlist) );
+    [~, ind1] = intersect_bc( lower(elec1.label), lower(chanlist) );
+    [~, ind2] = intersect_bc( lower(elec2.label), lower(chanlist) );
     
     transf = elec3.m;
     transf(4:6) = transf(4:6)/180*pi;
     if length(transf) == 6, transf(7:9) = 1; end
+    if length(transf) == 7, transf(8:9) = transf(7); end
     transf = checktransf(transf, elec1, elec2);
     
     dpre = mean(sqrt(sum((elec1.pnt(ind1,:) - elec2.pnt(ind2,:)).^2, 2)));
@@ -722,7 +724,7 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
 % --------------------------------------------
 function transf = checktransf(transf, elec1, elec2)
     
-    [tmp ind1 ind2] = intersect_bc( elec1.label, elec2.label );
+    [~, ind1, ind2] = intersect_bc( elec1.label, elec2.label );
     
     transfmat = traditionaldipfit(transf);
     tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
