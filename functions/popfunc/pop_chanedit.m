@@ -110,6 +110,7 @@
 %                   channel location file given as input.
 %  'rplurchanloc' - [1,0] [1] Replace EEG.urchanlocs.If EEG.urchanlocs is empty this
 %                   option will be ignored and will be set to [1]
+%   'addfiducials' - ['on'|'off'] add fiducials if they are not present.
 %
 % Outputs:
 %   EEG        - new EEGLAB dataset with updated channel location structures 
@@ -443,6 +444,7 @@ else
     end
     
     args = varargin;
+
     % no interactive inputs
     % scan all the fields of g
     % ------------------------
@@ -644,9 +646,6 @@ else
             case 'shrink'
                 chans(1).shrink = args{ curfield+1 };
                 
-            case 'plotrad'
-                chans(1).plotrad = args{ curfield+1 };
-                
             case 'deletegui'
                 chans(args{ curfield+1 })=[];
                 currentpos = min(length(chans), currentpos);
@@ -775,6 +774,9 @@ else
                 args{ curfield }   = 'eval';
                 args{ curfield+1 } = com;
 
+            case 'addfiducials'
+                % do nothing (already handled)
+
             case 'save'
                 if ~isempty(fig)
                      [tmpf tmpp] = uiputfile('*.ced', 'Save channel locs in EEGLAB .ced format');
@@ -831,8 +833,7 @@ else
                     error('Wrong value for nose direction');
                 end
                 
-            case { 'lookup' 'lookupgui' }
-                if strcmpi(lower(args{curfield}), 'lookupgui')
+            case 'lookupgui'
                     standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
                         'F3' 'F1' 'Fz' 'F2' 'F4' 'F6' 'F8' 'F10' 'FT9' 'FT7' 'FC5' 'FC3' 'FC1' 'FCz' 'FC2' ...
                         'FC4' 'FC6' 'FT8' 'FT10' 'T9' 'T7' 'C5' 'C3' 'C1' 'Cz' 'C2' 'C4' 'C6' 'T8' 'T10' ...
@@ -842,22 +843,55 @@ else
                     for indexchan = 1:length(chans)
                         if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end
                     end
-                    [tmp1 ind1 ind2] = intersect_bc( lower(standardchans), {chans.labels});
+                    tmp1 = intersect_bc( lower(standardchans), {chans.labels});
                     if ~isempty(tmp1) || isfield(chans, 'theta')
-
+                        % adding fiducials if they are not llaready present
+                        % -------------------------------------------------
+                        indFid = strmatch('addfiducials', args(1:2:end), 'exact');
+                        if isempty(indFid) || ~strcmpi(args{indFid+1}, 'no')
+                            if isfield(chans, 'type')
+                                % check if fiducial are present
+                                allTypes = lower(cellfun(@char, { chans.type }, 'UniformOutput',false));
+                                if ~isempty(strmatch('fid', allTypes))
+                                    disp('Skipped adding fiducials (they are already present)');
+                                elseif ~isempty(strmatch('nasion', lower({ chans.labels })))
+                                    disp('Skipped adding fiducials (they are already present)');
+                                elseif ~isempty(strmatch('nz', lower({ chans.labels })))
+                                    disp('Skipped adding fiducials (they are already present)');
+                                else
+                                    chans(end+1).labels = 'Nz';
+                                    chans(end).type     = 'FID';
+                                    chans(end).datachan = false;
+                                    chans(end+1).labels = 'LPA';
+                                    chans(end).type     = 'FID';
+                                    chans(end).datachan = false;
+                                    chans(end+1).labels = 'RPA';
+                                    chans(end).type     = 'FID';
+                                    chans(end).datachan = false;
+                                end
+                            end
+                        end
                         % finding template location files
                         % -------------------------------
-                        setmodel = [ 'tmpdat = get(gcbf, ''userdata'');' ...
-                            'tmpval = get(gcbo, ''value'');' ...
-                            'set(findobj(gcbf, ''tag'', ''elec''), ''string'', tmpdat{tmpval});' ...
-                            'clear tmpval tmpdat;' ];
-                        try
-                            EEG = eeg_emptyset; % for dipfitdefs
-                            dipfitdefs;
-                            userdatatmp = { template_models(1).chanfile template_models(2).chanfile 'Standard-10-5-Cap385_witheog.elp' }; % last file in the path (see eeglab.m)
-                            clear EEG;
-                        catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385_witheog.elp' }; % files are in the path (see eeglab.m)
-                        end
+                        dipfitdefs;
+
+                        [filePathBESA, fileNameBESA] = fileparts(template_models(1).chanfile); 
+                        [~,fileNameBEM             ] = fileparts(template_models(2).chanfile); 
+                        chantemplate(1).name        = fileNameBESA;
+                        chantemplate(1).filename    = template_models(1).chanfile;
+                        chantemplate(1).description = 'use BESA file for 4-shell dipfit spherical model';
+                        chantemplate(2).name        = fileNameBEM;
+                        chantemplate(2).filename    = template_models(2).chanfile;
+                        chantemplate(2).description = 'use MNI coordinate file for BEM dipfit model';
+                        chantemplate(3).name        = 'Standard-10-5-Cap385_witheog.elp';
+                        chantemplate(3).filename    = fullfile(filePathBESA, 'Standard-10-5-Cap385_witheog.elp');
+                        chantemplate(3).description = 'use BESA file and look up EOG channels';
+
+                        chantemplate = add_locfiles(chantemplate, 'eeglab', 'eeglab', 'Legacy EEGLAB');
+                        chantemplate = add_locfiles(chantemplate, 'eeglab', 'philips_neuro', 'Magstim/EGI');
+                        chantemplate = add_locfiles(chantemplate, 'eeglab', 'besa_egi', 'BESA or EGI legacy');
+                        chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'electrode', 'Fieldtrip ');
+                        chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'layout', 'Fieldtrip layout');
 
                         % other commands for help/load
                         % ----------------------------
@@ -869,6 +903,10 @@ else
                             '   set(findobj(''parent'', gcbf, ''tag'', ''elec''), ''string'', [ filepath filename ]);' ...
                             'end;' ...
                             'clear filename filepath tagtest;' ];
+                        setmodel = [ 'tmpdat = get(gcbf, ''userdata'');' ...
+                            'tmpval = get(gcbo, ''value'');' ...
+                            'set(findobj(gcbf, ''tag'', ''elec''), ''string'', tmpdat(tmpval).filename);' ...
+                            'clear tmpval tmpdat;' ];
                         if ~isfield(chans, 'theta'),                    message =1;
                         elseif all(cellfun('isempty', {chans.theta })), message =1;
                         else                                            message =2;
@@ -884,28 +922,33 @@ else
                                 'file below? If you do not know, press OK.');
                         end
                         uilist = { { 'style' 'text' 'string' textcomment } ...
-                            { 'style' 'popupmenu'  'string' [ 'use BESA file for 4-shell dipfit spherical model' ...
-                            '|use MNI coordinate file for BEM dipfit model|Use spherical file with eye channels' ] ...
+                            { 'style' 'popupmenu'  'string' { chantemplate.description } ...
                             'callback' setmodel 'value' 2 } ...
                             { } ...
-                            { 'style' 'edit'       'string' userdatatmp{2} 'tag' 'elec' } ...
+                            { 'style' 'edit'       'string' chantemplate(2).filename 'tag' 'elec' } ...
                             { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
+                            { } ...
+                            { 'style' 'checkbox'   'string' 'Import file instead and erase all channels' } ...
                             { } };
 %                             { 'Style', 'checkbox', 'value', 0, 'string','Overwrite Original Channels' } };
 
-                        res = inputgui( { 1 [1 0.3] [1 0.3] 1 }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1 1] );
+                        res = inputgui( { 1 [1 0.3] [1 0.3] 1 1 1 }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', chantemplate, 'normal', [3 1 1 1 1 1] );
                         if ~isempty(res)
                             chaninfo.filename = res{2};
-                            args{ curfield   } = 'lookup';
+                            if res{3}
+                                args{ curfield   } = 'load';
+                            else
+                                args{ curfield   } = 'lookup';
+                            end
                             args{ curfield+1 } = res{2};
                             com = args;
+                            [chans, chaninfo] = pop_chanedit(chans, chaninfo, args{ curfield }, args{ curfield+1 });
                         else
                             return;
                         end
                     end
-                else    
-                    chaninfo.filename = args{ curfield+1 };
-                end
+             case 'lookup'
+                chaninfo.filename = args{ curfield+1 };
                 if strcmpi(chaninfo.filename, 'standard-10-5-cap385.elp')
                     dipfitdefs;
                     chaninfo.filename = template_models(1).chanfile;
@@ -925,7 +968,11 @@ else
                     chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan }, 'type', { chans.type });
                     [ind2 ind3] = sort(ind2);
                     ind1 = ind1(ind3);
-                    
+                    if isempty(ind2)
+                        fprintf(2, 'Warning: No channel with the same label found in this file\n');
+                    else
+                        fprintf('%d channel with the same label found and imported\n', length(ind1));
+                    end
                     for index = 1:length(ind2)
                         chans(ind2(index)).theta      = tmplocs(ind1(index)).theta;
                         chans(ind2(index)).radius     = tmplocs(ind1(index)).radius;
@@ -944,12 +991,11 @@ else
                     
                     tmpdiff = setdiff_bc([1:length(chans)], ind2);
                     if ~isempty(tmpdiff)
-                        fprintf('Channel lookup: no location for ');
-                        for index = 1:(length(tmpdiff)-1)
-                            fprintf('%s,', chans(tmpdiff(index)).labels);
+                        fprintf('Channel lookup: no location for %s', chans(tmpdiff(1)).labels);
+                        for index = 2:length(tmpdiff)
+                            fprintf(',%s', chans(tmpdiff(index)).labels);
                         end
-                        fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu\n', ...
-                            chans(tmpdiff(end)).labels);
+                        fprintf('%s\n');
                     end
                     if ~isfield(chans, 'type'), chans(1).type = []; end
                 end
@@ -1062,3 +1108,28 @@ function EEG = update_datafield(EEG)
         EEG.data = 'in set file';
     end
     EEG.icaact = [];
+
+% adding channel location file
+% ----------------------------
+function chantemplate = add_locfiles(chantemplate, software, folder, str)
+folderContent = [];
+if isequal(software, 'eeglab')
+    eeglabp = fileparts(which('eeglab.m'));
+    folder = fullfile(eeglabp, 'functions', 'supportfiles', 'channel_location_files', folder);
+    folderContent = dir(folder);
+elseif isequal(software, 'fieldtrip')
+    if exist('ft_defaults')
+        fieldTripPath = fileparts(which('ft_defaults.m'));
+        folderContent  = dir( fullfile(fieldTripPath, 'template', folder, '*.*') );
+    end
+end
+if ~isempty(folderContent)
+    for iFolder = 1:length(folderContent)
+        [~,~,fileext] = fileparts(folderContent(iFolder).name);
+        if folderContent(iFolder).name(1) ~= '.' && ~contains(lower(folderContent(iFolder).name), 'readme') && ...
+                ~isequal(lower(fileext), 'ast') && ~isequal(lower(fileext), 'asc')
+            chantemplate(end+1).description = [ str ' ' folderContent(iFolder).name ];
+            chantemplate(end).filename = fullfile(folderContent(iFolder).folder, folderContent(iFolder).name);
+        end
+    end
+end

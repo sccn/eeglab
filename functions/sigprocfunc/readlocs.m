@@ -145,7 +145,16 @@
 %   '.asc', '.dat':     
 %               Neuroscan-.'asc' or '.dat' Cartesian polar coordinates text file.
 %   '.mat':     
-%               Brainstrom channel location file.
+%               Brainstrom or fieldtrip channel location/layout file.
+%   '.lay':     
+%               Fieldtrip layout file.
+%   '.txt':     
+%               Fieldtrip electore file.
+%               Fields:   label      phi  theta   
+%               Sample:   Fp1        -92   -72    
+%                         Fp2         92    72   
+%                         C3         -46    0  
+%                         C4          46    0 
 %   '.sfp': 
 %               BESA/EGI-xyz Cartesian coordinates. Notes: For EGI, x is toward right ear, 
 %               y is toward the nose, z is toward the vertex. EEGLAB converts EGI 
@@ -307,10 +316,20 @@ chanformat(12).typestring   = 'Brainstorm Matlab file format';
 chanformat(12).description  = 'Custom Matlab file.';
 chanformat(12).importformat = '';
 % ---------------------------------------------------------------------------------------------------
-chanformat(13).type         = 'custom';
-chanformat(13).typestring   = 'Custom file format';
-chanformat(13).description  = 'Custom ASCII file format where user can define content for each file columns.';
+chanformat(13).type         = 'lay';
+chanformat(13).typestring   = 'Fieldtrip layout file';
+chanformat(13).description  = 'Fieldtrip layout file';
 chanformat(13).importformat = '';
+% ---------------------------------------------------------------------------------------------------
+chanformat(14).type         = 'txt';
+chanformat(14).typestring   = 'Fieldtrip .txt spherical file';
+chanformat(14).description  = [ 'Standard 3-D spherical coordinate files in text format' ];
+chanformat(14).importformat = { 'labels' 'sph_theta_besa' 'sph_phi_besa' };
+% ---------------------------------------------------------------------------------------------------
+chanformat(15).type         = 'custom';
+chanformat(15).typestring   = 'Custom file format';
+chanformat(15).description  = 'Custom ASCII file format where user can define content for each file columns.';
+chanformat(15).importformat = '';
 % ---------------------------------------------------------------------------------------------------
 % ----- ADD MORE FORMATS HERE -----------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
@@ -360,9 +379,11 @@ if ischar(filename)
         case 'dat', g.filetype = 'dat';
         case 'elc', g.filetype = 'elc';
         case 'eps', g.filetype = 'besa';
+        case 'txt', g.filetype = 'txt';
         case 'sfp', g.filetype = 'sfp';
         case 'tsv', g.filetype = 'tsv';
         case 'mat', g.filetype = 'mat';
+        case 'lay', g.filetype = 'lay';
         otherwise, g.filetype =  ''; 
        end
        fprintf('readlocs(): ''%s'' format assumed from file extension\n', g.filetype); 
@@ -389,25 +410,49 @@ if ischar(filename)
    % import file
    % -----------
    if strcmp(g.filetype, 'mat')
-       elocBrainstrom = load('-mat', filename );
-       for iChan = 1:length(elocBrainstrom.Channel)
-           eloc(iChan).labels = elocBrainstrom.Channel(iChan).Name;
-           eloc(iChan).X      = elocBrainstrom.Channel(iChan).Loc(1);
-           eloc(iChan).Y      = elocBrainstrom.Channel(iChan).Loc(2);
-           eloc(iChan).Z      = elocBrainstrom.Channel(iChan).Loc(3);
-           eloc(iChan).type   = elocBrainstrom.Channel(iChan).Type;
-       end
-       if isfield(elocBrainstrom, 'SCS')
-           chans = { 'NAS' 'LPA' 'RPA' };
-           for iChan = 1:length(chans)
-               if isfield(elocBrainstrom.SCS, chans{iChan})
-                    eloc(end+1).labels = chans{iChan};
-                   eloc(end).X      = elocBrainstrom.SCS.(chans{iChan})(1);
-                   eloc(end).Y      = elocBrainstrom.SCS.(chans{iChan})(2);
-                   eloc(end).Z      = elocBrainstrom.SCS.(chans{iChan})(3);
-                   eloc(end).type   = elocBrainstrom.Channel(iChan).Type;
+       elocIn = load('-mat', filename );
+       if isfield(elocIn, 'Channel')
+           % brainstorm file
+           for iChan = 1:length(elocIn.Channel)
+               eloc(iChan).labels = elocIn.Channel(iChan).Name;
+               eloc(iChan).X      = elocIn.Channel(iChan).Loc(1);
+               eloc(iChan).Y      = elocIn.Channel(iChan).Loc(2);
+               eloc(iChan).Z      = elocIn.Channel(iChan).Loc(3);
+               eloc(iChan).type   = elocIn.Channel(iChan).Type;
+           end
+           if isfield(elocBrainstrom, 'SCS')
+               chans = { 'NAS' 'LPA' 'RPA' };
+               for iChan = 1:length(chans)
+                   if isfield(elocIn.SCS, chans{iChan})
+                       eloc(end+1).labels = chans{iChan};
+                       eloc(end).X      = elocIn.SCS.(chans{iChan})(1);
+                       eloc(end).Y      = elocIn.SCS.(chans{iChan})(2);
+                       eloc(end).Z      = elocIn.SCS.(chans{iChan})(3);
+                       eloc(end).type   = elocIn.Channel(iChan).Type;
+                   end
                end
            end
+       else
+           % fieldtrip layout file
+           fprintf(2, 'Warning: You are a 2-D Layout file, do not use channel coordinates for source localization\n');
+           radius = sqrt(elocIn.lay.pos(:,1).^2 + elocIn.lay.pos(:,2).^2);
+           theta  = atan2d(elocIn.lay.pos(:,1), elocIn.lay.pos(:,2));
+           for iChan = 1:length(elocIn.lay.label)
+               eloc(iChan).labels = elocIn.lay.label{iChan};
+               eloc(iChan).theta  = theta(iChan);
+               eloc(iChan).radius = radius(iChan);
+           end
+       end
+   elseif strcmp(g.filetype, 'lay')
+       layout = readtable(filename, 'filetype', 'text');
+       fprintf(2, 'Warning: You are a 2-D Layout file, do not use channel coordinates for source localization\n');
+       radius = sqrt([layout{:,2}].^2 + [layout{:,3}].^2);
+       theta  = atan2d([layout{:,2}], [layout{:,3}]);
+       for iChan = 1:length(radius)
+           eloc(iChan).labels = layout{iChan,1};
+           if isnumeric(eloc(iChan).labels) eloc(iChan).labels = num2str(eloc(iChan).labels); end
+           eloc(iChan).theta  = theta(iChan);
+           eloc(iChan).radius = radius(iChan);
        end
    elseif strcmp(g.filetype, 'asc') || strcmp(g.filetype, 'dat')
        eloc = readneurolocs( filename );
@@ -424,11 +469,22 @@ if ischar(filename)
                end
            end
        end
+   elseif strcmp(g.filetype, 'txt')
+       elocTmp = readtable(filename, 'filetype', 'text');
+       for iChan = 1:size(elocTmp,1)
+           eloc(iChan).labels = elocTmp{iChan,1};
+           if isnumeric(eloc(iChan).labels) eloc(iChan).labels = num2str(eloc(iChan).labels); end
+           eloc(iChan).sph_theta_besa = elocTmp{iChan,2};
+           eloc(iChan).sph_phi_besa  = elocTmp{iChan,3};
+       end
+       eloc = convertlocs(eloc, 'sphbesa2all');
+       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
+       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
    elseif strcmp(g.filetype, 'elc')
        eloc = readeetraklocs( filename );
-       %eloc = read_asa_elc( filename ); % from fieldtrip
-       %eloc = struct('labels', eloc.label, 'X', mattocell(eloc.pnt(:,1)'), 'Y', ...
-       %                        mattocell(eloc.pnt(:,2)'), 'Z', mattocell(eloc.pnt(:,3)'));
+       eloc = convertlocs(eloc, 'cart2all');
+       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
+       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
        eloc = convertlocs(eloc, 'cart2all');
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
@@ -530,7 +586,7 @@ if ischar(filename)
                    eloc(index).labels         = eloc(index).type;
                    eloc(index).type           = '';
                    eloc(index).radius         = 1;
-               end;           
+               end  
            end
        end
        

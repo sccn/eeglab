@@ -5,7 +5,7 @@
 %                  If field 'EEG.chanmatrix' exists, will use the TOPOPLOT 'plotgrid' option 
 %                  to plot the data on the indicated channel matrix instead of plotting 
 %                  on the head (see 'plotgrid' in >> help topoplot).
-
+%
 % Usage:
 %   >> pop_topoplot( EEG); % pops up a parameter query window
 %   >> pop_topoplot( EEG, typeplot, items, title, plotdip, options...); % no pop-up
@@ -301,10 +301,10 @@ for index = 1:size(arg2(:),1)
     dipoleplotted = 0;
     if plotdip && typeplot == 0
         if isfield(EEG, 'dipfit') && isfield(EEG.dipfit, 'model')
-            if isfield(EEG.chanlocs, 'type') && ~isempty(strfind(char(EEG.chanlocs(1).type), 'meg'))
+            if 0 %isfield(EEG.chanlocs, 'type') && ~isempty(strfind(char(EEG.chanlocs(1).type), 'meg'))
                 disp('Cannot plot dipoles on scalp topography for MEG data')
             else
-                if length(EEG.dipfit.model) >= index && ~strcmpi(EEG.dipfit.coordformat, 'CTF')
+                if length(EEG.dipfit.model) >= index
                     %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                     curpos = EEG.dipfit.model(arg2(index)).posxyz;
                     curmom = EEG.dipfit.model(arg2(index)).momxyz;
@@ -314,13 +314,21 @@ for index = 1:size(arg2(:),1)
                     end
                     if ~isempty(curpos)
                         
-    
-                        if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
-                            transform = pinv( sph2spm );
+                        % rotate dipole back to electrode space
+                        % by using the inverse transformation matrix
+                        if ~isempty(EEG.dipfit.coord_transform)
+                            transform = EEG.dipfit.coord_transform;
+                            transform = pinv(traditionaldipfit(transform));
+
+                            % first dipole
                             tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
                             tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
-                            try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end
-                            try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end
+                            
+                            % second dipole
+                            if size(curpos,1) == 2
+                                tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3)
+                                tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3);
+                            end
                         end
                             
                         curpos = curpos / 85;

@@ -1422,8 +1422,7 @@ end
  set(plotax,'ylim',ylm);                               % copy position and axis limits again
 
 axis equal;
-lim = [-0.525 0.525];
-%lim = [-0.56 0.56];
+lim = [-plotrad plotrad];
 set(gca, 'xlim', lim); set(plotax, 'xlim', lim);
 set(gca, 'ylim', lim); set(plotax, 'ylim', lim);
 set(gca, 'xlim', lim); set(plotax, 'xlim', lim);
@@ -1543,7 +1542,7 @@ end
 %
 %%%%%%%% Mark specified electrode locations with red filled disks  %%%%%%%%%%%%%%%%%%%%%%
 %
-try,
+try
     if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
         for kk = 1:length(1:length(x))
             if abs(Values(kk))

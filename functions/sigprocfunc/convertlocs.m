@@ -121,9 +121,13 @@ switch command
    end
    if isfield(chans, 'sph_radius')
        meanrad = mean([ chans(indices).sph_radius ]);
-       if isempty(meanrad), meanrad = 1; end
+       if isempty(meanrad)
+           [chans(indices).sph_radius] = deal(85);
+           meanrad = 85; 
+       end
    else
-       meanrad = 1;
+        [chans(indices).sph_radius] = deal(85);
+        meanrad = 85;
    end
    sph_radius(1:length(indices)) = {meanrad};
 case 'topo2sphbesa'
@@ -143,8 +147,11 @@ case 'sph2cart'
    sph_theta  = {chans.sph_theta};
    sph_phi    = {chans.sph_phi};
    indices = find(~cellfun('isempty', sph_theta));
-   if ~isfield(chans, 'sph_radius'), sph_radius(1:length(indices)) = {1};
-   else                              sph_radius = {chans.sph_radius};
+   if ~isfield(chans, 'sph_radius')
+        [chans(indices).sph_radius] = deal(85);
+       sph_radius(1:length(indices)) = {85};
+   else                              
+       sph_radius = {chans.sph_radius};
    end
    inde = find(cellfun('isempty', sph_radius));
    if ~isempty(inde)
@@ -169,7 +176,7 @@ case 'sph2topo'
      chans(indices(index)).theta  = angle(index);
      chans(indices(index)).radius = radius(index);
      if ~isfield(chans, 'sph_radius') || isempty(chans(indices(index)).sph_radius)
-         chans(indices(index)).sph_radius = 1;
+         chans(indices(index)).sph_radius = 85;
      end
  end
 case 'sph2sphbesa'
