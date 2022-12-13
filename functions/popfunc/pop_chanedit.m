@@ -886,12 +886,16 @@ else
                         chantemplate(3).name        = 'Standard-10-5-Cap385_witheog.elp';
                         chantemplate(3).filename    = fullfile(filePathBESA, 'Standard-10-5-Cap385_witheog.elp');
                         chantemplate(3).description = 'use BESA file and look up EOG channels';
-
-                        chantemplate = add_locfiles(chantemplate, 'eeglab', 'eeglab', 'Legacy EEGLAB');
-                        chantemplate = add_locfiles(chantemplate, 'eeglab', 'philips_neuro', 'Magstim/EGI');
-                        chantemplate = add_locfiles(chantemplate, 'eeglab', 'besa_egi', 'BESA or EGI legacy');
-                        chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'electrode', 'Fieldtrip ');
-                        chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'layout', 'Fieldtrip layout');
+                        
+                        try
+                            chantemplate = add_locfiles(chantemplate, 'eeglab', 'eeglab', 'Legacy EEGLAB');
+                            chantemplate = add_locfiles(chantemplate, 'eeglab', 'philips_neuro', 'Magstim/EGI');
+                            chantemplate = add_locfiles(chantemplate, 'eeglab', 'besa_egi', 'BESA or EGI legacy');
+                            chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'electrode', 'Fieldtrip ');
+                            chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'layout', 'Fieldtrip layout');
+                        catch
+                            fprintf(2, 'Warning: issue with looking up channel location files\n');
+                        end
 
                         % other commands for help/load
                         % ----------------------------
