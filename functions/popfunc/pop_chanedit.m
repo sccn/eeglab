@@ -888,9 +888,10 @@ else
                         chantemplate(3).description = 'use BESA file and look up EOG channels';
                         
                         try
-                            chantemplate = add_locfiles(chantemplate, 'eeglab', 'eeglab', 'Legacy EEGLAB');
+                            chantemplate = add_locfiles(chantemplate, 'eeglab', 'eeglab', 'EEGLAB ');
                             chantemplate = add_locfiles(chantemplate, 'eeglab', 'philips_neuro', 'Magstim/EGI');
                             chantemplate = add_locfiles(chantemplate, 'eeglab', 'besa_egi', 'BESA or EGI legacy');
+                            chantemplate = add_locfiles(chantemplate, 'eeglab', 'neuroscan', 'Neuroscan');
                             chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'electrode', 'Fieldtrip ');
                             chantemplate = add_locfiles(chantemplate, 'fieldtrip', 'layout', 'Fieldtrip layout');
                         catch
@@ -1131,7 +1132,7 @@ if ~isempty(folderContent)
     for iFolder = 1:length(folderContent)
         [~,~,fileext] = fileparts(folderContent(iFolder).name);
         if folderContent(iFolder).name(1) ~= '.' && ~contains(lower(folderContent(iFolder).name), 'readme') && ...
-                ~isequal(lower(fileext), 'ast') && ~isequal(lower(fileext), 'asc')
+                ~isequal(lower(fileext), '.ast') && ~isequal(lower(fileext), '.3dd') && ~isequal(lower(fileext), '.map')
             chantemplate(end+1).description = [ str ' ' folderContent(iFolder).name ];
             chantemplate(end).filename = fullfile(folderContent(iFolder).folder, folderContent(iFolder).name);
         end

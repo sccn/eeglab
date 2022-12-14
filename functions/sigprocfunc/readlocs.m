@@ -287,7 +287,7 @@ chanformat(8).type         = 'dat';
 chanformat(8).typestring   = 'Neuroscan 3-D .dat file';
 chanformat(8).description  = [ 'Neuroscan 3-D cartesian .dat file. Coordinates are re-oriented to fit ' ...
                                'the EEGLAB standard of having the nose along the +X axis.' ];
-chanformat(8).importformat = 'readneurolocs';
+chanformat(8).importformat = 'readneurodat';
 % ---------------------------------------------------------------------------------------------------
 chanformat(9).type         = 'elc';
 chanformat(9).typestring   = 'ASA .elc 3-D file';
@@ -456,16 +456,16 @@ if ischar(filename)
        end
    elseif strcmp(g.filetype, 'asc') || strcmp(g.filetype, 'dat')
        eloc = readneurolocs( filename );
-       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
-       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
        if isfield(eloc, 'type')
            for index = 1:length(eloc)
                eloc(index).labels = strtrim(eloc(index).labels);
                type = eloc(index).type;
-               if type == 69,     eloc(index).type = 'EEG';
-               elseif type == 88, eloc(index).type = 'REF';
-               elseif type >= 76 && type <= 82, eloc(index).type = 'FID';
-               else eloc(index).type = num2str(eloc(index).type);
+               if ~ischar(type) && ~isempty(type)
+                   if type == 69,     eloc(index).type = 'EEG';
+                   elseif type == 88, eloc(index).type = 'REF';
+                   elseif type >= 76 && type <= 82, eloc(index).type = 'FID';
+                   else eloc(index).type = num2str(eloc(index).type);
+                   end
                end
            end
        end
