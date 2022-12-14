@@ -413,6 +413,7 @@ if nargs > 2
                 if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end
                 if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end
                 if isfield(CHANINFO, 'plotrad') && isempty(plotrad), plotrad = CHANINFO.plotrad; end
+                if isfield(CHANINFO, 'headrad') && isempty(headrad), headrad = CHANINFO.headrad; end
             case 'chantype'
             case 'drawaxis'
                 DRAWAXIS = Value;
