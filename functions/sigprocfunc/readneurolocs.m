@@ -1,4 +1,4 @@
-% READNEUROLOCS - read neuroscan polar location file (.asc)
+% readneurolocs() - read neuroscan polar location file (.asc)
 %
 % Usage:
 %   >> CHANLOCS = readneurolocs( filename );
@@ -8,45 +8,34 @@
 %   filename       - file name or matlab cell array { names x_coord y_coord }
 %
 % Optional inputs:
-%   same as CALIBLOCS
+%   same as caliblocs()
 %   note that if no optional input are provided, re-centering will be
 %   performed automatically and re-scaling of coordinates will be
 %   performed for '.asc' files (not '.dat' files).
 %
 % Outputs:
 %   CHANLOCS       - EEGLAB channel location data structure. See
-%                    help READLOCS
+%                    help readlocs()
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 4 March 2003
 %
-% See also: READLOCS
+% See also: readlocs()
 
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
-% for the documentation and details.
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
 %
-% Redistribution and use in source and binary forms, with or without
-% modification, are permitted provided that the following conditions are met:
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 %
-% 1. Redistributions of source code must retain the above copyright notice,
-% this list of conditions and the following disclaimer.
-%
-% 2. Redistributions in binary form must reproduce the above copyright notice,
-% this list of conditions and the following disclaimer in the documentation
-% and/or other materials provided with the distribution.
-%
-% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-% THE POSSIBILITY OF SUCH DAMAGE.
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function chanlocs = readneurolocs( filename, varargin)
 
@@ -56,6 +45,33 @@ if nargin < 1
 end
 if nargin < 2
     plottag = 0;
+end
+
+% try new method
+try
+    locs = readtable(filename, 'filetype', 'text', 'Delimiter', { ';' ' ' '\t' }, 'ConsecutiveDelimitersRule', 'join');
+    locs = table2cell(locs);
+    
+    if mod(size(locs,1),2) == 1
+        error('Issue with file format')
+    end
+    halfHeight = size(locs,1)/2;
+    loc1 = locs(1:halfHeight,:);
+    loc2 = locs(halfHeight+1:end,:);
+    x = [loc2{:,3}]; x = x-0.5;
+    y = [loc2{:,4}]; y = y-0.5;
+    radius = sqrt(x.^2 + y.^2);
+    theta  = atan2d(x, y);
+
+    for iChan = 1:halfHeight
+        chanlocs(iChan).label = loc1{iChan,2};
+        chanlocs(iChan).theta = theta(iChan);
+        chanlocs(iChan).radius = radius(iChan);
+    end
+    chanlocs = convertlocs( chanlocs, 'topo2all');
+    return
+catch 
+    disp('Default method did not work, trying alternate method')
 end
 
 % read location file
@@ -80,7 +96,7 @@ if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
             % find first numerical index
             % --------------------------
             index = 1;
-            while ischar( locs{index,1} )
+            while ischar( locs{index,1} ) && index < size(locs,1)
                 index = index + 1;
             end
 
@@ -116,7 +132,8 @@ if ~ischar(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
     % convert to other types of coordinates
     % -------------------------------------
     labels = names';
-    chanlocs = struct('labels', labels, 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');      %% labels instead of labels(:) 
+    labels = cellfun(@num2str, labels, 'UniformOutput', false);
+    chanlocs = struct('labels', labels', 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');      %% labels instead of labels(:) 
     chanlocs = convertlocs( chanlocs, 'sphbesa2all');
 
     for index = 1:length(chanlocs)
