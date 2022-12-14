@@ -435,6 +435,14 @@ if ischar(filename)
        else
            % fieldtrip layout file
            fprintf(2, 'Warning: You are a 2-D Layout file, do not use channel coordinates for source localization\n');
+           if isfield(elocIn, 'layout') && ~isfield(elocIn, 'lay')
+               elocIn.lay = elocIn.layout;
+           end
+           if any(elocIn.lay.pos(:,1) > 700) 
+               elocIn.lay.pos = (elocIn.lay.pos - 400)/800;
+           elseif any(elocIn.lay.pos(:,1) > 400) 
+               elocIn.lay.pos = (elocIn.lay.pos - 250)/500;
+           end
            radius = sqrt(elocIn.lay.pos(:,1).^2 + elocIn.lay.pos(:,2).^2);
            theta  = atan2d(elocIn.lay.pos(:,1), elocIn.lay.pos(:,2));
            for iChan = 1:length(elocIn.lay.label)
@@ -474,6 +482,7 @@ if ischar(filename)
        for iChan = 1:size(elocTmp,1)
            eloc(iChan).labels = elocTmp{iChan,1};
            if isnumeric(eloc(iChan).labels) eloc(iChan).labels = num2str(eloc(iChan).labels); end
+           if iscell(   eloc(iChan).labels) eloc(iChan).labels = eloc(iChan).labels{1}; end
            eloc(iChan).sph_theta_besa = elocTmp{iChan,2};
            eloc(iChan).sph_phi_besa  = elocTmp{iChan,3};
        end

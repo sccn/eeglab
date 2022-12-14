@@ -49,7 +49,7 @@ if nargin < 2
 end
 
 if nargin < 2
-    disp('There are 6 methods to import Neuroscan files, if one does not work, try others')
+    disp('There are 5 methods to import Neuroscan files, if one does not work, try others')
     try
         chanlocs = readneurolocs( filename, 1);
         return
@@ -177,17 +177,25 @@ elseif method == 2
         chanlocs = adjustlocs(chanlocs, 'autoscale', 'on', 'autorotate', 'off', varargin{:});
     end
 elseif method == 3
-    % 5 rows, xyz positions
-    for index = 1:size(locs,1)
-        locs{index,3} = - locs{index,3};
-    end
-    chanlocs = struct('labels', locs(:,1), 'type', locs(:,2), 'X', locs(:,4), 'Y', locs(:,3), 'Z', locs(:,5));
-    chanlocs = convertlocs( chanlocs, 'cart2all');
-elseif method == 4
     chanlocs = readneurodat(  filename);
+elseif method == 4
+    % read location file
+    % ------------------
+    if ischar(filename)
+        locs  = loadtxt( filename, 'delim', [9 ' ']);
+    end
+
+    if size(locs,2) == 5
+        % 5 rows, xyz positions
+        for index = 1:size(locs,1)
+            locs{index,3} = - locs{index,3};
+        end
+        chanlocs = struct('labels', locs(:,1), 'type', locs(:,2), 'X', locs(:,4), 'Y', locs(:,3), 'Z', locs(:,5));
+        chanlocs = convertlocs( chanlocs, 'cart2all');
+    elseif size(locs,2) == 4
+        chanlocs = readlocs(filename, 'filetype', 'custom', 'format', { 'labels' '-Y' 'X' 'Z' });
+    end
 elseif method == 5
-    chanlocs = readlocs(filename, 'filetype', 'custom', 'format', { 'labels' '-Y' 'X' 'Z' });
-elseif method == 6
     chanlocs = readlocs(filename, 'filetype', 'custom', 'format', { 'labels' 'ignore' '-Y' 'X' 'Z' });
 end
 

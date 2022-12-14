@@ -875,8 +875,9 @@ else
                         % -------------------------------
                         dipfitdefs;
 
-                        [filePathBESA, fileNameBESA] = fileparts(template_models(1).chanfile); 
-                        [~,fileNameBEM             ] = fileparts(template_models(2).chanfile); 
+                        [~,fileNameBESA] = fileparts(template_models(1).chanfile); 
+                        [~,fileNameBEM ] = fileparts(template_models(2).chanfile); 
+                        eeglabp          = fileparts(which('eeglab.m'));
                         chantemplate(1).name        = fileNameBESA;
                         chantemplate(1).filename    = template_models(1).chanfile;
                         chantemplate(1).description = 'use BESA file for 4-shell dipfit spherical model';
@@ -884,7 +885,7 @@ else
                         chantemplate(2).filename    = template_models(2).chanfile;
                         chantemplate(2).description = 'use MNI coordinate file for BEM dipfit model';
                         chantemplate(3).name        = 'Standard-10-5-Cap385_witheog.elp';
-                        chantemplate(3).filename    = fullfile(filePathBESA, 'Standard-10-5-Cap385_witheog.elp');
+                        chantemplate(3).filename    = fullfile(eeglabp,'functions','supportfiles', 'Standard-10-5-Cap385_witheog.elp');
                         chantemplate(3).description = 'use BESA file and look up EOG channels';
                         
                         try

@@ -1,4 +1,4 @@
-% READNEURODAT - read neuroscan location file (.dat)
+% readneurodat() - read neuroscan location file (.dat)
 %
 % Usage:
 %   >> [ CHANLOCS labels theta theta ] = readneurodat( filename );
@@ -8,8 +8,8 @@
 %
 % Outputs:
 %   CHANLOCS       - [structure] EEGLAB channel location data structure. See
-%                    help READLOCS
-%   labels         - [cell array] channel labels
+%                    help readlocs()
+%   labels         - [cell arrya] channel labels
 %   theta          - [float array]array containing 3-D theta angle electrode
 %                    position (in degree)
 %   phi            - [float array]array containing 3-D phi angle electrode
@@ -17,9 +17,9 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 28 Nov 2003
 %
-% See also: READLOCS, READNEUROLOCS
+% See also: readlocs(), readneurolocs()
 
-% Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
+% Copyright (C) Arnaud Delorme, CNL / Salk Institute, 15 March 2003, arno@salk.edu
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -46,7 +46,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [chanlocs, labels, theta, phi] = readneurodat(filename);
+function [chanlocs, labels, theta, phi] = readneurodat(filename)
     
     if nargin < 1
         help readneurodat;
@@ -61,7 +61,7 @@ function [chanlocs, labels, theta, phi] = readneurodat(filename);
 
     % resort electrodes
     % -----------------
-    [tmp2 tmpind] = sort(celltomat(tmp(:,1))');
+    [tmp2, tmpind] = sort(celltomat(tmp(:,1))');
     tmp = tmp(tmpind,:);
 
     % convert to polar coordinates
@@ -74,6 +74,12 @@ function [chanlocs, labels, theta, phi] = readneurodat(filename);
     % convert to other types of coordinates
     % -------------------------------------
     labels = tmp(:,end-2)';
+    numLabel = labels{1};
+    if isnumeric(numLabel)
+        if numLabel ~= round(numLabel) % floating point label
+            error('Wrong file format')
+        end
+    end
     chanlocs = struct('labels', labels, 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');
     chanlocs = convertlocs( chanlocs, 'sphbesa2all');
     for index = 1:length(chanlocs)
