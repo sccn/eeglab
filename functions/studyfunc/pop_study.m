@@ -264,13 +264,6 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'pushbutton' 'string' 'CLear' 'tag' [ 'clear' int2str(index) ] 'userdata' index 'callback' delset} };
     end
     
-    if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
-        text1    = 'Dataset info (condition, group, ...) differs from study info. [set] = Overwrite dataset info for each dataset on disk.';
-        value_cb = 0;
-    else
-        text1    = 'Update dataset info - datasets stored on disk will be overwritten (unset = Keep study info separate).';
-        value_cb = 1;
-    end
     guispec = { guispec{:}, ...
                 {'style' 'text'       'string'  'Important note: Removed datasets will not be saved before being deleted from EEGLAB memory' }, ...
                 {}, ...
@@ -278,19 +271,10 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 {'style' 'text'       'string'  'Page 1' 'tag' 'page' 'horizontalalignment' 'center' }, ... 
                 {'style' 'pushbutton' 'string'  '>'      'Callback' nextpage 'userdata' 'addt'}, {}, ...
                 {}, ...
-                {'style' 'checkbox'   'value'   value_cb 'tag' 'copy_to_dataset' }, ...
-                {'style' 'text'       'string'  text1 }, ...
                 {'style' 'checkbox'   'value'   0        'tag' 'delclust' 'callback' cb_del }, ...
                 {'style' 'text'       'string'  'Delete cluster information (to allow loading new datasets, set new components for clustering, etc.)' } };
-	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] };
+	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] };
 
-%     if ~isempty(STUDY.filename)
-%         guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 0 'tag' 'studyfile' };
-%         guispec{end-2} = {'style' 'text'     'string' 'Re-save STUDY. Uncheck and use menu File > Save study as to save under a new filename'};
-%         guispec(end-1) = [];
-%         guigeom{end-1} = [0.14 3];
-%     end
-	
     fig_arg{1} = ALLEEG;      % datasets         
     fig_arg{2} = datasetinfo; % datasetinfo
     fig_arg{3} = 1;           % page
@@ -338,14 +322,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
 %     else
 %         if ~isempty(outstruct(1).studyfile), options = { options{:} 'filename' outstruct(1).studyfile }; end
 %     end
-    if outstruct(1).copy_to_dataset == 1
-         options = { options{:} 'updatedat' 'on' };
-         eeglab_options;
-         if option_storedisk
-             options = { options{:} 'savedat' 'on' };
-         end
-    else options = { options{:} 'updatedat' 'off' };
-    end
+    options = { options{:} 'updatedat' 'on' };
     
     if outstruct(1).delclust == 1
         options = { options{:} 'rmclust' 'on' };
