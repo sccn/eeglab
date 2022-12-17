@@ -105,6 +105,7 @@ if nargin < 1 || nargin > 25
     more off
     return
 end
+
 if size(data,3) > 1, data = reshape(data, size(data,1), size(data,2)*size(data,3) ); end
 
 if any(pwd == ' ')
@@ -112,6 +113,9 @@ if any(pwd == ' ')
 end
 
 icadefs % import ICABINARY and SC
+eeglab_p = fileparts(which('eeglab'));
+ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', ICABINARY); % done here and not icadefs because slow
+
 if ~exist('SC')
   fprintf('binica(): You need to update your icadefs file to include ICABINARY and SC.\n')
   return
