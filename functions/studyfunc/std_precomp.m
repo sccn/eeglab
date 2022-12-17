@@ -358,6 +358,7 @@ if strcmpi(g.spec, 'on')
         curstruct = rmfield(curstruct, 'specfreqs');
     end
 end
+
 % compute spectrum
 % ----------------
 if strcmpi(g.erpim, 'on')

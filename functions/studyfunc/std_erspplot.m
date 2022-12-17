@@ -52,7 +52,7 @@
 %                 STUDY structure.
 % Output:
 %   STUDY      - the input STUDY set structure with the plotted cluster 
-%                mean ERSPs added to allow quick replotting 
+%                mean ERSPs stored to allow quick replotting 
 %   erspdata   - [cell] ERSP data for each condition, group and subjects.
 %                size of cell array is [nconds x ngroups]. Size of each element
 %                is [freqs x times x subjects] for data channels or 

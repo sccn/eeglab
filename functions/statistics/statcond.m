@@ -116,7 +116,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005-
 %         With thanks to Robert Oostenveld for fruitful discussions 
-%         and advice on this function.
+%         and advices on this function.
 %
 % See also: ANOVA1_CELL, ANOVA2_CELL, ANOVA2RM_CELL, FCDF
 
