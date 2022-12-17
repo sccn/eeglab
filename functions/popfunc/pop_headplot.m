@@ -334,6 +334,11 @@ if ~isempty(loc)
     end
     options(loc:loc+1) = [];
 end
+loc = strmatch('maplimits', options(1:2:end));
+maplimits = [];
+if ~isempty(loc)
+    maplimits =  options{2*loc};
+end
 loc = strmatch('setup', options(1:2:end)); loc = loc*2-1;
 if ~isempty(loc)
     if typeplot
@@ -400,23 +405,28 @@ fprintf('Plotting...\n');
 
 % determine the scale for plot of different times (same scales)
 % -------------------------------------------------------------
-if typeplot
-	SIGTMP = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
-	pos = round( (arg2/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
-	indexnan = find(isnan(pos));
-	nanpos = find(isnan(pos));
-	pos(nanpos) = 1;
-	SIGTMPAVG = mean(SIGTMP(:,pos,:),3);
-	SIGTMPAVG(:, nanpos) = NaN;
-	maxlim = max(SIGTMPAVG(:));
-	minlim = min(SIGTMPAVG(:));
-	maplimits = max(maxlim, -minlim);
-    maplimits = maplimits*1.1;
-    maplimits = [ -maplimits maplimits ];
+if isempty(maplimits)
+    if typeplot
+	    SIGTMP = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
+	    pos = round( (arg2/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
+	    indexnan = find(isnan(pos));
+	    nanpos = find(isnan(pos));
+	    pos(nanpos) = 1;
+	    SIGTMPAVG = mean(SIGTMP(:,pos,:),3);
+	    SIGTMPAVG(:, nanpos) = NaN;
+	    maxlim = max(SIGTMPAVG(:));
+	    minlim = min(SIGTMPAVG(:));
+	    maplimits = max(maxlim, -minlim);
+        maplimits = maplimits*1.1;
+        maplimits = [ -maplimits maplimits ];
+    else
+        maplimits = [-1 1];
+    end
 else
-    maplimits = [-1 1];
+    SIGTMP = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
+    SIGTMPAVG = mean(SIGTMP,3);
 end
-	
+
 % plot the graphs
 % ---------------
 counter = 1;
