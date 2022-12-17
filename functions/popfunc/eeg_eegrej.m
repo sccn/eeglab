@@ -146,12 +146,14 @@ end
 % delicate so we do it twice using different methods and check
 % the results. It takes longer, but accuracy is paramount.
 eeglab_options;
+warnflag = false;
 if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     alllats = [ EEG.event.latency ];
     if ~isempty(event2)
         otherlatencies = [event2.latency];
         if ~isequal(alllats, otherlatencies)
-            warning([ 'Discrepancy when recomputing event latencies.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]);
+            warning([ 'Discrepancy when checking event latencies using legacy method.' 10 'Often the discrepency is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
+            warnflag = true;
         end
     end
 end
@@ -170,8 +172,8 @@ if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) 
         duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
         if ~isequal(duration1, duration2)
             duration1(duration1 == 0) = [];
-            if ~isequal(duration1, duration2)
-                warning(['Inconsistency in boundary event duration.' 10 '(this will not affect the accuracy of analyses).' 10 'Try to reproduce the problem and send us your dataset' ]); 
+            if ~isequal(duration1, duration2) && ~warnflag
+                warning([ 'Inconsistency in boundary event duration using legacy method.' 10 'Often the discrepency is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
             end
         end
     catch, warning('Unknown error when checking event latency - please send us your dataset');
