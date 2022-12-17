@@ -26,7 +26,9 @@
 %                    baseline. 0 remove the pre-0 baseline. To
 %                    remove the full epoch baseline, enter a value
 %                    larger than the upper epoch limit. Default is 0.
-%     'eventtype'  - [string] name for the event type. Default is 'X'
+%     'eventtype'  - [string] name for the time locking event type. Default is 'X'
+%     'eventdata'  - [struct|cell] additional data to store with each event
+%                    For example { 'condition' 'a' 'run' 1 }
 %     'extractepochs' - ['on'|'off'] extract data epochs ('on') or simply
 %                    insert events ('off'). Default is 'on'.
 %
@@ -96,19 +98,22 @@ g = finputcheck(options, { 'recurrence'    'real'  []  1;
                             'limits'        'real'  []  [0 1];
                             'rmbase'        'real'  []  0;
                             'eventtype'     'string' {} 'X';
+                            'eventdata'     {'cell' 'struct'} [] {};
                             'extractepochs' 'string' { 'on','off' } 'on' }, 'eeg_regepochs');
 if ischar(g), error(g); end
 
 if g.recurrence < 0 || g.recurrence > EEG.xmax
   error('recurrence_interval out of bounds');
 end
-
+if iscell(g.eventdata)
+    g.eventdata = struct(g.eventdata{:});
+end
 if nargin < 3
-  g.limits = [0 g.recurrence];
+    g.limits = [0 g.recurrence];
 end
 
 if length(g.limits) ~= 2 || g.limits(2) <= g.limits(1) 
-   error('epoch limits must be a 2-vector [minsec maxsec]')
+    error('epoch limits must be a 2-vector [minsec maxsec]')
 end
 
 % calculate number of events to add
@@ -122,7 +127,7 @@ nu = floor((EEG.xmax+1/EEG.srate)/g.recurrence); % number of type 'X' events to 
 % nu = length((bg+g.recurrence):g.recurrence:(en-g.recurrence)); % number of 'X' events, one every 'g.recurrence' sec
 
 if nu < 1
-  error('specified recurrence_interval too long')
+    error('specified recurrence_interval too long')
 end
 
 % print info on commandline
@@ -155,10 +160,18 @@ for k = 1:nu
 
    EEG.event(nevents+k).type = g.eventtype;
    EEG.event(nevents+k).latency = g.recurrence*(k-1)*EEG.srate+1;
-
    EEG.urevent(nurevents+k).type = g.eventtype;
    EEG.urevent(nurevents+k).latency = g.recurrence*(k-1)*EEG.srate+1;
    EEG.event(nevents+k).urevent = nurevents+k;
+
+   % add additional information
+   if ~isempty(g.eventdata)
+       fNames = fieldnames(g.eventdata);
+       for iField = 1:length(fNames)
+            EEG.event(    nevents+k).(fNames{iField}) = g.eventdata.(fNames{iField});
+            EEG.urevent(nurevents+k).(fNames{iField}) = g.eventdata.(fNames{iField});
+       end
+   end
 end
 fprintf('\n');
 
