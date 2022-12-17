@@ -147,7 +147,7 @@ function ALLEEG = std_loadalleeg(varargin)
         [~,~,ext] = fileparts(datasets{dset});
         if ~isequal(lower(ext), '.set')
             disp('Importing binary file and resaving with a .set file extension as an EEGLAB dataset');
-            EEG = pop_fileio(fullfile(relativePath, datasets{dset}));
+            EEG = pop_biosig(fullfile(relativePath, datasets{dset}));
             [pathTmp,fileTmp,ext] = fileparts(fullfile(relativePath, datasets{dset}));
             EEG = pop_saveset(EEG, fullfile(pathTmp, [ fileTmp '.set' ]));
         elseif exist(fullfile(relativePath, datasets{dset})) == 2
@@ -189,7 +189,7 @@ function ALLEEG = std_loadalleeg(varargin)
             EEG.icaact = [];
         end
         
-        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
+        [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
     end
     ALLEEG = eeg_checkset(ALLEEG);
 
