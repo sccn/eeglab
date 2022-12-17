@@ -131,6 +131,9 @@ for iRegion1=1:size(regions,1)
         selectedEvent = oriEvents(rejectedEvents{iRegion1});
         indBound = eeg_findboundaries(selectedEvent);
         duration(iRegion1) = duration(iRegion1) + sum([selectedEvent(indBound).duration]);
+%         if iRegion1 == size(regions,1) && regions(iRegion1,1) >= size(indata,2)
+%             duration(iRegion1) = duration(iRegion1) 
+%         end
     end
     
 	for iRegion2=iRegion1+1:size(regions)
@@ -197,6 +200,22 @@ if ~isempty(events) && isfield(events, 'latency')
     alllatencies = [ events.latency ];
     [~, sortind] = sort(alllatencies);
     events = events(sortind);
+end
+
+% handle contiguous boundary events
+for iEvent = length(events):-1:2
+    if isequal(events(iEvent).type, boundType) && isequal(events(iEvent-1).type, boundType) && ...
+            isequal(events(iEvent-1).latency, events(iEvent).latency)
+        events(iEvent-1).duration = events(iEvent-1).duration + events(iEvent).duration;
+        events(iEvent) = [];
+    end
+end
+
+% remove out of bound events
+for iEvent = length(events):-1:2
+    if events(iEvent).latency > size(indata,2)+1
+        events(iEvent) = [];
+    end
 end
 
 return;
