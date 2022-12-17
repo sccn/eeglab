@@ -348,7 +348,7 @@ elseif length(varargin) == 0 && length(EEG) == 1 && strcmpi(g.gui, 'on') % if se
             uilist{end+1} = { 'Style', 'text',       'string', 'Reload copy from disk (will be done after optional saving above)' };
             uilist{end+1} = {};
             uilist{end+1} = {};
-             geometry = { geometry{:} [0.12 1.6 0.2 0.2] };
+             geometry = { geometry{:} [0.2 1.6 0.12 0.2] };
         end
     end
             
