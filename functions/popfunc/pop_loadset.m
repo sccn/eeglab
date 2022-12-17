@@ -132,7 +132,9 @@ else
                     TMPVAR = rmfield(TMPVAR, 'data');
                 end
             end
-            if isfield(TMPVAR, 'setname')
+            if isfield(TMPVAR, 'datfile') && ~isempty(TMPVAR.datfile)
+                TMPVAR.data = TMPVAR.datfile;
+            else
                 TMPVAR.data = 'in set file';
             end
         else
