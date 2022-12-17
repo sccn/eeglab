@@ -23,7 +23,7 @@
 %   'notes'    - [string] notes about the experiment, the datasets, the STUDY, 
 %                or anything else to store with the STUDY itself {default: ''}. 
 %   'updatedat' - ['on'|'off'] update 'subject' 'session' 'condition' and/or
-%                'group' fields of STUDY dataset(s).
+%                'group' fields of STUDY dataset(s). Default is 'on'.
 %   'savedat'   - ['on'|'off'] re-save datasets
 %   'inbrain'   - ['on'|'off'] select components for clustering from all STUDY 
 %                 datasets with equivalent dipoles located inside the brain volume. 
@@ -98,7 +98,7 @@ end
 
 % decode input parameters
 % -----------------------
-g = finputcheck(varargin, { 'updatedat' 'string'  { 'on','off' }  'off';
+g = finputcheck(varargin, { 'updatedat' 'string'  { 'on','off' }  'on';
                             'name'      'string'  { }             '';
                             'task'      'string'  { }             '';
                             'notes'     'string'  { }             '';
@@ -185,6 +185,7 @@ end
 % ----------------
 currentind = 1;
 rmlist = [];
+fullFileNames = {};
 for k = 1:2:length(g.commands)
     
     switch g.commands{k}
@@ -263,13 +264,19 @@ for k = 1:2:length(g.commands)
             STUDY = std_checkset(STUDY, ALLEEG); % recreate parent dataset           
            
         case 'load'
+            if ~isempty(strmatch(g.commands{k+1}, fullFileNames))
+                error(['Duplicate dataset %s in STUDY.' 10 ...
+                    'Copy and rename the dataset if you absolutely want to use it twice'], g.commands{k+1})
+            end
+            fullFileNames{end+1} = g.commands{k+1};
+
             TMPEEG = std_loadalleeg( { g.commands{k+1} } );
             ALLEEG = eeg_store(ALLEEG, eeg_checkset(TMPEEG), currentind);
             ALLEEG(currentind).saved = 'yes';
             
             % update datasetinfo structure
             % ----------------------------
-            [tmppath tmpfile tmpext] = fileparts( fullfile(ALLEEG(currentind).filepath, ...
+            [tmppath, tmpfile, tmpext] = fileparts( fullfile(ALLEEG(currentind).filepath, ...
                                                            ALLEEG(currentind).filename) );
             STUDY.datasetinfo(currentind).filepath  = tmppath;   
             STUDY.datasetinfo(currentind).filename  = [ tmpfile tmpext ];   
