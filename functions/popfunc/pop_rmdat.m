@@ -1,4 +1,4 @@
-% POP_RMDAT - Remove continuous data around specific events
+% POP_RMDAT - Keep or remove continuous data around specific events
 %
 % Usage:
 %   >> OUTEEG = pop_rmdat( EEG); % pop-up a data entry window
@@ -20,7 +20,8 @@
 %                the 'EEG.event' structure).
 %   timelimits - Epoch latency limits [start end] in seconds relative to the time-locking event 
 %                {default: [-1 2]}%   
-%   invertselection - [0|1] Invert selection {default:0 is no}
+%   invertselection - [0|1] Invert selection. 0 is to keep data around events
+%                and 1 is to remove them {default:1 to remove them}
 %   
 % Outputs:
 %   OUTEEG     - output dataset
@@ -61,8 +62,10 @@ if nargin < 1
 	return;
 end
 com = '';
-invertsel = 0;
-
+if nargin < 4
+    invertsel = 1;
+    warning('This function behavior has been fixed and data is removed by default')
+end
 if isempty(EEG(1).event)
     error( [ 'No event. This function removes data' 10 'based on event latencies' ]);
 end
@@ -107,7 +110,7 @@ if nargin < 3
               { 'style' 'popupmenu'  'string' 'Keep selected|Remove selected' } };
               
    result = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_rmdat'')', 'title', 'Remove data portions around events - pop_rmdat()', 'userdata', EEG);
-   if length(result) == 0 return; end
+   if isempty(result) return; end
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end
    if ~isempty(result{1})
@@ -199,7 +202,7 @@ if invertsel
     EEG = pop_select(EEG, 'notime', (array-1)/EEG.srate);
 else
     EEG = pop_select(EEG, 'time', (array-1)/EEG.srate);
-end;    
+end  
    
 % generate output command
 % -----------------------
