@@ -45,7 +45,17 @@
 % ----------------
 globalvars = who('global');
 if ~isempty(strmatch('ALLCOM', globalvars, 'exact')) || exist('ALLCOM') ~= 1
-    global EEG;		% current dataset 
+    tmpEEG = whos('EEG');
+    % avoid overwritting variable in the current space
+    % in case it is not global
+    if ~isempty(tmpEEG) && ~tmpEEG.global
+        TMPEEG = EEG;
+        clear EEG;
+        global EEG;
+        EEG = TMPEEG;
+    else
+        global EEG;		% current dataset
+    end
     global ALLEEG;		% all datasets
     global CURRENTSET;	% current set index
 
