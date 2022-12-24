@@ -15,6 +15,7 @@
 %   'saveold'     - ['filename'] filename in which to save the old dataset
 %   'savenew'     - ['filename'] filename in which to save the new dataset
 %   'retrieve'    - [index] retrieve the old dataset (ignore recent changes)
+%   'guistring'   - ['string'] text for the GUI
 %
 % Note: Calls EEG_STORE which may modify the variable ALLEEG 
 %       containing the current dataset(s).
@@ -120,6 +121,7 @@ com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2
 
 [g varargin] = finputcheck(varargin, { ...
                     'gui'           'string'     { 'on';'off' }   'on'; % []=none; can be multiple numbers
+                    'guistring'     'string'     { }              'What do you want to do with the new dataset?';
                     'retrieve'      'integer'    []               []; % []=none; can be multiple numbers
                     'study'         'integer'    [0 1]            0;  % important because change behavior for modified datasets
                     }, 'pop_newset', 'ignore');
@@ -181,7 +183,7 @@ if isempty(EEG)
 elseif length(varargin) == 0 && length(EEG) == 1 && strcmpi(g.gui, 'on') % if several arguments, assign values 
     % popup window parameters	
     % -----------------------
-    text_new   = 'What do you want to do with the new dataset?';
+    text_new   = g.guistring;
     comcomment = ['tmpuserdat = get(gcbf, ''userdata'');' ...
 				  'tmpuserdat = pop_comments(tmpuserdat, ''Edit dataset comments'');' ...
 				  'set(gcbf, ''userdata'', tmpuserdat); clear tmpuserdat;'];

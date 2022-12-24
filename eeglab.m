@@ -591,12 +591,12 @@ cb_editset     = [ check      '[EEG LASTCOM] = pop_editset(EEG);'        e_store
 cb_editeventf  = [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG);' e_store];
 cb_editeventv  = [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);'  e_store];
 cb_adjustevents= [ checkevent '[EEG LASTCOM] = pop_adjustevents(EEG);'   e_store];
-cb_comments    = [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store];
+cb_comments    = [ check      '[EEG.comments, LASTCOM] = pop_comments(EEG.comments, ''About this dataset'');' e_store];
 cb_chanedit    = [ check 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
                    'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
                    'disp(''TIP: Call this function directly from the prompt, ">> pop_chanedit([]);"'');' ...
                    'disp(''     to convert between channel location file formats'');' ...
-                   '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); clear TMPINFO TMP; if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
+                   '[EEG,~,~,LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
                    e_store ];
                    %'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
 cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'                     e_newset];
@@ -1396,6 +1396,8 @@ set(W_MAIN, 'visible', 'on');
     
 return;
 
+% Update EEGLAB GUI (list of datasets)
+% -----------------
 function updatemenu()
 eeg_global;
 
@@ -1427,6 +1429,11 @@ warning(tmp);
 eeglab_options;
 if isempty(ALLEEG) && ~isempty(EEG) && all(arrayfun(@(eeg) ~isempty(eeg.data), EEG))
     ALLEEG = EEG;
+else
+    % check dataset
+    if ~isempty(EEG) && ~isequaln(EEG, ALLEEG(CURRENTSET))
+        [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'study', ~isempty(STUDY)+0, 'guistring', 'The EEG structure has changed, what do you want to do?');
+    end
 end
 
 % setting the dataset menu
