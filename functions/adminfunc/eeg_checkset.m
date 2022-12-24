@@ -367,9 +367,11 @@ for inddataset = 1:length(ALLEEG)
                     if isfield(EEG.event, 'type')
                         eventInds = arrayfun(@(x)isempty(x.type), EEG.event);
                         if any(eventInds)
+                            eventInds = find(eventInds);
+                            eventInds = eventInds(:)'; % make row vector
                             if all(arrayfun(@(x)isnumeric(x.type), EEG.event))
-                                 for ind = find(eventInds), EEG.event(ind).type = NaN; end
-                            else for ind = find(eventInds), EEG.event(ind).type = 'empty'; end
+                                 for ind = eventInds, EEG.event(ind).type = NaN; end
+                            else for ind = eventInds, EEG.event(ind).type = 'empty'; end
                             end
                         end
                         if ~all(arrayfun(@(x)ischar(x.type), EEG.event)) && ~all(arrayfun(@(x)isnumeric(x.type), EEG.event))
