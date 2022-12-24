@@ -63,14 +63,14 @@ processingEEGstruct = 0;
 if isfield(chans, 'data')
     processingEEGstruct = 1;
     tmpEEG = chans;
-    [chans, chaninfo,complicated] = insertchans(tmpEEG.chanlocs, tmpEEG.chaninfo);
+    [chans, chaninfo] = insertchans(tmpEEG.chanlocs, tmpEEG.chaninfo);
 
     % force Nosedir to +X (done here because of DIPFIT)
     % -------------------
     if isfield(tmpEEG.chaninfo, 'nosedir')
         if ~strcmpi(tmpEEG.chaninfo.nosedir, '+x') && all(isfield(tmpEEG.chanlocs,{'X','Y','theta','sph_theta'}))
             disp(['Note for expert users: Nose direction is now set from ''' upper(tmpEEG.chaninfo.nosedir)  ''' to default +X in EEG.chanlocs']);
-            [tmp chaninfo chans] = eeg_checkchanlocs(tmpEEG.chanlocs, tmpEEG.chaninfo); % Merge all channels for rotation (FID and data channels)
+            [~, chaninfo, chans] = eeg_checkchanlocs(tmpEEG.chanlocs, tmpEEG.chaninfo); % Merge all channels for rotation (FID and data channels)
             if strcmpi(chaninfo.nosedir, '+y')
                 rotate = 270;
             elseif strcmpi(chaninfo.nosedir, '-x')
@@ -232,6 +232,14 @@ if isfield(chanedit, 'labels')
             chanedit(index).labels = sprintf('E%d', index);
         end
     end   
+
+    % handle MEG
+    if ~isfield(chaninfo, 'topoplot')
+        if contains(chanedit(1).labels, 'MLC11') || (isfield(chanedit, 'type') && ~isempty(strfind(chanedit(1).type, 'meg')))
+            disp('MEG data detected and topoplot options not set, so setting them in EEG.chaninfo')
+            chaninfo.topoplot = { 'conv' 'on' 'headrad' 0.3 };
+        end
+    end
 end
 
 % remove fields
@@ -239,13 +247,15 @@ end
 if isfield(chanedit, 'sph_phi_besa'  ), chanedit = rmfield(chanedit, 'sph_phi_besa'); end
 if isfield(chanedit, 'sph_theta_besa'), chanedit = rmfield(chanedit, 'sph_theta_besa'); end
 
-% Populating  channel location fields with all coordinates systems
-if (any( cellfun('isempty',{ chanedit.X })) || any( cellfun('isempty', { chanedit.theta})) || any( cellfun('isempty', { chanedit.sph_theta}))) &&...
-   (any(~cellfun('isempty',{ chanedit.X })) || any(~cellfun('isempty', { chanedit.theta})) || any(~cellfun('isempty', { chanedit.sph_theta})))
+% Check if some channels need conversion
+% --------------------------------------
+chanX        = cellfun('isempty',{ chanedit.X });
+chanTheta    = cellfun('isempty',{ chanedit.theta });
+chanSphTheta = cellfun('isempty',{ chanedit.sph_theta });
+if any(~chanX & chanTheta) || any(~chanSphTheta & chanTheta) || any(~chanX & chanSphTheta)
     try
+        % convert them all
         chanedit = convertlocs(chanedit,'auto');
-        if isfield(chanedit, 'sph_theta_besa') chanedit = rmfield(chanedit, 'sph_theta_besa'); end
-        if isfield(chanedit, 'sph_phi_besa'  ) chanedit = rmfield(chanedit, 'sph_phi_besa'  ); end
     catch
         disp('eeg_checkchanlocs: Unable to convert electrode locations between coordinate systems');
     end
@@ -254,7 +264,7 @@ end
 % reconstruct the chans structure
 % -------------------------------
 if complicated
-    [chans chaninfo.nodatchans] = getnodatchan( chanedit );
+    [chans, chaninfo.nodatchans] = getnodatchan( chanedit );
     if ~isfield(chaninfo, 'nodatchans'), chaninfo.nodatchans = []; end
     if isempty(chanedit)
         for iField = 1:length(fields)
