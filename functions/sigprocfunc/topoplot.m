@@ -267,7 +267,7 @@ squeezefac = 1.0;
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
 VERBOSE = 'off';
 MASKSURF = 'off';
-CONVHULL = 'off';       % dont mask outside the electrodes convex hull
+CONVHULL = '';       % dont mask outside the electrodes convex hull
 DRAWAXIS = 'off';
 PLOTDISK = 'off';
 ContourVals = Values;
@@ -360,9 +360,22 @@ if nargs > 2
     if ~(round(nargs/2) == nargs/2)
         error('Odd number of input arguments??')
     end
-    for i = 1:2:length(varargin)
-        Param = varargin{i};
-        Value = varargin{i+1};
+
+    % check for chaninfo
+    options = varargin;
+    for i = 1:2:length(options)
+        if strcmpi(options{i}, 'chaninfo')
+            chaninfoTmp = options{i+1};
+            if isfield(chaninfoTmp, 'topoplot')
+                options = [ options chaninfoTmp.topoplot ];
+                break;
+            end
+        end
+    end
+
+    for i = 1:2:length(options)
+        Param = options{i};
+        Value = options{i+1};
         if ~ischar(Param)
             error('Flag arguments must be strings')
         end
@@ -413,7 +426,6 @@ if nargs > 2
                 if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end
                 if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end
                 if isfield(CHANINFO, 'plotrad') && isempty(plotrad), plotrad = CHANINFO.plotrad; end
-                if isfield(CHANINFO, 'headrad') && isempty(headrad), headrad = CHANINFO.headrad; end
             case 'chantype'
             case 'drawaxis'
                 DRAWAXIS = Value;
