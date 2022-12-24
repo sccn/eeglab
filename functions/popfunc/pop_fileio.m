@@ -19,6 +19,8 @@
 %                  choices are available in ft_read_data
 %   'memorymapped' - ['on'|'off'] import memory mapped file (useful if 
 %                  encountering memory errors). Default is 'off'.
+%   'makecontinuous' - ['on'|'off'] make data continuous (for data epochs
+%                  only). This is relevant for MEG data. Default is 'off'. 
 %
 % Outputs:
 %   OUTEEG   - EEGLAB data structure
@@ -102,34 +104,42 @@ if nargin < 1
         valueFormat = 48;
     end
     uilist   = { { 'style' 'text' 'String' 'Channel list (default all):' } ...
-                 { 'style' 'edit' 'string' '' } ...
+                 { 'style' 'edit' 'string' '' 'tag' 'chan' } ...
                  { 'style' 'text' 'String' [ 'Data range (in sample points) (default all [1 ' int2str(dat.nSamples) '])' ] } ...
-                 { 'style' 'edit' 'string' '' } ...
+                 { 'style' 'edit' 'string' '' 'tag' 'range' } ...
                  };
     geom = { [3 1.5] [3 1.5] };
     if dat.nTrials > 1
         uilist{end+1} = { 'style' 'text' 'String' [ 'Trial range (default all [1 ' int2str(dat.nTrials) '])' ] };
-        uilist{end+1} = { 'style' 'edit' 'string' '' };
+        uilist{end+1} = { 'style' 'edit' 'string' '' 'tag' 'trials' };
         geom = { geom{:} [3 1.5] };
     end
     uilist   = { uilist{:} ...
                  { 'style' 'text' 'String' 'Data format' } ...
-                 { 'style' 'popupmenu' 'string' formats 'value' valueFormat 'listboxtop' valueFormat } ...
-                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use in case of out of memory) - beta' 'value' option_memmapdata } };
-    geom = { geom{:}  [3 1.5] [1] };
-    
-    result = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
-    if length(result) == 0 return; end
-    if dat.nTrials <= 1
-        result = { result{1:2} [] result{3:end} };
+                 { 'style' 'popupmenu' 'string' formats 'value' valueFormat 'listboxtop' valueFormat 'tag' 'format' } ...
+                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use in case of out of memory) - beta' 'value' option_memmapdata 'tag' 'memmap' } };
+    geom = { geom{:}  [3 1.5] 1 };
+    if dat.nTrials > 1
+        uilist{end+1} = { 'style' 'checkbox' 'String' 'Convert data trials to continuous data' 'tag' 'makecontinuous'  };
+        geom = { geom{:} 3 };
     end
+
+    [result,~,~,restag] = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
+    if isempty(result) return; end
+    if ~isfield(restag, 'trials')
+        restag.trials = '';
+    end
+    if ~isfield(restag, 'makecontinuous')
+        restag.makecontinuous = 0;
+    end
+
     options = {};
-    if length(result) == 3, result = { result{1:2} '' result{3}}; end
-    if ~isempty(result{1}), options = { options{:} 'channels' eval( [ '[' result{1} ']' ] ) }; end
-    if ~isempty(result{2}), options = { options{:} 'samples'  eval( [ '[' result{2} ']' ] ) }; end
-    if ~isempty(result{3}), options = { options{:} 'trials'   eval( [ '[' result{3} ']' ] ) }; end
-    if ~isempty(result{4}), options = { options{:} 'dataformat' formats{result{4}} }; end
-    if result{5}, options = { options{:} 'memorymapped' fastif(result{5}, 'on', 'off') }; end
+    if ~isempty(restag.chan  ), options = { options{:} 'channels' eval( [ '[' restag.chan ']' ] ) }; end
+    if ~isempty(restag.range ), options = { options{:} 'samples'  eval( [ '[' restag.range ']' ] ) }; end
+    if ~isempty(restag.trials), options = { options{:} 'trials'   eval( [ '[' restag.trials ']' ] ) }; end
+    if ~isempty(restag.format), options = { options{:} 'dataformat' formats{restag.format} }; end
+    if restag.memmap        , options = { options{:} 'memorymapped'   fastif(restag.memmap, 'on', 'off') }; end
+    if restag.makecontinuous, options = { options{:} 'makecontinuous' fastif(restag.makecontinuous, 'on', 'off') }; end
 else
     ft_defaults;
     if ~isstruct(filename)
@@ -155,6 +165,7 @@ if ~isfield(g, 'trials'), g.trials = []; end
 if ~isfield(g, 'channels'), g.channels = []; end
 if ~isfield(g, 'dataformat'), g.dataformat = 'auto'; end
 if ~isfield(g, 'memorymapped'), g.memorymapped = 'off'; end
+if ~isfield(g, 'makecontinuous'), g.makecontinuous = 'off'; end
 
 % import data
 % -----------
@@ -279,9 +290,6 @@ if isfield(dat, 'label') && ~isempty(dat.label)
         if isfield(dat.elec, 'unit')
             EEG.chaninfo.unit = dat.elec.unit;
         end
-        if isfield(dat.elec, 'coordsys') && isequal(dat.elec.coordsys, 'ElektaNeuromag')
-            EEG.chaninfo.nosedir = '+Y';
-        end
     catch
         fprintf('pop_fileio: Unable to import EEG channel location\n');
     end
@@ -306,7 +314,7 @@ if isfield(dat, 'label') && ~isempty(dat.label)
         if isfield(dat.grad, 'unit')
             EEG.chaninfo.unit = dat.grad.unit;
         end
-        if isfield(dat.grad, 'coordsys') && isequal(dat.grad.coordsys, 'ElektaNeuromag')
+        if isfield(dat.grad, 'coordsys') && contains(lower(dat.grad.coordsys), 'neuromag')
             EEG.chaninfo.nosedir = '+Y';
         end
     catch
@@ -373,8 +381,20 @@ else
     disp('         To extract events, use menu File > Import Event Info > From data channel');
 end
 
-% convert data to single if necessary
-% -----------------------------------
+% convert data to single precision if necessary
+% ---------------------------------------------
+if exist('eeg_checkset')
+    EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
+end
+
+% convert data to continuous
+% --------------------------
+if strcmpi(g.makecontinuous, 'on')
+    EEG = eeg_epoch2continuous(EEG);
+end
+
+% convert data to single precision if necessary
+% ---------------------------------------------
 if exist('eeg_checkset')
     EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
 end
@@ -388,8 +408,6 @@ if ischar(filename)
         command = sprintf('EEG = pop_fileio(''%s'', %s);', filename, vararg2str(options));
     end
 end
-
-
 % check units (sometimes they are wrong)
 % --------------------------------------
 function sens = checkunit(sens)
