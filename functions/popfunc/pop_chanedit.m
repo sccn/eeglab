@@ -251,7 +251,7 @@ if isempty(chans) || all(~ishandle(chans))
     % insert "no data channels" in channel structure
     % ----------------------------------------------
     nbchan = length(chans);
-    [tmp chaninfo chans] = eeg_checkchanlocs(chans, chaninfo);
+    [tmp, chaninfo, chans] = eeg_checkchanlocs(chans, chaninfo);
 
     if isfield(chaninfo, 'shrink') && ~isempty(chaninfo.shrink)
         icadefs;
@@ -948,7 +948,11 @@ else
                             end
                             args{ curfield+1 } = res{2};
                             com = args;
+                            % there are 2 version of chans, chaninfo
+                            % - one where all channels are in chans (input below)
+                            % - one where some are in chainfo (output of  pop_chanedit)
                             [chans, chaninfo] = pop_chanedit(chans, chaninfo, args{ curfield }, args{ curfield+1 });
+                            [~, chaninfo, chans] = eeg_checkchanlocs(chans, chaninfo); % insert "data_chan" back in channel structure and move chaninfo channels in chans
                         else
                             return;
                         end
@@ -969,10 +973,10 @@ else
                 for indexchan = 1:length(chans)
                     if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end
                 end
-                [tmp ind1 ind2] = intersect_bc(lower({ tmplocs.labels }), lower({ chans.labels }));
+                [tmp, ind1, ind2] = intersect_bc(lower({ tmplocs.labels }), lower({ chans.labels }));
                 if ~isempty(tmp)
                     chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan }, 'type', { chans.type });
-                    [ind2 ind3] = sort(ind2);
+                    [ind2, ind3] = sort(ind2);
                     ind1 = ind1(ind3);
                     if isempty(ind2)
                         fprintf(2, 'Warning: No channel with the same label found in this file\n');
@@ -1057,7 +1061,7 @@ if ~isempty(fig)
         end
     end
 else
-    [chans chaninfo] = eeg_checkchanlocs(chans, chaninfo);
+    [chans, chaninfo] = eeg_checkchanlocs(chans, chaninfo);
     if dataset_input,
          if nchansori == length(chans)
              for index = 1:length(EEG)
