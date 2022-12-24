@@ -46,7 +46,7 @@ for iField = 1:length(fields)
     if ~isfield(EEG2, fields{iField})
         fprintf('Field %s missing in second dataset\n', fields{iField});
     else
-        if ~isequal(EEG.(fields{iField}), EEG2.(fields{iField}))
+        if ~isequaln(EEG.(fields{iField}), EEG2.(fields{iField}))
             fprintf('Field %s differs\n', fields{iField});
         end
     end
@@ -56,7 +56,7 @@ if ~isequal(EEG.xmax, EEG2.xmax), fprintf('Difference between xmax is %1.6f sec\
 
 % check chanlocs
 [~,~,chanlocs1] = eeg_checkchanlocs( EEG.chanlocs, EEG.chaninfo);
-[~,~,chanlocs2] = eeg_checkchanlocs( EEG2.chanlocs, EEG.chaninfo);
+[~,~,chanlocs2] = eeg_checkchanlocs( EEG2.chanlocs, EEG2.chaninfo);
 if length(chanlocs1) == length(chanlocs2)
     differ = 0;
     differLabel = 0;
