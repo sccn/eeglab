@@ -183,7 +183,7 @@ indp = find(vers == '.');
 vers = str2num(vers(1:indp(2)-1));
 tmpv = which('version');
 if ~isempty(findstr(lower(tmpv), 'biosig'))
-    [tmpp tmp] = fileparts(tmpv);
+    [tmpp, ~] = fileparts(tmpv);
     rmpath(tmpp);
 end
 % remove freemat folder if it exist
@@ -424,6 +424,18 @@ if nargin == 1
 		else
 			eegh('eeglab(''redraw'');');
 		end
+	elseif strcmp(onearg, 'continuous')
+        ALLEEG = []; CURRENTSET = 0; CURRENTSTUDY = 0; STUDY = [];
+        disp('Clearing all data and loading tutorial continuous data')
+        EEG = pop_loadset(fullfile(eeglabpath, 'sample_data', 'eeglab_data.set'));
+        eeglab redraw; 
+        return
+	elseif strcmp(onearg, 'epoch')
+        ALLEEG = []; CURRENTSET = 0; CURRENTSTUDY = 0; STUDY = [];
+        disp('Clearing all data and loading tutorial epoched data')
+        EEG = pop_loadset(fullfile(eeglabpath, 'sample_data', 'eeglab_data_epochs_ica.set'));
+        eeglab redraw; 
+        return
 	elseif strcmp(onearg, 'rebuild')
 		W_MAIN = findobj('tag', 'EEGLAB');
         close(W_MAIN);
@@ -476,19 +488,15 @@ backup =     [ 'if CURRENTSET ~= 0,' ...
                '    eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
                'end;' ];
 
-storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
-storenewcall = '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''study'', ~isempty(STUDY)+0); eegh(LASTCOM);';
-storeallcall = [ 'if ~isempty(ALLEEG) && ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG);' ...
-                 'EEG = eeg_retrieve(ALLEEG, CURRENTSET); eegh(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_retrieve(ALLEEG, CURRENTSET);''); end;' ];
-
+storenewcall = 'EEG = eegh(LASTCOM, EEG); [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''study'', ~isempty(STUDY)+0); eegh(LASTCOM);';
+storecall    = 'EEG = eegh(LASTCOM, EEG); [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eegh(''[ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
+storecall    = 'EEG = eegh(LASTCOM, EEG); [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);';
 testeegtmp   =  'if exist(''EEGTMP'') == 1, EEG = EEGTMP; clear EEGTMP; end;'; % for backward compatibility
 ifeeg        =  'if ~isempty(LASTCOM) && ~isempty(EEG),';
-ifeegnh      =  'if ~isempty(LASTCOM) && ~isempty(EEG) && ~isempty(findstr(''='',LASTCOM)),';
 
 % nh = no dataset history
 % -----------------------
-e_storeall_nh   = [e_catch 'eegh(LASTCOM);' ifeeg storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_hist_nh       = [e_catch 'eegh(LASTCOM);'];
+e_hist_noeegh   = [e_catch 'eegh(LASTCOM);'];
 
 % study checking
 % --------------
@@ -498,10 +506,10 @@ e_plot_study = [e_catch 'if ~isempty(LASTCOM), STUDY = STUDYTMP; STUDY = eegh(LA
 
 % same as above but also save history in dataset
 % ----------------------------------------------
-e_newset        = [e_catch 'EEG = eegh(LASTCOM, EEG);' testeegtmp ifeeg   storenewcall 'disp(''Done.''); end; eeglab(''redraw'');' e_check_study ];
-e_store         = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeegnh storecall    'disp(''Done.''); end; eeglab(''redraw'');' e_check_study];
-e_hist          = [e_catch 'EEG = eegh(LASTCOM, EEG);'];
-e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
+e_newset   = [e_catch testeegtmp 'eeglab_new;' e_check_study ];
+e_store    = [e_catch            'eeglab_new;' ];
+e_hist     = [e_catch            'eeglab_new;' ];
+e_histdone = [e_catch            'eeglab_new; disp(''done'');' ];
 
 % build structures for plugins
 % ----------------------------
@@ -516,7 +524,7 @@ trystrs.check_chanlocs           = checkplot;
 trystrs.check_epoch_chanlocs     = checkepochplot;
 trystrs.check_epoch_ica_chanlocs = checkepochicaplot;
 trystrs.check_ica_chanlocs       = checkicaplot;
-catchstrs.add_to_hist            = e_hist;
+catchstrs.add_to_hist            = e_store;
 catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
 catchstrs.new_non_empty          = e_newset;
@@ -569,7 +577,7 @@ cb_expdata     = [ check        'LASTCOM = pop_writeeeg(EEG);'            e_hist
 cb_loadset     = [ nocheck '[EEG LASTCOM] = pop_loadset;'                                e_newset];
 cb_saveset     = [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store ];
 cb_savesetas   = [ check   '[EEG LASTCOM] = pop_saveset(EEG);'                           e_store ];
-cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'         e_hist_nh 'eeglab redraw;' ];
+cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'         e_hist_noeegh 'eeglab redraw;' ];
 cb_study1      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');' e_load_study]; 
 cb_study2      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]; 
 cb_studyerp    = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_studyerp;' e_load_study]; 
@@ -578,11 +586,11 @@ cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, 
 cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);'                                e_load_study];
 cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
 cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
-                           'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
-cb_plugin      = [ nocheck 'if plugin_menu(PLUGINLIST) , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
+                           'else                            LASTCOM = pop_editoptions(0); end;'                    e_hist_noeegh ];
+cb_plugin      = [ nocheck 'if plugin_menu(PLUGINLIST) , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_noeegh ];
 
-cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
-cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
+cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_noeegh];
+cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_noeegh];
 cb_runsc       = [ nocheck 'LASTCOM = pop_runscript;'          e_hist   ];
 cb_quit        = [ 'close(gcf); disp(''To save the EEGLAB command history  >> pop_saveh(ALLCOM);'');' ...
                    'clear global EEG ALLEEG LASTCOM CURRENTSET;'];
@@ -591,18 +599,18 @@ cb_editset     = [ check      '[EEG LASTCOM] = pop_editset(EEG);'        e_store
 cb_editeventf  = [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG);' e_store];
 cb_editeventv  = [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);'  e_store];
 cb_adjustevents= [ checkevent '[EEG LASTCOM] = pop_adjustevents(EEG);'   e_store];
-cb_comments    = [ check      '[EEG.comments, LASTCOM] = pop_comments(EEG.comments, ''About this dataset'');' e_store];
+cb_comments    = [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store];
 cb_chanedit    = [ check 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
                    'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
                    'disp(''TIP: Call this function directly from the prompt, ">> pop_chanedit([]);"'');' ...
                    'disp(''     to convert between channel location file formats'');' ...
-                   '[EEG,~,~,LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
+                   '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); clear TMPINFO TMP; if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
                    e_store ];
                    %'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
 cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'                     e_newset];
 cb_rmdat       = [ checkevent '[EEG LASTCOM] = pop_rmdat(EEG);'                      e_newset];
 cb_selectevent = [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ];
-cb_copyset     = [ check      '[ALLEEG EEG CURRENTSET LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh];
+cb_copyset     = [ check      '[ALLEEG EEG CURRENTSET LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_noeegh];
 cb_mergeset    = [ check      '[EEG LASTCOM] = pop_mergeset(ALLEEG);' e_newset];
 
 cb_resample    = [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset];
@@ -616,16 +624,16 @@ cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store e_che
 cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
 %cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
 cb_chanrej     = [ check      '[EEG ~ ~ LASTCOM] = pop_rejchan(EEG);'  e_hist];
-cb_autorej     = [ checkepoch '[EEG ~ LASTCOM] = pop_autorej(EEG);'  e_hist];
+cb_autorej     = [ checkepoch '[EEG ~ LASTCOM] = pop_autorej(EEG);'    e_hist];
 cb_rejcont     = [ check      '[EEG ~ ~ LASTCOM] = pop_rejcont(EEG);'  e_hist];
 
 cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
 cb_eegplotrej1 = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'        e_hist];
-cb_eegthresh1  = [ checkepoch '[~ LASTCOM] = pop_eegthresh(EEG, 1);'  e_hist];
+cb_eegthresh1  = [ checkepoch '[~ LASTCOM] = pop_eegthresh(EEG, 1);'    e_hist];
 cb_rejtrend1   = [ checkepoch '[EEG LASTCOM] = pop_rejtrend(EEG, 1);'   e_store];
 cb_jointprob1  = [ checkepoch '[EEG LASTCOM] = pop_jointprob(EEG, 1);'  e_store];
 cb_rejkurt1    = [ checkepoch '[EEG LASTCOM] = pop_rejkurt(EEG, 1);'    e_store];
-cb_rejspec1    = [ checkepoch '[EEG ~ LASTCOM] = pop_rejspec(EEG, 1);' e_store];
+cb_rejspec1    = [ checkepoch '[EEG ~ LASTCOM] = pop_rejspec(EEG, 1);'  e_store];
 cb_rejsup1     = [ checkepochica '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1,1,1); eegh(LASTCOM);' ...
                      'LASTCOM = ''EEG.reject.icarejmanual = EEG.reject.rejglobal;''; eval(LASTCOM);' e_store ];
 cb_rejsup2     = [ checkepoch '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1,1,1); EEG = eegh(LASTCOM, EEG);' ...
@@ -685,6 +693,7 @@ cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, AL
 cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'                e_plot_study];
 cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_plot_study];
 cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_plot_study];
+
 % 
 % % add STUDY plugin menus
 % if exist('eegplugin_stderpimage')
@@ -1416,12 +1425,9 @@ try
 catch, return; end
 index = 1;
 indexmenu = 1;
-MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
-if MAX_SET > 200
-    disp('Updating menu, allowing selection of the first 200 datasets only to speed up display...')
-    MAX_SET = 200;
-end
 
+% check if EEG has changed
+% ------------------------
 tmp = warning;
 warning off;
 clear functions;
@@ -1431,9 +1437,17 @@ if isempty(ALLEEG) && ~isempty(EEG) && all(arrayfun(@(eeg) ~isempty(eeg.data), E
     ALLEEG = EEG;
 else
     % check dataset
-    if ~isempty(EEG) && ~isequaln(EEG, ALLEEG(CURRENTSET))
+    if ~isempty(EEG) && ~isempty(ALLEEG) && ~isequaln(EEG, ALLEEG(CURRENTSET))
         [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'study', ~isempty(STUDY)+0, 'guistring', 'The EEG structure has changed, what do you want to do?');
     end
+end
+
+% Maximum number of set
+% ---------------------
+MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
+if MAX_SET > 200
+    disp('Updating menu, allowing selection of the first 200 datasets only to speed up display...')
+    MAX_SET = 200;
 end
 
 % setting the dataset menu
