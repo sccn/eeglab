@@ -283,7 +283,7 @@ elseif length(varargin) == 0 && length(EEG) == 1 && strcmpi(g.gui, 'on') % if se
                            '''save or delete/overwrite the old dataset.''));' ... 
                        'end;' ];
         enable_saveold = 'on';
-        value_saveold  = 1;
+        value_owrt   = 1;
         overwrite_or_save = 1;
     elseif ~saved
     % ***************************************************
