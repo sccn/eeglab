@@ -186,6 +186,9 @@ if any(endtime   > EEG.xmax)
 	fprintf('Warning : endtime superior to maximum time, adjusted\n'); 
 	endtime(find(endtime > EEG.xmax)) = EEG.xmax;
 end
+if isempty(elecrange)
+    elecrange = 1:EEG.nbchan;
+end
 
 if icacomp == 1
 	[Itmp Irej NS Erejtmp] = eegthresh( EEG.data, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);

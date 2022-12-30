@@ -107,16 +107,16 @@ regions = combineregions(regions);
 
 % remove events within regions
 % ----------------------------
-% if ~isempty(EEG.event) && isfield(EEG.event, 'latency')
-%     allEventLatencies = [ EEG.event.latency];
-%     allEventFlag      = zeros(1,length(allEventLatencies));
-%     for iRegion = 1:size(regions,1)
-%         allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
-%     end
-%     EEG.event(allEventFlag) = [];
-% else
-%     allEventFlag = [];
-% end
+if ~isempty(EEG.event) && isfield(EEG.event, 'latency')
+    allEventLatencies = [ EEG.event.latency];
+    allEventFlag      = zeros(1,length(allEventLatencies));
+    for iRegion = 1:size(regions,1)
+        allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
+    end
+    boundaryIndices = eeg_findboundaries(EEG);
+    allEventFlag(boundaryIndices) = false; % do not remove boundary events
+    EEG.event(allEventFlag) = [];
+end
 
 % reject data
 % -----------
