@@ -235,7 +235,7 @@ end
 strjoinPath = fileparts(which('strjoin'));
 [~,strjoinPath2] = fileparts(strjoinPath);
 if ~strcmpi(strjoinPath2, 'strfun')
-    warning(sprintf('Potential function conflict for strjoin.m located in "%s" \nWe suggest removing the path from Matlab to avoid problems.', strjoinPath));
+    warning(sprintf('Potential function conflict for strjoin.m located in "%s" \nWe suggest removing the path from MATLAB to avoid problems.', strjoinPath));
 end
 
 % check for duplicate versions of EEGLAB
@@ -436,7 +436,7 @@ if nargin == 1
         EEG = pop_loadset(fullfile(eeglabpath, 'sample_data', 'eeglab_data_epochs_ica.set'));
         eeglab redraw; 
         return
-	elseif strcmp(onearg, 'rebuild')
+    elseif strcmp(onearg, 'rebuild')
 		W_MAIN = findobj('tag', 'EEGLAB');
         close(W_MAIN);
         eeglab redraw;
@@ -748,7 +748,7 @@ if ~strcmpi(onearg, 'nogui')
     help_m   = eegmenu( false,  W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
 
     eegmenu( false,  neuro_m, 'Label', '(for more use menu File > Manage EEGLAB extensions)', 'userdata', 'enable:off');
-    eegmenu( false,  neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata, 'separator', 'on');
+    eegmenu( false,  neuro_m, 'Label', 'From ASCII/float file or MATLAB array' , 'CallBack', cb_importdata, 'separator', 'on');
     %eegmenu( false,  neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
 
     % BIOSIG MENUS
@@ -756,8 +756,8 @@ if ~strcmpi(onearg, 'nogui')
     eegmenu( false,  neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
     eegmenu( false,  neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
 
-    eegmenu( false,  epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
-    eegmenu( false,  event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
+    eegmenu( false,  epoch_m, 'Label', 'From MATLAB array or ASCII file'       , 'CallBack', cb_importepoch);
+    eegmenu( false,  event_m, 'Label', 'From MATLAB array or ASCII file'       , 'CallBack', cb_importevent);
     eegmenu( false,  event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
     eegmenu( false,  event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
     eegmenu( false,  event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
@@ -771,7 +771,7 @@ if ~strcmpi(onearg, 'nogui')
     eegmenu( false,  exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
 
     eegmenu( false,  file_m, 'Label', 'Load existing dataset'                  , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
-    eegmenu( false,  file_m, 'Label', 'Save current dataset(s)'                , 'userdata', ondatastudy, 'CallBack', cb_saveset);
+    eegmenu( false,  file_m, 'Label', 'Resave current dataset(s)'              , 'userdata', ondatastudy, 'CallBack', cb_saveset);
     eegmenu( false,  file_m, 'Label', 'Save current dataset as'                , 'userdata', ondata,      'CallBack', cb_savesetas);
     eegmenu( false,  file_m, 'Label', 'Clear dataset(s)'                       , 'userdata', ondata,      'CallBack', cb_delset);
 
@@ -1438,6 +1438,7 @@ if isempty(ALLEEG) && ~isempty(EEG) && all(arrayfun(@(eeg) ~isempty(eeg.data), E
 else
     % check dataset
     if ~isempty(EEG) && ~isempty(ALLEEG) && ~isequaln(EEG, ALLEEG(CURRENTSET))
+        EEG.saved = 'no';
         [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'study', ~isempty(STUDY)+0, 'guistring', 'The EEG structure has changed, what do you want to do?');
     end
 end
