@@ -279,22 +279,11 @@ if nargin < 1                 % if several arguments, assign values
     % generate the output command
     % ---------------------------
     EEGOUT = pop_editset(EEGOUT, args{:});
-    com    = sprintf( 'EEG = pop_importdata(%s);', vararg2str(args) );
-    
-    %com = '';
-    %for i=1:2:length(args)
-    %    if ~isempty( args{i+1} )
-    %        if ischar( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
-    %        else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-    %        end
-    %    else
-    %        com = sprintf('%s, ''%s'', []', com, args{i} );
-    %    end
-    %end
-    %com = [ 'EEG = pop_importdata(' com(2:end) ');'];
 
 else % no interactive inputs
     EEGOUT = pop_editset(EEGOUT, varargin{:});
+    args = varargin;
 end
-
-return;
+if nargout > 1
+    com    = sprintf( 'EEG = pop_importdata(%s);', vararg2str(args) );
+end
