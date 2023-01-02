@@ -266,7 +266,7 @@ if nargin < 2                 % if several arguments, assign values
     if ~strcmp( results{i+5}, num2str(EEG.xmin)     ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end
     if ~strcmp( results{i+6},        EEG.group      ) , args = { args{:}, 'group',             results{i+6}  }; end
 	if ~strcmp( results{i+7}, num2str(EEG.nbchan)   ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end
-    if ~strcmp( results{i+8},        EEG.run        ) , args = { args{:}, 'run',       str2num(results{i+8}) }; end
+    if ~isequal( results{i+8},        EEG.run       ) , args = { args{:}, 'run',       str2num(results{i+8}) }; end
     if ~strcmp( results{i+9}, num2str(EEG.ref)      ) , args = { args{:}, 'ref',               results{i+9}  }; end
     if ~strcmp( results{i+10},num2str(EEG.session)  ) , args = { args{:}, 'session',   str2num(results{i+10})}; end
 

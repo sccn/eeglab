@@ -67,9 +67,17 @@ end
 
 % check if menu contains command
 cb = get(menuhandle, 'callback');
+if iscell(cb) 
+    if contains(cb{1}, func)
+        cb = cb{1};
+    else
+        cb = cb{end};
+    end
+end
 ind = strfind(cb, func);
 if length(ind) ~= 1
-    error('Menu with label ''%s'' found, but the callback does not contain the string ''%s''', label, func);
+    fprintf(2, 'Menu with label ''%s'' found, but the callback does not contain the string ''%s''\n', label, func);
+    ind = ind(end);
 end
 
 % extract callback and add parameters

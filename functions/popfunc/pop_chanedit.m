@@ -158,7 +158,7 @@
 % hidden parameter
 %   'gui' - [figure value], allow to process the same dialog box several times
 
-function [chansout, chaninfo, urchans, com] = pop_chanedit(chans, orichaninfo, varargin);
+function [chansout, chaninfo, urchans, com] = pop_chanedit(chans, orichaninfo, varargin)
 
 urchans  = [];
 com ='';
@@ -1077,6 +1077,9 @@ else
          end
          try chansout = EEG; catch, end
     else chansout = chans;
+    end
+    if nargout > 3
+        com = sprintf('%s=pop_chanedit(%s, %s);', inputname(1), inputname(1), vararg2str( [ { orichaninfo } varargin ]));
     end
 end
 
