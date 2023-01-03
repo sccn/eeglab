@@ -243,302 +243,256 @@ reset_randomseed = DEFAULT_RESETRANDOMSEED;
 %
 %%%%%%%%%% Collect keywords and values from argument list %%%%%%%%%%%%%%%
 %
-   if (nargin> 1 && rem(nargin,2) == 0)
-      fprintf('runica(): Even number of input arguments???')
-      return
-   end
-   for i = 1:2:length(varargin) % for each Keyword
-      Keyword = varargin{i};
-      Value = varargin{i+1};
-      if ~ischar(Keyword)
-         fprintf('runica(): keywords must be strings')
-         return
-      end
-      Keyword = lower(Keyword); % convert upper or mixed case to lower
+if (nargin> 1 && rem(nargin,2) == 0)
+    error('runica(): Even number of input arguments???')
+end
+for i = 1:2:length(varargin) % for each Keyword
+    Keyword = varargin{i};
+    Value = varargin{i+1};
+    if ~ischar(Keyword)
+        error('runica(): keywords must be strings')
+    end
+    Keyword = lower(Keyword); % convert upper or mixed case to lower
 
-      if strcmp(Keyword,'weights') || strcmp(Keyword,'weight')
-         if ischar(Value)
-            fprintf(...
-      'runica(): weights value must be a weight matrix or sphere')
-            return
-         else
-           weights = Value;
-           wts_passed =1;
-         end
-      elseif strcmp(Keyword,'ncomps')
-         if ischar(Value)
-            fprintf('runica(): ncomps value must be an integer')
-            return
-         end
-         if ncomps < urchans && ncomps ~= Value
-            fprintf('runica(): Use either PCA or ICA dimension reduction');
-            return
-         end
-         fprintf('*****************************************************************************************');
-         fprintf('************** WARNING: NCOMPS OPTION OFTEN DOES NOT RETURN ACCURATE RESULTS ************');
-         fprintf('************** WARNING: IF YOU FIND THE PROBLEM, PLEASE LET US KNOW          ************');
-         fprintf('*****************************************************************************************');
-         ncomps = Value;
-         if ~ncomps,
+    if strcmp(Keyword,'weights') || strcmp(Keyword,'weight')
+        if ischar(Value)
+            error('runica(): weights value must be a weight matrix or sphere')
+        else
+            weights = Value;
+            wts_passed =1;
+        end
+    elseif strcmp(Keyword,'ncomps')
+        if ischar(Value)
+            error('runica(): ncomps value must be an integer')
+        end
+        if ncomps < urchans && ncomps ~= Value
+            error('runica(): Use either PCA or ICA dimension reduction');
+        end
+        fprintf('*****************************************************************************************');
+        fprintf('************** WARNING: NCOMPS OPTION OFTEN DOES NOT RETURN ACCURATE RESULTS ************');
+        fprintf('************** WARNING: IF YOU FIND THE PROBLEM, PLEASE LET US KNOW          ************');
+        fprintf('*****************************************************************************************');
+        ncomps = Value;
+        if ~ncomps
             ncomps = chans;
-         end
-      elseif strcmp(Keyword,'pca') 
-         if ncomps < urchans && ncomps ~= Value
-            fprintf('runica(): Use either PCA or ICA dimension reduction');
-            return
-         end
-         if ischar(Value)
-            fprintf(...
-'runica(): pca value should be the number of principal components to retain')
-            return
-         end
-         pcaflag = 'on';
-         ncomps = Value;
-         if ncomps > chans || ncomps < -1
-            fprintf('runica(): pca value must be in range [%d,%d]\n',-chans+1, chans)
-            return
-         end
-         if ncomps < 0
-             ncomps = size(data,1)+ncomps;
-         end
-         chans = ncomps;
-       elseif strcmp(Keyword,'interupt') || strcmp(Keyword,'interrupt') 
-         if ~ischar(Value)
-           fprintf('runica(): interrupt value must be on or off')
-           return
-         else 
-           Value = lower(Value);
-           if ~strcmp(Value,'on') && ~strcmp(Value,'off')
-             fprintf('runica(): interrupt value must be on or off')
-             return
-           end
-           interrupt = Value;
-         end
-     elseif strcmp(Keyword,'posact') 
-         if ~ischar(Value)
-           fprintf('runica(): posact value must be on or off')
-           return
-         else 
-           Value = lower(Value);
-           if ~strcmp(Value,'on') && ~strcmp(Value,'off'),
-             fprintf('runica(): posact value must be on or off')
-             return
-           end
-           posactflag = Value;
-         end
-      elseif strcmp(Keyword,'lrate')
-         if ischar(Value)
-            fprintf('runica(): lrate value must be a number')
-            return
-         end
-         lrate = Value;
-         if lrate>MAX_LRATE || lrate <0
-           fprintf('runica(): lrate value is out of bounds'); 
-           return
-         end
-         if ~lrate
+        end
+    elseif strcmp(Keyword,'pca')
+        if ncomps < urchans && ncomps ~= Value
+            error('runica(): Use either PCA or ICA dimension reduction');
+        end
+        if ischar(Value)
+            error('runica(): pca value should be the number of principal components to retain')
+        end
+        pcaflag = 'on';
+        ncomps = Value;
+        if ncomps > chans || ncomps < -1
+            error('runica(): pca value must be in range [%d,%d]\n',-chans+1, chans)
+        end
+        if ncomps < 0
+            ncomps = size(data,1)+ncomps;
+        end
+        chans = ncomps;
+    elseif strcmp(Keyword,'interupt') || strcmp(Keyword,'interrupt')
+        if ~ischar(Value)
+            error('runica(): interrupt value must be on or off')
+        else
+            Value = lower(Value);
+            if ~strcmp(Value,'on') && ~strcmp(Value,'off')
+                error('runica(): interrupt value must be on or off')
+            end
+            interrupt = Value;
+        end
+    elseif strcmp(Keyword,'posact')
+        if ~ischar(Value)
+            error('runica(): posact value must be on or off')
+        else
+            Value = lower(Value);
+            if ~strcmp(Value,'on') && ~strcmp(Value,'off'),
+                error('runica(): posact value must be on or off')
+            end
+            posactflag = Value;
+        end
+    elseif strcmp(Keyword,'lrate')
+        if ischar(Value)
+            error('runica(): lrate value must be a number')
+        end
+        lrate = Value;
+        if lrate>MAX_LRATE || lrate <0
+            error('runica(): lrate value is out of bounds');
+        end
+        if ~lrate
             lrate = DEFAULT_LRATE;
-         end
-      elseif strcmp(Keyword,'block') || strcmp(Keyword,'blocksize')
-         if ischar(Value)
-            fprintf('runica(): block size value must be a number')
-            return
-         end
-         block = floor(Value);
-         if ~block
-           block = DEFAULT_BLOCK; 
-         end
-      elseif strcmp(Keyword,'stop') || strcmp(Keyword,'nochange') ...
-                    || strcmp(Keyword,'stopping')
-         if ischar(Value)
-            fprintf('runica(): stop wchange value must be a number')
-            return
-         end
-         nochange = Value;
-      elseif strcmp(Keyword,'logfile')
-         if ~ischar(Value)
-            fprintf('runica(): logfile value must be a string')
-            return
-         end
-         logfile = Value;
-      elseif strcmp(Keyword,'maxsteps') || strcmp(Keyword,'steps')
-         if ischar(Value)
-            fprintf('runica(): maxsteps value must be an integer')
-            return
-         end
-         maxsteps = Value;
-         if ~maxsteps
+        end
+    elseif strcmp(Keyword,'block') || strcmp(Keyword,'blocksize')
+        if ischar(Value)
+            error('runica(): block size value must be a number')
+        end
+        block = floor(Value);
+        if ~block
+            block = DEFAULT_BLOCK;
+        end
+    elseif strcmp(Keyword,'stop') || strcmp(Keyword,'nochange') ...
+            || strcmp(Keyword,'stopping')
+        if ischar(Value)
+            error('runica(): stop wchange value must be a number')
+        end
+        nochange = Value;
+    elseif strcmp(Keyword,'logfile')
+        if ~ischar(Value)
+            error('runica(): logfile value must be a string')
+        end
+        logfile = Value;
+    elseif strcmp(Keyword,'maxsteps') || strcmp(Keyword,'steps')
+        if ischar(Value)
+            error('runica(): maxsteps value must be an integer')
+        end
+        maxsteps = Value;
+        if ~maxsteps
             maxsteps   = DEFAULT_MAXSTEPS;
-         end
-         if maxsteps < 0
-            fprintf('runica(): maxsteps value (%d) must be a positive integer',maxsteps)
-            return
-         end
-      elseif strcmp(Keyword,'anneal') || strcmp(Keyword,'annealstep')
-         if ischar(Value)
-            fprintf('runica(): anneal step value (%2.4f) must be a number (0,1)',Value)
-            return
-         end
-         annealstep = Value;
-         if annealstep <=0 || annealstep > 1
-            fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
-            return
-         end
-      elseif strcmp(Keyword,'annealdeg') || strcmp(Keyword,'degrees')
-         if ischar(Value)
-            fprintf('runica(): annealdeg value must be a number')
-            return
-         end
-         annealdeg = Value;
-         if ~annealdeg
-             annealdeg = DEFAULT_ANNEALDEG;
-         elseif annealdeg > 180 || annealdeg < 0
-          fprintf('runica(): annealdeg (%3.1f) is out of bounds [0,180]',...
-                annealdeg);
-          return
-                                              
-         end
-      elseif strcmp(Keyword,'momentum')
-         if ischar(Value)
-            fprintf('runica(): momentum value must be a number')
-            return
-         end
-         momentum = Value;
-         if momentum > 1.0 || momentum < 0
-          fprintf('runica(): momentum value is out of bounds [0,1]')
-          return
-         end
-      elseif strcmp(Keyword,'sphering') || strcmp(Keyword,'sphereing') ...
-                || strcmp(Keyword,'sphere')
-         if ~ischar(Value)
-           fprintf('runica(): sphering value must be on, off, or none')
-           return
-         else 
-           Value = lower(Value);
-           if ~strcmp(Value,'on') && ~strcmp(Value,'off') && ~strcmp(Value,'none'),
-             fprintf('runica(): sphering value must be on or off')
-             return
-           end
-           sphering = Value;
-         end
-      elseif strcmp(Keyword,'bias')
-         if ~ischar(Value)
-           fprintf('runica(): bias value must be on or off')
-           return
-         else 
-           Value = lower(Value);
-           if strcmp(Value,'on') 
-              biasflag = 1;
-           elseif strcmp(Value,'off'),
-              biasflag = 0;
-           else
-              fprintf('runica(): bias value must be on or off')
-              return
-           end
-         end
-      elseif strcmp(Keyword,'specgram') || strcmp(Keyword,'spec')
+        end
+        if maxsteps < 0
+            error('runica(): maxsteps value (%d) must be a positive integer',maxsteps)
+        end
+    elseif strcmp(Keyword,'anneal') || strcmp(Keyword,'annealstep')
+        if ischar(Value)
+            error('runica(): anneal step value (%2.4f) must be a number (0,1)',Value)
+        end
+        annealstep = Value;
+        if annealstep <=0 || annealstep > 1
+            error('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
+        end
+    elseif strcmp(Keyword,'annealdeg') || strcmp(Keyword,'degrees')
+        if ischar(Value)
+            error('runica(): annealdeg value must be a number')
+        end
+        annealdeg = Value;
+        if ~annealdeg
+            annealdeg = DEFAULT_ANNEALDEG;
+        elseif annealdeg > 180 || annealdeg < 0
+            error('runica(): annealdeg (%3.1f) is out of bounds [0,180]',annealdeg);
+        end
+    elseif strcmp(Keyword,'momentum')
+        if ischar(Value)
+            error('runica(): momentum value must be a number')
+        end
+        momentum = Value;
+        if momentum > 1.0 || momentum < 0
+            error('runica(): momentum value is out of bounds [0,1]')
+        end
+    elseif strcmp(Keyword,'sphering') || strcmp(Keyword,'sphereing') ...
+            || strcmp(Keyword,'sphere')
+        if ~ischar(Value)
+            error('runica(): sphering value must be on, off, or none')
+        else
+            Value = lower(Value);
+            if ~strcmp(Value,'on') && ~strcmp(Value,'off') && ~strcmp(Value,'none'),
+                error('runica(): sphering value must be on or off')
+            end
+            sphering = Value;
+        end
+    elseif strcmp(Keyword,'bias')
+        if ~ischar(Value)
+            error('runica(): bias value must be on or off')
+        else
+            Value = lower(Value);
+            if strcmp(Value,'on')
+                biasflag = 1;
+            elseif strcmp(Value,'off'),
+                biasflag = 0;
+            else
+                error('runica(): bias value must be on or off')
+            end
+        end
+    elseif strcmp(Keyword,'specgram') || strcmp(Keyword,'spec')
 
-         if ~exist('specgram') < 2 % if ~exist or defined workspace variable
-           fprintf(...
-   'runica(): MATLAB Sig. Proc. Toolbox function "specgram" not found.\n')
-           return
-         end
-         if ischar(Value)
-           fprintf('runica(): specgram argument must be a vector')
-           return
-         end
-         srate = Value(1);
-         if (srate < 0)
-             fprintf('runica(): specgram srate (%4.1f) must be >=0',srate)
-             return
-           end
-         if length(Value)>1
-           loHz = Value(2);
-           if (loHz < 0 || loHz > srate/2)
-             fprintf('runica(): specgram loHz must be >=0 and <= srate/2 (%4.1f)',srate/2)
-             return
-           end
-         else
-           loHz = 0; % default
-         end
-         if length(Value)>2
-           hiHz = Value(3);
-           if (hiHz < loHz || hiHz > srate/2)
-             fprintf('runica(): specgram hiHz must be >=loHz (%4.1f) and <= srate/2 (%4.1f)',loHz,srate/2)
-             return
-           end
-         else
-           hiHz = srate/2; % default
-         end
-         if length(Value)>3
-           Hzframes = Value(5);
-           if (Hzframes<0 || Hzframes > size(data,2))
-             fprintf('runica(): specgram frames must be >=0 and <= data length (%d)',size(data,2))
-             return
-           end
-         else
-           Hzframes = size(data,2); % default
-         end
-         if length(Value)>4
-           Hzwinlen = Value(4);
-           if rem(Hzframes,Hzwinlen) % if winlen doesn't divide frames
-             fprintf('runica(): specgram Hzinc must divide frames (%d)',Hzframes)
-             return
-           end
-         else
-           Hzwinlen = Hzframes; % default
-         end
-         Specgramflag = 1; % set flag to perform specgram()
+        if ~exist('specgram') < 2 % if ~exist or defined workspace variable
+            error('runica(): MATLAB Sig. Proc. Toolbox function "specgram" not found.\n')
+        end
+        if ischar(Value)
+            error('runica(): specgram argument must be a vector')
+        end
+        srate = Value(1);
+        if (srate < 0)
+            fprintf('runica(): specgram srate (%4.1f) must be >=0',srate)
+        end
+        if length(Value)>1
+            loHz = Value(2);
+            if (loHz < 0 || loHz > srate/2)
+                error('runica(): specgram loHz must be >=0 and <= srate/2 (%4.1f)',srate/2)
+            end
+        else
+            loHz = 0; % default
+        end
+        if length(Value)>2
+            hiHz = Value(3);
+            if (hiHz < loHz || hiHz > srate/2)
+                error('runica(): specgram hiHz must be >=loHz (%4.1f) and <= srate/2 (%4.1f)',loHz,srate/2)
+            end
+        else
+            hiHz = srate/2; % default
+        end
+        if length(Value)>3
+            Hzframes = Value(5);
+            if (Hzframes<0 || Hzframes > size(data,2))
+                error('runica(): specgram frames must be >=0 and <= data length (%d)',size(data,2))
+            end
+        else
+            Hzframes = size(data,2); % default
+        end
+        if length(Value)>4
+            Hzwinlen = Value(4);
+            if rem(Hzframes,Hzwinlen) % if winlen doesn't divide frames
+                error('runica(): specgram Hzinc must divide frames (%d)',Hzframes)
+            end
+        else
+            Hzwinlen = Hzframes; % default
+        end
+        Specgramflag = 1; % set flag to perform specgram()
 
-      elseif strcmp(Keyword,'extended') || strcmp(Keyword,'extend')
-         if ischar(Value)
-           fprintf('runica(): extended value must be an integer (+/-)')
-           return
-         else
-           extended = 1;      % turn on extended-ICA
-           extblocks = fix(Value); % number of blocks per kurt() compute
-           if extblocks < 0
+    elseif strcmp(Keyword,'extended') || strcmp(Keyword,'extend')
+        if ischar(Value)
+            error('runica(): ''extended'' parameter value must be an integer (+/-)')
+        else
+            extended = 1;      % turn on extended-ICA
+            extblocks = fix(Value); % number of blocks per kurt() compute
+            if extblocks < 0
                 nsub = -1*fix(extblocks);  % fix this many sub-Gauss comps
-           elseif ~extblocks
+            elseif ~extblocks
                 extended = 0;             % turn extended-ICA off
-           elseif kurtsize>frames   % length of kurtosis calculation
+            elseif kurtsize>frames   % length of kurtosis calculation
                 kurtsize = frames;
                 if kurtsize < MIN_KURTSIZE
-                   fprintf(...
-   'runica() warning: kurtosis values inexact for << %d points.\n',...
-                                                         MIN_KURTSIZE);
+                    error('runica() warning: kurtosis values inexact for << %d points.\n', MIN_KURTSIZE);
                 end
-           end
-         end
-      elseif strcmp(Keyword,'verbose') 
-         if ~ischar(Value)
-            fprintf('runica(): verbose flag value must be on or off')
-            return
-         elseif strcmp(Value,'on')
-             verbose = 1; 
-         elseif strcmp(Value,'off')
-             verbose = 0; 
-         else
-             fprintf('runica(): verbose flag value must be on or off')
-             return
-         end
-      elseif strcmp(Keyword,'rndreset')
-         if ischar(Value)
-           if strcmp(Value,'yes')
-             reset_randomseed = true;
-           elseif strcmp(Value,'no')
-             reset_randomseed = false;
-           else
-             fprintf('runica(): not using the reset_randomseed flag, it should be ''yes'',''no'',0, or 1');
-           end
-         else
-           reset_randomseed = Value;
-         end
-      else
-         fprintf('runica(): unknown flag')
-         return
-      end
-   end
+            end
+        end
+    elseif strcmp(Keyword,'verbose')
+        if ~ischar(Value)
+            error('runica(): verbose flag value must be on or off')
+        elseif strcmp(Value,'on')
+            verbose = 1;
+        elseif strcmp(Value,'off')
+            verbose = 0;
+        else
+            error('runica(): verbose flag value must be on or off')
+        end
+    elseif strcmp(Keyword,'rndreset')
+        if ischar(Value)
+            if strcmp(Value,'yes')
+                reset_randomseed = true;
+            elseif strcmp(Value,'no')
+                reset_randomseed = false;
+            else
+                error('runica(): not using the reset_randomseed flag, it should be ''yes'',''no'',0, or 1');
+            end
+        else
+            reset_randomseed = Value;
+        end
+    else
+        fprintf(2, 'runica(): unknown flag')
+        return
+    end
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Initialize weights, etc. %%%%%%%%%%%%%%%%%%%%%%%%
