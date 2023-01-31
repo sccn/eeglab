@@ -4,6 +4,7 @@ function nameout = cleanvarname(namein)
 % nameout can be use as a variable or field in a structure
 
 % custom change
+nameout = namein;
 if strcmp(namein,'#')
     namein = 'nb';
 end
