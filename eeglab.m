@@ -1039,7 +1039,7 @@ else
                     
                 % special case of subfolder for BIOSIG
                 % ------------------------------------
-                if ~isempty(findstr(lower(dircontent(index).name), 'biosig')) && isempty(findstr(lower(dircontent(index).name), 'biosigplot'))
+                if ~isempty(findstr(lower(dircontent(index).name), 'biosig')) && isempty(strfind(lower(dircontent(index).name), 'biosigplot'))
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 't200_FileAccess'), 'sopen.m');
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 't250_ArtifactPreProcessingQualityControl'), 'regress_eog.m' );
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'biosig', 'doc'), 'DecimalFactors.txt');

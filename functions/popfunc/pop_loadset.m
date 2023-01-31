@@ -133,7 +133,18 @@ else
                 end
             end
             if isfield(TMPVAR, 'datfile') && ~isempty(TMPVAR.datfile)
-                TMPVAR.data = TMPVAR.datfile;
+                if exist(TMPVAR.datfile, 'file')
+                    TMPVAR.data = TMPVAR.datfile;
+                else
+                    warning('.fdt file not found, checking if .set contains data')
+                    TMPVAR = load('-mat', filename);
+                    if ~isnumeric(TMPVAR.data) && ~isempty(TMPVAR.data) 
+                        warning('.fdt file not found, but data found in .set EEGLAB file')
+                        TMPVAR.data = 'in set file';
+                    else
+                        warning('.fdt file not found, this EEGLAB file is missing raw data')
+                    end
+                end
             else
                 TMPVAR.data = 'in set file';
             end
