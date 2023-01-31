@@ -600,6 +600,9 @@ if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3)
     else
         EEG.data  = EEG.data(g.channel, :, g.trial);
     end
+    if isfield(EEG, 'etc') && isfield(EEG.etc, 'clean_channel_mask')
+        EEG.etc.clean_channel_mask(rmchan) = 1;
+    end
 end
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end
 if ~isempty(EEG.chanlocs)
