@@ -462,7 +462,7 @@ for i = 1:2:length(varargin) % for each Keyword
             elseif kurtsize>frames   % length of kurtosis calculation
                 kurtsize = frames;
                 if kurtsize < MIN_KURTSIZE
-                    error('runica() warning: kurtosis values inexact for << %d points.\n', MIN_KURTSIZE);
+                    warning('runica() warning: kurtosis values inexact for << %d points.\n', MIN_KURTSIZE);
                 end
             end
         end
