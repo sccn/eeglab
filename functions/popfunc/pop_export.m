@@ -173,6 +173,9 @@ end
 % transpose and write to disk
 % ---------------------------
 fid = fopen(filename, 'w');
+if fid == -1
+    error('Cannot write file %s', filename);
+end
 strprintf = [ '%.' num2str(g.precision) 'f' g.separator ];
 if strcmpi(g.transpose, 'on')
     % columns
