@@ -1,4 +1,4 @@
-% pop_rmdat() - Remove continuous data around specific events
+% POP_RMDAT - Keep or remove continuous data around specific events
 %
 % Usage:
 %   >> OUTEEG = pop_rmdat( EEG); % pop-up a data entry window
@@ -20,7 +20,8 @@
 %                the 'EEG.event' structure).
 %   timelimits - Epoch latency limits [start end] in seconds relative to the time-locking event 
 %                {default: [-1 2]}%   
-%   invertselection - [0|1] Invert selection {default:0 is no}
+%   invertselection - [0|1] Invert selection. 0 is to keep data around events
+%                and 1 is to remove them {default:1 to remove them}
 %   
 % Outputs:
 %   OUTEEG     - output dataset
@@ -54,23 +55,26 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, com] = pop_rmdat( EEG, events, timelims, invertsel );
+function [EEG, com] = pop_rmdat( EEG, events, timelims, invertsel )
 
 if nargin < 1
    help pop_rmdat;
 	return;
-end;	
+end
 com = '';
-
-if isempty(EEG.event)
+if nargin < 4
+    invertsel = 1;
+    warning('This function behavior has been fixed and data is removed by default')
+end
+if isempty(EEG(1).event)
     error( [ 'No event. This function removes data' 10 'based on event latencies' ]);
 end
-if isempty(EEG.trials)
+if isempty(EEG(1).trials)
     error( [ 'This function only works with continuous data' ]);
 end
-if ~isfield(EEG.event, 'latency'),
+if ~isfield(EEG(1).event, 'latency')
     error( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
-end;    
+end
 
 if nargin < 3
 	% popup window parameters
@@ -106,7 +110,7 @@ if nargin < 3
               { 'style' 'popupmenu'  'string' 'Keep selected|Remove selected' } };
               
    result = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_rmdat'')', 'title', 'Remove data portions around events - pop_rmdat()', 'userdata', EEG);
-   if length(result) == 0 return; end
+   if isempty(result) return; end
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end
    if ~isempty(result{1})
@@ -121,6 +125,17 @@ if nargin < 3
    timelims = eval( [ '[' result{2} ']' ] );
    invertsel = result{3}-1;
  
+end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 3
+        [ EEG, com ] = eeg_eval( 'pop_rmdat', EEG, 'warning', 'on', 'params', { events, timelims, invertsel } );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_rmdat', EEG, 'params', { events, timelims, invertsel } );
+    end
+    return;
 end
 
 tmpevent = EEG.event;
@@ -187,7 +202,7 @@ if invertsel
     EEG = pop_select(EEG, 'notime', (array-1)/EEG.srate);
 else
     EEG = pop_select(EEG, 'time', (array-1)/EEG.srate);
-end;    
+end  
    
 % generate output command
 % -----------------------

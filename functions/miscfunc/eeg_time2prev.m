@@ -1,9 +1,9 @@
-% eeg_time2prev() - returns a vector giving, for each event of specified ("target") type(s), 
+% EEG_TIME2PREV - returns a vector giving, for each event of specified ("target") type(s), 
 %                   the delay (in ms) since the preceding event (if any) of specified 
 %                   ("previous") type(s). Requires the EEG.urevent structure, plus 
-%                   EEG.event().urevent pointers to it. 
+%                   EEG.EVENT.urevent pointers to it. 
 %
-%           NOW SUPERCEDED BY eeg_context()
+%           NOW SUPERSEDED BY EEG_CONTEXT
 % Usage:
 %           >> [delays,targets,urtargs,urprevs] = eeg_time2prev(EEG,{target},{previous});
 % Inputs:
@@ -99,9 +99,9 @@ end
 %%%%%%%%%%%%%%%%%%%% Initialize output arrays %%%%%%%%%%%%%%%%%%%%%%
 %
 delays    = zeros(1,nevents); % holds output times in ms
-targets   = zeros(1,nevents); % holds indxes of targets
-urtargets = zeros(1,nevents); % holds indxes of targets
-urprevs   = zeros(1,nevents); % holds indxes of prevs
+targets   = zeros(1,nevents); % holds indexes of targets
+urtargets = zeros(1,nevents); % holds indexes of targets
+urprevs   = zeros(1,nevents); % holds indexes of prevs
 
 targetcount = 0; % index of current target
 % Below:

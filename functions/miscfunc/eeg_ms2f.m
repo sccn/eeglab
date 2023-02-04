@@ -1,4 +1,4 @@
-% eeg_ms2f() - convert epoch latency in ms to nearest epoch frame number
+% EEG_MS2F - convert epoch latency in ms to nearest epoch frame number
 %
 % Usage:
 %         >> outf = eeg_ms2f(EEG,ms);

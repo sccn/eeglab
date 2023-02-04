@@ -1,4 +1,4 @@
-% plotproj() - plot projections of one or more ICA components along with 
+% PLOTPROJ - plot projections of one or more ICA components along with 
 %              the original data (returns the data plotted)
 %
 % Usage:
@@ -7,26 +7,26 @@
 %                                 title,limits,chanlist,channames,colors);
 %
 % Inputs:
-%   data        = single epoch of runica() input data (chans,frames) 
+%   data        = single epoch of RUNICA input data (chans,frames) 
 %   weights     = unmixing matrix (=weights*sphere)
 %   compnums    = vector of component numbers to project and plot 
 %
 % Optional inputs:
-%   title       = 'fairly short plot title' {0 -> 'plotproj()'}
+%   title       = 'fairly short plot title' {0 -> 'PLOTPROJ'}
 %   limits      = [xmin xmax ymin ymax]  (x's in msec) 
 %                          {0, or both y's 0 -> data limits}
 %   chanlist    = list of data channels to plot {0 -> all}
-%   channames   = channel location file or structure (see readlocs())
+%   channames   = channel location file or structure (see READLOCS)
 %   colors      = file of color codes, 3 chars per line  ('.' = space)
 %                          {0 -> default color order (black/white first)}
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 05-01-96 
 %
-% See also: plotdata()
+% See also: PLOTDATA
 
 % Without color arg, reads filename for PROJCOLORS from icadefs.m
 
-% Copyright (C) 05-01-96 from plotdata() Scott Makeig, SCCN/INC/UCSD,
+% Copyright (C) 05-01-96 from PLOTDATA Scott Makeig, SCCN/INC/UCSD,
 % scott@sccn.ucsd.edu
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
@@ -59,8 +59,8 @@
 % 10-26-96 added test for column of compnums  -sm
 % 02-18-97 improved usage message -sm
 % 02-19-97 merged versions -sm
-% 03-19-97 changed var() to diag(cov()), use datamean arg instead of frames/baseframes -sm
-% 04-24-97 tested datamean for 1-epoch; replaced cov() with mean-squares -sm
+% 03-19-97 changed VAR to diag(COV), use datamean arg instead of frames/baseframes -sm
+% 04-24-97 tested datamean for 1-epoch; replaced COV with mean-squares -sm
 % 05-20-97 read icadefs for PROJCOLORS & MAXPLOTDATACHANS -sm
 % 06-05-97 use arbitrary chanlist as default channames -sm 
 % 06-07-97 changed order of args to conform to runica -sm
@@ -69,7 +69,7 @@
 % 09-09-97 corrected write out line " summing " -sm
 % 10-31-97 removed errcode var -sm
 % 11-05-97 added test for channames when chanlist ~= 1:length(chanlist) -sm & ch
-% 12-19-00 adjusted new icaproj() args -sm
+% 12-19-00 adjusted new ICAPROJ args -sm
 % 01-12-01 removed sphere arg -sm
 % 01-25-02 reformated help & license, added links -ad 
 

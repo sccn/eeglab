@@ -1,4 +1,4 @@
-% std_readitc()  - load ITC measures for data channels or 
+% STD_READITC  - load ITC measures for data channels or 
 %                  for all components of a specified cluster.
 % Usage:
 %         >> [STUDY, itcdata, times, freqs] = ...

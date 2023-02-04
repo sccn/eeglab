@@ -1,4 +1,4 @@
-% eegplotlegacy() - Scroll (horizontally and/or vertically) through multichannel data.
+% EEGPLOTLEGACY - Scroll (horizontally and/or vertically) through multichannel data.
 %             Allows vertical scrolling through channels and manual marking 
 %             and unmarking of data stretches or epochs for rejection.
 % Usage: 
@@ -20,13 +20,13 @@
 %                  Clicked on a marked region to unmark it. Called from the
 %                  command line, marked data stretches or epochs are returned in 
 %                  the TMPREJ variable in the global workspace *if/when* the "Reject" 
-%                  button is pressed (see Outputs); called from pop_eegplotlegacy() or 
-%                  eeglab(), the marked data portions are removed from the current
+%                  button is pressed (see Outputs); called from POP_EEGPLOTLEGACY or 
+%                  EEGLAB, the marked data portions are removed from the current
 %                  dataset, and the dataset is automatically updated.
 %     "Display > Marking color > Choose color" - [menu] Change the background marking 
 %                  color. The marking color(s) of previously marked trials are preserved. 
-%                  Called from command line, subsequent functions eegplot2event() or 
-%                  eegplot2trials() allow processing trials marked with different colors 
+%                  Called from command line, subsequent functions EEGPLOT2EVENT or 
+%                  EEGPLOT2TRIALS allow processing trials marked with different colors 
 %                  in the TMPREJ output variable. Command line equivalent: 'wincolor'.
 %     "Display > Grid > ..." - [menu] Toggle (on or off) time and/or channel axis grids 
 %                  in the activity plot. Submenus allow modifications to grid aspects.
@@ -45,12 +45,12 @@
 %                  user may scroll through channels using the slider on the left 
 %                  of the activity plot. Command line equivalent: 'dispchans'
 %     "Settings > Channel labels > ..."  - [menu] Use numbers as channel labels or load
-%                  a channel location file from disk. If called from the eeglab() menu or
-%                  pop_eegplotlegacy(), the channel labels of the dataset will be used. 
+%                  a channel location file from disk. If called from the EEGLAB menu or
+%                  POP_EEGPLOTLEGACY, the channel labels of the dataset will be used. 
 %                  Command line equivalent: 'eloc_file'
 %     "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off for time and
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
-%                  Else, draw a rectange in the activity window to zoom the display into 
+%                  Else, draw a rectangle in the activity window to zoom the display into 
 %                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
 %     "Settings > Events" - [menu] Toggle event on or off (assuming events have been 
 %                  given as input). Press "legend" to pop up a legend window for events.
@@ -120,7 +120,7 @@
 %                   clicked. The 'REJECT' button is visible only if this parameter is 
 %                   not empty. As explained in the "Output" section below, the variable 
 %                   'TMPREJ' contains the rejected windows (see the functions 
-%                   eegplot2event() and eegplot2trial()).
+%                   EEGPLOT2EVENT and EEGPLOT2TRIAL).
 %    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
 %                    for rejection, each row indicating a different period
@@ -136,15 +136,15 @@
 %    'events'     - [struct] EEGLAB event structure (EEG.event) to use to show events.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
-%    'tag'        - [string] Matlab object tag to identify this eegplotlegacy() window (allows 
-%                    keeping track of several simultaneous eegplotlegacy() windows). 
-%    'children'   - [integer] Figure handle of a *dependent* eegplotlegacy() window. Scrolling
+%    'tag'        - [string] Matlab object tag to identify this EEGPLOTLEGACY window (allows 
+%                    keeping track of several simultaneous EEGPLOTLEGACY windows). 
+%    'children'   - [integer] Figure handle of a *dependent* EEGPLOTLEGACY window. Scrolling
 %                    horizontally in the master window will produce the same scroll in 
 %                    the dependent window. Allows comparison of two concurrent datasets,
 %                    or of channel and component data from the same dataset.
 %    'scale'      - ['on'|'off'] Display the amplitude scale {default: 'on'}.
 %    'mocap'      - ['on'|'off'] Display motion capture data in a separate figure.
-%                     To run, select an EEG data period in the scolling display using 
+%                     To run, select an EEG data period in the scrolling display using 
 %                     the mouse. Motion capture (mocap) data should be
 %                     under EEG.moredata.mocap.markerPosition in xs, ys and zs fields which are
 %                     (number of markers, number of time points) arrays.                
@@ -157,11 +157,11 @@
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
 %                    the global workspace (only) when the REJECT button is clicked. 
 %                    The command specified in the 'command' keyword argument can use 
-%                    this variable. (See eegplot2trial() and eegplot2event()). 
+%                    this variable. (See EEGPLOT2TRIAL and EEGPLOT2EVENT). 
 %
 % Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/INC/UCSD, 1998-2001
 %
-% See also: eeg_multieegplotlegacy(), eegplot2event(), eegplot2trial(), eeglab()
+% See also: EEG_MULTIEEGPLOTLEGACY, EEGPLOT2EVENT, EEGPLOT2TRIAL, EEGLAB
 
 % deprecated 
 %    'colmodif'   - nested cell array of window colors that may be marked/unmarked. Default
@@ -209,7 +209,7 @@
 %    2 - colorlist
 %    3 - submean    % on or off, subtract the mean
 %    4 - maxfreq    % empty [] if no gfrequency content
-% 'buttons hold other informations' Eposition for instance hold the current postition
+% 'buttons hold other informations' Eposition for instance hold the current position
 
 function [outvar1] = eegplotlegacy(data, varargin); % p1,p2,p3,p4,p5,p6,p7,p8,p9)
 
@@ -1229,6 +1229,10 @@ else
     data = get(ax1,'UserData');
     ESpacing = findobj('tag','ESpacing','parent',figh);   % ui handle
     EPosition = findobj('tag','EPosition','parent',figh); % ui handle
+    Pushbutton1 = findobj('tag','Pushbutton1','parent',figh);
+    Pushbutton2 = findobj('tag','Pushbutton2','parent',figh);
+    Pushbutton3 = findobj('tag','Pushbutton3','parent',figh);
+    Pushbutton4 = findobj('tag','Pushbutton4','parent',figh);
     if ~isempty(EPosition) && ~isempty(ESpacing)
         if g.trialstag(1) == -1
             g.time    = str2num(get(EPosition,'string'));
@@ -1257,12 +1261,29 @@ else
     
     % Update edit box
     % ---------------
-    g.time = max(0,min(g.time,ceil((g.frames-1)/multiplier)-g.winlength));
+    editboxmax = ceil((g.frames-1)/multiplier)-g.winlength;
+    g.time = max(0,min(g.time,editboxmax));
     if g.trialstag(1) == -1
         set(EPosition,'string',num2str(g.time)); 
     else 
         set(EPosition,'string',num2str(g.time+1)); 
     end
+    
+    % Update navigation buttons
+    % ---------------
+    if g.time == 0
+        set(Pushbutton1,'enable','off');
+        set(Pushbutton2,'enable','off');
+    elseif g.time < editboxmax
+        set(Pushbutton1,'enable','on');
+        set(Pushbutton2,'enable','on');
+        set(Pushbutton3,'enable','on');
+        set(Pushbutton4,'enable','on');
+    else
+        set(Pushbutton3,'enable','off');
+        set(Pushbutton4,'enable','off');
+    end
+    
     set(figh, 'userdata', g);
 
     lowlim = round(g.time*multiplier+1);
@@ -2044,7 +2065,7 @@ else
         g = get(fig,'UserData');       
         ax1 = findobj('tag','backeeg','parent',fig);
         tmppos = get(ax1, 'currentpoint');       
-        g = get(fig,'UserData'); % get data of backgroung image {g.trialstag g.winrej incallback}
+        g = get(fig,'UserData'); % get data of background image {g.trialstag g.winrej incallback}
         if g.incallback ~= 1 % interception of nestest calls
             if g.trialstag ~= -1
                 lowlim = round(g.time*g.trialstag+1);

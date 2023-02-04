@@ -1,4 +1,4 @@
-% pop_editeventvals() - Edit events contained in an EEG dataset structure. 
+% POP_EDITEVENTVALS - Edit events contained in an EEG dataset structure. 
 %               If the dataset is the only input, a window pops up 
 %               allowing the user to insert the relevant parameter values.
 %
@@ -33,7 +33,7 @@
 %
 % Author: Arnaud Delorme & Hilit Serby, SCCN, UCSD, 15 March 2002
 %
-% See also: pop_selectevent(), pop_importevent()
+% See also: POP_SELECTEVENT, POP_IMPORTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 15 March 2002, arno@salk.edu
 %
@@ -67,15 +67,15 @@
 % 03-18-02 debug soring order - ad
 % 03-18-02 put latencies in ms - ad, lf & sm
 % 03-29-02 debug latencies in ms - ad & sm
-% 04-02-02 debuging test - ad & sm
+% 04-02-02 debugging test - ad & sm
 
-function [EEG, com] = pop_editeventvals(EEG, varargin);
+function [EEG, com] = pop_editeventvals(EEG, varargin)
 
 com ='';
 if nargin < 1
    help pop_editeventvals;
    return;
-end;	
+end
 
 if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
     
@@ -104,7 +104,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
         if isempty(EEG.event)
             disp('Getevent: cannot deal with empty event structure');
             return;
-        end;   
+        end  
         
         allfields = fieldnames(EEG.event);
         tmpind = strmatch('urevent', allfields);
@@ -150,7 +150,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
         
         switch lower(varargin{indfield})
         
-     case 'goto', % ******************** GUI ONLY ***********************
+     case 'goto' % ******************** GUI ONLY ***********************
       
       % shift time
       % ----------
@@ -204,7 +204,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
       end
       return; % NO NEED TO SAVE ANYTHING
           
-     case { 'append' 'insert' 'add' }, % **********************************************************
+     case { 'append' 'insert' 'add' } % **********************************************************
 
       if gui
           shift     = tmparg; % shift is for adding before or after the event
@@ -285,7 +285,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
           EEG.event = checkconsistency(EEG.event, valnum, allfields{tmpind});
       end
       
-     case 'delete', % **********************************************************
+     case 'delete' % **********************************************************
       
       if ~gui
           valnum = tmparg;
@@ -293,7 +293,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
                 
       EEG.event(valnum) = []; 
       
-      if gui, 
+      if gui
           
           valnum           = min(valnum,length(EEG.event));
           set(objevent, 'string', num2str(valnum)); 
@@ -304,9 +304,9 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
       
       end
     
-     case { 'assign' 'changefield' }, % **********************************************************
+     case { 'assign' 'changefield' } % **********************************************************
       
-      if gui, % GUI case
+      if gui % GUI case
           
           field    = tmparg;
           objfield = findobj('parent', gcf, 'tag', field);
@@ -398,7 +398,7 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
           EEG.urevent = setfield(EEG.urevent, {urvalnum}, field, editval);
       end
       
-     case 'sort', % **********************************************************
+     case 'sort' % **********************************************************
       
       if gui % retrieve data
           
@@ -446,22 +446,22 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
           %if strcmp(field2, 'latency') & EEG.trials > 1
           %    tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
           %end
-          [X I] = mysort( tmparray );
+          [~, I] = mysort( tmparray );
           if dir2 == 1, I = I(end:-1:1); end
           events = EEG.event(I);
       else
           events = EEG.event;
-      end;  
+      end  
       tmpevent = EEG.event;
       if ~ischar(EEG.event(1).(field1))
-          tmparray = [ tmpevent.(field1) ];
+           tmparray = [ tmpevent.(field1) ];
       else tmparray = { tmpevent.(field1) };
       end
       % Commented out 11/18/2005, Toby
       %if strcmp( field1, 'latency') & EEG.trials > 1
       %    tmparray = eeg_point2lat(tmparray, {events.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
       %end
-      [X I] = mysort( tmparray );
+      [~, I] = mysort( tmparray );
       if dir1 == 1, I = I(end:-1:1); end
       EEG.event = events(I);
 
@@ -474,8 +474,8 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
           noeventcheck  = 1; % otherwise infinite recursion with eeg_checkset
       end
       
-    end; % end switch
-    end; % end loop
+        end % end switch
+    end % end loop
 
     % save userdata
     % -------------
@@ -489,6 +489,9 @@ if nargin >= 2 || ischar(EEG) % interpreting command from GUI or command line
             EEG = eeg_checkset(EEG, 'eventconsistency');
             EEG = eeg_checkset(EEG, 'checkur');
         end
+        if nargout > 1
+            com = sprintf('EEG = pop_editeventvals(EEG, %s);', vararg2str(varargin));
+        end
     end
     return;
 end
@@ -500,7 +503,7 @@ end
 if isempty(EEG.event)
     disp('Getevent: cannot deal with empty event structure');
     return;
-end;   
+end
 
 allfields = fieldnames(EEG.event);
 tmpind = strmatch('urevent', allfields);
@@ -524,7 +527,7 @@ if nargin<2
             if EEG.trials > 1
                  inputstr =  [ allfields{index} ' (ms)'];
             else inputstr =  [ allfields{index} ' (sec)'];
-            end;   
+            end
 		else inputstr =  allfields{index};
 		end
         
@@ -624,13 +627,13 @@ function strval = reformat( val, latencycondition, trialcondition, eventnum)
         end
     else
         if ischar(val), strval = [ '''' val '''' ];
-        else           strval = num2str(val);
+        else            strval = num2str(val);
         end
     end
 
 % sort also empty values
 % ----------------------
-function [X, I] = mysort(tmparray);
+function [X, I] = mysort(tmparray)
     if iscell(tmparray)
         if all(cellfun('isreal', tmparray))
             tmpempty = cellfun('isempty', tmparray);
@@ -638,9 +641,9 @@ function [X, I] = mysort(tmparray);
             tmparray = [ tmparray{:} ];
         end
     end
-    try, 
-        [X I] = sort(tmparray);
-    catch,
+    try
+        [X, I] = sort(tmparray);
+    catch
         disp('Sorting failed. Check that selected fields contain uniform value format.');
         X = tmparray;
         I = 1:length(X);

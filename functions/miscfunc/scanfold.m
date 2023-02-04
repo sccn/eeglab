@@ -1,4 +1,4 @@
-% scanfold() - scan folder content
+% SCANFOLD - scan folder content
 %
 % Usage:    
 %    >> [cellres textres] = scanfold(foldname);
@@ -11,7 +11,7 @@
 %
 % Outputs:
 %   cellres   - cell array containing all the files
-%   textres   - string array containing all the names preceeded by "-a"
+%   textres   - string array containing all the names preceded by "-a"
 % 
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, 2009
 

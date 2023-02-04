@@ -1,11 +1,11 @@
-% pop_rejcont() - reject continuous portions of data based on spectrum
+% POP_REJCONT - reject continuous portions of data based on spectrum
 %                 thresholding. First, contiguous data epochs are extracted
 %                 and a standard spectrum thresholding algorithm is
 %                 applied. Regions of contiguous epochs larger than a
 %                 specified size are then labeled as artifactual.
 %
 % Usage:
-%   >> pop_rejcont( INEEG ) % pop-up interative window mode
+%   >> pop_rejcont( INEEG ) % pop-up interactive window mode
 %   >> [OUTEEG, selectedregions] = pop_rejcont( INEEG, 'key', 'val');
 %
 % Inputs:
@@ -56,7 +56,7 @@
 % EEG = pop_rejcont(EEG, 'elecrange',[1:32] ,'freqlimit',[20 40] ,'threshold',...
 %    10,'epochlength',0.5,'contiguous',4,'addlength',0.25, 'taper', 'hamming');
 % 
-% See also: eegthresh()
+% See also: EEGTHRESH
 
 % Copyright (C) 2009 Arnaud Delorme, CERCO, UPS/CNRS
 %
@@ -189,11 +189,11 @@ if isempty(opt.precompstruct)
     % -------------------------
     tmpevent = NEWEEG.event;
     if ~isempty(tmpevent)
-        if isnumeric( tmpevent(1).type )
-            NEWEEG.event = [];
-        else
-            boundEvent = strmatch('boundary', { tmpevent.type }, 'exact');
+        boundEvent = eeg_findboundaries( tmpevent );
+        if ~isempty(boundEvent)
             NEWEEG.event = NEWEEG.event(boundEvent);
+        else
+            NEWEEG.event = [];
         end
     end
 

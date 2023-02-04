@@ -1,4 +1,4 @@
-% std_comppol() - inverse component polarity in a component cluster
+% STD_COMPPOL - inverse component polarity in a component cluster
 %
 % Usage: [compout pol] = std_comppol(compin);
 %

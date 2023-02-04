@@ -1,4 +1,4 @@
-% std_erp() -   Constructs and returns channel or ICA activation ERPs for a dataset. 
+% STD_ERP -   Constructs and returns channel or ICA activation ERPs for a dataset. 
 %               Saves the ERPs into a Matlab file, [dataset_name].icaerp, for
 %               data channels or [dataset_name].icaerp for ICA components, 
 %               in the same directory as the dataset file.  If such a file 
@@ -56,7 +56,7 @@
 % OR
 %    [dataset_file].daterp     % channel erp file
 %
-% See also: std_spec(), std_ersp(), std_topo(), std_preclust()
+% See also: STD_SPEC, STD_ERSP, STD_TOPO, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -151,16 +151,21 @@ filename = filenameshort;
 
 % ERP information found in datasets
 % ---------------------------------
-if exist(filename) && strcmpi(g.recompute, 'off') && nargout > 0
+if exist(filename) && strcmpi(g.recompute, 'off')
 
     fprintf('File "%s" found on disk, no need to recompute\n', filenameshort);
-    setinfo.filebase = filename;
-    if strcmpi(prefix, 'comp')
-        [X tmp t] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
+
+    if nargout > 0
+        setinfo.filebase = filename;
+        if strcmpi(prefix, 'comp')
+            [X tmp t] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
+        else
+            [X tmp t] = std_readfile(setinfo, 'channels', g.channels,  'timelimits', g.timerange, 'measure', 'erp');
+        end
+        if ~isempty(X), return; end
     else
-        [X tmp t] = std_readfile(setinfo, 'channels', g.channels,  'timelimits', g.timerange, 'measure', 'erp');
+        return; 
     end
-    if ~isempty(X), return; end
     
 end 
    

@@ -1,4 +1,4 @@
-% std_plotcurve() - plot ERP or spectral traces for a STUDY component 
+% STD_PLOTCURVE - plot ERP or spectral traces for a STUDY component 
 %                   or channel cluster 
 % Usage:
 %          >> std_plotcurve( axvals, data, 'key', 'val', ...)
@@ -57,7 +57,7 @@
 %                  above). 'nocurve' does not plot the mean. This functionality
 %                  does not work for all data configuration {default: 'off'}
 %  'figure'      - ['on'|'off'] creates a new figure ('on'). The 'off' mode
-%                  plots all of the groups and conditions on the same pannel.
+%                  plots all of the groups and conditions on the same panel.
 % 'plotsubjects' - ['on'|'off'] overplot traces for individual components
 %                  or channels {default: 'off'}
 % 'singlesubject' - ['on'|'off'] set to 'on' to plot single subject.
@@ -70,7 +70,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
+% See also: POP_ERSPPARAMS, POP_ERPPARAMS, POP_SPECPARAMS, STATCOND
 
 % Copyright (C) 2006 Arnaud Delorme
 %
@@ -240,7 +240,7 @@ if isempty(opt.groupnames)
     if ng == 1, opt.groupnames = { '' }; end
 end
 
-% plotting paramters
+% plotting parameters
 % ------------------
 if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end
 if nc > 1 && ~isempty(opt.condstats ), addr = 1; else addr = 0; end
@@ -282,13 +282,13 @@ if strcmpi(opt.effect, 'marginal') || ng == 1 || nc == 1
     end
 elseif strcmpi(opt.effect, 'main') && ~isempty(opt.interstats)
     if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
-        pcondplot  = { opt.interstats{1} };
-        pgroupplot = { opt.interstats{2} };
+        pcondplot  = { opt.interstats{2} };
+        pgroupplot = { opt.interstats{1} };
         pinterplot = opt.interstats{3};
         maxplot = 1;
     else
-        if ~isempty(opt.interstats{1}), pcondplot  = { -log10(opt.interstats{1}) }; end
-        if ~isempty(opt.interstats{2}), pgroupplot = { -log10(opt.interstats{2}) }; end
+        if ~isempty(opt.interstats{2}), pcondplot  = { -log10(opt.interstats{2}) }; end
+        if ~isempty(opt.interstats{1}), pgroupplot = { -log10(opt.interstats{1}) }; end
         if ~isempty(opt.interstats{3}), pinterplot = -log10(opt.interstats{3}); end
         maxplot = 3;
     end
@@ -430,7 +430,7 @@ for c = 1:ncplot
             % tmpdata is of size "points x channels x subject x conditions"
             % or                 "points x   1   x components x conditions"
             % -------------------------------------------------------------
-            if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off') % average accross subjects
+            if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off') % average across subjects
                 tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,3)));
             end
             tmpdata = squeeze(permute(tmpdata, [2 1 3 4]));
@@ -491,7 +491,7 @@ for c = 1:ncplot
             end
         end
 
-        % statistics accross groups
+        % statistics across groups
         % -------------------------
         if g == ngplot && ng > 1 && ~isempty(opt.groupstats)            
             if ~strcmpi(opt.plotgroups, 'together') || ~isempty(opt.condstats) || isnan(opt.threshold)
@@ -521,7 +521,7 @@ for c = 1:ncplot
     end
 end
 
-% statistics accross conditions
+% statistics across conditions
 % -----------------------------
 if ~isempty(opt.condstats) && nc > 1 && (~strcmpi(opt.plotconditions, 'together') || ~isempty(opt.groupstats) || isnan(opt.threshold))
     for g = 1:ng
@@ -550,7 +550,7 @@ if ~isempty(opt.condstats) && nc > 1 && (~strcmpi(opt.plotconditions, 'together'
 end
     
     
-% statistics accross group and conditions
+% statistics across group and conditions
 % ---------------------------------------
 if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1 
     mysubplot(ncplot+addr, ngplot+addc, ncplot+addr, ngplot + 1, opt.subplot);

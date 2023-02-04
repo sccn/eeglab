@@ -1,20 +1,20 @@
-% tftopo()  - Generate a figure showing a selected or representative image (e.g., 
+% TFTOPO  - Generate a figure showing a selected or representative image (e.g., 
 %             an ERSP, ITC or ERP-image) from a supplied set of images, one for each 
-%             scalp channel. Then, plot topoplot() scalp maps of value distributions 
+%             scalp channel. Then, plot TOPOPLOT scalp maps of value distributions 
 %             at specified (time, frequency) image points. Else, image the signed 
-%             (selected) between-channel std(). Inputs may be outputs of 
-%             timef(), crossf(), or erpimage().
+%             (selected) between-channel STD. Inputs may be outputs of 
+%             TIMEF, CROSSF, or ERPIMAGE.
 % Usage:
 %             >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
 % Inputs:
 %   tfdata    = Set of time/freq images, one for each channel. Matrix dims: 
 %               (time,freq),(time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
 %               RMS plotting.
-%   times     = Vector of image (x-value) times in msec, from timef()).
-%   freqs     = Vector of image (y-value) frequencies in Hz, from timef()).
+%   times     = Vector of image (x-value) times in msec, from TIMEF).
+%   freqs     = Vector of image (y-value) frequencies in Hz, from TIMEF).
 %
 % Optional inputs:
-%  'timefreqs' = Array of time/frequency points at which to plot topoplot() maps.
+%  'timefreqs' = Array of time/frequency points at which to plot TOPOPLOT maps.
 %                Size: (nrows,2), each row given the [ms Hz] location 
 %                of one point. Or size (nrows,4), each row given [min_ms
 %                max_ms min_hz max_hz].
@@ -25,7 +25,7 @@
 %  'limits'    = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
 %                May omit final vales, or use NaN's to use the input data limits. 
 %                Ex: [nan nan -100 400];
-%  'signifs'   = (times,freqs) Matrix of significance level(s) (e.g., from timef()) 
+%  'signifs'   = (times,freqs) Matrix of significance level(s) (e.g., from TIMEF) 
 %                to zero out non-signif. tfdata points. Matrix size must be 
 %                         ([1|2], freqs, chans, subjects) 
 %                if using the same threshold for all time points at each frequency, or
@@ -37,7 +37,7 @@
 %                K electrodes have non-0 (significant) values. If several subjects, 
 %                the second value L is used to concatenate subjects in the same way. 
 %                {default: [1 1]}
-%  'selchans'  = Channels to include in the topoplot() scalp maps (and image values) 
+%  'selchans'  = Channels to include in the TOPOPLOT scalp maps (and image values) 
 %                {default: all}
 %  'smooth'    = [pow2] magnification and smoothing factor. power of 2 (default: 1}.
 %  'mode'      = ['rms'|'ave'] ('rms') return root-mean-square, else ('ave') average 
@@ -64,7 +64,7 @@
 %  'denseLogTicks' = ['on'|'off'] creates denser labels on log freuqncy axis {default: 'off'} 
 %
 % Notes:
-%  1) Additional topoplot() optional arguments can be used.
+%  1) Additional TOPOPLOT optional arguments can be used.
 %  2) In the topoplot maps, average power (not masked by significance) is used 
 %     instead of the (signed and masked) root-mean-square (RMS) values used in the image.
 %  3) If tfdata from several subjects is used (via a 4-D tfdata input), RMS power is first 
@@ -72,7 +72,7 @@
 %
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
 %
-% See also: timef(), topoplot(), spectopo(), timtopo(), envtopo(), changeunits()
+% See also: TIMEF, TOPOPLOT, SPECTOPO, TIMTOPO, ENVTOPO, CHANGEUNITS
 
 % hidden parameter: 'shiftimgs' = array with one value per subject for shifting in time the
 %                                 time/freq images. Had to be inserted in tftopo because
@@ -419,7 +419,7 @@ mmidx = [mintimeidx maxtimeidx minfreqidx maxfreqidx];
 %end
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Plot tfdata image for specified channel or selchans std()
+% Plot tfdata image for specified channel or selchans STD
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 axis off;
 colormap(cc);
@@ -500,7 +500,9 @@ else
     imagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1:4)]);
 end
-caxis([g.limits(5:6)]);
+if length(unique(g.limits(5:6))) > 1
+    caxis([g.limits(5:6)]);
+end
 hold on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%

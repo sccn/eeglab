@@ -1,4 +1,4 @@
-% eeg_getdatact() - get EEG data from a specified dataset or
+% EEG_GETDATACT - get EEG data from a specified dataset or
 %                  component activity
 %
 % Usage:
@@ -29,7 +29,7 @@
 %
 % Author: Arnaud Delorme, SCCN & CERCO, CNRS, 2008-
 %
-% See also: eeg_checkset()
+% See also: EEG_CHECKSET
 
 % Copyright (C) 15 Feb 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -97,7 +97,8 @@ if iscell(EEG) || (~ischar(EEG) && length(EEG) > 1)
             data       = tmpdata;
             boundaries = datboundaries;
         else
-            if size(tmpdata,3) == 1 && size(data,2) ~= size(tmpdata,2) % continuous data (if same number of data points, consider 1 trial dataset)
+            if (isstruct(EEG) && all([EEG.trials] == 1)) || size(tmpdata,3) == 1 || size(data,2) ~= size(tmpdata,2) % continuous data (if same number of data points, consider 1 trial dataset)
+                if size(tmpdata,3) ~= 1 || size(data,3) ~= 1, error('Trying to concatenate continuous and epoched datasets'); end
                 if size(data,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end
 
                 % adding boundaries
@@ -198,8 +199,10 @@ else
     
         data = EEG.data;
     
-    else % channel but no data loaded
-
+    else % channel but no data loaded string
+        
+        [~,EEG.data,ext] = fileparts(EEG.data); % remove path if present
+        EEG.data = [ EEG.data ext];
         filename = fullfile(EEG.filepath, EEG.data);
         fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
         if fid == -1

@@ -1,11 +1,11 @@
-% statcondfiledtrip()  - same as statcond except that it uses the fieldtrip
+% STATCONDFILEDTRIP  - same as statcond except that it uses the fieldtrip
 %                        statistical functions. This is useful to perform
 %                        a wider variety of corrections for multiple 
 %                        comparisons for instance.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 % Inputs:
-%   data       = same as for statcond()
+%   data       = same as for STATCOND
 %
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
@@ -19,8 +19,8 @@
 %                corresponds to the 'analytic' method of Fieldtrip and
 %                'permutation' correspond to the 'montecarlo' method.
 %   'naccu'    = this input is passed on as 'numrandomization' to Fieldtrip
-%   'neighbours' = Fieldtrip channel neighbour structure to perfom statistics
-%                and cluster correction for multiple comparisons accross 
+%   'neighbours' = Fieldtrip channel neighbour structure to perform statistics
+%                and cluster correction for multiple comparisons across 
 %                channels.
 %   'alpha'    = [float] p-value threshold value. Allow returning
 %                confidence intervals and mask (requires structoutput below).
@@ -49,7 +49,7 @@
 %         With thanks to Robert Oostenveld for fruitful discussions 
 %         and advice on this function.
 %
-% See also: freqanalysis(), statistics_montecarlol()
+% See also: FREQANALYSIS, STATISTICS_MONTECARLOL
 
 % Copyright (C) Arnaud Delorme
 %

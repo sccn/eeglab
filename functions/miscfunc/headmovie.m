@@ -1,7 +1,7 @@
 % ########## This function is deprecated. Use eegmovie instead. ########## 
 %
-% headmovie() - Record a Matlab movie of scalp data.
-%               Use seemovie() to display the movie.
+% HEADMOVIE - Record a Matlab movie of scalp data.
+%               Use SEEMOVIE to display the movie.
 %
 % Usage:  >> [Movie,Colormap] = headmovie(data,elec_loc,spline_file);
 %         >> [Movie,Colormap,minc,maxc] = headmovie(data,elec_loc,spline_file,...
@@ -9,7 +9,7 @@
 % Inputs:
 %   data        = (chans,frames) EEG data set to plot
 %   elec_loc    = electrode locations file for eegplot {default 'chan.loc'}
-%   spline_file = headplot() produced spline 'filename' {default  'chan.spline'}
+%   spline_file = HEADPLOT produced spline 'filename' {default  'chan.spline'}
 %   srate       = sampling rate in Hz {default|0 -> 256 Hz}
 %   title       = 'plot title' {default|0 -> none}
 %   camerapath  = [az_start az_step el_start el_step] {default [-127 0 30 0]}
@@ -22,11 +22,11 @@
 %                 {default|0 -> +/-abs max of data}
 %   startsec    = starting time in seconds {default|0 -> 0.0}
 %
-% Note: BUG IN MATLAB 5.0-5.1 -- CANT SHOW MOVIES IN CORRECT COLORS
+% Note: BUG IN MATLAB 5.0-5.1 -- CAN'T SHOW MOVIES IN CORRECT COLORS
 %
 % Authors: Scott Makeig & Colin Humphries, SCCN/INC/UCSD, La Jolla, 2/1998 
 %
-% See also: seemovie(), eegmovie(), headplot()
+% See also: SEEMOVIE, EEGMOVIE, HEADPLOT
 
 % Copyright (C) 2.6.98 Scott Makeig & Colin Humphries, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -161,7 +161,7 @@ end
 figure(gcf);   % bring figure to front
 clf            % clear figure
 
-%%%%%%%%%%%%%%%%%%%%% eegplot() of data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% EEGPLOT of data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 axeegplot = axes('Units','Normalized','Position',[.75 .05 .2 .9]);
 if isstruct(eloc_file)

@@ -1,4 +1,4 @@
-% newtimefbaseln() - Remove baseline power values for newtimef. This
+% NEWTIMEFBASELN - Remove baseline power values for newtimef. This
 %                    function assumes absolute power NOT log transformed power.
 %                    This function only removes baseline. Data has to be
 %                    averaged subsequently if necessary. This function

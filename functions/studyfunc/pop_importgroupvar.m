@@ -1,4 +1,4 @@
-% pop_importgroupvar() - import a group variable from a ASCII file and
+% POP_IMPORTGROUPVAR - import a group variable from a ASCII file and
 % manual entry.
 %
 % Usage:
@@ -49,7 +49,7 @@ end
 
 % Set var stuff
 design = usrdat.design(numdesign);
-listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
+listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be always the subjects
 
 setappdata(0,'usrdat',usrdat);
 setappdata(0,'numdesign',numdesign);
@@ -70,7 +70,7 @@ if length(data) ~= length(listsubj)
 end
 
 % Creating GUI
-% Positions and settingss
+% Positions and settings
 %--------------------------------------------------------------------------
 mainfig_pos           = [.565  .282  .146  .417];  
 text_varname_pos      = [.048  .927  .324  .035];
@@ -137,7 +137,7 @@ handles.popup =uicontrol('Style','popupmenu',...
                          'String',{'Categorical';'Continous'},...
                          'Position',popup_vartype_pos);           
                      
-% Buttoms
+% Buttons
 % .........................................................................
 handles.button_cancel = uicontrol('Style'       ,'PushButton',...
                                   'String'      ,'Cancel',...
@@ -170,7 +170,7 @@ function callback_button_add(src,eventdata,handles)
 numdesign = getappdata(0,'numdesign');
 usrdat    = getappdata(0,'usrdat');
 
-% retreiving name of variable
+% Retrieving name of variable
 varname   = get(handles.edit_varname,'String') ;
 if isempty(varname)
     error('pop_importgroupvar() error: Variable name must be provided');

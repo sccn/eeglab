@@ -1,4 +1,4 @@
-% std_readpac() - read phase-amplitude correlation
+% STD_READPAC - read phase-amplitude correlation
 %
 % Usage:
 %         >> [STUDY, clustinfo] = std_readpac(STUDY, ALLEEG);
@@ -161,7 +161,7 @@ for ind1 = 1:len1 % usually only one channel/component
                             else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(setinds1{c,g}(subj)), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
                             end
                             
-                            % collapse first 2 dimentions (comps x comps)
+                            % collapse first 2 dimensions (comps x comps)
                             if ndims(pacarraytmp) == 4
                                  pacarraytmp = reshape(pacarraytmp,    size(pacarraytmp,1)*size(pacarraytmp,2), size(pacarraytmp,3), size(pacarraytmp,4));
                             else pacarraytmp = reshape(pacarraytmp, 1, size(pacarraytmp,1),size(pacarraytmp,2));

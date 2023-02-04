@@ -1,4 +1,4 @@
-% plotcurve() - plot curve(s) with optional significance highlighting.
+% PLOTCURVE - plot curve(s) with optional significance highlighting.
 %
 % Usage: >> plotcurve(times, data, 'key1', 'val1', 'key2', val2' ...);
 %

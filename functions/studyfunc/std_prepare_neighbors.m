@@ -1,4 +1,4 @@
-% std_prepare_neighbors() - prepare Fieldtrip channel neighbor structure.
+% STD_PREPARE_NEIGHBORS - prepare Fieldtrip channel neighbor structure.
 %                           Only prepare the structure if necessary based
 %                           on statistical options in STUDY.etc.statistics.
 %                           Use the 'force' option to force preparing the
@@ -28,7 +28,7 @@
 %
 % Author: Arnaud Delorme, SCCN, UCSD, 2012-
 %
-% See also: statcondfieldtrip()
+% See also: STATCONDFIELDTRIP
 
 % Copyright (C) Arnaud Delorme
 %
@@ -115,6 +115,9 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
             tmpcfg2 = tmpcfg;
             tmpcfg  = rmfield(tmpcfg, 'label'); % first input must not be data
             tmpcfg2 = rmfield(tmpcfg2, 'method'); % second input must not be method
+            if isfield(tmpcfg, 'trialinfo')
+                tmpcfg  = rmfield(tmpcfg, 'trialinfo'); % first input must not be data
+            end
             % tmpcfg = rmfield(tmpcfg, 'label');
             % --> removing label seems to make ft_prepare_neighbours to crash
             cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg2);

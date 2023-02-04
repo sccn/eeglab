@@ -1,4 +1,4 @@
-% pop_runscript() - Run Matlab script
+% POP_RUNSCRIPT - Run Matlab script
 %
 % Usage: >> pop_runscript;
 %        >> pop_runscript( filename );

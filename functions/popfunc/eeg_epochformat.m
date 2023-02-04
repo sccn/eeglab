@@ -1,4 +1,4 @@
-% eeg_epochformat() - Convert the epoch information of a dataset from struct
+% EEG_EPOCHFORMAT - Convert the epoch information of a dataset from struct
 %                     to array or vice versa.
 %
 % Usage: >> [epochsout fields] = eeg_epochformat( epochs, 'format', fields, events );
@@ -34,7 +34,7 @@
 %          Unfortunately, structures are awkward for expert users to deal
 %          with from the command line (Ex: To get an array of 'var1' values,
 %           >> celltomat({EEG.epoch(:).var1})')
-%          In array format, asuming 'var1' is the first variable
+%          In array format, assuming 'var1' is the first variable
 %          declared, the same information is obtained by
 %           >> EEG.epoch(:,1)
 %       3) This function automatically updates the 'epochfields'
@@ -42,7 +42,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 Feb 2002
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 

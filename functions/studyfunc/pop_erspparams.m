@@ -1,10 +1,10 @@
-% pop_erspparams() - Set plotting and statistics parameters for 
+% POP_ERSPPARAMS - Set plotting and statistics parameters for 
 %                    computing and plotting STUDY mean (and optionally 
 %                    single-trial) ERSP and ITC measures and measure 
 %                    statistics. Settings are stored within the STUDY 
 %                    structure (STUDY.etc.erspparams) which is used
 %                    whenever plotting is performed by the function
-%                    std_erspplot().
+%                    STD_ERSPPLOT.
 % Usage:    
 %   >> STUDY = pop_erspparams(STUDY, 'key', 'val', ...);   
 %
@@ -39,7 +39,7 @@
 %  'averagechan' - ['on'|'off'] average/rms data channels when several are
 %                  selected ('on') or plot them individually ('off')
 %
-% See also: std_erspplot(), std_itcplot()
+% See also: STD_ERSPPLOT, STD_ITCPLOT
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 
@@ -158,7 +158,7 @@ if isempty(varargin)
     if ~isequal(res.timerange, STUDY.etc.erspparams.timerange) && res.multiplechan ~= 2, options = { options{:} 'timerange' res.timerange }; end
     if ~isequal(res.freqrange, STUDY.etc.erspparams.freqrange) && res.multiplechan ~= 2, options = { options{:} 'freqrange' res.freqrange }; end
     
-    % mutliple channel option
+    % multiple channel option
     % -----------------------
     if res.multiplechan == 1
         if ~isequal('off', STUDY.etc.erspparams.averagechan), options = { options{:} 'averagechan' 'off' }; end

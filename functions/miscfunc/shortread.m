@@ -1,4 +1,4 @@
-% shortread() - Read matrix from short file.
+% SHORTREAD - Read matrix from short file.
 %
 % Usage:
 %  >> A = shortread(filename,size,'format',offset) 
@@ -13,14 +13,14 @@
 %
 % Optional inputs:
 % 'format'  - The option FORMAT argument specifies the storage format as
-%             defined by fopen(). Default format ([]) is 'native'.
+%             defined by FOPEN. Default format ([]) is 'native'.
 % offset    - The option OFFSET is offset in shorts from the beginning of file (=0)
 %             to start reading (2-byte shorts assumed).
 %             It uses fseek to read a portion of a large data file.
 %
 % Author: Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998 
 %
-% See also: floatread(), floatwrite(), fopen()
+% See also: FLOATREAD, FLOATWRITE, FOPEN
 
 % Copyright (C) Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998
 %

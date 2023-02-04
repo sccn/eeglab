@@ -1,6 +1,6 @@
-% timefrq() - progressive Power Spectral Density estimates on a single 
+% TIMEFRQ - progressive Power Spectral Density estimates on a single 
 %             EEG channel using out-of-bounds and muscle activity rejection 
-%             tests. Uses Matlab FFT-based psd().
+%             tests. Uses Matlab FFT-based PSD.
 % Usage: 
 %   >> [Power,frqs,times,rejections] = timefrq(data,srate,subwindow);
 %   >> [Power,frqs,times,rejections] = ...
@@ -11,7 +11,7 @@
 % Inputs:
 %       data        = single-channel (1,frames) EEG data      {none}
 %       srate       = data sampling rate (Hz)                 {256 Hz}
-%       subwindow   = subepoch data length per psd()          {<=256}
+%       subwindow   = subepoch data length per PSD          {<=256}
 %
 %       fftwindow   = subepoch FFT window length after zero-padding 
 %                            (determines freq bin width)      {subwindow}
@@ -20,7 +20,7 @@
 %       overlap     = overlap between output epochs in frames {subwindow*2}
 %                     total epoch length is (overlap+epochstep)
 %       nfreqs      = nfreqs to output (2:nfreqs+1), no DC    {fftwindow/4}
-%       rejthresh   = abs() rejection threshold for subepochs {off}
+%       rejthresh   = ABS rejection threshold for subepochs {off}
 %                     If in (0,1) == percentage of data to reject; else 
 %                     reject subepochs reaching > the given abs value.
 %       minmuscle   = lower bound of muscle band (Hz)         {30 Hz}
@@ -45,7 +45,7 @@
 %
 % Authors: Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, La Jolla, 10/1/97 
 %
-% See also: timef()
+% See also: TIMEF
  
 % Copyright (C) 10/1/97 Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -391,7 +391,7 @@ fprintf('Output interval %d frames (%g secs).\n', ...
 fprintf('First and last time points: %g and %g secs.\n',...
                          times(1),times(length(times)));
 %
-%%%%%%%%%%%%%%% Make surf() plot of time-frequency distribution %%%%%%
+%%%%%%%%%%%%%%% Make SURF plot of time-frequency distribution %%%%%%
 %
 if nfreqs>1 && epoch>1 && SURFPLOT 
   if min(min(Power))>0

@@ -1,8 +1,8 @@
-% supergui() - a comprehensive gui automatic builder. This function help
+% SUPERGUI - a comprehensive gui automatic builder. This function help
 %              to create GUI very fast without bothering about the 
 %              positions of the elements. After creating a geometry, 
 %              elements just place themselves into the predefined 
-%              locations. It is especially usefull for figure where you
+%              locations. It is especially useful for figure where you
 %              intend to put text button and descriptions.
 %
 % Usage:
@@ -34,7 +34,7 @@
 %   'uilist'   - list of uicontrol lists describing elements properties
 %               { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %               uicontrol arguments such as { 'style', 'radiobutton', 
-%               'String', 'hello' }. See Matlab function uicontrol() for details.
+%               'String', 'hello' }. See Matlab function UICONTROL for details.
 %   'borders'  - [left right top bottom] GUI internal borders in normalized
 %               units (0 to 1). Default values are 
 %   'title'    - optional figure title
@@ -44,7 +44,7 @@
 %   'insetv'   - vertical space between elements. Default is 2% 
 %               of window height.
 %   'spacing'  - [horiz vert] spacing in normalized units. Default 
-%   'spacingtype' - ['absolute'|'proportional'] abolute means that the 
+%   'spacingtype' - ['absolute'|'proportional'] absolute means that the 
 %               spacing values are fixed. Proportional means that they
 %               depend on the number of element in a line.
 %   'minwidth' - [integer] minimal width in pixels. Default is none.
@@ -60,7 +60,7 @@
 % Output:
 %    handles  - all the handles of the elements (in the same order as the
 %                uilist input).
-%    height    - adviced height for the figure (so the text look nice).
+%    height    - advised height for the figure (so the text look nice).
 %    allhandles - all the handles in object format
 %
 % Example:
@@ -71,7 +71,7 @@
 %      
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 2001-
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -100,7 +100,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [handlers, outheight, allhandlers] = supergui( varargin);
+function [handlers, outheight, allhandlers, alltags] = supergui( varargin);
 
 % handlers cell format
 % allhandlers linear format
@@ -241,6 +241,7 @@ column = 1; % count the elements
 factmultx = 0;
 factmulty = 0; %zeros(length(g.geomhoriz));
 transformTextUIList = [];
+alltags = [];
 for counter = 1:maxcount
 
 	% init
@@ -274,6 +275,7 @@ for counter = 1:maxcount
                                           [posx posy+(hf1+hf2)/2*height width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers{counter} = nan;
         else
+
             if strcmpi(currentelem{1}, 'width')
                  curwidth = currentelem{2};
                  currentelem(1:2) = [];
@@ -309,15 +311,15 @@ for counter = 1:maxcount
                 posy = posy+height/5;
             end
                 
-            if strcmpi(currentelem{1}, 'function'),
+            if strcmpi(currentelem{1}, 'function')
                 % property grid argument
                 panel = uipanel('Title','','FontSize',12,'BackgroundColor','white','Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = arg_guipanel(panel, currentelem{:});
-            elseif strcmpi(currentelem{1}, 'panel'),
+            elseif strcmpi(currentelem{1}, 'panel')
                 % property grid argument
                 uipanel(currentelem{2:end},'FontSize',12,'Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = nan;
-            elseif strcmpi(currentelem{1}, 'uitable'),
+            elseif strcmpi(currentelem{1}, 'uitable')
                 uitable(g.fig, currentelem{2:end}, 'unit', 'normalized', 'Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = nan;
             else
@@ -382,7 +384,7 @@ for counter = 1:maxcount
                 factmulty = max(factmulty, curext(4)/curpos(4));
             end
             
-            % Uniformize button text aspect (first letter must be upercase)
+            % Uniformize button text aspect (first letter must be uppercase)
             % -----------------------------
             if strcmp(style, 'pushbutton') && ishandle(allhandlers{counter})
                 tmptext = get(allhandlers{counter}, 'string');
@@ -394,6 +396,11 @@ for counter = 1:maxcount
                 end
                 set(allhandlers{counter}, 'string', tmptext);
             end
+
+            try
+                currentelemstruct = struct(currentelem{:});
+                alltags.(currentelemstruct.tag) = allhandlers{counter};
+            catch, end
         end
     else 
         allhandlers{counter} = nan;

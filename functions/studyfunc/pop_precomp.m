@@ -1,5 +1,5 @@
-% pop_precomp() - precompute measures (spectrum, ERP, ERSP) for a collection of data
-%                 channels.  Calls std_precomp().
+% POP_PRECOMP - precompute measures (spectrum, ERP, ERSP) for a collection of data
+%                 channels.  Calls STD_PRECOMP.
 % Usage:    
 %                >> [STUDY, ALLEEG] = pop_precomp(STUDY, ALLEEG); % pop up interactive window
 % Inputs:
@@ -7,13 +7,13 @@
 %   ALLEEG       - ALLEEG vector of EEG structures, else a single EEG dataset.
 %
 % Outputs:
-%   STUDY        - the input STUDY set with added pre-clustering data for use by pop_clust() 
+%   STUDY        - the input STUDY set with added pre-clustering data for use by POP_CLUST 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding 
 %                  pre-clustering data (pointers to .mat files that hold cluster measure information).
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: std_precomp()
+% See also: STD_PRECOMP
 
 % Copyright (C) Arnaud Delorme, CERCO, CNRS, arno@salk.edu
 %
@@ -46,7 +46,7 @@ function [STUDY, ALLEEG, com] = pop_precomp(varargin)
 
 com = '';
 
-if ~ischar(varargin{1}) %intial settings
+if ~ischar(varargin{1}) %initial settings
     if length(varargin) < 2
         error('pop_precomp(): needs both ALLEEG and STUDY structures');
     end
@@ -79,7 +79,7 @@ if ~ischar(varargin{1}) %intial settings
     chanlist       = ['pop_precomp(''chanlist'',gcf);']; 
     chanlist       = 'warndlg2([ ''You need to compute measures on all data channels.'' 10 ''This functionality is under construction.'']);';
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
-    warninterp     = 'warndlg2(''Not interpolating channels may sometimes lead to unexpected errors when ploting results'');';
+    warninterp     = 'warndlg2(''Not interpolating channels may sometimes lead to unexpected errors when plotting results'');';
     cb_ica1        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica2_on''), ''value'', 0); end;' ];
     cb_ica2        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica1_on''), ''value'', 0); end;' ];
     

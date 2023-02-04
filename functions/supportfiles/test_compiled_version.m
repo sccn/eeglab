@@ -1,7 +1,7 @@
 function test_compiled_version(varargin)
 global CURRENTSTUDY CURRENTSET ALLEEG EEG STUDY
 
-res = questdlg2('Are you seing the command line outputs?', 'Compiled version', 'No', 'Yes', 'Yes');
+res = questdlg2('Are you seeing the command line outputs?', 'Compiled version', 'No', 'Yes', 'Yes');
 if strcmpi(res, 'No')
     res = questdlg2( [ 'Users need to be able to see command line' 10 ...
         'output even for the compiled version. This' 10 ...
@@ -12,6 +12,18 @@ if strcmpi(res, 'No')
 end
 
 try
+    % test binary files
+    if isdeployed
+        TMP = pop_loadxdf( fullfile('sample_data', 'test_data', 'test.xdf') );
+        TMP = pop_loadbv( fullfile('sample_data', 'test_data'), 'testbva.vhdr' );
+        TMP = pop_loadcnt( fullfile('sample_data', 'test_data', 'test.cnt') );
+        TMP = pop_musemonitor( fullfile('sample_data', 'test_data', 'testmusemonitor.csv') );
+        TMP = pop_mffimport( fullfile(pwd, 'sample_data', 'test_data', 'testmff.mff'), 'code' );
+        TMP = pop_biosig( fullfile('sample_data', 'test_data', 'test.edf') );
+        TMP = pop_biosig( fullfile('sample_data', 'test_data', 'test.bdf') );
+        [TMP,TMP2] = pop_importbids( fullfile('sample_data', 'test_data', 'BIDS_test'), 'bidsevent', 'off' );
+    end
+
     % EEGLAB history file generated on the 08-Jul-2020
     % ------------------------------------------------
     EEG = pop_loadset( 'filename', 'eeglab_data.set', 'filepath', 'sample_data');
@@ -44,6 +56,7 @@ try
     close;
     EEG = pop_loadset( 'filename', 'eeglab_data_epochs_ica.set', 'filepath', 'sample_data');
     EEG = pop_dipfit_settings( EEG, 'hdmfile',fullfile('plugins','dipfit','standard_BEM','standard_vol.mat'),'coordformat','MNI','mrifile',fullfile('plugins','dipfit','standard_BEM','standard_mri.mat'),'chanfile',fullfile('plugins','dipfit','standard_BEM','elec', 'standard_1005.elc'),'coord_transform',[0.83215 -15.6287 2.4114 0.081214 0.00093739 -1.5732 1.1742 1.0601 1.1485],'chansel',[1:31] );
+    EEG = pop_leadfield(EEG, 'sourcemodel','LORETA-Talairach-BAs.mat','sourcemodel2mni',[],'downsample',1);
     pop_dipfit_loreta(EEG, 6);
     close
     

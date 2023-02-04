@@ -1,4 +1,4 @@
-% readtxtfile() - Read text file into a Matlab variable
+% READTXTFILE - Read text file into a Matlab variable
 %
 % Usage: >> str = readtxtfile( filename );
 %

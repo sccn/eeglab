@@ -1,4 +1,4 @@
-% pop_fileio() - import data files into EEGLAB using FileIO 
+% POP_FILEIO - import data files into EEGLAB using FileIO 
 %
 % Usage:
 %   >> OUTEEG = pop_fileio; % pop up window
@@ -19,6 +19,8 @@
 %                  choices are available in ft_read_data
 %   'memorymapped' - ['on'|'off'] import memory mapped file (useful if 
 %                  encountering memory errors). Default is 'off'.
+%   'makecontinuous' - ['on'|'off'] make data continuous (for data epochs
+%                  only). This is relevant for MEG data. Default is 'off'. 
 %
 % Outputs:
 %   OUTEEG   - EEGLAB data structure
@@ -58,7 +60,9 @@ function [EEG, command] = pop_fileio(filename, varargin)
 EEG = [];
 command = '';
 
-if ~plugin_askinstall('Fileio', 'ft_read_data'), return; end
+if exist('plugin_askinstall')
+    if ~plugin_askinstall('Fileio', 'ft_read_data'), return; end
+end
 
 alldata = [];
 event   = [];
@@ -99,36 +103,45 @@ if nargin < 1
     if strcmpi(filename(end-2:end), 'mff')
         valueFormat = 48;
     end
-    uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
-                 { 'style' 'edit' 'string' '' } ...
+    uilist   = { { 'style' 'text' 'String' 'Channel list (default all):' } ...
+                 { 'style' 'edit' 'string' '' 'tag' 'chan' } ...
                  { 'style' 'text' 'String' [ 'Data range (in sample points) (default all [1 ' int2str(dat.nSamples) '])' ] } ...
-                 { 'style' 'edit' 'string' '' } ...
+                 { 'style' 'edit' 'string' '' 'tag' 'range' } ...
                  };
     geom = { [3 1.5] [3 1.5] };
     if dat.nTrials > 1
         uilist{end+1} = { 'style' 'text' 'String' [ 'Trial range (default all [1 ' int2str(dat.nTrials) '])' ] };
-        uilist{end+1} = { 'style' 'edit' 'string' '' };
+        uilist{end+1} = { 'style' 'edit' 'string' '' 'tag' 'trials' };
         geom = { geom{:} [3 1.5] };
     end
     uilist   = { uilist{:} ...
                  { 'style' 'text' 'String' 'Data format' } ...
-                 { 'style' 'popupmenu' 'string' formats 'value' valueFormat 'listboxtop' valueFormat } ...
-                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use in case of out of memory) - beta' 'value' option_memmapdata } };
-    geom = { geom{:}  [3 1.5] [1] };
-    
-    result = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
-    if length(result) == 0 return; end
-    if dat.nTrials <= 1
-        result = { result{1:2} [] result{3:end} };
+                 { 'style' 'popupmenu' 'string' formats 'value' valueFormat 'listboxtop' valueFormat 'tag' 'format' } ...
+                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use in case of out of memory) - beta' 'value' option_memmapdata 'tag' 'memmap' } };
+    geom = { geom{:}  [3 1.5] 1 };
+    if dat.nTrials > 1
+        uilist{end+1} = { 'style' 'checkbox' 'String' 'Convert data trials to continuous data' 'tag' 'makecontinuous'  };
+        geom = { geom{:} 3 };
     end
+
+    [result,~,~,restag] = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
+    if isempty(result) return; end
+    if ~isfield(restag, 'trials')
+        restag.trials = '';
+    end
+    if ~isfield(restag, 'makecontinuous')
+        restag.makecontinuous = 0;
+    end
+
     options = {};
-    if length(result) == 3, result = { result{1:2} '' result{3}}; end
-    if ~isempty(result{1}), options = { options{:} 'channels' eval( [ '[' result{1} ']' ] ) }; end
-    if ~isempty(result{2}), options = { options{:} 'samples'  eval( [ '[' result{2} ']' ] ) }; end
-    if ~isempty(result{3}), options = { options{:} 'trials'   eval( [ '[' result{3} ']' ] ) }; end
-    if ~isempty(result{4}), options = { options{:} 'dataformat' formats{result{4}} }; end
-    if result{5}, options = { options{:} 'memorymapped' fastif(result{5}, 'on', 'off') }; end
+    if ~isempty(restag.chan  ), options = { options{:} 'channels' eval( [ '[' restag.chan ']' ] ) }; end
+    if ~isempty(restag.range ), options = { options{:} 'samples'  eval( [ '[' restag.range ']' ] ) }; end
+    if ~isempty(restag.trials), options = { options{:} 'trials'   eval( [ '[' restag.trials ']' ] ) }; end
+    if ~isempty(restag.format), options = { options{:} 'dataformat' formats{restag.format} }; end
+    if restag.memmap        , options = { options{:} 'memorymapped'   fastif(restag.memmap, 'on', 'off') }; end
+    if restag.makecontinuous, options = { options{:} 'makecontinuous' fastif(restag.makecontinuous, 'on', 'off') }; end
 else
+    ft_defaults;
     if ~isstruct(filename)
         dat = ft_read_header(filename);
         options = varargin;
@@ -143,14 +156,16 @@ else
     end
 end
 
-% decode imput parameters
+% decode input parameters
 % -----------------------
+ft_defaults;
 g = struct(options{:});
 if ~isfield(g, 'samples'), g.samples = []; end
 if ~isfield(g, 'trials'), g.trials = []; end
 if ~isfield(g, 'channels'), g.channels = []; end
 if ~isfield(g, 'dataformat'), g.dataformat = 'auto'; end
 if ~isfield(g, 'memorymapped'), g.memorymapped = 'off'; end
+if ~isfield(g, 'makecontinuous'), g.makecontinuous = 'off'; end
 
 % import data
 % -----------
@@ -158,7 +173,7 @@ EEG = eeg_emptyset;
 fprintf('Reading data ...\n');
 dataopts = {};
 % In case of FIF files convert EEG channel units to uV in FT options
-[trash1, trash2, filext] = fileparts(filename); clear trash1 trash2;
+[filePath, fileNameNoExt, filext] = fileparts(filename);
 if strcmpi(filext,'.fif')
     eegchanindx = find(strcmpi(dat.chantype,'eeg'));
     if ~isempty(eegchanindx) && isfield (dat,'chanunit')
@@ -179,6 +194,8 @@ if strcmpi(g.memorymapped, 'off') || ~isempty(alldata)
     if ~isempty(g.channels), dataopts = { dataopts{:} 'chanindx', g.channels }; end
     if isempty(alldata)
         alldata = ft_read_data(filename, 'header', dat, dataopts{:});
+    elseif isstruct(alldata) && isfield(alldata, 'trial')
+        alldata = alldata.trial;
     end
 else
     % read memory mapped file
@@ -196,13 +213,27 @@ end
 
 % convert to seconds for sread
 % ----------------------------
-EEG.srate           = dat.Fs;
-EEG.nbchan          = size(alldata,1);
-EEG.data            = alldata;
-EEG.setname 		= '';
-EEG.comments        = [ 'Original file: ' filename ];
-EEG.xmin = -dat.nSamplesPre/EEG.srate; 
-EEG.trials = dat.nTrials;
+if isfield(dat, 'hdr') && ~isfield(dat, 'Fs')
+    if isfield(dat, 'fsample') EEG.srate = dat.fsample; else EEG.srate = dat.hdr.Fs; end
+    EEG.nbchan          = dat.hdr.nChans;
+    EEG.data            = alldata;
+    if iscell(EEG.data)
+        EEG.data = [ EEG.data{:} ];
+    end
+    EEG.setname 		= '';
+    EEG.comments        = [ 'Original file: ' filename ];
+    EEG.xmin = -dat.hdr.nSamplesPre/EEG.srate; 
+    dat.nTrials = dat.hdr.nTrials;
+    EEG.trials = dat.hdr.nTrials;    
+else
+    EEG.srate           = dat.Fs;
+    EEG.nbchan          = dat.nChans;
+    EEG.data            = alldata;
+    EEG.setname 		= '';
+    EEG.comments        = [ 'Original file: ' filename ];
+    EEG.xmin = -dat.nSamplesPre/EEG.srate; 
+    EEG.trials = dat.nTrials;
+end
 if size(alldata,3) > 1
     EEG.trials = size(alldata,3);
     EEG.pnts   = size(alldata,2);
@@ -215,31 +246,100 @@ else
 end
 if isfield(dat, 'label') && ~isempty(dat.label)
     EEG.chanlocs = struct('labels', dat.label);
+    EEG.nbchan   = length(dat.label);
     
     % START ----------- Extracting EEG channel location
     % Note: Currently for extensions where FT is able to generate valid 'labels' and 'elec' structure (e.g. FIF)
     %If more formats, add them below
     try
-        if isfield(dat,'elec')
-            eegchanindx = find(ft_chantype(dat, 'eeg') | ft_chantype(dat, 'pns') );
-            if ~isempty(eegchanindx)
-                for ichan = 1:length(eegchanindx)
-                    chanType = 'EEG';
-                    if isfield(dat, 'chantype') && ~isempty(dat.chantype)
-                        chanType = dat.chantype{ichan};
-                    end
-                    EEG = pop_chanedit(EEG,'changefield',{eegchanindx(ichan) 'X' dat.elec.chanpos(ichan,1) 'Y' dat.elec.chanpos(ichan,2) 'Z' dat.elec.chanpos(ichan,3) 'type' chanType});
+        if isfield(dat,'elec') && ~isfield(dat.elec, 'chanpos')
+            dat.elec.chanpos = dat.elec.elecpos;
+        end
+
+        % fix issue with different units
+        if isfield(dat,'elec') && isfield(dat,'grad')
+            try
+                dat.elec = checkunit(dat.elec); % sometimes the unit is wrong
+                dat.grad = checkunit(dat.grad);
+                if isequal(dat.elec.unit, 'cm') && isequal(dat.grad.unit, 'mm') 
+                    dat.elec.chanpos = dat.elec.chanpos*10;
+                    dat.elec.unit = 'mm';
                 end
-                EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
-                EEG.urchanlocs = EEG.chanlocs;
-            else
-                fprintf('pop_fileio: Unable to find EEG channels to extract location\n');
+            catch, end
+        end
+
+        if isfield(dat,'elec')
+            if isfield(dat, 'label')
+                for iChan = 1:length(dat.label)
+                    indLabel = strmatch(dat.label{iChan}, dat.elec.label, 'exact');
+                    EEG.chanlocs(iChan).labels = dat.label{iChan};
+                    if ~isempty(indLabel) && ~isnan(dat.elec.chanpos(indLabel,1))
+                        EEG.chanlocs(iChan).labels = dat.elec.label{indLabel};
+                        EEG.chanlocs(iChan).X = dat.elec.chanpos(indLabel,1);
+                        EEG.chanlocs(iChan).Y = dat.elec.chanpos(indLabel,2);
+                        EEG.chanlocs(iChan).Z = dat.elec.chanpos(indLabel,3);
+                        if isfield(dat, 'chantype')
+                            EEG.chanlocs(iChan).type = dat.chantype{iChan};
+                        elseif isfield(dat.elec, 'chantype')
+                            EEG.chanlocs(iChan).type = dat.elec.chantype{iChan};
+                        end
+                    end
+                end
             end
         end
+        if isfield(dat.elec, 'unit')
+            EEG.chaninfo.unit = dat.elec.unit;
+        end
     catch
-        fprintf('pop_fileio: Unable to import channel location\n');
+        fprintf('pop_fileio: Unable to import EEG channel location\n');
     end
+    try
+        if isfield(dat,'grad')
+            if isfield(dat, 'label')
+                for iChan = 1:length(dat.label)
+                    indLabel = strmatch(dat.label{iChan}, dat.grad.label, 'exact');
+                    EEG.chanlocs(iChan).labels = dat.label{iChan};
+                    if ~isempty(indLabel) && ~isnan(dat.grad.chanpos(indLabel,1))
+                        EEG.chanlocs(iChan).labels = dat.grad.label{indLabel};
+                        EEG.chanlocs(iChan).X = dat.grad.chanpos(indLabel,1);
+                        EEG.chanlocs(iChan).Y = dat.grad.chanpos(indLabel,2);
+                        EEG.chanlocs(iChan).Z = dat.grad.chanpos(indLabel,3);
+                        if isfield(dat, 'chantype')
+                            EEG.chanlocs(iChan).type = dat.chantype{iChan};
+                        end
+                    end
+                end
+            end
+        end
+        if isfield(dat.grad, 'unit')
+            EEG.chaninfo.unit = dat.grad.unit;
+        end
+        if isfield(dat.grad, 'coordsys') && contains(lower(dat.grad.coordsys), 'neuromag')
+            EEG.chaninfo.nosedir = '+Y';
+        end
+    catch
+        fprintf('pop_fileio: Unable to import EEG channel location\n');
+    end
+    EEG.etc.fileio_dat = dat;
+    EEG.chanlocs   = convertlocs(EEG.chanlocs,'cart2all');
+    EEG.urchanlocs = EEG.chanlocs;
+
     % END ----------- Extracting EEG channel location
+end
+
+% import fiducial in associated coordsystem file if present
+% ---------------------------------------------------------
+coordSystemFile = dir(fullfile(filePath, [ fileNameNoExt(1:4) '*coordsystem.json' ]));
+if length(coordSystemFile) == 1
+    coordSystemFileName = fullfile(coordSystemFile(1).folder, coordSystemFile(1).name);
+    if ~exist('eeg_importcoordsystemfiles', 'file')
+        fprintf(2, 'BIDS coordsystem file %s detected but not imported, install bids-matlab-tools to import it\n', coordSystemFileName);
+    else
+        fprintf('BIDS coordsystem file detected %s and imported (may contain fiducials)\n', coordSystemFileName);
+        EEG = eeg_importcoordsystemfiles(EEG, coordSystemFileName); % require the bids-matlab-tools plugin
+    end
+elseif length(coordSystemFile) > 1
+    fprintf(2, 'More than one BIDS coordsystem file detected so none imported (may contain fiducials)\n');
 end
 
 % extract events
@@ -277,12 +377,24 @@ if ~isempty(event)
         EEG = eeg_checkset(EEG, 'eventconsistency');
     end
 else
-    disp('Warning: no event found. Events might be embeded in a data channel.');
+    disp('Warning: no event found. Events might be embedded in a data channel.');
     disp('         To extract events, use menu File > Import Event Info > From data channel');
 end
 
-% convert data to single if necessary
-% -----------------------------------
+% convert data to single precision if necessary
+% ---------------------------------------------
+if exist('eeg_checkset')
+    EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
+end
+
+% convert data to continuous
+% --------------------------
+if strcmpi(g.makecontinuous, 'on')
+    EEG = eeg_epoch2continuous(EEG);
+end
+
+% convert data to single precision if necessary
+% ---------------------------------------------
 if exist('eeg_checkset')
     EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
 end
@@ -294,5 +406,17 @@ if ischar(filename)
         command = sprintf('EEG = pop_fileio(''%s'');', filename);
     else
         command = sprintf('EEG = pop_fileio(''%s'', %s);', filename, vararg2str(options));
+    end
+end
+% check units (sometimes they are wrong)
+% --------------------------------------
+function sens = checkunit(sens)
+if isfield(sens, 'unit')
+    medX = median(abs(sens.chanpos(:,1)));
+    if medX < 15 && isequal(sens.unit, 'mm')
+        sens.unit = 'cm';
+    end
+    if medX > 15 && isequal(sens.unit, 'cm')
+        sens.unit = 'mm';
     end
 end

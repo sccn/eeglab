@@ -1,4 +1,4 @@
-% gradmap() - compute the gradient of an EEG spatial distribution.
+% GRADMAP - compute the gradient of an EEG spatial distribution.
 %
 % Usage:
 %    >> [gradX, gradY ] = gradmap( map, filename, draw )

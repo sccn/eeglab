@@ -1,0 +1,30 @@
+Brain Vision Data Exchange Marker File, Version 1.0
+; Data created from history path: BrainVision_Dataformat_01/Raw Data
+; The channel numbers are related to the channels in the exported file.
+
+[Common Infos]
+DataFile=testbva.dat
+
+[Marker Infos]
+; Each entry: Mk<Marker number>=<Type>,<Description>,<Position in data points>,
+; <Size in data points>, <Channel number (0 = marker is related to all channels)>,
+; <Date (YYYYMMDDhhmmssuuuuuu)>
+; Fields are delimited by commas, some fields might be omitted (empty).
+; Commas in type or description text are coded as "\1".
+Mk1=New Segment,,1,1,0,20030924105038119829
+Mk2=Stimulus,S  4,108,1,0
+Mk3=Stimulus,S  1,265,1,0
+Mk4=Stimulus,S  4,282,1,0
+Mk5=Stimulus,S  4,455,1,0
+Mk6=Stimulus,S  4,629,1,0
+Mk7=Stimulus,S  4,803,1,0
+Mk8=Stimulus,S  2,811,1,0
+Mk9=Stimulus,S  4,977,1,0
+Mk10=Stimulus,S  4,1151,1,0
+Mk11=Stimulus,S  4,1325,1,0
+Mk12=Stimulus,S  3,1357,1,0
+Mk13=Stimulus,S  4,1499,1,0
+Mk14=Stimulus,S  4,1673,1,0
+Mk15=Stimulus,S  4,1847,1,0
+Mk16=Stimulus,S  1,1903,1,0
+Mk17=Stimulus,S  4,2021,1,0

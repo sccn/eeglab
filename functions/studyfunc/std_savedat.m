@@ -1,4 +1,4 @@
-% std_savedat() - save measure for computed data
+% STD_SAVEDAT - save measure for computed data
 %
 % Usage: std_savedat( filename, structure);
 %

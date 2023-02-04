@@ -1,6 +1,6 @@
-% neural_net() - computes clusters using Matlab Neural Net toolbox. 
-%        Alternative clustering algorithm to kmeans().
-%        This is a helper function called from pop_clust(). 
+% NEURAL_NET - computes clusters using Matlab Neural Net toolbox. 
+%        Alternative clustering algorithm to KMEANS.
+%        This is a helper function called from POP_CLUST. 
 
 % Copyright (C) 2006 UCSD
 %

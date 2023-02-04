@@ -1,4 +1,4 @@
-% pop_eegfilt() - interactively filter EEG dataset data using eegfilt()
+% POP_EEGFILT - interactively filter EEG dataset data using EEGFILT
 %
 % Usage:
 %   >> EEGOUT = pop_eegfilt( EEG, locutoff, hicutoff, filtorder);
@@ -13,7 +13,7 @@
 %                 given above. Set the 'locutoff' and 'hicutoff' values to the
 %                 values entered as parameters, and set 'revfilt to 1, to swap
 %                 from bandpass to notch filtering.
-%   "Filter length" - [edit box] Filter lenghth in point (default: see 
+%   "Filter length" - [edit box] Filter length in point (default: see 
 %                 >> help eegfilt). Same as 'filtorder' optional input.
 %
 % Inputs:
@@ -34,7 +34,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegfilt(), eegfiltfft(), eeglab()
+% See also: EEGFILT, EEGFILTFFT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -116,9 +116,9 @@ if nargin < 2
     else filtorder    = eval( result{3} );
     end
     revfilt = 0;
-    if result{4},
+    if result{4}
         revfilt = 1;
-        if locutoff == 0 || hicutoff == 0,
+        if locutoff == 0 || hicutoff == 0
             error('Need both lower and higher edge for notch filter');
         end
     end
@@ -170,7 +170,7 @@ end
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
-    [ EEG com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
+    [ EEG, com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
         { locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz, firtype, causal} );
     return;
 end
@@ -184,10 +184,11 @@ end
 
 options = {options{:} revfilt firtype causal};
 
+eeglab_options;
 if EEG.trials == 1
-    if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
+    if ~isempty(EEG.event) && isfield(EEG.event, 'type')
         tmpevent = EEG.event;
-        boundaries = strmatch('boundary', { tmpevent.type });
+        boundaries = eeg_findboundaries(tmpevent);
         if isempty(boundaries)
             if ~usefft
                 [EEG.data, b] = eegfilt( EEG.data, options{:});
@@ -223,7 +224,7 @@ if EEG.trials == 1
                     end
                 end
             end
-            try, warning on MATLAB:divideByZero
+            try warning on MATLAB:divideByZero
             catch, end
         end
     else

@@ -1,4 +1,4 @@
-% errordlg2() - Makes a popup dialog box with the specified message and (optional)
+% ERRORDLG2 - Makes a popup dialog box with the specified message and (optional)
 %               title.
 %
 % Usage:
@@ -8,12 +8,12 @@
 %   errordlg2('Explanation of error','title of error');
 %
 % Input:
-%   Prompt  -   A text string explaning why the user is seeing this error message.
+%   Prompt  -   A text string explaining why the user is seeing this error message.
 %   Title   _   A text string that appears in the title bar of the error message.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002
 %
-% See also: inputdlg2(), questdlg2()
+% See also: INPUTDLG2, QUESTDLG2
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %

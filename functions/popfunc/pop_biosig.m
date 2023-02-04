@@ -1,4 +1,4 @@
-% pop_biosig() - import data files into EEGLAB using BIOSIG toolbox
+% POP_BIOSIG - import data files into EEGLAB using BIOSIG toolbox
 %
 % Usage:
 %   >> OUTEEG = pop_biosig; % pop up window
@@ -14,8 +14,11 @@
 %                  Default is empty -> import all data blocks. 
 %  'importevent' - ['on'|'off'] import events. Default if 'on'.
 %  'importannot' - ['on'|'off'] import annotations (EDF+ only). Default if 'on'
-%  'importmex' - ['on'|'off'] import events with Biosig mexSLOAD as an alternative. Default if 'off'
+%  'importmex'   - ['on'|'off'] import events with Biosig mexSLOAD as an alternative. Default if 'off'
+%  'overflow'    - ['on'|'off'] overflow detection. Default is 'off'
+%  'uncalibrated' - ['on'|'off'] import uncalibrated data. Default is 'off'
 %  'blockepoch'  - ['on'|'off'] force importing continuous data. Default is 'on'
+%  'bdfeventmode' - [integer] see bdf2biosig_events function help. Default is 4.
 %  'ref'         - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
 %                  allowing easy re-referencing. If more than one
@@ -131,18 +134,22 @@ if nargin < 1
                  'warndlg2([ ''mexSLOAD not found in path. It needs to be installed.'' 10 ' ...
                  '''It is easier to use this option on Windows where mexSLOAD'' 10 ' ...
                  '''is automatically installed with BIOSIG.'' ]); end' ];
-    uilist = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
+    uilist = { { 'style' 'text' 'String' 'Channel list (default all):' } ...
                  { 'style' 'edit' 'string' '' 'tag' 'channels' } ...
                  { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
                  { 'style' 'edit' 'string' '' 'tag' 'blockrange'  } ...
                  { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
                  { 'style' 'edit' 'string' ''  'tag' 'ref' } ...
+                 { 'style' 'text' 'String' 'Event mode import (see bdf2biosig_events function help)' } ...
+                 { 'style' 'edit' 'string' '4'  'tag' 'bdfmode' } ...         
                  { 'style' 'checkbox' 'string' 'Extract event from marker channel' 'value' 1 'tag' 'importevent' } ...
                  { 'style' 'checkbox' 'String' 'Force continuous data when data is stored in blocks' 'value' 1 'tag' 'blockepoch' } ...
                  { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata 'tag' 'memorymapped' } ...
-                 { 'style' 'checkbox' 'string' 'Import EDF+ anotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
+                 { 'style' 'checkbox' 'String' 'Enable overflow detection' 'value' 0 'tag' 'overflow' } ...
+                 { 'style' 'checkbox' 'String' 'Import uncalibrated data' 'value' 0 'tag' 'uncalibrated' } ...
+                 { 'style' 'checkbox' 'string' 'Import EDF+ annotations (try also mexSLOAD below)' 'value' 1 'enable' 'on' 'tag' 'importannot' } ...
                  { 'style' 'checkbox' 'string' 'Import using alternative BIOSIG method (mexSLOAD)' 'value' 0 'callback' checkmex 'tag' 'importmex' } };
-    geom = { [3 1] [3 1] [3 1] [1] [1] [1] [1] [1] };
+    geom = { [3 1] [3 1] [3 1] [3 1] [1] [1] [1] [1] [1] [1] [1] };
 
     [~,~,~,result] = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
@@ -151,9 +158,10 @@ if nargin < 1
     % decode GUI params
     % -----------------
     options = {};
-    if ~isempty(result.channels)  , options = { options{:} 'channels'   eval( [ '[' result.channels ']' ] ) }; end
-    if ~isempty(result.blockrange), options = { options{:} 'blockrange' eval( [ '[' result.blockrange ']' ] ) }; end
-    if ~isempty(result.ref       ), options = { options{:} 'ref'        eval( [ '[' result.ref ']' ] ) }; end
+    if ~isempty(result.channels)  ,   options = { options{:} 'channels'     eval( [ '[' result.channels ']' ] ) }; end
+    if ~isempty(result.blockrange),   options = { options{:} 'blockrange'   eval( [ '[' result.blockrange ']' ] ) }; end
+    if ~isempty(result.ref       ),   options = { options{:} 'ref'          eval( [ '[' result.ref ']' ] ) }; end
+    if ~isequal(result.bdfmode, '4'), options = { options{:} 'bdfeventmode' eval( [ '[' result.bdfmode ']' ] ) }; end
     
     % default to 1
     if ~result.importevent,    options = { options{:} 'importevent'  'off'  }; end
@@ -163,6 +171,8 @@ if nargin < 1
     % default to 0
     if result.memorymapped,    options = { options{:} 'memorymapped'  'on'  }; end
     if result.importmex   ,    options = { options{:} 'importmex'     'on'  }; end
+    if result.overflow    ,    options = { options{:} 'overflow'      'on'  }; end
+    if result.uncalibrated,    options = { options{:} 'uncalibrated'  'on'  }; end
     
     if length(eval( [ '[' result.ref ']' ] )) > 1
         options = { options{:} 'refoptions' { 'keepref' 'off' } };
@@ -171,13 +181,16 @@ else
     options = varargin;
 end
 
-% decode imput parameters
+% decode input parameters
 % -----------------------
 g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'channels'     'integer' [0 Inf]    [];
                             'ref'          'integer' [0 Inf]    [];
+                            'bdfeventmode' 'integer' [0 Inf]    4;
                             'refoptions'   'cell'    {}             { 'keepref' 'on' };
                             'rmeventchan'  'string'  { 'on';'off' } 'on';
+                            'overflow'     'string'  { 'on';'off' } 'off';
+                            'uncalibrated' 'string'  { 'on';'off' } 'off';
                             'importevent'  'string'  { 'on';'off' } 'on';
                             'importannot'  'string'  { 'on';'off' } 'on';
                             'importmex'   'string'  { 'on';'off' }  'off';
@@ -191,7 +204,7 @@ for iFile = 1:length(filename)
     % import data
     % -----------
     EEG = eeg_emptyset;
-    [dat, DAT, interval] = readfile(filename{iFile}, g.channels, g.blockrange, g.memorymapped);
+    [dat, DAT, interval] = readfile(filename{iFile}, g.channels, g.blockrange, g.memorymapped, g.bdfeventmode, g.overflow, g.uncalibrated);
     
     if strcmpi(g.blockepoch, 'off')
         dat.NRec = 1;
@@ -292,10 +305,23 @@ biosigpathlast;
 % ---------
 % read data
 % ---------
-function [dat, DAT, interval] = readfile(filename, channels, blockrange, memmapdata);
+function [dat, DAT, interval] = readfile(filename, channels, blockrange, memmapdata, bdfeventmode, overflow, uncalibrated)
 
 if isempty(channels), channels = 0; end
-dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');
+strmode = '';
+if strcmpi(overflow, 'off')
+    strmode = 'OVERFLOWDETECTION:OFF';
+end
+if strcmpi(uncalibrated, 'on')
+    if ~isempty(strmode) strmode = [ strmode ';' ]; end
+    strmode = [ strmode 'UCAL'];
+end
+if ~isequal(bdfeventmode, 4)
+    if ~isempty(strmode) strmode = [ strmode ';' ]; end
+    strmode = [ strmode 'BDF:[' num2str(bdfeventmode) ']' ];
+end
+fprintf('sopen mode is "%s"\n', strmode);
+dat = sopen(filename, 'r', channels, strmode);
 
 if strcmpi(memmapdata, 'off')
     fprintf('Reading data in %s format...\n', dat.TYPE);

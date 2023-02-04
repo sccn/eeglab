@@ -1,4 +1,4 @@
-% pop_timef() - Returns estimates and plots of event-related (log) spectral
+% POP_TIMEF - Returns estimates and plots of event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           timelocked to a set of input events in one data channel. 
 %
@@ -19,14 +19,14 @@
 %               0 -> Use FFTs (with constant window length)
 %
 % Optional inputs:
-%    See the timef() function.
+%    See the TIMEF function.
 %    
-% Outputs: same as timef(), no outputs are returned when a
+% Outputs: same as TIMEF, no outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: timef(), eeglab() 
+% See also: TIMEF, EEGLAB 
 
 % Copyright (C) 2002 arno@salk.edu, Arnaud Delorme, CNL / Salk Institute
 %

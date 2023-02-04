@@ -1,4 +1,4 @@
-% inputgui() - A comprehensive gui automatic builder. This function helps
+% INPUTGUI - A comprehensive gui automatic builder. This function helps
 %              to create GUI very quickly without bothering about the 
 %              positions of the elements. After creating a geometry, 
 %              elements just place themselves in the predefined 
@@ -7,7 +7,7 @@
 %
 % Usage:
 %   >> [ outparam ] = inputgui( 'key1', 'val1', 'key2', 'val2', ... );
-%   >> [ outparam userdat strhalt outstruct] = ...
+%   >> [ outparam userdat strhalt outstruct tags] = ...
 %             inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
@@ -22,7 +22,7 @@
 %   'uilist'     - list of uicontrol lists describing elements properties
 %                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %                  uicontrol arguments such as { 'style', 'radiobutton', 
-%                  'String', 'hello' }. See Matlab function uicontrol() for details.
+%                  'String', 'hello' }. See Matlab function UICONTROL for details.
 %   'helpcom'    - optional help command 
 %   'helpbut'    - text for help button
 %   'title'      - optional figure title
@@ -49,8 +49,9 @@
 %   outstruct  - returns outputs as a structure (only tagged ui controls
 %                are considered). The field name of the structure is
 %                the tag of the ui and contain the ui value or string.
-%   instruct   - resturn inputs provided in the same format as 'outstruct'
+%   instruct   - returns inputs provided in the same format as 'outstruct'
 %                This allow to compare in/outputs more easy.
+%   tags       - uicontrols by tags
 %
 % Note: the function also adds three buttons at the bottom of each 
 %       interactive windows: 'CANCEL', 'HELP' (if callback command
@@ -67,7 +68,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 1 Feb 2002
 %
-% See also: supergui(), eeglab()
+% See also: SUPERGUI, EEGLAB
 
 % Copyright (C) Arnaud Delorme, CNL/Salk Institute, 27 Jan 2002, arno@salk.edu
 %
@@ -96,8 +97,12 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [result, userdat, strhalt, resstruct, instruct] = inputgui( varargin);
+function [result, userdat, strhalt, resstruct, instruct, alltags] = inputgui( varargin);
 
+result = [];
+userdat = [];
+strhalt = [];
+resstruct = [];
 if nargin < 2
    help inputgui;
    return;
@@ -118,6 +123,7 @@ end
 g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'geometry' {'cell','integer'}    []      []; ...
                            'uilist'   'cell'                []      {}; ...
+                           'cancel'   'string'              []      'Cancel'; ...
                            'helpcom'  { 'string','cell' }   { [] [] }      ''; ...
                            'title'    'string'              []      ''; ...
                            'eval'     'string'              []      ''; ...
@@ -181,20 +187,20 @@ if isempty(g.getresult)
             else
                 g.uilist = { g.uilist{:}, {} {} };
             end
-            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close(gcbf)' } };
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', g.cancel, 'tag' 'cancel' 'callback', 'close(gcbf)' } };
             g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
         end
         
         % add the three buttons (CANCEL HELP OK) at the bottom of the GUI
         % ---------------------------------------------------------------
         if ~isempty(g.geom)
-            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos );
+            [~, ~, allobj, alltags] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos);
         elseif isempty(g.geomvert)
-            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos );
+            [~, ~, allobj, alltags] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos);
         else
             if strcmpi(g.skipline, 'on'),  g.geomvert = [g.geomvert(:)' 1]; end
             if strcmpi(g.addbuttons, 'on'),g.geomvert = [g.geomvert(:)' 1]; end
-            [tmp, tmp2, allobj] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
+            [~, ~, allobj, alltags] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
         end
     else 
         fig = g.mode;
@@ -207,7 +213,7 @@ if isempty(g.getresult)
     % --------------------------------
     if ~isempty(g.eval), eval(g.eval); end
     instruct = outstruct(allobj); % Getting default values in the GUI. 
-    
+
     % create figure and wait for return
     % ---------------------------------
     if ischar(g.mode) && (strcmpi(g.mode, 'plot') || strcmpi(g.mode, 'return') )

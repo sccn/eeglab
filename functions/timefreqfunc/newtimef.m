@@ -1,4 +1,4 @@
-% newtimef() - Return estimates and plots of mean event-related (log) spectral
+% NEWTIMEF - Return estimates and plots of mean event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) events across
 %           event-related trials (epochs) of a single input channel time series.
 %
@@ -11,7 +11,7 @@
 %
 %         * For the wavelet and FFT methods, output frequency spacing
 %           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
-%           NaN input values (such as returned by eventlock()) are ignored.
+%           NaN input values (such as returned by EVENTLOCK) are ignored.
 %
 %         * If 'alpha' is given (see below), permutation statistics are computed
 %           (from a distribution of 'naccu' surrogate data trials) and
@@ -19,7 +19,7 @@
 %           and plotted in green.
 %
 %         * Given a 'topovec' topo vector and 'elocs' electrode location file,
-%           the figure also shows a topoplot() view of the specified scalp map.
+%           the figure also shows a TOPOPLOT view of the specified scalp map.
 %
 %         * Note: Left-click on subplots to view and zoom in separate windows.
 %
@@ -34,7 +34,7 @@
 %                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles);
 % NOTE:
 %        >> timef details  % presents more detailed argument information
-%                          % Note: version timef() also computes multitaper transforms
+%                          % Note: version TIMEF also computes multitaper transforms
 %
 % Required inputs:    Value                                 {default}
 %       data        = Single-channel data vector (1,frames*ntrials), else 
@@ -44,7 +44,7 @@
 %       frames      = Frames per trial. Ignored if data are 2-D or 3-D.  {750}
 %       tlimits     = [mintime maxtime] (ms).  Note that these are the time limits 
 %                     of the data epochs themselves, NOT A SUB-WINDOW TO EXTRACT 
-%                     FROM THE EPOCHS as is the case for pop_newtimef(). {[-1000 2000]}
+%                     FROM THE EPOCHS as is the case for POP_NEWTIMEF. {[-1000 2000]}
 %       Fs          = data sampling rate (Hz)  {default: read from icadefs.m or 250}
 %       varwin      = [real] indicates the number of cycles for the time-frequency 
 %                        decomposition {default: 0}
@@ -68,7 +68,7 @@
 %    Optional inter-trial coherence (ITC) Type:
 %       'itctype'   = ['coher'|'phasecoher'|'phasecoher2'] Compute either linear
 %                     coherence ('coher') or phase coherence ('phasecoher').
-%                     Originall called 'phase-locking factor' {default: 'phasecoher'}
+%                     Originally called 'phase-locking factor' {default: 'phasecoher'}
 %
 %    Optional detrending:
 %       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
@@ -101,7 +101,7 @@
 %                     for wavelets. {default: use 'padratio'}
 %       'freqscale' = ['log'|'linear'] frequency scale. {default: 'linear'}
 %                     Note that for obtaining 'log' spaced freqs using FFT,
-%                     closest correspondant frequencies in the 'linear' space
+%                     closest correspondent frequencies in the 'linear' space
 %                     are returned.
 %       'verbose'   = ['on'|'off'] print text {'on'}
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
@@ -110,8 +110,8 @@
 %                     to experimental events. See notes.    {default: 'off'}
 %       'wletmethod' = ['dftfilt'|'dftfilt2'|'dftfilt3'] Wavelet type to use.
 %                     'dftfilt2' -> Morlet-variant wavelets, or Hanning DFT.
-%                     'dftfilt3' -> Morlet wavelets.  See the timefreq() function 
-%                     for more detials {default: 'dftfilt3'}
+%                     'dftfilt3' -> Morlet wavelets.  See the TIMEFREQ function 
+%                     for more details {default: 'dftfilt3'}
 %       'cycleinc'    ['linear'|'log'] mode of cycles increase when [min max] cycles 
 %                     are provided in 'cycle' parameter. Applies only to 
 %                     'wletmethod','dftfilt'  {default: 'linear'}
@@ -166,7 +166,7 @@
 %                      probability level. Show non-signif. output values 
 %                      as green.                              {default: 0}
 %       'mcorrect'  = ['none'|'fdr'] correction for multiple comparison
-%                     'fdr' uses false detection rate (see function fdr()).
+%                     'fdr' uses false detection rate (see function FDR).
 %                     Not available for condition comparisons. {default:'none'} 
 %       'pcontour'  = ['on'|'off'] draw contour around significant regions
 %                     instead of masking them. Not available for condition 
@@ -189,8 +189,8 @@
 %       'condboot'  = ['abs'|'angle'|'complex'] to compare two conditions,
 %                     either subtract ITC absolute values ('abs'), angles
 %                     ('angles'), or complex values ('complex'). {default: 'abs'}
-%       'pboot'     = permutation power limits (e.g., from newtimef()) {def: from data}
-%       'rboot'     = permutation ITC limits (e.g., from newtimef()). 
+%       'pboot'     = permutation power limits (e.g., from NEWTIMEF) {def: from data}
+%       'rboot'     = permutation ITC limits (e.g., from NEWTIMEF). 
 %                     Note: Both 'pboot' and 'rboot' must be provided to avoid 
 %                     recomputing the surrogate data! {default: from data}
 %
@@ -267,9 +267,9 @@
 %   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). 
 %   The upper panel presents the data ERSP (Event-Related Spectral Perturbation) 
 %   in dB, with mean baseline spectral activity (in dB) subtracted. Use 
-%   "'baseline', NaN" to prevent timef() from removing the baseline. 
+%   "'baseline', NaN" to prevent TIMEF from removing the baseline. 
 %   The lower panel presents the data ITC (Inter-Trial Coherence). 
-%   Click on any plot axes to pop up a new window (using 'axcopy()')
+%   Click on any plot axes to pop up a new window (using 'AXCOPY')
 %   -- Upper left marginal panel presents the mean spectrum during the baseline 
 %      period (blue), and when significance is set, the significance threshold 
 %      at each frequency (dotted green-black trace).
@@ -281,10 +281,10 @@
 %   -- The marginal panel under the ITC image shows the ERP (which is produced by 
 %      ITC across the data spectral pass band).
 %
-% Authors: Arnaud Delorme, Jean Hausser from timef() by Sigurd Enghoff, Scott Makeig
+% Authors: Arnaud Delorme, Jean Hausser from TIMEF by Sigurd Enghoff, Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
-% See also: timefreq(), condstat(), newcrossf(), tftopo()
+% See also: TIMEFREQ, CONDSTAT, NEWCROSSF, TFTOPO
 
 %    Deprecated Multitaper Parameters: [not included here]
 %       'mtaper'    = If [N W], performs multitaper decomposition.
@@ -364,9 +364,9 @@
 % 12-22-99 debugged ERPtimes, added BASE_BOOT -sm
 % 01-10-00 debugged BASE_BOOT=0 -sm
 % 02-28-00 added NOTE on formula derivation below -sm
-% 03-16-00 added axcopy() feature -sm && tpj
+% 03-16-00 added AXCOPY feature -sm && tpj
 % 04-16-00 added multiple marktimes loop -sm
-% 04-20-00 fixed ITC cbar limits when spcified in input -sm
+% 04-20-00 fixed ITC cbar limits when specified in input -sm
 % 07-29-00 changed frequencies displayed msg -sm
 % 10-12-00 fixed bug in freqs when cycles>0 -sm
 % 02-07-01 fixed inconsistency in BASE_BOOT use -sm
@@ -382,7 +382,7 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, fram
 % Note: Above, PA is output of 'phsamp','on'
 
 % For future 'timewarp' keyword help: 'timewarp' 3rd element {colors} contains a
-%               list of Matlab linestyles to use for vertical lines marking the occurence
+%               list of Matlab linestyles to use for vertical lines marking the occurrence
 %               of the time warped events. If '', no line will be drawn for this event
 %               column. If fewer colors than event columns, cycles through the given color
 %               labels.  Note: Not compatible with 'vert' (below).
@@ -583,7 +583,7 @@ end
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
     'cycleinc'      'string'    {'linear','log'}        'linear'
-    'colormap'      'string'    []            DEFAULT_COLORMAP;...
+    'colormap'      {'string' 'float' }    []            DEFAULT_COLORMAP;...
     }, 'newtimef', 'ignore');
 if ischar(g), error(g); end
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
@@ -800,7 +800,7 @@ end
 % --------------------------
 if ~isempty(g.mtaper) % multitaper, inspired from a Bijan Pesaran matlab function
     if length(g.mtaper) < 3
-        %error('mtaper arguement must be [N W] or [N W K]');
+        %error('mtaper argument must be [N W] or [N W K]');
 
         if g.mtaper(1) * g.mtaper(2) < 1
             error('mtaper 2 first arguments'' product must be larger than 1');
@@ -1142,7 +1142,7 @@ if iscell(data)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%
-% display text to user (computation perfomed only for display)
+% display text to user (computation performed only for display)
 %%%%%%%%%%%%%%%%%%%%%%
 verboseprintf(g.verbose, 'Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
@@ -1466,7 +1466,7 @@ persistent showwarning;
 if isempty(showwarning)
     warning( [ 'Some versions of Matlab crash on this function. If this is' 10 ...
                'the case, simply comment the code line 1655-1673 in newtimef.m' 10 ...
-               'which aims at "ploting marginal ERSP mean below ERSP image"' ]);
+               'which aims at "plotting marginal ERSP mean below ERSP image"' ]);
     showwarning = 1;
 end;    
 
@@ -1507,7 +1507,6 @@ end
 if g.plot
     % verboseprintf(g.verbose, '\nNow plotting...\n');
     set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
-    colormap(g.colormap);
     pos = get(gca,'position');
     q = [pos(1) pos(2) 0 0];
     s = [pos(3) pos(4) pos(3) pos(4)];
@@ -1887,10 +1886,10 @@ switch lower(g.plotitc)
         end
         ylabel('ERP')
 
-end; %switch
+end %switch
 
 %
-%%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% plot a TOPOPLOT %%%%%%%%%%%%%%%%%%%%%%%
 %
 if (~isempty(g.topovec)) && strcmpi(g.plotitc, 'on') && strcmpi(g.plotersp, 'on')
     
@@ -1920,6 +1919,7 @@ if g.plot
 
     try, axcopy(gcf); catch, end
 end
+colormap(g.colormap);
 
 % ---------------
 % Plotting curves

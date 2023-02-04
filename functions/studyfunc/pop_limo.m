@@ -1,4 +1,4 @@
-% pop_limo() - prepare and convert EEGLAB data and structure to be
+% POP_LIMO - prepare and convert EEGLAB data and structure to be
 %              processed by LIMO.
 %
 % Usage:
@@ -12,7 +12,7 @@
 %   'dat'|'ica'  - show the interface for data channels or for ICA. The
 %                  default is to use data.
 %
-% Optional inputs: same as std_limo()
+% Optional inputs: same as STD_LIMO
 %
 % Graphical interface:
 %   "See GLM factors" - [push button] See all the GLM factors or columns in
@@ -28,7 +28,7 @@
 %
 %  "Interaction model for categorical indep. var." - When using more than 
 %                   one categorical variable, clicking this option forces
-%                   to have factors which are the conjonction of the
+%                   to have factors which are the conjunction of the
 %                   different independent var. values. This is useful only 
 %                   if you want to calculate interactions at the subject.
 %                   The 'best' option is typically to have a design with
@@ -45,7 +45,7 @@
 %                   for the GLM. Currently, only "ERP" and "spectrum" are 
 %                   supported.
 %
-%  "Optimization method" - [pop up meny] may be Ordinary Least Squares (OLS), 
+%  "Optimization method" - [pop up menu] may be Ordinary Least Squares (OLS), 
 %                   Weighted Least Squares (WLS), or Iterative Reweighted Least 
 %                   Squares. WTS should be used as it is more robust to trials
 %                   with different time course. OLS is a standard solution and 
@@ -69,7 +69,7 @@
 % Author: Arnaud Delorme, SCCN, UCSD, 2015-
 %         Cyril Pernet, LIMO Team - edit info and defaults
 %
-% See also: std_limo()
+% See also: STD_LIMO
 
 % Copyright (C) Arnaud Delorme
 %
@@ -118,7 +118,10 @@ if nargin > 2
 else
     measureflagindx = 1;
 end
-    
+
+% check that channel location are present
+ALLEEG = eeg_checkset(ALLEEG, 'chanloc');
+
 if nargin < 4
     dataMeasures = { 'ERP' 'Spectrum' 'ERSP'};
     fileMeasures = { 'daterp' 'datspec' 'dattimef'; 'icaerp' 'icaspec' 'icatimef'};
@@ -129,7 +132,7 @@ if nargin < 4
                      '   set(findobj(gcbf, ''tag'', ''options''), ''string'', ''''''freqlim'''', [1 25]'');' ...
                      'end;' ];
     cb_listfactors = [ 'pop_listfactors(STUDY, ''gui'', ''on'', ' ...
-                               '''level'', ''one'',' ...
+                               '''level'', ''both'',' ...
                                '''splitreg''   , fastif(get(findobj(gcbf, ''tag'', ''splitreg''   ), ''value''), ''on'', ''off''),' ...
                                '''interaction'', fastif(get(findobj(gcbf, ''tag'', ''interaction''), ''value''), ''on'', ''off''));' ];
     uilist = { ...
@@ -139,7 +142,7 @@ if nargin < 4
         {'style' 'checkbox'   'string' 'Split regressions (continuous indep. var.)' 'tag' 'splitreg' } {} ...
         {'style' 'text'       'string' 'Input data to use for the GLM' } ...
         {'style' 'popupmenu'  'string' dataMeasures 'tag' 'measure' 'callback' cb_measure} ...
-        {'style' 'text'       'string' 'Optimization method' } ...
+        {'style' 'text'       'string' 'Estimation method' } ...
         {'style' 'popupmenu'  'string' methods 'tag' 'method' } ...
         {'style' 'text'       'string' 'Options' } ...
         {'style' 'edit'       'string' '' 'tag' 'options' } ...

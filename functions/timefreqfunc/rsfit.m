@@ -1,4 +1,4 @@
-% rsfit() - find p value for a given value in a given distribution
+% RSFIT - find p value for a given value in a given distribution
 %             using Ramberg-Schmeiser distribution
 %
 % Usage: >> p = rsfit(x, val)
@@ -21,7 +21,7 @@
 %
 % Author: Arnaud Delorme, SCCN, 2003
 %
-% See also: rsadjust(), rsget(), rspdfsolv(), rspfunc()
+% See also: RSADJUST, RSGET, RSPDFSOLV, RSPFUNC
 %
 % Reference: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F.
 %            A probability distribution and its uses in fitting data. 

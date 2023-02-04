@@ -1,6 +1,6 @@
-% make_timewarp() - Select a subset of epochs containing a given event sequence, and return 
+% MAKE_TIMEWARP - Select a subset of epochs containing a given event sequence, and return 
 %                   a matrix of latencies for time warping the selected epochs to a common 
-%                   timebase in newtimef(). Events in the given sequence may be further 
+%                   timebase in NEWTIMEF. Events in the given sequence may be further 
 %                   restricted to those with specified event field values.
 % Usage:
 %       >> timeWarp = make_timewarp(EEG, eventSequence, 'key1',value1,
@@ -32,11 +32,11 @@
 %                         from the mean in the selected epochs. {default: Inf -> no removal}
 % Outputs:
 %   timeWarp            - a structure with latencies (time-warp matrix with fields
-%                          timeWarp.latencies - an (N, M) timewarp matrix for use in newtimef() 
+%                          timeWarp.latencies - an (N, M) timewarp matrix for use in NEWTIMEF 
 %                           where    N = number of selected epochs containing the specified sequence,
 %                                    M = number of events in specified event sequence.
 %                          timeWarp.epochs - a (1, M) vector giving the index of epochs with the 
-%                              specified sequence. Only these epochs should be passed to newtimef().
+%                              specified sequence. Only these epochs should be passed to NEWTIMEF.
 %                          timeWarp.eventSequence - same as the 'eventSequence' input variable.
 % Example:
 %   % Create a timewarp matrix for a sequence of events, first an event of type 'movement Onset' followed by 
@@ -52,7 +52,7 @@
 %                  'eventConditions', {'vx>0' 'vx>0 && vy<1'},'maxSTDForAbsolute', 3,'maxSTDForRelative', 2);
 %
 % Author: Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
-% See also: show_events(), newtimef()
+% See also: SHOW_EVENTS, NEWTIMEF
 
 % Copyright (C) Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
 %

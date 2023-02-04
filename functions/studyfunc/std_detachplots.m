@@ -1,4 +1,4 @@
-% std_detachplots() -  Given a figure with subplots and several lines per axis, will add a callback to
+% STD_DETACHPLOTS -  Given a figure with subplots and several lines per axis, will add a callback to
 % each axis specified in the 'figtitles' input. The callback consist in a figure with all the detached
 % individuals lines.
 %
@@ -9,12 +9,12 @@
 %      data        - Cell array containing the data matrices for each plot in the same order showed in the figure
 %      figtitles   - Cell array of the titles of each individual axes in
 %                    the  figure. The titles must correspond. The function
-%                    use this value to find the right hanlde of the axis
+%                    use this value to find the right handle of the axis
 %      sbtitles    - Cell array of cell arrays with the titles for each
 %                    detached line per axis. i.e. {{'Axis1 line1' 'Axis1 line2'} {'Axis2 line1' 'Axis2 line2'}}
 %      handles     - Handles of the main figure who contain all the
 %                    subplots
-%      flagstd     - Flag to plot the Standar Deviation  {default: 1} means 'on'
+%      flagstd     - Flag to plot the Standard Deviation  {default: 1} means 'on'
 %
 % See also:
 %  

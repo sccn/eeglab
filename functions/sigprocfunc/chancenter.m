@@ -1,9 +1,9 @@
-% chancenter() - recenter cartesian X,Y,Z channel coordinates
+% CHANCENTER - recenter cartesian X,Y,Z channel coordinates
 %
 % Usage:  >> [x y z newcenter] = chancenter(x,y,z,center); 
 %
 % Optional inputs:
-%    x,y,z     = 3D coordintates of the channels
+%    x,y,z     = 3D coordinates of the channels
 %    center    = [X Y Z] known center different from [0 0 0]
 %                [] will optimize the center location according
 %                to the best sphere. Default is [0 0 0].
@@ -13,7 +13,7 @@
 % Authors: Arnaud Delorme, Luca Finelli & Scott Makeig SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
 %
-% See also: spherror(), cart2topo()
+% See also: SPHERROR, CART2TOPO
 
 % Copyright (C) 11/1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

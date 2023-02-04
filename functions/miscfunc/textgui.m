@@ -1,4 +1,4 @@
-% textgui() - make sliding vertical window. This window contain text
+% TEXTGUI - make sliding vertical window. This window contain text
 %             with optional function calls at each line.
 %
 % Usage:
@@ -6,7 +6,7 @@
 %
 % Inputs:
 %   commandnames - name of the commands. Either char array or cell
-%                  array of char. All style are 'pushbuttons' exept
+%                  array of char. All style are 'pushbuttons' except
 %                  for empty commands.
 %   helparray    - cell array of commands to execute for each menu
 %                  (default is empty)  
@@ -121,7 +121,7 @@ if ~isempty(g.title)
         divider = g.linesperpage;
     else
         divider = nblines+addlines;
-    end;    
+    end
     ordinate      = topordi-topordi*TOPLINES/divider;
     currentheight = topordi/divider;
     
@@ -140,7 +140,7 @@ if ~isempty(g.title)
         divider = g.linesperpage;
     else
         divider = nblines+addlines;
-    end;    
+    end
 end
 
 maxlen = size(g.title,2);

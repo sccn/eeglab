@@ -1,4 +1,4 @@
-% perminv() - returns the inverse permutation vector
+% PERMINV - returns the inverse permutation vector
 %
 % Usage: >> [invvec] = perminverse(vector);
 %
@@ -31,7 +31,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 4-4-97 shortened name to perminv() -sm
+% 4-4-97 shortened name to PERMINV -sm
 % 4-7-97 allowed row vector, added tests -sm
 % 01-25-02 reformated help & license -ad 
 

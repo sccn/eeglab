@@ -1,4 +1,4 @@
-% pop_selectevent() - Find events in an EEG dataset. If the dataset
+% POP_SELECTEVENT - Find events in an EEG dataset. If the dataset
 %                     is the only input, a window pops up to
 %                     ask for the relevant parameter values.
 %
@@ -54,7 +54,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002-
 %
-% See also: eeg_eventformat(), pop_importevent()
+% See also: EEG_EVENTFORMAT, POP_IMPORTEVENT
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002, arno@salk.edu
 %
@@ -464,19 +464,22 @@ if strcmp(g.select, 'inverse')
 end
 
 % checking if trying to remove boundary events (in continuous data)
-if isfield(EEG.event, 'type')
+eeglab_options;
+if ~isempty(EEG.event) && isfield(EEG.event, 'type')
     if ischar(EEG.event(1).type) && EEG.trials == 1 
         Ieventrem = setdiff_bc([1:length(EEG.event)], Ievent );
         tmpevent  = EEG.event;
-        boundaryindex = strmatch('boundary', { tmpevent(Ieventrem).type });
+        boundaryindex = eeg_findboundaries(tmpevent(Ieventrem));
         if ~isempty(boundaryindex)
             boundaryindex = Ieventrem(boundaryindex);
             Ievent = [ Ievent boundaryindex ];
         end
         Ievent = sort(Ievent);
-    else boundaryindex = [];
+    else 
+        boundaryindex = [];
     end
-else boundaryindex = [];
+else 
+    boundaryindex = [];
 end
 
 % rename events if necessary

@@ -1,11 +1,11 @@
-% writelocs() - write a file containing channel location, type and gain information
+% WRITELOCS - write a file containing channel location, type and gain information
 %             
 % Usage:
 %   >> writelocs( chanstruct, filename );
 %   >> writelocs( chanstruct, filename, 'key', 'val' );
 %
 % Inputs:
-%   chanstruct - EEG.chanlocs data structure returned by readlocs() containing
+%   chanstruct - EEG.chanlocs data structure returned by READLOCS containing
 %                channel location, type and gain information.
 %   filename   - File name for saving channel location, type and gain information
 %
@@ -22,12 +22,12 @@
 %                  'xyz' - MATLAB/EEGLAB cartesian coordinates (Not EGI cartesian; 
 %                          z is toward nose; y is toward left ear; z is toward vertex).
 %                  'polhemus' or 'polhemusx' - Polhemus electrode location file recorded with 
-%                          'X' on sensor pointing to subject (see below and readelp()).
+%                          'X' on sensor pointing to subject (see below and READELP).
 %                  'polhemusy' - Polhemus electrode location file recorded with 
-%                          'Y' on sensor pointing to subject (see below and readelp()).
+%                          'Y' on sensor pointing to subject (see below and READELP).
 %                  'besa' - BESA'(.elp') spherical coordinate file. (Not MATLAB spherical
 %                           - see below).
-%                  'chanedit' - EEGLAB channel location files created by pop_chanedit().
+%                  'chanedit' - EEGLAB channel location files created by POP_CHANEDIT.
 %                  'custom' - Ascii files with columns in user-defined 'format' (see below).
 %   'format'    - [cell array] Format of a 'custom' channel location file (see above).
 %                          Default if no file type is defined. The cell array contains
@@ -61,15 +61,15 @@
 %                             Comment lines begin with '%'. Default is 'off'.
 %   'customheader' - [string] Add a custom header at the beginning of the file and
 %                             preceded by '%'.  If used with 'header' set to 'on', 
-%                             the column names will be insterted after the custom header.
+%                             the column names will be inserted after the custom header.
 %   'elecind' - [integer array] Indices of channels to export. 
 %                             Default is all channels.
 %
-% Note: for file formats, see readlocs() help  (>> help readlocs)
+% Note: for file formats, see READLOCS help  (>> help readlocs)
 %
 % Author: Arnaud Delorme, Salk Institute, 16 Dec 2002
 %
-% See also: readlocs(), readelp()
+% See also: READLOCS, READELP
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 28 Feb 2002
 %

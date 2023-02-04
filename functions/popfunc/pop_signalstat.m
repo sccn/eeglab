@@ -1,6 +1,6 @@
-% pop_signalstat() - Computes and plots statistical characteristics of a signal,
+% POP_SIGNALSTAT - Computes and plots statistical characteristics of a signal,
 %                    including the data histogram, a fitted normal distribution,
-%                    a normal ditribution fitted on trimmed data, a boxplot, and
+%                    a normal distribution fitted on trimmed data, a boxplot, and
 %                    the QQ-plot. The estimates value are printed in a panel and
 %                    can be read as output. See SIGNALSTAT.
 % Usage:
@@ -98,7 +98,7 @@ if cnum < 1 || cnum > EEG.nbchan
    error('pop_signalstat(): Channel/component number out of range');
 end;   
 
-% call function signalstat() either on raw data or ICA data
+% call function SIGNALSTAT either on raw data or ICA data
 % ---------------------------------------------------------
 if typeproc == 1
 	tmpsig=EEG.data(cnum,:);

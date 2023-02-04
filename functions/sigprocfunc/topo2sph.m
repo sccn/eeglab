@@ -1,21 +1,21 @@
-% topo2sph() - convert a topoplot() style 2-D polar-coordinate
+% TOPO2SPH - convert a TOPOPLOT style 2-D polar-coordinate
 %              channel locations file to a 3-D spherical-angle
-%              file for use with headplot()
+%              file for use with HEADPLOT
 % Usage: 
 %   >> [c h] = topo2sph('eloc_file','eloc_outfile', method, unshrink);
 %   >> [c h] = topo2sph( topoarray, method, unshrink );
 %
 % Inputs:
 %   'eloc_file'    = filename of polar 2-D electrode locations file used by 
-%                    topoplot(). See >> topoplot example or cart2topo()
+%                    TOPOPLOT. See >> topoplot example or CART2TOPO
 %   'eloc_outfile' = output file of 3-D electrode locations in spherical angle 
-%                    coords. for use in headplot().
+%                    coords. for use in HEADPLOT.
 %   topoarray      = polar array of 2-D electrode locations, with polar angle
 %                    in the first column and radius in the second one.
 %   method         = [1|2] 1 is for Besa compatibility, 2 is for
-%                    compatibility with Matlab function cart2sph(). {default: 2}
+%                    compatibility with Matlab function CART2SPH. {default: 2}
 %   unshrink       = [0<real<1] unshrink factor. Enter a shrink factor used
-%                    to convert spherical to topo (see sph2topo()). Only 
+%                    to convert spherical to topo (see SPH2TOPO). Only 
 %                    implemented for 'method' 1 (above). Electrode 'shrink' 
 %                    is now deprecated. See >> help topoplot
 % Outputs:
@@ -24,7 +24,7 @@
 %
 % Author: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 1999 
 %
-% See also: sph2topo(), cart2topo()
+% See also: SPH2TOPO, CART2TOPO
 
 % Copyright (C) 1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -53,7 +53,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 3-16-00 changed name to topo2sph() for compatibility with cart2topo() -sm
+% 3-16-00 changed name to TOPO2SPH for compatibility with CART2TOPO -sm
 % 01-25-02 reformated help & license -ad 
 % 03-22-02 complete remodeling for returning arguments and taking arrays -ad 
 

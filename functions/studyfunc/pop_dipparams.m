@@ -1,4 +1,4 @@
-% pop_dipparams() - Set plotting parameters for dipoles.
+% POP_DIPPARAMS - Set plotting parameters for dipoles.
 %
 % Usage:    
 %   >> STUDY = pop_dipparams(STUDY, 'key', 'val');   
@@ -8,13 +8,13 @@
 %
 % Optional inputs:
 %   'axistight' - ['on'|'off'] Plot closest MRI slide. Default is 'off'.
-%   'projimg'   - ['on'|'off'] lot dipoles projections on each axix. Default is 'off'.
+%   'projimg'   - ['on'|'off'] lot dipoles projections on each axis. Default is 'off'.
 %   'projlines' - ['on'|'off'] Plot projection lines. Default is 'off'.
 %   'density'   - ['on'|'off'] Plot dipole density. Default is 'off'.
 %   'centrline' - ['on'|'off'] Plot centroid's projection line. 
 %                 This option overwrite 'projlines'. Default is 'on'.
 %
-% See also: std_dipplot()
+% See also: STD_DIPPLOT
 %
 % Authors: Arnaud Delorme
 

@@ -1,11 +1,11 @@
-% shuffle() - shuffle a given dimension in an array
+% SHUFFLE - shuffle a given dimension in an array
 %
 % Usage: >> Y = shuffle(X)
 %        >> [Y = shuffle(X, DIM)
 % 
 % Inputs: 
 %   X   - input array
-%   DIM - dimension index (default is firt non-singleton dimention)
+%   DIM - dimension index (default is first non-singleton dimension)
 %
 % Outputs: 
 %    Y - shuffled array

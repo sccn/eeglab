@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<eventTrack xmlns="http://www.egi.com/event_mff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <name>ECI TCP-IP 55513</name>
+   <trackType>STIM</trackType>
+   <event>
+      <beginTime>2015-07-01T16:24:33.845920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>stm+</code>
+      <label/>
+      <description/>
+      <sourceDevice>Multi-Port ECI</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>cel#</keyCode>
+            <description/>
+            <data dataType="short">1</data>
+         </key>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="short">3</data>
+         </key>
+         <key>
+            <keyCode>pos#</keyCode>
+            <description/>
+            <data dataType="short">3</data>
+         </key>
+         <key>
+            <keyCode>argu</keyCode>
+            <description/>
+            <data dataType="short">0</data>
+         </key>
+      </keys>
+   </event>
+   <event>
+      <beginTime>2015-07-01T16:24:34.610920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>resp</code>
+      <label/>
+      <description/>
+      <sourceDevice>Multi-Port ECI</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>cel#</keyCode>
+            <description/>
+            <data dataType="short">1</data>
+         </key>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="short">3</data>
+         </key>
+         <key>
+            <keyCode>pos#</keyCode>
+            <description/>
+            <data dataType="short">1</data>
+         </key>
+         <key>
+            <keyCode>rsp+</keyCode>
+            <description/>
+            <data dataType="short">1</data>
+         </key>
+      </keys>
+   </event>
+   <event>
+      <beginTime>2015-07-01T16:24:34.628920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>fbk+</code>
+      <label/>
+      <description/>
+      <sourceDevice>Multi-Port ECI</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>cel#</keyCode>
+            <description/>
+            <data dataType="short">1</data>
+         </key>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="short">3</data>
+         </key>
+         <key>
+            <keyCode>pos#</keyCode>
+            <description/>
+            <data dataType="short">4</data>
+         </key>
+         <key>
+            <keyCode>argu</keyCode>
+            <description/>
+            <data dataType="short">0</data>
+         </key>
+      </keys>
+   </event>
+   <event>
+      <beginTime>2015-07-01T16:24:35.044920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>stm+</code>
+      <label/>
+      <description/>
+      <sourceDevice>Multi-Port ECI</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>cel#</keyCode>
+            <description/>
+            <data dataType="short">1</data>
+         </key>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="short">134</data>
+         </key>
+         <key>
+            <keyCode>pos#</keyCode>
+            <description/>
+            <data dataType="short">3</data>
+         </key>
+         <key>
+            <keyCode>argu</keyCode>
+            <description/>
+            <data dataType="short">0</data>
+         </key>
+      </keys>
+   </event>
+</eventTrack>

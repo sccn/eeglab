@@ -1,4 +1,4 @@
-% std_figtitle() - Generate plotting figure titles in a cell array
+% STD_FIGTITLE - Generate plotting figure titles in a cell array
 %
 % Usage:    
 %   >> celltxt = std_figtitle(key1, val1, key2, val2);  
@@ -22,8 +22,8 @@
 %  'factor2stat'   - ['on'|'off'] default is 'off'
 %  'mcorrect'      - [string] correction for multiple comparisons. Default is
 %                  empty.
-%  'statistics'  - [string] type of statictics
-%  'threshold'   - [real] treshold value
+%  'statistics'  - [string] type of statistics
+%  'threshold'   - [real] threshold value
 % 
 % Optional grouping:
 %  'factor1grouped'  - ['on'|'off'] group factor 1 together default is 'off'
@@ -237,14 +237,14 @@ if ~isempty(alllegends)
 
     % convert legends to string if necessary
     % --------------------------------------
-    for ileg = 1:length(alllegends), 
+    for ileg = 1:length(alllegends)
         alllegends{ileg} = value2str(alllegends{ileg}); 
     end
 end
 
 % statistic titles
 % ----------------
-if isnan(opt.threshold), 
+if isnan(opt.threshold)
     basicstat = '(p-value)';
 else
     if length(opt.threshold) >= 1
@@ -285,7 +285,7 @@ if ~strcmpi(opt.effect, 'marginal') && (strcmpi(opt.factor1stat, 'on') && strcmp
    all_titles{rown, coln} = [ 'Interaction ' basicstat ];   
 end
 
-function pres = thresh_pres(thresh_pres);
+function pres = thresh_pres(thresh_pres)
     if (round(thresh_pres*100)-thresh_pres*100) == 0
         pres = 2;
     elseif (round(thresh_pres*1000)-thresh_pres*1000) == 0
@@ -316,8 +316,12 @@ function str = value2str(value)
         end
     else % cell array
         str = value{1};
-        for ind = 2:length(value)
-            str = [ str ' & ' value{ind} ];
+        if length(value) <= 5
+            for ind = 2:length(value)
+                str = [ str ' & ' value{ind} ];
+            end
+        else
+            str = [ str ' & ' num2str(value{2}) ' & ...' ];
         end
     end
     

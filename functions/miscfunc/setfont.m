@@ -1,4 +1,4 @@
-% setfont() - Change all the fonts properties of a figure.
+% SETFONT - Change all the fonts properties of a figure.
 %
 % Usage:
 %   >>  newdata = setfont( handle, 'key', 'val');
@@ -8,11 +8,11 @@
 % Inputs:
 %   handle       - [gcf,gca] figure or plot handle
 %   'handletype' - ['xlabels'|'ylabels'|'titles'|'axis'|'strings'] only apply
-%                formating to selected category. Note that this has to be the 
+%                formatting to selected category. Note that this has to be the 
 %                first optional input.
 %   properties - 'key', 'val' properties for the figure
 %
-% Exemple:
+% Example:
 %  setfont(gcf, 'fontweight', 'normal', 'fontsize', 14);
 %
 % Author: Arnaud Delorme, CNL / Salk Institute - SCCN, 25 Oct 2002
@@ -74,7 +74,7 @@ function setfont(fig, varargin);
         end
     end
     
-    % apply formating
+    % apply formatting
     % ---------------
     for index = 1:length(h)
         isaxis = 0;

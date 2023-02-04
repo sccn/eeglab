@@ -1,4 +1,4 @@
-% vectdata() - vector data interpolation with optional moving 
+% VECTDATA - vector data interpolation with optional moving 
 %              average.
 %
 % Usage:
@@ -19,7 +19,7 @@
 %        'nearest'   -> Nearest neighbor interpolation.
 %        'v4'        -> MATLAB 4 griddata method.
 %   'average'  - [real] moving average in the dimension of timesin
-%                note that extreme values might be inacurate (see 'borders'). 
+%                note that extreme values might be inaccurate (see 'borders'). 
 %                Default none or [].
 %   'avgtype'  - ['const'|'gauss'] use a const value when averaging (array of 
 %                ones) or a gaussian window. Default is 'const'.
@@ -32,7 +32,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 Oct 2002
 %
-% See also: griddata()
+% See also: GRIDDATA
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

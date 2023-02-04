@@ -1,4 +1,4 @@
-% std_interp() - interpolate, if needed, a list of named data channels 
+% STD_INTERP - interpolate, if needed, a list of named data channels 
 %                for all datasets included in a STUDY. Currently assumes
 %                that all channels have uniform locations across datasets.
 %
@@ -9,8 +9,8 @@
 %     ALLEEG   - EEGLAB vector containing all EEG dataset structures in the STUDY.
 %     chans    - [Cell array] cell array of channel names (labels) to interpolate 
 %                into the data if they are missing from one of the datasets.
-%     method   - [string] griddata() method to use for interpolation.
-%                See  >> help eeg_interp() {default:'spherical'}
+%     method   - [string] GRIDDATA method to use for interpolation.
+%                See  >> help EEG_INTERP {default:'spherical'}
 %
 % Important limitation:
 %     This function currently presuposes that all datasets have the same channel 
@@ -23,7 +23,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, August 2006-
 %
-% See also: eeg_interp()
+% See also: EEG_INTERP
 
 % Copyright (C) Arnaud Delorme, CERCO, 2006, arno@salk.edu
 %
@@ -106,12 +106,12 @@ for index = 1:length(STUDY.datasetinfo)
    
    if length(interplocs) ~= length(tmplocs)
        
-       % search for position of electrode in backup structure
+       % search for position of electrode in removed channels
        % ----------------------------------------------
        extrachans = [];
-       if isfield(ALLEEG(tmpind).chaninfo, 'nodatchans')
-            if isfield(ALLEEG(tmpind).chaninfo.nodatchans, 'labels')
-                extrachans = ALLEEG(tmpind).chaninfo.nodatchans;
+       if isfield(ALLEEG(tmpind).chaninfo, 'removedchans')
+            if isfield(ALLEEG(tmpind).chaninfo.removedchans, 'labels')
+                extrachans = ALLEEG(tmpind).chaninfo.removedchans;
             end
        end
        tmplabels = { tmplocs.labels };
@@ -120,7 +120,7 @@ for index = 1:length(STUDY.datasetinfo)
            if ~isempty(ind)
                interplocs(i) = tmplocs(ind); % this is necessary for polhemus
            elseif ~isempty(extrachans)
-               ind = strmatch( interplocs(i).labels, { extrachans.labels }, 'exact');
+               ind = strmatch( lower(interplocs(i).labels), lower({ extrachans.labels }), 'exact');
                if ~isempty(ind)
                     fprintf('Found position of %s in chaninfo structure\n', interplocs(i).labels);
                     interplocs(i) = extrachans(ind);

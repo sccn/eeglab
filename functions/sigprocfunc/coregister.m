@@ -1,29 +1,29 @@
-% coregister() -  Co-register measured or template electrode locations with a 
+% COREGISTER -  Co-register measured or template electrode locations with a 
 %                 a reference channel locations file. For instance if you
 %                 want to perform dipole modeling you have to coregister
 %                 (align) your channel electrodes with the model (and the
 %                 easiest way to do that is to coregister your channel
 %                 electrodes with the electrodes file associated with the
-%                 model. To use coregister(), one may for instance use the default 
+%                 model. To use COREGISTER, one may for instance use the default 
 %                 MNI head and 10-5 System locations from Robert Oostenveld, used in  
-%                 the dipfit2() dipole modeling function as a reference. 
-%                 Use coregister() to linearly align or nonlinearly warp 
+%                 the DIPFIT2 dipole modeling function as a reference. 
+%                 Use COREGISTER to linearly align or nonlinearly warp 
 %                 subsequently recorded or nominally identified (e.g., 'Cz') sets of 
 %                 channel head locations to the reference locations. 
 %                 Both channel locations and/or fiducial (non-electrode) 
-%                 locations can then be used by coregister() to linearly align 
+%                 locations can then be used by COREGISTER to linearly align 
 %                 or nonlinearly warp a given or measured montage to the reference 
-%                 locations. In its (default) manual mode, coregister() produces 
+%                 locations. In its (default) manual mode, COREGISTER produces 
 %                 an interactive gui showing the imported and reference channel 
 %                 locations on the imported head mesh (if any), allowing the user 
 %                 to make additional manual adjustments using gui text entry boxes, 
 %                 and to rotate the display using the mouse.
 % Usage:
-%        >>  coregister(EEG.chanlocs); % Show channel locations in the coregister() 
+%        >>  coregister(EEG.chanlocs); % Show channel locations in the COREGISTER 
 %                 % gui, for align, warp, or manual mode co-registration with the 
-%                 % dipfit2() model head mesh and 10-5 System reference locations.
+%                 % DIPFIT2 model head mesh and 10-5 System reference locations.
 %                 % Note: May need to scale channel x,y,z positions by 100 to see 
-%                 % the imported locations in the default dipfit2() head mesh.
+%                 % the imported locations in the default DIPFIT2 head mesh.
 %
 %        >> [chanlocs_out transform] = coregister( chanlocs, reflocs, 'key', 'val' )
 %                 % Perform custom co-registration to a reference locations and
@@ -41,14 +41,14 @@
 %                 or {points triangles normals} (see >> help plotmesh 
 %                 for details). May also be the name of a head mesh .mat
 %                 file (several formats recognized). By default, loads the 
-%                 dipfit2() MNI head mesh file. Compare 'mheadnew.mat', the 
-%                 mesh used by headplot(); 'mesh',[] shows no head mesh.
+%                 DIPFIT2 MNI head mesh file. Compare 'mheadnew.mat', the 
+%                 mesh used by HEADPLOT; 'mesh',[] shows no head mesh.
 %   'warpmethod' - ['rigidbody'|'globalrescale'|'traditional'|'nonlin1'|
 %                 'nonlin2'|'nonlin3'|'nonlin4'|'nonlin5']
-%                 'traditional' calls the dipfit2.* function traditionaldipfit()
-%                 all others are enacted by electrodenormalize()
+%                 'traditional' calls the dipfit2.* function TRADITIONALDIPFIT
+%                 all others are enacted by ELECTRODENORMALIZE
 %                 {default: 'traditional}
-%   'transform' - [real array] homogenous transformation matrix (>>help 
+%   'transform' - [real array] homogeneous transformation matrix (>>help 
 %                 electrodenormalize) or a 1x9 matrix containing traditional 
 %                 9-parameter "Talairach model" transformation (>> help traditional) 
 %                 used to calculate locs_out.
@@ -65,7 +65,7 @@
 %                 Default is 'off'.
 %
 % Optional 'keywords' for MANUAL MODE (default):
-%   'manual'    - ['on'|'off'|'show'] Pops up the coregister() gui window to 
+%   'manual'    - ['on'|'off'|'show'] Pops up the COREGISTER gui window to 
 %                 allow viewing the current alignment, performing 'alignfid' or 
 %                 'warp' mode co-registration,  and making manual
 %                 adjustments. Default if 'on'. 'off' does not pop up any 
@@ -96,16 +96,16 @@
 %
 % Outputs:
 %  chanlocs_out - transformed input channel locations (chanlocs) structure
-%  transform    - transformation matrix. Use traditionaldipfit() to convert
-%                 this to a homogenous transformation matrix used in
-%                 3-D plotting functions such as headplot().
+%  transform    - transformation matrix. Use TRADITIONALDIPFIT to convert
+%                 this to a homogeneous transformation matrix used in
+%                 3-D plotting functions such as HEADPLOT.
 %
 % Note on how to create a template:
 %                 (1) Extract a head mesh from a subject MRI (possibly in 
 %                 Matlab using the function isosurface). 
 %                 (2) Measure reference locations on the subject's head. 
 %                 (3) Align these locations to the extracted subject head mesh 
-%                 (using the coregister() graphic interface). The aligned locations 
+%                 (using the COREGISTER graphic interface). The aligned locations 
 %                 then become reference locations for this mesh.
 %
 % Example:
@@ -119,7 +119,7 @@
 %   [newlocs transform] = coregister(EEG.chanlocs, template_models(2).chanfile, ...
 %        'mesh', template_models(2).hdmfile);
 %
-% See also: traditionaldipfit(), headplot(), plotmesh(), electrodenormalize(). 
+% See also: TRADITIONALDIPFIT, HEADPLOT, PLOTMESH, ELECTRODENORMALIZE. 
 %
 % Note: Calls Robert Oostenveld's FieldTrip coregistration functions for
 %       automatic coregistration.
@@ -193,28 +193,19 @@ if ischar(chanlocs1)
         % ----------------------------------
         dat = get(fid, 'userdata');
         if strcmpi(com, 'fiducials')
-            [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-            try
-                [ ~, transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
-                if ~isempty(transform), dat.transform = transform; end
-            catch
-                warndlg2(strvcat('Transformation failed', lasterr));
-            end
+            method = 'globalrescale';
         elseif strcmpi(com, 'warp')
-            [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
+            method = 'traditional';
+        end
+        [clist1, clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
 
-            % copy electrode names
-            if ~isempty(clist1)
-                tmpelec2 = dat.elec2;
-                for index = 1:length(clist2)
-                    tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
-                end
-                %try,
-                    [ ~, dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
-                %catch,
-                %    warndlg2(strvcat('Transformation failed', lasterr));
-                %end
+        % copy electrode names
+        if ~isempty(clist1)
+            tmpelec2 = dat.elec2;
+            for index = 1:length(clist2)
+                tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
             end
+            [ ~, dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), method);
         end
         set(fid, 'userdata', dat);
         redrawgui(fid); 
@@ -228,7 +219,7 @@ end
 defaultmesh = 'standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       { 'string','cell' }  { {} {} }      {};
-                            'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5'} 'traditional';
+                            'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5' 'realignfiducial'} 'traditional';
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
                             'transform'  'real'   []      [];
@@ -277,8 +268,18 @@ if ~isempty(g.mesh)
                     dat.meshtri = g.mesh.vol.bnd(1).tri;
                 end
             elseif isfield(g.mesh, 'bnd')
-                dat.meshpnt = g.mesh.bnd(1).pnt;
-                dat.meshtri = g.mesh.bnd(1).tri;
+                if isfield(g.mesh.bnd, 'pnt')
+                    dat.meshpnt = g.mesh.bnd(1).pnt;
+                    dat.meshtri = g.mesh.bnd(1).tri;
+                else
+                    if isfield(g.mesh, 'skin_surface')
+                        dat.meshpnt = g.mesh.bnd(g.mesh.skin_surface).pos;
+                        dat.meshtri = g.mesh.bnd(g.mesh.skin_surface).tri;
+                    else
+                        dat.meshpnt = g.mesh.bnd(1).pos;
+                        dat.meshtri = g.mesh.bnd(1).tri;
+                    end
+                end
             elseif isfield(g.mesh, 'TRI1')
                 dat.meshpnt = g.mesh.POS;
                 dat.meshtri = g.mesh.TRI1;
@@ -336,7 +337,7 @@ if ~isempty(g.transform)
     dat.transform = g.transform;
 elseif ~isempty(elec2)
 
-    % perfrom alignment
+    % perform alignment
     % -----------------
     if strcmpi(g.autoscale, 'on')
         avgrad1 = sqrt(sum(elec1.pnt.^2,2));
@@ -364,7 +365,7 @@ elseif ~isempty(elec2)
                     tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
                 end
                 try
-                    [ ~, dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
+                    [ ~, dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), g.warpmethod);
                 catch
                     warndlg2(strvcat('Transformation failed', lasterr));
                 end
@@ -698,16 +699,17 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     try
         elec3 = electroderealign(cfg);
     catch
-        error( [ 'You need to select more pairs or the correspondance you selectd' 10 ...
+        error( [ 'You need to select more pairs or the correspondence you selectd' 10 ...
                  'leads to a failure in initial objective function evaluation' 10 ...
-                 'which means that the correspondance is wrong.' ]);
+                 'which means that the correspondence is wrong.' ]);
     end
-    [tmp ind1 ] = intersect_bc( lower(elec1.label), lower(chanlist) );
-    [tmp ind2 ] = intersect_bc( lower(elec2.label), lower(chanlist) );
+    [~, ind1] = intersect_bc( lower(elec1.label), lower(chanlist) );
+    [~, ind2] = intersect_bc( lower(elec2.label), lower(chanlist) );
     
     transf = elec3.m;
     transf(4:6) = transf(4:6)/180*pi;
     if length(transf) == 6, transf(7:9) = 1; end
+    if length(transf) == 7, transf(8:9) = transf(7); end
     transf = checktransf(transf, elec1, elec2);
     
     dpre = mean(sqrt(sum((elec1.pnt(ind1,:) - elec2.pnt(ind2,:)).^2, 2)));
@@ -722,7 +724,7 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
 % --------------------------------------------
 function transf = checktransf(transf, elec1, elec2)
     
-    [tmp ind1 ind2] = intersect_bc( elec1.label, elec2.label );
+    [~, ind1, ind2] = intersect_bc( elec1.label, elec2.label );
     
     transfmat = traditionaldipfit(transf);
     tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
@@ -894,8 +896,8 @@ function s = plotnose(transf, col)
      NaN NaN NaN NaN
      ];
 
-    % apply homogenous transformation
-    % -------------------------------
+    % apply homogeneous transformation
+    % --------------------------------
     transfhom = traditionaldipfit( transf );
     xyz       = [ x(:) y(:) z(:) ones(length(x(:)),1) ];
     xyz2      = transfhom * xyz';

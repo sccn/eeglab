@@ -45,7 +45,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [ factor factorvals subjects paired ] = std_getindvar(STUDY, mode, scandesign)
+function [ factor, factorvals, subjects, paired ] = std_getindvar(STUDY, mode, scandesign)
 
 if nargin < 1
     help std_getindvar;
@@ -83,7 +83,7 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                 % get subject for each factor value
                 intersectSubject = { setinfo(:).subject };
                 for c = 1:length(tmpvals)
-                    eval( [ 'datind = strmatch(tmpvals{c}, { setinfo.' ff{index} '}, ''exact'');' ] );
+                    datind = strmatch(tmpvals{c}, allSetinfoVals, 'exact');
                     subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
                     intersectSubject = intersect(intersectSubject, subjects{  countfact}{c});
                 end

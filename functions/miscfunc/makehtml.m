@@ -1,4 +1,4 @@
-% makehtml() - generate .html function-index page and function help pages 
+% MAKEHTML - generate .html function-index page and function help pages 
 %              composed automatically from formatted Matlab function help messages
 %
 % Usage: 
@@ -28,8 +28,8 @@
 % Optional inputs:
 %   'outputfile' - Output file name. {default: 'index.html'}
 %   'header'     - Command to insert in the header of all .html files (e.g., javascript 
-%                  declaration or meta-tag). {default: javascript 'openhelp()' 
-%                  function. See help2htm() code for details.}
+%                  declaration or meta-tag). {default: javascript 'OPENHELP' 
+%                  function. See HELP2HTM code for details.}
 %   'footer'     - Command to insert at the end of all .html files (e.g., back
 %                  button. {default: reference back to the function-index file}
 %   'refcall'    - Syntax format to call references. {default is  
@@ -41,7 +41,7 @@
 %                  standard .html page link instead.}    
 %   'fontindex'  - Font for the .html index file (default: 'Helvetica')
 %   'backindex'  - Background tag for the index file (c.f. 'background')
-%   'mainheader' - Text file to insert at the beggining of the index page. Default is
+%   'mainheader' - Text file to insert at the beginning of the index page. Default is
 %                  none.
 %   'mainonly'   - ['on'|'off'] 'on' -> Generate the index page only.
 %                   {default: 'off' -> generate both the index and help pages}
@@ -54,7 +54,7 @@
 %             { { 'toolbox', 'toolbox2' } 'Signal processing functions' 'adminfunc/eeg_helpsigproc.m' }}, ...
 %            '/home/www/eeglab/allfunctions', 'mainheader', '/data/common/matlab/indexfunchdr.txt');          
 %
-% See also: help2html2()
+% See also: HELP2HTML2
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 2002
 %
@@ -133,7 +133,7 @@ if strcmpi( g.mainonly, 'on')
 end
 
 % ------------------------------------------- 
-% scrips which generate a web page for eeglab
+% scripts which generate a web page for eeglab
 % ------------------------------------------- 
 STYLEHEADER = '<BR><a name="%s"></a><H2>%s</H2>\n'; 
 OPENWIN = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10 ... 
@@ -170,7 +170,7 @@ fprintf(fo, '<HTML><HEAD>%s</HEAD>%s<FONT FACE="%s">\n', OPENWIN, g.backindex, g
 
 if strcmp(mode, 'files')
 	makehelphtml( directorylist, fo, 'MAIN TITLE', STYLEHEADER, outputdir, mode, options, g.mainonly );
-else % direcotry
+else % directory
 	for index = 1:length( directorylist )
 		makehelphtml( direct{ index }, fo, directorylist{index}{2}, STYLEHEADER, outputdir, mode, options, g.mainonly );
 	end
@@ -244,7 +244,7 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
                     
                     if strcmp(mainonly,'off')
                         inputfile = which( filename);
-                        try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
+                        try, copyfile( inputfile, [ DEST filename ]); % assuming the file is in the path 
                         catch, fprintf('Cannot copy file %s\n', inputfile); end
                     end
                     
@@ -274,7 +274,7 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
                 fprintf( fo, '%s', com);
                 if strcmp(mainonly,'off')
                     inputfile = which( files{index});
-                    try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
+                    try, copyfile( inputfile, [ DEST files{index} ]); % assuming the file is in the path 
                     catch, fprintf('Cannot copy file %s\n', inputfile); end
                 end
             else

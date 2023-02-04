@@ -1,4 +1,4 @@
-% help2html() - Convert a Matlab m-file help-message header into an .html help file 
+% HELP2HTML - Convert a Matlab m-file help-message header into an .html help file 
 %
 % Usage:
 %  >> linktext = help2html( filein, fileout, 'key1', val1, 'key2', val2 ...);
@@ -34,7 +34,7 @@
 %   to allow .html help file generation. Characters '-' and ':' are used
 %   explicitly by the function for parsing.
 %                                               
-%%    function_name() - description line 1              
+%%    FUNCTION_NAME - description line 1              
 %%                      description line 2       
 %%                      etc.                     
 %%                                               
@@ -50,7 +50,7 @@
 %%      text line 2                              
 %%                                               
 %%    See also:                                  
-%%     function1(), function2()                     
+%%     FUNCTION1, FUNCTION2                     
 %    
 % Author:  Arnaud Delorme, Salk Institute 2001
 %
@@ -61,7 +61,7 @@
 %           each  descriptor (i.e., single_word followed by '-' or '='
 %           or multiple quoted words followed by a '-' or '=') 
 %           are concatenated. 
-%        2) The pattern 'function()' is detected and is printed in bold 
+%        2) The pattern 'FUNCTION' is detected and is printed in bold 
 %           if it is the first function descriptor. Otherwise,
 %           it is used as a web link to the .html function file 
 %           'function.html' if this exists.
@@ -246,10 +246,10 @@ while (str(1) == '%')
                vartext = str;
             else	
                if ~isempty(varname) 
-               	    vartext = [ vartext ' ' str]; % espace if in array
+               	    vartext = [ vartext ' ' str]; % space if in array
                else 
                		if all(vartext(	end-2:end) == '.')
-               			vartext = [ deblank2(vartext(1:end-3)) ' ' str]; % espace if '...'
+               			vartext = [ deblank2(vartext(1:end-3)) ' ' str]; % space if '...'
                		else
                     	vartext = [ vartext '<BR>' str];    % CR otherwise
                     end;	
@@ -380,7 +380,7 @@ function strout = formatstr( str, refcall );
 		end
 return;	
 
-% final formating
+% final formatting
 function str = finalformat(str); % bold text in bracket if just in the beginning
     tmploc = sort(union(find(str == '['), find(str == ']')));
     if ~isempty(tmploc) && str(1) == '['

@@ -1,4 +1,4 @@
-% pop_icathresh() - main menu for choosing threshold for component
+% POP_ICATHRESH - main menu for choosing threshold for component
 %                      rejection in EEGLAB. 
 %
 % Usage:
@@ -56,7 +56,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -85,7 +85,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-%PROBLEM: when the % is set and we change manually yhe threshold,
+%PROBLEM: when the % is set and we change manually the threshold,
 % the software comes back to the percentage rejection
 
 % 01-25-02 reformated help & license -ad 

@@ -1,4 +1,4 @@
-% eeg_eventhist() - return or plot histogram of event or urevent field values. 
+% EEG_EVENTHIST - return or plot histogram of event or urevent field values. 
 %                   If NO output args, plots the histogram. If the field values 
 %                   are not numbers or strings, no histogram is computed.
 % Usage:
@@ -22,9 +22,9 @@
 %         >> [vals,histNs,bins] = eeg_eventhist(EEG.event,'type');
 %         %
 %         % Returns cell array of event-type strings, numbers of each event type, 
-%         % and event type strings, in alphabetic order. No bar() plot produced.
+%         % and event type strings, in alphabetic order. No BAR plot produced.
 %
-% See also:  pop_eventstat(), signalstat(), pop_signalstat().
+% See also:  POP_EVENTSTAT, SIGNALSTAT, POP_SIGNALSTAT
 %
 % Author: Scott Makeig, SCCN, Institute for Neural Computation, UCSD, March 26, 2004
 
@@ -143,7 +143,7 @@ if exist('IS_NUM')  %%%%%%%%%%%%%%%% numeric values histogram %%%%%%%%%%%%%%%%%%
     histNs = histc(vals,binsout);
     histNs = histNs(1:end-1);
 
-  else  % accomodate specified bin edges
+  else  % accommodate specified bin edges
    histNs = histc(vals,bins);
    histNs = histNs(1:end-1);
   end
@@ -169,7 +169,7 @@ else  % exist('IS_CHAR')   %%%%%%%%%%%% string values histogram %%%%%%%%%%%%%%%%
    if nargout == 0
       bar(histNs,1);
       if IS_CHAR
-         set(gca,'xticklabel',outbins); % ??? NEEDS MORE WORK - CANT TEST FROM HOME
+         set(gca,'xticklabel',outbins); % ??? NEEDS MORE WORK - CAN'T TEST FROM HOME
          yl = get(gca,'ylim');
          set(gca,'ylim',[yl(1) yl(2)*1.1]);
        

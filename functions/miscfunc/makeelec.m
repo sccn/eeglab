@@ -1,4 +1,4 @@
-% makeelec() - subroutine to make electrode file in eegplot()
+% MAKEELEC - subroutine to make electrode file in EEGPLOT
 %
 % Usage:   >> makeelec(chans) 
 %          >> [channames] = makeelec(chans)
@@ -8,7 +8,7 @@
 %
 % Author: Colin Humprhies, CNL / Salk Institute, 1996
 %
-% See also: eegplot()
+% See also: EEGPLOT
 
 % Copyright (C) Colin Humphries, CNL / Salk Institute, Aug, 1996
 %

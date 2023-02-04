@@ -1,4 +1,4 @@
-% eeg_oldica()  - report, return or add to oldicaweights and oldicasphere 
+% EEG_OLDICA  - report, return or add to oldicaweights and oldicasphere 
 %                 stored in cell arrays in EEG.etc of an EEGLAB dataset
 % Usage:
 %        >> eeg_oldica(EEG); % report number of stored oldicaweights 
@@ -14,7 +14,7 @@
 %        icaweights - ICA unmixing matrix (e.g., EEG.icaweights)
 %        icasphere  - ICA data sphering matrix (e.g., EEG.icasphere)
 %
-% See also:   pop_runica()
+% See also:   POP_RUNICA
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, March 17, 2005
 

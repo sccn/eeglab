@@ -1,4 +1,4 @@
-% icademo() - a sample ICA analysis script using the ICA/ERP package 
+% ICADEMO - a sample ICA analysis script using the ICA/ERP package 
 %             of Matlab functions distributed via
 %             http://www.sccn.ucsd.edu/eeglab
 %
@@ -8,7 +8,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 5-18-97 
 %
-% See also: runica(), icavar(), icaproj(), icaact()
+% See also: RUNICA, ICAVAR, ICAPROJ, ICAACT
 
 % Copyright (C) 5-18-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -38,18 +38,18 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % This version tested on package version
-% Added envproj(), used maxmap in compplot() 6-18-97 -sm
+% Added ENVPROJ, used maxmap in COMPPLOT 6-18-97 -sm
 % Reworked to use actual sample ERP data 6-27-97 -sm
 % Pruned again 7/18/97 -sm
 % Adjusted envproj, plotproj, icaproj to remove datamean, distributing 
 %     mean offset (if any) among component projections 7/23/97 -sm
-% Fixed plotproj() call - it can't label arbitrry channel lists -sm 
+% Fixed PLOTPROJ call - it can't label arbitrry channel lists -sm 
 % Adjusted envproj etc. 12/08/97 -sm
-% Added timtopo() 1-16-98 -sm
+% Added TIMTOPO 1-16-98 -sm
 % Added more formatting, fixed compplot and eegmovie plotting 10-9-99 -sm
 % 12-19-00 revised icaproj args -sm
-% 01-05-01 advertised the web tutorial, fixed chanproj(), improved eegmovie() -sm
-% 01-12-01 removed 'sphere' arg from plotproj(), icaact() -sm
+% 01-05-01 advertised the web tutorial, fixed CHANPROJ, improved EEGMOVIE -sm
+% 01-12-01 removed 'sphere' arg from PLOTPROJ, ICAACT -sm
 % 01-25-02 reformated help & license, added links -ad 
 
    chans  = 14;  % data channels (rows in data matrix)
@@ -289,7 +289,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the activation waveforms of all the components 
-%        as reordered by compsort()
+%        as reordered by COMPSORT
 % Identify the components using the original component numbers.
 %
 fprintf('Plotting the component activation waveforms using plotdata()')

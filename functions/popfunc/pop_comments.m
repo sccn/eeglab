@@ -1,10 +1,12 @@
-% pop_comments() - edit comments
+% POP_COMMENTS - edit comments
 %
 % Usage:
+%   >> EEG = pop_comments( EEG);
 %   >> newcomments = pop_comments( oldcomments);
 %   >> newcomments = pop_comments( oldcomments, title, newcomments, concat);
 %
 % Inputs:
+%   EEG         - EEGLAB structure
 %   oldcomments - old comments (string or cell array of strings)
 %   title       - optional window title (string)
 %   newcomments - new comments (string or cell array of strings)
@@ -26,7 +28,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -58,9 +60,19 @@
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 text interface editing -sm & ad 
 
-function [newcomments, com] = pop_comments( comments, plottitle, newcomments, concat );
+function [newcomments, com] = pop_comments( comments, plottitle, newcomments, concat )
 
 com = '';
+structFlag = false;
+if isstruct(comments)
+    EEG = comments;
+    comments = EEG.comments;
+    structFlag = true;
+end
+if nargin < 4
+    concat = 0;
+end
+
 if exist('comments') ~=1, comments = '';
 elseif iscell(comments), comments = strvcat(comments{:}); 
 end
@@ -70,8 +82,9 @@ comments = strmultiline( comments, 53);
 
 if nargin < 3
     newcomments = comments;
-	try, icadefs;
-	catch,
+	try
+        icadefs;
+    catch
 		BACKCOLOR  =  [.8 .8 .8];     
 		GUIBUTTONCOLOR   = [.8 .8 .8];    
 	end
@@ -132,7 +145,7 @@ if nargin < 3
       if ~isempty(tmppos)
           set(hh, 'fontname', lf{tmppos(1)}, 'fontsize', 10);
       end
-    catch, end; 
+    catch, end
     
     waitfor(fig, 'userdata');
 
@@ -152,24 +165,29 @@ else
     if nargin > 3 && concat == 1
         newcomments = strvcat(comments, newcomments);
     end
-    return;
 end
 
 I = find( comments(:) == '''');
 comments(I) = ' ';  
 if nargout > 1
-        if ~strcmp( comments, newcomments)
-          allsame = 1;
-            for index = 1:size(comments, 1)
-                if ~strcmp(comments(index,:), newcomments(index,:)), allsame = 0; end
+    if ~isequal( comments, newcomments)
+        allsame = 1;
+        for index = 1:min(size(comments, 1), size(newcomments,1))
+            if ~strcmp(comments(index,:), newcomments(index,:))
+                allsame = 0;
             end
-        else
-            allsame = 0;
         end
-        if allsame && ~isempty(comments)
-             com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', vararg2str(newcomments(index+1:end,:)));
-        else 
-            com =sprintf('EEG.comments = pop_comments('''', '''', %s);', vararg2str(newcomments));     
-        end
+    else
+        allsame = 0;
+    end
+    if allsame && ~isempty(comments)
+        com =sprintf('EEG = pop_comments(EEG, '''', %s, 1);', vararg2str(newcomments(index+1:end,:)));
+    else
+        com =sprintf('EEG = pop_comments(EEG, '''', %s);', vararg2str(newcomments));
+    end
 end
-return;
+
+if structFlag
+    EEG.comments = newcomments;
+    newcomments = EEG;
+end

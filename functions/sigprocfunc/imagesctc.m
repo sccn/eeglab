@@ -1,10 +1,10 @@
-% imagesctc() - DEPRECATED. never completed or documented.
-% imagesctc() - imagesc in true color. Can help plot different
+% IMAGESCTC - DEPRECATED. never completed or documented.
+% IMAGESCTC - imagesc in true color. Can help plot different
 %               colormap on the same window.
 %
 % Usage: same as imagesctc
 %
-% Exemple:
+% Example:
 %         figure; 
 %         colormap(jet); 
 %         subplot(1,2,1); imagesctc(rand(10,10));
@@ -13,7 +13,7 @@
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, 31 July 2002
 %
-% See also: image(), imagesc()
+% See also: IMAGE, IMAGESC
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

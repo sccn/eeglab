@@ -1,4 +1,4 @@
-% timtopo()   - plot all channels of a data epoch on the same axis 
+% TIMTOPO   - plot all channels of a data epoch on the same axis 
 %               and map its scalp map(s) at selected latencies.
 % Usage:
 %  >> timtopo(data, chan_locs);
@@ -24,11 +24,11 @@
 %                  the time series plotted {default |0 -> Do not plot envelopes}
 %
 % Optional keyword, arg pair inputs (must come after the above):
-% 'topokey','val' = optional topoplot() scalp map plotting arguments. See >> help topoplot 
+% 'topokey','val' = optional TOPOPLOT scalp map plotting arguments. See >> help topoplot 
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1-10-98 
 %
-% See also: envtopo(), topoplot()
+% See also: ENVTOPO, TOPOPLOT
 
 % Copyright (C) 1-10-98 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -481,7 +481,7 @@ end
   end
 
 %
-% Turn on axcopy()
+% Turn on AXCOPY
 %
 
 % clicking on ERP pop_up topoplot

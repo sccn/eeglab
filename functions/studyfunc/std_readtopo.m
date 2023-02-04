@@ -1,8 +1,8 @@
-% std_readtopo() - returns the scalp map of a specified ICA component, assumed
+% STD_READTOPO - returns the scalp map of a specified ICA component, assumed
 %                  to have been saved in a Matlab file, [dataset_name].icatopo, 
 %                  in the same directory as the dataset file. If this file does 
-%                  not exist, use std_topo() to create it, else a pre-clustering 
-%                  function that calls it: pop_preclust() or eeg_preclust().  
+%                  not exist, use STD_TOPO to create it, else a pre-clustering 
+%                  function that calls it: POP_PRECLUST or EEG_PRECLUST.  
 % Usage:    
 %   >> [grid, y, x ] = std_readtopo(ALLEEG, setindx, component);  
 %   >> [grid, y, x ] = std_readtopo(ALLEEG, setindx, component, transform, mode);  
@@ -17,18 +17,18 @@
 %   transform  - ['none'!'laplacian'|'gradient'] transform scalp map to
 %                laplacian or gradient map. Default is 'none'.
 %   mode       - ['2dmap'|'preclust'] return either a 2-D array for direct
-%                plotting ('2dmap') or an array formated for preclustering
+%                plotting ('2dmap') or an array formatted for preclustering
 %                with all the NaN values removed (ncomps x points). Default
 %                is '2dmap' for 1 component and 'preclust' for several.
 %
 % Outputs:
 %   grid      - square scalp-map color-value grid for the requested ICA component 
 %               in the specified dataset, an interpolated Cartesian grid as output 
-%               by topoplot(). 
+%               by TOPOPLOT. 
 %   y         - y-axis values for the interpolated grid
 %   x         - x-axis values of the interpolated grid
 %
-%  See also  std_topo(), std_preclust()
+%  See also  STD_TOPO, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -92,6 +92,7 @@ end
 for k = 1:length(comps)
 
     if length(comps) < 3
+        lastwarn('', '');
         try
             topo = load( '-mat', filename, ...
                          [ 'comp' int2str(comps(k)) '_grid'], ...
@@ -99,6 +100,10 @@ for k = 1:length(comps)
                          [ 'comp' int2str(comps(k)) '_y'] );
         catch
             error( [ 'Cannot read file ''' filename '''' ]);
+        end
+        [~, warnId] = lastwarn();
+        if ~isempty(warnId)
+            error( 'Cannot find component %d in file %s', comps(k),  filename );
         end
     elseif k == 1
         try
@@ -108,9 +113,9 @@ for k = 1:length(comps)
         end
     end
     
-    try,
+    try
         tmp =  getfield(topo, [ 'comp' int2str(comps(k)) '_grid' ]);
-    catch,
+    catch
         error([ 'Empty scalp topography file - also necessary for ERP polarity' 10 'Try recomputing scalp topographies for components' ]);
     end
         

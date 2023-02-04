@@ -1,6 +1,6 @@
-% pop_interp() - interpolate data channels
+% POP_INTERP - interpolate data channels
 %
-% Usage: EEGOUT = pop_interp(EEG, badchans, method);
+% Usage: EEGOUT = pop_interp(EEG, badchans, method, t_range);
 %
 % Inputs: 
 %     EEG      - EEGLAB dataset
@@ -15,6 +15,9 @@
 %                'spherical' uses superfast spherical interpolation. 
 %                'spacetime' uses griddata3 to interpolate both in space 
 %                and time (very slow and cannot be interrupted).
+%     t_range  - [integer array with just two elements] time interval of the
+%                badchans which should be interpolated. First element is
+%                the start time and the second element is the end time.
 % Output: 
 %     EEGOUT   - data set with bad electrode data replaced by
 %                interpolated data
@@ -48,9 +51,10 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG com] = pop_interp(EEG, bad_elec, method)
+function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
 
     com = '';
+    t_range = '';
     if nargin < 1
         help pop_interp;
         return;
@@ -67,15 +71,33 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         disp('editor and declare such channels as non-data channels'); 
          
         enablenondat = 'off';
-        if isfield(EEG.chaninfo, 'nodatchans')
-            if ~isempty(EEG.chaninfo.nodatchans)
+        if isfield(EEG.chaninfo, 'removedchans')
+            if ~isempty(EEG.chaninfo.removedchans)
                 enablenondat = 'on';
             end
         end
-                  
-        uilist = { { 'Style' 'text' 'string' 'What channel(s) do you want to interpolate' 'fontweight' 'bold' } ...
+        if isempty(EEG.epoch)
+            uilist = { { 'Style' 'text' 'string' 'What channel(s) do you want to interpolate' 'fontweight' 'bold' } ...
+                       { 'style' 'text' 'string' 'none selected' 'tag' 'chanlist' } ...
+                       { 'style' 'pushbutton' 'string' 'Select from removed channels' 'callback' 'pop_interp(''nondatchan'',gcbf);' 'enable' enablenondat } ...                   
+                       { 'style' 'pushbutton' 'string' 'Select from data channels'    'callback' 'pop_interp(''datchan'',gcbf);' } ...                   
+                       { 'style' 'pushbutton' 'string' 'Use specific channels of other dataset' 'callback' 'pop_interp(''selectchan'',gcbf);'} ...
+                       { 'style' 'pushbutton' 'string' 'Use all channels from other dataset' 'callback' 'pop_interp(''uselist'',gcbf);'} ...
+                       { } ...
+                       { 'style' 'text'  'string' 'Interpolation method'} ...
+                       { 'style' 'popupmenu'  'string' 'Spherical|Planar (slow)'  'tag' 'method' } ...
+                       { } ...
+                       { 'Style', 'text', 'string', 'Time range [min max] (s)', 'fontangle', fastif(length(EEG)>1, 'italic', 'normal') } ...
+                       { 'Style', 'edit', 'string', '', 'enable', fastif(length(EEG)>1, 'off', 'on') } ...
+                       {} { 'Style' 'text' 'string' 'Note: for group level analysis, interpolate in STUDY' } ...
+                       };
+
+            geom     = { 1 1 1 1 1 1 1 [1.1 1] 1 [1.1 1] 1   1 };
+            geomvert = [ 1 1 1 1 1 1 1 1       0.5 1      0.5  1 ];
+        else
+            uilist = { { 'Style' 'text' 'string' 'What channel(s) do you want to interpolate' 'fontweight' 'bold' } ...
                    { 'style' 'text' 'string' 'none selected' 'tag' 'chanlist' } ...
-                   { 'style' 'pushbutton' 'string' 'Select from removed channels' 'callback' 'pop_interp(''nondatchan'',gcbf);' 'enable' enablenondat } ...                   
+                   { 'style' 'pushbutton' 'string' 'Select from removed channels' 'callback' 'pop_interp(''removedchans'',gcbf);' 'enable' enablenondat } ...                   
                    { 'style' 'pushbutton' 'string' 'Select from data channels'    'callback' 'pop_interp(''datchan'',gcbf);' } ...                   
                    { 'style' 'pushbutton' 'string' 'Use specific channels of other dataset' 'callback' 'pop_interp(''selectchan'',gcbf);'} ...
                    { 'style' 'pushbutton' 'string' 'Use all channels from other dataset' 'callback' 'pop_interp(''uselist'',gcbf);'} ...
@@ -85,9 +107,10 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                    {} { 'Style' 'text' 'string' 'Note: for group level analysis, interpolate in STUDY' } ...
                    };
                
-        geom     = { 1 1 1 1 1 1 1 [1.1 1] 1   1 };
-        geomvert = [ 1 1 1 1 1 1 1 1       0.5 1 ];
-        [res userdata tmp restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'geomvert', geomvert, 'helpcom', 'pophelp(''pop_interp'')');
+            geom     = { 1 1 1 1 1 1 1 [1.1 1] 1   1 };
+            geomvert = [ 1 1 1 1 1 1 1 1       0.5 1 ];
+        end
+        [res, userdata, ~, restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'geomvert', geomvert, 'helpcom', 'pophelp(''pop_interp'')');
         if isempty(res) || isempty(userdata), return; end
         
         if restag.method == 1
@@ -95,9 +118,30 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         else method = 'invdist';
         end
         bad_elec = userdata.chans;
+        if nargin < 4
+            if numel(res) > 1
+                t_range = res{2};
+            else
+                t_range = '';
+            end
+        end
+        if isempty(t_range)
+            t_range = [EEG.xmin EEG.xmax];
+        else
+            t_range = eval( [ '[' t_range ']' ] );
+        end
+        if size(t_range,2) ~= 2
+            error('Time/point range must contain 2 columns exactly');
+        end
+        if floor(max(t_range)) > EEG.xmax 
+            error('Time/point range exceed upper data limits');
+        end
+        if min(t_range) < EEG.xmin
+            error('Time/point range exceed lower data limits');
+        end
         
         com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
-        if ~isempty(findstr('nodatchans', userdata.chanstr))
+        if ~isempty(findstr('removedchans', userdata.chanstr))
             eval( [ userdata.chanstr '=[];' ] );
         end
         
@@ -107,21 +151,21 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         fig = bad_elec;
         userdata = get(fig, 'userdata');
         
-        if strcmpi(command, 'nondatchan')
+        if strcmpi(command, 'removedchans')
             global EEG;
             tmpchaninfo = EEG.chaninfo;
-            [chanlisttmp chanliststr] = pop_chansel( { tmpchaninfo.nodatchans.labels } );
-            if ~isempty(chanlisttmp),
-                userdata.chans   = EEG.chaninfo.nodatchans(chanlisttmp);
-                userdata.chanstr = [ 'EEG.chaninfo.nodatchans([' num2str(chanlisttmp) '])' ];
+            [chanlisttmp, chanliststr] = pop_chansel( { tmpchaninfo.removedchans.labels } );
+            if ~isempty(chanlisttmp)
+                userdata.chans   = EEG.chaninfo.removedchans(chanlisttmp);
+                userdata.chanstr = [ 'EEG.chaninfo.removedchans([' num2str(chanlisttmp) '])' ];
                 set(fig, 'userdata', userdata);
                 set(findobj(fig, 'tag', 'chanlist'), 'string', chanliststr);
             end
         elseif strcmpi(command, 'datchan')
             global EEG;
             tmpchaninfo = EEG.chanlocs;
-            [chanlisttmp chanliststr] = pop_chansel( { tmpchaninfo.labels } );
-            if ~isempty(chanlisttmp),
+            [chanlisttmp, chanliststr] = pop_chansel( { tmpchaninfo.labels } );
+            if ~isempty(chanlisttmp)
                 userdata.chans   = chanlisttmp;
                 userdata.chanstr = [ '[' num2str(chanlisttmp) ']' ];
                 set(fig, 'userdata', userdata);
@@ -130,10 +174,10 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         else
             global ALLEEG EEG;
             tmpanswer = inputdlg2({ 'Dataset index' }, 'Choose dataset', 1, { '' });
-            if ~isempty(tmpanswer),
+            if ~isempty(tmpanswer)
                 tmpanswernum = round(str2num(tmpanswer{1}));
-                if ~isempty(tmpanswernum),
-                    if tmpanswernum > 0 && tmpanswernum <= length(ALLEEG),
+                if ~isempty(tmpanswernum)
+                    if tmpanswernum > 0 && tmpanswernum <= length(ALLEEG)
                         TMPEEG = ALLEEG(tmpanswernum);
                         
                         tmpchans1 = TMPEEG.chanlocs;
@@ -145,8 +189,8 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                         
                         % look at what new channels are selected
                         tmpchans2 = EEG.chanlocs;
-                        [tmpchanlist chaninds] = setdiff_bc( { tmpchans1(chanlist).labels }, { tmpchans2.labels } );
-                        if ~isempty(tmpchanlist),
+                        [tmpchanlist, chaninds] = setdiff_bc( { tmpchans1(chanlist).labels }, { tmpchans2.labels } );
+                        if ~isempty(tmpchanlist)
                             if length(chanlist) == length(TMPEEG.chanlocs)
                                 userdata.chans   = TMPEEG.chanlocs;
                                 userdata.chanstr = [ 'ALLEEG(' tmpanswer{1} ').chanlocs' ];
@@ -169,6 +213,16 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         return;
     end
     
-    EEG = eeg_interp(EEG, bad_elec, method);
+    % remove from removedchans if interpolated
+    if isfield(EEG.chaninfo, 'removedchans') && ~isempty(EEG.chaninfo.removedchans) && isstruct(bad_elec)
+        for iChan = 1:length(bad_elec)
+            ind = strmatch(lower(bad_elec(iChan).labels), lower({EEG.chaninfo.removedchans.labels}), 'exact');
+            if ~isempty(ind)
+                EEG.chaninfo.removedchans(ind) = [];
+            end
+        end
+    end
+    
+    EEG = eeg_interp(EEG, bad_elec, method, t_range);
     
     

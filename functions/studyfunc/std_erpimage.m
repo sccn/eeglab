@@ -1,4 +1,4 @@
-% std_erpimage() - Compute ERP images and save them on disk.
+% STD_ERPIMAGE - Compute ERP images and save them on disk.
 %
 % Usage:
 %   >> std_erpimage( EEG, 'key', 'val', ...);
@@ -32,9 +32,9 @@
 %                  ('off') computes an ERPimage for each subject and then
 %                  averages these ERPimages. This allows to perform
 %                  statistics (the 'on' options does not allow statistics).
-%   'smoothing'  - Smoothing parameter (number of trials). {Default: 10}
-%                  erpimage() equivalent: 'avewidth'
-%   'nlines'     - Number of lines for ERPimage. erpimage() equivalent is 
+%   'smoothing'  - Smootmeter (number of trials). {Default: 10}
+%                  ERPIMAGE equivalent: 'avewidth'
+%   'nlines'     - Number of lines for ERPimage. ERPIMAGE equivalent is 
 %                  'decimate'. Note that this parameter must be larger than
 %                  the minimum number of trials in each design cell 
 %                  {Default: 10}
@@ -42,7 +42,7 @@
 %                  Either a string or an integer.
 %   'sortwin'    - Sorting event window [start, end] in milliseconds ([]=whole epoch)
 %   'sortfield'  - Sorting field name. {default: latency}.
-%   'erpimageopt'  - erpimage() options, separated by commas (Ex: 'erp', 'cbar').
+%   'erpimageopt'  - ERPIMAGE options, separated by commas (Ex: 'erp', 'cbar').
 %                  {Default: none}. For further details see >> erpimage help
 % Outputs:
 %   erpimagestruct - structure containing ERPimage information that is
@@ -137,7 +137,7 @@ if ~isempty(opt.channels)
             opt.indices = eeg_chaninds(EEG(1), opt.channels, 0);
             for ind = 2:length(EEG)
                 if ~isequal(eeg_chaninds(EEG(ind), opt.channels, 0), opt.indices)
-                    error([ 'Channel information must be consistant when ' 10 'several datasets are merged for a specific design' ]);
+                    error([ 'Channel information must be consistent when ' 10 'several datasets are merged for a specific design' ]);
                 end
             end
         end

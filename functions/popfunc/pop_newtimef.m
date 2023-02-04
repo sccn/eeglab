@@ -1,4 +1,4 @@
-% pop_newtimef() - Returns estimates and plots of event-related (log) spectral
+% POP_NEWTIMEF - Returns estimates and plots of event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) phenomena 
 %           timelocked to a set of single-channel input epochs 
 %
@@ -16,7 +16,7 @@
 %   "Sub-epoch time limits" - [edit box] sub epochs may be extracted (note that
 %              this function aims at plotting data epochs not continuous data).
 %              You may select the new epoch limits in this edit box.
-%   "Use n time points" - [muliple choice list] this is the number of time
+%   "Use n time points" - [multiple choice list] this is the number of time
 %              points to use for the time-frequency decomposition. The more
 %              time points, the longer the time-frequency decomposition
 %              takes to compute.
@@ -25,7 +25,7 @@
 %              of limits, you may also enter a sequence of frequencies. For
 %              example to compute the time-frequency decomposition at all
 %              frequency between 5 and 50 hertz with 1 Hz increment, enter "1:50"
-%   "Use limits, padding n" - [muliple choice list] "using limits" means
+%   "Use limits, padding n" - [multiple choice list] "using limits" means
 %              to use the upper and lower limits in "Frequency limits" with
 %              a specific padding ratio (padratio argument of newtimef).
 %              The last option "use actual frequencies" forces newtimef to
@@ -35,7 +35,7 @@
 %              frequencies. Note that this is only relevant if you specify
 %              frequency limits (in case you specify actual frequencies,
 %              this parameter is ignored).
-%   "Use divisive baseline" - [muliple choice list] there are two types of
+%   "Use divisive baseline" - [multiple choice list] there are two types of
 %              baseline correction, additive (the baseline is subtracted)
 %              or divisive (the data is divided by the baseline values).
 %              The choice is yours. There is also the option to perform 
@@ -57,13 +57,13 @@
 %              Uncheck this box to plot the absolute power values.
 %   "ITC color limits" - [edit box] set the upper and lower limit for the
 %              ITC image. 
-%   "plot ITC phase" - [checkbox] check this box plot plot (overlayed on
+%   "plot ITC phase" - [checkbox] check this box plot plot (overlaid on
 %              the ITC amplitude) the polarity of the ITC complex value.
 %   "Bootstrap significance level" - [edit box] use this edit box to enter
 %              the p-value threshold for masking both the ERSP and the ITC
 %              image for significance (masked values appear as light green)
 %   "FDR correct" - [checkbox] this correct the p-value for multiple comparisons
-%              (accross all time and frequencies) using the False Discovery
+%              (across all time and frequencies) using the False Discovery
 %              Rate method. See the fdr.m function for more details.
 %   "Optional newtimef arguments" - [edit box] addition argument for the
 %              newtimef function may be entered here in the 'key', value
@@ -86,20 +86,20 @@
 %                       at all frequencies)
 %
 % Optional inputs:
-%    See the newtimef() function.
+%    See the NEWTIMEF function.
 %    
-% Outputs: Same as newtimef(); no outputs are returned when a
+% Outputs: Same as NEWTIMEF; no outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
 % Saving the ERSP and ITC output values:
 %    Simply look up the history using the eegh function (type eegh).
-%    Then copy and paste the pop_newtimef() command and add output args.
-%    See the newtimef() function for a list of outputs. For instance,
+%    Then copy and paste the POP_NEWTIMEF command and add output args.
+%    See the NEWTIMEF function for a list of outputs. For instance,
 % >> [ersp itc powbase times frequencies] = pop_newtimef( EEG, ....);
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001 
 %
-% See also: newtimef(), eeglab() 
+% See also: NEWTIMEF, EEGLAB 
 
 % Copyright (C) 2002 University of California San Diego
 %

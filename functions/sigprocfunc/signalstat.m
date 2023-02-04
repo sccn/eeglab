@@ -1,6 +1,6 @@
-% signalstat()  -  Computes and plots statistical characteristics of a signal,
+% SIGNALSTAT  -  Computes and plots statistical characteristics of a signal,
 %                  including the data histogram, a fitted normal distribution,
-%                  a normal ditribution fitted on trimmed data, a boxplot, and
+%                  a normal distribution fitted on trimmed data, a boxplot, and
 %                  the QQ-diagram. The estimates value are printed in a panel and
 %                  can be read as output. Optionally, a topographic map (see TOPOPLOT)
 %                  can be plotted.
@@ -41,7 +41,7 @@
 % Author: Luca Finelli, CNL / Salk Institute - SCCN, 2 August 2002
 %
 % See also: 
-%   pop_signalstat(), qqdiagram(), eeglab() 
+%   POP_SIGNALSTAT, QQDIAGRAM, EEGLAB 
 
 % Copyright (C) 2002 Luca Finelli, Salk/SCCN, La Jolla, CA
 
@@ -85,7 +85,7 @@ istats=1;
 %hs = help('stats');
 % toolbx = ver;
 % if isempty(hs) || all([~any(strcmpi({toolbx.Name},'statistics toolbox')), ~any(strcmpi({toolbx.Name},'statistics and machine learning toolbox'))])
-%     disp('signalstat() note: the boxplot (not shown) requires the MATLAB Statistics Toolbox or Statistics and Machine Learning Toolbox');
+%     disp('SIGNALSTAT note: the boxplot (not shown) requires the MATLAB Statistics Toolbox or Statistics and Machine Learning Toolbox');
 %     istats=0;
 % end
 

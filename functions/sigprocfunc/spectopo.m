@@ -1,7 +1,7 @@
-% spectopo() - Plot the power spectral density (PSD) of winsize length segments of data 
+% SPECTOPO - Plot the power spectral density (PSD) of winsize length segments of data 
 %              epochs at all channels as a bundle of traces. At specified frequencies,
 %              plot the relative topographic distribution of PSD. If available, uses
-%              pwelch() from the Matlab signal processing toolbox, else the EEGLAB spec()
+%              PWELCH from the Matlab signal processing toolbox, else the EEGLAB SPEC
 %              function. Plots the mean spectrum for all of the supplied data, not just
 %              the pre-stimulus baseline.
 % Usage:
@@ -43,7 +43,7 @@
 %   'blckhn'   = [integer] Parameter to scale the windows length when Blackman-Harris 
 %                windows is used in 'wintype' {default: 2}
 %   'reref'    = ['averef'|'off'] convert data to average reference {default: 'off'}
-%   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
+%   'mapnorm'  = [float vector] If 'data' contain the activity of an independent 
 %                component, this parameter should contain its scalp map. In this case
 %                the spectrum amplitude will be scaled to component RMS scalp power.
 %                Useful for comparing component strengths {default: none}
@@ -72,7 +72,7 @@
 %   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectra of
 %                individual ICA components, the function computes the spectrum of
 %                the data minus their contributions {default: 'normal'}
-%   'icamaps'  = [integer array] force plotting of selected ICA compoment maps 
+%   'icamaps'  = [integer array] force plotting of selected ICA component maps 
 %                {default: [] = the 'nicamaps' largest contributing components}.
 %   'icawinv'  = [float array] inverse component weight or mixing matrix. Normally,
 %                this is computed by inverting the ICA unmixing matrix 'weights' (above).
@@ -87,7 +87,7 @@
 %   'freqdata' = [freq] array of frequencies
 % 
 % Topoplot options:
-%    other 'key','val' options are propagated to topoplot() for map display
+%    other 'key','val' options are propagated to TOPOPLOT for map display
 %                (See >> help topoplot)
 %
 % Outputs:
@@ -102,7 +102,7 @@
 %        specstd  = spectrum standard deviation in dB
 %
 % Notes: The original input format is still functional for backward compatibility.
-%        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
+%        PSD has been replaced by PWELCH (see Matlab note 24750 on their web site)
 %
 % Non-backward compatible change (Nov 15 2015):
 %   Default winsize was set to the sampling rate (giving a default window
@@ -115,7 +115,7 @@
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
 %          SCCN/INC/UCSD, La Jolla, 3/01 
 %
-% See also: timtopo(), envtopo(), tftopo(), topoplot()
+% See also: TIMTOPO, ENVTOPO, TFTOPO, TOPOPLOT
 
 % Copyright (C) 3/01 Scott Makeig & Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, 
 % scott@sccn.ucsd.edu
@@ -153,7 +153,7 @@
 % 03-27-02 downsampling factor exact calculation -ad
 % 04-03-02 added axcopy -sm
 
-% Uses: MATLAB pwelch(), changeunits(), topoplot(), textsc()
+% Uses: MATLAB PWELCH, CHANGEUNITS, TOPOPLOT, TEXTSC
 
 function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,srate,varargin) 
 
@@ -422,7 +422,7 @@ else
         if strcmp(g.memory, 'high') && strcmp(g.icamode, 'normal')
             myfprintf(g.verbose, 'Computing component spectra: ')
             [compeegspecdB freqs] = spectcomp( newweights*data(:,:), frames, srate, epoch_subset, g);
-        else % in case out of memory error, multiply conmponent sequencially
+        else % in case out of memory error, multiply conmponent sequentially
             if strcmp(g.icamode, 'sub') && ~isempty(g.plotchan) && g.plotchan == 0
                 % scan all electrodes
                 myfprintf(g.verbose, 'Computing component spectra at each channel: ')
@@ -630,7 +630,7 @@ if ~isempty(g.weights)
                 end
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
-                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f ± %3.2f\n', ...
+                myfprintf(g.verbose, 'Component %d percent variance accounted for: %6.2f Â± %3.2f\n', ...
                         g.icacomps(index), resvar(index), stdvar(index));
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
@@ -695,7 +695,7 @@ if ~isempty(g.freq) &&  strcmpi(g.plot, 'on')
 			[realpos(index) allaxuse] = closestplot( freqnormpos, allaxcoords, allaxuse );
 		end
 	
-		% put the channel plot a liitle bit higher
+		% put the channel plot a little bit higher
 		tmppos = get(headax(realpos(1)), 'position');
 		tmppos(2) = tmppos(2)+0.04;
 		set(headax(realpos(1)), 'position', tmppos);
@@ -892,7 +892,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 %         winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
 %         winlength = min(winlength, 512);
 %         winlength = max(winlength, 256);
-        winlength = min(srate, frames);
+        winlength = min(round(srate), frames);
     else
         winlength = g.winsize;
     end
@@ -918,7 +918,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     
     if ~usepwelch
         myfprintf(g.verbose, '\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
-        myfprintf(g.verbose, 'function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
+        myfprintf(g.verbose, 'function from Octave which is supposedly 100%% compatible with the Matlab pwelch function\n');
     end
     myfprintf(g.verbose,' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
         

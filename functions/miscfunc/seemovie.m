@@ -1,16 +1,16 @@
-% seemovie() - see an EEG movie produced by eegmovie()
+% SEEMOVIE - see an EEG movie produced by EEGMOVIE
 %
 % Usage: >> seemovie(Movie,ntimes,Colormap)
 %
 % Inputs:
-%         Movie    = Movie matrix returned by eegmovie()
+%         Movie    = Movie matrix returned by EEGMOVIE
 %         ntimes   = Number of times to display {0 -> -10}
 %                    If ntimes < 0, movie will play forward|backward
-%         Colormap = Color map returned by eegmovie() {0 -> default}
+%         Colormap = Color map returned by EEGMOVIE {0 -> default}
 %
 % Author: Scott Makeig & Colin Humphries, CNL / Salk Institute, 6/3/97
 %
-% See also: eegmovie()
+% See also: EEGMOVIE
 
 % Copyright (C) 6/3/97 Scott Makeig & Colin Humphries, CNL / Salk Institute, La Jolla CA
 %
@@ -55,7 +55,7 @@ if nargin<3
     Colormap = 0;
 end
 if nargin<2
-	ntimes = -10;    % default to playing foward|backward endlessly
+	ntimes = -10;    % default to playing forward|backward endlessly
 end
 if ntimes == 0
 	ntimes = -10;

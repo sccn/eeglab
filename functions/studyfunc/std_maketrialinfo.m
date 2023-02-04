@@ -1,8 +1,9 @@
-% std_maketrialinfo() - create trial information structure using the 
+% STD_MAKETRIALINFO - create trial information structure using the 
 %                       .epoch structure of EEGLAB datasets
 %
 % Usage: 
-%   >> STUDY = std_maketrialinfo(STUDY, ALLEEG);  
+%   >> [STUDY,trialinfo] = std_maketrialinfo(STUDY, ALLEEG);  
+%   >> [~,trialinfo]     = std_maketrialinfo([], EEG);  
 %
 % Inputs:
 %   STUDY      - EEGLAB STUDY set
@@ -11,6 +12,7 @@
 % Inputs:
 %   STUDY      - EEGLAB STUDY set updated. The fields which is created or
 %                updated is STUDY.datasetinfo.trialinfo
+%   trialinfo  - Trial information structure (cell array)
 %
 % Authors: Arnaud Delorme, SCCN/INC/UCSD, April 2010
 
@@ -41,12 +43,12 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function STUDY = std_maketrialinfo(STUDY, ALLEEG)
+function [STUDY,alltrialinfo] = std_maketrialinfo(STUDY, ALLEEG)
 
 %% test if .epoch field exist in ALLEEG structure
 epochfield = cellfun(@isempty, { ALLEEG.epoch });
 if any(epochfield)
-    fprintf('Warning: some datasets are continuous and trial information cannot be created\n');
+    fprintf('Warning: some datasets are continuous and trial information cannot be created. Please use [ALLEEG.trials] to see which ones.\n');
     return;
 end
 
@@ -134,6 +136,7 @@ for index = 1:length(ALLEEG)
         trialinfo = struct(commands{:});
         STUDY.datasetinfo(index).trialinfo = trialinfo;
     end
+    alltrialinfo{index} = trialinfo;
     
 %    % same as above but 10 times slower
 %     for e = 1:length(ALLEEG(index).event)

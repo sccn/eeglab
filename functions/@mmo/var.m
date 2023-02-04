@@ -1,4 +1,4 @@
-% var() - variance of memory mapped underlying array
+% VAR - variance of memory mapped underlying array
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

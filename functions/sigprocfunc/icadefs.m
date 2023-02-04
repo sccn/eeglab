@@ -1,4 +1,4 @@
-% icadefs() - function to read in a set of EEGLAB system-wide (i.e. lab-wide)
+% ICADEFS - function to read in a set of EEGLAB system-wide (i.e. lab-wide)
 %             or working directory-wide constants and preferences. Change the 
 %             way these are defined in the master icadefs.m file (usually
 %             in dir eeglab/functions/sigprocfunc) or make a custom copy of 
@@ -150,25 +150,25 @@ end
 
 clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
 
-% the eeg_options.m file also countains additional options
+% the eeg_options.m file also contains additional options
 
 % ----------------------------------------------------------------------
 % ------------------------ END OF DEFINITIONS --------------------------
 % ----------------------------------------------------------------------
 
 % INSERT location of ica executable (UNIX ONLY) for binica.m below
-eeglab_p = fileparts(which('eeglab'));
 if ~isdeployed
-    ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_linux'); 
+    % ICA binary file in functions/supportfiles
+    ICABINARY = 'ica_linux'; 
     tmpComputer = computer;
     if strcmpi(tmpComputer(1:3), 'MAC')
-        ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_osx');
+        ICABINARY = 'ica_osx';
     elseif strcmpi(tmpComputer(1:2), 'PC')
-        ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'binica.exe');
+        ICABINARY = 'binica.exe';
     end
     clear tmpComputer
 else
-    ICABINARY = fullfile(eeglab_p, 'functions', 'supportfiles', 'ica_linux');
+    ICABINARY = 'ica_linux';
 end
 
 try
@@ -186,7 +186,7 @@ DEFAULT_TIMLIM = [-1000 2000]; % default local epoch limits (ms)
 % Set EEGLAB figure and GUI colors
 % --------------------------------
 lowscreendepth = 0;
-if ~exist('OCTAVE_VERSION')
+if ~exist('OCTAVE_VERSION', 'builtin')
     if get(0, 'screendepth') <=8 % if mono or 8-bit color
 	lowscreendepth = 1; 
     end

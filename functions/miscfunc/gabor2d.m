@@ -1,4 +1,4 @@
-% gabor2d() - generate a two-dimensional gabor matrice.
+% GABOR2D - generate a two-dimensional gabor matrice.
 %
 % Usage:
 %   >> [ matrix ] = gabor2d(rows, columns);
@@ -22,7 +22,7 @@
 %                 0 and 90 being the phase offset of the real and imaginary parts
 %   cut	        - percentage (0->1) of maximum value below which to remove values 
 %                 from the matrix {default: 0}
-% Ouput:
+% Output:
 %   matrix - output gabor matrix
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
@@ -98,8 +98,8 @@ mat = sin(real(rotatedmat)*freq + dephase/180*pi).*exp(-0.5*(  ((X-meanX)/sigmaX
             			/((sigmaX*sigmaY)^(0.5)*pi); 
 
 if cut > 0
-	maximun = max(max(mat))*cut;
-	I = find(mat < maximun);
+	maximum = max(max(mat))*cut;
+	I = find(mat < maximum);
 	mat(I) = 0;
 end
 

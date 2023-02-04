@@ -1,4 +1,4 @@
-% newcrossf() - Returns estimates and plots event-related coherence (ERCOH) 
+% NEWCROSSF - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input data time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel: 
 %        In the plot output by   > newcrossf(x,y,...);
@@ -105,7 +105,7 @@
 %                     for wavelets. {Default: use 'padratio'}.
 %       'freqscale' = ['log'|'linear'] Frequency scaling. {Default: 'linear'}.
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
-%                     closest correspondant frequencies in the 'linear' space 
+%                     closest correspondent frequencies in the 'linear' space 
 %                     are returned.
 %       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
 %                      baseline is used. A range [min max] may also be entered
@@ -137,7 +137,7 @@
 %                    either subtract complex spectral values' absolute vales 
 %                    ('abs'), angles ('angles') or the complex values themselves
 %                    ('complex').     {default: 'abs'}
-%       'rboot'    = Input bootstrap coherence limits (e.g., from newcrossf()) 
+%       'rboot'    = Input bootstrap coherence limits (e.g., from NEWCROSSF) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
 % Optional scalp map plot:
@@ -189,7 +189,7 @@
 %   Assuming both 'plotamp' and 'plotphase' options are 'on' (=default), the upper panel
 %   presents the magnitude of either phase coherence or linear coherence, depending on 
 %   the 'type' parameter (above). The lower panel presents the coherence phase difference 
-%   (in degrees). Click on any plot to pop up a new window (using 'axcopy()').
+%   (in degrees). Click on any plot to pop up a new window (using 'AXCOPY').
 %   -- The upper left marginal panel shows mean coherence during the baseline period
 %      (blue), and when significance is set, the significance threshold (dotted black-green).
 %   -- The horizontal panel under the coherence magnitude image indicates the maximum 
@@ -215,7 +215,7 @@
 % Authors: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
-% See also: timef()
+% See also: TIMEF
 
 % NOTE: one hidden parameter 'savecoher', 0 or 1
 
@@ -251,16 +251,16 @@
 % 06-29-99 fixed constant-Q freq indexing  -se 
 % 08-13-99 added cohangle plotting -sm
 % 08-20-99 made bootstrap more efficient -sm
-% 08-24-99 allow nan values introduced by possible eventlock() preproc. -sm
+% 08-24-99 allow nan values introduced by possible EVENTLOCK preproc. -sm
 % 03-16-00 added lead/lag interpretation to help msg - sm & eric visser
-% 03-16-00 added axcopy() feature -sm & tpj
+% 03-16-00 added AXCOPY feature -sm & tpj
 % 04-20-00 fixed Rangle sign for wavelets, added verts array -sm
 % 01-22-01 corrected help msg when nargin<2 -sm & arno delorme
 % 01-25-02 reformated help & license, added links -ad 
 % 03-09-02 function restructuration -ad
 %  add 'key', val arguments (+ external baseboot, baseline, color axis, angleunit...)
 %  add detrending (across time and trials) + 'coher' option for amplitude coherence
-%  significance only if alpha is given, ploting options in 'plotamp' and 'plotphase'
+%  significance only if alpha is given, plotting options in 'plotamp' and 'plotphase'
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-03-02 added new options for bootstrap -ad 
 
@@ -273,7 +273,7 @@
 %    (Coher) function Coher = coherinit(...) - initialize coherence object
 %    (Coher) function Coher = cohercomp(Coher, tmpX, tmpY, trial, time) - compute coherence
 %    (Coher) function Coher = cohercomppost(Coher, trials) - coherence normalization
-%    (Boot) function Boot = bootinit(...) - intialize bootstrap object
+%    (Boot) function Boot = bootinit(...) - initialize bootstrap object
 %    (Boot) function Boot = bootcomp(...) - compute bootstrap
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
 % - by real objects under C++ (see C++ code)
@@ -535,7 +535,7 @@ if ~strcmpi(g.condboot, 'abs') && ~strcmpi(g.condboot, 'angle') ...
 	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
 end
 if g.tlimits(2)-g.tlimits(1) < 30
-    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
+    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in milliseconds not seconds.'); 
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -584,7 +584,7 @@ if iscell(X)
     % deal with titles
     % ----------------
 	for index = length(vararginori)-1:-2:1
-		if index<=length(vararginori) % needed: if elemenets are deleted
+		if index<=length(vararginori) % needed: if elements are deleted
 			if strcmp(vararginori{index}, 'title') , vararginori(index:index+1) = []; end
 			if strcmp(vararginori{index}, 'subitc'), vararginori(index:index+1) = []; end
 			if strcmp(vararginori{index}, 'shuffle'), vararginori(index:index+1) = []; end
@@ -942,7 +942,7 @@ if strcmpi(g.plotamp, 'on') || strcmpi(g.plotphase, 'on')
     end
 end
 
-% proces outputs
+% process outputs
 % --------------
 Rangle = angle(coherres);
 R = abs(coherres);
@@ -1203,7 +1203,7 @@ case 'on'
    %
    h(13) = axes('Units','Normalized','Position',[.1 ordinate2 .8 height].*s+q);
    if setylim
-       if strcmpi(g.type, 'amp') % currrently -1 to 1
+       if strcmpi(g.type, 'amp') % currently -1 to 1
            maxangle = max(abs(g.amplag)) * mean(times(2:end) - times(1:end-1));
            Rangle   = Rangle * maxangle;
            maxangle = maxangle+5; % so that the min and the max does not mix
@@ -1404,7 +1404,7 @@ end
 %   case 'phasecoher',
 %      Coher.R = Coher.R + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
 %      Coher.Rn(trial,:) = 1;
-%end % ~any(isnan())
+%end % ~any(ISNAN)
 
 function [Coher,tmptrialcoh] = cohercomp(Coher, tmpX, tmpY, trial, time);
 tmptrialcoh = tmpX.*conj(tmpY);

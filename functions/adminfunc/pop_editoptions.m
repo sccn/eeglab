@@ -1,4 +1,4 @@
-% pop_editoptions() - Edit memory-saving eeglab() options. These are stored in 
+% POP_EDITOPTIONS - Edit memory-saving EEGLAB options. These are stored in 
 %                     a file 'eeg_options.m'. With no argument, pop up a window 
 %                     to allow the user to set/unset these options. Store
 %                     user choices in a new 'eeg_options.m' file in the 
@@ -10,7 +10,7 @@
 % Graphic interface inputs:
 %   "If set, keep at most one dataset in memory ..." - [checkbox] If set, EEGLAB will only retain the current
 %                   dataset in memory. All other datasets will be automatically
-%                   read and writen to disk. All EEGLAB functionalities are preserved
+%                   read and written to disk. All EEGLAB functionalities are preserved
 %                   even for dataset stored on disk. 
 %   "If set, write data in same file as dataset ..." - [checkbox] Set -> dataset data (EEG.data) are 
 %                   saved in the EEG structure in the standard Matlab dataset (.set) file. 
@@ -27,7 +27,7 @@
 %                   time courses are precomputed (this requires more RAM). 
 %                   Command line equivalent: option_computeica.
 %   "If set, remember old folder when reading dataset" - [checkbox] this option
-%                   is convinient if the file you are working on are not in the 
+%                   is convenient if the file you are working on are not in the 
 %                   current folder.
 %
 % Commandline keywords:
@@ -45,13 +45,13 @@
 %   and 'option_savematlab'  are updated, and a new 'eeg_options.m' file may be
 %   written to the working directory. The copy of 'eeg_options.m' placed in your 
 %   working directory overwrites system defaults whenever EEGLAB operates in this
-%   directory (assuming your working directory is in your MATLABPATH - see path()).
+%   directory (assuming your working directory is in your MATLABPATH - see PATH).
 %   To adjust these options system-wide, edit the master "eeg_options.m" file in the
-%   EEGLAB directory heirarchy.
+%   EEGLAB directory hierarchy.
 %
 % Author: Arnaud Delorme, SCCN / INC / UCSD, March 2002
 %
-% See also: eeg_options(), eeg_readoptions()
+% See also: EEG_OPTIONS, EEG_READOPTIONS
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 09 March 2002, arno@salk.edu
 %
@@ -147,6 +147,7 @@ optionsToShow = {
     'option_allmenus'  ...
     'option_checkversion' ...
     'option_showadvanced' ...
+    'option_boundary99' ...
     'option_cachesize' };
 
 % remove advanced options if necessary
@@ -201,6 +202,8 @@ if nargin < 2
             
         elseif strcmpi(opt(index).varname, 'option_memmapdata')
             cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2(strvcat(''Matlab memory is beta, use at your own risk'')); end;' ];
+        elseif strcmpi(opt(index).varname, 'option_boundary99')
+            cb_nomodif = [ 'warndlg2(strvcat(''This function is for ERPLAB compatility. If you do not have numerical events,'', ''it will have no effect. If you have numerical events, type -99 will be used as boundary'', ''event type throughout EEGLAB. If you use this option to process some datasets and then'', ''unset it, EEGLAB will no longer detect type -99 boundaries, so be careful!'' ));' ];
         elseif strcmpi(opt(index).varname, 'option_donotusetoolboxes')
             cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2([''You have selected the option to disable'' 10 ''Matlab toolboxes. Use with caution.'' 10 ''Matlab toolboxes will be removed from'' 10 ''your path. Unlicking this option later will not'' 10 ''add back the toolboxes. You will need'' 10 ''to add them back manually. If you are unsure'' 10 ''if you want to disable Matlab toolboxes'' 10 ''deselect the option now.'' ]); end;' ];
         else

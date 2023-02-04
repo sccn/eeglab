@@ -1,4 +1,4 @@
-% eegh() - history function.           
+% EEGH - history function.           
 %
 % Usage:
 %   >> eegh( arg );
@@ -24,7 +24,7 @@
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2001
 %
 % See also:
-%  eeglab() (a graphical interface for eeg plotting, space frequency
+%  EEGLAB (a graphical interface for eeg plotting, space frequency
 %  decomposition, ICA, ... under Matlab for which this command
 %  was designed).
 
@@ -57,7 +57,7 @@
 
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
-function str = eegh( command, str );
+function str = eegh( command, str )
 
 mode = 1; % mode = 1, full print, mode = 0, truncated print
 
@@ -73,17 +73,17 @@ if nargin < 1
 	if isempty(ALLCOM)
 		fprintf('No history\n');
 	else	
-      for index = 1:length(ALLCOM)
-         if mode == 0, txt = ALLCOM{ index }; fprintf('%d: ', index);
-         else          txt = ALLCOM{ length(ALLCOM)-index+1 };
-         end;   
-         if (length(txt) > 72) && (mode == 0)
-				fprintf('%s...\n', txt(1:70) );
-			else
-				fprintf('%s\n', txt );
-			end;				
-		end
-	end;	
+        for index = 1:length(ALLCOM)
+            if mode == 0, txt = ALLCOM{ index }; fprintf('%d: ', index);
+            else          txt = ALLCOM{ length(ALLCOM)-index+1 };
+            end
+            if (length(txt) > 72) && (mode == 0)
+                fprintf('%s...\n', txt(1:70) );
+            else
+                fprintf('%s\n', txt );
+            end
+        end
+    end
     if nargout > 0
         str = strvcat(ALLCOM);
     end
@@ -97,7 +97,7 @@ elseif nargin == 1
 			ALLCOM = { command };
 		else	
 			ALLCOM = { command ALLCOM{:}};
-		end;	
+        end
         global LASTCOM;
 		LASTCOM  = command;
 	else	
@@ -111,12 +111,12 @@ elseif nargin == 1
 					fprintf('%s...\n', txt(1:70) );
 				else
 					fprintf('%s\n', txt );
-				end;				
+                end			
 				evalin( 'base', ALLCOM{command} ); % execute element
 				eegh( ALLCOM{command} );    % add to history
 			end
-		end;	
-	end;		
+        end
+    end
 else % nargin == 2
     if ~isstruct(str)
         if strcmp(command, 'find')

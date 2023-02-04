@@ -6,7 +6,7 @@
 % Inputs:
 %   STUDY      - STUDY structure comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - vector of EEG dataset structures for the dataset(s) in the STUDY, 
-%                typically created using load_ALLEEG().  
+%                typically created using LOAD_ALLEEG.  
 %   'channels' - [numeric vector]  specific channel group to plot. By
 %                default, the grand mean channel spectrum is plotted (using the 
 %                same format as for the cluster component means described above)
@@ -20,12 +20,12 @@
 %   'freqslim'  - [freqs] array of landmark frequencies to set color
 %                 limits.
 %   'movieparams' - [low inc high] lower limit, higher limit and increment. If
-%                increment is omited, movie is generate at every possible
+%                increment is omitted, movie is generate at every possible
 %                increment (max freq resolution or max time resolution)
 %
 % Authors: Arnaud Delorme, CERCO, August, 2006
 %
-% See also: std_specplot(), std_erppplot(), std_erspplot()
+% See also: STD_SPECPLOT, STD_ERPPPLOT, STD_ERSPPLOT
 
 % Copyright (C) Arnaud Delorme, arno@salk.edu
 %

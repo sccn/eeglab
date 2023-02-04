@@ -1,4 +1,4 @@
-% readlocsold() - Read electrode locations file in style of topoplot() or headplot().
+% READLOCSOLD - Read electrode locations file in style of TOPOPLOT or HEADPLOT.
 %              Output channel information is ordered by channel numbers.
 %
 % Usage: >> [nums labels th r x y] = readlocsold(locfile);% {default, polar 2-D}
@@ -14,7 +14,7 @@
 %          nums   = ordered channel numbers (from locfile)
 %          labels = Matrix of 4-char channel labels (nchannels,4)
 % 2-D:     r,th   = polar coordinates of each electrode (th in radians)
-%          x,y    = 2-D Cartesian coordinates (from pol2cart())
+%          x,y    = 2-D Cartesian coordinates (from POL2CART)
 % 3-D:     x,y,z  = 3-D Cartesian coordinates (normalized, |x,y,z| = 1)
 
 % Copyright (C) Scott Makeig, CNL / Salk Institute, La Jolla CA 3/01
@@ -45,7 +45,7 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % 
-%  code from topoplot()
+%  code from TOPOPLOT
 
 function [channums,labels,o1,o2,o3,o4] = readlocsold(loc_file,loctype)
 

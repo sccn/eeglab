@@ -1,4 +1,4 @@
-% newtimeftrialbaseln() - Remove baseline power values for single trials in 
+% NEWTIMEFTRIALBASELN - Remove baseline power values for single trials in 
 %        newtimef. This only remove single trial baseline (not the average
 %        baseline). 
 %

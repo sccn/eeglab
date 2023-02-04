@@ -1,4 +1,4 @@
-% eeg_eegrej() - reject porition of continuous data in an EEGLAB 
+% EEG_EEGREJ - reject porition of continuous data in an EEGLAB 
 %                dataset
 %
 % Usage:
@@ -17,7 +17,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 8 August 2002
 %
-% See also: eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -46,7 +46,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [EEG, com] = eeg_eegrej( EEG, regions);
+function [EEG, com] = eeg_eegrej( EEG, regions)
 
 com = '';
 if nargin < 2
@@ -100,17 +100,6 @@ catch
     warning(warnmsg)
 end
 
-
-if isfield(EEG.event, 'latency'),
-   	 tmpevent = EEG.event;
-     
-     tmpdata = EEG.data; % REMOVE THIS, THIS IS FOR DEBUGGING %
-     
-     tmpalllatencies = [ tmpevent.latency ];
-
-else tmpalllatencies = []; 
-end
-
 % handle regions from eegplot
 % ---------------------------
 if size(regions,2) > 2, regions = regions(:, 3:4); end
@@ -118,12 +107,14 @@ regions = combineregions(regions);
 
 % remove events within regions
 % ----------------------------
-if ~isempty(EEG.event)
+if ~isempty(EEG.event) && isfield(EEG.event, 'latency')
     allEventLatencies = [ EEG.event.latency];
     allEventFlag      = zeros(1,length(allEventLatencies));
     for iRegion = 1:size(regions,1)
         allEventFlag = allEventFlag | ( allEventLatencies >= regions(iRegion,1) & allEventLatencies <= regions(iRegion,2));
     end
+    boundaryIndices = eeg_findboundaries(EEG);
+    allEventFlag(boundaryIndices) = false; % do not remove boundary events
     EEG.event(allEventFlag) = [];
 end
 
@@ -142,73 +133,27 @@ if length(event2) > 2 && event2(end).latency == event2(end-1).latency
     end
 end
 
-
 % add boundary events
 % -------------------
 [ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
 EEG = eeg_checkset(EEG, 'eventconsistency');
-if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency > EEG.pnts
+if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency-0.5 > EEG.pnts
     EEG.event(end) = []; % remove last event if necessary
 end
 
 % double check event latencies
 % the function that insert boundary events and recompute latency is
 % delicate so we do it twice using different methods and check
-% the results. It is longer, but accuracy is paramount.
+% the results. It takes longer, but accuracy is paramount.
+eeglab_options;
+warnflag = false;
 if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
-    % assess difference between old and new event latencies
-    [ eventtmp ] = eeg_insertboundold(oldEEGevents, oldEEGpnts, regions);
-    if ~isempty(eventtmp)
-        [~,indEvent] = sort([ eventtmp.latency ]);
-        eventtmp = eventtmp(indEvent);
-    end
-    if ~isempty(eventtmp) && length(eventtmp) > length(EEG.event) && isfield(eventtmp, 'type') && isequal(eventtmp(1).type, 'boundary')
-        eventtmp(1) = [];
-    end
-    if isfield(eventtmp, 'duration')
-        for iEvent=1:length(eventtmp)
-            if isempty(eventtmp(iEvent).duration)
-                eventtmp(iEvent).duration = 0;
-            end
-        end
-    end
-    if ~isempty(eventtmp) && eventtmp(end).latency > EEG.pnts
-        eventtmp(end) = [];
-    end
-    % add initial event to eventtmp when missing
-    if ~isempty(eventtmp) && ~isempty(EEG.event) && ...
-            strcmpi(EEG.event(1).type, 'boundary') && EEG.event(1).latency == 0.5 && eventtmp(1).latency ~= 0.5
-        if size(eventtmp,2) > 1
-            eventtmp = [ eventtmp(1) eventtmp(1:end) ];
-        else
-            eventtmp = [ eventtmp(1) eventtmp(1:end)' ];
-        end
-        eventtmp(1).type = 'boundary';
-        eventtmp(1).latency = 0.5;
-        eventtmp(1).duration = EEG.event(1).duration;
-    end
-        
-    differs = 0;
-    for iEvent=1:min(length(EEG.event), length(eventtmp)-1)
-        if ~issameevent(EEG.event(iEvent), eventtmp(iEvent)) && ~issameevent(EEG.event(iEvent), eventtmp(iEvent+1)) 
-            differs = differs+1;
-        end
-    end
-    
-    if 100*differs/length(EEG.event) > 50
-        db = dbstack;
-        if length(db) > 1 
-            fprintf(['BUG 1971 WARNING: IF YOU ARE USING A SCRIPT WITTEN FOR A PREVIOUS VERSION OF EEGLAB (<2017)\n' ...
-                'TO CALL THIS FUNCTION, BECAUSE YOU ARE REJECTING THE ONSET OF THE DATA, EVENTS MIGHT HAVE\n' ...
-                'BEEN CORRUPTED. EVENT LATENCIES ARE NOW CORRECT (SEE https://sccn.ucsd.edu/wiki/EEGLAB_bug1971);\n' ]);
-        end
-    end
-    
     alllats = [ EEG.event.latency ];
     if ~isempty(event2)
         otherlatencies = [event2.latency];
         if ~isequal(alllats, otherlatencies)
-            warning([ 'Discrepency when recomputing event latency.' 10 'Try to reproduce the problem and send us your dataset' ]);
+            warning([ 'Discrepancy when checking event latencies using legacy method.' 10 'Often the discrepency is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
+            warnflag = true;
         end
     end
 end
@@ -216,21 +161,26 @@ end
 % double check boundary event latencies
 if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) && isfield(EEG.event, 'duration') && isfield(event2, 'duration')
     try
-        indBound1 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { EEG.event(:).type }));
-        indBound2 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { event2(:).type }));
+        if ~isempty(EEG.event) && ischar(EEG.event(1).type)
+            indBound1 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { EEG.event(:).type }));
+            indBound2 = find(cellfun(@(x)strcmpi(num2str(x), 'boundary'), { event2(:).type }));
+        else
+            indBound1 = find([ EEG.event(:).type ] == -99);
+            indBound2 = find([ event2(:).type ] == -99);
+        end
         duration1 = [EEG.event(indBound1).duration]; duration1(isnan(duration1)) = [];
         duration2 = [event2(indBound2).duration]; duration2(isnan(duration2)) = [];
         if ~isequal(duration1, duration2)
             duration1(duration1 == 0) = [];
-            if ~isequal(duration1, duration2)
-                warning(['Inconsistency in boundary event duration.' 10 'Try to reproduce the problem and send us your dataset' ]); 
+            if ~isequal(duration1, duration2) && ~warnflag
+                warning([ 'Inconsistency in boundary event duration using legacy method.' 10 'Often the discrepency is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
             end
         end
     catch, warning('Unknown error when checking event latency - please send us your dataset');
     end
 end
 
-% debuging code below
+% debugging code below
 % regions, n1 = 1525; n2 = 1545; n = n2-n1+1;
 % a = zeros(1,n); a(:) = 1; a(strmatch('boundary', { event2(n1:n2).type })') = 8; 
 % [[n1:n2]' alllats(n1:n2)' [event2(n1:n2).latency]' alllats(n1:n2)'-[event2(n1:n2).latency]' otherorilatencies(n1:n2)' a']

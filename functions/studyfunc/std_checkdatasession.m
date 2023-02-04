@@ -1,4 +1,4 @@
-% std_checkdatasession() - Check/fill session field in STUDY. Based in the
+% STD_CHECKDATASESSION - Check/fill session field in STUDY. Based in the
 % name and IC decomposition of datases, the function determine which
 % ones are coming from the same sessions. 
 % It will assign the same index number to the sets from the same subject coming
@@ -23,7 +23,7 @@
 %             (datasetinfo.session updated)
 %    flags  - Vector of the dimension of the numbre of subjects (Ordered as
 %    in STUDY.datasetinfo) with the information if the subject have dataset
-%    from different sesssions (1) or not (0)
+%    from different sessions (1) or not (0)
 %
 % See also:
 %   std_plotinfocluster
@@ -115,7 +115,7 @@ if isempty(g.session)
         [STUDY.datasetinfo.session] = deal(1);
     end
     
-    if g.verbose, display('--- Session fields in current STUDY succesfully updated ---'); end
+    if g.verbose, display('--- Session fields in current STUDY successfully updated ---'); end
     
     flags = zeros(1,length(UniqueSubj));
     for i = 1: length(UniqueSubj)
@@ -135,10 +135,10 @@ elseif ~(isempty(g.session))
             STUDY.datasetinfo(i).session = g.session(i); %Assigning values
         end
         
-        if g.verbose, display('--- Session fields in current STUDY succesfully updated ---'); end
+        if g.verbose, display('--- Session fields in current STUDY successfully updated ---'); end
         
     else
-        error('Error in std_checkdatasession(): Vector dimensions inconsisten with STUDY');
+        error('Error in std_checkdatasession(): Vector dimensions inconsistent with STUDY');
         eeglab_error;
         return
     end

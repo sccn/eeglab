@@ -1,4 +1,4 @@
-% entropy_rej() - calculation of entropy of a 1D, 2D or 3D array and
+% ENTROPY_REJ - calculation of entropy of a 1D, 2D or 3D array and
 %             rejection of odd last dimension values of the input data array   
 %             using the discrete entropy of the values in that dimension
 %             (and using the probability distribution of all columns).
@@ -29,7 +29,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: realproba()
+% See also: REALPROBA
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

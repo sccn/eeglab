@@ -1,4 +1,4 @@
-% convertlocs() - Convert electrode locations between coordinate systems
+% CONVERTLOCS - Convert electrode locations between coordinate systems
 %                 using the EEG.chanlocs structure.
 %
 % Usage: >> newchans = convertlocs( chanlocs, 'command');
@@ -25,7 +25,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002
 %
-% See also: readlocs()
+% See also: READLOCS
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002, arno@salk.edu
 %
@@ -54,11 +54,15 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function chans = convertlocs(chans, command, varargin);
+function chans = convertlocs(chans, command, varargin)
 
 if nargin < 1
    help convertlocs;
    return;
+end
+
+if ~isfield(chans, 'theta') && ~isfield(chans, 'X') && ~isfield(chans, 'radius') && ~isfield(chans, 'sph_theta_besa')
+    return
 end
 
 if nargin < 2
@@ -73,7 +77,7 @@ end
 % test if value exists for default
 % --------------------------------
 if strcmp(command, 'auto')
-    if isfield(chans, 'X') && ~isempty(chans(1).X)
+    if isfield(chans, 'X') && any(~cellfun(@isempty, { chans.X }))
         command = 'cart2all';
         if verbose
             disp('Make all coordinate frames uniform using Cartesian coords');
@@ -103,11 +107,11 @@ end
 % convert
 % -------         
 switch command
- case 'topo2sph',
+ case 'topo2sph'
    theta  = {chans.theta};
    radius = {chans.radius};
    indices = find(~cellfun('isempty', theta));
-   [sph_phi sph_theta] = topo2sph( [ [ theta{indices} ]' [ radius{indices}]' ] );
+   [sph_phi, sph_theta] = topo2sph( [ [ theta{indices} ]' [ radius{indices}]' ] );
    if verbose
        disp('Warning: electrodes forced to lie on a sphere for polar to 3-D conversion');
    end
@@ -115,14 +119,18 @@ switch command
       chans(indices(index)).sph_theta  = sph_theta(index);
       chans(indices(index)).sph_phi    = sph_phi  (index);
    end
-   if isfield(chans, 'sph_radius'),
+   if isfield(chans, 'sph_radius')
        meanrad = mean([ chans(indices).sph_radius ]);
-       if isempty(meanrad), meanrad = 1; end
+       if isempty(meanrad)
+           [chans(indices).sph_radius] = deal(85);
+           meanrad = 85; 
+       end
    else
-       meanrad = 1;
+        [chans(indices).sph_radius] = deal(85);
+        meanrad = 85;
    end
    sph_radius(1:length(indices)) = {meanrad};
-case 'topo2sphbesa',
+case 'topo2sphbesa'
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
 case 'topo2cart'
@@ -131,29 +139,32 @@ case 'topo2cart'
        disp('Warning: spherical coordinates automatically updated');
    end
    chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords
-case 'topo2all',
+case 'topo2all'
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords
-case 'sph2cart',
+case 'sph2cart'
    sph_theta  = {chans.sph_theta};
    sph_phi    = {chans.sph_phi};
    indices = find(~cellfun('isempty', sph_theta));
-   if ~isfield(chans, 'sph_radius'), sph_radius(1:length(indices)) = {1};
-   else                              sph_radius = {chans.sph_radius};
+   if ~isfield(chans, 'sph_radius')
+        [chans(indices).sph_radius] = deal(85);
+       sph_radius(1:length(indices)) = {85};
+   else                              
+       sph_radius = {chans.sph_radius};
    end
    inde = find(cellfun('isempty', sph_radius));
    if ~isempty(inde)
        meanrad = mean( [ sph_radius{:} ]);
        sph_radius(inde) = { meanrad };
    end
-   [x y z] = sph2cart([ sph_theta{indices} ]'/180*pi, [ sph_phi{indices} ]'/180*pi, [ sph_radius{indices} ]');
+   [x, y, z] = sph2cart([ sph_theta{indices} ]'/180*pi, [ sph_phi{indices} ]'/180*pi, [ sph_radius{indices} ]');
    for index = 1:length(indices)
       chans(indices(index)).X = x(index);
       chans(indices(index)).Y = y(index);
       chans(indices(index)).Z = z(index);
    end
-case 'sph2topo',
+case 'sph2topo'
  if verbose
      % disp('Warning: all radii constrained to one for spherical to topo transformation');
  end
@@ -165,25 +176,25 @@ case 'sph2topo',
      chans(indices(index)).theta  = angle(index);
      chans(indices(index)).radius = radius(index);
      if ~isfield(chans, 'sph_radius') || isempty(chans(indices(index)).sph_radius)
-         chans(indices(index)).sph_radius = 1;
+         chans(indices(index)).sph_radius = 85;
      end
  end
-case 'sph2sphbesa',
+case 'sph2sphbesa'
    % using polar coordinates
    sph_theta  = {chans.sph_theta};
    sph_phi    = {chans.sph_phi};
    indices = find(~cellfun('isempty', sph_theta));
    [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2);
-   [sph_theta_besa sph_phi_besa] = topo2sph([angle radius], 1, 1);
+   [sph_theta_besa, sph_phi_besa] = topo2sph([angle radius], 1, 1);
    for index = 1:length(indices)
       chans(indices(index)).sph_theta_besa  = sph_theta_besa(index);
       chans(indices(index)).sph_phi_besa    = sph_phi_besa(index);
-   end;   
-case 'sph2all',
+   end
+case 'sph2all'
    chans = convertlocs(chans, 'sph2topo', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords
-case 'sphbesa2sph',
+case 'sphbesa2sph'
    % using polar coordinates
    sph_theta_besa  = {chans.sph_theta_besa};
    sph_phi_besa    = {chans.sph_phi_besa};
@@ -196,41 +207,41 @@ case 'sphbesa2sph',
    %end;   
    %figure; topoplot([],chans, 'style', 'blank', 'electrodes', 'labelpoint');
    
-   [sph_phi sph_theta] = topo2sph([angle radius], 2);
+   [sph_phi, sph_theta] = topo2sph([angle radius], 2);
    for index = 1:length(indices)
       chans(indices(index)).sph_theta  = sph_theta(index);
       chans(indices(index)).sph_phi    = sph_phi  (index);      
    end
-case 'sphbesa2topo',
+case 'sphbesa2topo'
    chans = convertlocs(chans, 'sphbesa2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2topo', varargin{:}); % search for spherical coords
-case 'sphbesa2cart',
+case 'sphbesa2cart'
    chans = convertlocs(chans, 'sphbesa2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords   
-case 'sphbesa2all',
+case 'sphbesa2all'
    chans = convertlocs(chans, 'sphbesa2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2all', varargin{:}); % search for spherical coords
-case 'cart2topo',
+case 'cart2topo'
    chans = convertlocs(chans, 'cart2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2topo', varargin{:}); % search for spherical coords
-case 'cart2sphbesa',
+case 'cart2sphbesa'
    chans = convertlocs(chans, 'cart2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
-case 'cart2sph',
+case 'cart2sph'
     if verbose
         disp('WARNING: If XYZ center has not been optimized, optimize it using Edit > Channel Locations');
-	end
+    end
     X  = {chans.X};
     Y  = {chans.Y};
     Z  = {chans.Z};
     indices = find(~cellfun('isempty', X));
-    [th phi radius] = cart2sph( [ X{indices} ], [ Y{indices} ], [ Z{indices} ]);
+    [th, phi, radius] = cart2sph( [ X{indices} ], [ Y{indices} ], [ Z{indices} ]);
 	for index = 1:length(indices)
 		 chans(indices(index)).sph_theta     = th(index)/pi*180;
 		 chans(indices(index)).sph_phi       = phi(index)/pi*180;
 		 chans(indices(index)).sph_radius    = radius(index);
 	end
-case 'cart2all',
+case 'cart2all'
    chans = convertlocs(chans, 'cart2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2all', varargin{:}); % search for spherical coords
 end

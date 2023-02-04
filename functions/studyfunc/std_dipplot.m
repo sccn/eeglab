@@ -1,16 +1,16 @@
-% std_dipplot() - Commandline function to plot cluster component dipoles. Dipoles for each
+% STD_DIPPLOT - Commandline function to plot cluster component dipoles. Dipoles for each
 %                 named cluster is displayed in a separate figure. To view all the clustered 
 %                 components in the STUDY on the same figure (in a separate subplot), all 
 %                 STUDY clusters must be requested.
 %                 To visualize dipoles, they first must be stored in the EEG dataset structures
-%                 using dipfit(). Only components that have dipole locations will be displayed,
+%                 using DIPFIT. Only components that have dipole locations will be displayed,
 %                 along with the cluster mean dipole (in red). 
 % Usage:    
 %                 >> [STUDY] = std_dipplot(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in 
-%                the STUDY. ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                the STUDY. ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %
 % Optional inputs:
 %   'clusters' - [numeric vector | 'all']  -> specific cluster numbers to plot.
@@ -21,7 +21,7 @@
 %                {default: 'all'}.
 %   'mode'     - ['together'|'apart'|'multicolor'] Display all requested cluster on one 
 %                figure ('together') or separate figures ('apart'). 
-%                'together'-> plot all 'clusters' individuall in one multi-pane figure (without the gui).
+%                'together'-> plot all 'clusters' individually in one multi-pane figure (without the gui).
 %                'apart'   -> plot each cluster in a separate figure. 
 %                'multicolor' -> plot all clusters in one figure, 
 %                Note that this parameter has no effect if the 'comps' option (above) is used.
@@ -42,10 +42,10 @@
 %                already exists in the STUDY).  
 %   Example:
 %   >> [STUDY] = std_dipplot(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
-%                % Plot cluster-5 component dipoles (in blue), plus ther mean dipole (in red), 
-%                % on an exisiting (gui-less) figure. 
+%                % Plot cluster-5 component dipoles (in blue), plus their mean dipole (in red), 
+%                % on an existing (gui-less) figure. 
 %
-%  See also  pop_clustedit(), dipplot()        
+%  See also  POP_CLUSTEDIT, DIPPLOT        
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 %          'groups' added by Makoto Miyakoshi on June 2012.
@@ -88,12 +88,13 @@ mode = 'apart';
 
 STUDY = pop_dipparams(STUDY, 'default');
 
-opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'spheres', 'on', 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
+opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'dipolelength', 0, 'density', STUDY.etc.dipparams.density};
 
 dipcolor = [];
 dipsize = [];
 %, 'spheres', 'on'
 groupval = 'off';
+nosphere = true;
 for k = 3:2:nargin
     switch varargin{k-2}
         case 'clusters'
@@ -134,7 +135,13 @@ for k = 3:2:nargin
         dipcolor = varargin{k-1};
       case 'dipsize'
         dipsize = varargin{k-1};
+      case 'spheres'
+        opt_dipplot = { opt_dipplot{:}, 'spheres',  varargin{k-1} };  
+        nosphere = false;
     end
+end
+if nosphere
+    opt_dipplot = { opt_dipplot{:}, 'spheres', 'on' };
 end
 
 if strcmpi(mode, 'together')
@@ -385,7 +392,7 @@ end % finished case of 'all' clusters
 if strcmpi(mode, 'multicolor')
   N = length(cls);
   %%%%%%%%%%%%%%%%%%%%% color list %%%%%%%%%%%%%%%%%%%%%
-  % This color list was developped for std_envtopo
+  % This color list was developed for std_envtopo
   % modified from dipgroups below
   colors{1}  = [1 1 1];            % White
   colors{2}  = [1 1 0];            % Yellow
@@ -531,18 +538,18 @@ end % multicolor. Supporting functions at end of file
 
 % ========================================================================================
 
-% std_plotcompdip() - Commandline function, to visualizing cluster components dipoles. 
+% STD_PLOTCOMPDIP - Commandline function, to visualizing cluster components dipoles. 
 %                   Displays the dipoles of specified cluster components with the cluster mean 
 %                   dipole on separate figures. 
 %                   To visualize dipoles they first must be stored in the EEG dataset structures
-%                   using dipfit(). Only components that have a dipole locations will be displayed,
+%                   using DIPFIT. Only components that have a dipole locations will be displayed,
 %                   along with the cluster mean dipole in red. 
 % Usage:    
 %                   >> [STUDY] = std_plotcompdip(STUDY, ALLEEG, cluster, comps);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%                     ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.  
 %   cluster     - single cluster number.  
 %
 % Optional inputs:
@@ -639,7 +646,7 @@ for ci = 1:length(comp_ind)
     else
        dipplot(cluster_dip_models, 'meshdata', ALLEEG(abset).dipfit.hdmfile, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
           'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [STUDY.cluster(cls).name ' mean']}, ...
-          'spheres', 'on', 'verbose', 'off', varargin{:});
+          'spheres', 'off', 'verbose', 'off', varargin{:});
     end
     fig_h = gcf;
     set(fig_h,'Name', [subject ' / ' 'IC' num2str(comp) ', ' STUDY.cluster(cls).name],'NumberTitle','off');
@@ -772,7 +779,7 @@ function [cluster_dip_models, options] = dipgroups(ALLEEG, STUDY, cls, comp_to_d
     % fifth, use subj_groupnum as a type of dipole color
 
         %%%%%%%%%%%%%%%%%%%%% color list %%%%%%%%%%%%%%%%%%%%%
-        % This color list was developped for std_envtopo
+        % This color list was developed for std_envtopo
         % 16 colors names officially supported by W3C specification for HTML
         colors{1,1}  = [1 1 1];            % White
         colors{2,1}  = [1 1 0];            % Yellow

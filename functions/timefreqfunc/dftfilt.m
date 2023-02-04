@@ -1,4 +1,4 @@
-% dftfilt() - discrete Fourier filter
+% DFTFILT - discrete Fourier filter
 %
 % Usage:
 %   >> b = dftfilt(n,W,c,k,q)
@@ -50,7 +50,7 @@
 % - the delta in frequency: ex 0.5 Hz
 % The function should: compute the number of points (len) automatically
 % Warning with FFT compatibility
-% Still, something has to be done about the masking so that it would be comaptible
+% Still, something has to be done about the masking so that it would be compatible
 
 function b = dftfilt(len,maxfreq,cycle,oversmp,wavfact)
 
@@ -68,8 +68,8 @@ b = exp(-w);
 
 for i = 1:size(b,2),
 	m  = round(wavfact*len*(i-1)/(i+oversmp-1));	% Number of elements to discard.
-	mu = round(m/2);				                % Number of upper elemnts.
-	ml = m-round(m/2);				                % Number of lower elemnts.
+	mu = round(m/2);				                % Number of upper elements.
+	ml = m-round(m/2);				                % Number of lower elements.
 	b(:,i) = b(:,i) .* [zeros(mu,1) ; hanning(len-m) ; zeros(ml,1)];
 end
 

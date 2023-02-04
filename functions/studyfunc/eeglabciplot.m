@@ -6,7 +6,7 @@ function eeglabciplot(lower,upper,x,colour, alphaval)
 % Plots a shaded region on a graph between specified lower and upper confidence intervals (L and U).
 % l and u must be vectors of the same length.
 % Uses the 'fill' function, not 'area'. Therefore multiple shaded plots
-% can be overlayed without a problem. Make them transparent for total visibility.
+% can be overlaid without a problem. Make them transparent for total visibility.
 % x data can be specified, otherwise plots against index values.
 % colour can be specified (eg 'k'). Defaults to blue.
 

@@ -1,16 +1,16 @@
-% pop_snapread() - load an EEG SnapMaster file (pop out window if no arguments).
+% POP_SNAPREAD - load an EEG SnapMaster file (pop out window if no arguments).
 %
 % Usage:
 %   >> [dat] = pop_snapread( filename, gain);
 %
 % Graphic interface:
-%   "Relative gain" - [edit box] to compute the relative gain, fisrt look at
+%   "Relative gain" - [edit box] to compute the relative gain, first look at
 %                   the text header of the snapmater file with a text editor. 
 %                   Find the recording unit, usually in volts (UNITS field).  
 %                   Then, find the voltage range in the "CHANNEL.RANGE" [cmin cmax]
 %                   field. Finally, determine the gain of the amplifiers (directly
 %                   on the machine, not in the header file).
-%                   Knowing that the recording precision is 12 bits. The folowing
+%                   Knowing that the recording precision is 12 bits. The following
 %                   formula 
 %                                    1/2^12*[cmax-cmin]*1e6/gain 
 %                   returns the relative gain. You have to compute it and enter
@@ -18,7 +18,7 @@
 %                   (note that if the voltage range is not the same for all channels
 %                   or if the CONVERSION.POLY field in the file header
 %                   is not "0 + 1x" for all channels,  you will have to load the data 
-%                   using snapread() and scale manually all channels, then import
+%                   using SNAPREAD and scale manually all channels, then import
 %                   the Matlab array into EEGLAB).
 %
 % Inputs:
@@ -30,7 +30,7 @@
 %
 % Author: Arnaud Delorme, CNL/Salk Institute, 13 March 2002
 %
-% See also: eeglab(), snapread()
+% See also: EEGLAB, SNAPREAD
 
 % Copyright (C) 13 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

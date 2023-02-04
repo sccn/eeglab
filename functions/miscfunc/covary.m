@@ -1,4 +1,4 @@
-%  covary() - For vectors, covary(X) returns the variance of X.
+%  COVARY - For vectors, covary(X) returns the variance of X.
 %             For matrices, covary(X)is a row vector containing the
 %             variance of each column of X.
 %

@@ -1,4 +1,4 @@
-% promax() - perform Promax oblique rotation after orthogonal Varimax 
+% PROMAX - perform Promax oblique rotation after orthogonal Varimax 
 %            rotation of the rows of the input data. A method for 
 %            linear decomposition by "rotating to simple structure."
 % Usage:
@@ -18,7 +18,7 @@
 %
 % Author: Colin Humphries, CNL / Salk Institute, 1998
 %
-% See also: runica()
+% See also: RUNICA
 
 % Copyright (C) Colin Humphries, CNL / Salk Institute, June 1998
 %

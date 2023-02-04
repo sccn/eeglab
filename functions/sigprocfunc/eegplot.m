@@ -1,11 +1,9 @@
-% eegplot() - Scroll (horizontally and/or vertically) through multichannel data.
+% EEGPLOT - Scroll (horizontally and/or vertically) through multichannel data.
 %             Allows vertical scrolling through channels and manual marking 
 %             and unmarking of data stretches or epochs for rejection.
 % Usage: 
 %           >> eegplot(data, 'key1', value1 ...); % use interface buttons, etc.
-%      else
-%           >> eegplot('noui', data, 'key1', value1 ...); % no user interface;
-%                                                         % use for plotting
+%
 % Menu items:
 %    "Figure > print" - [menu] Print figure in portrait or landscape.
 %    "Figure > Edit figure" - [menu] Remove menus and buttons and call up the standard
@@ -20,13 +18,13 @@
 %                  Clicked on a marked region to unmark it. Called from the
 %                  command line, marked data stretches or epochs are returned in 
 %                  the TMPREJ variable in the global workspace *if/when* the "Reject" 
-%                  button is pressed (see Outputs); called from pop_eegplot() or 
-%                  eeglab(), the marked data portions are removed from the current
+%                  button is pressed (see Outputs); called from POP_EEGPLOT or 
+%                  EEGLAB, the marked data portions are removed from the current
 %                  dataset, and the dataset is automatically updated.
 %     "Display > Marking color > Choose color" - [menu] Change the background marking 
 %                  color. The marking color(s) of previously marked trials are preserved. 
-%                  Called from command line, subsequent functions eegplot2event() or 
-%                  eegplot2trials() allow processing trials marked with different colors 
+%                  Called from command line, subsequent functions EEGPLOT2EVENT or 
+%                  EEGPLOT2TRIALS allow processing trials marked with different colors 
 %                  in the TMPREJ output variable. Command line equivalent: 'wincolor'.
 %     "Display > Grid > ..." - [menu] Toggle (on or off) time and/or channel axis grids 
 %                  in the activity plot. Submenus allow modifications to grid aspects.
@@ -45,12 +43,12 @@
 %                  user may scroll through channels using the slider on the left 
 %                  of the activity plot. Command line equivalent: 'dispchans'
 %     "Settings > Channel labels > ..."  - [menu] Use numbers as channel labels or load
-%                  a channel location file from disk. If called from the eeglab() menu or
-%                  pop_eegplot(), the channel labels of the dataset will be used. 
+%                  a channel location file from disk. If called from the EEGLAB menu or
+%                  POP_EEGPLOT, the channel labels of the dataset will be used. 
 %                  Command line equivalent: 'eloc_file'
 %     "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off for time and
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
-%                  Else, draw a rectange in the activity window to zoom the display into 
+%                  Else, draw a rectangle in the activity window to zoom the display into 
 %                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
 %     "Settings > Events" - [menu] Toggle event on or off (assuming events have been 
 %                  given as input). Press "legend" to pop up a legend window for events.
@@ -120,7 +118,7 @@
 %                   clicked. The 'REJECT' button is visible only if this parameter is 
 %                   not empty. As explained in the "Output" section below, the variable 
 %                   'TMPREJ' contains the rejected windows (see the functions 
-%                   eegplot2event() and eegplot2trial()).
+%                   EEGPLOT2EVENT and EEGPLOT2TRIAL).
 %    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
 %                    for rejection, each row indicating a different period
@@ -136,15 +134,15 @@
 %    'events'     - [struct] EEGLAB event structure (EEG.event) to use to show events.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
-%    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
-%                    keeping track of several simultaneous eegplot() windows). 
-%    'children'   - [integer] Figure handle of a *dependent* eegplot() window. Scrolling
+%    'tag'        - [string] Matlab object tag to identify this EEGPLOT window (allows 
+%                    keeping track of several simultaneous EEGPLOT windows). 
+%    'children'   - [integer] Figure handle of a *dependent* EEGPLOT window. Scrolling
 %                    horizontally in the master window will produce the same scroll in 
 %                    the dependent window. Allows comparison of two concurrent datasets,
 %                    or of channel and component data from the same dataset.
 %    'scale'      - ['on'|'off'] Display the amplitude scale {default: 'on'}.
 %    'mocap'      - ['on'|'off'] Display motion capture data in a separate figure.
-%                     To run, select an EEG data period in the scolling display using 
+%                     To run, select an EEG data period in the scrolling display using 
 %                     the mouse. Motion capture (mocap) data should be
 %                     under EEG.moredata.mocap.markerPosition in xs, ys and zs fields which are
 %                     (number of markers, number of time points) arrays.                
@@ -153,15 +151,17 @@
 %                      button is down, when it is moving and when the mouse button is up.
 %    'ctrlselectcommand' - [cell array] same as above in conjunction with pressing the 
 %                      CTRL key.
+%    'noui'          - ['on'|'off'] Remove user interface for printing {default: 'off'}
+%
 % Outputs:
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
 %                    the global workspace (only) when the REJECT button is clicked. 
 %                    The command specified in the 'command' keyword argument can use 
-%                    this variable. (See eegplot2trial() and eegplot2event()). 
+%                    this variable. (See EEGPLOT2TRIAL and EEGPLOT2EVENT). 
 %
 % Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/INC/UCSD, 1998-2001
 %
-% See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
+% See also: EEG_MULTIEEGPLOT, EEGPLOT2EVENT, EEGPLOT2TRIAL, EEGLAB
 
 % deprecated 
 %    'colmodif'   - nested cell array of window colors that may be marked/unmarked. Default
@@ -209,7 +209,7 @@
 %    2 - colorlist
 %    3 - submean    % on or off, subtract the mean
 %    4 - maxfreq    % empty [] if no gfrequency content
-% 'buttons hold other informations' Eposition for instance hold the current postition
+% 'buttons hold other informations' Eposition for instance hold the current position
 
 function [outvar1] = eegplot(data, varargin)
 
@@ -277,14 +277,14 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 
    try
        options = varargin;
-       if ~isempty( varargin ), 
+       if ~isempty( varargin )
            for i = 1:2:numel(options)
                g.(options{i}) = options{i+1};
            end
        else g= []; end
    catch
        disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
-   end;	
+   end
    
    % Selection of data range If spectrum plot  
    if isfield(g,'freqlimits') || isfield(g,'freqs')
@@ -292,8 +292,8 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 %        % Check  consistency of freqs
 
        % Selecting data and freqs
-       [temp, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
-       [temp, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
+       [~, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
+       [~, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
        data = data(:,fBeg:fEnd,:);
        g.freqs     = g.freqs(fBeg:fEnd);
        
@@ -314,8 +314,8 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 		 
    try, g.srate; 		    catch, g.srate		= 256; 	end
    try, g.spacing; 			catch, g.spacing	= 0; 	end
-   try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
-   try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
+   try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end % 0 mean numbered
+   try, g.winlength; 		catch, g.winlength	= 5; 	end % Number of seconds of EEG displayed
    try, g.position; 	    catch, g.position	= ORIGINAL_POSITION; 	end
    try, g.title; 		    catch, g.title		= ['Scroll activity -- eegplot()']; 	end
    try, g.plottitle; 		catch, g.plottitle	= ''; 	end
@@ -329,7 +329,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.submean;			catch, g.submean	= 'off'; end
    try, g.children;			catch, g.children	= 0; end
    try, g.limits;		    catch, g.limits	    = [0 1000*(size(data,2)-1)/g.srate]; end
-   try, g.freqs;            catch, g.freqs	    = []; end;  % Ramon
+   try, g.freqs;            catch, g.freqs	    = []; end  % Ramon
    try, g.freqlimits;	    catch, g.freqlimits	= []; end
    try, g.dispchans; 		catch, g.dispchans  = size(data,1); end
    try, g.wincolor; 		catch, g.wincolor   = [ 0.7 1 0.9]; end
@@ -340,19 +340,20 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.ploteventdur;     catch, g.ploteventdur = 'off'; end
    try, g.data2;            catch, g.data2      = []; end
    try, g.plotdata2;        catch, g.plotdata2 = 'off'; end
-   try, g.mocap;		    catch, g.mocap		= 'off'; end; % nima
-   try, g.selectcommand;     catch, g.selectcommand     = { defdowncom defmotioncom defupcom }; end
+   try, g.mocap;		    catch, g.mocap		= 'off'; end % nima
+   try, g.selectcommand;    catch, g.selectcommand     = { defdowncom defmotioncom defupcom }; end
    try, g.ctrlselectcommand; catch, g.ctrlselectcommand = { defctrldowncom defctrlmotioncom defctrlupcom }; end
-   try, g.datastd;          catch, g.datastd = []; end; %ozgur
-   try, g.normed;            catch, g.normed = 0; end; %ozgur
-   try, g.envelope;          catch, g.envelope = 0; end;%ozgur
-   try, g.maxeventstring;    catch, g.maxeventstring = 10; end; % JavierLC
-   try, g.isfreq;            catch, g.isfreq = 0;    end; % Ramon
-      
+   try, g.datastd;          catch, g.datastd = []; end %ozgur
+   try, g.normed;           catch, g.normed = 0; end %ozgur
+   try, g.envelope;         catch, g.envelope = 0; end %ozgur
+   try, g.maxeventstring;   catch, g.maxeventstring = 10; end % JavierLC
+   try, g.isfreq;           catch, g.isfreq = 0;    end % Ramon
+   try, g.noui;             catch, g.noui = 'off'; end
+   try, g.time;             catch, g.time = []; end 
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
-   	end;	
+   end
       
    gfields = fieldnames(g);
    for index=1:length(gfields)
@@ -360,7 +361,8 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' 'plottitle' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqs' 'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq'},;
+               'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' ...
+               'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq' 'noui' 'time' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end
    end
@@ -369,41 +371,41 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    
    if length(g.srate) > 1
    		disp('Error: srate must be a single number'); return;
-   end;	
+   end
    if length(g.spacing) > 1
    		disp('Error: ''spacing'' must be a single number'); return;
-   end;	
+   end
    if length(g.winlength) > 1
    		disp('Error: winlength must be a single number'); return;
-   end;	
+   end
    if ischar(g.title) > 1
    		disp('Error: title must be is a string'); return;
-   end;	
+   end
    if ischar(g.command) > 1
    		disp('Error: command must be is a string'); return;
-   end;	
+   end
    if ischar(g.tag) > 1
    		disp('Error: tag must be is a string'); return;
-   end;	
+   end
    if length(g.position) ~= 4
    		disp('Error: position must be is a 4 elements array'); return;
-   end;	
+   end
    switch lower(g.xgrid)
 	   case { 'on', 'off' },; 
 	   otherwise disp('Error: xgrid must be either ''on'' or ''off'''); return;
-   end;	
+   end
    switch lower(g.ygrid)
 	   case { 'on', 'off' },; 
 	   otherwise disp('Error: ygrid must be either ''on'' or ''off'''); return;
-   end;	
+   end
    switch lower(g.submean)
 	   case { 'on' 'off' };
 	   otherwise disp('Error: submean must be either ''on'' or ''off'''); return;
-   end;	
+   end
    switch lower(g.scale)
 	   case { 'on' 'off' };
 	   otherwise disp('Error: scale must be either ''on'' or ''off'''); return;
-   end;	
+   end
    
    if ~iscell(g.color)
 	   switch lower(g.color)
@@ -412,7 +414,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 		otherwise 
 		 disp('Error: color must be either ''on'' or ''off'' or a cell array'); 
                 return;
-	   end;	
+	   end
    end
    if length(g.dispchans) > size(data,1)
 	   g.dispchans = size(data,1);
@@ -422,6 +424,9 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
    end
    if g.maxeventstring>20 % JavierLC
         disp('Error: maxeventstring must be equal or lesser than 20'); return;
+   end
+   if isempty(g.time)
+        g.time = fastif(g.trialstag(1) == -1, 0, 1);
    end
 
    % max event string;  JavierLC
@@ -456,7 +461,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 		stds = mean(stds(2:end-1)); 
 	else
 		stds = mean(stds);
-	end;	
+	end
     g.spacing = stds*3;  
     if g.spacing > 10
       g.spacing = round(g.spacing);
@@ -474,7 +479,6 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
   [g.chans,g.frames,tmpnb] = size(data);   
   g.frames = g.frames*tmpnb;
   g.nbdat = 1; % deprecated
-  g.time  = 0;
   g.elecoffset = 0;
   
   % %%%%%%%%%%%%%%%%%%%%%%%%
@@ -598,7 +602,7 @@ if ~ischar(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Position', posbut(5,:), ...
 	'Style','edit', ...
 	'Tag','EPosition',...
-	'string', fastif(g.trialstag(1) == -1, '0', '1'),...
+	'string', num2str(g.time),...
 	'Callback', 'eegplot(''drawp'',0);' );
   u(3) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
@@ -1173,6 +1177,11 @@ u(22) = uicontrol('Parent',figh, ...
           for index = 1:length(g.eventtypes)
               if strcmpi(g.eventtypes{index}, 'boundary'), indexwidth(index) = 1; end
           end
+      else
+          eeglab_options;
+          if option_boundary99
+              indexwidth = [ g.eventtypes == -99 ];
+          end
       end
       g.eventtypewidths = g.eventwidths (mod(indexwidth([1:length(g.eventtypes)])-1 ,length(g.eventwidths))+1);
       g.eventwidths     = g.eventwidths (mod(indexwidth(indexcolor)-1               ,length(g.eventwidths))+1);
@@ -1219,7 +1228,7 @@ u(22) = uicontrol('Parent',figh, ...
   eegplot('drawp', 0);
   if g.dispchans ~= g.chans
   	   eegplot('zoom', gcf);
-  end;  
+  end 
   eegplot('scaleeye', [], gcf);
   
   h = findobj(gcf, 'style', 'pushbutton');
@@ -1227,6 +1236,10 @@ u(22) = uicontrol('Parent',figh, ...
   h = findobj(gcf, 'tag', 'eegslider');
   set(h, 'backgroundcolor', BUTTON_COLOR);
   set(figh, 'visible', 'on');
+  
+  if strcmpi(g.noui, 'on')
+      eegplot('noui');
+  end
   
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function
@@ -1422,7 +1435,7 @@ else
          set(ax1, 'userdata', tmpdata);
          set(figh, 'userdata', g);
      else
-         eegplot('drawb'); % draw backgound first
+         eegplot('drawb'); % draw background first
      end
   
   case 'drawb' % Draw background ******************************************************
@@ -1502,7 +1515,7 @@ else
     % 	for tmptag = trialtag
 	%		if tmptag >= lowlim & tmptag <= highlim
 	%			plot([tmptag-lowlim tmptag-lowlim], [0 1], 'b--');
-   	%		end;	
+   	%		end
     %	end
     %end
 
@@ -1546,7 +1559,7 @@ else
 %             EVENTFONT = ' \fontsize{10} ';
 %             ylims=ylim;
             evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
-            if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end; % truncate
+            if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end % truncate
             try, 
                 tmph2 = text(ax0, [tmplat], ylims(2)-0.005, [EVENTFONT evntxt], ...
                                     'color', g.eventcolors{ event2plot(index) }, ...
@@ -1672,7 +1685,7 @@ else
         g.time    = str2num(get(EPosition,'string'));  
     else 
         g.time    = str2num(get(EPosition,'string'))-1;   
-    end;        
+    end       
     g.spacing = str2num(get(ESpacing,'string'));  
     
     orgspacing= g.spacing;
@@ -1739,7 +1752,7 @@ else
       % -------------------------------------
       g = get(gcf,'UserData');
       result = inputdlg2({ 'Max events'' string length:' } , 'Change events'' string length to display', 1,  { num2str(g.maxeventstring) });
-      if size(result,1) == 0 return; end;                  
+      if size(result,1) == 0 return; end                 
       g.maxeventstring = eval(result{1});
       set(gcf, 'UserData', g);
       eegplot('drawb');
@@ -1869,7 +1882,8 @@ else
 	  obj = findobj(fig, 'tag', 'Etimename');delete(obj);
 	  obj = findobj(fig, 'tag', 'Evaluename');delete(obj);
 	  obj = findobj(fig, 'type', 'uimenu');delete(obj);
- 
+      set(gcf, 'paperpositionmode', 'manual', 'WindowButtonMotionFcn', []);
+
    case 'zoom' % if zoom
       fig = varargin{1};
       ax1 = findobj('tag','eegaxis','parent',fig); 
@@ -1894,7 +1908,7 @@ else
           Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1)-1)/g.srate;
           Eposition = round(Eposition*1000)/1000;
           set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition+1));
-      end;  
+      end 
       
       % deal with ordinate
       % ------------------
@@ -1957,17 +1971,17 @@ else
           nleg = length(g.eventtypes);
           fig2 = figure('numbertitle', 'off', 'name', '', 'visible', 'off', 'menubar', 'none', 'color', DEFAULT_FIG_COLOR);
           pos = get(fig2, 'position');
-          set(fig2, 'position', [ pos(1) pos(2) 130 14*nleg+20]);
+          set(fig2, 'position', [ pos(1) pos(2) 200 14*nleg+20]);
           
           for index = 1:nleg
               plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}, 'linestyle', ...
                           g.eventtypestyle{ index }, 'linewidth', g.eventtypewidths( index )); hold on;
               if iscell(g.eventtypes)
                   th=text(35, (index-0.5)*10, g.eventtypes{index}, ...
-                                    'color', g.eventtypecolors{index});
+                                    'color', g.eventtypecolors{index}, 'interpreter', 'none');
               else
                   th=text(35, (index-0.5)*10, num2str(g.eventtypes(index)), ...
-                                    'color', g.eventtypecolors{index});
+                                    'color', g.eventtypecolors{index}, 'interpreter', 'none');
               end
           end
           xlim([0 130]);
@@ -2023,7 +2037,7 @@ else
     ax1 = findobj('tag','backeeg','parent',fig); 
     g.incallback = 0;
     set(fig,'UserData', g);  % early save in case of bug in the following
-    if strcmp(g.mocap,'on'), g.winrej = g.winrej(end,:);end; % nima
+    if strcmp(g.mocap,'on'), g.winrej = g.winrej(end,:);end % nima
     if ~isempty(g.winrej)', ...
         if g.winrej(end,1) == g.winrej(end,2) % remove unitary windows
             g.winrej = g.winrej(1:end-1,:);
@@ -2055,14 +2069,14 @@ else
     end
     set(fig,'UserData', g);
     eegplot('drawp', 0);
-    if strcmp(g.mocap,'on'), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end; % nima
+    if strcmp(g.mocap,'on'), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end % nima
          
   % push button: create/remove window
   % ---------------------------------
   case 'defdowncom'
     fig = varargin{1};
     g = get(fig,'UserData');
-    if strcmp(g.mocap,'on'), show_mocap_timer = timerfind('tag','mocapDisplayTimer'); if ~isempty(show_mocap_timer),  end; end; % nima
+    if strcmp(g.mocap,'on'), show_mocap_timer = timerfind('tag','mocapDisplayTimer'); if ~isempty(show_mocap_timer),  end; end % nima
     
     ax1 = findobj('tag','backeeg','parent',fig); 
     tmppos = get(ax1, 'currentpoint');
@@ -2072,7 +2086,7 @@ else
         g = get(fig,'UserData');       
         ax1 = findobj('tag','backeeg','parent',fig);
         tmppos = get(ax1, 'currentpoint');       
-        g = get(fig,'UserData'); % get data of backgroung image {g.trialstag g.winrej incallback}
+        g = get(fig,'UserData'); % get data of background image {g.trialstag g.winrej incallback}
         if g.incallback ~= 1 % interception of nestest calls
             if g.trialstag ~= -1
                 lowlim = round(g.time*g.trialstag+1);

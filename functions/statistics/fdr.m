@@ -1,4 +1,4 @@
-% fdr() - compute false detection rate mask
+% FDR - compute false detection rate mask
 %
 % Usage:
 %   >> [p_fdr, p_masked] = fdr( pvals, alpha);

@@ -1,5 +1,5 @@
 function B =  jadeR(X,m)
-% jader() - blind separation of real signals using JADE (v1.5, Dec. 1997).
+% JADER - blind separation of real signals using JADE (v1.5, Dec. 1997).
 %
 % Usage: 
 %   >> B = jader(X);
@@ -226,7 +226,7 @@ return ;
 %-  V1.2, Oct.  5 1997 
 %   - Changed random picking of the cumulant matrix used for
 %     initialization to a deterministic choice.  This is not because
-%     of a better rationale but to make the ouput (almost surely)
+%     of a better rationale but to make the output (almost surely)
 %     deterministic.
 %   - Rewrote the joint diag. to take more advantage of Matlab's
 %     tricks.
@@ -285,7 +285,7 @@ return ;
 %
 %  The rows of the separating matrix B are resorted in such a way that
 %  the columns of the corresponding mixing matrix A=pinv(B) are in
-%  decreasing order of (Euclidian) norm.  This is a simple, `almost
+%  decreasing order of (Euclidean) norm.  This is a simple, `almost
 %  canonical' way of fixing the indetermination of permutation.  It
 %  has the effect that the first rows of the recovered signals (ie the
 %  first rows of B*X) correspond to the most energetic *components*.

@@ -1,7 +1,7 @@
-% statcond()  - compare two or more data conditions statistically using 
+% STATCOND  - compare two or more data conditions statistically using 
 %               standard parametric or nonparametric permutation-based ANOVA 
 %               (1-way or 2-way) or t-test methods. Parametric testing uses 
-%               fcdf() from the Matlab Statistical Toolbox.
+%               FCDF from the Matlab Statistical Toolbox.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 %
@@ -78,7 +78,7 @@
 %   df         = degrees of freedom, a (2,1) vector, when F-values are returned
 %   pvals      = array of p-values. Same size as input data without the last
 %                data dimension. All returned p-values are two-tailed.
-%   surrog     = surrogate data array (same size as input data with the last 
+%   surrog     = surrogate statistic values (same size as stats output with the last 
 %                dimension filled with a number ('naccu') of surrogate data sets.
 %
 % Important note: When a two-way ANOVA is performed, outputs are cell arrays
@@ -91,7 +91,7 @@
 %         [t df pvals] = statcond(a);        % perform paired t-test
 %           pvals =                  
 %              5.2807e-04 % standard t-test probability value
-%         % Note: for different rand() outputs, results will differ.
+%         % Note: for different RAND outputs, results will differ.
 %
 %         [t df pvals surog] = statcond(a, 'method', 'perm', 'naccu', 2000); 
 %           pvals =
@@ -110,15 +110,15 @@
 %         [F df pvals] = statcond(a);  % perform a paired 2-way ANOVA 
 %         % Output:
 %           pvals{1} % a (3,4) matrix of p-values; effects across rows
-%           pvals{2} % a (3,4) matrix of p-values; effects across colums 
+%           pvals{2} % a (3,4) matrix of p-values; effects across columns 
 %           pvals{3} % a (3,4) matrix of p-values; interaction effects
 %                                      % across rows and columns
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005-
 %         With thanks to Robert Oostenveld for fruitful discussions 
-%         and advice on this function.
+%         and advices on this function.
 %
-% See also: anova1_cell(), anova2_cell(), anova2rm_cell, fcdf()
+% See also: ANOVA1_CELL, ANOVA2_CELL, ANOVA2RM_CELL, FCDF
 
 % perform a paired t-test
 % -----------------------
@@ -524,7 +524,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         end
     end
     
-    % create a structure for outputing values
+    % create a structure for outputting values
     % ---------------------------------------
     if strcmpi(g.structoutput, 'on')
         outputstruct.method = g.method;

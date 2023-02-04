@@ -1,11 +1,11 @@
-% pop_chancenter() - recenter cartesian X,Y,Z channel coordinates
+% POP_CHANCENTER - recenter cartesian X,Y,Z channel coordinates
 %
 % Usage:  
 %    >> chanlocs = pop_chancenter(chanlocs); % pop up interactive window
 %    >> [chanlocs centerloc] = pop_chancenter(chanlocs, center, omitchan); 
 %
 % Inputs:
-%    chanlocs  = eeglab channel location structure (see readlocs())
+%    chanlocs  = eeglab channel location structure (see READLOCS)
 %    center    = [X Y Z] known center different from [0 0 0]
 %                [] will optimize the center location according
 %                to the best sphere. Default is [0 0 0].
@@ -18,7 +18,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, Feb 2004
 %
-% See also: chancenter(), spherror(), cart2topo()
+% See also: CHANCENTER, SPHERROR, CART2TOPO
 
 % Copyright (C) 2004, Arnaud Delorme, SCCN/INC/UCSD, arno@salk.edu
 %

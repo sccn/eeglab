@@ -1,5 +1,5 @@
-% cart2topo() - convert xyz-cartesian channel coordinates 
-%               to polar topoplot() coordinates. Input data
+% CART2TOPO - convert xyz-cartesian channel coordinates 
+%               to polar TOPOPLOT coordinates. Input data
 %               are points on a sphere centered at (0,0,0)
 %               or at optional input 'center'. This function
 %               is now DEPRECATED! See Important warning below.
@@ -20,20 +20,20 @@
 %
 % Example: >> [th r] = cart2topo(xyz,[1 0 4]);
 %
-% Notes: topoplot() does not plot channels with radius>0.5
+% Notes: TOPOPLOT does not plot channels with radius>0.5
 %        Shrink radii to within this range to plot all channels.
 %        [x y z] are returned after the optimization of the center
 %        and optionally squeezing r towards it by factor 'squeeze'
 %
 % Important: 
-%   DEPRECATED: cart2topo() should NOT be used if elevation angle is less than 0 
-%   (for electrodes below zero plane) since then it returns INNACURATE results. 
-%   SUBSTITUTE: Use cart2topo = cart2sph() -> sph2topo().
+%   DEPRECATED: CART2TOPO should NOT be used if elevation angle is less than 0 
+%   (for electrodes below zero plane) since then it returns INACCURATE results. 
+%   SUBSTITUTE: Use cart2topo = CART2SPH -> SPH2TOPO.
 %
 % Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
 %
-% See also: topo2sph(), sph2topo(), chancenter()
+% See also: TOPO2SPH, SPH2TOPO, CHANCENTER
 
 % Copyright (C) 11/1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -77,6 +77,7 @@ if nargin<1
     help cart2topo
     return;
 end
+
 if nargin >= 2
 	if ~ischar(varargin{1})
 		y = varargin{1};
@@ -96,9 +97,38 @@ end
 
 g = [];
 if ~isempty(varargin)
+    error('additional parameters no longer supported')
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
 end
+
+chans  = [];
+for index = 1:length(x)
+    chans(index).X = x(index);
+    chans(index).Y = y(index);
+    chans(index).Z = z(index);
+end
+chans = convertlocs(chans, 'cart2all');
+th = [chans.theta];
+r  = [chans.radius];
+return
+
+% legacy implementation, fails on
+% [th r] = cart2topo([1 0 0; -1 0 0; 0 1 0; 0 -1 0])
+% th = [ 90  -90   -90    90 ] instead of [ 0  -180   -90    90 ]
+
+
+% cart 2spf
+    X  = x;
+    Y  = y;
+    Z  = z;
+    indices = find(~cellfun('isempty', X));
+    [th, phi, radius] = cart2sph( [ X{indices} ], [ Y{indices} ], [ Z{indices} ]);
+	for index = 1:length(indices)
+		 chans(indices(index)).sph_theta     = th(index)/pi*180;
+		 chans(indices(index)).sph_phi       = phi(index)/pi*180;
+		 chans(indices(index)).sph_radius    = radius(index);
+	end
 
 try, g.optim;      catch, g.optim = 0; end
 try, g.squeeze;    catch, g.squeeze = 0; end

@@ -1,4 +1,4 @@
-% pop_savestudy() - save a STUDY structure to a disk file
+% POP_SAVESTUDY - save a STUDY structure to a disk file
 %
 % Usage:
 %   >> STUDY = pop_savestudy( STUDY, EEG ); % pop up and interactive window 
@@ -16,7 +16,7 @@
 %   'resavedatasets' - ['on'|'off'] resave STUDY datasets if necessary.
 %                Default is 'off'.
 %
-% Note: the parameter EEG is currenlty not being used. In the future, this function
+% Note: the parameter EEG is currently not being used. In the future, this function
 %       will check if any of the datasets of the study have been modified and
 %       have to be resaved.
 %

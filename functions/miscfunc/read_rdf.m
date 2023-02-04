@@ -1,4 +1,4 @@
-% read_rdf() - read RDF-formatted EEG files.
+% READ_RDF - read RDF-formatted EEG files.
 %
 % Usage: 
 %   >> [eeg,ev,header] = read_rdf(filename);

@@ -1,4 +1,4 @@
-% eeg_decodechan() - given an input EEG dataset structure, output a new EEG data structure 
+% EEG_DECODECHAN - given an input EEG dataset structure, output a new EEG data structure 
 %                retaining and/or excluding specified time/latency, data point, channel, 
 %                and/or epoch range(s).
 % Usage:
@@ -11,6 +11,8 @@
 %               a list of channel types (see below)
 %   field     - ['labels'|'type'] channel field to match. Default is
 %               'labels'
+%   ignoremissing - [true|false] ignore channel in channel list that would
+%               be missing in the dataset.
 %
 % Outputs:
 %   chaninds  - integer array with the list of channel indices
@@ -18,7 +20,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2009-
 % 
-% see also: eeglab()
+% see also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -47,7 +49,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [ chaninds, chanlist ] = eeg_decodechan(chanlocs, chanstr, field)
+function [ chaninds, chanlist ] = eeg_decodechan(chanlocs, chanstr, field, ignoremissing)
 
 if nargin < 2
     help eeg_decodechan;
@@ -55,6 +57,12 @@ if nargin < 2
 end
 if nargin < 3
     field = 'labels';
+end
+if nargin < 4
+    ignoremissing = false;
+end
+if isstruct(chanlocs) && isfield(chanlocs, 'chanlocs')
+    chanlocs = chanlocs.chanlocs;
 end
 
 if isempty(chanlocs) && ischar(chanstr)
@@ -132,20 +140,30 @@ else
                 chaninds(end+1) = indmatch(tmpi);
             end
         else
-            try,
-                eval([ 'chaninds = ' chanlist{ind} ';' ]);
-                if isempty(chaninds)
+            try
+                eval([ 'chantmp = ' chanlist{ind} ';' ]);
+                if isempty(chantmp)
                      error([ 'Channel ''' chanlist{ind} ''' not found' ]);
                 else 
+                    if chantmp <= length(chanlist)
+                        chaninds(end+1) = chantmp;
+                    elseif ~ignoremissing 
+                        error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                    end
                 end
             catch
-                error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                if ~ignoremissing
+                    error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                end
             end
         end
     end
 end
 chaninds = sort(chaninds);
 if ~isempty(chanlocs)
+    if any(chaninds > length(chanlocs)) || any(chaninds <= 0)
+        error('Channel index out of range')
+    end
     chanlist = { chanlocs(chaninds).(field) };
 else
     chanlist = {};

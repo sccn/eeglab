@@ -1,4 +1,4 @@
-% jointprob() - rejection of odd columns of a data array  using 
+% JOINTPROB - rejection of odd columns of a data array  using 
 %              joint probability of the values in that column (and
 %              using the probability distribution of all columns).
 %
@@ -33,7 +33,7 @@
 %   The exact values of joint-probability depend on the size of a time 
 %   step and thus cannot be considered as absolute.
 %
-% See also: realproba()
+% See also: REALPROBA
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

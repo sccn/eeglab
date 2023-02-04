@@ -1,4 +1,4 @@
-% eeg_insertbound() - insert boundary event in an EEG event structure.
+% EEG_INSERTBOUND - insert boundary event in an EEG event structure.
 %
 % Usage:
 %       >> [eventout newind] = eeg_insertbound( eventin, pnts, ...
@@ -27,7 +27,7 @@
 % 
 % Author: Arnaud Delorme and Hilit Serby, SCCN, INC, UCSD, April, 19, 2004
 %
-% See also: eeg_eegrej(), pop_mergeset()
+% See also: EEG_EEGREJ, POP_MERGESET
 
 % Copyright (C) 2004 Arnaud Delorme, SCCN, INC, UCSD, arno@salk.edu
 %
@@ -62,6 +62,8 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
         help eeg_insertbound;
         return;
     end
+
+    eeglab_options;
     regions = round(regions);
     regions(regions < 1) = 1;
     regions(regions > pnts) = pnts;
@@ -79,31 +81,38 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
 
     % recompute latencies of boundevents (in new dataset)
     % ---------------------------------------------------
-    [tmp, tmpsort] = sort(regions(:,1));
+    [~, tmpsort] = sort(regions(:,1));
     regions        = regions(tmpsort,:);
     lengths = regions(:,2)-regions(:,1)+1;
     
-    if ~isempty(eventin)
+    if ~isempty(eventin) && isfield(eventin, 'latency')
          eventLatencies = [ eventin.latency ]; 
-    else eventLatencies = [];
+         if length(eventLatencies) ~= length(eventin)
+             error('Some events do not have latencies')
+         end
+    else 
+        eventLatencies = [];
     end
     newEventLatencies = eventLatencies;
     oriLen            = length(eventin);
     rmEvent           = [];
 	for iRegion = 1:size(regions,1) % sorted in decreasing order
 
-        % find event succeding boundary to insert event
+        % find event succeeding boundary to insert event
         % at the correct location in the event structure
         % ----------------------------------------------
         tmpind    = find( eventLatencies - regions(iRegion,1) > 0 );
-        newEventLatencies(tmpind) = newEventLatencies(tmpind)-lengths(iRegion);
-        
+        if ~isempty(newEventLatencies)
+            newEventLatencies(tmpind) = newEventLatencies(tmpind)-lengths(iRegion);
+        end
+
         % insert event
         % ------------
         [tmpnest, addlength ]  = findnested(eventin, eventLatencies, regions(iRegion,:));
         rmEvent = [ rmEvent tmpnest ];
         %if regions(iRegion,1) % do not remove first event
-            eventin(end+1).type   = 'boundary';
+
+            eventin(end+1).type   = eeg_boundarytype(eventin);
             eventin(end).latency  = regions(iRegion,1)-sum(lengths(1:iRegion-1))-0.5;
             eventin(end).duration = lengths(iRegion,1)+addlength;
         %end
@@ -111,8 +120,10 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
 
     % copy latencies
     % --------------
-    for iEvent = 1:oriLen
-        eventin(iEvent).latency = newEventLatencies(iEvent);
+    if ~isempty(newEventLatencies)
+        for iEvent = 1:oriLen
+            eventin(iEvent).latency = newEventLatencies(iEvent);
+        end
     end
     eventin(rmEvent) = [];
     
@@ -122,7 +133,7 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
 %       eventin([ eventin.latency ] < 1) = [];
         eventin([ eventin.latency ] < 0) = [];
         alllatencies = [ eventin.latency ];
-        [tmp, sortind] = sort(alllatencies);
+        [~, sortind] = sort(alllatencies);
         eventin = eventin(sortind);
         newind = sortind(oriLen+1:end);
     end
@@ -133,14 +144,14 @@ function [eventin, newind] = eeg_insertbound( eventin, pnts, regions, lengths)
 
     
 % look for nested events
-% retrun indices of nested events and
+% return indices of nested events and
 % their total length
 % -----------------------------------
 function [ indEvents, addlen ] = findnested(event, eventlat, region)
     indEvents = find( eventlat > region(1) & eventlat < region(2));
 
-    if ~isempty(event) && isfield(event,'type') && ischar(event(1).type) && isfield(event, 'duration')
-        boundaryInd = strmatch('boundary', { event(indEvents).type });
+    if ~isempty(event) && isfield(event,'type') && isfield(event, 'duration')
+        boundaryInd = eeg_findboundaries( event(indEvents) );
         addlen      = sum( [ event(indEvents(boundaryInd)).duration ] );
     else
         addlen = 0;

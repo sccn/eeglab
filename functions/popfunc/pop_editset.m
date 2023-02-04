@@ -1,4 +1,4 @@
-% pop_editset() - Edit EEG dataset structure fields.
+% POP_EDITSET - Edit EEG dataset structure fields.
 %
 % Usage:
 %   >> EEGOUT = pop_editset( EEG ); % pops-up a data entry window
@@ -21,9 +21,9 @@
 %                  equivalent: 'nbchan'. This edit box cannot be edited.
 %   "Ref. channel indices or mode" - [edit box] current reference. This edit box
 %                  cannot be edited. To change the data reference, use menu item,
-%                  'Tools > Re-reference', calling function pop_reref(). The 
+%                  'Tools > Re-reference', calling function POP_REREF. The 
 %                  reference can be either a string (channel name), 'common', 
-%                  indicating an unknown common reference, 'averef' indicating 
+%                  indicating an unknown common reference, 'average' indicating 
 %                  average reference, or an array of integers containing indices 
 %                  of the reference channel(s).
 %   "Subject code" - [Edit box] subject code. For example, 'S01'. The command 
@@ -96,7 +96,7 @@
 %                  data trials is automatically calculated.
 %                   {default: length of the data -> continuous data assumed}
 %   'srate'      - [real] Data sampling rate in Hz {default: 1Hz}
-%   'ref'        - [string or integer] reference channel indices; 'averef' 
+%   'ref'        - [string or integer] reference channel indices; 'average' 
 %                  indicates average reference. Note that this does not perform 
 %                  referencing but only sets the initial reference when the data 
 %                  are imported.
@@ -112,14 +112,14 @@
 %
 % Note:
 %   To create a new dataset:
-%   >> EEG = pop_editset( eeg_emptyset ); % eeg_emptyset() returns an empty dataset
+%   >> EEG = pop_editset( eeg_emptyset ); % EEG_EMPTYSET returns an empty dataset
 %
 %   To erase a variable, use '[]'. The following suppresses channel locations:
 %   >> EEG = pop_editset( EEG, 'chanlocs', '[]');
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_importdata(), pop_select(), eeglab()
+% See also: POP_IMPORTDATA, POP_SELECT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -266,7 +266,7 @@ if nargin < 2                 % if several arguments, assign values
     if ~strcmp( results{i+5}, num2str(EEG.xmin)     ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end
     if ~strcmp( results{i+6},        EEG.group      ) , args = { args{:}, 'group',             results{i+6}  }; end
 	if ~strcmp( results{i+7}, num2str(EEG.nbchan)   ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end
-    if ~strcmp( results{i+8},        EEG.run        ) , args = { args{:}, 'run',       str2num(results{i+8}) }; end
+    if ~isequal( results{i+8},        EEG.run       ) , args = { args{:}, 'run',       str2num(results{i+8}) }; end
     if ~strcmp( results{i+9}, num2str(EEG.ref)      ) , args = { args{:}, 'ref',               results{i+9}  }; end
     if ~strcmp( results{i+10},num2str(EEG.session)  ) , args = { args{:}, 'session',   str2num(results{i+10})}; end
 
@@ -405,7 +405,7 @@ for curfield = tmpfields'
                                     EEGOUT.icasphere = floatread(varname, [1 Inf]);
                                     EEGOUT.icasphere = reshape( EEGOUT.icasphere, [length(EEGOUT.icasphere)/nbcol nbcol]);
                                 catch
-                                    fprintf('pop_editset() warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                                    fprintf('pop_editset() warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
                                 end
                             end
                          else
@@ -475,7 +475,7 @@ for curfield = tmpfields'
                              else
                                  commandrestore = [];
                              end;		  
-                             % make global, must make these variable global, if you try to evaluate them direclty in the base
+                             % make global, must make these variable global, if you try to evaluate them directly in the base
                              % workspace, with a large array the computation becomes incredibly slow.  
                              %--------------------------------------------------------------------
                              comglobal = sprintf('global %s;', varname);

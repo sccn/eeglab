@@ -1,4 +1,4 @@
-% pop_comperp() - Compute the grand average ERP waveforms of multiple datasets
+% POP_COMPERP - Compute the grand average ERP waveforms of multiple datasets
 %                 currently loaded into EEGLAB, with optional ERP difference-wave 
 %                 plotting and t-tests. Creates a plotting figure.
 % Usage:
@@ -24,8 +24,8 @@
 %                perform two-tailed t-tests against a 0 mean dataset with same variance. 
 %                Significant time regions are highlighted in the plotted data. 
 %   'chans'    - [integer array] Vector of chans. or comps. to use {default: all}
-%   'geom'     - ['scalp'|'array'] Plot erps in a scalp array (plottopo())
-%                or as a rectangular array (plotdata()). Note: Only channels
+%   'geom'     - ['scalp'|'array'] Plot erps in a scalp array (PLOTTOPO)
+%                or as a rectangular array (PLOTDATA). Note: Only channels
 %                (see 'chans' above) can be plotted in a 'scalp' array.
 %   'tlim'     - [min max] Time window (ms) to plot data {default: whole time range}
 %   'title'    - [string] Plot title {default: none}
@@ -35,7 +35,7 @@
 %   'std'      - ['on'|'off'|'none'] 'on' -> plot std. devs.; 'none' -> do not 
 %                interact with other options {default:'none'}
 %
-% Vizualisation options:
+% Visualisation options:
 %   'addavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datadd' datasets
 %                {default: 'on' if 'datsub' empty, otherwise 'off'}
 %   'subavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datsub' datasets 
@@ -52,7 +52,7 @@
 %                other options {default:'none'}
 %   'allerps'  - ['on'|'off'|'none'] 'on' -> show ERPs for all conditions; 
 %                'none' -> do not affect other options {default:'none'}
-%   'tplotopt' - [cell array] Pass 'key', val' plotting options to plottopo()
+%   'tplotopt' - [cell array] Pass 'key', val' plotting options to PLOTTOPO
 %
 % Output:
 %   erp1   - Grand average (or rms) of the 'datadd' datasets
@@ -64,10 +64,10 @@
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2003
 %
 % Note: t-test functions were adapted for matrix preprocessing from C functions 
-%       by Press et al. See the description in the pttest() code below 
+%       by Press et al. See the description in the PTTEST code below 
 %       for more information.
 %
-% See also: eeglab(), plottopo()
+% See also: EEGLAB, PLOTTOPO
 
 % Copyright (C) 15 March 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

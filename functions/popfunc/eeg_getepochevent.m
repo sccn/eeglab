@@ -1,4 +1,4 @@
-% eeg_getepochevent() - Return dataset event field values for all events 
+% EEG_GETEPOCHEVENT - Return dataset event field values for all events 
 %                                of one or more specified types
 % Usage:
 %       >> epochval = eeg_getepochevent( EEG );
@@ -32,7 +32,7 @@
 %                 the subfunction ascii2num for more details.
 %   allepochval - cell array with same length as the number of epoch 
 %                 containing all values for all epochs. This output is
-%                 usefull when several value are found within each epoch.
+%                 useful when several value are found within each epoch.
 %                 Not forced to be numerical.
 %
 % Notes: 1) Each epoch structure refers to the events that occurred
@@ -46,7 +46,7 @@
 %        If NO EVENT is selected in a given epoch, the value returned 
 %        is NaN.
 %
-%        3) If the user elects to return the latency field, eeg_getepochevent()
+%        3) If the user elects to return the latency field, EEG_GETEPOCHEVENT
 %        recomputes the latency of each event relative to the epoch time
 %        limits.
 %
@@ -62,7 +62,7 @@
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 15 Feb 2002
 %
-% See also: eeglab(), epoch() 
+% See also: EEGLAB, EPOCH 
 
 % Copyright (C) 15 Feb 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

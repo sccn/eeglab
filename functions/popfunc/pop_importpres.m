@@ -1,4 +1,4 @@
-% pop_importpres() - append Presentation event file information into an EEGLAB dataset
+% POP_IMPORTPRES - append Presentation event file information into an EEGLAB dataset
 %                    The Presentation stimulus presentation program outputs an ascii
 %                    log file. This function merges existing EEG dataset events with
 %                    additional field information (fields) about those events contained 
@@ -16,7 +16,7 @@
 %   durfield       - [string] duration fieldname {default: 'none'}
 %   align          - [integer] alignment with pre-existing events
 %                    See    >> help pop_importevent
-%   'key','val'    - This function calls pop_importevent(). These are
+%   'key','val'    - This function calls POP_IMPORTEVENT. These are
 %                    optional arguments for this function (for event 
 %                    alignment for instance).
 % Outputs:
@@ -31,9 +31,9 @@
 %
 % Note: This function is backward compatible with its early versions
 %       (before the input argument 'durfield' was introduced). 
-%       It can read the 'align' value as its 5th (not 6th) paramater. 
+%       It can read the 'align' value as its 5th (not 6th) parameter. 
 %
-% See also: eeglab(), pop_importevent()
+% See also: EEGLAB, POP_IMPORTEVENT
 
 % Copyright (C) 13 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

@@ -1,4 +1,4 @@
-% std_readcustom() - Read custom data structure for file save on disk.
+% STD_READCUSTOM - Read custom data structure for file save on disk.
 %
 % Usage:    
 % >> data = std_readcustom(STUDY, ALLEEG, fileext, 'key', 'val', ...);

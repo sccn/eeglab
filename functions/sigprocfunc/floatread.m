@@ -1,5 +1,5 @@
-% floatread() - Read matrix from float file ssuming four byte floating point number
-%               Can use fseek() to read an arbitary (continguous) submatrix.
+% FLOATREAD - Read matrix from float file ssuming four byte floating point number
+%               Can use FSEEK to read an arbitrary (contiguous) submatrix.
 %
 % Usage:        >> a = floatread(filename,size,'format',offset) 
 %
@@ -8,12 +8,12 @@
 %   size     - determine the number of float elements to be read and 
 %              the dimensions of the resulting matrix. If the last element 
 %              of 'size' is Inf, the size of the last dimension is determined
-%              by the file length. If size is 'square,' floatread() attempts 
+%              by the file length. If size is 'square,' FLOATREAD attempts 
 %              to read a square 2-D matrix.
 %
 % Optional inputs:
 %  'format'  - the option FORMAT argument specifies the storage format as
-%              defined by fopen(). Default format ([]) is 'native'.
+%              defined by FOPEN. Default format ([]) is 'native'.
 %  offset    - either the number of first floats to skip from the beginning of the
 %              float file, OR a cell array containing the dimensions of the original 
 %              data matrix and a starting position vector in that data matrix. 
@@ -25,7 +25,7 @@
 % 
 % Author: Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998 
 %
-% See also: floatwrite(), fopen()
+% See also: FLOATWRITE, FOPEN
 
 % Copyright (C) Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998
 %

@@ -1,4 +1,4 @@
-% pop_resample() - resample dataset (pop up window).
+% POP_RESAMPLE - resample dataset (pop up window).
 %
 % Usage:
 %   >> [OUTEEG] = pop_resample( INEEG ); % pop up interactive window
@@ -25,11 +25,11 @@
 %
 % Author: Arnaud Delorme, CNL/Salk Institute, 2001
 %
-% Note: uses the resample() function from the signal processing toolbox
+% Note: uses the RESAMPLE function from the signal processing toolbox
 %       if present. Otherwise use griddata interpolation method (it should be
 %       reprogrammed using spline interpolation for speed up).
 %
-% See also: resample(), eeglab()
+% See also: RESAMPLE, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -98,16 +98,16 @@ if nargin < 4 || isempty(df)
 end
 % fc in range?
 if fc < 0 || fc > 1
-    error('Anti-aliasing filter cutoff freqeuncy out of range.')
+    error('Anti-aliasing filter cutoff frequency out of range.')
 end
 
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
     if nargin < 2
-        [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
+        [ EEG, command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
     else
-        [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'params', { freq } );
+        [ EEG, command ] = eeg_eval( 'pop_resample', EEG, 'params', { freq } );
     end
     return;
 end
@@ -125,8 +125,8 @@ oldpnts  = EEG.pnts;
 % -------------------------
 if isfield(EEG, 'event') && ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
     tmpevent = EEG.event;
-    bounds = strmatch('boundary', { tmpevent.type });
-    if ~isempty(bounds),
+    bounds = eeg_findboundaries(tmpevent);
+    if ~isempty(bounds)
         disp('Data break detected and taken into account for resampling');
         bounds = [ tmpevent(bounds).latency ];
         bounds(bounds <= 0 | bounds > size(EEG.data,2)) = []; % Remove out of range boundaries
@@ -216,7 +216,7 @@ if isfield(EEG.event, 'latency')
             % Old version EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
 
             % Recompute event latencies relative to segment onset
-            if strcmpi(EEG.event(iEvt).type, 'boundary') && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+            if eeg_isboundary(EEG.event(iEvt)) && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
                 iBnd = sum(EEG.event(iEvt).latency + 0.5 >= bounds);
                 EEG.event(iEvt).latency = indices(iBnd) - 0.5;
             else
@@ -234,8 +234,15 @@ if isfield(EEG.event, 'latency')
         if isfield(EEG, 'urevent') && isfield(EEG.urevent, 'latency')
             try
                 for iUrevt = 1:length(EEG.urevent)
+
+                    isBoundaryEvent = false;
+                    if ischar( EEG.urevent(iUrevt).type )
+                        isBoundaryEvent = strcmpi(EEG.urevent(iUrevt).type, 'boundary');
+                    elseif option_boundary99
+                        isBoundaryEvent = EEG.urevent(iUrevt).type == -99;
+                    end
                     % Recompute urevent latencies relative to segment onset
-                    if strcmpi(EEG.urevent(iUrevt).type, 'boundary') && mod(EEG.urevent(iUrevt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+                    if isBoundaryEvent && mod(EEG.urevent(iUrevt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
                         iBnd = sum(EEG.urevent(iUrevt).latency + 0.5 >= bounds);
                         EEG.urevent(iUrevt).latency = indices(iBnd) - 0.5;
                     else
@@ -345,11 +352,11 @@ function tmpeeglab = myresample(data, p, q, usesigproc, fc, df)
 %         XX = linspace( 1, lastpointval, nbnewpoints2);
 
         % New time axis scaling, May 06, 2015, AW
-        X = 0:length(data) - 1;
-        newpnts  = ceil(length(data) * p / q);
+        X = 0:size(data,1) - 1;
+        newpnts  = ceil(size(data,1) * p / q);
         XX = (0:newpnts - 1) / (p / q);
 
-        cs = spline( X, data);
+        cs = spline( X, data');
         tmpeeglab = ppval(cs, XX)';
 
         if p > q % Upsampling, anti-imaging filter
@@ -358,7 +365,7 @@ function tmpeeglab = myresample(data, p, q, usesigproc, fc, df)
 
     end
     
-% firfiltdcpadded() - Pad data with DC constant and filter
+% FIRFILTDCPADDED - Pad data with DC constant and filter
 %
 % Usage:
 %   >> data = firfiltdcpadded(data, b, causal);

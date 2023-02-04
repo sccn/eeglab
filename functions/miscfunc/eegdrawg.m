@@ -1,8 +1,8 @@
-% eegdrawg() - subroutine used by eegplotgold() to plot data.
+% EEGDRAWG - subroutine used by EEGPLOTGOLD to plot data.
 %
 % Author: Colin Humphries, CNL, Salk Institute, La Jolla, 7/96
 
-% Copyright (C) Colin Humphries, CNL, Salk Institute 7/96 from eegplot()
+% Copyright (C) Colin Humphries, CNL, Salk Institute 7/96 from EEGPLOT
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -29,7 +29,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% 4-4-97 shortened name to eegdrawq() -sm
+% 4-4-97 shortened name to EEGDRAWQ -sm
 % 4-7-97 allowed data names other than 'data' -ch 
 % 01-25-02 reformated help & license -ad 
 

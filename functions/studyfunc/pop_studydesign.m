@@ -1,4 +1,4 @@
-% pop_studydesign() - create a STUDY design structure.
+% POP_STUDYDESIGN - create a STUDY design structure.
 %
 % Usage: 
 %   >> [STUDY, ALLEEG] = pop_studydesign(STUDY, ALLEEG, key1, val1, ...);  

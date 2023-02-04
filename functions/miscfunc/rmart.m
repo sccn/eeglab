@@ -1,4 +1,4 @@
-% rmart() - Remove eye artifacts from EEG data using regression with 
+% RMART - Remove eye artifacts from EEG data using regression with 
 %           multiple time lags. Each channel is first made mean-zero. 
 %           After JL Kenemans et al., Psychophysiology 28:114-21, 1991.
 %
@@ -16,7 +16,7 @@
 %
 % Note: Regression epoch length and number of lags are set in the script.  
 %       Some machines may require a new byte_order value in the script. 
-%       note that runica() -> icaproj() should give better results! See
+%       note that RUNICA -> ICAPROJ should give better results! See
 %       Jung et al., Psychophysiology 111:1745-58, 2000.
 %
 % Author: Tzyy-Ping Jung, SCCN/INC/UCSD, La Jolla, 1997 

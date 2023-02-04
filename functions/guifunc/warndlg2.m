@@ -1,8 +1,8 @@
-% warndlg2() - same as warndlg for eeglab()
+% WARNDLG2 - same as warndlg for EEGLAB
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002
 %
-% See also: inputdlg2(), questdlg2()
+% See also: INPUTDLG2, QUESTDLG2
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %
@@ -31,9 +31,13 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function warndlg2(Prompt, Title);
+function warndlg2(Prompt, Title, modal)
 
 if nargin <2
 	Title = 'Warning';
 end
-questdlg2(Prompt, Title, 'OK', 'OK');
+if nargin > 2 && ischar(modal) && strcmpi(modal, 'non-modal')
+    warndlg(Prompt, Title, 'non-modal')
+else
+    questdlg2(Prompt, Title, 'OK', 'OK');
+end

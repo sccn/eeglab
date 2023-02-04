@@ -2,8 +2,8 @@ function [M,stderr,V,grpids] = means(X,grps)
 % MEANS:  Means, standard errors and variances.  For column vectors, means(x) 
 %         returns the mean value.  For matrices or row vectors, means(x) is a 
 %         row vector containing the mean value of each column.  The basic 
-%         difference from the Matlab functions mean() and var() is for a row vector, 
-%         where means() returns the row vector instead of the mean value of the 
+%         difference from the Matlab functions MEAN and VAR is for a row vector, 
+%         where MEANS returns the row vector instead of the mean value of the 
 %         elements of the row.  Also allows for missing data, passed as NaNs.
 %
 %         If an optional grouping vector is supplied, returns a vector of means

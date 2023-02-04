@@ -1,4 +1,4 @@
-% realproba() - compute the effective probability of the value 
+% REALPROBA - compute the effective probability of the value 
 %               in the sample.
 %
 % Usage: 

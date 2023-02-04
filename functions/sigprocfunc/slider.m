@@ -1,4 +1,4 @@
-% slider() - add slider to a figure
+% SLIDER - add slider to a figure
 %
 % Usage:
 %   >>  slider( handler, horiz, vert, horizmag, vertmag);
@@ -21,7 +21,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

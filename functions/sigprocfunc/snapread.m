@@ -1,4 +1,4 @@
-% snapread() - Read data in Snap-Master Standard Binary Data File Format
+% SNAPREAD - Read data in Snap-Master Standard Binary Data File Format
 %              Reads Snap-Master header and data matrix (nchans,nframes).
 %              Ref: Users Guide, Snap-Master for Windows (1997) p. 4-19
 % Usage:
@@ -17,7 +17,7 @@
 %
 % Authors: Scott Makeig & Tzyy-Ping Jung, SCCN/INC/UCSD, La Jolla, January 31, 2000 
 
-% Copyright (C) January 31, 2000 from plotdata() Scott Makeig & Tzyy-Ping Jung, SCCN/INC/UCSD,
+% Copyright (C) January 31, 2000 from PLOTDATA Scott Makeig & Tzyy-Ping Jung, SCCN/INC/UCSD,
 % scott@sccn.ucsd.edu
 %
 % This file is part of EEGLAB, see http://www.eeglab.org

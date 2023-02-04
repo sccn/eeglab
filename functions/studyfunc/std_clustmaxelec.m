@@ -1,4 +1,4 @@
-% std_clustmaxelec() - function to find the electrode with maximum absolute projection
+% STD_CLUSTMAXELEC - function to find the electrode with maximum absolute projection
 %                  for each component of a cluster
 % Usage:    
 %     >> [eleclist, setlist, complist] = std_clustmaxelec(STUDY, ALLEEG, clustind); 

@@ -1,4 +1,4 @@
-% epoch() - Extract epochs time locked to specified events from continuous EEG data.
+% EPOCH - Extract epochs time locked to specified events from continuous EEG data.
 %
 % Usage:
 %   >> epocheddata = epoch( data, events, timelim);
@@ -49,7 +49,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_epoch(), eeglab()
+% See also: POP_EPOCH, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -150,11 +150,11 @@ for index = 1:length(events)
    if ~isempty(g.allevents)
         posinit = pos0 + g.alleventrange(1)*g.srate; % compute offset
         posend  = pos0 + g.alleventrange(2)*g.srate; % compute offset
-        eventtrial = intersect_bc( find(g.allevents*g.srate >= posinit),  find(g.allevents*g.srate <= posend) );
+        eventtrial = intersect_bc( find(g.allevents*g.srate >= posinit),  find(g.allevents*g.srate < posend) );
         alleventout{index} = eventtrial;
         alllatencyout{index} = g.allevents(eventtrial)*g.srate-pos0; 
    end
-end;   
+end
 newtime(1) = reallim(1)/g.srate;
 newtime(2) = reallim(2)/g.srate;
 

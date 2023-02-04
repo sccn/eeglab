@@ -1,5 +1,5 @@
-% std_selsubject() - Helper function for std_erpplot(), std_specplot() 
-%                    and std_erspplot() to select specific subject when
+% STD_SELSUBJECT - Helper function for STD_ERPPLOT, STD_SPECPLOT 
+%                    and STD_ERSPPLOT to select specific subject when
 %                    plotting channel data.
 % Usage:
 %  >> data = std_selsubject( data, subject, setinds, allsubjects);
@@ -24,7 +24,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 % 
-% See also: std_erpplot(), std_specplot() and std_erspplot()
+% See also: STD_ERPPLOT, STD_SPECPLOT and STD_ERSPPLOT
 
 % Copyright (C) 2012 Arnaud Delorme
 %

@@ -1,4 +1,4 @@
-% matsel() - select rows, columns, and epochs from given multi-epoch data matrix
+% MATSEL - select rows, columns, and epochs from given multi-epoch data matrix
 %
 % Usage:
 %       >> [dataout] = matsel(data,frames,framelist);

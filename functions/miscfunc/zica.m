@@ -1,14 +1,14 @@
-% zica() - Z-transform of ICA activations; useful for studying component SNR
+% ZICA - Z-transform of ICA activations; useful for studying component SNR
 %
 % Usage: >> [zact,basesd,maz,mazc,mazf] = zica(activations,frames,baseframes)
 %
 % Inputs:
-%   activations - activations matrix produced by runica()
+%   activations - activations matrix produced by RUNICA
 %   frames      - frames per epoch {0|default ->  length(activations)}
 %   baseframes  - vector of frames in z-defining baseline period {default frames}
 % 
 % Outputs:
-%   zact        - activations z-scaled and reorded in reverse order of max abs
+%   zact        - activations z-scaled and reordered in reverse order of max abs
 %   basesd      - standard deviations in each activation row (reverse ordered)
 %   maz         - maximum absolute z-value for each activation row (rev ordered)
 %   mazc        - component indices of the reverse-sorted max abs z-values
@@ -17,7 +17,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2-25-98 
 %
-% See also: runica()
+% See also: RUNICA
 
 function [zact,basesd,maxabsz,maxc,maxabszf] = zica(activations,frames,baseframes)
 

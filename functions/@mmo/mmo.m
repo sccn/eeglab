@@ -1,4 +1,4 @@
-% mmo() - create a memory-mapped data class
+% MMO - create a memory-mapped data class
 %
 % Usage:
 %   >> data_class = mmo(data);

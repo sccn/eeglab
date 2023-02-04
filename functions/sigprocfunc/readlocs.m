@@ -1,4 +1,4 @@
-% readlocs() - read electrode location coordinates and other information from a file. 
+% READLOCS - read electrode location coordinates and other information from a file. 
 %              Several standard file formats are supported. Users may also specify 
 %              a custom column format. Defined format examples are given below 
 %              (see File Formats).
@@ -25,19 +25,19 @@
 %                          z is toward nose; y is toward left ear; z is toward vertex
 %                  'asc'   Neuroscan polar coordinates.
 %                  'polhemus' or 'polhemusx' - Polhemus electrode location file recorded 
-%                          with 'X' on sensor pointing to subject (see below and readelp()).
+%                          with 'X' on sensor pointing to subject (see below and READELP).
 %                  'polhemusy' - Polhemus electrode location file recorded with 
-%                          'Y' on sensor pointing to subject (see below and readelp()).
+%                          'Y' on sensor pointing to subject (see below and READELP).
 %                  'besa' BESA-'.elp' spherical coordinates. (Not MATLAB spherical -
 %                           see below).
-%                  'chanedit' - EEGLAB channel location file created by pop_chanedit().
+%                  'chanedit' - EEGLAB channel location file created by POP_CHANEDIT.
 %                  'custom' - Ascii file with columns in user-defined 'format' (see below).
 %   'importmode' - ['eeglab'|'native'] for location files containing 3-D cartesian electrode
 %                  coordinates, import either in EEGLAB format (nose pointing toward +X). 
 %                  This may not always be possible since EEGLAB might not be able to 
 %                  determine the nose direction for scanned electrode files. 'native' import
-%                  original carthesian coordinates (user can then specify the position of
-%                  the nose when calling the topoplot() function; in EEGLAB the position
+%                  original cartesian coordinates (user can then specify the position of
+%                  the nose when calling the TOPOPLOT function; in EEGLAB the position
 %                  of the nose is stored in the EEG.chaninfo structure). {default 'eeglab'}
 %   'format'    -  [cell array] Format of a 'custom' channel location file (see above).
 %                  {default: if no file type is defined. The cell array contains
@@ -47,7 +47,7 @@
 %                           'theta'     [real degrees] 2-D angle in polar coordinates.
 %                                       positive => rotating from nose (0) toward left ear
 %                           'radius'    [real] radius for 2-D polar coords; 0.5 is the head
-%                                       disk radius and limit for topoplot() plotting).
+%                                       disk radius and limit for TOPOPLOT plotting).
 %                           'X'         [real] Matlab-Cartesian X coordinate (to nose).
 %                           'Y'         [real] Matlab-Cartesian Y coordinate (to left ear).
 %                           'Z'         [real] Matlab-Cartesian Z coordinate (to vertex).
@@ -113,18 +113,18 @@
 %                           ...
 %   '.elc':
 %               Cartesian 3-D electrode coordinates scanned using the EETrak software. 
-%               See readeetraklocs().
+%               See READEETRAKLOCS.
 %   '.elp':     
 %               Polhemus-.'elp' Cartesian coordinates. By default, an .elp extension is read
 %               as PolhemusX-elp in which 'X' on the Polhemus sensor is pointed toward the 
-%               subject. Polhemus files are not in columnar format (see readelp()).
+%               subject. Polhemus files are not in columnar format (see READELP).
 %   '.elp':
 %               BESA-'.elp' spherical coordinates: Need to specify 'filetype','besa'.
 %               The elevation angle (phi) is measured from the vertical axis. Positive 
 %               rotation is toward right ear. Next, perform azimuthal/horizontal rotation 
 %               (theta): 0 is toward right ear; 90 is toward nose, -90 toward occiput. 
 %               Angles are in degrees.  If labels are absent or weights are given in 
-%               a last column, readlocs() adjusts for this. Default labels are E1, E2, ...
+%               a last column, READLOCS adjusts for this. Default labels are E1, E2, ...
 %               Fields:   Type  label      phi  theta   
 %               Sample:   EEG   Fp1        -92   -72    
 %                         EEG   Fp2         92    72   
@@ -145,7 +145,16 @@
 %   '.asc', '.dat':     
 %               Neuroscan-.'asc' or '.dat' Cartesian polar coordinates text file.
 %   '.mat':     
-%               Brainstrom channel location file.
+%               Brainstrom or fieldtrip channel location/layout file.
+%   '.lay':     
+%               Fieldtrip layout file.
+%   '.txt':     
+%               Fieldtrip electore file.
+%               Fields:   label      phi  theta   
+%               Sample:   Fp1        -92   -72    
+%                         Fp2         92    72   
+%                         C3         -46    0  
+%                         C4          46    0 
 %   '.sfp': 
 %               BESA/EGI-xyz Cartesian coordinates. Notes: For EGI, x is toward right ear, 
 %               y is toward the nose, z is toward the vertex. EEGLAB converts EGI 
@@ -157,7 +166,7 @@
 %                         C4      .719        0          .695  
 %                           ...
 %   '.ced':   
-%               ASCII file saved by pop_chanedit(). Contains multiple MATLAB/EEGLAB formats.
+%               ASCII file saved by POP_CHANEDIT. Contains multiple MATLAB/EEGLAB formats.
 %               Cartesian coordinates are as in the 'xyz' format (above).
 %               Fields:   channum  label  theta  radius   x      y      z    sph_theta   sph_phi  ...
 %               Sample:   1        Fp1     -18    .511   .950   .308  -.035   18         -2       ...
@@ -177,7 +186,7 @@
 %
 % Author: Arnaud Delorme, Salk Institute, 8 Dec 2002
 %
-% See also: readelp(), writelocs(), topo2sph(), sph2topo(), sph2cart()
+% See also: READELP, WRITELOCS, TOPO2SPH, SPH2TOPO, SPH2CART
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 28 Feb 2002
 %
@@ -225,8 +234,8 @@ end
 % 7)  Document the new channel format in the help message above.
 % 8)  After testing, please send the new version of readloca.m to us
 %       at eeglab@sccn.ucsd.edu with a sample locs file.
-% The 'chanformat' structure is also used (automatically) by the writelocs() 
-% and pop_readlocs() functions. You do not need to edit these functions.
+% The 'chanformat' structure is also used (automatically) by the WRITELOCS 
+% and POP_READLOCS functions. You do not need to edit these functions.
 
 chanformat(1).type         = 'polhemus';
 chanformat(1).typestring   = 'Polhemus native .elp file';
@@ -278,7 +287,7 @@ chanformat(8).type         = 'dat';
 chanformat(8).typestring   = 'Neuroscan 3-D .dat file';
 chanformat(8).description  = [ 'Neuroscan 3-D cartesian .dat file. Coordinates are re-oriented to fit ' ...
                                'the EEGLAB standard of having the nose along the +X axis.' ];
-chanformat(8).importformat = 'readneurolocs';
+chanformat(8).importformat = 'readneurodat';
 % ---------------------------------------------------------------------------------------------------
 chanformat(9).type         = 'elc';
 chanformat(9).typestring   = 'ASA .elc 3-D file';
@@ -307,10 +316,20 @@ chanformat(12).typestring   = 'Brainstorm Matlab file format';
 chanformat(12).description  = 'Custom Matlab file.';
 chanformat(12).importformat = '';
 % ---------------------------------------------------------------------------------------------------
-chanformat(13).type         = 'custom';
-chanformat(13).typestring   = 'Custom file format';
-chanformat(13).description  = 'Custom ASCII file format where user can define content for each file columns.';
+chanformat(13).type         = 'lay';
+chanformat(13).typestring   = 'Fieldtrip layout file';
+chanformat(13).description  = 'Fieldtrip layout file';
 chanformat(13).importformat = '';
+% ---------------------------------------------------------------------------------------------------
+chanformat(14).type         = 'txt';
+chanformat(14).typestring   = 'Fieldtrip .txt spherical file';
+chanformat(14).description  = [ 'Standard 3-D spherical coordinate files in text format' ];
+chanformat(14).importformat = { 'labels' 'sph_theta_besa' 'sph_phi_besa' };
+% ---------------------------------------------------------------------------------------------------
+chanformat(15).type         = 'custom';
+chanformat(15).typestring   = 'Custom file format';
+chanformat(15).description  = 'Custom ASCII file format where user can define content for each file columns.';
+chanformat(15).importformat = '';
 % ---------------------------------------------------------------------------------------------------
 % ----- ADD MORE FORMATS HERE -----------------------------------------------------------------------
 % ---------------------------------------------------------------------------------------------------
@@ -360,9 +379,11 @@ if ischar(filename)
         case 'dat', g.filetype = 'dat';
         case 'elc', g.filetype = 'elc';
         case 'eps', g.filetype = 'besa';
+        case 'txt', g.filetype = 'txt';
         case 'sfp', g.filetype = 'sfp';
         case 'tsv', g.filetype = 'tsv';
         case 'mat', g.filetype = 'mat';
+        case 'lay', g.filetype = 'lay';
         otherwise, g.filetype =  ''; 
        end
        fprintf('readlocs(): ''%s'' format assumed from file extension\n', g.filetype); 
@@ -389,46 +410,90 @@ if ischar(filename)
    % import file
    % -----------
    if strcmp(g.filetype, 'mat')
-       elocBrainstrom = load('-mat', filename );
-       for iChan = 1:length(elocBrainstrom.Channel)
-           eloc(iChan).labels = elocBrainstrom.Channel(iChan).Name;
-           eloc(iChan).X      = elocBrainstrom.Channel(iChan).Loc(1);
-           eloc(iChan).Y      = elocBrainstrom.Channel(iChan).Loc(2);
-           eloc(iChan).Z      = elocBrainstrom.Channel(iChan).Loc(3);
-           eloc(iChan).type   = elocBrainstrom.Channel(iChan).Type;
-       end
-       if isfield(elocBrainstrom, 'SCS')
-           chans = { 'NAS' 'LPA' 'RPA' };
-           for iChan = 1:length(chans)
-               if isfield(elocBrainstrom.SCS, chans{iChan})
-                    eloc(end+1).labels = chans{iChan};
-                   eloc(end).X      = elocBrainstrom.SCS.(chans{iChan})(1);
-                   eloc(end).Y      = elocBrainstrom.SCS.(chans{iChan})(2);
-                   eloc(end).Z      = elocBrainstrom.SCS.(chans{iChan})(3);
-                   eloc(end).type   = elocBrainstrom.Channel(iChan).Type;
+       elocIn = load('-mat', filename );
+       if isfield(elocIn, 'Channel')
+           % brainstorm file
+           for iChan = 1:length(elocIn.Channel)
+               eloc(iChan).labels = elocIn.Channel(iChan).Name;
+               eloc(iChan).X      = elocIn.Channel(iChan).Loc(1);
+               eloc(iChan).Y      = elocIn.Channel(iChan).Loc(2);
+               eloc(iChan).Z      = elocIn.Channel(iChan).Loc(3);
+               eloc(iChan).type   = elocIn.Channel(iChan).Type;
+           end
+           if isfield(elocBrainstrom, 'SCS')
+               chans = { 'NAS' 'LPA' 'RPA' };
+               for iChan = 1:length(chans)
+                   if isfield(elocIn.SCS, chans{iChan})
+                       eloc(end+1).labels = chans{iChan};
+                       eloc(end).X      = elocIn.SCS.(chans{iChan})(1);
+                       eloc(end).Y      = elocIn.SCS.(chans{iChan})(2);
+                       eloc(end).Z      = elocIn.SCS.(chans{iChan})(3);
+                       eloc(end).type   = elocIn.Channel(iChan).Type;
+                   end
                end
            end
+       else
+           % fieldtrip layout file
+           fprintf(2, 'Warning: You are a 2-D Layout file, do not use channel coordinates for source localization\n');
+           if isfield(elocIn, 'layout') && ~isfield(elocIn, 'lay')
+               elocIn.lay = elocIn.layout;
+           end
+           if any(elocIn.lay.pos(:,1) > 700) 
+               elocIn.lay.pos = (elocIn.lay.pos - 400)/800;
+           elseif any(elocIn.lay.pos(:,1) > 400) 
+               elocIn.lay.pos = (elocIn.lay.pos - 250)/500;
+           end
+           radius = sqrt(elocIn.lay.pos(:,1).^2 + elocIn.lay.pos(:,2).^2);
+           theta  = atan2d(elocIn.lay.pos(:,1), elocIn.lay.pos(:,2));
+           for iChan = 1:length(elocIn.lay.label)
+               eloc(iChan).labels = elocIn.lay.label{iChan};
+               eloc(iChan).theta  = theta(iChan);
+               eloc(iChan).radius = radius(iChan);
+           end
+       end
+   elseif strcmp(g.filetype, 'lay')
+       layout = readtable(filename, 'filetype', 'text');
+       fprintf(2, 'Warning: You are a 2-D Layout file, do not use channel coordinates for source localization\n');
+       radius = sqrt([layout{:,2}].^2 + [layout{:,3}].^2);
+       theta  = atan2d([layout{:,2}], [layout{:,3}]);
+       for iChan = 1:length(radius)
+           eloc(iChan).labels = layout{iChan,1};
+           if isnumeric(eloc(iChan).labels) eloc(iChan).labels = num2str(eloc(iChan).labels); end
+           eloc(iChan).theta  = theta(iChan);
+           eloc(iChan).radius = radius(iChan);
        end
    elseif strcmp(g.filetype, 'asc') || strcmp(g.filetype, 'dat')
        eloc = readneurolocs( filename );
-       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
-       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
        if isfield(eloc, 'type')
            for index = 1:length(eloc)
                eloc(index).labels = strtrim(eloc(index).labels);
                type = eloc(index).type;
-               if type == 69,     eloc(index).type = 'EEG';
-               elseif type == 88, eloc(index).type = 'REF';
-               elseif type >= 76 && type <= 82, eloc(index).type = 'FID';
-               else eloc(index).type = num2str(eloc(index).type);
+               if ~ischar(type) && ~isempty(type)
+                   if type == 69,     eloc(index).type = 'EEG';
+                   elseif type == 88, eloc(index).type = 'REF';
+                   elseif type >= 76 && type <= 82, eloc(index).type = 'FID';
+                   else eloc(index).type = num2str(eloc(index).type);
+                   end
                end
            end
        end
+   elseif strcmp(g.filetype, 'txt')
+       elocTmp = readtable(filename, 'filetype', 'text');
+       for iChan = 1:size(elocTmp,1)
+           eloc(iChan).labels = elocTmp{iChan,1};
+           if isnumeric(eloc(iChan).labels) eloc(iChan).labels = num2str(eloc(iChan).labels); end
+           if iscell(   eloc(iChan).labels) eloc(iChan).labels = eloc(iChan).labels{1}; end
+           eloc(iChan).sph_theta_besa = elocTmp{iChan,2};
+           eloc(iChan).sph_phi_besa  = elocTmp{iChan,3};
+       end
+       eloc = convertlocs(eloc, 'sphbesa2all');
+       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
+       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
    elseif strcmp(g.filetype, 'elc')
        eloc = readeetraklocs( filename );
-       %eloc = read_asa_elc( filename ); % from fieldtrip
-       %eloc = struct('labels', eloc.label, 'X', mattocell(eloc.pnt(:,1)'), 'Y', ...
-       %                        mattocell(eloc.pnt(:,2)'), 'Z', mattocell(eloc.pnt(:,3)'));
+       eloc = convertlocs(eloc, 'cart2all');
+       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
+       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
        eloc = convertlocs(eloc, 'cart2all');
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
@@ -453,7 +518,7 @@ if ischar(filename)
        % --------------
        if isempty(g.skiplines), g.skiplines = 0; end
        if strcmpi(g.filetype, 'chanedit')
-           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines);
+           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines, 'blankcell', 'off');
        else
            array = load_file_or_array( filename, g.skiplines);
        end
@@ -530,7 +595,7 @@ if ischar(filename)
                    eloc(index).labels         = eloc(index).type;
                    eloc(index).type           = '';
                    eloc(index).radius         = 1;
-               end;           
+               end  
            end
        end
        
@@ -658,7 +723,7 @@ end
 fidnames = { 'nz' 'lpa' 'rpa' 'nasion' 'left' 'right' 'nazion' 'fidnz' 'fidt9' 'fidt10' 'cms' 'drl' 'nas' 'lht' 'rht' 'lhj' 'rhj' };
 for index = 1:length(fidnames)
     ind = strmatch(fidnames{index}, lower(labels), 'exact');
-    if ~isempty(ind), eloc(ind).type = 'FID'; end
+    if ~isempty(ind), for iInd = 1:length(ind) eloc(ind(iInd)).type = 'FID'; end; end
 end
 
 return;

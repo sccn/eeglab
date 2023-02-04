@@ -1,6 +1,6 @@
-% eeg_interp() - interpolate data channels
+% EEG_INTERP - interpolate data channels
 %
-% Usage: EEGOUT = eeg_interp(EEG, badchans, method);
+% Usage: EEGOUT = eeg_interp(EEG, badchans, method, t_range);
 %
 % Inputs: 
 %     EEG      - EEGLAB dataset
@@ -15,6 +15,9 @@
 %                'spherical' uses superfast spherical interpolation. 
 %                'spacetime' uses griddata3 to interpolate both in space 
 %                and time (very slow and cannot be interrupted).
+%     t_range  - [integer array with just two elements] time interval of the
+%                badchans which should be interpolated. First element is
+%                the start time and the second element is the end time.
 % Output: 
 %     EEGOUT   - data set with bad electrode data replaced by
 %                interpolated data
@@ -48,7 +51,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = eeg_interp(ORIEEG, bad_elec, method)
+function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
 
     if nargin < 2
         help eeg_interp;
@@ -60,6 +63,10 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         disp('Using spherical interpolation');
         method = 'spherical';
     end
+    
+    if nargin < 4
+        t_range = [ORIEEG.xmin ORIEEG.xmax];
+    end
 
     % check channel structure
     tmplocs = ORIEEG.chanlocs;
@@ -69,17 +76,25 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     
     if isstruct(bad_elec)
        
+        % remove duplicate channel labels
+        % -------------------------------
+        allLabels = { bad_elec.labels };
+        if length(unique(allLabels)) ~= length(allLabels)
+            [~,uniqueInd] = unique(allLabels);
+            bad_elec = bad_elec(uniqueInd);
+        end
+
         % add missing channels in interpolation structure
         % -----------------------------------------------
         lab1 = { bad_elec.labels };
         tmpchanlocs = EEG.chanlocs;
         lab2 = { tmpchanlocs.labels };
-        [tmp tmpchan] = setdiff_bc( lab2, lab1);
+        [~, tmpchan] = setdiff_bc( lab2, lab1);
         tmpchan = sort(tmpchan);
         
         % From 'bad_elec' using only fields present on EEG.chanlocs
         fields = fieldnames(bad_elec);
-        [tmp, indx1] = setxor(fields,fieldnames(EEG.chanlocs)); clear tmp;
+        [~, indx1] = setxor(fields,fieldnames(EEG.chanlocs)); clear tmp;
         if ~isempty(indx1)
             bad_elec = rmfield(bad_elec,fields(indx1));
             fields = fieldnames(bad_elec);
@@ -103,15 +118,15 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab1 = { bad_elec.labels };
         tmpchanlocs = EEG.chanlocs;
         lab2 = { tmpchanlocs.labels };
-        [tmp badchans] = setdiff_bc( lab1, lab2);
+        [~, badchans] = setdiff_bc( lab1, lab2);
         fprintf('Interpolating %d channels...\n', length(badchans));
-        if length(badchans) == 0, return; end
+        if isempty(badchans), return; end
         goodchans      = sort(setdiff(1:length(bad_elec), badchans));
        
         % re-order good channels
         % ----------------------
-        [tmp1 tmp2 neworder] = intersect_bc( lab1, lab2 );
-        [tmp1 ordertmp2] = sort(tmp2);
+        [~, tmp2, neworder] = intersect_bc( lab1, lab2 );
+        [~, ordertmp2] = sort(tmp2);
         neworder = neworder(ordertmp2);
         EEG.data = EEG.data(neworder, :, :);
 
@@ -124,7 +139,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         % ---------------------------------------
         if ~isempty(EEG.icasphere)
             
-            [tmp sorti] = sort(neworder);
+            [~, sorti] = sort(neworder);
             EEG.icachansind = sorti(EEG.icachansind);
             EEG.icachansind = goodchans(EEG.icachansind);
             EEG.chaninfo.icachansind = EEG.icachansind;
@@ -154,10 +169,15 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     else
         badchans  = bad_elec;
         goodchans = setdiff_bc(1:EEG.nbchan, badchans);
-        oldelocs  = EEG.chanlocs;
-        EEG       = pop_select(EEG, 'nochannel', badchans);
-        EEG.chanlocs = oldelocs;
-        disp('Interpolating missing channels...');
+        if strcmpi(method, 'sphericalfast')
+            EEG.data(badchans,:) = [];
+            EEG.nbchan = length(goodchans);
+        else
+            oldelocs  = EEG.chanlocs;
+            EEG       = pop_select(EEG, 'nochannel', badchans);
+            EEG.chanlocs = oldelocs;
+            disp('Interpolating missing channels...');
+        end
     end
 
     % find non-empty good channels
@@ -173,7 +193,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     
     % scan data points
     % ----------------
-    if strcmpi(method, 'spherical')
+    if strcmpi(method, 'spherical') || strcmpi(method, 'sphericalfast')
         % get theta, rad of electrodes
         % ----------------------------
         tmpgoodlocs = EEG.chanlocs(goodchans);
@@ -254,11 +274,25 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     if length(size(tmpdata))==3
         badchansdata = reshape(badchansdata,length(badchans),size(tmpdata,2),size(tmpdata,3));
     end
+
+    if ~isempty(t_range)
+        t_start = t_range(1);
+        t_end   = t_range(2);
+        if t_start~=ORIEEG.xmin || t_end~=ORIEEG.xmax
+            if length(size(tmpdata))==2
+                times_2b_ignored = [1:floor(t_start*ORIEEG.srate), floor(t_end*ORIEEG.srate):floor(ORIEEG.xmax*ORIEEG.srate)];
+                badchansdata(:, times_2b_ignored) = ORIEEG.data(badchans, times_2b_ignored);
+            end
+        end
+    end
+
     tmpdata(badchans,:,:) = badchansdata;
     EEG.data = tmpdata;
     EEG.nbchan = size(EEG.data,1);
-    EEG = eeg_checkset(EEG);
-
+    if ~strcmpi(method, 'sphericalfast')
+        EEG = eeg_checkset(EEG);
+    end
+    
 % get data channels
 % -----------------
 function datachans = getdatachans(goodchans, badchans);
@@ -283,7 +317,7 @@ Gelec = computeg(xelec,yelec,zelec,xelec,yelec,zelec);
 Gsph  = computeg(x,y,z,xelec,yelec,zelec);
 
 % equations are 
-% Gelec*C + C0  = Potential (C unknow)
+% Gelec*C + C0  = Potential (C unknown)
 % Sum(c_i) = 0
 % so 
 %             [c_1]

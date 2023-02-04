@@ -1,4 +1,4 @@
-% pop_rejspec() - rejection of artifact in a dataset using 
+% POP_REJSPEC - rejection of artifact in a dataset using 
 %                 thresholding of frequencies in the data.
 % Usage:
 %   >>  pop_rejspec(INEEG, typerej); % pop-up interactive window mode
@@ -16,7 +16,7 @@
 %                 component individually. If fewer than number of 
 %                 electrodes|components, apply the last value to all remaining
 %                 electrodes|components.
-% "Maximun power  rejection threshold(s) (dB)" - Maximum rejection threshold(s) 
+% "Maximum power  rejection threshold(s) (dB)" - Maximum rejection threshold(s) 
 %                 Sets the command  line parameter 'threshold'.
 % "Low frequency  limit(s)" - [edit box] Low-frequency limit(s) in Hz of 
 %                 range to perform  rejection. Sets the command line parameter
@@ -52,13 +52,13 @@
 % Outputs:
 %   OUTEEG     - output dataset with updated spectrograms
 %   Indices    - index of rejected trials
-%   Note: When eegplot() is called, modifications are applied to the current 
-%   dataset at the end of the call to eegplot() (e.g., when the user presses 
+%   Note: When EEGPLOT is called, modifications are applied to the current 
+%   dataset at the end of the call to EEGPLOT (e.g., when the user presses 
 %   the 'Reject' button).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001-
 %
-% See also: eegthresh(), eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGTHRESH, EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -100,21 +100,21 @@ com  = '';
 if nargin < 1
    help pop_rejspec;
    return;
-end;  
+end
 if nargin < 2
    icacomp = 1;
-end;  
+end  
 
 if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
-    	switch ButtonName,
+    	switch ButtonName
         	case 'NO', disp('Operation cancelled'); return;   
-        	case 'YES', [ EEG com ] = pop_runica(EEG);
+        	case 'YES', [ EEG, com ] = pop_runica(EEG);
     	end % switch
 	end
-end;	
+end	
 
 if nargin < 3
     
@@ -175,7 +175,7 @@ if nargin < 3
     options = { options{:} 'eegplotplotallrej' superpose };
     options = { options{:} 'eegplotreject'     reject };
 else
-    if isnumeric(varargin{3}) || ~isempty(str2num(varargin{3}))
+    if isnumeric(varargin{3}) || (ischar(varargin{3}) && ~strcmpi(varargin{3}, 'threshold') && ~isempty(str2num(varargin{3})))
         options = {};
         if ischar(varargin{1}), varargin{1} = str2num(varargin{1}); end
         if ischar(varargin{2}), varargin{2} = str2num(varargin{2}); end
@@ -293,7 +293,7 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
             if ~exist('pmtm')
                 error('The signal processing toolbox needs to be installed');
             end
-            [tmp, freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
+            [~, freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
 
             fprintf('Computing spectrum (using slepian tapers; done only once):\n');
 
@@ -312,13 +312,13 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
             sizewin = size(data,2);
             freqs = srate*[1, sizewin]/sizewin/2;
         else
-            [tmp, freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
+            [~, freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
         end
     end
     
 	% perform the rejection
 	% ---------------------	
-	[I1, Irej, NS, Erej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
+	[~, Irej, ~, Erej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
 										 [freqs(1) freqs(end)], startfreq, min(freqs(end), endfreq));
 	fprintf('\n');    
 	

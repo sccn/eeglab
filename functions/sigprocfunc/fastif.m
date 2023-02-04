@@ -1,4 +1,4 @@
-% fastif() - fast if function.
+% FASTIF - fast if function.
 %
 % Usage:
 %  >> res = fastif(test, s1, s2);

@@ -1,4 +1,4 @@
-% eeglab_update() - assess if EEGLAB new updating and ask user to install
+% EEGLAB_UPDATE - assess if EEGLAB new updating and ask user to install
 %                   new version
 %
 % Usage:
@@ -57,6 +57,9 @@ if isempty(eeglabVersionUpdate)
     warning(stateWarning.state, 'backtrace');
     return
 end
+if length(eeglabVersionUpdate) > 1
+    eeglabVersionUpdate = eeglabVersionUpdate(1);
+end
 
 %% automatic update
 eeglabVersionNumber = eeg_getversion;
@@ -68,7 +71,7 @@ if ~isequal(eeglabVersionUpdate.version, eeglabVersionNumber)
     stateWarning = warning('query', 'backtrace');
     warning('off', 'backtrace');
     msg = sprintf(['\nA %s revision of EEGLAB (v%s) is available <a href="matlab:eeglab_update;">HERE</a>.\n%s\n' ...
-        'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
+        'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more information\n' ...
         'You may disable this message in the File > Preferences menu.\n' ], ...
         fastif(eeglabVersionUpdate.critical, 'CRITICAL', 'newer'), eeglabVersionUpdate.version, ...
         eeglabVersionUpdate.releasenotes, eeglabVersionUpdate.webdoc);
@@ -136,7 +139,7 @@ if res
     questdlg2( [ 'EEGLAB cannot modify and save the Matlab path file.' 10 ...
         'Although EEGLAB could still be updated, EEGLAB will not' 10 ...
         'be able to set paths in a way that is persistent after' 10 ...
-        'you close Matlab. We therefore recommend that you abord and' 10 ...
+        'you close Matlab. We therefore recommend that you abort and' 10 ...
         'update EEGLAB manually by downloading the EEGLAB zip file' 10 ...
         'online, uncompress it on your computer and modify and save' 10 ...
         'the Matlab paths manually.' ], 'Install warning message', 'Continue', 'Abord', 'Abord');
@@ -167,7 +170,7 @@ if nargin < 1
             sprintf('One is at %s', eeglabpath) 10 ...
             sprintf('The other one is at %s', eeglabpath2) 10 ...
             'You must at least remove one version from the Matlab path' 10 ...
-            'before you can install a new version of EEGLAB. Abording instalation.' ] );
+            'before you can install a new version of EEGLAB. Abording installation.' ] );
         return
     end
 end
@@ -223,7 +226,7 @@ end
 [parentPath,eeglabFolder,ext] = fileparts(res.folder);
 eeglabFolder = [ eeglabFolder ext ];
 
-% check if target folder can be writen into
+% check if target folder can be written into
 % -----------------------------------------
 if ~exist(res.folder)
     try
@@ -320,7 +323,7 @@ end
 % copying plugins
 % ---------------
 disp('EEGLAB require some plugins to function properly.');
-disp('Updated vesions of plugins Dipfit, Firfilt, ICLabel, and clean_rawdata are automatically included');
+disp('Updated versions of plugins Dipfit, Firfilt, ICLabel, and clean_rawdata are automatically included');
 if res.copyplugins
     pluginOri  = fullfile(eeglabpath, 'plugins');
     pluginDest = fullfile(parentPath, eeglabFolder, 'plugins');
@@ -380,5 +383,5 @@ function res = mywhich(varargin);
 try
     res = which(varargin{:});
 catch
-    fprintf('Warning: permission error accesssing %s\n', varargin{1});
+    fprintf('Warning: permission error accessing %s\n', varargin{1});
 end

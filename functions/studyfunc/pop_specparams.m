@@ -1,4 +1,4 @@
-% pop_specparams() - Set plotting and statistics parameters for computing
+% POP_SPECPARAMS - Set plotting and statistics parameters for computing
 %                    STUDY component spectra.
 % Usage:    
 %       >> STUDY = pop_specparams(STUDY, 'key', 'val');   
@@ -28,7 +28,7 @@
 %   'averagechan' - ['rms'|'on'|'off'] average data channels when several are
 %                  selected ('on') or compute root mean square ('rms').
 %
-% See also: std_specplot()
+% See also: STD_SPECPLOT
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 
@@ -156,7 +156,7 @@ if isempty(varargin)
     if ~isequal(res.ylim, STUDY.etc.specparams.ylim),               options = { options{:} 'ylim' res.ylim      }; end
     if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange) && res.multiplechan ~= 2,     options = { options{:} 'freqrange' res.freqrange }; end
     
-    % mutliple channel option
+    % multiple channel option
     % -----------------------
     if res.multiplechan == 1
         if ~isequal('off', STUDY.etc.specparams.averagechan), options = { options{:} 'averagechan' 'off' }; end

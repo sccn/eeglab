@@ -43,10 +43,10 @@ if datenum(dateTmp) < 736583
               'Download plugins from the internet and unzip them in the plugin folder instead.' ] );
 end
 
-% retreiving statistics
+% retrieving statistics
 eeglab_options;
 try
-    disp( [ 'Retreiving download statistics...' ] );
+    disp( [ 'Retrieving download statistics...' ] );
     if exist('OCTAVE_VERSION', 'builtin') == 0
         [plugin, status] = plugin_urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type '&upload=' num2str(option_showpendingplugins)]);
     else

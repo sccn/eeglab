@@ -1,4 +1,4 @@
-% pop_chancoresp() - define correspondances between two channel locations structures
+% POP_CHANCORESP - define correspondences between two channel locations structures
 %                    (EEG.chanlocs) automatically (by matching channel labels) 
 %                    else using a user input gui.
 % Usage:

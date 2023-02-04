@@ -1,4 +1,4 @@
-% eeg_pvaf() - Compute EEG.data 'percent variance accounted for' (pvaf) by specified components. 
+% EEG_PVAF - Compute EEG.data 'percent variance accounted for' (pvaf) by specified components. 
 %              Can omit specified components and channels from the computation. Can draw a plot 
 %              of the scalp distribution of pvaf, or progressively compute the pvaf for comps
 %              1:k, where k = 1 -> the total number of components.  Note: pvaf's of spatially
@@ -33,7 +33,7 @@
 %    vars      - variances of the requested channels
 %
 % Fields:  
-%    Assumes existence of the following EEG fiels: EEG.data, EEG.pnts, EEG.nbchan, EEG.trials,
+%    Assumes existence of the following EEG fields: EEG.data, EEG.pnts, EEG.nbchan, EEG.trials,
 %          EEG.icaact, EEG.icaweights, EEG.icasphere, EEG.icawinv, and for plot, EEG.chanlocs
 %
 % Author: Scott Makeig & Arnaud Delorme, SCCN, INC, UCSD, Fri Feb 13, 2004
@@ -224,7 +224,7 @@ if progressive % output accumulated results
   end
 elseif strcmpi(g.plot, 'on')
 %
-%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribtion of pvaf %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribution of pvaf %%%%%%%%%%%%%
 %
  if isfield(EEG,'chanlocs')
    chanlocs = EEG.chanlocs;

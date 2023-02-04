@@ -1,4 +1,4 @@
-% std_plodtmat() - plot design matrix and info associated with the study for
+% STD_PLODTMAT - plot design matrix and info associated with the study for
 %                  each subject. Designed to be used directly (as a callback 
 %                  function of button plot) from pop_studydesign
 % Usage:
@@ -6,7 +6,7 @@
 %
 % Inputs:
 %      datasetinfo - datasetinfo
-%      design      - Structure withe the fields {name,filepath,variable,
+%      design      - Structure with the fields {name,filepath,variable,
 %                   cases, include, deletepreviousfiles} for each variable
 %                   in the design. i.e. STUDY.design(1)
 %    
@@ -47,7 +47,7 @@
 function std_plotmat(design,datasetinfo)
 
 % Set var stuff
-listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
+listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be always the subjects
 
 varindx = 1:length(design.variable);
 
@@ -209,7 +209,7 @@ datasetinfo = getappdata(handles.mainfig,'datasetinfo');
 set(handles.edit_dispclick, 'String', ' ', ...
                              'ForegroundColor'  , [1 1 1]);       
 
-listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
+listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be always the subjects
 if isfield(handles,'popup_subject')
     indtmp = get(handles.popup_subject, 'Value');
 else
@@ -224,7 +224,7 @@ if flag.subj ~= indtmp
 end
 subj = listsubj{indtmp};
 
-%  Retreiving all trials and values for this subject
+%  Retrieving all trials and values for this subject
 dsetinfo_subjindx = sort(find(strcmp({datasetinfo.subject},subj)));  % in datasetinfo
 trialinfo  = std_combtrialinfo(datasetinfo, dsetinfo_subjindx);      % Combining trialinfo
 
@@ -243,7 +243,7 @@ set(handles.popup_sort,'String'   , [ ' ' allLabels ] );
 check = find(sum(isnan(tmpdmat),2));
 tmpdmat(check,:) = [];
 
-% Checking checbox to sort/unsort
+% Checking checkbox to sort/unsort
 dmatsortindex = 1:size(tmpdmat, 1);
 if get(handles.popup_sort, 'Value') ~= 1
     [tmp,dmatsortindex] = sortrows(tmpdmat,get(handles.popup_sort, 'Value')-1);
@@ -361,7 +361,7 @@ if  coordinates(1) <= size(tmpdmat,2)-1
             val = tmpdmatval;
         end
     else
-        % Note: When an old STUDY is used withouth modifying the variables,
+        % Note: When an old STUDY is used without modifying the variables,
         % the structure 'STUDY.design' does not have the field 'vartype'.
         val = tmpdmatval;
     end

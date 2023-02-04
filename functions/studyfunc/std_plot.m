@@ -1,5 +1,5 @@
-% std_plot() - This function is outdated. Use std_plottf() to plot time/
-%              frequency decompositions and function std_plotcurve() to
+% STD_PLOT - This function is outdated. Use STD_PLOTTF to plot time/
+%              frequency decompositions and function STD_PLOTCURVE to
 %              plot erp and spectrum.
 
 % Copyright (C) 2006 Arnaud Delorme

@@ -9,7 +9,7 @@
 %
 % Author: Arnaud Delorme, 2020
 %
-% See also: eeglab(), eegplot(), pop_rejepoch()
+% See also: EEGLAB, EEGPLOT, POP_REJEPOCH
 
 % Copyright (C) 2020 Arnaud Delorme
 %
@@ -46,7 +46,7 @@ for iField = 1:length(fields)
     if ~isfield(EEG2, fields{iField})
         fprintf('Field %s missing in second dataset\n', fields{iField});
     else
-        if ~isequal(EEG.(fields{iField}), EEG2.(fields{iField}))
+        if ~isequaln(EEG.(fields{iField}), EEG2.(fields{iField}))
             fprintf('Field %s differs\n', fields{iField});
         end
     end
@@ -56,7 +56,7 @@ if ~isequal(EEG.xmax, EEG2.xmax), fprintf('Difference between xmax is %1.6f sec\
 
 % check chanlocs
 [~,~,chanlocs1] = eeg_checkchanlocs( EEG.chanlocs, EEG.chaninfo);
-[~,~,chanlocs2] = eeg_checkchanlocs( EEG2.chanlocs, EEG.chaninfo);
+[~,~,chanlocs2] = eeg_checkchanlocs( EEG2.chanlocs, EEG2.chaninfo);
 if length(chanlocs1) == length(chanlocs2)
     differ = 0;
     differLabel = 0;
@@ -107,7 +107,7 @@ else
                 end
             else
                 for iEvent = 1:length(EEG.event)
-                    diffVal(iEvent) = ~isequal(EEG.event(iEvent).(fields1{iField}), EEG2.event(iEvent).(fields1{iField}));
+                    diffVal(iEvent) = ~isequaln(EEG.event(iEvent).(fields1{iField}), EEG2.event(iEvent).(fields1{iField}));
                 end
             end
             if any(diffVal ~= 0)
@@ -138,7 +138,7 @@ if length(EEG.epoch) == length(EEG2.epoch)
             diffVal = [];
             for iField = 1:length(fields1)
                 for iEpoch = 1:length(EEG.epoch)
-                    diffVal(iEpoch) = ~isequal(EEG.epoch(iEpoch).(fields1{iField}), EEG2.epoch(iEpoch).(fields1{iField}));
+                    diffVal(iEpoch) = ~isequaln(EEG.epoch(iEpoch).(fields1{iField}), EEG2.epoch(iEpoch).(fields1{iField}));
                 end
                 if any(diffVal ~= 0)
                     fprintf('Epoch fields "%s" are NOT OK (%2.1f %% of them)\n', fields1{iField}, length(find(diffVal))/length(diffVal)*100);

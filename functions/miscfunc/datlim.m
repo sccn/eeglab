@@ -1,4 +1,4 @@
-% datlim() - return min and max of a matrix
+% DATLIM - return min and max of a matrix
 %
 % Usage: 
 %          >> limits_vector = datlim(data);

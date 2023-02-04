@@ -1,7 +1,7 @@
-% std_readdata() - load measures for data channels or 
+% STD_READDATA - load measures for data channels or 
 %                  for all components of a specified cluster.
 %                  Called by plotting functions
-%                  std_envtopo(), std_erpplot(), std_erspplot(), ...
+%                  STD_ENVTOPO, STD_ERPPLOT, STD_ERSPPLOT, ...
 % Usage:
 %         >> [STUDY, datavals, times, setinds, cinds] = ...
 %                   std_readdata(STUDY, ALLEEG, varargin);
@@ -82,7 +82,7 @@ end
 STUDY = pop_erpparams(STUDY, 'default');
 STUDY = pop_specparams(STUDY, 'default');
 STUDY = pop_erspparams(STUDY, 'default');
-[opt moreopts] = finputcheck( varargin, { ...
+[opt, moreopts] = finputcheck( varargin, { ...
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
@@ -131,8 +131,8 @@ end
 % options
 % -------
 opts = {};
-if ~isempty(opt.timerange), opts = { 'timelimits', opt.timerange }; end
-if ~isempty(opt.freqrange), opts = { 'freqlimits', opt.freqrange }; end
+if ~isempty(opt.timerange), opts = { opts{:} 'timelimits', opt.timerange }; end
+if ~isempty(opt.freqrange), opts = { opts{:} 'freqlimits', opt.freqrange }; end
 opts = { opts{:} 'singletrials' opt.singletrials };
 fprintf('Reading subjects'' data or looking up measure values in EEGLAB cache\n');
 
@@ -179,7 +179,7 @@ for iSubj = 1:length(subjectList)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
         polList     = [];
-        if size(STUDY.cluster(opt.clusters).sets,2) ~= length(datasetInds)
+        if size(STUDY.cluster(opt.clusters).sets,1) ~= length(datasetInds)
             error('Cannot process components from different ICA decomposition of the same subjects'); % sometimes different sessions
         end            
         if isempty(opt.component)
@@ -239,7 +239,8 @@ for iSubj = 1:length(subjectList)
                 if all(isnan(eventsTmp{iSubj}{iCond})), eventsTmp{iSubj}{iCond} = []; end
                 [dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}] = processerpim(dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}, xvals, params);
             end
-            yvals = 1:size(dataTmp{iSubj}{1},1);
+            nonEmptyCell = find( cellfun(@isempty, dataTmp{iSubj}) == 0);
+            yvals = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
         elseif strcmpi(opt.datatype, 'custom')
             disp('Nothing to do for custom data');
         else
@@ -308,9 +309,9 @@ if ~isempty(opt.clusters)
                         dataTmp2{end+1} = cell(size(dataTmp{iDat1}));
                         % check dimensions of components
                         if ~isempty(dataTmp{iDat1}{iDat2})
-                            if strcmpi(opt.singletrials, 'on') && strcmpi(tmpDataType, 'timef'),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
-                            elseif strcmpi(opt.singletrials, 'on') || strcmpi(tmpDataType, 'timef') dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
-                            else                                                                    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
+                            if strcmpi(opt.singletrials, 'on') && (strcmpi(tmpDataType, 'timef') || strcmpi(tmpDataType, 'erpim')),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
+                            elseif strcmpi(opt.singletrials, 'on') || (strcmpi(tmpDataType, 'timef') || strcmpi(tmpDataType, 'erpim')) dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                            else                                                                                                       dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
                             end
                         end
                     end
@@ -367,7 +368,7 @@ function [dataTmp,eventTmp] = checkdataerpimage(dataTmp, eventTmp)
         allsizes = [ allsizes allsize2 ];
     end
     if length(unique(allsizes(:))) > 1
-        disp('********* Discrepency between the number of lines in ERP-image');
+        disp('********* Discrepancy between the number of lines in ERP-image');
     else
         return;
     end
@@ -381,14 +382,14 @@ function [dataTmp,eventTmp] = checkdataerpimage(dataTmp, eventTmp)
                 if size(dataTmp{iCase}{iItem},2)+1 == commonSize
                     dataTmp{iCase}{iItem}(:,end+1) = dataTmp{iCase}{iItem}(:,end); % duplicate last line
                     eventTmp{iCase}{iItem}(end+1) = eventTmp{iCase}{iItem}(end); % duplicate last line
-                    disp('******** ERPimage discrepency between the number of lines detected and corrected')
+                    disp('******** ERPimage discrepancy between the number of lines detected and corrected')
                 elseif size(dataTmp{iCase}{iItem},2)-1 == commonSize
                     dataTmp{iCase}{iItem}(:,end) = [];
                     eventTmp{iCase}{iItem}( end) = [];
-                    disp('******** ERPimage discrepency between the number of lines detected and corrected')
+                    disp('******** ERPimage discrepancy between the number of lines detected and corrected')
                 end
                 if size(dataTmp{iCase}{iItem},2) ~= commonSize
-                    error('ERPimage discrepency between the number of lines');
+                    error('ERPimage discrepancy between the number of lines');
                 end
             end
         end
@@ -439,7 +440,7 @@ function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
     
     % remove all fields and create new parameter list
     fieldList = { 'nlines' 'smoothing' 'sorttype' 'sortwin' 'sortfield' 'channels' ...
-                  'interp' 'trialinfo' 'concatenate' 'savetrials' 'recompute' 'fileout' 'events'};
+                  'interp' 'trialinfo' 'concatenate' 'savetrials' 'recompute' 'fileout' 'events' 'rmcomps'};
     params = {};
     fieldN = fieldnames(g);
     for iField = 1:length(fieldN)
@@ -485,20 +486,24 @@ function [dataout, eventout] = processerpim(dataSubject, events, xvals, g)
 function filebase = getfilename(filepath, subj, sess, fileSuffix, onlyOneSession)
 if onlyOneSession
     filebase = fullfile(filepath{1}, [ subj fileSuffix ] );
-else
-    if isempty(sess)
-        sess = { '1' };
+    if exist(filebase, 'file')
+        return;
     end
-    for iSess = 1:length(sess)
-        if isnumeric(sess{iSess})
-            sesStr   = [ '0' num2str(sess{iSess}) ];
-        else
-            sesStr   = [ '0' sess{iSess} ];
-        end
-        filebase{iSess} = fullfile(filepath{iSess}, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
+    clear filebase;
+end
+
+if isempty(sess)
+    sess = { '1' };
+end
+for iSess = 1:length(sess)
+    if isnumeric(sess{iSess})
+        sesStr   = [ '0' num2str(sess{iSess}) ];
+    else
+        sesStr   = [ '0' sess{iSess} ];
     end
-    if length(unique(filebase)) < length(filebase)
-        filebase = unique(filebase); % order is not important
-    end
-end    
+    filebase{iSess} = fullfile(filepath{iSess}, [ subj '_ses-' sesStr(end-1:end) fileSuffix ] );
+end
+if length(unique(filebase)) < length(filebase)
+    filebase = unique(filebase); % order is not important
+end
     

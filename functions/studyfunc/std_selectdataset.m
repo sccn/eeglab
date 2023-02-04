@@ -1,4 +1,4 @@
-% std_selectdataset() - select datasets and trials for a given independent
+% STD_SELECTDATASET - select datasets and trials for a given independent
 %                       variable with a given set of values.
 %
 % Usage:
@@ -11,7 +11,7 @@
 %   indvarvals  - [cell] cell array of string for selected values for the 
 %   verboseflag - ['verbose'|'silent'] print info flag
 %
-%                choosen independent variable
+%                chosen independent variable
 % Output:
 %   datind       - [integer array] indices of selected dataset
 %   dattrialsind - [cell] trial indices for each dataset (not only the

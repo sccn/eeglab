@@ -1,7 +1,8 @@
-% std_chaninds() - look up channel indices in a EEG structure
+% EEG_CHANINDS - look up channel indices in a EEG structure. Function is obsolete.
+%                Use EEG_DECODECHAN instead.
 %
 % Usage:
-%         >> inds = std_chaninds(EEG, channames);
+%         >> inds = eeg_chaninds(EEG, channames);
 % Inputs:
 %         EEG   - EEG structure containing a chanlocs substructure.
 %                 the chanlocs structure may also be used as input.
@@ -40,42 +41,9 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function finalinds = eeg_chaninds(EEG, channames, errorifnotfound);
-
-    if nargin < 2
-        help eeg_chaninds;
-        return;
+function finalinds = eeg_chaninds(EEG, channames, errorifnotfound)
+    if isfield(EEG, 'labels')
+        finalinds = eeg_decodechan(EEG, channames);
+    else
+        finalinds = eeg_decodechan(EEG.chanlocs, channames);
     end
-    if nargin < 3
-        errorifnotfound = 1;
-    end
-    
-    if isfield(EEG, 'chanlocs')
-         chanlocs = EEG.chanlocs;
-    else chanlocs = EEG;
-    end
-    
-    % decode string if necessary
-    % --------------------------
-    if ischar(channames)
-        channames = parsetxt( channames );
-    end
-
-    finalinds   = [];
-    if isempty(chanlocs)
-         tmpallchans = [];
-    else tmpallchans = lower({ chanlocs.labels });
-    end
-    if isempty(channames), finalinds = [1:length(chanlocs)]; return; end
-    for c = 1:length(channames)
-        chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
-        if isempty(chanind), 
-            chanind = str2double(channames{c});
-            if isnan(chanind), chanind = []; end
-            if errorifnotfound && isempty(chanind)
-                error(sprintf('Channel %s not found', channames{c})); 
-            end
-        end
-        finalinds   = [ finalinds chanind ];
-    end
-    finalinds = sort(finalinds);

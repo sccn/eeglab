@@ -1,4 +1,4 @@
-% std_chantopo() - plot ERP/spectral/ERSP topoplot at a specific
+% STD_CHANTOPO - plot ERP/spectral/ERSP topoplot at a specific
 %                  latency/frequency. 
 % Usage:
 %          >> std_chantopo( data, 'key', 'val', ...)
@@ -25,7 +25,7 @@
 %  'datatype'    - ['erp'|'spec'] data type {default: 'erp'}
 %  'titles'      - [cell array of string] titles for each of the subplots. 
 %                  { default: none}
-%  'subplotpos'  - [addr addc posr posc] perform ploting in existing figure.
+%  'subplotpos'  - [addr addc posr posc] perform plotting in existing figure.
 %                  Add "addr" rows, "addc" columns and plot the scalp
 %                  topographies starting at position (posr,posc).
 %
@@ -42,7 +42,7 @@
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
-% See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
+% See also: POP_ERSPPARAMS, POP_ERPPARAMS, POP_SPECPARAMS, STATCOND
 
 % Copyright (C) 2006 Arnaud Delorme
 %
@@ -110,7 +110,7 @@ if nc >= ng, opt.transpose = 'on';
 else         opt.transpose = 'off';
 end
 
-% plotting paramters
+% plotting parameters
 % ------------------
 if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end
 if nc > 1 && ~isempty(opt.condstats ), addr = 1; else addr = 0; end
@@ -139,13 +139,13 @@ if strcmpi(opt.effect, 'marginal') || ng == 1 || nc == 1
     end
 elseif strcmpi(opt.effect, 'main') && ~isempty(opt.interstats)
     if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
-        pcondplot  = { opt.interstats{1} };
-        pgroupplot = { opt.interstats{2} };
+        pcondplot  = { opt.interstats{2} };
+        pgroupplot = { opt.interstats{1} };
         pinterplot = opt.interstats{3};
         maxplot = 1;
     else
-        if ~isempty(opt.interstats{1}), pcondplot  = { -log10(opt.interstats{1}) }; end
-        if ~isempty(opt.interstats{2}), pgroupplot = { -log10(opt.interstats{2}) }; end
+        if ~isempty(opt.interstats{2}), pcondplot  = { -log10(opt.interstats{2}) }; end
+        if ~isempty(opt.interstats{1}), pgroupplot = { -log10(opt.interstats{1}) }; end
         if ~isempty(opt.interstats{3}), pinterplot = -log10(opt.interstats{3}); end
         maxplot = 3;
     end
@@ -188,7 +188,7 @@ for c = 1:nc
             axis off;
         end
 
-        % statistics accross groups
+        % statistics across groups
         % -------------------------
         if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && c == 1)
             if g == ng && ng > 1 && ~isempty(opt.groupstats)
@@ -196,7 +196,7 @@ for c = 1:nc
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, c+centerc, ng + 1, opt.transpose);
                 pgroupplot{c}(pgroupplot{c} <0) = 0;
                 topoplot( pgroupplot{c}, opt.chanlocs, opt.ptopoopt{:});
-                title(opt.titles{c,g+1});
+                title(opt.titles{c,g+1}, 'interpreter', 'none');
                 caxis([-maxplot maxplot]);
             end
         end
@@ -215,7 +215,7 @@ if isempty(opt.caxis)
 end
 
 for g = 1:ng
-    % statistics accross conditions
+    % statistics across conditions
     % -----------------------------
     if strcmpi(opt.effect, 'marginal') || (strcmpi(opt.effect, 'main') && g == 1)
         if ~isempty(opt.condstats) && nc > 1
@@ -223,19 +223,19 @@ for g = 1:ng
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, nc+addr, g+centerg, opt.transpose);
             pcondplot{g}(pcondplot{g} < 0) = 0;
             topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
-            title(opt.titles{nc+1,g});
+            title(opt.titles{nc+1,g}, 'interpreter', 'none');
             caxis([-maxplot maxplot]);
         end
     end
 end
 
-% statistics accross group and conditions
+% statistics across group and conditions
 % ---------------------------------------
 if ~isempty(opt.condstats) && ~isempty(opt.groupstats) && ng > 1 && nc > 1 && ~isempty(pinterplot)
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, nc+addr, ng+1, opt.transpose);
     pinterplot(pinterplot<0) = 0;
     topoplot( pinterplot, opt.chanlocs, opt.ptopoopt{:});
-    title(opt.titles{nc+1,ng+1}); 
+    title(opt.titles{nc+1,ng+1}, 'interpreter', 'none');  
     caxis([-maxplot maxplot]);
 end    
 

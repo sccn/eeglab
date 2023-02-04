@@ -1,4 +1,4 @@
-% eeg_epoch2continuous() - convert epoched dataset to continuous dataset
+% EEG_EPOCH2CONTINUOUS - convert epoched dataset to continuous dataset
 %                          with data epochs separated by boundary events.
 % Usage:
 %           >> EEGOUT = eeg_epoch2continuous(EEGIN);
@@ -47,8 +47,9 @@ end
 
 EEG.data = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3));
 
+eeglab_options;
 for index = 1:EEG.trials-1
-    EEG.event(end+1).type     = 'boundary';
+    EEG.event(end+1).type = eeg_boundarytype(EEG);
     EEG.event(end  ).latency  = index*EEG.pnts-0.5;
     EEG.event(end  ).duration = NaN;
 end

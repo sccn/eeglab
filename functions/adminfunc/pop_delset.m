@@ -1,4 +1,4 @@
-% pop_delset() - Delete a dataset from the variable containing
+% POP_DELSET - Delete a dataset from the variable containing
 %                all datasets.
 %
 % Usage: >> ALLEEG = pop_delset(ALLEEG, indices);
@@ -11,7 +11,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_copyset(), eeglab()
+% See also: POP_COPYSET, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -49,12 +49,11 @@ if nargin < 1
 	help pop_delset;
 	return;
 end
-if isempty( ALLSET )
-	error('Cannot delete dataset. Restart eeglab to clear all dataset information');
-    return;
-end;    
+if length( ALLSET ) < 2
+	error( [ 'Cannot delete dataset when there is only one of them. Restart EEGLAB' 10 'or use the menu item in the File menu to clear all datasets' ]);
+end
 
-if nargin < 2 || set_in < 0
+if nargin < 2 || (length(set_in)==1 && set_in < 0)
 	% which set to delete
 	% -----------------
 	promptstr    = { 'Dataset(s) to delete:' };
@@ -71,7 +70,7 @@ end
 
 if isempty(set_in)
 	return;
-end;	
+end
 
 A = fieldnames( ALLSET );
 A(:,2) = cell(size(A));

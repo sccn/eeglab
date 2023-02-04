@@ -1,14 +1,14 @@
-% std_spec() - Returns the data or ICA component spectra for a dataset. Updates the EEG structure 
+% STD_SPEC - Returns the data or ICA component spectra for a dataset. Updates the EEG structure 
 %              in the Matlab environment and in the .set file as well. Saves the spectra 
 %              in a file.
 % Usage:    
 %           >> [spec freqs] = std_spec(EEG, 'key', 'val', ...);
 %
-%              Computes the mean spectra of the data channels or activites of specified 
+%              Computes the mean spectra of the data channels or activities of specified 
 %              components of the supplied dataset. The spectra are saved in a Matlab file. 
 %              If such a file already exists, loads the spectral information from this file.  
 %              Options (below) specify which components to use, and the desired frequency 
-%              range. There is also an option to specify other spectopo() input variables 
+%              range. There is also an option to specify other SPECTOPO input variables 
 %              (see >> help spectopo for details).
 %
 %              Returns the removed mean spectra of the selected ICA components in the 
@@ -108,7 +108,7 @@
 % Files output or overwritten for data: 
 %               [dataset_filename].datspec, 
 % 
-% See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
+% See also  SPECTOPO, STD_ERP, STD_ERSP, STD_MAP, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -189,7 +189,7 @@ end
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if ischar(g), error(g); end
-if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end
+if isempty(g.trialindices), g.trialindices = cell(1, length(EEG)); end
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end
 if ~strcmpi(g.specmode, 'fft') && strcmpi(g.output, 'ftt'), error('FFT option only valid when computing FFT'); end
 if isfield(EEG,'icaweights')
@@ -272,7 +272,7 @@ if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
         TMP = eeg_checkset(TMP);
         if TMP.trials > 1
             % epoch data - need to re-extract data
-            TMP = pop_select(TMP, 'trials', [epochCount:(epochCount+EEG(iEEG).trials-1)]);
+            TMP = pop_select(TMP, 'trial', [epochCount:(epochCount+EEG(iEEG).trials-1)]);
             epochCount = epochCount+EEG(iEEG).trials;
             TMP = eeg_epoch2continuous(TMP);
         else
@@ -306,7 +306,7 @@ if strcmpi(g.specmode, 'psd')
                 fprintf('Spectopo(psd): randomly extracted epochs are only 1 seconds. PSD is better suited for longer epochs.\n');
             end
         end
-        fprintf('Computing spectopo (psd) accross trials: ');
+        fprintf('Computing spectopo (psd) across trials: ');
         for iTrial = 1:size(X,3)
             [tmp, f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, 'verbose', 'off', spec_opt{:});
             if iTrial == 1

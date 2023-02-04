@@ -1,4 +1,4 @@
-% eeg_uniformepochinfo() - make uniform event field information within 
+% EEG_UNIFORMEPOCHINFO - make uniform event field information within 
 %                          epochs by filling in empty field values with 
 %                          values of other events in the same epoch. This
 %                          is particularly useful when time-locking event

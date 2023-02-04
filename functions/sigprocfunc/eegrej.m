@@ -1,4 +1,4 @@
-% eegrej() - reject/excise arbitrary periods from continuous EEG data 
+% EEGREJ - reject/excise arbitrary periods from continuous EEG data 
 %            (e.g., EEG.data).
 %
 % Usage:
@@ -8,9 +8,9 @@
 % Inputs:
 %   indata     - input data (channels, frames). If indata is a string, 
 %                the function use the disk to perform the rejection
-%   regions    - array of regions to suppress. [beg end] x number of 
+%   regions    - array of regions to remove. [beg end] x number of 
 %                regions. 'beg' and 'end' are expressed in term of points
-%                in the input dataset. The size() of the array should be
+%                in the input dataset. The SIZE of the array should be
 %                (2, number of regions).
 %   timelength - length in time (s) of the input data. Only used to compute 
 %                new total data length after rejections (newt).
@@ -24,7 +24,7 @@
 %                region, NaN is returned.
 %   boundevents - boundary events latencies 
 %
-% Exemple: 
+% Example: 
 %   [outdat t] = eegrej( 'EEG.data', [1 100; 200 300]', [0 10]);
 %   this command pick up two regions in EEG.data (from point 1 to
 %   point 100, and point 200 to point 300) and put the result in 
@@ -99,7 +99,7 @@ end
 rmEvent = [];
 rejectedEvents = {};
 oriEvents = events;
-if ~isempty(events)
+if ~isempty(events) && isfield(events, 'latency')
     eventLatencies = [ events.latency ];
     oriEventLatencies = eventLatencies;
     for i=1:size(regions,1)
@@ -127,10 +127,13 @@ for iRegion1=1:size(regions,1)
     duration(iRegion1)    = regions(iRegion1,2)-regions(iRegion1,1)+1;
     
     % add nested boundary events
-    if ~isempty(events) && isfield(events, 'type') && ischar(events(1).type) && isfield(events, 'duration')
+    if ~isempty(events) && isfield(events, 'type') && isfield(events, 'duration')
         selectedEvent = oriEvents(rejectedEvents{iRegion1});
-        indBound      = strmatch('boundary', { selectedEvent.type });
+        indBound = eeg_findboundaries(selectedEvent);
         duration(iRegion1) = duration(iRegion1) + sum([selectedEvent(indBound).duration]);
+%         if iRegion1 == size(regions,1) && regions(iRegion1,1) >= size(indata,2)
+%             duration(iRegion1) = duration(iRegion1) 
+%         end
     end
     
 	for iRegion2=iRegion1+1:size(regions)
@@ -176,15 +179,17 @@ for iBound = length(boundevents):-1:2
         duration(iBound) = [];
     end
 end
-if ~isempty(boundevents) && boundevents(end) > size(indata,2)
+if ~isempty(boundevents) && boundevents(end) >= size(indata,2)+1
     boundevents(end) = [];
 end
 
 % insert boundary events
 % ----------------------
+boundType = eeg_boundarytype(events);
 for iRegion1=1:length(boundevents)
-    if boundevents(iRegion1) > 0 && boundevents(iRegion1) < size(indata,2)
-        events(end+1).type = 'boundary';
+    if boundevents(iRegion1) > 0 && boundevents(iRegion1) < size(indata,2)+1
+        eeglab_options;
+        events(end+1).type = boundType;
         events(end).latency  = boundevents(iRegion1);
         events(end).duration = duration(iRegion1);
     end
@@ -195,6 +200,22 @@ if ~isempty(events) && isfield(events, 'latency')
     alllatencies = [ events.latency ];
     [~, sortind] = sort(alllatencies);
     events = events(sortind);
+end
+
+% handle contiguous boundary events
+for iEvent = length(events):-1:2
+    if isequal(events(iEvent).type, boundType) && isequal(events(iEvent-1).type, boundType) && ...
+            isequal(events(iEvent-1).latency, events(iEvent).latency)
+        events(iEvent-1).duration = events(iEvent-1).duration + events(iEvent).duration;
+        events(iEvent) = [];
+    end
+end
+
+% remove out of bound events
+for iEvent = length(events):-1:2
+    if events(iEvent).latency > size(indata,2)+1
+        events(iEvent) = [];
+    end
 end
 
 return;

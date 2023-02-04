@@ -1,18 +1,18 @@
-% std_preclust() - select measures to be included in computation of a preclustering array.
-%                    This array is used by pop_clust() to find component clusters from a
+% STD_PRECLUST - select measures to be included in computation of a preclustering array.
+%                    This array is used by POP_CLUST to find component clusters from a
 %                    specified parent cluster.
 %                    Selected measures (dipole location, ERPs, spectra, scalp maps, ERSPs,
-%                    and/or ITCs) should already be precomputed using pop-precomp(). Each 
+%                    and/or ITCs) should already be precomputed using pop-PRECOMP. Each 
 %                    feature dimension is reduced by PCA decomposition. These PCA matrices 
 %                    (one per measure) are concatenated and used as input to the clustering
-%                    algorithm in pop_clust(). Follow with pop_clust(). 
+%                    algorithm in POP_CLUST. Follow with POP_CLUST. 
 %                    See Example below:
 %
 %  >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG); % prepare to cluster all comps 
 %                                                                % in all sets on all measures
 %
 %  >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG, clustind, preproc1, preproc2...);
-%                                                                % prepare to cluster specifed 
+%                                                                % prepare to cluster specified 
 %                                                                % cluster on specified measures
 % Required inputs:
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
@@ -31,11 +31,11 @@
 %                    'dipoles' = cluster on the component [X Y Z] dipole locations
 %                    'spec'    = cluster on the component log activity spectra (in dB)
 %                                  (with the baseline mean dB spectrum subtracted).
-%                    'scalp'   = cluster on component (topoplot()) scalp maps 
+%                    'scalp'   = cluster on component (TOPOPLOT) scalp maps 
 %                                  (or on their absolute values),
-%                    'scalpLaplac' = cluster on component (topoplot()) laplacian scalp maps
+%                    'scalpLaplac' = cluster on component (TOPOPLOT) laplacian scalp maps
 %                                  (or on their absolute values),
-%                    'scalpGrad' = cluster on the (topoplot()) scalp map gradients 
+%                    'scalpGrad' = cluster on the (TOPOPLOT) scalp map gradients 
 %                                  (or on their absolute values),
 %                    'ersp'    = cluster on components ERSP. (requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
@@ -44,7 +44,7 @@
 %                    'finaldim' = final number of dimensions. Enables second-level PCA. 
 %                                  By default this command is not used (see Example below).
 %
-%            * 'key'   optional keywords and [valuess] used to compute the above 'commands':
+%            * 'key'   optional keywords and [values] used to compute the above 'commands':
 %                    'npca'    =  [integer] number of principal components (PCA dimension) of 
 %                                   the selected measures to retain for clustering. {default: 5}
 %                    'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
@@ -55,7 +55,7 @@
 %                                   spectrum, 'ersp', and 'itc' measures.  
 %                    'timewindow' = [min max] time window (in sec) to include in 'erp',
 %                                   'ersp', and 'itc' measures.  
-%                    'abso'    =  [0|1] 1 = use absolute values of topoplot(), gradient, or 
+%                    'abso'    =  [0|1] 1 = use absolute values of TOPOPLOT, gradient, or 
 %                                   Laplacian maps {default: 1}
 %                    'erpfilter' = [double] Perform low pass filter on ERPs
 %                                  at the frequency provided. This is done ONLY for
@@ -63,7 +63,7 @@
 %                    'funarg'  =  [cell array] optional function arguments for mean spectrum 
 %                                   calculation (>> help spectopo) {default: none}
 % Outputs:
-%   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
+%   STUDY        - the input STUDY set with pre-clustering data added, for use by POP_CLUST 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
 %                  data as pointers to Matlab files that hold the pre-clustering component measures.
 %
@@ -81,7 +81,7 @@
 %                          
 %                   % This prepares, for initial clustering, all components in the STUDY datasets
 %                   % except components with dipole model residual variance (see function 
-%                   % std_editset() for how to select such components).
+%                   % STD_EDITSET for how to select such components).
 %                   % Clustering will be based on the components' mean spectra in the [3 25] Hz 
 %                   % frequency range, on the components' ERPs in the [350 500] ms time window, 
 %                   % on the (absolute-value) component scalp maps, on the equivalent dipole 
@@ -189,7 +189,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         % -------------
         strcom = varargin{index}{1};
         if any(strcom == 'X'), disp('character ''X'' found in command'); end
-        %defult values
+        %default values
         npca = NaN;
         norm = 1;
         weight = 1;
@@ -251,16 +251,16 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             
             % select ica component ERPs
             % -------------------------
-            case 'erp',
-                [STUDY data, datatime] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'datatype', 'erp', 'componentpol', 'off');
+            case 'erp'
+                [STUDY, data, datatime] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'datatype', 'erp', 'componentpol', 'off');
                 % Filtering data to be plotted
                 if ~isempty(erpfilter), data = {myfilt(data{:}, 1000/(datatime(2)-datatime(1)), 0, erpfilter)}; end;       
                 data = data{1}';
                 
             % select ica component spectrum
             % -----------------------------
-            case 'spec',
-                [STUDY data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'freqrange', freqrange, 'datatype', 'spec', 'componentpol', 'off');
+            case 'spec'
+                [STUDY, data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'freqrange', freqrange, 'datatype', 'spec', 'componentpol', 'off');
                 data = data{1}';
                 
             % select ica scalp maps
@@ -288,7 +288,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
                                     && any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
                                 % find the leftmost dipole
-                                [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
+                                [~, ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
                             elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:))
                                 ldip = 2; % the leftmost dipole is the only one that exists
                             end
@@ -317,7 +317,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
                                     && any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
                                 % find the leftmost dipole
-                                [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
+                                [~, ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2));
                             elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:))
                                 ldip = 2; % the leftmost dipole is the only one that exists
                             end
@@ -337,23 +337,23 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             % cluster on ica ersp / itc values
             % --------------------------------
             case  {'ersp', 'itc' }
-                [STUDY data] = std_readersp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'freqrange', freqrange, 'measure', strcom);
+                [STUDY, data] = std_readersp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'freqrange', freqrange, 'measure', strcom);
                 data = reshape(data{1}, [size(data{1},1)*size(data{1},2) size(data{1},3)])';
                 
         end
 
         % adjust number of PCA values
         % ---------------------------
-        if isnan(npca), npca = 5; end; % default number of components
+        if isnan(npca), npca = 5; end % default number of components
         if npca >= size(data,2)
             % no need to run PCA, just copy the data.
             % But still run it to "normalize" coordinates
             % --------------------------------------
             npca = size(data,2);
-        end;        
+        end
         if npca >= size(data,1) % cannot be more than the number of components
             npca = size(data,1);            
-        end;        
+        end
         if ~strcmp(strcom, 'dipoles')
             fprintf('PCA dimension reduction to %d for command ''%s'' (normalize:%s; weight:%d)\n', ...
                 npca, strcom, fastif(norm, 'on', 'off'), weight);
@@ -368,10 +368,10 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             case {'ersp','itc'}
                 dsflag = 1;
                 while dsflag
-                    try,
+                    try
                         clustdatatmp = runpca( double(data.'), npca, 1);
                         dsflag = 0;
-                    catch,
+                    catch
                         % downsample frequency by 2 and times by 2
                         % ----------------------------------------
                         data = data(:,1:2:end);
@@ -388,7 +388,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 end
                 clustdatatmp = clustdatatmp.';
             case 'dipoles'
-                % normalize each cordinate by the std dev of the radii
+                % normalize each coordinate by the std dev of the radii
                 normval = std(sqrt(data(:,1).^2 + data(:,2).^2 + data(:,3).^2));
                 clustdatatmp = data./normval;
                 norm = 0;
@@ -441,9 +441,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
 
 return
 
-% erspdownsample() - down samples component ERSP/ITC images if the
+% ERSPDOWNSAMPLE - down samples component ERSP/ITC images if the
 %        PCA operation in the clustering feature reduction step fails.
-%        This is a helper function called by eeg_preclust().
+%        This is a helper function called by EEG_PRECLUST.
 
 function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
     len = length(freqs)*length(times); %size of ERSP
@@ -459,8 +459,8 @@ function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
         end
     end
 
-% the function below checks the precense of the centroid field
-function cluster = checkcentroidfield(cluster, varargin);
+% the function below checks the presence of the centroid field
+function cluster = checkcentroidfield(cluster, varargin)
     for kk = 1:length(cluster)
         if ~isfield('centroid', cluster(kk)), cluster(kk).centroid = []; end
         for vi = 1:length(varargin)
@@ -472,7 +472,7 @@ function cluster = checkcentroidfield(cluster, varargin);
     
     % rapid filtering for ERP (from std_plotcurve)
 % -----------------------
-function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass);
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass)
 if ischar(highpass)
     highpass = str2num(highpass);
 end

@@ -1,9 +1,9 @@
-% pop_rejkurt() - rejection of artifact in a dataset using kurtosis 
+% POP_REJKURT - rejection of artifact in a dataset using kurtosis 
 %                 of activity (i.e. to detect peaky distribution of
 %                 activity).
 %
 % Usage:
-%   >> pop_rejkurt( INEEG, typerej) % pop-up interative window mode
+%   >> pop_rejkurt( INEEG, typerej) % pop-up interactive window mode
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
 %		= pop_rejkurt( INEEG, typerej, elec_comp, ...
 %                   locthresh, globthresh, superpose, reject, vistype);
@@ -41,8 +41,8 @@
 %   reject     - [0] do not reject labelled trials (but still  
 %              store the labels. [1] reject labelled trials. 
 %              Default is [1].
-%   vistype    - Visualization type. [0] calls rejstatepoch() and [1] calls
-%              eegplot() default is [0].When added to the command line
+%   vistype    - Visualization type. [0] calls REJSTATEPOCH and [1] calls
+%              EEGPLOT default is [0].When added to the command line
 %              call it will not display the plots if the option 'plotflag'
 %              is not set.
 %   topcommand - [] Deprecated argument , keep to ensure backward compatibility
@@ -60,7 +60,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: rejkurt(), rejstatepoch(), pop_rejepoch(), eegplot(), eeglab()  
+% See also: REJKURT, REJSTATEPOCH, POP_REJEPOCH, EEGPLOT, EEGLAB  
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

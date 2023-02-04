@@ -1,4 +1,4 @@
-% pac_cont() - compute phase-amplitude coupling (power of first input
+% PAC_CONT - compute phase-amplitude coupling (power of first input
 %         correlation with phase of second). There is no graphical output
 %         to this function.
 %
@@ -11,7 +11,7 @@
 %    y       = [float array] 1-D data vector of size (1xtimes)
 %    srate   = data sampling rate (Hz)
 %
-% Optional time information intputs:
+% Optional time information inputs:
 %   'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                 If cycles >0: *longest* window length to use. This
 %                 determines the lowest output frequency. Note that this

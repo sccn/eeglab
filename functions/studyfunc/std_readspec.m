@@ -1,7 +1,7 @@
-% std_readspec() - load spectrum measures for data channels or 
+% STD_READSPEC - load spectrum measures for data channels or 
 %                  for all components of a specified cluster.
 %                  Called by plotting functions
-%                  std_envtopo(), std_erpplot(), std_erspplot(), ...
+%                  STD_ENVTOPO, STD_ERPPLOT, STD_ERSPPLOT, ...
 % Usage:
 %         >> [STUDY, specdata, allfreqs, setinds, cinds] = ...
 %                   std_readspec(STUDY, ALLEEG, varargin);

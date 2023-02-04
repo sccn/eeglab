@@ -1,7 +1,7 @@
-% std_precomp() - Precompute measures (ERP, spectrum, ERSP, ITC) for channels or
+% STD_PRECOMP - Precompute measures (ERP, spectrum, ERSP, ITC) for channels or
 %                 components in a  study. If channels are interpolated before
 %                 computing the measures, the updated EEG datasets are also saved
-%                 to disk. Called by pop_precomp(). Follow with pop_plotstudy().
+%                 to disk. Called by POP_PRECOMP. Follow with POP_PLOTSTUDY.
 %                 See Example below.
 % Usage:
 % >> [STUDY ALLEEG customRes] = std_precomp(STUDY, ALLEEG, chanorcomp, 'key', 'val', ...);
@@ -65,7 +65,7 @@
 %
 % Outputs:
 %   STUDY        - the input STUDY set with pre-clustering data added,
-%                  for use by pop_clust()
+%                  for use by POP_CLUST
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified
 %                  by adding preprocessing data as pointers to Matlab files that
 %                  hold the pre-clustering component measures.
@@ -82,7 +82,7 @@
 %
 %           % This prepares, channels 'cz' and 'oz' in the STUDY datasets.
 %           % If a data channel is missing in one dataset, it will be
-%           % interpolated (see eeg_interp()). The ERP, spectrum, ERSP, and
+%           % interpolated (see EEG_INTERP). The ERP, spectrum, ERSP, and
 %           % ITC for each dataset is then computed.
 %
 % Example of custom call:
@@ -230,15 +230,24 @@ uniqueSessions = unique(allSessions);
 % handle parallelization
 % ----------------------
 eeglab_options;
+parstatus_changed = 0;
 if ~option_parallel
-    delete(gcp('nocreate'));
-    ps = parallel.Settings;
-    parstatus = ps.Pool.AutoCreate;
-    ps.Pool.AutoCreate = false;
+    if ~exist('gcp')
+        disp('Parallel toolbox not found - nothing to worry about (except slower computation in some cases)');
+    else
+        delete(gcp('nocreate'));
+        ps = parallel.Settings;
+        parstatus = ps.Pool.AutoCreate;
+        ps.Pool.AutoCreate = false;
+        parstatus_changed = 1;
+    end
 else
-    ps = parallel.Settings;
-    parstatus = ps.Pool.AutoCreate;
-    ps.Pool.AutoCreate = true;
+    if exist('gcp')
+        ps = parallel.Settings;
+        parstatus = ps.Pool.AutoCreate;
+        ps.Pool.AutoCreate = true;
+        parstatus_changed = 1;
+    end
 end    
 
 % compute custom measure
@@ -349,6 +358,7 @@ if strcmpi(g.spec, 'on')
         curstruct = rmfield(curstruct, 'specfreqs');
     end
 end
+
 % compute spectrum
 % ----------------
 if strcmpi(g.erpim, 'on')
@@ -372,7 +382,10 @@ if strcmpi(g.erpim, 'on')
     
     for iSubj = 1:length(uniqueSubjects)
         for iSess = 1:length(uniqueSessions)
-            inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
+            inds  = intersect(inds1, inds2);
+
             filepath = STUDY.datasetinfo(inds(1)).filepath;
             trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
             filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
@@ -425,7 +438,10 @@ if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
     
     for iSubj = 1:length(uniqueSubjects) % parfor inside function
         for iSess = 1:length(uniqueSessions)
-            inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds1 = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
+            inds2 = strmatch( uniqueSessions{iSess}, allSessions, 'exact');
+            inds  = intersect(inds1, inds2);
+
             filepath = STUDY.datasetinfo(inds(1)).filepath;
             trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
             filebase = getfilename(filepath, uniqueSubjects{iSubj}, uniqueSessions{iSess}, fileSuffix, length(uniqueSessions) == 1);
@@ -459,7 +475,9 @@ end
 
 % set back default parallelization
 % ----------------------
-ps.Pool.AutoCreate = parstatus;
+if parstatus_changed
+    ps.Pool.AutoCreate = parstatus;
+end
 
 % compute component scalp maps
 % ----------------------------

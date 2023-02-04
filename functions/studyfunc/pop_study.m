@@ -1,4 +1,4 @@
-% pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
+% POP_STUDY  - create a new STUDY set structure defining a group of related EEG datasets. 
 %                The STUDY set also contains information about each of the datasets: the 
 %                subject code, subject group, experimental condition, and session. This can 
 %                be provided interactively in a pop-up window or be automatically filled 
@@ -16,7 +16,7 @@
 %   ALLEEG               - vector of EEG dataset structures to be included in the STUDY. 
 %
 % Optional Inputs:
-%   All "'key', 'val'" inputs of std_editset() may be used.
+%   All "'key', 'val'" inputs of STD_EDITSET may be used.
 %
 % Outputs:
 %   STUDY                - new STUDY set comprising some or all of the datasets in 
@@ -29,6 +29,9 @@
 %  "STUDY set notes"     - [edit box] notes about the experiment, the datasets, the STUDY, 
 %                          or anything else to store with the rest of the STUDY information 
 %                          {default: ''}   
+%  "dataset filename/browse" - Load dataset from specified filename. It may be 
+%                          an EEGLAB dataset or any file supported by File-IO (if 
+%                          it is installed from the plugin manager).
 %  "subject"             - [edit box] subject code associated with the dataset. If no 
 %                          subject code is provided, each dataset will assumed to be from 
 %                          a different subject {default: 'S1', 'S2', ..., 'Sn'}
@@ -47,7 +50,7 @@
 %                          structure to disk. If no filename is provided, a window will 
 %                          pop up to ask for it. 
 %
-% See also: std_editset, pop_loadstudy(), pop_preclust(), pop_clust()
+% See also: std_editset, POP_LOADSTUDY, POP_PRECLUST, POP_CLUST
 %
 % Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN, INC, UCSD, July 22, 2005
 
@@ -209,7 +212,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     cb_del      = 'pop_study(''delclust'' , gcbf, ''showwarning'');';
     cb_dipole   = 'pop_study(''dipselect'', gcbf, ''showwarning'');';
 
-	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use exsiting STUDY set to import dataset information -- pop_study()''); ' ... 
+	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use existing STUDY set to import dataset information -- pop_study()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''usestudy_file''), ''string'', [filepath filename]);' ];
 	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
@@ -261,13 +264,6 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'pushbutton' 'string' 'CLear' 'tag' [ 'clear' int2str(index) ] 'userdata' index 'callback' delset} };
     end
     
-    if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
-        text1    = 'Dataset info (condition, group, ...) differs from study info. [set] = Overwrite dataset info for each dataset on disk.';
-        value_cb = 0;
-    else
-        text1    = 'Update dataset info - datasets stored on disk will be overwritten (unset = Keep study info separate).';
-        value_cb = 1;
-    end
     guispec = { guispec{:}, ...
                 {'style' 'text'       'string'  'Important note: Removed datasets will not be saved before being deleted from EEGLAB memory' }, ...
                 {}, ...
@@ -275,25 +271,17 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 {'style' 'text'       'string'  'Page 1' 'tag' 'page' 'horizontalalignment' 'center' }, ... 
                 {'style' 'pushbutton' 'string'  '>'      'Callback' nextpage 'userdata' 'addt'}, {}, ...
                 {}, ...
-                {'style' 'checkbox'   'value'   value_cb 'tag' 'copy_to_dataset' }, ...
-                {'style' 'text'       'string'  text1 }, ...
                 {'style' 'checkbox'   'value'   0        'tag' 'delclust' 'callback' cb_del }, ...
                 {'style' 'text'       'string'  'Delete cluster information (to allow loading new datasets, set new components for clustering, etc.)' } };
-	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] };
+	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] };
 
-%     if ~isempty(STUDY.filename)
-%         guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 0 'tag' 'studyfile' };
-%         guispec{end-2} = {'style' 'text'     'string' 'Re-save STUDY. Uncheck and use menu File > Save study as to save under a new filename'};
-%         guispec(end-1) = [];
-%         guigeom{end-1} = [0.14 3];
-%     end
-	
     fig_arg{1} = ALLEEG;      % datasets         
     fig_arg{2} = datasetinfo; % datasetinfo
     fig_arg{3} = 1;           % page
     fig_arg{4} = {};          % all commands
     fig_arg{5} = (length(STUDY.cluster) > 1); % are cluster present
-    fig_arg{6} = STUDY; % are cluster present
+    fig_arg{6} = STUDY;       % are cluster present
+    fig_arg{7} = [];          % tags
     
     % generate GUI
     % ------------
@@ -301,14 +289,22 @@ elseif strcmpi(mode, 'gui') % GUI mode
                   'uilist'  , guispec, ...
                   'helpcom' , 'pophelp(''pop_study'')', ...
                   'title'   , 'Create a new STUDY set -- pop_study()', ...
-                  'userdata', fig_arg, ...
-                  'eval'    , 'pop_study(''delclust'', gcf); pop_study(''redraw'', gcf);' };
-	[result, userdat2, strhalt, outstruct, instruct] = inputgui( 'mode', 'noclose', optiongui{:});
-    if isempty(result), return; end
-    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end
+                  'userdata', fig_arg };
+	[~, ~, ~, ~, instruct, alltags] = inputgui( 'mode', 'plot', optiongui{:}); % plot only to get tags
+
+    % save tags
+    currentfig = gcf;
+    fig_arg{7} = alltags; 
+    set(currentfig, 'userdata', fig_arg);
     
+    % update GUI and wait for user input
+    pop_study('delclust', currentfig);
+    pop_study('redraw', currentfig);
+    [result, userdat2, ~, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
+    if isempty(result), return; end
+
     while test_wrong_parameters(currentfig)
-    	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
+    	[result, userdat2, ~, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
         if isempty(result), return; end
     end
     close(currentfig);
@@ -326,14 +322,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
 %     else
 %         if ~isempty(outstruct(1).studyfile), options = { options{:} 'filename' outstruct(1).studyfile }; end
 %     end
-    if outstruct(1).copy_to_dataset == 1
-         options = { options{:} 'updatedat' 'on' };
-         eeglab_options;
-         if option_storedisk
-             options = { options{:} 'savedat' 'on' };
-         end
-    else options = { options{:} 'updatedat' 'off' };
-    end
+    options = { options{:} 'updatedat' 'on' };
     
     if outstruct(1).delclust == 1
         options = { options{:} 'rmclust' 'on' };
@@ -404,6 +393,7 @@ else % internal command
     allcom      = userdat{4};
     clusterpresent = userdat{5};
     STUDY       = userdat{6};
+    tags        = userdat{7};
 
     switch  com
         case 'subject'
@@ -464,7 +454,7 @@ else % internal command
             realindex = guiindex+(page-1)*10;
             datasetinfo(realindex).condition   = varargin{2};
             if get(findobj(hdl, 'tag', 'copy_to_dataset'), 'value')
-                ALLEEG(realindex).conditon     = varargin{2};
+                ALLEEG(realindex).condition     = varargin{2};
             end
             allcom = { allcom{:}, { 'index' realindex 'condition' varargin{2} } };
             userdat{1} = ALLEEG;
@@ -590,17 +580,17 @@ else % internal command
             if clusterpresent
                 if ~get(findobj(hdl, 'tag', 'delclust'), 'value')
                     for k = 1:10
-                        set(findobj('parent', hdl, 'tag',['set'   num2str(k)]), 'style', 'text');
-                        set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'enable', 'off');
-                        set(findobj('parent', hdl, 'tag',['sess'  num2str(k)]), 'enable', 'off');
-                        set(findobj('parent', hdl, 'tag',['brw'   num2str(k)]), 'enable', 'off');
+                        set(tags.(['set'   num2str(k)]), 'style', 'text');
+                        set(tags.(['comps' num2str(k)]), 'enable', 'off');
+                        set(tags.(['sess'  num2str(k)]), 'enable', 'off');
+                        set(tags.(['brw'   num2str(k)]), 'enable', 'off');
                     end
                 else
                     for k = 1:10
-                        set(findobj('parent', hdl, 'tag',['set'   num2str(k)]), 'style', 'edit');
-                        set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'enable', 'on');
-                        set(findobj('parent', hdl, 'tag',['sess'  num2str(k)]), 'enable', 'on');
-                        set(findobj('parent', hdl, 'tag',['brw'   num2str(k)]), 'enable', 'on');
+                        set(tags.(['set'   num2str(k)]), 'style', 'edit');
+                        set(tags.(['comps' num2str(k)]), 'enable', 'on');
+                        set(tags.(['sess'  num2str(k)]), 'enable', 'on');
+                        set(tags.(['brw'   num2str(k)]), 'enable', 'on');
                     end
                 end
             else 
@@ -614,30 +604,30 @@ else % internal command
             for k = 1:10
                 kk = k+(page-1)*10; % real index
                 if kk > length(datasetinfo)
-                    set(findobj('parent', hdl, 'tag',['num' num2str(k)]), 'string', int2str(kk));
-                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', '');
-                    set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['run'  num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string','');
-                    set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string','');
+                    set(tags.(['num' num2str(k)]), 'string', int2str(kk));
+                    set(tags.(['set' num2str(k)]), 'string', '');
+                    set(tags.(['sub' num2str(k)]), 'string','');
+                    set(tags.(['sess' num2str(k)]), 'string','');
+                    set(tags.(['run'  num2str(k)]), 'string','');
+                    set(tags.(['cond' num2str(k)]), 'string','');
+                    set(tags.(['comps' num2str(k)]), 'string','');
+                    set(tags.(['group' num2str(k)]), 'string','');
                 else
-                    set(findobj('parent', hdl, 'tag',['num' num2str(k)]), 'string', int2str(kk));
-                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', fullfile(char(datasetinfo(kk).filepath), char(datasetinfo(kk).filename)));
-                    set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string', char(datasetinfo(kk).subject));
-                    set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string', int2str(datasetinfo(kk).session));
-                    set(findobj('parent', hdl, 'tag',['run' num2str(k)]),  'string', int2str(datasetinfo(kk).run));
-                    set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string', char(datasetinfo(kk).condition));
-                    set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string', formatbut(datasetinfo(kk).comps));
-                    set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string', char(datasetinfo(kk).group));
+                    set(tags.(['num' num2str(k)]), 'string', int2str(kk));
+                    set(tags.(['set' num2str(k)]), 'string', fullfile(char(datasetinfo(kk).filepath), char(datasetinfo(kk).filename)));
+                    set(tags.(['sub' num2str(k)]), 'string', char(datasetinfo(kk).subject));
+                    set(tags.(['sess' num2str(k)]), 'string', int2str(datasetinfo(kk).session));
+                    set(tags.(['run' num2str(k)]),  'string', int2str(datasetinfo(kk).run));
+                    set(tags.(['cond' num2str(k)]), 'string', char(datasetinfo(kk).condition));
+                    set(tags.(['comps' num2str(k)]), 'string', formatbut(datasetinfo(kk).comps));
+                    set(tags.(['group' num2str(k)]), 'string', char(datasetinfo(kk).group));
                 end
             end
             if page<10
                  pagestr =  [ ' Page ' int2str(page) ];
             else pagestr =  [ 'Page ' int2str(page) ];
             end
-            set(findobj('parent', hdl, 'tag','page'), 'string', pagestr );
+            set(tags.('page'), 'string', pagestr );
     end
 end
 
@@ -720,7 +710,7 @@ if nargin < 5
 end
 	
 if length(Prompt) ~= length(DefAns)
-	error('inputdlg2: prompt and default answer cell array must have the smae size');
+	error('inputdlg2: prompt and default answer cell array must have the same size');
 end
 
 geometry = {};

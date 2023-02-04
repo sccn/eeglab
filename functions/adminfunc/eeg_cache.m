@@ -1,4 +1,4 @@
-% eeg_cache() - Store data in cache with hashcode
+% EEG_CACHE - Store data in cache with hashcode
 %
 % >> [cache data] = eeg_cache(cache, hashcode, data);  
 %
@@ -20,7 +20,7 @@
 %
 % Examples
 % cache = eeg_cache([], 'dyufisf8da0df', 3); % store 3 with hashcode dyufisf8da0df
-% [cache data] = eeg_cache(cache, 'dyufisf8da0df'); % retreive 3
+% [cache data] = eeg_cache(cache, 'dyufisf8da0df'); % retrieve 3
 %
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, 2015
 

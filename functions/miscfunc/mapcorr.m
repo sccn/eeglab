@@ -1,6 +1,6 @@
-% mapcorr() - Find matching rows in two matrices and their corrs.
+% MAPCORR - Find matching rows in two matrices and their corrs.
 %             Uses the Hungarian (default), VAM, or maxcorr assignment methods.
-%             (Follow with matperm() to permute and sign x -> y).
+%             (Follow with MATPERM to permute and sign x -> y).
 %
 %             Finds correlation of maximum common subset of channels (using
 %             channel location files to match channel labels.) Thus, number
@@ -26,7 +26,7 @@
 %               2= Max Abs Corr Method - find pairs in order of max abs corr 
 %               Note that the methods 0 and 1 require matrices to be square.
 %   weighting = An optional weighting matrix size(weighting) = size(corrs) that 
-%               weights the corrs matrix before pair assignment {def: 0/[]->ones()}
+%               weights the corrs matrix before pair assignment {def: 0/[]->ONES}
 % Outputs:
 %   corr  = a column vector of correlation coefficients between 
 %           best-correlating rows of matrice x and y
@@ -73,10 +73,10 @@
 % 2007/03/20 02:33:48  arno, Andreas fix
 % 2003/09/04 23:21:06  scott, changed default matching method to Max Abs Corr
 % 04-22-99 Re-written using VAM by Sigurd Enghoff, CNL/Salk
-% 04-30-99 Added revision of algorthm loop by SE -sm
+% 04-30-99 Added revision of algorithm loop by SE -sm
 % 05-25-99 Added Hungarian method assignment by SE
 % 06-15-99 Maximum correlation method reinstated by SE
-% 08-02-99 Made order of outpus match help msg -sm
+% 08-02-99 Made order of outputs match help msg -sm
 % 02-16-00 Fixed order of corr output under VAM added method explanations, 
 %          and returned corr signs in abs max method -sm
 % 01-25-02 reformated help & license, added links -ad 

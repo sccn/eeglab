@@ -7,7 +7,7 @@
 % more prone to bugs given that they only use complex Matlab code to
 % avoid loops and speed up computation.
 %
-% This test function does not garantee that EEGLAB statistical functions
+% This test function does not guarantee that EEGLAB statistical functions
 % are bug free. It does assure though that bugs are unlikely and minor
 % if they are present.
 %
@@ -238,7 +238,7 @@ for method = 1:2
             fprintf('Bootstrap paired dim%d resampling method %d Pass\n', dim, method);
         else  error('Bootstrap paired resampling Error');
         end
-        % for paired permutation, in addition, we make sure that the sum accross condition is constant
+        % for paired permutation, in addition, we make sure that the sum across condition is constant
         % which is not true for bootstrap
         msa = meansa(sa2); msa = msa(:)-msa(1);
         if all(rem(sa1{1}(:)',10) == [1:9 0]) && all(rem(sa1{2}(:)',10) == [1:9 0]) && ...

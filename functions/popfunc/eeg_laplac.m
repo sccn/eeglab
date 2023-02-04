@@ -1,21 +1,21 @@
-% eeg_laplac() - gives the laplacian for the data contained in EEG
-% for the values 1:stepl:end with electrodes position gived by EEG.chanlocs. 
-% Step must be a number betwen 1 and length(EEG.data) 
-% The metod used for computig the laplacian is the described by Perrin et al.
+% EEG_LAPLAC - gives the laplacian for the data contained in EEG
+% for the values 1:stepl:end with electrodes position given by EEG.chanlocs. 
+% Step must be a number between 1 and length(EEG.data) 
+% The method used for computig the laplacian is the described by Perrin et al.
 % 1989 using a spline interpolation between the electrodes. This function 
-% requires the functions g2() and gm_1() to be in the path or in the same dir. 
+% requires the functions G2 and GM_1 to be in the path or in the same dir. 
 % Usage:
 %        >>  [laplac time] = eeg_laplac(EEG, step);
 %        >>  laplac = eeg_laplac(EEG, step);
 % Inputs:
-%   EEG     - A EEG structure containig the EEG.data an the EEG.chanlocs
+%   EEG     - A EEG structure containing the EEG.data an the EEG.chanlocs
 %   step    - The step for subsampling the data
 %    
 % Outputs:
-%   laplac     - A matrix containig the value of laplacian for the data
+%   laplac     - A matrix containing the value of laplacian for the data
 %   time       - Time spent in calculation  
 %
-% See also: del2map()
+% See also: DEL2MAP
 %
 % Author: Juan Sebastian Gonzalez, DFI / Universidad de Chile
 % 
@@ -103,7 +103,7 @@ time = toc;
 %---------------------------------------------------------------------
 % internal functions g2 gm_1
 function valor=g2(r1,r2,r3,r4)
-%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la tecnical note del
+%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la technical note del
 %Electrical Geodesics, salvo que esta esta bien
 
 x=cos(r1).*cos(r2).*cos(r3).*cos(r4) + ...
@@ -134,7 +134,7 @@ end
     valor = 1/4/pi*sum(aux2.*P);
  %-----------------------------------------------------   
 function valor=gm_1(r1,r2,r3,r4)
-%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la tecnical note del
+%g entrega la sumatoria hasta 7 con m=3 de la ec. (2) de la technical note del
 %Electrical Geodesics
 
 x=cos(r1).*cos(r2).*cos(r3).*cos(r4) + ...

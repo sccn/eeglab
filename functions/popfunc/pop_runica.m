@@ -1,5 +1,5 @@
-% pop_runica() - Run an ICA decomposition of an EEG dataset using runica(), 
-%                binica(), or another ICA or other linear decomposition. 
+% POP_RUNICA - Run an ICA decomposition of an EEG dataset using RUNICA, 
+%                BINICA, or another ICA or other linear decomposition. 
 % Usage:
 %   >> OUT_EEG = pop_runica( EEG ); % pops-up a data entry window
 %   >> OUT_EEG = pop_runica( EEG, 'key', 'val' ); % no pop_up
@@ -16,8 +16,8 @@
 %   'icatype'   - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
 %                 to use for the ICA decomposition. The nature of any 
 %                 differences in the results of these algorithms have 
-%                 not been well characterized. {default: binica(), if
-%                 found, else runica()}
+%                 not been well characterized. {default: BINICA, if
+%                 found, else RUNICA}
 %   'dataset'   - [integer array] dataset index or indices.
 %   'chanind'   - [integer array or cell array] subset of channel indices 
 %                 for running the ICA decomposition. Alternatively, you may
@@ -47,12 +47,12 @@
 %    on Tony Bell's infomax algorithm as implemented for automated use by 
 %    Scott Makeig et al. using the natural gradient of Amari et al. It can 
 %    also extract sub-Gaussian sources using the (recommended) 'extended' option 
-%    of Lee and Girolami. Function runica() is the all-Matlab version; function 
-%    binica() calls the (1.5x faster) binary version (a separate download) 
-%    translated into C from runica() by Sigurd Enghoff.
-% 2) jader() calls the JADE algorithm of Jean-Francois Cardoso. This is 
+%    of Lee and Girolami. Function RUNICA is the all-Matlab version; function 
+%    BINICA calls the (1.5x faster) binary version (a separate download) 
+%    translated into C from RUNICA by Sigurd Enghoff.
+% 2) JADER calls the JADE algorithm of Jean-Francois Cardoso. This is 
 %    included in the EEGLAB toolbox by his permission. See >> help jader
-% 3) To run fastica(), download the fastICA toolbox from its website,
+% 3) To run FASTICA, download the fastICA toolbox from its website,
 %    http://www.cis.hut.fi/projects/ica/fastica/, and make it available 
 %    in your Matlab path. According to its authors, default parameters
 %    are not optimal: Try args 'approach', 'sym' to estimate components 
@@ -64,7 +64,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: runica(), binica(), jader(), fastica()
+% See also: RUNICA, BINICA, JADER, SOBI, FASTICA.
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -108,22 +108,61 @@ end
 
 % find available algorithms
 % -------------------------
-allalgs   = { 'runica' 'binica' 'jader' 'jadeop' 'jade_td_p' 'MatlabshibbsR' 'fastica' ...
-              'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'evd24' 'sons' 'sobi' 'ng_ol' ...
-              'acsobiro' 'acrsobibpf' 'pearson_ica' 'egld_ica' 'eeA' 'tfbss' 'icaML' 'icaMS' 'picard' }; % do not use egld_ica => too slow
-selectalg = {};
-linenb    = 1;
-count     = 1;
+allalgs(1).name = 'runica';
+allalgs(1).description = 'Infomax runica.m (default)';
+allalgs(1).options     = '''extended'', 1';
+allalgs(end+1).name = 'runica';
+allalgs(end).description = 'Infomax runica.m conservative (slow)';
+allalgs(end).options     = '''extended'', 1, ''lrate'', 1e-5, ''maxstep'', 2000';
+allalgs(end).help        = 'See this <a href="https://sccn.ucsd.edu/wiki/Makoto%27s_useful_EEGLAB_code#How_to_obtain_practically_reproducible_ICA_results_.2809.2F26.2F2022_added.29">reference</a> for ICA conservative parameters ';
+allalgs(end+1).name = 'amica';
+allalgs(end).description = 'AMICA (slowest; best)';
+allalgs(end).options     = '''maxiter'', 2000';
+allalgs(end).help        = 'See this <a href="https://github.com/sccn/amica/wiki/AMICA">reference</a> for AMICA';
+allalgs(end+1).name = 'picard';
+allalgs(end).description = 'Infomax picard.m';
+allalgs(end).options     = '''maxiter'', 500, ''mode'', ''standard''';
+allalgs(end).help        = 'See this <a href="https://github.com/pierreablin/picard">page</a> for Picard parameters ';
+allalgs(end+1).name = 'picard';
+allalgs(end).description = 'FastICA picard.m (fastest)';
+allalgs(end).options     = '''maxiter'', 500';
+allalgs(end).help        = 'See this <a href="https://github.com/pierreablin/picard">page</a> for Picard parameters ';
+
+allalgs(end+1).name = 'sobi'; allalgs(end).description = 'SOBI (sobi.m function)';
+allalgs(end+1).name = 'acsobiro'; allalgs(end).description = 'SOBI (acsobiro.m function)';
+allalgs(end+1).name = 'pearson_ica'; allalgs(end).description = 'Pearson (pearson_ica.m function)';
+allalgs(end+1).name = 'jader';     allalgs(end).description = 'Jade (jader.m function)';
+allalgs(end+1).name = 'jadeop';    allalgs(end).description = 'Jade (jadeop.m function)';
+allalgs(end+1).name = 'jade_td_p'; allalgs(end).description = 'Jade (jade_td_p.m function)';
+allalgs(end+1).name = 'MatlabshibbsR'; allalgs(end).description = 'MatlabshibbsR';
+allalgs(end+1).name = 'fastica'; allalgs(end).description = 'FastICA (fastica.m function)';
+allalgs(end+1).name = 'tica'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'simbec'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'unica'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'amuse'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'fobi'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'evd'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'evd24'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'sons'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'ng_ol'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'acrsobibpf'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'egld_ica'; allalgs(end).description = allalgs(end).name; % do not use egld_ica => too slow
+allalgs(end+1).name = 'eeA'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'tfbss'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'icaML'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'icaMS'; allalgs(end).description = allalgs(end).name;
+allalgs(end+1).name = 'binica'; allalgs(end).description = 'Executable runica';
+defaultopts = allalgs(1).options;
+
 for index = length(allalgs):-1:1
-    if exist(allalgs{index}) ~= 2 && exist(allalgs{index}) ~= 6
+    if ~exist(allalgs(index).name, 'file')
         allalgs(index) = [];
     end
 end
 
-% special AMICA
+% special AMICA (deprecated use the pop_runamica function)
 % -------------
 selectamica = 0;
-defaultopts = [ '''extended'', 1' ] ;
 if nargin > 1
     if ischar(varargin{1})
         if strcmpi(varargin{1}, 'selectamica')
@@ -158,29 +197,34 @@ if nargin < 2 || selectamica
                    '    warndlg2(''No channel type'', ''No channel type'');' ...
                    'end;' ...
 				   'clear tmps tmpv tmpstr tmptype tmpchans;' ];
-    cb_ica = [ 'if get(gcbo, ''value'') < 3, ' ...
-               '     set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''extended'''', 1'');' ...
-               'else,' ...
-               '    tmpStr =  get(gcbo, ''string'');' ....
-               '    tmpAlgo = tmpStr(get(gcbo, ''value''));' ...
-               '    if strcmpi(tmpAlgo, ''picard''),' ...
-               '        set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''maxiter'''', 500'');' ...
-               '    else,' ...
-               '        set(findobj(gcbf, ''tag'', ''params''), ''string'', '''');' ...
-               '    end;' ...
-               'end;' ];
+    cb_ica = ['tmpalgos = get(gcbf, ''userdata'');' ...
+              'tmpalgos = tmpalgos{3};' ...
+              'set(findobj(gcbf, ''tag'', ''params''), ''string'',  tmpalgos( get(gcbo, ''value'') ).options );' ... 
+              'disp(char(tmpalgos( get(gcbo, ''value'') ).help));' ...
+              'clear tmpalgos;' ];
+%     [ 'if get(gcbo, ''value'') < 3, ' ...
+%                '     set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''extended'''', 1'');' ...
+%                'else,' ...
+%                '    tmpStr =  get(gcbo, ''string'');' ....
+%                '    tmpAlgo = tmpStr(get(gcbo, ''value''));' ...
+%                '    if strcmpi(tmpAlgo, ''picard''),' ...
+%                '        set(findobj(gcbf, ''tag'', ''params''), ''string'', ''''''maxiter'''', 500'');' ...
+%                '    else,' ...
+%                '        set(findobj(gcbf, ''tag'', ''params''), ''string'', '''');' ...
+%                '    end;' ...
+%                'end;' ];
                
-    promptstr    = { { 'style' 'text'       'string' 'ICA algorithm to use (click to select)' } ...
-                     { 'style' 'listbox'    'string' allalgs 'callback', cb_ica } ...
+    promptstr    = { { 'style' 'text'       'string' [ 'ICA algorithm to use (click to select)' 10 ] } ...
+                     { 'style' 'listbox'    'string' { allalgs.description } 'callback', cb_ica } ...
                      { 'style' 'text'       'string' 'Commandline options (See help messages)' } ...
                      { 'style' 'edit'       'string' defaultopts 'tag' 'params' } ...
                      { 'style'  'checkbox'  'string' 'Reorder components by variance (if that''s not already the case)' 'value' 1 } ...
-                     { 'style' 'text'       'string' 'Channel type(s) or channel indices' } ...
+                     { 'style' 'text'       'string' 'Use only channel type(s) or indices' } ...
                      { 'style' 'edit'       'string' '' 'tag' 'chantype' }  ...
                      { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
                      { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
     geometry = { [2 1.5] [2 1.5] [1] [2 1 1 1] };
-    geomvert = [ 1.5 1 1 1];
+    geomvert = [ 3 1 1 1];
     if length(ALLEEG) > 1
         cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
         cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
@@ -224,9 +268,9 @@ if nargin < 2 || selectamica
     % ---
     result       = inputgui( 'geometry', geometry, 'geomvert', geomvert, 'uilist', promptstr, ...
                              'helpcom', 'pophelp(''pop_runica'')', ...
-                             'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes } );
+                             'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes allalgs } );
     if length(result) == 0 return; end      
-    options = { 'icatype' allalgs{result{1}} 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) 'reorder' fastif(result{3}, 'on', 'off') };
+    options = { 'icatype' allalgs(result{1}).name 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) 'reorder' fastif(result{3}, 'on', 'off') };
     if ~isempty(result{4})
         if ~isempty(str2num(result{4})), options = { options{:} 'chanind' str2num(result{4}) };
         else                             options = { options{:} 'chanind' parsetxt(result{4}) }; 
@@ -246,7 +290,7 @@ end
 
 % decode input arguments
 % ----------------------
-[ g, addoptions ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
+[ g, addoptions ] = finputcheck( options, { 'icatype'        'string'  unique({ allalgs.name })   'runica'; ...
                             'dataset'        'integer' []        [1:length(ALLEEG)];
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on','off' }   'off';
@@ -322,6 +366,7 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
                 ALLEEG(dats{index}(idat)).saved = 'no';
                 pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
                 ALLEEG(dats{index}(idat)).saved = 'yes';
+                ALLEEG(dats{index}(idat)) = update_datafield(ALLEEG(dats{index}(idat)));
             end
         end
     end
@@ -329,34 +374,38 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
               vararg2str({ 'icatype' g.icatype 'concatcond' 'on' 'options' g.options }) );
     return;
 else
-    disp('Concatenating datasets...');
-    EEG = ALLEEG(g.dataset(1));
-    
-    if isfield(EEG.etc, 'ic_classification')
-        EEG.etc = rmfield(EEG.etc, 'ic_classification');
-    end
-    
-    % compute total data size
-    % -----------------------
-    totalpnts = 0;
-    for i = g.dataset
-        totalpnts = totalpnts+ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
-    end
-    EEG.data = zeros(EEG.nbchan, totalpnts);
-    
     % copy data
     % ---------
-    cpnts = 1;
-    for i = g.dataset
-        tmplen = ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
-        TMP = eeg_checkset(ALLEEG(g.dataset(i)), 'loaddata');
-        EEG.data(:,cpnts:cpnts+tmplen-1) = reshape(TMP.data, size(TMP.data,1), size(TMP.data,2)*size(TMP.data,3));
-        cpnts = cpnts+tmplen;
+    if all([ALLEEG(g.dataset).trials] == 1)
+        EEG = eeg_checkset(ALLEEG, 'loaddata');
+        EEG = pop_mergeset(EEG, 1:length(EEG));
+    else
+        disp('Concatenating datasets...');
+        EEG = ALLEEG(g.dataset(1));
+        EEG.data = zeros(EEG.nbchan, totalpnts);
+        
+        cpnts = 1;
+        % compute total data size
+        % -----------------------
+        totalpnts = 0;
+        for i = g.dataset
+            totalpnts = totalpnts+ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
+        end
+            
+        for i = g.dataset
+            tmplen = ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
+            TMP = eeg_checkset(ALLEEG(g.dataset(i)), 'loaddata');
+            EEG.data(:,cpnts:cpnts+tmplen-1) = reshape(TMP.data, size(TMP.data,1), size(TMP.data,2)*size(TMP.data,3));
+            cpnts = cpnts+tmplen;
+        end
     end
     EEG.icaweights = [];
     EEG.trials = 1;
     EEG.pnts   = size(EEG.data,2);
     EEG.saved  = 'no';
+    if isfield(EEG.etc, 'ic_classification')
+        EEG.etc = rmfield(EEG.etc, 'ic_classification');
+    end
 end
 
 % Store and then remove current EEG ICA weights and sphere
@@ -411,6 +460,10 @@ for i = 1:length(g.options)
         end
     end
 end
+if pca_opt
+    fprintf([ 'Warning: you have used PCA to reduce dimensionality so ICA\n' ...
+        '         is not modeling the entire data, only the PCA-reduced data.\n' ]);
+end
 
 %------------------------------
 % compute ICA on a definite set
@@ -434,6 +487,12 @@ if ~strcmpi(g.icatype, 'binica')
 end
 switch lower(g.icatype)
     case 'runica' 
+        % make sure we are using the correct ICA function
+        runicaCurrentLoc = fileparts(which('runica'));
+        runicaDesiredLoc = fullfile(fileparts(fileparts(which('pop_runica'))), 'sigprocfunc');
+        if ~isequal(runicaCurrentLoc, runicaDesiredLoc)
+            addpath(runicaDesiredLoc); % put back to the beginning of the path
+        end
         try if ismatlab, g.options = {  g.options{:}, 'interrupt', 'on' }; end; catch, end
         if tmprank == size(tmpdata,1) || pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001,  g.options{:} );
@@ -444,7 +503,7 @@ switch lower(g.icatype)
                                                        'be because you are including a reference channel or' 10 ...
                                                        'because you are running a second ICA decomposition.' 10 ...
                                                        sprintf('The proposed dimension for ICA is %d (out of %d channels).', tmprank, size(tmpdata,1)) 10 ...
-                                                       'Rank computation may be inacurate so you may edit this' 10 ...
+                                                       'Rank computation may be inaccurate so you may edit this' 10 ...
                                                        'number below. If you do not understand, simply press OK.' ] } { } ...
                            { 'style' 'text' 'string' 'Proposed rank:' } ...
                            { 'style' 'edit' 'string' num2str(tmprank) } };
@@ -473,22 +532,22 @@ switch lower(g.icatype)
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end
     case 'amica' 
-        tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
-        fprintf('Now Running AMICA\n');
-        if length(g.options) > 1
-            if ischar(g.options{2})
-                fprintf('See folder %s for outputs\n', g.options{2});
-            end
-        end
-        fprintf('To import results, use menu item "Tools > Run AMICA > Load AMICA components\n');
-        modres = runamica( tmpdata, [], size(tmpdata,1), size(tmpdata,2), g.options{:} );
-        if ~isempty(modres)
-            EEG.icaweights = modres.W;
-            EEG.icasphere  = modres.S;
-        else
-            return;
-        end
+         if ~exist('pop_runamica')
+             if nargin < 2
+                 errordlg2('You must install the AMICA plugin first to use AMICA');
+             else
+                error('You must install the AMICA plugin first to use AMICA');
+             end
+         end
+         EEG = pop_runamica(EEG, g.options{:});
      case 'picard' 
+         if ~exist('picard')
+             if nargin < 2
+                 errordlg2('You must install the picard plugin first to use Picard');
+             else
+                error('You must install the picard plugin first to use Picard');
+             end
+         end
          options2 = g.options;
          if pca_opt
              if g.options{pca_ind+1} < 0
@@ -613,10 +672,17 @@ function tmprank2 = getrank(tmpdata, pca_opt)
     rankTolerance = 1e-7;
     tmprank2=sum (diag (D) > rankTolerance);
     if tmprank ~= tmprank2
-        if pca_opt ~= 0
+        if nargin >= 2 && pca_opt ~= 0
             fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab\n', tmprank, tmprank2);
         end
         tmprank2 = max(tmprank, tmprank2);
     end
             
-            
+function EEG = update_datafield(EEG)
+    if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end
+    if ~isempty(EEG.datfile)
+        EEG.data = EEG.datfile;
+    else 
+        EEG.data = 'in set file';
+    end
+    EEG.icaact = [];            

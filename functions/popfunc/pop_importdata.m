@@ -1,7 +1,7 @@
-% pop_importdata() - import data from a Matlab variable or disk file by calling
-%                    importdata().
+% POP_IMPORTDATA - import data from a Matlab variable or disk file by calling
+%                    IMPORTDATA.
 % Usage:
-%   >> EEGOUT = pop_importdata(); % pop-up a data entry window 
+%   >> EEGOUT = POP_IMPORTDATA; % pop-up a data entry window 
 %   >> EEGOUT = pop_importdata( 'key', val,...); % no pop-up window
 %
 % Graphic interface (refer to a previous version of the GUI):
@@ -30,9 +30,9 @@
 %                  equivalent: 'nbchan'. This edit box cannot be edited.
 %   "Ref. channel indices or mode" - [edit box] current reference. This edit box
 %                  cannot be edited. To change data reference, use menu 
-%                  Tools > Re-reference calling function pop_reref(). The reference 
-%                  can be a string, 'common' indicating an unknow common reference, 
-%                  'averef' indicating average reference, or an array of integer 
+%                  Tools > Re-reference calling function POP_REREF. The reference 
+%                  can be a string, 'common' indicating an unknown common reference, 
+%                  'average' indicating average reference, or an array of integer 
 %                  containing the indices of the reference channels.
 %   "Subject code" - [Edit box] subject code. For example, 'S01'. The command
 %                    line equivalent is 'subject'.
@@ -93,7 +93,7 @@
 %                  is automatically calculated.
 %                   {default: length of the data -> continuous data assumed}
 %   'srate'      - [real] Data sampling rate in Hz {default: 1Hz}
-%   'ref'        - [string or integer] reference channel indices. 'averef' indicates
+%   'ref'        - [string or integer] reference channel indices. 'average' indicates
 %                  average reference. Note that this does not perform referencing
 %                  but only sets the initial reference when the data is imported.
 %   'icaweight'  - [matrix] ICA weight matrix. 
@@ -105,11 +105,11 @@
 % Outputs:
 %   EEGOUT      - modified EEG dataset structure
 %
-% Note: This function calls pop_editset() to modify parameter values.
+% Note: This function calls POP_EDITSET to modify parameter values.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_editset(), pop_select(), eeglab()
+% See also: POP_EDITSET, POP_SELECT, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -279,22 +279,11 @@ if nargin < 1                 % if several arguments, assign values
     % generate the output command
     % ---------------------------
     EEGOUT = pop_editset(EEGOUT, args{:});
-    com    = sprintf( 'EEG = pop_importdata(%s);', vararg2str(args) );
-    
-    %com = '';
-    %for i=1:2:length(args)
-    %    if ~isempty( args{i+1} )
-    %        if ischar( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
-    %        else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-    %        end
-    %    else
-    %        com = sprintf('%s, ''%s'', []', com, args{i} );
-    %    end
-    %end
-    %com = [ 'EEG = pop_importdata(' com(2:end) ');'];
 
 else % no interactive inputs
     EEGOUT = pop_editset(EEGOUT, varargin{:});
+    args = varargin;
 end
-
-return;
+if nargout > 1
+    com    = sprintf( 'EEG = pop_importdata(%s);', vararg2str(args) );
+end

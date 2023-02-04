@@ -1,17 +1,17 @@
-% timef() - Returns estimates and plots of mean event-related spectral
+% TIMEF - Returns estimates and plots of mean event-related spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           across event-related trials (epochs) of a single input time series. 
 %        * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
 %           0-padded DFTs (both Hanning-tapered), OR multitaper spectra ('mtaper').
 %        * For the wavelet and FFT methods, output frequency spacing 
 %           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
-%           NaN input values (such as returned by eventlock()) are ignored.
+%           NaN input values (such as returned by EVENTLOCK) are ignored.
 %        * If 'alpha' is given, then bootstrap statistics are computed 
 %           (from a distribution of 'naccu' surrogate data trials) and 
 %           non-significant features of the output plots are zeroed out 
 %           (i.e., plotted in green). 
 %        * Given a 'topovec' scalp map weights vector and an 'elocs' electrode 
-%           location file or structure, the figure also shows a topoplot() 
+%           location file or structure, the figure also shows a TOPOPLOT 
 %           image of the specified scalp map.
 %
 %        * Note: Left-click on subplots to view and zoom in separate windows.
@@ -20,8 +20,8 @@
 %                timef(data,frames,tlimits,srate,cycles,...
 %                                 'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
-%        * For more detailed information about timef(), >> timef details  
-%        * Default values may differ when called from pop_timef()
+%        * For more detailed information about TIMEF, >> timef details  
+%        * Default values may differ when called from POP_TIMEF
 %
 % Required inputs:     
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
@@ -94,8 +94,8 @@
 %       'title'     = Optional figure title                                {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)  {2}
-%       'pboot'     = Bootstrap power limits (e.g., from timef())    {from data}
-%       'rboot'     = Bootstrap ITC limits (e.g., from timef())      {from data}
+%       'pboot'     = Bootstrap power limits (e.g., from TIMEF)    {from data}
+%       'rboot'     = Bootstrap ITC limits (e.g., from TIMEF)      {from data}
 %       'axesfont'  = Axes text font size                                  {10}
 %       'titlefont' = Title text font size                                 {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at given ms.
@@ -119,9 +119,9 @@
 %   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). 
 %   The upper panel presents the data ERSP (Event-Related Spectral Perturbation) 
 %   in dB, with mean baseline spectral activity (in dB) subtracted. Use 
-%   "'baseline', NaN" to prevent timef() from removing the baseline. 
+%   "'baseline', NaN" to prevent TIMEF from removing the baseline. 
 %   The lower panel presents the data ITC (Inter-Trial Coherence). 
-%   Click on any plot axes to pop up a new window (using 'axcopy()')
+%   Click on any plot axes to pop up a new window (using 'AXCOPY')
 %   -- Upper left marginal panel presents the mean spectrum during the baseline 
 %      period (blue), and when significance is set, the significance threshold 
 %      at each frequency (dotted green-black trace).
@@ -139,7 +139,7 @@
 % Known problems:
 %   Significance masking currently fails for linear coherence.
 %
-% See also: crossf()
+% See also: CROSSF
  
 % Copyright (C) 1998 Sigurd Enghoff, Scott Makeig, Arnaud Delorme, 
 % CNL / Salk Institute 8/1/98-8/28/01
@@ -179,9 +179,9 @@
 % 12-22-99 debugged ERPtimes, added BASE_BOOT -sm 
 % 01-10-00 debugged BASE_BOOT=0 -sm
 % 02-28-00 added NOTE on formula derivation below -sm
-% 03-16-00 added axcopy() feature -sm & tpj
+% 03-16-00 added AXCOPY feature -sm & tpj
 % 04-16-00 added multiple marktimes loop -sm
-% 04-20-00 fixed ITC cbar limits when spcified in input -sm
+% 04-20-00 fixed ITC cbar limits when specified in input -sm
 % 07-29-00 changed frequencies displayed msg -sm
 % 10-12-00 fixed bug in freqs when cycles>0 -sm
 % 02-07-01 fixed inconsistency in BASE_BOOT use -sm
@@ -460,7 +460,7 @@ end
 
 if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   if length(g.mtaper) < 3
-        %error('mtaper arguement must be [N W] or [N W K]');
+        %error('mtaper argument must be [N W] or [N W K]');
     
     if g.mtaper(1) * g.mtaper(2) < 1
         error('mtaper 2 first arguments'' product must be higher than 1');

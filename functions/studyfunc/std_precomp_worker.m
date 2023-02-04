@@ -1,4 +1,4 @@
-% std_precomp_worker() - allow dispatching ERSP to be computed in parallel 
+% STD_PRECOMP_WORKER - allow dispatching ERSP to be computed in parallel 
 %                        on a given cluster. 
 % Usage:
 %   >> feature = std_precomp_worker(filename, varargin);

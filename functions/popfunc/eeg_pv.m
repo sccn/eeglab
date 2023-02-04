@@ -1,4 +1,4 @@
-% eeg_pv()   - Compute EEG.data 'percent variance ' (pv) of the whole EEG data versus the projections
+% EEG_PV   - Compute EEG.data 'percent variance ' (pv) of the whole EEG data versus the projections
 %              of specified components. 
 %              Can omit specified components and channels from the computation. Can draw a plot 
 %              of the scalp distribution of pv, or progressively compute the pv for comps
@@ -32,9 +32,9 @@
 %    Assumes existence of the following EEG fields: EEG.data, EEG.pnts, EEG.nbchan, EEG.trials,
 %          EEG.icaact, EEG.icaweights, EEG.icasphere, EEG.icawinv, and for plot, EEG.chanlocs
 %
-% See also:  eeg_pvaf()
+% See also:  EEG_PVAF
 %
-% Author: from eeg_pvaf(), Scott Makeig, SCCN/INC/UCSD, 02/04/05
+% Author: from EEG_PVAF, Scott Makeig, SCCN/INC/UCSD, 02/04/05
 
 % Copyright (C) Scott Makeig, SCCN/INC/UCSD, 02/04/05
 %
@@ -227,7 +227,7 @@ if progressive % output accumulated results
   end
 elseif plotit 
 %
-%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribtion of pv %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribution of pv %%%%%%%%%%%%%
 %
  if isfield(EEG,'chanlocs')
    chanlocs = EEG.chanlocs;

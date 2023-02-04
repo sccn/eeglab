@@ -1,11 +1,11 @@
-% pop_clustedit() - graphic user interface (GUI)-based function with editing and plotting 
+% POP_CLUSTEDIT - graphic user interface (GUI)-based function with editing and plotting 
 %                options for visualizing and manipulating an input STUDY structure. 
 %                Only component measures (e.g., dipole locations, scalp maps, spectra, 
 %                ERPs, ERSPs, ITCs) that have been computed and saved in the study EEG 
 %                datasets can be visualized. These can be computed during pre-clustering 
-%                using the GUI-based function pop_preclust() or the equivalent command
-%                line functions std_preclust(). To use dipole locations for clustering, 
-%                they must first be stored in the EEG dataset structures using dipfit(). 
+%                using the GUI-based function POP_PRECLUST or the equivalent command
+%                line functions STD_PRECLUST. To use dipole locations for clustering, 
+%                they must first be stored in the EEG dataset structures using DIPFIT. 
 %                Supported cluster editing functions include new cluster creation, cluster 
 %                merging, outlier rejection, and cluster renaming. Components can also be 
 %                moved from one cluster to another or to the outlier cluster. 
@@ -14,18 +14,18 @@
 % Inputs:
 %   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
 %                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
-%                pop_loadstudy(), or in creating a new STUDY, using pop_createstudy().  
+%                POP_LOADSTUDY, or in creating a new STUDY, using POP_CREATESTUDY.  
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %
 % Optional inputs:
 %   clusters   - [integer vector] of cluster numbers. These clusters will be visualized 
-%                and manipulated in the pop_clustedit() graphic interface. There are 
+%                and manipulated in the POP_CLUSTEDIT graphic interface. There are 
 %                restrictions on which clusters can be loaded together. The clusters must 
-%                either originate from the same clustering (same pre_clustering() and 
-%                subsequent pop_clust() execution), or they must all be leaf clusters 
+%                either originate from the same clustering (same PRE_CLUSTERING and 
+%                subsequent POP_CLUST execution), or they must all be leaf clusters 
 %                (i.e., clusters with no child clusters) {default: all leaf clusters}.
 %   addui      - [struct] additional uicontrols entries for the graphic
-%                interface. Must contains the fiels "uilist", "geometry".
+%                interface. Must contains the fields "uilist", "geometry".
 %
 % Outputs:
 %   STUDY      - The input STUDY set structure modified according to specified user edits,
@@ -54,27 +54,27 @@
 %                another cluster or moving them to the outlier cluster.
 %  "Plot Cluster properties" - [button] Displays in one figure all the mean cluster measures
 %                (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
-%                and saved in the EEG datsets. If there is more than one condition, the ERP 
+%                and saved in the EEG datasets. If there is more than one condition, the ERP 
 %                and the spectrum will have different colors for each condition. The ERSP 
 %                and ITC plots will show only the first condition; clicking on the subplot 
 %                will open a new figure with the different conditions displayed together. 
-%                Uses the command line function std_propplot().
+%                Uses the command line function STD_PROPPLOT.
 %  "Plot scalp maps"  - [button] Displays the scalp maps of cluster components.
 %                If applied to a cluster, scalp maps of the cluster components
 %                are plotted along with the cluster mean scalp map in one figure. 
 %                If "All # cluster centroids" option is selected, all cluster scalp map
 %                means are plotted in the same figure. If applied to components, displays
 %                the scalp maps of the specified cluster components in separate figures.
-%                Uses the command line functions std_topoplot().
+%                Uses the command line functions STD_TOPOPLOT.
 %  "Plot ERSPs" - [button] Displays the cluster component ERSPs. 
 %                If applied to a cluster, component ERSPs are plotted in one figure  
 %                (per condition) with the cluster mean ERSP. If "All # cluster centroids" 
 %                option is selected, plots all average ERSPs of the clusters in one figure 
 %                per condition. If applied to components, display the ERSP images of specified 
 %                cluster components in separate figures, using one figure for all conditions.
-%                Uses the command line functions std_erspplot().
+%                Uses the command line functions STD_ERSPPLOT.
 %  "Plot ITCs" - [button] Same as  "Plot ERSPs" but with ITC.
-%                Uses the command line functions std_itcplot().
+%                Uses the command line functions STD_ITCPLOT.
 %  "Plot dipoles" - [button] Displays the dipoles of the cluster components.
 %                If applied to a cluster, plots the cluster component dipoles (in blue) 
 %                plus the average cluster dipole (in red). If "All # cluster centroids" option 
@@ -82,7 +82,7 @@
 %                a separate subplot. If applied to components, displays the ERSP images of the
 %                specified cluster. For specific components displays components dipole (in blue) 
 %                plus the average cluster dipole (in Red) in separate figures. 
-%                Uses the command line functions std_dipplot().
+%                Uses the command line functions STD_DIPPLOT.
 %  "Plot spectra" - [button] Displays the cluster component spectra.   
 %                If applied to a cluster, displays component spectra plus the average cluster 
 %                spectrum in bold. For a specific cluster, displays the cluster component 
@@ -92,11 +92,11 @@
 %                conditions (if any) plotted in different colors.  
 %                If applied to components, displays the spectrum of specified cluster 
 %                components in separate figures using one figure for all conditions.  
-%                Uses the command line functions std_specplot().
+%                Uses the command line functions STD_SPECPLOT.
 %  "Plot ERPs" - [button] Same as "Plot spectra" but for ERPs.
-%                Uses the command line functions std_erpplot().
+%                Uses the command line functions STD_ERPPLOT.
 %  "Plot ERPimage" - [button] Same as "Plot ERP" but for ERPimave.
-%                Uses the command line functions std_erpimplot().
+%                Uses the command line functions STD_ERPIMPLOT.
 %  "Create new cluster" - [button] Creates a new empty cluster.
 %                Opens a popup window in which a name for the new cluster can be entered.
 %                If no name is given the default name is 'Cls #', where '#' is the next
@@ -104,40 +104,40 @@
 %                window 'OK' button, else press the 'Cancel' button. After the empty 
 %                cluster is created, components can be moved into it using, 
 %                'Reassign selected component(s)' (see below). Uses the command line 
-%                function std_createclust().
+%                function STD_CREATECLUST.
 %  "Rename selected cluster" - [button] Renames a cluster using the selected (mnemonic) name. 
 %                Opens a popup window in which a new name for the selected cluster can be 
 %                entered. For changes to take place, press the popup window 'OK' button, 
-%                else press the 'Cancel' button. Uses the command line function std_renameclust().
+%                else press the 'Cancel' button. Uses the command line function STD_RENAMECLUST.
 %  "Reject outlier components" - [button] rejects outlier components to an outlier cluster.
 %                Opens a popup window to specify the outlier threshold. Move outlier 
 %                components that are more than x standard deviations devs from the 
 %                cluster centroid to an outlier cluster. For changes to take place, 
 %                press the popup window 'OK' button, else press the 'Cancel' button. 
-%                Uses the command line function std_rejectoutliers().
+%                Uses the command line function STD_REJECTOUTLIERS.
 %  "Merge clusters" - [button] Merges several clusters into one cluster.
 %                Opens a popup window in which the clusters to merge may be specified 
 %                An optional name can be given to the merged cluster. If no name is given, 
 %                the default name is 'Cls #', where '#' is the next available cluster number.   
 %                For changes to take place, press the popup window 'OK' button, else press
-%                the 'Cancel' button. Uses the command line function std_mergeclust().
+%                the 'Cancel' button. Uses the command line function STD_MERGECLUST.
 %  "Remove selected outlier component(s)" - [button] Moves selected component(s) to the 
 %                outlier cluster. The components that will be moved are the ones selected 
 %                in the "Select component(s) to plot" list box. Opens a popup window in which 
 %                a list of the selected component(s) is presented. For changes to take place,
 %                press the popup window 'OK' button, else press the 'Cancel' button. 
-%                Uses the command line function std_moveoutlier().
+%                Uses the command line function STD_MOVEOUTLIER.
 %  "Reassign selected component(s)" - [button] Moves selected component(s) from one cluster 
 %                to another. The components that will reassign are the ones selected in the
 %                "Select component(s) to plot" list box. Opens a popup window in which 
 %                a list of possible clusters to which to move the selected component(s) is 
 %                presented. For changes to take place, press the popup window 'OK' button, 
-%                else press the 'Cancel' button. Uses the command line function std_movecomp().
+%                else press the 'Cancel' button. Uses the command line function STD_MOVECOMP.
 %  "Save STUDY set to disk" - [check box] Saves the STUDY set structure modified according 
 %                to specified user edits to the disk. If no file name is entered will
 %                overwrite the current STUDY set file. 
 %
-% See also:  pop_preclust(), pop_clust().         
+% See also:  POP_PRECLUST, POP_CLUST.         
 %
 % Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
 
@@ -212,7 +212,7 @@ if ~ischar(varargin{1})
                 % For any other case verify that all clusters have the same parents
                 if ~(sum(strcmp(STUDY.cluster(cls(k)).parent, parent)) == length(parent)) % different parent
                     if ~strcmp(STUDY.cluster(cls(k)).parent,'manual') && ~strcmp(parent, 'manual') 
-                        % if nither is an empty cluster (which was created manually)
+                        % if neither is an empty cluster (which was created manually)
                         sameparent = 0; % then the clusters have different parents
                     end
                 end
@@ -230,7 +230,7 @@ if ~ischar(varargin{1})
             end
         end
 
-        % ploting text etc ...
+        % plotting text etc ...
         % --------------------
         num_cls = 0;
         for k = 1:N
@@ -335,7 +335,7 @@ if ~ischar(varargin{1})
     browsesave     = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
     
-    % Create default ERSP / ITC time/freq. paramters 
+    % Create default ERSP / ITC time/freq. parameters 
     % ----------------------------------------------
     if isempty(ALLEEG)
         error('STUDY contains no datasets');

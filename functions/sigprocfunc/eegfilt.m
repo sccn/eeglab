@@ -1,4 +1,4 @@
-% eegfilt() -  (high|low|band)-pass filter data using two-way least-squares 
+% EEGFILT -  (high|low|band)-pass filter data using two-way least-squares 
 %              FIR filtering. Optionally uses the window method instead of 
 %              least-squares. Multiple data channels and epochs supported.
 %              Requires the MATLAB Signal Processing Toolbox.
@@ -21,7 +21,7 @@
 %    smoothdata = smoothed data
 %    filtwts    = filter coefficients [smoothdata <- filtfilt(filtwts,1,data)]
 %
-% See also: firls(), filtfilt()
+% See also: FIRLS, FILTFILT
 
 % Author: Scott Makeig, Arnaud Delorme, Clemens Brunner SCCN/INC/UCSD, La Jolla, 1997
 
@@ -54,7 +54,7 @@
 
 % 05-08-97 fixed frequency bound computation -sm
 % 10-22-97 added MINFREQ tests -sm
-% 12-05-00 added error() calls -sm
+% 12-05-00 added ERROR calls -sm
 % 01-25-02 reformated help & license, added links -ad
 % 03-20-12 added firtype option -cb
 
@@ -67,7 +67,7 @@ if nargin<4
 end
 
 %if ~exist('firls')
-%   error('*** eegfilt() requires the signal processing toolbox. ***');
+%   error('*** EEGFILT requires the signal processing toolbox. ***');
 %end
 
 [chans frames] = size(data);

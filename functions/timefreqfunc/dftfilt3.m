@@ -1,4 +1,4 @@
-% dftfilt3() - discrete complex wavelet filters
+% DFTFILT3 - discrete complex wavelet filters
 %
 % Usage:
 %   >> [wavelet,cycles,freqresol,timeresol] = dftfilt3( freqs, cycles, srate, varargin)

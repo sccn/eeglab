@@ -1,14 +1,14 @@
-% eeg_emptyset() - Initialize an EEG dataset structure with default values.
+% EEG_EMPTYSET - Initialize an EEG dataset structure with default values.
 %
 % Usage:
-%   >> EEG = eeg_emptyset();
+%   >> EEG = EEG_EMPTYSET;
 %
 % Outputs:
 %   EEG    - empty dataset structure with default values.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

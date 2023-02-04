@@ -1,4 +1,4 @@
-% length() - length of memory mapped underlying array
+% LENGTH - length of memory mapped underlying array
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

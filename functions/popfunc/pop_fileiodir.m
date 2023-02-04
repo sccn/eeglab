@@ -1,4 +1,4 @@
-% pop_fileiodir() - import directory into EEGLAB using FileIO 
+% POP_FILEIODIR - import directory into EEGLAB using FileIO 
 %
 % Usage:
 %   >> OUTEEG = pop_fileiodir; % pop up window
@@ -60,7 +60,7 @@ if nargin < 1
     % ----------------------
     disp('Reading data file header...');
     dat = ft_read_header(folder);
-    uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
+    uilist   = { { 'style' 'text' 'String' 'Channel list (default all):' } ...
                  { 'style' 'edit' 'string' '' } ...
                  { 'style' 'text' 'String' [ 'Data range (in sample points) (default all [1 ' int2str(dat.nSamples) '])' ] } ...
                  { 'style' 'edit' 'string' '' }  };

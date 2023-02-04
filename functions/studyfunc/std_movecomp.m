@@ -1,11 +1,11 @@
-% std_movecomp()  - Move ICA component(s) from one cluster to another. 
+% STD_MOVECOMP  - Move ICA component(s) from one cluster to another. 
 %
 % Usage:    
 %       >> [STUDY] = std_movecomp(STUDY, ALLEEG, from_cluster, to_cluster, comps);   
 % Inputs:
 %   STUDY        - STUDY structure comprising all or some of the EEG datasets in ALLEEG.
 %   ALLEEG       - vector of EEG structures in the STUDY, typically created using
-%                  load_ALLEEG().  
+%                  LOAD_ALLEEG.  
 %   from_cluster - index of the cluster components are to be moved from.  
 %   to_cluster   - index of the cluster components are to be moved to.  
 %   comps        - [int vector] indices of from_cluster components to move.  

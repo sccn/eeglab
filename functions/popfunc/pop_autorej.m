@@ -1,4 +1,4 @@
-% pop_autorej() - perform automatic artifact epoch detection and rejection 
+% POP_AUTOREJ - perform automatic artifact epoch detection and rejection 
 %
 % Usage:
 %   >> [EEG, rmepochs] = pop_autorej( EEG, 'key', 'val');
@@ -29,7 +29,7 @@
 %   rmepochs     - [integer] rejected trial indices
 %
 % Function description: 
-%     pop_autorej() first detects extremely large potential fluctuations;
+%     POP_AUTOREJ first detects extremely large potential fluctuations;
 %     this is mostly to detect artifacts from electrical surges or other 
 %     unreasonably large amplitude events. Then it applies the following.
 %     The function rejects data epochs containing data values outside a 
@@ -37,7 +37,7 @@
 %     3 s.d.'s). In each iteration, if the number of epochs that are
 %     thus marked for rejection arefewer than 'maxrej' (by default, 5%), it  
 %     then rejects thebeyond-threshold dataepochsand iterates. If the number 
-%     of epochs marked for rejection is more than 5% ofthe totalnumber 
+%     of epochs marked for rejection is more than 5% of the total number 
 %     of data epochs, it does not reject them, but instead increases the 
 %     s.d.threshold by 0.5 s.d.and iterates. When no more data epochs are 
 %     found toexceed the currents.d. threshold, it lowersthe threshold 
@@ -102,7 +102,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
     % ----------------------------------
     if strcmpi(opt.nogui, 'off')
         
-        promptstr    = { { 'style' 'text'       'string' 'Detection of extremelly large fluctuations (channels only)' 'fontweight' 'bold' } ...
+        promptstr    = { { 'style' 'text'       'string' 'Detection of extremely large fluctuations (channels only)' 'fontweight' 'bold' } ...
                          { 'style' 'text'       'string' 'Threshold limit (microV)' } ...
                          { 'style' 'edit'       'string' '1000' }  ...
                          { 'style' 'text'       'string' ' ' }  ...
@@ -145,7 +145,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
         complist   = opt.electrodes;
     end
     
-    % rejection of extremelly large fluctuations
+    % rejection of extremely large fluctuations
     % ------------------------------------------
     fprintf('\nRunning auto-rejection protocol...\n');
     rmep = zeros(1,0);

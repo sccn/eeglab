@@ -1,6 +1,6 @@
-% topoplot() - plot a topographic map of a scalp data field in a 2-D circular view 
+% TOPOPLOT - plot a topographic map of a scalp data field in a 2-D circular view 
 %              (looking down at the top of the head) using interpolation on a fine 
-%              cartesian grid. Can also show specified channnel location(s), or return 
+%              cartesian grid. Can also show specified channel location(s), or return 
 %              an interpolated value at an arbitrary scalp location (see 'noplot').
 %              By default, channel locations below head center (arc_length 0.5) are 
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
@@ -96,14 +96,14 @@
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
 %   'emarkercolor'    - cell array of colors for 'blank' option.
 %   'plotdisk'        - ['on'|'off'] plot disk instead of dots for electrodefor 'blank' option. Size of disk
-%                       is controled by input values at each electrode. If an imaginary value is provided, 
+%                       is controlled by input values at each electrode. If an imaginary value is provided, 
 %                       plot partial circle with red for the real value and blue for the imaginary one.
 %
 % Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                       model has radius 1). If several rows, plot one dipole per row.
-%                       Coordinates returned by dipplot() may be used. Can accept
+%                       Coordinates returned by DIPPLOT may be used. Can accept
 %                       an EEG.dipfit.model structure (See >> help dipplot).
 %                       Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
 %   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'on'}.
@@ -141,7 +141,7 @@
 % Authors: Andy Spydell, Colin Humphries, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001 -
 %
-% See also: timtopo(), envtopo()
+% See also: TIMTOPO, ENVTOPO
 
 % Deprecated options: 
 %           'shrink' - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
@@ -267,7 +267,7 @@ squeezefac = 1.0;
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
 VERBOSE = 'off';
 MASKSURF = 'off';
-CONVHULL = 'off';       % dont mask outside the electrodes convex hull
+CONVHULL = '';       % dont mask outside the electrodes convex hull
 DRAWAXIS = 'off';
 PLOTDISK = 'off';
 ContourVals = Values;
@@ -360,9 +360,22 @@ if nargs > 2
     if ~(round(nargs/2) == nargs/2)
         error('Odd number of input arguments??')
     end
-    for i = 1:2:length(varargin)
-        Param = varargin{i};
-        Value = varargin{i+1};
+
+    % check for chaninfo
+    options = varargin;
+    for i = 1:2:length(options)
+        if strcmpi(options{i}, 'chaninfo')
+            chaninfoTmp = options{i+1};
+            if isfield(chaninfoTmp, 'topoplot')
+                options = [ options chaninfoTmp.topoplot ];
+                break;
+            end
+        end
+    end
+
+    for i = 1:2:length(options)
+        Param = options{i};
+        Value = options{i+1};
         if ~ischar(Param)
             error('Flag arguments must be strings')
         end
@@ -434,16 +447,16 @@ if nargs > 2
                 if strcmpi(ELECTRODES,'pointlabels') || strcmpi(ELECTRODES,'ptslabels') ...
                         | strcmpi(ELECTRODES,'labelspts') | strcmpi(ELECTRODES,'ptlabels') ...
                         | strcmpi(ELECTRODES,'labelpts')
-                    ELECTRODES = 'labelpoint'; % backwards compatability
+                    ELECTRODES = 'labelpoint'; % backwards compatibility
                 elseif strcmpi(ELECTRODES,'pointnumbers') || strcmpi(ELECTRODES,'ptsnumbers') ...
                         | strcmpi(ELECTRODES,'numberspts') | strcmpi(ELECTRODES,'ptnumbers') ...
                         | strcmpi(ELECTRODES,'numberpts')  | strcmpi(ELECTRODES,'ptsnums')  ...
                         | strcmpi(ELECTRODES,'numspts')
-                    ELECTRODES = 'numpoint'; % backwards compatability
+                    ELECTRODES = 'numpoint'; % backwards compatibility
                 elseif strcmpi(ELECTRODES,'nums')
-                    ELECTRODES = 'numbers'; % backwards compatability
+                    ELECTRODES = 'numbers'; % backwards compatibility
                 elseif strcmpi(ELECTRODES,'pts')
-                    ELECTRODES = 'on'; % backwards compatability
+                    ELECTRODES = 'on'; % backwards compatibility
                 elseif ~strcmp(ELECTRODES,'off') ...
                         & ~strcmpi(ELECTRODES,'on') ...
                         & ~strcmp(ELECTRODES,'labels') ...
@@ -887,7 +900,7 @@ if length(pltchans) < length(Rd) && strcmpi(VERBOSE, 'on')
 end;	
 
 
-% fprintf('topoplot(): plotting %d channels\n',length(pltchans));
+% fprintf('TOPOPLOT: plotting %d channels\n',length(pltchans));
 if ~isempty(EMARKER2CHANS)
     if strcmpi(STYLE,'blank')
        error('emarker2 not defined for style ''blank'' - use marking channel numbers in place of data');
@@ -1227,7 +1240,9 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
 
 % 7/30/2014 Ramon: +-5% for the color limits were added
 cax_sgn = sign([amin amax]);                                                  % getting sign
-caxis([amin+cax_sgn(1)*(0.05*abs(amin)) amax+cax_sgn(2)*(0.05*abs(amax))]);   % Adding 5% to the color limits
+if ~all(cax_sgn == 0)
+    caxis([amin+cax_sgn(1)*(0.05*abs(amin)) amax+cax_sgn(2)*(0.05*abs(amax))]);   % Adding 5% to the color limits
+end
 
 else % if STYLE 'blank'
 %
@@ -1422,8 +1437,7 @@ end
  set(plotax,'ylim',ylm);                               % copy position and axis limits again
 
 axis equal;
-lim = [-0.525 0.525];
-%lim = [-0.56 0.56];
+lim = [-plotrad plotrad];
 set(gca, 'xlim', lim); set(plotax, 'xlim', lim);
 set(gca, 'ylim', lim); set(plotax, 'ylim', lim);
 set(gca, 'xlim', lim); set(plotax, 'xlim', lim);
@@ -1543,7 +1557,7 @@ end
 %
 %%%%%%%% Mark specified electrode locations with red filled disks  %%%%%%%%%%%%%%%%%%%%%%
 %
-try,
+try
     if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
         for kk = 1:length(1:length(x))
             if abs(Values(kk))

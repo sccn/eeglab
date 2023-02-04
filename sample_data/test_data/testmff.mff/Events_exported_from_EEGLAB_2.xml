@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<eventTrack xmlns="http://www.egi.com/event_mff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <name>ECI TCP-IP 55513</name>
+   <trackType>Temp</trackType>
+   <event>
+      <beginTime>2015-07-01T16:24:33.845920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>LRND</code>
+      <label/>
+      <description/>
+      <sourceDevice>Markup Tool from GNG_F_001_1_TRSP.txt</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="long">3</data>
+         </key>
+         <key>
+            <keyCode>rtim</keyCode>
+            <description/>
+            <data dataType="long">765</data>
+         </key>
+         <key>
+            <keyCode>SCod</keyCode>
+            <description/>
+            <data dataType="long">G2</data>
+         </key>
+         <key>
+            <keyCode>EStr</keyCode>
+            <description/>
+            <data dataType="long">CorFing</data>
+         </key>
+         <key>
+            <keyCode>LRND</keyCode>
+            <description/>
+            <data dataType="long">0</data>
+         </key>
+      </keys>
+   </event>
+   <event>
+      <beginTime>2015-07-01T16:24:33.845920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>LRND</code>
+      <label/>
+      <description/>
+      <sourceDevice>Markup Tool from GNG_F_001_1_TRSP.txt</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="long">3</data>
+         </key>
+         <key>
+            <keyCode>rtim</keyCode>
+            <description/>
+            <data dataType="long">765</data>
+         </key>
+         <key>
+            <keyCode>SCod</keyCode>
+            <description/>
+            <data dataType="long">G2</data>
+         </key>
+         <key>
+            <keyCode>EStr</keyCode>
+            <description/>
+            <data dataType="long">CorFing</data>
+         </key>
+         <key>
+            <keyCode>LRND</keyCode>
+            <description/>
+            <data dataType="long">0</data>
+         </key>
+      </keys>
+   </event>
+   <event>
+      <beginTime>2015-07-01T16:24:35.044920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>LRND</code>
+      <label/>
+      <description/>
+      <sourceDevice>Markup Tool from GNG_F_001_1_TRSP.txt</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="long">134</data>
+         </key>
+         <key>
+            <keyCode>rtim</keyCode>
+            <description/>
+            <data dataType="long">1217</data>
+         </key>
+         <key>
+            <keyCode>SCod</keyCode>
+            <description/>
+            <data dataType="long">G2</data>
+         </key>
+         <key>
+            <keyCode>EStr</keyCode>
+            <description/>
+            <data dataType="long">CorFing</data>
+         </key>
+         <key>
+            <keyCode>LRND</keyCode>
+            <description/>
+            <data dataType="long">1</data>
+         </key>
+      </keys>
+   </event>
+   <event>
+      <beginTime>2015-07-01T16:24:35.044920-07:00</beginTime>
+      <relativeBeginTime>0</relativeBeginTime>
+      <duration>1000</duration>
+      <code>LRND</code>
+      <label/>
+      <description/>
+      <sourceDevice>Markup Tool from GNG_F_001_1_TRSP.txt</sourceDevice>
+      <segmentationEvent>false</segmentationEvent>
+      <keys>
+         <key>
+            <keyCode>obs#</keyCode>
+            <description/>
+            <data dataType="long">134</data>
+         </key>
+         <key>
+            <keyCode>rtim</keyCode>
+            <description/>
+            <data dataType="long">1217</data>
+         </key>
+         <key>
+            <keyCode>SCod</keyCode>
+            <description/>
+            <data dataType="long">G2</data>
+         </key>
+         <key>
+            <keyCode>EStr</keyCode>
+            <description/>
+            <data dataType="long">CorFing</data>
+         </key>
+         <key>
+            <keyCode>LRND</keyCode>
+            <description/>
+            <data dataType="long">1</data>
+         </key>
+      </keys>
+   </event>
+</eventTrack>

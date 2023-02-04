@@ -1,6 +1,6 @@
-% eeg_global() - declare global EEGLAB variables. These variables are
-%                used only as global by the main function eeglab(),
-%                the function pop_rejmenu() and the history eegh() function.
+% EEG_GLOBAL - declare global EEGLAB variables. These variables are
+%                used only as global by the main function EEGLAB,
+%                the function POP_REJMENU and the history EEGH function.
 %           
 % Global variables:
 %  EEG        - structure containing the current dataset
@@ -12,7 +12,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab()
+% See also: EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -45,7 +45,17 @@
 % ----------------
 globalvars = who('global');
 if ~isempty(strmatch('ALLCOM', globalvars, 'exact')) || exist('ALLCOM') ~= 1
-    global EEG;		% current dataset 
+    tmpEEG = whos('EEG');
+    % avoid overwritting variable in the current space
+    % in case it is not global
+    if ~isempty(tmpEEG) && ~tmpEEG.global
+        TMPEEG = EEG;
+        clear EEG;
+        global EEG;
+        EEG = TMPEEG;
+    else
+        global EEG;		% current dataset
+    end
     global ALLEEG;		% all datasets
     global CURRENTSET;	% current set index
 

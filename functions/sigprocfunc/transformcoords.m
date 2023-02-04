@@ -1,4 +1,4 @@
-% transformcoords() - Select nazion and inion in anatomical MRI images.
+% TRANSFORMCOORDS - Select nazion and inion in anatomical MRI images.
 %
 % Usage:
 %   mewcoords = transformcoords(coords, rotate, scale, center, reverse);
@@ -9,7 +9,7 @@
 %               roll (y plane) and yaw (z plane). An empty array does
 %               not perform any rotation.
 %   scale     - [scalex scaley scalez] scale axis. A single numeric
-%               input scale all the dimentions the same. Default 1
+%               input scale all the dimensions the same. Default 1
 %               does not scale.
 %   shifts    - [x y z] shift coordinates (after rotation and scaling). 
 %               Default [0 0 0] does not move the center.

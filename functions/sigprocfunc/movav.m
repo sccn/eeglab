@@ -1,4 +1,4 @@
-% movav() - Perform a moving average of data indexed by xvals.
+% MOVAV - Perform a moving average of data indexed by xvals.
 %           Supports use of a moving non-rectangular window.
 %           Can be used to resample a data matrix to any size 
 %           (see xadv NOTE below) and to regularize sampling of 
@@ -17,7 +17,7 @@
 %            to about xxx, xadv needs to be near yyy/xxx {default|0 -> 1}
 %   firstx = low xval of first averaging window {def|[] -> min xvals}
 %   lastx  = high xval of last averaging window {def|[] -> max xvals}
-%   xwin   = vector of window values {def|0 -> ones() = square window}
+%   xwin   = vector of window values {def|0 -> ONES = square window}
 %            May be long. NOTE: linear interp. is NOT used between values.
 %            Example: gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
 %   nonorm = [1|0] If non-zero, do not normalize the moving sum. If
@@ -58,9 +58,9 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 % 3-20-98 fixed bug in multi-channel windowed averaging -sm
-% 6-10-98 changed mean() and sum() to nanmean() and nansum() -sm
-% 2-16-99 tested for stat toolbox functions nanmean() and nansum() -sm
-% 9-03-01 fixed gauss() example -sm
+% 6-10-98 changed MEAN and SUM to NANMEAN and NANSUM -sm
+% 2-16-99 tested for stat toolbox functions NANMEAN and NANSUM -sm
+% 9-03-01 fixed GAUSS example -sm
 % 01-25-02 reformated help & licenses -ad 
 
 function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin,nonorm)
@@ -243,10 +243,10 @@ if verbose,
 end
 
 %
-%%%%%%%%%%%%%%%%%%%%%%% function nan_mean() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% function NAN_MEAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
-% nan_mean() - take the column means of a matrix, ignoring NaN values
+% NAN_MEAN - take the column means of a matrix, ignoring NaN values
 %
 function out = nan_mean(in)
 
@@ -262,10 +262,10 @@ function out = nan_mean(in)
    out(nononnans) = NaN;
 
 %
-%%%%%%%%%%%%%%%%%%%%%%% function nan_sum() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% function NAN_SUM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
-% nan_sum() - take the column sums of a matrix, ignoring NaN values
+% NAN_SUM - take the column sums of a matrix, ignoring NaN values
 %
 function out = nan_sum(in)
 

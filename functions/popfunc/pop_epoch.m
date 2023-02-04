@@ -1,38 +1,39 @@
-% pop_epoch() - Convert a continuous EEG dataset to epoched data by extracting
+% POP_EPOCH - Convert a continuous EEG dataset to epoched data by extracting
 %               data epochs time locked to specified event types or event indices. 
 %               May also sub-epoch an already epoched dataset (if sub-epochs are 
-%               same size or smaller). This pop_function calls epoch().
+%               same size or smaller). This pop_function calls EPOCH.
 % Usage:
 %   >> OUTEEG = pop_epoch( EEG); % pop-up a data entry window
-%   >> OUTEEG = pop_epoch( EEG, events, timelimits);
-%   >> [OUTEEG, indices] = pop_epoch( EEG, typerange, timelimits,'key1', value1 ...);
+%   >> OUTEEG = pop_epoch( EEG, types, timelimits);
+%   >> [OUTEEG, indices] = pop_epoch( EEG, types, timelimits,'key1', value1 ...);
 %
 % Graphic interface:
 %   "Time-locking event type(s)" - [edit box] Select 'Edit > Event values' 
 %                to see a list of event.type values; else use the push button.
 %                To use event types containing spaces, enter in single-quotes.
-%                epoch() function command line equivalent: 'typerange' 
+%                EPOCH function command line equivalent: 'typerange' 
 %   "..."      - [push button] scroll event types.
 %   "Epoch limits" - [edit box] epoch latency range [start, end] in seconds relative
-%                to the time-locking events. epoch() function equivalent: 'timelim' 
+%                to the time-locking events. EPOCH function equivalent: 'timelim' 
 %   "Name for the new dataset" - [edit box] 
-%                epoch() function equivalent: 'newname'
+%                EPOCH function equivalent: 'newname'
 %   "Out-of-bounds EEG ..." - [edit box] Rejection limits ([min max], []=none).
-%                epoch() function equivalent: 'valuelim' 
+%                EPOCH function equivalent: 'valuelim' 
 % Inputs:
 %   EEG        - Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
-%   typerange  - Cell array of event types to time lock to. 'eventindices'
-%                {default {} --> time lock epochs to any type of event}
-%                (Note: An event field called 'type' must be defined in the 
-%                'EEG.event' structure. The command line argument is
-%                'eventindices' below).
+%   types      - String (regular expression) or cell array of event types to time 
+%                lock to. The default is {} which means to extract time lock epochs 
+%                lock to every single event (Note: An event field called 'type' must 
+%                be defined in the 'EEG.event' structure). For regular
+%                expression, see the REGEXP function.
 %   timelim    - Epoch latency limits [start end] in seconds relative to 
 %                the time-locking event {default: [-1 2]}
 %
 % Optional inputs:
 %   'eventindices'- [integer vector] Extract data epochs time locked to the 
-%                indexed event numbers. 
+%                indexed event numbers. If type is defined as well (not
+%                empty), take the intersection of the selected events.
 %   'valuelim' - [min max] or [max]. Lower and upper bound latencies for 
 %                trial data. Else if one positive value is given, use its 
 %                negative as the lower bound. The given values are also 
@@ -87,7 +88,7 @@
 % 03-18-02 interface and debugging -ad
 % 03-27-02 interface and debugging -ad & sm
 
-function [EEG, indices, com] = pop_epoch( EEG, events, lim, varargin )
+function [EEG, indices, com] = pop_epoch( EEG, types, lim, varargin )
 
 if nargin < 1
    help pop_epoch;
@@ -119,7 +120,7 @@ if ~isfield(EEG(1).event, 'latency'),
 end
 if size(EEG(1).data,3) > 1
     epochlim = [num2str( round(EEG.xmin)) '  '  num2str(round(EEG.xmax))]; % Units in seconds as in GUI
-%   epochlim = [num2str( round(EEG.xmin*1000)) '  '  num2str(round(EEG.xmax*1000))]; % Units in miliseconds
+%   epochlim = [num2str( round(EEG.xmin*1000)) '  '  num2str(round(EEG.xmax*1000))]; % Units in milliseconds
 else
     epochlim = '-1 2';
 end
@@ -170,10 +171,10 @@ if nargin < 3
        if strcmpi(result{1}(1),'''')   % If event type appears to be in single-quotes, use comma
                                        % and single-quote as delimiter between event types. toby 2.24.2006
                                        % fixed Arnaud May 2006
-            events = eval( [ '{' result{1} '}' ] );
-       else events = parsetxt( result{1});
+            types = eval( [ '{' result{1} '}' ] );
+       else types = parsetxt( result{1});
        end
-   else events = {};
+   else types = {};
    end
    lim = eval( [ '[' result{2} ']' ] );
 
@@ -190,9 +191,9 @@ end
 % -------------------------
 if length(EEG) > 1
     if nargin < 2
-        [ EEG, com ] = eeg_eval( 'pop_epoch', EEG, 'warning', 'on', 'params', { events lim args{:} } );
+        [ EEG, com ] = eeg_eval( 'pop_epoch', EEG, 'warning', 'on', 'params', { types lim args{:} } );
     else
-        [ EEG, com ] = eeg_eval( 'pop_epoch', EEG, 'params', { events lim args{:} } );
+        [ EEG, com ] = eeg_eval( 'pop_epoch', EEG, 'params', { types lim args{:} } );
     end
     return;
 end
@@ -216,39 +217,53 @@ try, g.eventindices;      catch, g.eventindices = 1:length(EEG.event); end
 try, g.epochinfo;         catch, g.epochinfo = 'yes'; end
 try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [-Inf Inf]; end
 
-% transform string events into a int array of column indices
+% transform string types into a int array of column indices
 % ----------------------------------------------------------
+eeglab_options;
 tmpevent = EEG.event;
 tmpeventlatency = [ tmpevent(:).latency ];
 [tmpeventlatency Itmp] = sort(tmpeventlatency);
 EEG.event = EEG.event(Itmp);  % sort by ascending time 
 Ievent = g.eventindices;
+if ischar(EEG.data)
+    EEG = eeg_checkset(EEG, 'loaddata'); % just in case
+end
 
-if ~isempty( events )
+if ~isempty( types )
     % select the events for epoching
     % ------------------------------
     Ieventtmp = [];
     tmpevent = EEG.event;
     tmpeventtype = { tmpevent.type };
     if ischar(tmpeventtype{1}), tmpeventtype  = deblank(tmpeventtype); end
-    if iscell(events)
+    if iscell(types)
 		if ischar(EEG.event(1).type)
-			for index2 = 1:length( events )
-				tmpevent = events{index2};
+			for index2 = 1:length( types )
+				tmpevent = types{index2};
 				if ~ischar( tmpevent ), tmpevent = num2str( tmpevent ); end
                 tmpEventList = strmatch(deblank(tmpevent), tmpeventtype, 'exact');
 				Ieventtmp = [ Ieventtmp ; tmpEventList(:) ];
 			end
 		else
-			for index2 = 1:length( events )
-				tmpevent = events{index2};
+			for index2 = 1:length( types )
+				tmpevent = types{index2};
 				if ischar( tmpevent ),tmpevent = str2num( tmpevent ); end
 				if isempty( tmpevent ), error('pop_epoch(): string entered in a numeric field'); end
 				Ieventtmp = [ Ieventtmp find(tmpevent == [ tmpeventtype{:} ]) ];
 			end
 		end
+    elseif ischar(types)
+        disp('Using regular expression')
+		if ~ischar(EEG.event(1).type)
+            error('Event types must be string to use regular expression');
+        end
+        for iEvent = 1:length(EEG.event)
+            if ~isempty(regexp(EEG.event(iEvent).type, types, 'once'))
+                Ieventtmp = [ Ieventtmp iEvent ];
+            end
+        end
     else
-        error('pop_epoch(): multiple event types must be entered as {''a'', ''cell'', ''array''}'); return;
+        error('pop_epoch(): multiple event types must be entered as {''a'', ''cell'', ''array''} or a string'); 
     end
     Ievent = sort(intersect(Ievent, Ieventtmp));
 end
@@ -273,7 +288,7 @@ try
 
                 EEG = eeg_formatamica(EEG);
                 %--------------------
-                [EEG indices com] = pop_epoch(EEG,events,lim,args{:});
+                [EEG indices com] = pop_epoch(EEG,types,lim,args{:});
                 %---------------------------------
 
                 EEG = eeg_reformatamica(EEG);
@@ -294,12 +309,13 @@ end
 % change boundaries in rare cases when limits do not include time-locking events
 % ------------------------------------------------------------------------------
 tmpevents = EEG.event;
-if lim(1) > 0 && ischar(EEG.event(1).type)
+if lim(1) > 0
    % go through all onset latencies
    for Z1 = length(alllatencies):-1:1
-      % if there is any event in between trigger and epoch onset which are boundary events
-      selEvt = find([tmpevents.latency] > alllatencies(Z1) & [tmpevents.latency] < alllatencies(Z1) + lim(1) * EEG.srate);
-      selEvt = selEvt(strcmp({tmpevents(selEvt).type}, 'boundary'));
+       % if there is any event in between trigger and epoch onset which are boundary events
+       selEvt = find([tmpevents.latency] > alllatencies(Z1) & [tmpevents.latency] < alllatencies(Z1) + lim(1) * EEG.srate);
+       selEvt = selEvt( eeg_findboundaries(tmpevent(selEvt) ) ); % keep only boundary events
+
       if any(selEvt)
           if sum([tmpevents(selEvt).duration]) > lim(1) * EEG.srate
               alllatencies(Z1) = [];
@@ -310,12 +326,12 @@ if lim(1) > 0 && ischar(EEG.event(1).type)
       end
    end
 end
-if lim(2) < 0 && ischar(EEG.event(1).type)
+if lim(2) < 0
    % go through all onset latencies
    for Z1 = length(alllatencies):-1:1
       % if there is any event in between trigger and epoch onset which are boundary events
       selEvt = find([tmpevents.latency] < alllatencies(Z1) & [tmpevents.latency] > alllatencies(Z1) + lim(2) * EEG.srate);
-      selEvt = selEvt(strcmp({tmpevents(selEvt).type}, 'boundary'));
+      selEvt = selEvt( eeg_findboundaries(tmpevent(selEvt) ) ); % keep only boundary events
       if any(selEvt)
           if sum([tmpevents(selEvt).duration]) > -lim(2) * EEG.srate
               alllatencies(Z1) = [];
@@ -330,10 +346,10 @@ end
 % select event time format and epoch
 % ----------------------------------
 switch lower( g.timeunit )
- case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [lim(1) lim(2)]*EEG.srate, ...
+ case 'points',	[EEG.data, tmptime, indices, epochevent]= epoch(EEG.data, alllatencies, [lim(1) lim(2)]*EEG.srate, ...
                                                     'valuelim', g.valuelim, 'allevents', tmpeventlatency);
   tmptime = tmptime/EEG.srate;
- case 'seconds',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, ...
+ case 'seconds',	[EEG.data, tmptime, indices, epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, ...
                                                     'srate', EEG.srate, 'allevents', tmpeventlatency);
 	otherwise, disp('pop_epoch(): invalid event time format'); beep; return;
 end
@@ -394,7 +410,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 disp('pop_epoch(): checking epochs for data discontinuity');
 if ~isempty(EEG.event) && ischar(EEG.event(1).type)
     tmpevent = EEG.event;
-	boundaryindex = strmatch('boundary', { tmpevent.type });
+    boundaryindex = eeg_findboundaries( tmpevent );
 	if ~isempty(boundaryindex)
 		indexepoch = [];
 		for tmpindex = boundaryindex
@@ -412,19 +428,23 @@ end
 
 % generate text command
 % ---------------------
-com = sprintf('EEG = pop_epoch( EEG, { ');
-for j=1:length(events)
-    if ischar( events{j} )  com = sprintf('%s ''%s'' ', com, events{j} );
-    else                    com = sprintf('%s [%s] ',   com, num2str(events{j}) );
+if ischar(types)
+    com = sprintf('EEG = pop_epoch( EEG, ''%s'', [%s]', types, num2str(lim));
+else
+    com = sprintf('EEG = pop_epoch( EEG, { ');
+    for j=1:length(types)
+        if ischar( types{j} )  com = sprintf('%s ''%s'' ', com, types{j} );
+        else                    com = sprintf('%s [%s] ',   com, num2str(types{j}) );
+        end
     end
+    com = sprintf('%s }, [%s]', com, num2str(lim)); 
 end
-com = sprintf('%s }, [%s]', com, num2str(lim)); 
 for i=1:2:length(args)
     if ~isempty( args{i+1} )
         if ischar( args{i+1} )   com = sprintf('%s, ''%s'', ''%s''', com, args{i}, args{i+1} );
         else                    com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
         end
-    end;    
+    end    
 end
 com = [com ');'];
 return; % text command

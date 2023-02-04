@@ -1,4 +1,4 @@
-% eegthresh() -  reject trials with out-of-bounds channel values within a
+% EEGTHRESH -  reject trials with out-of-bounds channel values within a
 %                specified epoch time range.
 %
 % Usage:
@@ -32,7 +32,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_eegthresh(), eeglab()
+% See also: POP_EEGTHRESH, EEGLAB
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -61,7 +61,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [Iin, Iout, newsignal, elec] = eegthresh( signal, pnts, electrodes, negthresh, posthresh, timerange, starttime, endtime);
+function [Iin, Iout, newsignal, elec] = eegthresh( signal, pnts, electrodes, negthresh, posthresh, timerange, starttime, endtime)
 
 if nargin < 7
 	help eegthresh;
@@ -71,17 +71,20 @@ end
 if starttime < timerange(1)
 	disp('eegthresh: starting point out of range, adjusted');
     starttime = timerange(1);
-end;	
+end
 if endtime > timerange(2)
 	disp('eegthresh: ending point out of range, adjusted');
     endtime = timerange(2);
-end;	
+end
+if isempty(electrodes)
+    electrodes = 1:size(signal,1);
+end
 
 % complete thresholds values if necessary
 %----------------------------------------
 if size(posthresh,2) < size(electrodes,2)
 	posthresh = [ posthresh posthresh(end)*ones(1,size(electrodes,2)-size(posthresh,2))];
-end;	
+end
 if size(negthresh,2) < size(electrodes,2)
 	negthresh = [ negthresh negthresh(end)*ones(1,size(electrodes,2)-size(negthresh,2))];
 end
@@ -90,10 +93,10 @@ end
 %----------------------------------------
 if size(starttime,2) < size(electrodes,2)
 	starttime = [ starttime starttime(end)*ones(1,size(electrodes,2)-size(starttime,2))];
-end;	
+end
 if size(endtime,2) < size(electrodes,2)
 	endtime = [ endtime endtime(end)*ones(1,size(electrodes,2)-size(endtime,2))];
-end;	
+end
 
 % find the maximum for each trial
 %--------------------------------

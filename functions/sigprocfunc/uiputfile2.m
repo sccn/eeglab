@@ -1,4 +1,4 @@
-% uiputfile2() - same as uigputfile but remember folder location.
+% UIPUTFILE2 - same as uigputfile but remember folder location.
 %
 % Usage: >> uiputfile2(...)
 %

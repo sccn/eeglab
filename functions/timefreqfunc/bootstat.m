@@ -1,4 +1,4 @@
-% bootstat() - accumulate surrogate data to assess significance by permutation of some 
+% BOOTSTAT - accumulate surrogate data to assess significance by permutation of some 
 %              measure of two input variables. 
 %
 %              If 'distfit','on', fits the psd with a 4th-order polynomial using the 
@@ -56,7 +56,7 @@
 %                   rsignif returns the p-values. Requires 'distfit' (see above).
 %                   This option currently implemented only for 1-D data.
 %   'correctp'    - [phat pci zerofreq] parameters for correcting for a biased probability 
-%                   distribution (requires 'distfit' above). See help of correctfit().
+%                   distribution (requires 'distfit' above). See help of CORRECTFIT.
 % Outputs: 
 %    rsignif      - significance arrays. 2 values (low high) for each point (use
 %                   'alpha' to change these limits).
@@ -64,7 +64,7 @@
 %
 % Authors: Arnaud Delorme, Bhaktivedcanta Institute, Mumbai, India, Nov 2004
 %
-% See also: timef()
+% See also: TIMEF
 
 % NOTE: There is an undocumented parameter, 'savecoher', [0|1]
 % HELP TEXT REMOVED:  (Ex: Using option 'both', coherence during baseline would be 
@@ -448,7 +448,7 @@ return;
     end
 
 % this shuffling preserve the number of -1 and 1
-% for cloumns and rows (assuming matrix size is multiple of 2
+% for columns and rows (assuming matrix size is multiple of 2
 % -----------------------------------------------------------
 function array = supershuffle(array, dim)
     if size(array, 1) == 1 || size(array,2) == 1
@@ -466,21 +466,21 @@ function array = supershuffle(array, dim)
         end
     elseif dim == 2
         indcols = shuffle(1:size(array,2));
-        for index = 1:2:length(indcols)-rem(length(indcols),2) % shuffle colums
+        for index = 1:2:length(indcols)-rem(length(indcols),2) % shuffle columns
             tmparray                    = array(:,indcols(index),:);
             array(:,indcols(index),:)   = array(:,indcols(index+1),:);
             array(:,indcols(index+1),:) = tmparray;
         end
     else
         ind3d = shuffle(1:size(array,3));
-        for index = 1:2:length(ind3d)-rem(length(ind3d),2) % shuffle colums
+        for index = 1:2:length(ind3d)-rem(length(ind3d),2) % shuffle columns
             tmparray                  = array(:,:,ind3d(index));
             array(:,:,ind3d(index))   = array(:,:,ind3d(index+1));
             array(:,:,ind3d(index+1)) = tmparray;
         end
     end
 
-% shuffle one dimension, one row/colums at a time
+% shuffle one dimension, one row/columns at a time
 % -----------------------------------------------
 function array = shuffleonedim(array, dim)
     if size(array, 1) == 1 || size(array,2) == 1

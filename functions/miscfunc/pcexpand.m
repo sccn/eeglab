@@ -1,6 +1,6 @@
-% pcexpand() - expand data using Principal Component Analysis (PCA)
+% PCEXPAND - expand data using Principal Component Analysis (PCA)
 %              returns data expanded from a principal component subspace 
-%                              [compare pcsquash()]
+%                              [compare PCSQUASH]
 % Usage: 
 %        After  >> [eigenvectors,eigenvalues,projections] = pcsquash(data,ncomps);
 %        then   >> [expanded_data] = pcexpand(projections,eigenvectors,mean(data'));
@@ -16,7 +16,7 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 %
-% See also: pcsquash(), svd()
+% See also: PCSQUASH, SVD
 
 % Copyright (C) 6-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %

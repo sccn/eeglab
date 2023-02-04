@@ -1,4 +1,4 @@
-% fillcurves() - fill the space between 2 curves
+% FILLCURVES - fill the space between 2 curves
 %
 % Usage:
 %   h=fillcurves( Y1, Y2);
@@ -82,10 +82,10 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
             fillcurves(X, Y1(:,index)', Y2(:,index)', color{index}, transparent);
             hold on;
         end
-        yl = ylim;
-        xl = xlim;
-        line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
-        line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
+%         yl = ylim;
+%         xl = xlim;
+%         line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
+%         line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
         
         % write legend and add transparency to it
         % ---------------------------------------
@@ -117,10 +117,10 @@ function h = fillcurves(X, Y1, Y2, color, transparent, legends)
 
     % replot lines at boundaries
     % --------------------------
-    parent = dbstack;
-    if length(parent) == 1 || ~strcmpi(parent(2).name, 'fillcurves')
-        yl = ylim;
-        xl = xlim;
-        line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
-        line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
-    end
+%     parent = dbstack;
+%     if length(parent) == 1 || ~strcmpi(parent(2).name, 'fillcurves')
+%         yl = ylim;
+%         xl = xlim;
+%         line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
+%         line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
+%     end

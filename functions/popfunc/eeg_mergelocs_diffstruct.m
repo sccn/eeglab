@@ -1,4 +1,4 @@
-% eeg_mergelocs() - merge channel structure while preserving channel
+% EEG_MERGELOCS - merge channel structure while preserving channel
 %                   order
 %
 %      >> mergedlocs = eeg_mergelocs(loc1, loc2, loc3, ...);
@@ -87,7 +87,7 @@ for index = 2:length(varargin)
 end
 
 % union of two channel location structure
-% without loosing the order information
+% without losing the order information
 % ---------------------------------------
 function alllocs = myunion(locs1, locs2)
 

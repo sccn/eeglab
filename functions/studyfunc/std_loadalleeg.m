@@ -1,7 +1,7 @@
-% std_loadalleeg() - constructs an ALLEEG structure, given the paths and file names 
+% STD_LOADALLEEG - constructs an ALLEEG structure, given the paths and file names 
 %                    of all the EEG datasets that will be loaded into the ALLEEG 
 %                    structure. The EEG datasets may be loaded without their EEG.data 
-%                    (see the pop_editoptions() function), so many datasets can be 
+%                    (see the POP_EDITOPTIONS function), so many datasets can be 
 %                    loaded simultaneously. The loaded EEG datasets have dataset 
 %                    information and a (filename) pointer to the data. 
 % Usage:    
@@ -21,13 +21,13 @@
 %          >> datasets = { 'visattS1', 'visattS2', 'visattS3', 'visattS4'};
 %          >> ALLEEG = std_loadalleeg(paths,datasets) ; 
 %                
-% See also: pop_loadstudy(), pop_study()
+% See also: POP_LOADSTUDY, POP_STUDY
 %
 % Authors: Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
+% This file is part of EEGLAB, see https://eeglab.org
 % for the documentation and details.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -112,33 +112,45 @@ function ALLEEG = std_loadalleeg(varargin)
         if ~isempty(oldgenpath) && oldgenpath(end) == filesep
              oldgenpath(end) = [];
         end
-        if ~isequal(genpath, oldgenpath) && ~isempty(oldgenpath)
-            disp('Warning: STUDY moved since last saved, trying to load data files using relative path');
-            if  ~isempty(strfind(char(paths{dset}), oldgenpath))
-                relativePath = char(paths{dset}(length(oldgenpath)+1:end));
-                relativePath = fullfile(genpath, relativePath);
+        if ~isequal(genpath, oldgenpath) && ~isempty(oldgenpath) %
+            oldgenpath = strrep(oldgenpath, [ filesep filesep ], filesep);
+            if ~isequal(genpath, oldgenpath) && ~isempty(oldgenpath)
+                
+                disp('Warning: STUDY moved since last saved, trying to load data files using relative path');
+                if  ~isempty(strfind(char(paths{dset}), oldgenpath))
+                    relativePath = char(paths{dset}(length(oldgenpath)+1:end));
+                    relativePath = fullfile(genpath, relativePath);
+                else
+                    disp('Important warning: relative path cannot calculated, make sure the correct data files are loaded');
+                    relativePath = char(paths{dset});
+                end
+                
+                % fix issue when datasets are in a parent folder of the STUDY
+                if dset == 1
+                    indCommon = 1;
+                    while indCommon <= length(oldgenpath) && indCommon <= length(paths{1}) && paths{1}(indCommon) == oldgenpath(indCommon)
+                        indCommon = indCommon+1;
+                    end
+                    indCommon = indCommon-1;
+                    if indCommon > 1 && indCommon < length(genpath) % do not change path if nothing in common between the two paths
+                        genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
+                    end
+                end
             else
-                disp('Important warning: relative path cannot calculated, make sure the correct data files are loaded');
                 relativePath = char(paths{dset});
-            end;   
-            
-            % fix issue when datasets are in a parent folder of the STUDY
-            if dset == 1
-                indCommon = 1;
-                while indCommon <= length(oldgenpath) && indCommon <= length(paths{1}) && paths{1}(indCommon) == oldgenpath(indCommon)
-                    indCommon = indCommon+1;
-                end
-                indCommon = indCommon-1;
-                if indCommon > 1 && indCommon < length(genpath) % do not change path if nothing in common between the two paths
-                    genpath(indCommon-length(oldgenpath)+length(genpath)+1:end) = [];
-                end
             end
         else
             relativePath = char(paths{dset});
         end
         
-        % load data files
-        if exist(fullfile(relativePath, datasets{dset})) == 2
+        % load files with a variety of extension using file-io
+        [~,~,ext] = fileparts(datasets{dset});
+        if ~isequal(lower(ext), '.set')
+            disp('Importing binary file and resaving with a .set file extension as an EEGLAB dataset');
+            EEG = pop_biosig(fullfile(relativePath, datasets{dset}));
+            [pathTmp,fileTmp,ext] = fileparts(fullfile(relativePath, datasets{dset}));
+            EEG = pop_saveset(EEG, fullfile(pathTmp, [ fileTmp '.set' ]));
+        elseif exist(fullfile(relativePath, datasets{dset})) == 2
             EEG = pop_loadset('filename', datasets{dset}, 'filepath', relativePath, 'loadmode', 'info', 'check', 'off');
         elseif exist(fullfile(char(paths{dset}), datasets{dset})) == 2
             EEG = pop_loadset('filename', datasets{dset}, 'filepath', char(paths{dset}), 'loadmode', 'info', 'check', 'off');
@@ -177,11 +189,11 @@ function ALLEEG = std_loadalleeg(varargin)
             EEG.icaact = [];
         end
         
-        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
+        [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
     end
     ALLEEG = eeg_checkset(ALLEEG);
 
-    if strcmpi(warnfold, 'on') && ~strcmpi(pwd, genpath)
+    if strcmpi(warnfold, 'on') && ~strcmpi(pwd, genpath) && ~isempty(genpath)
         disp('Changing current path to STUDY path...');
         cd(genpath);
     end

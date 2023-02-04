@@ -1,7 +1,7 @@
 echo off;
 
-% eeglab_options() - handle EEGLAB options. This script (not function)
-%                    set the various options in the eeg_options() file.
+% EEGLAB_OPTIONS - handle EEGLAB options. This script (not function)
+%                    set the various options in the EEG_OPTIONS file.
 %
 % Usage:
 %   eeglab_options;
@@ -54,8 +54,9 @@ try
         if ~isempty(EEGOPTION_PATH) % in icadefs above
              homefolder = EEGOPTION_PATH;
         elseif ispc
-             if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end
-             homefolder = deblank(evalc('!echo %USERPROFILE%'));
+%              if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end
+%              homefolder = deblank(evalc('!echo %USERPROFILE%'));
+            homefolder = getenv('USERPROFILE');
         else homefolder = '~';
         end
         

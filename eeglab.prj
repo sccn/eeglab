@@ -1,18 +1,18 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="751778857" file="/data/matlab/eeglab_versions/eeglabcompile/eeglab.prj" location="/data/matlab/eeglab_versions/eeglabcompile" name="eeglab" preferred-package-location="/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_redistribution" preferred-package-type="package.type.app" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="751778857" file="Z:\data\matlab\eeglab_versions\eeglabcompile\eeglab.prj" location="Z:\data\matlab\eeglab_versions\eeglabcompile" name="eeglab" preferred-package-location="Z:\data\matlab\eeglab_versions\eeglabcompile\eeglab\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
-    <param.version>2020.0</param.version>
+    <param.version>2021.1</param.version>
     <param.authnamewatermark>Arnaud Delorme and Scott Makeig</param.authnamewatermark>
     <param.email>eeglab@sccn.ucsd.edu</param.email>
     <param.company />
     <param.summary>EEGLAB Matlab toolbox for processing continuous and event-related EEG, MEG and other electrophysiological data</param.summary>
     <param.description>EEGLAB is an interactive Matlab toolbox for processing continuous and event-related EEG, MEG and other electrophysiological data incorporating independent component analysis (ICA), time/frequency analysis, artifact rejection, event-related statistics, and several useful modes of visualization of the averaged and single-trial data.</param.description>
-    <param.screenshot>${PROJECT_ROOT}/functions/supportfiles/EEGLAB_compile_splash.jpg</param.screenshot>
+    <param.screenshot>${PROJECT_ROOT}\functions\supportfiles\EEGLAB_compile_splash.jpg</param.screenshot>
     <param.guid />
-    <param.installpath.string>/EEGLAB/</param.installpath.string>
-    <param.installpath.combo>option.installpath.systemwideapp</param.installpath.combo>
+    <param.installpath.string>\EEGLAB\</param.installpath.string>
+    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
     <param.logo />
     <param.install.notes>In the following directions, replace MCR_ROOT by the directory where the MATLAB Runtime is installed on the target machine.
 
@@ -28,19 +28,11 @@ If it is defined, set it to the concatenation of these strings:
     MCR_ROOT/v92/runtime/maci64:
     MCR_ROOT/v92/sys/os/maci64:
     MCR_ROOT/v92/bin/maci64</param.install.notes>
-    <param.target.install.notes>In the following directions, replace MR/v98 by the directory on the target machine where MATLAB is installed, or MR by the directory where the MATLAB Runtime is installed.
-
-If the environment variable DYLD_LIBRARY_PATH is undefined, set it to the following string:
-
-MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci64
-
-If it is defined, set it to the following:
-
-${DYLD_LIBRARY_PATH}:MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci64</param.target.install.notes>
-    <param.intermediate>${PROJECT_ROOT}/eeglab/for_testing</param.intermediate>
-    <param.files.only>${PROJECT_ROOT}/eeglab/for_redistribution_files_only</param.files.only>
-    <param.output>${PROJECT_ROOT}/eeglab/for_redistribution</param.output>
-    <param.logdir>${PROJECT_ROOT}/eeglab</param.logdir>
+    <param.target.install.notes />
+    <param.intermediate>${PROJECT_ROOT}\eeglab\for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}\eeglab\for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}\eeglab\for_redistribution</param.output>
+    <param.logdir>${PROJECT_ROOT}\eeglab</param.logdir>
     <param.enable.clean.build>false</param.enable.clean.build>
     <param.user.defined.mcr.options />
     <param.target.type>subtarget.standalone</param.target.type>
@@ -73,6 +65,7 @@ ${DYLD_LIBRARY_PATH}:MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci6
       <param.installpath.string />
       <param.installpath.combo />
       <param.logo />
+      <param.target.install.notes />
       <param.intermediate />
       <param.files.only />
       <param.output />
@@ -87,113 +80,114 @@ ${DYLD_LIBRARY_PATH}:MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci6
       <param.web.mcr.name />
       <param.package.mcr.name />
       <param.no.mcr.name />
-      <param.windows.command.prompt />
       <param.native.matlab />
       <param.checkbox />
       <param.example />
     </unset>
     <fileset.main>
-      <file>${PROJECT_ROOT}/eeglab.m</file>
+      <file>${PROJECT_ROOT}\eeglab.m</file>
     </fileset.main>
     <fileset.resources>
-      <file>${PROJECT_ROOT}/functions/adminfunc</file>
-      <file>${PROJECT_ROOT}/functions/guifunc</file>
-      <file>${PROJECT_ROOT}/functions/miscfunc</file>
-      <file>${PROJECT_ROOT}/functions/popfunc</file>
-      <file>${PROJECT_ROOT}/functions/sigprocfunc</file>
-      <file>${PROJECT_ROOT}/functions/statistics</file>
-      <file>${PROJECT_ROOT}/functions/studyfunc</file>
-      <file>${PROJECT_ROOT}/functions/supportfiles</file>
-      <file>${PROJECT_ROOT}/functions/timefreqfunc</file>
-      <file>${PROJECT_ROOT}/plugins/ANTeepimport1.13</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/forward</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/inverse</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/preproc</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/statfun</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/trialfun</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite20210120/external/biosig</file>
-      <file>${PROJECT_ROOT}/plugins/Fileio20210120</file>
-      <file>${PROJECT_ROOT}/plugins/ICLabel</file>
-      <file>${PROJECT_ROOT}/plugins/PICARD1.0</file>
-      <file>${PROJECT_ROOT}/plugins/VisEd1.05</file>
-      <file>${PROJECT_ROOT}/plugins/bids-matlab-tools5.3</file>
-      <file>${PROJECT_ROOT}/plugins/bids-matlab-tools5.3/JSONIO</file>
-      <file>${PROJECT_ROOT}/plugins/bids-validator1.1</file>
-      <file>${PROJECT_ROOT}/plugins/bva-io1.7</file>
-      <file>${PROJECT_ROOT}/plugins/clean_rawdata</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit</file>
-      <file>${PROJECT_ROOT}/plugins/egilegacy1.0</file>
-      <file>${PROJECT_ROOT}/plugins/firfilt</file>
-      <file>${PROJECT_ROOT}/plugins/iirfilt1.03</file>
-      <file>${PROJECT_ROOT}/plugins/musedirect1.2</file>
-      <file>${PROJECT_ROOT}/plugins/musemonitor3.2</file>
-      <file>${PROJECT_ROOT}/plugins/neuroscanio1.4</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.18</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.18/xdf</file>
+      <file>${PROJECT_ROOT}\functions\adminfunc</file>
+      <file>${PROJECT_ROOT}\functions\guifunc</file>
+      <file>${PROJECT_ROOT}\functions\miscfunc</file>
+      <file>${PROJECT_ROOT}\functions\popfunc</file>
+      <file>${PROJECT_ROOT}\functions\sigprocfunc</file>
+      <file>${PROJECT_ROOT}\functions\statistics</file>
+      <file>${PROJECT_ROOT}\functions\studyfunc</file>
+      <file>${PROJECT_ROOT}\functions\supportfiles</file>
+      <file>${PROJECT_ROOT}\functions\timefreqfunc</file>
+      <file>${PROJECT_ROOT}\plugins\ANTeepimport1.13</file>
+      <file>${PROJECT_ROOT}\plugins\bids-matlab-tools6.1</file>
+      <file>${PROJECT_ROOT}\plugins\bids-matlab-tools6.1\JSONIO</file>
+      <file>${PROJECT_ROOT}\plugins\bva-io1.71</file>
+      <file>${PROJECT_ROOT}\plugins\clean_rawdata</file>
+      <file>${PROJECT_ROOT}\plugins\dipfit</file>
+      <file>${PROJECT_ROOT}\plugins\egilegacy1.0</file>
+      <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210</file>
+      <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\external\biosig</file>
+      <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\forward</file>
+      <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\inverse</file>
+      <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\preproc</file>
+      <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\statfun</file>
+      <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\trialfun</file>
+      <file>${PROJECT_ROOT}\plugins\Fileio220210</file>
+      <file>${PROJECT_ROOT}\plugins\firfilt</file>
+      <file>${PROJECT_ROOT}\plugins\ICLabel</file>
+      <file>${PROJECT_ROOT}\plugins\iirfilt1.03</file>
+      <file>${PROJECT_ROOT}\plugins\musedirect1.2</file>
+      <file>${PROJECT_ROOT}\plugins\musemonitor3.2</file>
+      <file>${PROJECT_ROOT}\plugins\neuroscanio1.5</file>
+      <file>${PROJECT_ROOT}\plugins\PICARD1.0</file>
+      <file>${PROJECT_ROOT}\plugins\scd1.0</file>
+      <file>${PROJECT_ROOT}\plugins\snapmaster1.0</file>
+      <file>${PROJECT_ROOT}\plugins\VisEd1.05</file>
+      <file>${PROJECT_ROOT}\plugins\xdfimport1.18</file>
+      <file>${PROJECT_ROOT}\plugins\xdfimport1.18\xdf</file>
+      <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.0</file>
+      <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.0\MFF-1.2.2-jar-with-dependencies.jar</file>
     </fileset.resources>
     <fileset.package>
-      <file>${PROJECT_ROOT}/1ST_README.txt</file>
-      <file>${PROJECT_ROOT}/eeglablicense.txt</file>
-      <file>${PROJECT_ROOT}/functions/supportfiles/eeglab_run_this_one_on_osx_or_linux</file>
-      <file>${PROJECT_ROOT}/functions/supportfiles/eeglab_run_this_one_on_windows.bat</file>
-      <file>${PROJECT_ROOT}/sample_data</file>
-      <file>${PROJECT_ROOT}/sample_locs</file>
+      <file>${PROJECT_ROOT}\1ST_README.txt</file>
+      <file>${PROJECT_ROOT}\eeglablicense.txt</file>
+      <file>${PROJECT_ROOT}\functions\supportfiles\eeglab_run_this_one_on_osx_or_linux</file>
+      <file>${PROJECT_ROOT}\functions\supportfiles\eeglab_run_this_one_on_windows.bat</file>
+      <file>${PROJECT_ROOT}\sample_data</file>
+      <file>${PROJECT_ROOT}\sample_locs</file>
     </fileset.package>
     <fileset.depfun>
-      <file>${MATLAB_ROOT}/examples/rptgen/data/peppers.png</file>
-      <file>${MATLAB_ROOT}/toolbox/local/restoredefaultpath.m</file>
-      <file>${MATLAB_ROOT}/toolbox/local/userpath.m</file>
-      <file>${MATLAB_ROOT}/toolbox/matlab/demos/watchoff.m</file>
-      <file>${MATLAB_ROOT}/toolbox/matlab/demos/watchon.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/display.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/eegobj.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/fieldnames.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/horzcat2.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/isfield.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/isstruct.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/length.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/orderfields.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/rmfield.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/simpletest.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/subsasgn.m</file>
-      <file>${PROJECT_ROOT}/functions/@eegobj/subsref.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/binaryopp.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/bsxfun.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/changefile.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/checkcopies_local.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/checkworkspace.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/ctranspose.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/display.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/double.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/end.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/fft.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/isnumeric.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/length.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/mmo.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/ndims.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/permute.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/reshape.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/size.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/subsasgn.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/subsasgn_old.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/subsref.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/sum.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/transpose.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/unitaryopp.m</file>
-      <file>${PROJECT_ROOT}/functions/@mmo/var.m</file>
+      <file>${MATLAB_ROOT}\toolbox\local\restoredefaultpath.m</file>
+      <file>${MATLAB_ROOT}\toolbox\local\userpath.m</file>
+      <file>${MATLAB_ROOT}\toolbox\matlab\demos\watchoff.m</file>
+      <file>${MATLAB_ROOT}\toolbox\matlab\demos\watchon.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\display.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\eegobj.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\fieldnames.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\horzcat2.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\isfield.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\isstruct.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\length.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\orderfields.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\rmfield.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\simpletest.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\subsasgn.m</file>
+      <file>${PROJECT_ROOT}\functions\@eegobj\subsref.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\binaryopp.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\bsxfun.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\changefile.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\checkcopies_local.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\checkworkspace.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\ctranspose.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\display.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\double.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\end.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\fft.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\isnumeric.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\length.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\mmo.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\ndims.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\permute.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\reshape.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\size.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\subsasgn.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\subsasgn_old.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\subsref.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\sum.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\transpose.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\unitaryopp.m</file>
+      <file>${PROJECT_ROOT}\functions\@mmo\var.m</file>
     </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/readme.txt</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/EEGLAB.app</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/splash.png</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/run_EEGLAB.sh</file>
+      <file location="${PROJECT_ROOT}\eeglab\for_testing" name="splash.png" optional="false">Z:\data\matlab\eeglab_versions\eeglabcompile\eeglab\for_testing\splash.png</file>
+      <file location="${PROJECT_ROOT}\eeglab\for_testing" name="EEGLAB.exe" optional="false">Z:\data\matlab\eeglab_versions\eeglabcompile\eeglab\for_testing\EEGLAB.exe</file>
+      <file location="${PROJECT_ROOT}\eeglab\for_testing" name="readme.txt" optional="true">Z:\data\matlab\eeglab_versions\eeglabcompile\eeglab\for_testing\readme.txt</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/Applications/MATLAB_R2020a.app</root>
+      <root>C:\Program Files\MATLAB\R2020a</root>
       <toolboxes>
         <toolbox name="matlabcoder" />
+        <toolbox name="gpucoder" />
         <toolbox name="neuralnetwork" />
       </toolboxes>
       <toolbox>
@@ -202,24 +196,29 @@ ${DYLD_LIBRARY_PATH}:MR/v98/runtime/maci64:MR/v98/sys/os/maci64:MR/v98/bin/maci6
         </matlabcoder>
       </toolbox>
       <toolbox>
+        <gpucoder>
+          <enabled>true</enabled>
+        </gpucoder>
+      </toolbox>
+      <toolbox>
         <neuralnetwork>
           <enabled>true</enabled>
         </neuralnetwork>
       </toolbox>
     </matlab>
     <platform>
-      <unix>true</unix>
-      <mac>true</mac>
-      <windows>false</windows>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
       <win2k>false</win2k>
       <winxp>false</winxp>
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.14.6</osver>
+      <osver>10.0</osver>
       <os32>false</os32>
       <os64>true</os64>
-      <arch>maci64</arch>
+      <arch>win64</arch>
       <matlab>true</matlab>
     </platform>
   </configuration>

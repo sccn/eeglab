@@ -1,4 +1,4 @@
-% erpregoutfunc() - sub function of erpregout() used to regress 
+% ERPREGOUTFUNC - sub function of ERPREGOUT used to regress 
 %                   out the ERP from the data
 %
 % Usage:

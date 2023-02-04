@@ -1,4 +1,4 @@
-% pop_eegthresh() - reject artifacts by detecting outlier values.  This has 
+% POP_EEGTHRESH - reject artifacts by detecting outlier values.  This has 
 %                   long been a standard method for selecting data to reject.
 %                   Applied either for electrode data or component activations.
 % Usage:
@@ -45,13 +45,13 @@
 %              marks: 1=immediately reject marked trials. {Default: 1}.
 % Outputs:
 %   Indexes    - index of rejected trials
-%     When eegplot() is called, modifications are applied to the current 
-%     dataset at the end of the call to eegplot() when the user presses 
+%     When EEGPLOT is called, modifications are applied to the current 
+%     dataset at the end of the call to EEGPLOT when the user presses 
 %     the 'Reject' button.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegthresh(), eeglab(), eegplot(), pop_rejepoch() 
+% See also: EEGTHRESH, EEGLAB, EEGPLOT, POP_REJEPOCH 
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -97,7 +97,7 @@ if nargin < 2
 end
 
 if icacomp == 0
-	if isempty( EEG.icasphere )
+	if isempty( EEG(1).icasphere )
 		disp('Error: you must run ICA first'); return;
 	end
 end
@@ -116,11 +116,11 @@ if nargin < 3
                   'End time limit(s) (seconds, Ex 0.2):', ...
                   'Display previous rejection marks', ...
                   'Reject marked trial(s)' };
-    inistr = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], '1:5'), ...
+    inistr = { fastif(icacomp, ['1:' int2str(EEG(1).nbchan)], '1:5'), ...
                fastif(icacomp, '-10', '-20'),  ...
                fastif(icacomp, '10', '20'), ...
-               num2str(EEG.xmin), ...
-               num2str(EEG.xmax), ...
+               num2str(EEG(1).xmin), ...
+               num2str(EEG(1).xmax), ...
                '0', ...
                '0' };
     
@@ -166,6 +166,18 @@ else
     calldisp = 0;
 end
 
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_eegthresh', EEG, 'warning', 'on', 'params', { icacomp, elecrange, negthresh, posthresh, starttime, endtime, superpose, reject } );
+    else
+        [ EEG, com ] = eeg_eval( 'pop_eegthresh', EEG, 'params', { icacomp, elecrange, negthresh, posthresh, starttime, endtime, superpose, reject } );
+    end
+    Irej = [];
+    return;
+end
+
 if any(starttime < EEG.xmin) 
  fprintf('Warning : starttime inferior to minimum time, adjusted\n'); 
 	starttime(find(starttime < EEG.xmin)) = EEG.xmin; 
@@ -173,6 +185,9 @@ end
 if any(endtime   > EEG.xmax) 
 	fprintf('Warning : endtime superior to maximum time, adjusted\n'); 
 	endtime(find(endtime > EEG.xmax)) = EEG.xmax;
+end
+if isempty(elecrange)
+    elecrange = 1:EEG.nbchan;
 end
 
 if icacomp == 1

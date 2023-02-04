@@ -1,4 +1,4 @@
-% std_erpimageplot() - Commandline function to plot cluster ERPimage or channel erpimage.
+% STD_ERPIMAGEPLOT - Commandline function to plot cluster ERPimage or channel erpimage.
 %
 % Usage:
 %   >> [STUDY] = std_erpimageplot(STUDY, ALLEEG, key1, val1, key2, val2);
@@ -7,13 +7,13 @@
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the datasets in the STUDY.
-%                Note: ALLEEG for a STUDY set is typically created using load_ALLEEG().
+%                Note: ALLEEG for a STUDY set is typically created using LOAD_ALLEEG.
 %
 % Additional help:
-% Inputs and output of this function are strictly identical to the std_erspplot().
+% Inputs and output of this function are strictly identical to the STD_ERSPPLOT.
 % See the help message of this function for more information.
 %
-% See also: std_erspplot()
+% See also: STD_ERSPPLOT
 %
 % Authors: Arnaud Delorme, UCSD/CERCO, August, 2011-
 

@@ -1,13 +1,13 @@
-% erpimage() - Plot a colored image of a collection of single-trial data epochs, optionally
+% ERPIMAGE - Plot a colored image of a collection of single-trial data epochs, optionally
 %              sorted on and/or aligned to an input sorting variable and smoothed across
 %              trials with a Gaussian weighted moving-average. (To return event-aligned data
-%              without plotting, use eegalign()).  Optionally sort trials on value, amplitude
+%              without plotting, use EEGALIGN).  Optionally sort trials on value, amplitude
 %              or phase within a specified latency window. Optionally plot the ERP mean
 %              and std. dev.and moving-window spectral amplitude and inter-trial coherence
 %              at aselected or peak frequency. Optionally 'time warp' the single trial
 %              time-domain (potential) or power data to align the plotted data to a series
 %              of events with varying latencies that occur in each trial. Click on
-%              individual figures parts to examine them separately and zoom (using axcopy()).
+%              individual figures parts to examine them separately and zoom (using AXCOPY).
 % Usage:
 %            >> figure; erpimage(data,[],times); % image trials as colored lines in input order
 %
@@ -280,8 +280,8 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% Uses external toolbox functions: phasecoher(), rmbase(), cbar(), movav()
-% Uses included functions:         plot1trace(), phasedet()
+% Uses external toolbox functions: PHASECOHER, RMBASE, CBAR, MOVAV
+% Uses included functions:         PLOT1TRACE, PHASEDET
 
 % UNIMPLEMENTED - 'allcohers',[data2] -> image the coherences at each latency & epoch.
 %                 Requires arg 'coher' with alpha significance.
@@ -1143,7 +1143,7 @@ if ~isempty(auxvar)
 elseif exist('timeStretchRef') && ~isempty(timeStretchRef)
     if ~isnan(aligntime)
         fprintf(['\nerpimage(): options "align" and ' ...
-            '"timewarp" are not compatiable.\n']);
+            '"timewarp" are not compatible.\n']);
         return;
     end
     
@@ -2047,7 +2047,7 @@ if ~isempty(i)
 end
 
 %
-%% %%%%%%%%%%% Determine coherence freqeuncy %%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%% Determine coherence frequency %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if length(coherfreq) == 2 && coherfreq(1) ~= coherfreq(2) && freq <= 0
     % find max frequency in specified band - should use Matlab pwelch()?
@@ -3389,7 +3389,7 @@ if nargout<1
 end
 
 %
-%% %%%%%%%%%%%%% Plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%% Plot a TOPOPLOT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if (~isempty(topomap)) && strcmpi(NoShow, 'no')
     h(12)=axes('Position',...
@@ -3482,7 +3482,7 @@ limits = [min(times) max(times) minerp maxerp minamp maxamp mincoh maxcoh];
 limits = [limits baseamp coherfreq];  % add coherfreq to output limits array
 
 %
-%% %%%%%%%%%%%%% turn on axcopy() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%% turn on AXCOPY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmpi(NoShow, 'no')
     axcopy(gcf);
@@ -3499,7 +3499,7 @@ end
 fprintf('Done.\n\n');
 
 %
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End erpimage() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End ERPIMAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmpi(NoShow, 'no')
     axes('position',gcapos);
@@ -3509,7 +3509,7 @@ warning on;
 
 return
 %
-%% %%%%%%%%%%%%%%%%% function plot1trace() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%% function PLOT1TRACE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs,erp_grid,erp_vltg_ticks)
 %function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs,erp_grid,erp_vltg_ticks)
@@ -3633,9 +3633,9 @@ set(gca,'children',kids');
 plot_handle=[plot_handle l1 l2];
 
 %
-%% %%%%%%%%%%%%%%%%% function phasedet() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%% function PHASEDET %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% phasedet() - function used in erpimage.m
+% PHASEDET - function used in erpimage.m
 %              Constructs a complex filter at frequency freq
 %
 function [ang,amp,win] = phasedet(data,frames,srate,nwin,freq)
@@ -3663,7 +3663,7 @@ ang = angle(resp);
 amp = abs(resp);
 
 %
-%% %%%%%%%%%%%% function prctle() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%% function PRCTLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 function prctl = prctle(data,pc); % return percentile of a distribution
 [prows pcols] = size(pc);
@@ -3688,9 +3688,9 @@ pt = [0 100*((1:i)-0.5)./i 100];
 sortdata = [min(data); sortdata; max(data)];
 prctl = interp1(pt,sortdata,pc);
 %
-%% %%%%%%%%%%%%%%%%%%%%% function nan_mean() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%% function NAN_MEAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% nan_mean() - Take the column means of a matrix, ignoring NaN values.
+% NAN_MEAN - Take the column means of a matrix, ignoring NaN values.
 %              Return significance bounds if alpha (0 < alpha< <1) is given.
 %
 function [out, outalpha]  = nan_mean(in,alpha)
@@ -3728,7 +3728,7 @@ if nargin>1
 end
 out(nononnans) = NaN;
 %
-%% %%%%%%%%%%%%%%%%%%%%% function nan_std() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%% function NAN_STD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 function out = nan_std(in)
 
@@ -3754,7 +3754,7 @@ else
     w = [w; w(end-1:-1:1)];
 end
 %
-%% %%%%%%%%%%%%%%%%%%%%% function compute_percentile() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%% function COMPUTE_PERCENTILE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 function outpercent = compute_percentile(sortvar, percent, outtrials, winsize);
 ntrials = length(sortvar);
@@ -3769,7 +3769,7 @@ for index = 1:length(outtrials)
 end
 
 %
-%% %%%%%%%%%%%%%%%%%%%%% function orderofmag() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%% function ORDEROFMAG %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 function ord=orderofmag(val)
 %function ord=orderofmag(val)
@@ -3799,7 +3799,7 @@ else
 end
 
 %
-%% %%%%%%%%%%%%%%%%%%%%% function find_crspnd_pt() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%% function FIND_CRSPND_PT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 function y_pt=find_crspnd_pt(targ,vals,outtrials)
 %function id=find_crspnd_pt(targ,vals,outtrials)

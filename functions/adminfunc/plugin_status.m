@@ -1,4 +1,4 @@
-% plugin_status()- Given the name of a plugin(or part of it), returns 
+% PLUGIN_STATUS- Given the name of a plugin(or part of it), returns 
 %                  the status (e.g. [0]not installed, [1]installed)                                                               
 %  Inputs:
 %         pluginname   - {string} Name (or part of it) of plugin of interest
@@ -6,7 +6,7 @@
 % Optional inputs:
 %        exactmatch  - [0,1] Force the function to look for an exact match of
 %                       the name provided in the input 'pluginname' 
-%                       {defaul: 0 = not exact match enforced}
+%                       {default: 0 = not exact match enforced}
 %  Outputs:
 %        
 %        status         - [Vector 1xnumber of plugins]. 0 = Not installed,

@@ -1,4 +1,4 @@
-% end() - last index to memmapdata array
+% END - last index to memmapdata array
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

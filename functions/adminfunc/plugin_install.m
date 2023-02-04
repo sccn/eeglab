@@ -1,4 +1,4 @@
-% plugin_install() - install EEGLAB plugin. Called by plugin_askinstall().
+% PLUGIN_INSTALL - install EEGLAB plugin. Called by PLUGIN_ASKINSTALL.
 %
 % Usage:
 %  plugin_install(zipfilelink, name, version, force, size);
@@ -14,7 +14,7 @@
 %
 % plugin_askinstall('xxxxxx', [], true); % with xxxx being the name of the plugin
 %
-% See also: plugin_askinstall()
+% See also: PLUGIN_ASKINSTALL
 
 % Copyright (C) 2012- Arnaud Delorme
 %
@@ -63,7 +63,7 @@ function result = plugin_install(zipfilelink, name, version, pluginsize, forceIn
     if pluginsize > 500000 && ~forceInstall
         res = questdlg2( [ 'Extension ' name ' size is ' num2str(ceil(pluginsize/100)/10) 'MB. Are you sure' 10 ...
             'you want to download this extension?' ], 'Warning', 'No', 'Yes', 'Yes');
-        if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); 
+        if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension installation\n' ]); 
             result = -1; 
             return; 
         end

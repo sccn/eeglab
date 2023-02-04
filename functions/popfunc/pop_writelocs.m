@@ -1,17 +1,17 @@
-% pop_writelocs() - load a EGI EEG file (pop out window if no arguments).
+% POP_WRITELOCS - load a EGI EEG file (pop out window if no arguments).
 %
 % Usage:
 %   >> EEG = pop_writelocs(chanstruct);             % a window pops up
 %   >> EEG = pop_writelocs(chanstruct, filename, 'key', val, ...);
 %
 % Inputs:
-%   chanstruct     - channel structure. See readlocs()
+%   chanstruct     - channel structure. See READLOCS
 %   filename       - Electrode location file name
-%   'key',val      - same as writelocs()
+%   'key',val      - same as WRITELOCS
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, 17 Dec 2002
 %
-% See also: writelocs()
+% See also: WRITELOCS
 
 % Copyright (C) Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -73,7 +73,7 @@ formatskip = [ chanformat(indformat).skipline ];
    
 %[listtype formatinfo listcolformat formatskip] = readlocs('getinfoswrite');
 
-% GUI support of `custom` filetype, removed until `custom` can pass readlocs() check
+% GUI support of `custom` filetype, removed until `custom` can pass READLOCS check
 %listtype{end+1} = 'custom';
 %formatinfo{end+1} = {};
 %formatskip = [ formatskip 0];

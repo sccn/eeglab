@@ -1,6 +1,6 @@
-% eeg_store() - store specified EEG dataset(s) in the ALLEEG variable 
+% EEG_STORE - store specified EEG dataset(s) in the ALLEEG variable 
 %               containing all current datasets, after first checking 
-%               dataset consistency using eeg_checkset().
+%               dataset consistency using EEG_CHECKSET.
 %
 % Usage: >> [ALLEEG EEG index] = eeg_store(ALLEEG, EEG);
 %        >> [ALLEEG EEG index] = eeg_store(ALLEEG, EEG, index);
@@ -11,7 +11,7 @@
 %                May also be an array of datasets; these will be 
 %                checked and stored separately in ALLEEG.
 %   index      - (optional), ALLEEG index (or indices) to use to store 
-%                the new dataset(s). If no index is given, eeg_store() 
+%                the new dataset(s). If no index is given, EEG_STORE 
 %                uses the lowest empty slot(s) in the ALLEEG array. 
 % Outputs:
 %   ALLEEG - array of all current datasets
@@ -30,7 +30,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeglab(), eeg_checkset(), eeg_retrieve()
+% See also: EEGLAB, EEG_CHECKSET, EEG_RETRIEVE
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

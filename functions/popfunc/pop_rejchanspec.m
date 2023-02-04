@@ -1,9 +1,9 @@
-% pop_rejchanspec() - reject artifacts channels in an EEG dataset using 
+% POP_REJCHANSPEC - reject artifacts channels in an EEG dataset using 
 %                  channel spectrum. The average spectrum for all selected
 %                  is computed and a threshold is applied.
 %
 % Usage:
-%   >> pop_rejchanspec( INEEG ) % pop-up interative window mode
+%   >> pop_rejchanspec( INEEG ) % pop-up interactive window mode
 %   >> [OUTEEG, indelec] = pop_rejchanspec( INEEG, 'key', 'val');
 %
 % Inputs:
@@ -16,7 +16,7 @@
 %   'stdthresh' - [max] positive threshold in terms of standard deviation.
 %                 Default is 5.
 %   'absthresh' - [max] positive threshold in terms of spectrum units
-%                 (overides the option above).
+%                 (overrides the option above).
 %   'averef'    - ['on'|'off'] 'on' computes average reference before
 %                 applying threshold. Default is 'off'.
 %   'plothist'  - ['on'|'off'] 'on' plot the histogram of values along 
@@ -135,7 +135,7 @@ opt = finputcheck( options, { 'averef'    'string'    { 'on';'off' }       'off'
                               'stdthresh' 'real'   []                      5 }, 'pop_rejchanspec');
 if ischar(opt), error(opt); end
 
-% compute average referecne if necessary
+% compute average reference if necessary
 if strcmpi(opt.averef, 'on')
      NEWEEG = pop_reref(EEG, [], 'exclude', setdiff([1:EEG.nbchan], opt.elec));
 else NEWEEG = EEG;

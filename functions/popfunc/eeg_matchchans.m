@@ -1,4 +1,4 @@
-% eeg_matchchans()  - find closest channels in a larger EEGLAB chanlocs structure
+% EEG_MATCHCHANS  - find closest channels in a larger EEGLAB chanlocs structure
 %                     to channels in a smaller chanlocs structure
 % Usage:
 %        >> [selchans,distances,selocs] = eeg_matchchans(BIGlocs,smalllocs,'noplot');

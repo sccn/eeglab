@@ -1,4 +1,4 @@
-% laplac2d() - generate a 2 dimensional laplacian matrice
+% LAPLAC2D - generate a 2 dimensional laplacian matrice
 %
 % Usage :
 %    >> [ gaussmatrix ] = laplac2d( rows, columns, sigma, ...
@@ -10,7 +10,7 @@
 % Inputs:
 %   rows    - number of rows 
 %   columns - number of columns 
-%   sigma   - standart deviation (default: rows/5)
+%   sigma   - standard deviation (default: rows/5)
 %   meanR   - mean for rows (default: center of the row)
 %   meanC   - mean for columns (default: center of the column)
 %   cut	    - percentage (0->1) of the maximum value for removing 
@@ -20,7 +20,7 @@
 %       research. For a more rigorous validated approach use the freely 
 %       available Current Source Density Matlab toolbox.
 %
-% See also: eeg_laplac()
+% See also: EEG_LAPLAC
 %
 % Author: Arnaud Delorme, CNL, Salk Institute, 2001
 
@@ -82,8 +82,8 @@ mat = - exp(-0.5*r2/sigma2) .* ((r2 - sigma2)/(sigma2*sigma2));
 % zeros crossing at r = -/+ sigma;
 % mat = r2;
 if cut > 0
-	maximun = max(max(mat))*cut;
-	I = find(mat < maximun);
+	maximum = max(max(mat))*cut;
+	I = find(mat < maximum);
 	mat(I) = 0;
 end
 

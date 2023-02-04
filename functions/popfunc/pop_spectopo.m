@@ -1,11 +1,11 @@
-% pop_spectopo() - Plot spectra of specified data channels or components.
+% POP_SPECTOPO - Plot spectra of specified data channels or components.
 %                  Show scalp maps of power at specified frequencies. 
-%                  Calls spectopo(). 
+%                  Calls SPECTOPO. 
 % Usage:
 %   >> pop_spectopo( EEG, dataflag); % pops-up interactive window
 %  OR
 %   >> [spectopo_outputs] = pop_spectopo( EEG, dataflag, timerange, ...
-%                        process, 'key', 'val',...); % returns spectopo() outputs
+%                        process, 'key', 'val',...); % returns SPECTOPO outputs
 %
 % Graphic interface for EEG data (dataflag = 1):
 %   "Epoch time range" - [edit box]  [min max] Epoch time range (in ms) to use 
@@ -13,18 +13,18 @@
 %                      Command line equivalent: 'timerange'
 %   "Percent data to sample" - [edit box] Percentage of data to use in
 %                      computing the spectra (low % speeds up the computation).
-%                      spectopo() equivalent: 'percent'
+%                      SPECTOPO equivalent: 'percent'
 %   "Frequencies to plot as scalp maps" - [edit box] Vector of 1-7 frequencies to 
-%                      plot topoplot() scalp maps of power at all channels.
-%                      spectopo() equivalent: 'freqs'
+%                      plot TOPOPLOT scalp maps of power at all channels.
+%                      SPECTOPO equivalent: 'freqs'
 %   "Apply to EEG|ERP|BOTH" - [edit box] Plot spectra of the 'EEG', 'ERP' or of 'BOTH'.
 %                      NOTE: This edit box does not appear for continuous data.
 %                      Command line equivalent: 'process'
 %   "Plotting frequency range" - [edit box] [min max] Frequency range (in Hz) to plot.
-%                      spectopo() equivalent: 'freqrange'
+%                      SPECTOPO equivalent: 'freqrange'
 %   "Spectral and scalp map options (see topoplot)" - [edit box] 'key','val','key',... 
-%                      sequence of arguments passed to spectopo() for details of the 
-%                      spectral decomposition or to topoplot() to adjust details of 
+%                      sequence of arguments passed to SPECTOPO for details of the 
+%                      spectral decomposition or to TOPOPLOT to adjust details of 
 %                      the scalp maps. For details see  >> help topoplot
 %
 % Graphic interface for components (dataflag = 0):
@@ -32,30 +32,30 @@
 %                      in computing the spectra (by default the whole epoch or data).
 %                      Command line equivalent: 'timerange'
 %   "Frequency (Hz) to analyze" - [edit box] Single frequency (Hz) at which to plot 
-%                      component contributions. spectopo() equivalent: 'freqs'
+%                      component contributions. SPECTOPO equivalent: 'freqs'
 %   "Electrode number to analyze" - [edit box] 1-nchans --> Plot component contributions 
 %                      at this channel; [] --> Plot contributions at channel with max 
 %                      power; 0 --> Plot component contributions to global (RMS) power.
-%                      spectopo() equivalent: 'plotchan'
+%                      SPECTOPO equivalent: 'plotchan'
 %   "Percent data to sample" - [edit box] Percent of data to use in computing the spectra 
-%                      (low % speeds up the computation). spectopo() equivalent: 'percent'
+%                      (low % speeds up the computation). SPECTOPO equivalent: 'percent'
 %   "Components to include ..." - [Edit box] Only compute spectrum of a subset of the
-%                      components. spectopo() equivalent: 'icacomps'
+%                      components. SPECTOPO equivalent: 'icacomps'
 %   "Number of largest-contributing ..." - [edit box] Number of component maps 
-%                      to plot. spectopo() equivalent: 'nicamaps'
+%                      to plot. SPECTOPO equivalent: 'nicamaps'
 %   "Else, map only these components ..." - [edit box] Use this entry to override 
 %                      plotting maps of the components that project most strongly (at
 %                      the selected frequency) to the the selected channel (or whole scalp 
-%                      if 'plotchan' (above) == 0). spectopo() equivalent: 'icamaps'
+%                      if 'plotchan' (above) == 0). SPECTOPO equivalent: 'icamaps'
 %   "[Checked] Compute comp spectra ..." - [checkbox] If checked, compute the spectra 
 %                      of the selected component activations; else, if unchecked 
 %                      compute the spectra of (the data MINUS each selected component).
-%                      spectopo() equivalent: 'icamode' 
+%                      SPECTOPO equivalent: 'icamode' 
 %   "Plotting frequency range" - [edit box] [min max] Frequency range (in Hz) to plot.
-%                      spectopo() equivalent: 'freqrange'
+%                      SPECTOPO equivalent: 'freqrange'
 %   "Spectral and scalp map options (see topoplot)" - [edit box] 'key','val','key',... 
-%                      sequence of arguments passed to spectopo() for details of the 
-%                      spectral decomposition or to topoplot() to adjust details of 
+%                      sequence of arguments passed to SPECTOPO for details of the 
+%                      spectral decomposition or to TOPOPLOT to adjust details of 
 %                      the scalp maps. For details see  >> help topoplot
 % Inputs:
 %   EEG         - Input EEGLAB dataset
@@ -69,17 +69,17 @@
 %                   'ERP', or plot 'BOTH' the EEG and ERP spectra. {Default: 'EEG'}
 %
 % Optional inputs:
-%   'key','val'  - Optional topoplot() and/or spectopo() plotting arguments 
+%   'key','val'  - Optional TOPOPLOT and/or SPECTOPO plotting arguments 
 %                  {Default, 'electrodes','off'}
 %
-% Outputs: As from spectopo(). When nargin<2, a query window pops-up 
+% Outputs: As from SPECTOPO. When nargin<2, a query window pops-up 
 %          to ask for additional arguments and NO outputs are returned.
 %          Note: Only the outputs of the 'ERP' spectral analysis 
 %          are returned when plotting 'BOTH' ERP and EEG spectra.
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 10 March 2002
 %
-% See also: spectopo(), topoplot()
+% See also: SPECTOPO, TOPOPLOT
 
 % Copyright (C) 10 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -144,7 +144,7 @@ if nargin < 3
 		promptstr    = { { 'style' 'text' 'string' 'Epoch time range to analyze [min_ms max_ms]:' }, ...
 						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
 						 { 'style' 'text' 'string' 'Percent data to sample (1 to 100):'}, ...
-						 { 'style' 'edit' 'string' '50' }, ...
+						 { 'style' 'edit' 'string' '100' }, ...
 						 { 'style' 'text' 'string' 'Frequencies to plot as scalp maps (Hz):'}, ...
 						 { 'style' 'edit' 'string'  scalp_freq{:} }, ...
 						 { 'style' 'text' 'string' 'Apply to EEG|ERP|BOTH:'}, ...
@@ -202,7 +202,7 @@ if nargin < 3
 						 { 'style' 'edit' 'string' '' }, ...
 						 { 'style' 'text' 'string' '[Checked] Compute comp spectra; [Unchecked] (data-comp) spectra:', 'tooltipstring' ...
 						 ['If checked, compute the spectra of the selected component activations' 10 ...
-						 'else [if unchecked], compute the spectra of (the data MINUS each slected component)']}, ...
+						 'else [if unchecked], compute the spectra of (the data MINUS each selected component)']}, ...
 						 { 'style' 'checkbox' 'value' 1 } { }, ...
 						 { 'style' 'text' 'string' 'Plotting frequency range ([min max] Hz):'}, ...
 						 { 'style' 'edit' 'string' '2 25' }, ...
@@ -297,9 +297,9 @@ end
 
 % add boundaries if continuous data
 % ----------------------------------
-if EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
+if EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type')
 	tmpevent = EEG.event;
-    boundaries = strmatch('boundary', {tmpevent.type});
+    boundaries = eeg_findboundaries(tmpevent);
 	if ~isempty(boundaries)
 		if exist('pointrange')
 			boundaries = [ tmpevent(boundaries).latency ] - 0.5-pointrange(1)+1;

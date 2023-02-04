@@ -1,8 +1,8 @@
-% eegdraw() - subroutine used by eegplotold() to plot data.
+% EEGDRAW - subroutine used by EEGPLOTOLD to plot data.
 %
 % Author: Colin Humphries, CNL, Salk Institute, La Jolla, 7/96
 
-% Copyright (C) Colin Humphries, CNL, Salk Institute 7/96 from eegplot()
+% Copyright (C) Colin Humphries, CNL, Salk Institute 7/96 from EEGPLOT
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.

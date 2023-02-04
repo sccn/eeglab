@@ -1,4 +1,4 @@
-% display() - display an EEG data class underlying structure
+% DISPLAY - display an EEG data class underlying structure
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 

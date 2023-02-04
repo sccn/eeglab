@@ -1,4 +1,4 @@
-% gethelpvar() - convert a Matlab m-file help-message header 
+% GETHELPVAR - convert a Matlab m-file help-message header 
 %               into out variables 
 % Usage:
 %  >> [vartext, varnames] = gethelpvar( filein, varlist);
@@ -6,19 +6,19 @@
 % Inputs:
 %   filein     - input filename  (with .m extension)
 %   varlist    - optional list of variable to return. If absent
-%                retrun all variables.
+%                return all variables.
 %
 % Outputs:
 %   vartext     - variable text
-%   varnames    - name of the varialbe returned;
+%   varnames    - name of the variable returned;
 %
-% Notes: see help2html() for file format
+% Notes: see HELP2HTML for file format
 %
 % Example: >> gethelpvar( 'gethelpvar.m', 'filein')
 %
 % Author:  Arnaud Delorme, Salk Institute 20 April 2002
 %
-% See also: help2html()
+% See also: HELP2HTML
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -138,10 +138,10 @@ while (str(1) == '%')
                vartext = str;
             else	
                if ~isempty(varname) 
-               	    vartext = [ vartext 10 str]; % espace if in array
+               	    vartext = [ vartext 10 str]; % space if in array
                else 
                		if length(vartext)>3 && all(vartext(	end-2:end) == '.')
-               			vartext = [ deblank2(vartext(1:end-3)) 10 str]; % espace if '...'
+               			vartext = [ deblank2(vartext(1:end-3)) 10 str]; % space if '...'
                		else
                     	vartext = [ vartext 10 str];    % CR otherwise
                     end;	
