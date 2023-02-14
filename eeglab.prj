@@ -97,13 +97,6 @@ If it is defined, set it to the concatenation of these strings:
       <file>${PROJECT_ROOT}\functions\studyfunc</file>
       <file>${PROJECT_ROOT}\functions\supportfiles</file>
       <file>${PROJECT_ROOT}\functions\timefreqfunc</file>
-      <file>${PROJECT_ROOT}\plugins\ANTeepimport1.13</file>
-      <file>${PROJECT_ROOT}\plugins\bids-matlab-tools6.1</file>
-      <file>${PROJECT_ROOT}\plugins\bids-matlab-tools6.1\JSONIO</file>
-      <file>${PROJECT_ROOT}\plugins\bva-io1.71</file>
-      <file>${PROJECT_ROOT}\plugins\clean_rawdata</file>
-      <file>${PROJECT_ROOT}\plugins\dipfit</file>
-      <file>${PROJECT_ROOT}\plugins\egilegacy1.0</file>
       <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210</file>
       <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\external\biosig</file>
       <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\forward</file>
@@ -112,20 +105,27 @@ If it is defined, set it to the concatenation of these strings:
       <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\statfun</file>
       <file>${PROJECT_ROOT}\plugins\Fieldtrip-lite220210\trialfun</file>
       <file>${PROJECT_ROOT}\plugins\Fileio220210</file>
-      <file>${PROJECT_ROOT}\plugins\firfilt</file>
+      <file>${PROJECT_ROOT}\plugins\ANTeepimport1.13</file>
       <file>${PROJECT_ROOT}\plugins\ICLabel</file>
-      <file>${PROJECT_ROOT}\plugins\iirfilt1.03</file>
-      <file>${PROJECT_ROOT}\plugins\musedirect1.2</file>
-      <file>${PROJECT_ROOT}\plugins\musemonitor3.2</file>
-      <file>${PROJECT_ROOT}\plugins\neuroscanio1.5</file>
+      <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.1</file>
+      <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.1\MFF-1.2.2-jar-with-dependencies.jar</file>
       <file>${PROJECT_ROOT}\plugins\PICARD1.0</file>
+      <file>${PROJECT_ROOT}\plugins\VisEd1.05</file>
+      <file>${PROJECT_ROOT}\plugins\bids-matlab-tools7.5</file>
+      <file>${PROJECT_ROOT}\plugins\bids-matlab-tools7.5\JSONIO</file>
+      <file>${PROJECT_ROOT}\plugins\bva-io1.71</file>
+      <file>${PROJECT_ROOT}\plugins\clean_rawdata</file>
+      <file>${PROJECT_ROOT}\plugins\dipfit</file>
+      <file>${PROJECT_ROOT}\plugins\egilegacy1.0</file>
+      <file>${PROJECT_ROOT}\plugins\firfilt</file>
+      <file>${PROJECT_ROOT}\plugins\iirfilt1.05</file>
+      <file>${PROJECT_ROOT}\plugins\musedirect1.2</file>
+      <file>${PROJECT_ROOT}\plugins\musemonitor4.0</file>
+      <file>${PROJECT_ROOT}\plugins\neuroscanio1.6</file>
       <file>${PROJECT_ROOT}\plugins\scd1.0</file>
       <file>${PROJECT_ROOT}\plugins\snapmaster1.0</file>
-      <file>${PROJECT_ROOT}\plugins\VisEd1.05</file>
       <file>${PROJECT_ROOT}\plugins\xdfimport1.18</file>
       <file>${PROJECT_ROOT}\plugins\xdfimport1.18\xdf</file>
-      <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.0</file>
-      <file>${PROJECT_ROOT}\plugins\MFFMatlabIO4.0\MFF-1.2.2-jar-with-dependencies.jar</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}\1ST_README.txt</file>
