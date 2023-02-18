@@ -128,7 +128,7 @@ If it is defined, set it to the concatenation of these strings:
       <file>${PROJECT_ROOT}\plugins\xdfimport1.18\xdf</file>
     </fileset.resources>
     <fileset.package>
-      <file>${PROJECT_ROOT}\1ST_README.txt</file>
+      <file>${PROJECT_ROOT}\README.md</file>
       <file>${PROJECT_ROOT}\eeglablicense.txt</file>
       <file>${PROJECT_ROOT}\functions\supportfiles\eeglab_run_this_one_on_osx_or_linux</file>
       <file>${PROJECT_ROOT}\functions\supportfiles\eeglab_run_this_one_on_windows.bat</file>
