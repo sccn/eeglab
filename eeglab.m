@@ -164,6 +164,9 @@ end
 
 % Warning if in toolbox folder
 % ----------------------------
+if isdeployed
+    fprintf(2, 'Compiled EEGLAB version: if you encounter problem, try running EEGLAB as administrator\n');
+end
 if isempty(warningShowed)
     filterPath = fileparts(fileparts(fileparts(which('filter'))));
     eeglabPath = fileparts(fileparts(which('eeglab')));

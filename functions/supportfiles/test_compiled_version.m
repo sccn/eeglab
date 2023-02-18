@@ -18,10 +18,15 @@ try
         TMP = pop_loadbv( fullfile('sample_data', 'test_data'), 'testbva.vhdr' );
         TMP = pop_loadcnt( fullfile('sample_data', 'test_data', 'test.cnt') );
         TMP = pop_musemonitor( fullfile('sample_data', 'test_data', 'testmusemonitor.csv') );
-        TMP = pop_mffimport( fullfile(pwd, 'sample_data', 'test_data', 'testmff.mff'), 'code' );
         TMP = pop_biosig( fullfile('sample_data', 'test_data', 'test.edf') );
         TMP = pop_biosig( fullfile('sample_data', 'test_data', 'test.bdf') );
         [TMP,TMP2] = pop_importbids( fullfile('sample_data', 'test_data', 'BIDS_test'), 'bidsevent', 'off' );
+        try
+            TMP = pop_mffimport( fullfile(pwd, 'sample_data', 'test_data', 'testmff.mff'), 'code' );
+        catch
+            warning(lasterr)
+            fprintf(2, 'pop_mffimport error could be due to permission issues, try running EEGLAB as administrator\n')
+        end
     end
 
     % EEGLAB history file generated on the 08-Jul-2020
