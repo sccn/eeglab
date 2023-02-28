@@ -326,7 +326,7 @@ for iSubj = 1:nb_subjects
                 warning('No filename in ALLEEG, pulling data blindly from STUDY')
             end
 
-            if strcmp(subname(1:4),'sub-')
+            if contains(subname,'sub-') 
                 if contains(subname,'ses-')
                     filename = [subname '_design' num2str(design_index) '.set'];
                 else
