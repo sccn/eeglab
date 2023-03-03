@@ -853,7 +853,7 @@ for inddataset = 1:length(ALLEEG)
     else
         EEG.event = [];
     end
-    if isfield(EEG, 'urevent') && ~isempty(EEG.urevent) && ~isfield(EEG.event, 'urevent')
+    if isfield(EEG, 'urevent') && ~isempty(EEG.urevent) && ~isfield(EEG.event, 'urevent') && ~isempty(EEG.event)
         warning('Inconsistency between urevent (backup) and event structures, removing urevent structure');
         EEG.urevent = [];
     end
