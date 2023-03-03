@@ -108,7 +108,9 @@ for index = 1:length(allargs)
 			strout = [ strout ',{' tmpres '}' ];
 		elseif isstruct(tmpvar)
 			strout = [ strout ',' struct2str( tmpvar ) ];		
-		else
+        elseif isa(tmpvar, 'function_handle')
+            strout = [ strout ',' char( tmpvar ) ];
+        else
 			error('Unrecognized input');
 		end
 	end
