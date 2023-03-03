@@ -69,7 +69,7 @@ if nargin < 1
 	return;
 end
 if isempty(EEG)  , error('Cannot save empty datasets'); end
-if isequal(EEG.data, 'in set file')
+if length(EEG) == 1 && isequal(EEG.data, 'in set file')
     EEG = pop_loadset(fullfile(EEG.filepath, EEG.filename));
 end
 
