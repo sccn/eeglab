@@ -264,7 +264,9 @@ if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
         TMP.trials = size(TMP.data,3);
         TMP.pnts   = size(TMP.data,2);
         TMP.event  = [];
+        TMP.urevent  = [];
         TMP.epoch  = [];
+        TMP.chanlocs = [];
         for index = 1:length(boundaries)
             TMP.event(index).type = 'boundary';
             TMP.event(index).latency = boundaries(index);
