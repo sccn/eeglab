@@ -176,7 +176,10 @@ if ~isfield(STUDY, 'datasetinfo')
             STUDY.datasetinfo(realindex).session   = ALLEEG(realindex).session;
             STUDY.datasetinfo(realindex).run       = ALLEEG(realindex).run;
             STUDY.datasetinfo(realindex).condition = ALLEEG(realindex).condition;
-            STUDY.datasetinfo(realindex).group     = ALLEEG(realindex).group;                    
+            STUDY.datasetinfo(realindex).group     = ALLEEG(realindex).group;       
+            if isfield(ALLEEG(realindex), 'task')   
+                STUDY.datasetinfo(realindex).task      = ALLEEG(realindex).task;                 
+            end
         end
     end
 end
@@ -286,6 +289,9 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
             STUDY.datasetinfo(currentind).index     = currentind;    
+            if isfield(ALLEEG(realindex), 'task')   
+                STUDY.datasetinfo(currentind).task      = ALLEEG(currentind).task;                 
+            end
         otherwise
             % running custom command
             cleanname = cleanvarname(g.commands{k});
