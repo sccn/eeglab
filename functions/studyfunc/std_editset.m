@@ -295,6 +295,10 @@ for k = 1:2:length(g.commands)
         otherwise
             % running custom command
             cleanname = cleanvarname(g.commands{k});
+            cleanname(cleanname == ' ') = [];
+            cleanname(cleanname == ',') = [];
+            cleanname(cleanname == '.') = [];
+            cleanname(cleanname == '-') = [];
             STUDY.datasetinfo(currentind).(cleanname) = g.commands{k+1};
     end
 end
