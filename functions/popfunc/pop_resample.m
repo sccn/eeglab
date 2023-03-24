@@ -221,7 +221,9 @@ if isfield(EEG.event, 'latency')
                 EEG.event(iEvt).latency = indices(iBnd) - 0.5;
             else
                 iBnd = sum(EEG.event(iEvt).latency >= bounds);
-                EEG.event(iEvt).latency = (EEG.event(iEvt).latency - bounds(iBnd)) * p / q + indices(iBnd);
+                if iBnd > 0
+                    EEG.event(iEvt).latency = (EEG.event(iEvt).latency - bounds(iBnd)) * p / q + indices(iBnd);
+                end
             end
             
             % Recompute event duration relative to segment onset
