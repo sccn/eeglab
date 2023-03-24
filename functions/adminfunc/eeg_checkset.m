@@ -184,6 +184,7 @@ if nargin < 1
 end
 
 EEGFINAL = EEG;
+warning backtrace off
 if isempty(EEG), return; end
 if ~isfield(EEG, 'data'), return; end
 
