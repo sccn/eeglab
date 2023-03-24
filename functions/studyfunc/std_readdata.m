@@ -289,9 +289,9 @@ if ~isempty(opt.clusters)
     realDim  = dim;
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
     for iDat1 = 1:length(dataTmp)
-        for iDat2 = 1:length(dataTmp{iDat1})
+        for iDat2 = 1:length(dataTmp{iDat1}(:))
             if isempty(dataTmp{iDat1}{iDat2})
-                dataTmp{iDat1}{iDat2} = []; % sometimes empty but all dim not 0
+                dataTmp{iDat1}{iDat2} = double.empty(0,0,0); % sometimes empty but all dim not 0
             end
         end
         compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
@@ -302,7 +302,7 @@ if ~isempty(opt.clusters)
             end
         end
         
-        if any(compNumbers)
+        if any(any(compNumbers))
             for iDat2 = 1:length(dataTmp{iDat1}(:))
                 if compNumbers(iDat2)
                     for iComps = 1:compNumbers(iDat2)
