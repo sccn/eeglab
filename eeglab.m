@@ -424,7 +424,7 @@ if nargin == 1
 		else
 			eegh('eeglab(''redraw'');');
 		end
-	elseif strcmp(onearg, 'continuous')
+	elseif strcmpi(onearg, 'continuous') || strcmpi(onearg, 'cont')
         ALLEEG = []; CURRENTSET = 0; CURRENTSTUDY = 0; STUDY = [];
         disp('Clearing all data and loading tutorial continuous data')
         EEG = pop_loadset(fullfile(eeglabpath, 'sample_data', 'eeglab_data.set'));
@@ -1174,7 +1174,7 @@ else
         end
         if ~exist('pop_dipfit_settings', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'tools');
-            cb_dipfit = [ 'if ~plugin_askinstall(''dipfit'', ''pop_dipfit_settings''), return; end;'  ];
+            cb_dipfit =  'if ~plugin_askinstall(''dipfit'', ''pop_dipfit_settings''), return; end;'  ;
             eegmenu( false,  neuro_m, 'Label', 'Locate dipoles using DIPFIT 2.x', 'CallBack', cb_dipfit, 'separator', 'on');
         end
         if ~exist('pop_loadbva', 'file')
@@ -1438,8 +1438,20 @@ if isempty(ALLEEG) && ~isempty(EEG) && all(arrayfun(@(eeg) ~isempty(eeg.data), E
 else
     % check dataset
     if ~isempty(EEG) && ~isempty(ALLEEG) && ~isequaln(EEG, ALLEEG(CURRENTSET))
-        EEG.saved = 'no';
-        [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'study', ~isempty(STUDY)+0, 'guistring', 'The EEG structure has changed, what do you want to do?');
+        if length(EEG) > 1
+            options =  { 'EEG overwrites ALLEEG', 'ALLEEG overwrites EEG', 'Do nothing' };
+            res = questdlg2('In a STUDY, ALLEEG and EEG should be equal and they are not. How do you want EEGLAB to resolve this?', 'ALLEEG and EEG structure do not match', options{:}, options{1});
+            if isequal(res, options{1})
+                disp('Overwriting ALLEEG with EEG')
+                ALLEEG = EEG;
+            elseif isequal(res, options{2})
+                disp('Overwriting EEG with ALLEEG')
+                EEG = ALLEEG;
+            end
+        else
+            EEG.saved = 'no';
+            [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'study', ~isempty(STUDY)+0, 'guistring', 'The EEG structure has changed, what do you want to do?');
+        end
     end
 end
 
