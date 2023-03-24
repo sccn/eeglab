@@ -175,6 +175,7 @@ dataopts = {};
 % In case of FIF files convert EEG channel units to uV in FT options
 [filePath, fileNameNoExt, filext] = fileparts(filename);
 if strcmpi(filext,'.fif')
+    fprintf(2, 'FIF file detected, check if channel locations are rotated properly in the channel editor\n')
     eegchanindx = find(strcmpi(dat.chantype,'eeg'));
     if ~isempty(eegchanindx) && isfield (dat,'chanunit')
         if ~all(strcmpi(dat.chanunit(eegchanindx),'uv'))
