@@ -212,7 +212,10 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
         xbad = xbad./rad;
         ybad = ybad./rad;
         zbad = zbad./rad;
-        
+        if isempty(xbad)
+            error('Trying to interpolate a channel without coordinates assigned to it');
+        end
+
         EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
         %[tmp1 tmp2 tmp3 tmpchans] = spheric_spline_old( xelec, yelec, zelec, EEG.data(goodchans,1));
         %max(tmpchans(:,1)), std(tmpchans(:,1)), 
