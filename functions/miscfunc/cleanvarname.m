@@ -49,6 +49,8 @@ nb_check = 1;
 while nb_check
     if isletter(nameout(1)) 
        nb_check = 0;
+    elseif strcmp(nameout(1),'_')
+        nameout(1) = [];
     elseif isnumeric(eval(nameout(1)))
         nameout(1) = [];
     end
