@@ -392,7 +392,7 @@ end
 
 % convert data to continuous
 % --------------------------
-if strcmpi(g.makecontinuous, 'on')
+if strcmpi(g.makecontinuous, 'on') && EEG.trials > 1
     EEG = eeg_epoch2continuous(EEG);
 end
 
