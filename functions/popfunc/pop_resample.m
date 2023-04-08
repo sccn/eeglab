@@ -205,6 +205,7 @@ if isfield(EEG.event, 'latency')
         
     else % Continuous data
 
+        eeglab_options;
         for iEvt = 1:length(EEG.event)
 
             % From >> help resample: Y is P/Q times the length of X (or the
@@ -216,7 +217,7 @@ if isfield(EEG.event, 'latency')
             % Old version EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
 
             % Recompute event latencies relative to segment onset
-            if eeg_isboundary(EEG.event(iEvt)) && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+            if eeg_isboundary(EEG.event(iEvt), option_boundary99) && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
                 iBnd = sum(EEG.event(iEvt).latency + 0.5 >= bounds);
                 EEG.event(iEvt).latency = indices(iBnd) - 0.5;
             else
