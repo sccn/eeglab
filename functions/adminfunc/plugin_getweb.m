@@ -86,6 +86,10 @@ for iRow = 1:length(plugin)
     
     % rename fields
     for iField = 1:size(renameField, 1)
+        if ~isfield(plugin, renameField{iField, 1})
+            disp('Plugin list incomplete - maybe an issue with internet connection - aborting.');
+            return
+        end
         plugin(iRow).(renameField{iField, 2}) = plugin(iRow).(renameField{iField, 1});
     end
     
