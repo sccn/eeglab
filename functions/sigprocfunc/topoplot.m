@@ -81,6 +81,11 @@
 %   'emarker2'        - {markchans}|{markchans marker color size linewidth} cell array specifying 
 %                       an alternate marker for specified 'plotchans'. Ex: {[3 17],'s','g'} 
 %                       {default: none, or if {markchans} only are specified, then {markchans,'o','r',10,1}}
+%   'scatter'         - ['on'|'off'] use scatter3 function instead of plot3 function toplot the electrode location. This
+%                       helps with controlling over the individual size and color of the electrodes.
+%                       If on, you can use {markerchar color size linewidth} convention for emarker and/or emarker2,
+%                       but you can provide a 1byX vector for size and Xby3 vector for color to change.
+%                       {defualt : 'off'}  
 %   'hcolor'          - color of the cartoon head. Use 'hcolor','none' to plot no head. {default: 'k' = black}
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'numcontour'      - number of contour lines {default: 6}. You may also enter a vector to set contours 
@@ -254,6 +259,7 @@ EMARKER2 = 'o';          % mark subset of electrode locations with small disks
 EMARKER2COLOR = 'r';     % mark subset of electrode locations with small disks
 EMARKERSIZE2 = 10;      % default selected channel location marker size
 EMARKER2LINEWIDTH = 1;
+SCATTER = 'off';        % plot the electrode locations using scatter plot.
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
 HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 BLANKINGRINGWIDTH = .035;% width of the blanking ring 
@@ -391,8 +397,6 @@ if nargs > 2
                     error('Colormap must be a n x 3 matrix')
                 end
                 colormap(Value)
-            case 'gridscale'
-                GRID_SCALE = Value;
             case 'plotdisk'
                 PLOTDISK = lower(Value);
                 if ~strcmp(PLOTDISK,'on') && ~strcmp(PLOTDISK,'off')
@@ -529,6 +533,8 @@ if nargs > 2
                 if length(Value) > 4
                     EMARKER2LINEWIDTH = Value{5};
                 end
+            case 'scatter'
+                SCATTER = Value;
             case 'shrink'
                 shrinkfactor = Value;
             case 'intrad'
@@ -1475,13 +1481,28 @@ ELECTRODE_HEIGHT = 2.1;  % z value for plotting electrode information (above the
 
 if strcmp(ELECTRODES,'on')   % plot electrodes as spots
   if isempty(EMARKER2CHANS)
-    hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+      if strcmp(SCATTER, 'on')
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE(pltchans); end
+        if size(ECOLOR,1)>1, ECOLOR = ECOLOR(pltchans,:); end
+        hp2 = scatter3(y,x,ones(size(x))*ELECTRODE_HEIGHT,s,ECOLOR,'filled');
+      else
+        hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
+            EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+      end
   else % plot markers for normal chans and EMARKER2CHANS separately
-    hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
-    hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
-        EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
+      if strcmp(SCATTER, 'on')
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE(pltchans); end
+        if size(ECOLOR,1)>1, ECOLOR = ECOLOR(pltchans,:); end
+        hp2 = scatter3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,s,ECOLOR,'filled');
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE2(pltchans); end
+        if size(EMARKER2COLOR,1)>1, EMARKER2COLOR = EMARKER2COLOR(pltchans,:); end
+        hp2b = scatter3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,s,EMARKER2COLOR,'filled');
+      else
+        hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
+            EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+        hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
+            EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);  
+      end
   end
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Print electrode labels only %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1498,44 +1519,77 @@ elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
 %
 elseif strcmp(ELECTRODES,'labelpoint') 
   if isempty(EMARKER2CHANS)
-    hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
-  else
-    hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
-    hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
-        EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
+      if strcmp(SCATTER, 'on')
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE(pltchans); end
+        if size(ECOLOR,1)>1, ECOLOR = ECOLOR(pltchans,:); end
+        hp2 = scatter3(y,x,ones(size(x))*ELECTRODE_HEIGHT,s,ECOLOR,'filled');
+      else
+        hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
+            EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+      end
+  else % plot markers for normal chans and EMARKER2CHANS separately
+      if strcmp(SCATTER, 'on')
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE(pltchans); end
+        if size(ECOLOR,1)>1, ECOLOR = ECOLOR(pltchans,:); end
+        hp2 = scatter3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,s,ECOLOR,'filled');
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE2(pltchans); end
+        if size(EMARKER2COLOR,1)>1, EMARKER2COLOR = EMARKER2COLOR(pltchans); end
+        hp2b = scatter3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,s,EMARKER2COLOR,'filled');
+      else
+        hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
+            EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+        hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
+            EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2); 
+      end
   end
   for i = 1:size(labels,1)
-    hh(i) = text(double(y(i)+0.01),double(x(i)),...
-        ELECTRODE_HEIGHT,labels(i,:),'HorizontalAlignment','left',...
-	'VerticalAlignment','middle','Color', ECOLOR,'userdata', num2str(allchansind(i)), ...
-	'FontSize',EFSIZE, 'buttondownfcn', ...
-	    ['tmpstr = get(gco, ''userdata'');'...
-	     'set(gco, ''userdata'', get(gco, ''string''));' ...
-	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
+      if size(ECOLOR,1)>1, ec = ECOLOR(i,:); if size(ec,2)==1, ec = 'k'; end, else, ec = ECOLOR; end
+      hh(i) = text(double(y(i)+0.01),double(x(i)),...
+          ELECTRODE_HEIGHT,labels(i,:),'HorizontalAlignment','left',...
+  	    'VerticalAlignment','middle','Color', ec,'userdata', num2str(allchansind(i)), ...
+        'FontSize',EFSIZE, 'buttondownfcn', ...
+        ['tmpstr = get(gco, ''userdata'');'...
+        'set(gco, ''userdata'', get(gco, ''string''));' ...
+        'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
+  
 %
 %%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations plus numbers %%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'numpoint') 
   if isempty(EMARKER2CHANS)
-    hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
-  else
-    hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
-    hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
-        EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
+      if strcmp(SCATTER, 'on')
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE(pltchans); end
+        if size(ECOLOR,1)>1, ECOLOR = ECOLOR(pltchans,:); end
+        hp2 = scatter3(y,x,ones(size(x))*ELECTRODE_HEIGHT,s,ECOLOR,'filled');
+      else
+        hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
+            EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+      end
+  else % plot markers for normal chans and EMARKER2CHANS separately
+      if strcmp(SCATTER, 'on')
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE(pltchans); end
+        if size(ECOLOR,1)>1, ECOLOR = ECOLOR(pltchans,:); end
+        hp2 = scatter3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,s,ECOLOR,'filled');
+        if length(EMARKERSIZE)==1, S = repmat(EMARKERSIZE,numel(x),1); s = S(:); else, s = EMARKERSIZE2(pltchans); end
+        if size(EMARKER2COLOR,1)>1, EMARKER2COLOR = EMARKER2COLOR(pltchans); end
+        hp2b = scatter3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,s,EMARKER2COLOR,'filled');
+      else
+        hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
+            EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+        hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
+            EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2); 
+      end
   end
   for i = 1:size(labels,1)
-    hh(i) = text(double(y(i)+0.01),double(x(i)),...
-        ELECTRODE_HEIGHT,num2str(allchansind(i)),'HorizontalAlignment','left',...
-	'VerticalAlignment','middle','Color', ECOLOR,'userdata', labels(i,:) , ...
-	'FontSize',EFSIZE, 'buttondownfcn', ...
-	    ['tmpstr = get(gco, ''userdata'');'...
-	     'set(gco, ''userdata'', get(gco, ''string''));' ...
-	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
+      if size(ECOLOR,1)>1, ec = ECOLOR(i,:); if size(ec,2)==1, ec = 'k'; end, else, ec = ECOLOR; end
+      hh(i) = text(double(y(i)+0.01),double(x(i)),...
+          ELECTRODE_HEIGHT,num2str(allchansind(i)),'HorizontalAlignment','left',...
+          'VerticalAlignment','middle','Color', ec,'userdata', labels(i,:) , ...
+          'FontSize',EFSIZE, 'buttondownfcn', ...
+          ['tmpstr = get(gco, ''userdata'');'...
+    	     'set(gco, ''userdata'', get(gco, ''string''));' ...
+             'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
 %
 %%%%%%%%%%%%%%%%%%%%%% Print electrode numbers only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
