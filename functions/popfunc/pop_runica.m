@@ -673,9 +673,9 @@ function tmprank2 = getrank(tmpdata, pca_opt)
     tmprank2=sum (diag (D) > rankTolerance);
     if tmprank ~= tmprank2
         if nargin >= 2 && pca_opt ~= 0
-            fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab\n', tmprank, tmprank2);
+            fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab, taking the minimum\n', tmprank, tmprank2);
         end
-        tmprank2 = max(tmprank, tmprank2);
+        tmprank2 = min(tmprank, tmprank2);
     end
             
 function EEG = update_datafield(EEG)
