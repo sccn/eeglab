@@ -285,7 +285,7 @@ if nargin < 3 && isstruct(chans)
             chans(index).datachan  = 1;
         end
         if ~isempty(com)
-            totaluserdat = com;
+            totaluserdat = { com };
             %[chans chaninfo urchans com] = pop_chanedit(chans, chaninfo, com{:});
         end
     end
@@ -1078,7 +1078,7 @@ else
          try chansout = EEG; catch, end
     else chansout = chans;
     end
-    if nargout > 3
+    if nargout > 3 && isempty(com)
         com = sprintf('%s=pop_chanedit(%s, %s);', inputname(1), inputname(1), vararg2str( [ { orichaninfo } varargin ]));
     end
 end
