@@ -38,7 +38,6 @@
 %                 empty index. For instance creating a STUDY with a single
 %                 dataset at index 10 will result with a STUDY with a
 %                 single dataset at index 1.
-%   'remove'    - [integer] remove dataset index.
 %   'subject'   - [string] subject code.
 %   'condition' - [string] dataset condition. 
 %   'session '  - [integer] dataset session number.
@@ -51,6 +50,8 @@
 %   'inbrain'   - ['on'|'off'] same as above. This option may also be
 %                 placed in the command list (preceding the 'dipselect'
 %                 option).
+%   'remove'    - deprecated. Use the STD_RMDAT function instead to remove
+%                 dataset.
 %
 % Outputs:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
