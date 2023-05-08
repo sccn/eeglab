@@ -1034,7 +1034,7 @@ else
                 
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
-                if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip'))
+                if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip')) && isempty(findstr(lower(dircontent(index).name), 'rest'))
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'compat') , 'electrodenormalize' );
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'forward'), 'ft_sourcedepth.m');
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'utilities'), 'ft_datatype.m');
