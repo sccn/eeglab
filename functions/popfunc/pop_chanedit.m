@@ -995,7 +995,9 @@ else
                     end
                     if isfield(tmplocs, 'type')
                         for index = 1:length(ind2)
-                            chans(ind2(index)).type   = tmplocs(ind1(index)).type;
+                            if isempty(chans(ind2(index)).type)
+                                chans(ind2(index)).type   = tmplocs(ind1(index)).type;
+                            end
                         end
                     end
                     
