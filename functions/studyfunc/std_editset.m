@@ -290,7 +290,7 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
             STUDY.datasetinfo(currentind).index     = currentind;    
-            if isfield(ALLEEG(realindex), 'task')   
+            if isfield(ALLEEG(currentind), 'task')   
                 STUDY.datasetinfo(currentind).task      = ALLEEG(currentind).task;                 
             end
         otherwise
