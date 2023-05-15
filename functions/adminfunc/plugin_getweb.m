@@ -52,8 +52,9 @@ try
     else
         [plugin, status] = urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type '&upload=' num2str(option_showpendingplugins)]);
     end
-    if isempty(plugin)
+    if isempty(plugin) || isequal(plugin, 'Couldn''t make connection to DB.')
         disp('Issue with retrieving statistics for extensions');
+        plugin = [];
         return;
     end
     try
