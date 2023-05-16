@@ -587,6 +587,10 @@ end
 % ------------------
 if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3))
     eeglab_options;
+    if ~isequal(g.channel,1:size(EEG.data,1))
+        EEG.dipfit = [];
+        EEG.roi    = [];
+    end
     if option_memmapdata
         % this code below is preferred for memory mapped files
         diff1 = setdiff_bc([1:size(EEG.data,1)], g.channel);
