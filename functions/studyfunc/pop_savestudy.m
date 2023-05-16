@@ -168,8 +168,14 @@ STUDYfile = fullfile(STUDY.filepath,STUDY.filename);
 STUDYTMP = STUDY;
 STUDY = std_rmalldatafields(STUDY);
 eeglab_options;
-if option_saveversion6, save('-v6' , STUDYfile, 'STUDY');
-else                    save('-v7.3' , STUDYfile, 'STUDY');
+if option_saveversion6
+    try 
+        save('-v6' , STUDYfile, 'STUDY'); % will crash for chinese characters
+    catch
+        save('-v7.3' , STUDYfile, 'STUDY');
+    end
+else
+    save('-v7.3' , STUDYfile, 'STUDY');
 end
 STUDY = STUDYTMP;
 
