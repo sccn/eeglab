@@ -588,8 +588,11 @@ end
 if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3))
     eeglab_options;
     if ~isequal(g.channel,1:size(EEG.data,1))
-        EEG.dipfit = [];
-        EEG.roi    = [];
+        if ~isempty(EEG.dipfit)
+            warning('erasing dipole information since channels have being removed')
+            EEG.dipfit = [];
+            EEG.roi    = [];
+        end
     end
     if option_memmapdata
         % this code below is preferred for memory mapped files
