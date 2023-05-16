@@ -86,12 +86,13 @@
 %                   Ex: 'changechan' {12 'PXz' -90 0.30}
 %   'changefield' - {number field value} Change field value for channel number number.
 %                   Ex: {34 'theta' 320.4}.
-%   'insert'      - {number label theta radius X Y Z sph_theta sph_phi sph_radius }
+%   'insert'      - {number 'labels' value 'theta' value 'radius' value 'X' value 'Y' ...
+%                   value 'Z' value 'sph_theta' value 'sph_phi' value 'sph_radius' ...
+%                   value 'type' value 'datachan' value }
 %                   Insert new channel and specified values before the current channel
 %                    number. If the number of values is less than 10, remaining
 %                   fields will be 0. (Previously, this parameter was termed 'add').
-%   'append'      - {num label theta radius X Y Z sph_theta sph_phi sph_radius }
-%                   same as 'insert' (above) but insert the the new channel after
+%   'append'      - Same as 'insert' (above) but insert the the new channel after
 %                   the current channel number.
 %   'delete'      - [int_vector] Vector of channel numbers to delete.
 %   'forcelocs'   - [cell] call FORCELOCS to force a particular channel to be at a
@@ -669,20 +670,20 @@ else
                 tmpargs = args{ curfield+1 };
                 allfields = fieldnames(chans);
                 if isnumeric(tmpargs)
-                    tmpargs2    = cell(1, length(allfields)+1);
                     tmpargs2{1} = tmpargs;
                     tmpargs     = tmpargs2;
-                    if strcmpi(allfields{end}, 'datachan'), tmpargs{end} = 0; end
-                end
-                if length( tmpargs ) < length(allfields)+1
-                    error('pop_chanedit: not enough arguments to change all field values');
                 end
                 num = tmpargs{1};
-                if strcmpi(lower(args{curfield}), 'append'), num=num+1; currentpos = currentpos+1; end
-                chans(end+1) = chans(end);
+                if strcmpi(args{curfield}, 'append')
+                    num=num+1; 
+                    currentpos = currentpos+1; 
+                end
+                chans(end+1).label = '';
+                tmpChan = chans(end);
                 chans(num+1:end) = chans(num:end-1);
-                for index = 1:length( allfields )
-                    chans = setfield(chans, {num}, allfields{index}, tmpargs{index+1});
+                chans(num) = tmpChan;
+                for index = 2:2:length( tmpargs )
+                    chans = setfield(chans, {num}, tmpargs{index}, tmpargs{index+1});
                 end
                 if isfield(chans, 'datachan')
                     if isempty(chans(num).datachan)
