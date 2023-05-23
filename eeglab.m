@@ -1940,6 +1940,14 @@ if exist('ALLERP') == 1 && ~isempty(ALLERP)
     menustatus = { menustatus{:} 'erp_dataset' };
 end
 
+if exist('ALLBEST') == 1 && ~isempty(ALLBEST)
+    menustatus = { menustatus{:} 'best_dataset' };
+end
+
+if exist('ALLMVPC') == 1 && ~isempty(ALLMVPC)
+    menustatus = { menustatus{:} 'mvpc_dataset'}; 
+end
+
 % enable selected menu items
 % --------------------------
 allmenus = findobj( W_MAIN, 'type', 'uimenu');
@@ -2011,6 +2019,20 @@ if any(strcmp(menustatus, 'erp_dataset'))
 end
 % end, Javier Lopez-Calderon for ERPLAB
 % --------------------------------
+% --------------------------------
+% Aaron Matthew Simmons for ERPLAB
+
+if any(strcmp(menustatus, 'best_dataset'))
+    set(allmenus, 'enable', 'on');  
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''bestset:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');  
+end
+if any(strcmp(menustatus, 'mvpc_dataset'))
+    set(allmenus, 'enable', 'on');  
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''mvpcset:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');  
+end
+% end, Aaron Matthew Simmons for ERPLAB
 
 
 % adjust title extent
