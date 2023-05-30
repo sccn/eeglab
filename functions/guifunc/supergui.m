@@ -305,7 +305,7 @@ for counter = 1:maxcount
             
             % position adjustment depending on GUI type
             if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'popupmenu')
-                posy = posy-height/5;
+                %posy = posy-height/5;
             end
             if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'text')
                 posy = posy+height/5;

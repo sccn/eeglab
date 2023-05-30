@@ -70,5 +70,7 @@ if ~isempty(strmatch('ALLCOM', globalvars, 'exact')) || exist('ALLCOM') ~= 1
 
     if exist('eegplugin_erplab.m')
         global ALLERP; % Javier Lopez-Calderon for ERPLAB
+        global ALLBEST;
+        global ALLMVPC;
     end
 end
