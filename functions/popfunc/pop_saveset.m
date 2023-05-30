@@ -256,8 +256,12 @@ try,
         if option_saveasstruct
             if strcmpi(g.version, '6') 
                 warning('')
-                save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', '-struct', 'EEG');
-                [a,b] = lastwarn;
+                try
+                    save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', '-struct', 'EEG');
+                    [~,b] = lastwarn;
+                catch
+                    b = 'MATLAB:save:sizeTooBigForMATFile';
+                end
                 if strcmpi(b, 'MATLAB:save:sizeTooBigForMATFile')
                     disp('Re-saving file using the 7.3 format that can handle large variables')
                     save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', '-struct', 'EEG');
