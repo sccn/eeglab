@@ -554,7 +554,7 @@ if ~isdeployed
         addpath(ptopoplot);
     end
     pcheck  = fileparts(mywhich('finputcheck'));
-    if ~contains(pcheck, 'guifunc')
+    if ~strfind(pcheck, 'guifunc')
         rmpath(fileparts(pcheck));
     end
 end
