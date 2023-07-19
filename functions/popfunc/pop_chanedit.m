@@ -970,7 +970,7 @@ else
                     dipfitdefs;
                     chaninfo.filename = template_models(2).chanfile;
                 end
-                tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );                
+                tmplocs = readlocs( char(chaninfo.filename), 'defaultelp', 'BESA' );                
                 for indexchan = 1:length(chans)
                     if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end
                 end
