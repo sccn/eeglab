@@ -305,7 +305,7 @@ for counter = 1:maxcount
             
             % position adjustment depending on GUI type
             if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'popupmenu')
-                posy = posy-height/5;
+                %posy = posy-height/5;
             end
             if ischar(currentelem{2}) && strcmpi(currentelem{2}, 'text')
                 posy = posy+height/5;
@@ -377,7 +377,7 @@ for counter = 1:maxcount
 %                    if iscell(tmptxt) fprintf('%s -> %f\n', 'cell', curext(3)/curpos(3));
 %                    else              fprintf('%s -> %f\n', tmptxt, curext(3)/curpos(3));
 %                    end                      
-                    if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
+                    %if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
                 end
             end
             if  ~strcmp(style, 'listbox') &&  ~strcmp(style, 'popupmenu')

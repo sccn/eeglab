@@ -52,8 +52,9 @@ try
     else
         [plugin, status] = urlread([ 'http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall_nowiki_json.php?type=' type '&upload=' num2str(option_showpendingplugins)]);
     end
-    if isempty(plugin)
+    if isempty(plugin) || isequal(plugin, 'Couldn''t make connection to DB.')
         disp('Issue with retrieving statistics for extensions');
+        plugin = [];
         return;
     end
     try
@@ -86,6 +87,10 @@ for iRow = 1:length(plugin)
     
     % rename fields
     for iField = 1:size(renameField, 1)
+        if ~isfield(plugin, renameField{iField, 1})
+            disp('Plugin list incomplete - maybe an issue with internet connection - aborting.');
+            return
+        end
         plugin(iRow).(renameField{iField, 2}) = plugin(iRow).(renameField{iField, 1});
     end
     
