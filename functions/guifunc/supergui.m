@@ -377,7 +377,7 @@ for counter = 1:maxcount
 %                    if iscell(tmptxt) fprintf('%s -> %f\n', 'cell', curext(3)/curpos(3));
 %                    else              fprintf('%s -> %f\n', tmptxt, curext(3)/curpos(3));
 %                    end                      
-                    if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
+                    %if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end
                 end
             end
             if  ~strcmp(style, 'listbox') &&  ~strcmp(style, 'popupmenu')
