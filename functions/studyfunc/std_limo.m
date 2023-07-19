@@ -1,5 +1,5 @@
 % STD_LIMO - Export and run in LIMO the EEGLAB STUDY design.
-%           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
+%           call limo_batch to create all 1st level LIMO_EEG analysis 
 %
 % Usage:
 %   [STUDY LIMO_files] = std_limo(STUDY,ALLEEG,'key',val)
