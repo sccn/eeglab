@@ -115,7 +115,7 @@ if ~isempty(varargin) && isstruct(varargin{1})
 else
     opt = [];
 end
-if ~isempty(varargin) ||isempty(opt);
+if ~isempty(varargin) ||isempty(opt)
     opt = pop_statparams(opt, varargin{:});
 end
 
