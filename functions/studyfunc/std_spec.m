@@ -371,9 +371,10 @@ elseif strcmpi(g.specmode, 'pburg')
 else % fft mode
     %
     if size(X,3) > 1
-        for iTrial = 1:size(X,3)
-            X(:,:,iTrial) = detrend(X(:,:,iTrial)')';
-        end
+        % check with X = 1:10; X(2,:) = X(1,:)*2; X(:,:,2) = X;
+        X = permute(X, [2 1 3]);
+        X = detrend(X);
+        X = permute(X, [2 1 3]);
     else
         X = detrend(X')';
     end
