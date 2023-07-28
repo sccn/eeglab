@@ -86,14 +86,20 @@ STUDY = pop_erspparams(STUDY, 'default');
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
+    'ndim'          'integer' []             [];
     'timerange'     'real'    []             [];
     'freqrange'     'real'    []             [];
     'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' 'erpim' 'custom' } 'erp';
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
+    'customread'    ''        []             [];
+    'customparams'  'cell'    []             {};
     'subject'       'string'  []             '' }, ...
     'std_readdata', 'ignore');
+if ~isempty(moreopts)
+    fprintf(2, 'Warning: std_readdata ignored at least one parameters: "%s"\n', moreopts{1})
+end
 if ischar(opt), error(opt); end
 
 dtype = opt.datatype;
@@ -101,6 +107,9 @@ dtype = opt.datatype;
 % get the file extension
 % ----------------------
 tmpDataType = opt.datatype;
+if ~isempty(opt.customread)
+    opt.datatype = 'custom';
+end
 if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc')
     tmpDataType = 'timef'; 
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end
@@ -138,7 +147,7 @@ fprintf('Reading subjects'' data or looking up measure values in EEGLAB cache\n'
 
 % determining component polarity if necessary
 % -------------------------------------------
-if isempty(opt.channels) && strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
+if isempty(opt.customread) && isempty(opt.channels) && strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
     componentPol = ones(1, length(STUDY.cluster(opt.clusters).comps)); % default is all 1
     disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
     STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
@@ -168,6 +177,7 @@ for iSubj = 1:length(subjectList)
     bigstruct.subject      = subjectList{iSubj};
     bigstruct.component    = opt.component;
     bigstruct.options      = opts;
+    bigstruct.moreoptions  = opt;
     if isnan(opt.design)
          bigstruct.design.variable = struct([]);
     else bigstruct.design.variable = STUDY.design(opt.design).variable;
@@ -215,12 +225,16 @@ for iSubj = 1:length(subjectList)
     else
         datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
         
-        fileName = getfilename({STUDY.datasetinfo(datInds).filepath}, STUDY.datasetinfo(datInds(1)).subject, { STUDY.datasetinfo(datInds).session }, fileExt, length(uniqueSessions) == 1);
-        if ~isempty(opt.channels)
-             [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
-        else [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
+        if isempty(opt.customread)
+            fileName = getfilename({STUDY.datasetinfo(datInds).filepath}, STUDY.datasetinfo(datInds(1)).subject, { STUDY.datasetinfo(datInds).session }, fileExt, length(uniqueSessions) == 1);
+            if ~isempty(opt.channels)
+                 [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
+            else [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
+            end
+        else
+            % read custom data
+            [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj}] = feval(opt.customread, STUDY.datasetinfo(datInds), ALLEEG(datInds), struct(bigstruct.design.variable), opt.customparams{:}, opts{:});
         end
-
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') % ERP or spectrum
             % inverting ERP polarity when relevant
             if strcmpi(opt.datatype, 'erp') && ~isempty(opt.clusters) && strcmpi(opt.componentpol, 'on')
@@ -269,9 +283,14 @@ if strcmpi(opt.singletrials, 'on') && length(opt.channels) > 1
 end
 
 % store data for all subjects
-if strcmpi(opt.datatype, 'erp') || strcmpi(opt.datatype, 'spec')
-     if length(opt.channels) > 1, dim = 3; else dim = 2; end
-else if length(opt.channels) > 1, dim = 4; else dim = 3; end
+if isempty(opt.ndim)
+    if strcmpi(opt.datatype, 'erp') || strcmpi(opt.datatype, 'spec')
+        if length(opt.channels) > 1, dim = 3; else dim = 2; end
+    else 
+        if length(opt.channels) > 1, dim = 4; else dim = 3; end
+    end
+else
+    dim = opt.ndim;
 end
 
 % check that all ERPimages have the same number of lines
