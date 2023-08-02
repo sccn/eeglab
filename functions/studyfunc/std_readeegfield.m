@@ -75,6 +75,13 @@ opt = finputcheck(varargin, { ...
     'xvalaverage'      'string'   { 'on','off' }  'off';
     'xvallimits'       'real'     []    [] }, 'std_readeegfield', 'ignore');
 
+if ~iscell(fieldName)
+    fieldName = { fieldName };
+end
+if ~iscell(opt.xvalfield)
+    opt.xvalfield = { opt.xvalfield };
+end
+
 % check data
 for iDes = 1:length(designvar)
     if ~isfield(datasetinfo, designvar(iDes).label)
@@ -117,11 +124,7 @@ if ~isempty(ind)
         xvals = 1:size(dataOut{ind},2);
     end
     if ~isempty(opt.xvalfield)
-        if iscell(opt.xvalfield)
-            xvals = ALLEEG(1).(opt.xvalfield{1}).(opt.xvalfield{2});
-        else
-            xvals = ALLEEG(1).(opt.xvalfield);
-        end
+        xvals = getfield( ALLEEG(1), opt.xvalfield{:} );
     end
 end
 
@@ -155,11 +158,7 @@ if isempty(datInd)
     dataOut = {[]};
 else
     for iDat = 1:length(datInd)
-        if ~iscell(fieldName)
-            dataOut{iDat} = ALLEEG(datInd(iDat)).(fieldName);
-        else
-            dataOut{iDat} = ALLEEG(datInd(iDat)).(fieldName{1}).(fieldName{2});
-        end
+        dataOut{iDat} = getfield(ALLEEG(datInd(iDat)), fieldName{:});
     end
 end
 
@@ -177,11 +176,7 @@ if isempty(datInd)
     dataOut = {[]};
 else
     for iDat = 1:length(datInd)
-        if ~iscell(fieldName)
-            dataOut{iDat} = ALLEEG(datInd(iDat)).(fieldName);
-        else
-            dataOut{iDat} = ALLEEG(datInd(iDat)).(fieldName{1}).(fieldName{2});
-        end
+        dataOut{iDat} = getfield(ALLEEG(datInd(iDat)), fieldName{:});
     end
 end
 
