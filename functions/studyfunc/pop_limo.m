@@ -167,8 +167,7 @@ if nargin < 4
     end
     options = { 'method' methods{res.method} 'measure' fileMeasures{measureflagindx,res.measure} opttmp{:} ...
                 'erase'       fastif(res.erase, 'on', 'off') ...
-                'splitreg'    fastif(res.splitreg, 'on', 'off') ...
-                'interaction' fastif(res.interaction, 'on', 'off') };
+                'splitreg'    fastif(res.splitreg, 'on', 'off') };
 else
     options = varargin; 
 end
