@@ -63,7 +63,7 @@
 % 03-08-02 debug call to function help -ad
 % 04-05-02 recompute event latencies -ad
 
-function [EEG, command] = pop_resample( EEG, freq, fc, df); 
+function [EEG, command] = pop_resample( EEG, freq, fc, df)
 
 command = '';
 if nargin < 1
