@@ -554,7 +554,7 @@ if ~isdeployed
         addpath(ptopoplot);
     end
     pcheck  = fileparts(mywhich('finputcheck'));
-    if ~contains(pcheck, 'guifunc')
+    if ~strfind(pcheck, 'guifunc')
         rmpath(fileparts(pcheck));
     end
 end
@@ -623,17 +623,17 @@ cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_newset];
 cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store e_check_study];
 cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
 %cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
-cb_chanrej     = [ check      '[EEG ~ ~ LASTCOM] = pop_rejchan(EEG);'  e_hist];
-cb_autorej     = [ checkepoch '[EEG ~ LASTCOM] = pop_autorej(EEG);'    e_hist];
-cb_rejcont     = [ check      '[EEG ~ ~ LASTCOM] = pop_rejcont(EEG);'  e_hist];
+cb_chanrej     = [ check      '[EEG, ~, ~, LASTCOM] = pop_rejchan(EEG);'  e_hist];
+cb_autorej     = [ checkepoch '[EEG, ~, LASTCOM] = pop_autorej(EEG);'    e_hist];
+cb_rejcont     = [ check      '[EEG, ~, ~, LASTCOM] = pop_rejcont(EEG);'  e_hist];
 
 cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
 cb_eegplotrej1 = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'        e_hist];
-cb_eegthresh1  = [ checkepoch '[~ LASTCOM] = pop_eegthresh(EEG, 1);'    e_hist];
+cb_eegthresh1  = [ checkepoch '[EEG,~,LASTCOM] = pop_eegthresh(EEG, 1);'    e_hist];
 cb_rejtrend1   = [ checkepoch '[EEG LASTCOM] = pop_rejtrend(EEG, 1);'   e_store];
 cb_jointprob1  = [ checkepoch '[EEG LASTCOM] = pop_jointprob(EEG, 1);'  e_store];
 cb_rejkurt1    = [ checkepoch '[EEG LASTCOM] = pop_rejkurt(EEG, 1);'    e_store];
-cb_rejspec1    = [ checkepoch '[EEG ~ LASTCOM] = pop_rejspec(EEG, 1);'  e_store];
+cb_rejspec1    = [ checkepoch '[EEG, ~, LASTCOM] = pop_rejspec(EEG, 1);'  e_store];
 cb_rejsup1     = [ checkepochica '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1,1,1); eegh(LASTCOM);' ...
                      'LASTCOM = ''EEG.reject.icarejmanual = EEG.reject.rejglobal;''; eval(LASTCOM);' e_store ];
 cb_rejsup2     = [ checkepoch '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1,1,1); EEG = eegh(LASTCOM, EEG);' ...
@@ -1034,7 +1034,7 @@ else
                 
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
-                if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip'))
+                if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip')) && isempty(findstr(lower(dircontent(index).name), 'rest'))
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'compat') , 'electrodenormalize' );
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'forward'), 'ft_sourcedepth.m');
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'utilities'), 'ft_datatype.m');
@@ -1459,7 +1459,7 @@ end
 % ---------------------
 MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 if MAX_SET > 200
-    disp('Updating menu, allowing selection of the first 200 datasets only to speed up display...')
+    disp('Updating menu, restricting menu selection to the first 200 datasets to speed up display...')
     MAX_SET = 200;
 end
 
@@ -1567,7 +1567,11 @@ if exist_study
     tmp_m = eegmenu( false,  set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
     set(tmp_m, 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
 else 
-    delete( findobj('label', 'Select the study set') );
+    try
+        delete( findobj('label', 'Select the study set') );
+    catch
+        fprintf(2, 'Note: Issue with updating menu')
+    end
 end
 
 EEGUSERDAT{2} = EEGMENU;
@@ -1940,6 +1944,14 @@ if exist('ALLERP') == 1 && ~isempty(ALLERP)
     menustatus = { menustatus{:} 'erp_dataset' };
 end
 
+if exist('ALLBEST') == 1 && ~isempty(ALLBEST)
+    menustatus = { menustatus{:} 'best_dataset' };
+end
+
+if exist('ALLMVPC') == 1 && ~isempty(ALLMVPC)
+    menustatus = { menustatus{:} 'mvpc_dataset'}; 
+end
+
 % enable selected menu items
 % --------------------------
 allmenus = findobj( W_MAIN, 'type', 'uimenu');
@@ -2011,6 +2023,20 @@ if any(strcmp(menustatus, 'erp_dataset'))
 end
 % end, Javier Lopez-Calderon for ERPLAB
 % --------------------------------
+% --------------------------------
+% Aaron Matthew Simmons for ERPLAB
+
+if any(strcmp(menustatus, 'best_dataset'))
+    set(allmenus, 'enable', 'on');  
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''bestset:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');  
+end
+if any(strcmp(menustatus, 'mvpc_dataset'))
+    set(allmenus, 'enable', 'on');  
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''mvpcset:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');  
+end
+% end, Aaron Matthew Simmons for ERPLAB
 
 
 % adjust title extent

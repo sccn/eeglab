@@ -1,5 +1,5 @@
 % STD_LIMO - Export and run in LIMO the EEGLAB STUDY design.
-%           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
+%           call limo_batch to create all 1st level LIMO_EEG analysis 
 %
 % Usage:
 %   [STUDY LIMO_files] = std_limo(STUDY,ALLEEG,'key',val)
@@ -135,10 +135,18 @@ design_index = opt.design;
 % Make sure paths are ok for LIMO (Consider to move this to eeglab.m in a future)
 % -------------------------------------------------------------------------
 root = fileparts(which('limo_eeg'));
-addpath([root filesep 'limo_cluster_functions']);
-addpath([root filesep 'external' filesep 'psom']);
-addpath([root filesep 'external']);
-addpath([root filesep 'help']);
+pathCell = regexp(path, pathsep, 'split');
+onPath = all([sum(strcmp([root filesep 'help'],pathCell))~=0,...
+    sum(strcmp([root filesep 'limo_cluster_functions'],pathCell))~=0,...
+    sum(strcmp([root filesep 'external' filesep 'psom'],pathCell))~=0,...
+    sum(strcmp([root filesep 'deprecated'], pathCell))~=0]);
+if onPath == 0
+    addpath([root filesep 'limo_cluster_functions'])
+    addpath([root filesep 'external'])
+    addpath([root filesep 'external' filesep 'psom'])
+    addpath([root filesep 'help'])
+    addpath([root filesep 'deprecated'])
+end
 
 % Checking fieldtrip paths to compute gp channel location
 skip_chanlocs   = 0;

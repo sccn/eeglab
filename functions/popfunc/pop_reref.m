@@ -122,16 +122,16 @@ if nargin < 2
                   'end;' ];
     cb_chansel1 = 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''reref''   ), ''string'',tmpval); clear tmpEEG tmpchanlocs tmp tmpval';
     cb_chansel2 = 'tmpEEG = get(gcbf, ''userdata''); tmpchanlocs = tmpEEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''exclude'' ), ''string'',tmpval); clear tmpEEG tmpchanlocs tmp tmpval';
-    cb_chansel3 = [ 'tmpEEG = get(gcbf, ''userdata''); if ~isfield(tmpEEG(1).chaninfo, ''removedchans''), ' ...
+    cb_chansel3 = [ 'tmpEEG = get(gcbf, ''userdata''); if ~isfield(tmpEEG(1).chaninfo, ''nodatchans''), ' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
-                    'elseif isempty(tmpEEG(1).chaninfo.removedchans),' ...
+                    'elseif isempty(tmpEEG(1).chaninfo.nodatchans),' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
-                    'elseif isfield(tmpEEG(1).chaninfo.removedchans, ''type''),' ...
-                    '   fidType = ismember(cellfun(@char, {  tmpEEG(1).chaninfo.removedchans.type}, ''UniformOutput'', false), ''FID'');' ...
+                    'elseif isfield(tmpEEG(1).chaninfo.nodatchans, ''type''),' ...
+                    '   fidType = ismember(cellfun(@char, {  tmpEEG(1).chaninfo.nodatchans.type}, ''UniformOutput'', false), ''FID'');' ...
                     '   if sum(fidType == 0) == 0,' ...
                     '      warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
                     '   else,' ...
-                    '      tmpchaninfo = tmpEEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.removedchans(~fidType).labels}, ''withindex'', ''on'');' ...
+                    '      tmpchaninfo = tmpEEG(1).chaninfo; [tmp tmpval] = pop_chansel({tmpchaninfo.nodatchans(~fidType).labels}, ''withindex'', ''on'');' ...
                     '      set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval);' ...
                     '   end;' ...
                     'end;' ...
@@ -185,13 +185,13 @@ if nargin < 2
     if ~isempty(restag.refloc)
          try
              tmpchaninfo = EEG(1).chaninfo;
-             tmpallchans = lower({ tmpchaninfo.removedchans.labels });
+             tmpallchans = lower({ tmpchaninfo.nodatchans.labels });
              allelecs = parsetxt(lower(restag.refloc));
              chanind  = [];
              for iElec = 1:length(allelecs)
                  chanind = [chanind strmatch( allelecs{iElec}, tmpallchans, 'exact') ];
              end
-             options = { options{:} 'refloc' EEG(1).chaninfo.removedchans(chanind) }; 
+             options = { options{:} 'refloc' EEG(1).chaninfo.nodatchans(chanind) }; 
          catch, disp('Error with old reference: ignoring it');
          end
     end
@@ -241,8 +241,8 @@ if ~isequal('off', g.interpchan )
     
     % Case no channel provided, inferring them from urchanlocs field
     if isempty(g.interpchan) 
-        if isfield(EEG.chaninfo, 'removedchans') && isfield(EEG.chaninfo.removedchans, 'theta')
-            chanlocs2interp = EEG.chaninfo.removedchans;
+        if isfield(EEG.chaninfo, 'nodatchans') && isfield(EEG.chaninfo.nodatchans, 'theta')
+            chanlocs2interp = EEG.chaninfo.nodatchans;
             emptyChans = cellfun(@isempty, { chanlocs2interp.theta });
             chanlocs2interp(emptyChans) = [];
             if ~isempty(chanlocs2interp)
@@ -338,32 +338,32 @@ nchans = EEG.nbchan; % retrieve number of channels for ICA bussines
 % deal with reference
 % -------------------
 if ~isempty(refchan)
-    if ~isfield(EEG.chaninfo, 'removedchans')
-        EEG.chaninfo.removedchans = refchan;
-    elseif isempty(EEG.chaninfo.removedchans)
-        EEG.chaninfo.removedchans = refchan;
+    if ~isfield(EEG.chaninfo, 'nodatchans')
+        EEG.chaninfo.nodatchans = refchan;
+    elseif isempty(EEG.chaninfo.nodatchans)
+        EEG.chaninfo.nodatchans = refchan;
     else
         allf = fieldnames(refchan);
-        n    = length(EEG.chaninfo.removedchans);
+        n    = length(EEG.chaninfo.nodatchans);
         for iRef = 1:length(refchan)
             for ind = 1:length(allf)
-                EEG.chaninfo.removedchans = setfield(EEG.chaninfo.removedchans, { n+iRef }, ...
+                EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n+iRef }, ...
                     allf{ind}, getfield(refchan(iRef), allf{ind}));
             end
         end
     end
 end
 if ~isempty(g.refloc) 
-    if isfield(EEG.chaninfo, 'removedchans') && ~isempty(EEG.chaninfo.removedchans)
+    if isfield(EEG.chaninfo, 'nodatchans') && ~isempty(EEG.chaninfo.nodatchans)
         allinds = [];
         tmpchaninfo = EEG.chaninfo;
         for iElec = 1:length(g.refloc)
-            if isempty(tmpchaninfo) || isempty(tmpchaninfo.removedchans)
+            if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
                 error('Missing reference channel information. Edit channels and add reference first.');
             end
-            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.removedchans.labels }) ];
+            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
         end
-        EEG.chaninfo.removedchans(allinds) = [];
+        EEG.chaninfo.nodatchans(allinds) = [];
     else
         error('Missing reference channel information. Edit channels and add reference first.');
     end

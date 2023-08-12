@@ -56,26 +56,41 @@ elseif nargin == 2
     icathreshold = varargin{1};
 end
     
-cluster = { [1] };
-inds = [1];
-for index = 2:length(ALLEEG)
-    
-    found = 0;
-    for c = 1:length(cluster)
-        w1 = ALLEEG(cluster{c}(1)).icaweights*ALLEEG(cluster{c}(1)).icasphere;
-        w2 = ALLEEG(index).icaweights*ALLEEG(index).icasphere;
-        if all(size(w1) == size(w2))
-            %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
-            if sum(sum(abs(w1-w2))) < icathreshold
-                cluster{c}(end+1) = index;
-                inds(index) = c;
-                found = 1;
-                break;
+if isfield(ALLEEG, 'subject') && length(unique({ ALLEEG.subject })) > 1
+    cluster = {};
+    allSubjects = { ALLEEG.subject };
+    uniqueSubjects = unique(allSubjects);
+    for index = 1:length(uniqueSubjects)
+        allinds = strmatch(uniqueSubjects{index}, allSubjects, 'exact')';
+
+        clusterTmp = std_findsameica(ALLEEG(allinds), varargin{:});
+        for iCluster = 1:length(clusterTmp)
+            clusterTmp{iCluster} = allinds(clusterTmp{iCluster});
+        end
+        cluster = [ cluster clusterTmp ];
+    end
+else
+    cluster = { [1] };
+    inds = [1];
+    for index = 2:length(ALLEEG)
+        
+        found = 0;
+        for c = 1:length(cluster)
+            w1 = ALLEEG(cluster{c}(1)).icaweights*ALLEEG(cluster{c}(1)).icasphere;
+            w2 = ALLEEG(index).icaweights*ALLEEG(index).icasphere;
+            if all(size(w1) == size(w2))
+                %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
+                if sum(sum(abs(w1-w2))) < icathreshold
+                    cluster{c}(end+1) = index;
+                    inds(index) = c;
+                    found = 1;
+                    break;
+                end
             end
         end
-    end
-    if ~found
-        cluster{end+1} = index;
-        inds(index) = index;
+        if ~found
+            cluster{end+1} = index;
+            inds(index) = index;
+        end
     end
 end

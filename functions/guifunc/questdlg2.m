@@ -73,17 +73,9 @@ else
 end
 listui{end+1} = {};
 
-width = 80;
 geometry = { geometry{:} 1 ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val
-    if index == 1 
-        if length(varargin{index}) > 15
-            width = 160;
-        elseif length(varargin{index}) > 10
-            width = 120;
-        end
-    end
-	listui = {listui{:} { 'width',width,'align','center','Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
+	listui = {listui{:} { 'align','center','Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
 	if strcmp(varargin{index}, varargin{end})
 		listui{end}{end+1} = 'fontweight';
 		listui{end}{end+1} = 'bold';
@@ -99,7 +91,7 @@ end
 %if cr >= 4, cr = cr-1; end
 %[tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'geomvert', [cr 1 1], 'uilist', listui, ...
 [tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
-    'borders', [0.05 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'off' );
+    'borders', [0.023 0.02 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left', 'adjustbuttonwidth', 'on' );
 
 waitfor( fig, 'userdata');
 try,

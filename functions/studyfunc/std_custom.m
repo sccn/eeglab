@@ -20,8 +20,6 @@
 %                  computed and saved. Only selected channels 
 %                  are returned by the function to Matlab
 %                  {default|[] -> none}
-%   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
-%                  already on disk.
 %   'trialindices' - [cell array] indices of trials for each dataset.
 %                  Default is all trials.
 %   'recompute'  - ['on'|'off'] force recomputing data file even if it is 
@@ -32,14 +30,9 @@
 %   'interp'     - [struct] channel location structure containing electrode
 %                  to interpolate ((this entry is ignored when plotting 
 %                  components). Default is no interpolation.
-%   'output'     - ['power'|'fft'] compute power of keep single complex
-%                  'fft' estimate. Default is 'power'.
 %   'fileout'    - [string] name of the file to save on disk. The default
 %                  is the same name (with a different extension) as the 
 %                  dataset given as input.
-%  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
-%                  space (dataset space on disk times 10) but allow for refined
-%                  single-trial statistics.
 %
 % Outputs:
 %   customres - custom result array
@@ -88,11 +81,10 @@ options = varargin;
                                       'timerange'  'float'   []         [];
                                       'recompute'  'string'  { 'on','off' } 'off';
                                       'savetrials' 'string'  { 'on','off' } 'off';
-                                      'savefile'   'string'  { 'on','off' } 'on';
+                                      'savefile'   'string'  { 'on','off' } 'on'; % ignored
                                       'fileext'    'string'  { }        'custom';
                                       'trialindices' { 'integer','cell' } []         [];
                                       'rmcomps'    'cell'    []         cell(1,length(EEG));
-                                      'fileout'    'string'  []         '';
                                       'trialinfo'  'struct'  []         struct([]);
                                       'fileout'    'string'  []         '';
                                       'interp'     'struct'  { }        struct([]) }, 'std_spec', 'ignore');
