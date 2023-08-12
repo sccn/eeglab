@@ -181,10 +181,10 @@ tmpfields = fieldnames(g);
 event = oldevent;
 
 % check if latency is present in the array
-% latencypresent = ~isempty(strmatch('latency', g.fields));
-% if ~latencypresent && isfield(oldevent, 'latency')
-%     g.append = 'no';
-% end
+latencypresent = ~isempty(strmatch('latency', g.fields));
+if ~latencypresent && isfield(oldevent, 'latency')
+    g.append = 'no';
+end
 
 %% scan all the fields of g
 % ------------------------
@@ -226,6 +226,7 @@ for curfield = tmpfields'
                       % match existing fields
                       % ---------------------
                       if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end
+
                       if isstruct(g.event)
                           g.fields = fieldnames(g.event);
                           latencypresent = ~isempty(strmatch('latency', g.fields));
