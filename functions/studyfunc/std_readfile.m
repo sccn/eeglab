@@ -83,7 +83,7 @@
 % dimensions
 % time x freqs x channel_comps x subjects_trials
 
-function [measureData, parameters, measureRange1, measureRange2, events] = std_readfile(fileBaseName, varargin);
+function [measureData, parameters, measureRange1, measureRange2, events] = std_readfile(fileBaseName, varargin)
 
 if nargin < 1
     help std_readfile;

@@ -69,7 +69,7 @@ if nargin < 1
 	return;
 end
 if isempty(EEG)  , error('Cannot save empty datasets'); end
-if isequal(EEG.data, 'in set file')
+if length(EEG) == 1 && isequal(EEG.data, 'in set file')
     EEG = pop_loadset(fullfile(EEG.filepath, EEG.filename));
 end
 
@@ -256,8 +256,12 @@ try,
         if option_saveasstruct
             if strcmpi(g.version, '6') 
                 warning('')
-                save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', '-struct', 'EEG');
-                [a,b] = lastwarn;
+                try
+                    save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', '-struct', 'EEG');
+                    [~,b] = lastwarn;
+                catch
+                    b = 'MATLAB:save:sizeTooBigForMATFile';
+                end
                 if strcmpi(b, 'MATLAB:save:sizeTooBigForMATFile')
                     disp('Re-saving file using the 7.3 format that can handle large variables')
                     save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', '-struct', 'EEG');

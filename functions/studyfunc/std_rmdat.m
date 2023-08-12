@@ -93,7 +93,7 @@ allTrials = [ALLEEG.trials];
 % check pnts range
 rmDats = zeros(1, length(allPnts));
 if ~isempty(g.datinds)
-    rmDats(g.datInds) = 1;
+    rmDats(g.datinds) = 1;
 end
 rmDats = g.pntsrange(1)  > allPnts   | allPnts   > g.pntsrange(2)  | rmDats;
 rmDats = g.sraterange(1) > allSrate  | allSrate  > g.sraterange(2) | rmDats;

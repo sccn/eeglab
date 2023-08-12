@@ -67,7 +67,7 @@ if isempty(eeglabVersionNumber)
     eeglabVersionNumber = 'dev';
 end
 
-if ~isequal(eeglabVersionUpdate.version, eeglabVersionNumber)
+if ~isequal(eeglabVersionUpdate.version, eeglabVersionNumber) && ~isequal(eeglabVersionNumber, 'dev')
     stateWarning = warning('query', 'backtrace');
     warning('off', 'backtrace');
     msg = sprintf(['\nA %s revision of EEGLAB (v%s) is available <a href="matlab:eeglab_update;">HERE</a>.\n%s\n' ...

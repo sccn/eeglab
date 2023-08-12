@@ -235,7 +235,7 @@ if isfield(chanedit, 'labels')
 
     % handle MEG
     if ~isfield(chaninfo, 'topoplot')
-        if contains(chanedit(1).labels, 'MLC11') || (isfield(chanedit, 'type') && ~isempty(strfind(chanedit(1).type, 'meg')))
+        if ~isempty(strfind([chanedit(1).labels], 'MLC11')) || (isfield(chanedit, 'type') && ~isempty(strfind(chanedit(1).type, 'meg')))
             disp('MEG data detected and topoplot options not set, so setting them in EEG.chaninfo')
             chaninfo.topoplot = { 'conv' 'on' 'headrad' 0.3 };
         end

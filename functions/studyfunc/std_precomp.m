@@ -168,6 +168,14 @@ if ischar(g), error(g); end
 if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end
 if ~isempty(g.customfileext), error('customfileext option has been removed from this function. Let us know if this is something you need.'); end
 if strcmpi(g.bids, 'on'), fileSuffix = [ '_' STUDY.task ]; else fileSuffix = ''; end
+if length(unique([ALLEEG.srate])) > 1
+    fprintf(2, 'Some STUDY datasets'' sampling rate is inomogeneous. Some plotting functions will error.')
+end
+if any([ALLEEG.trials]) > 1
+    if length(unique([ALLEEG.pnts])) > 1
+        fprintf(2, 'Some STUDY datasets have more than one trial but trials'' lengths differ. Some functions will error.')
+    end
+end
 
 % union of all channel structures
 % -------------------------------

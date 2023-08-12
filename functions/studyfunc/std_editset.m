@@ -38,7 +38,6 @@
 %                 empty index. For instance creating a STUDY with a single
 %                 dataset at index 10 will result with a STUDY with a
 %                 single dataset at index 1.
-%   'remove'    - [integer] remove dataset index.
 %   'subject'   - [string] subject code.
 %   'condition' - [string] dataset condition. 
 %   'session '  - [integer] dataset session number.
@@ -51,6 +50,8 @@
 %   'inbrain'   - ['on'|'off'] same as above. This option may also be
 %                 placed in the command list (preceding the 'dipselect'
 %                 option).
+%   'remove'    - deprecated. Use the STD_RMDAT function instead to remove
+%                 dataset.
 %
 % Outputs:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
@@ -176,7 +177,10 @@ if ~isfield(STUDY, 'datasetinfo')
             STUDY.datasetinfo(realindex).session   = ALLEEG(realindex).session;
             STUDY.datasetinfo(realindex).run       = ALLEEG(realindex).run;
             STUDY.datasetinfo(realindex).condition = ALLEEG(realindex).condition;
-            STUDY.datasetinfo(realindex).group     = ALLEEG(realindex).group;                    
+            STUDY.datasetinfo(realindex).group     = ALLEEG(realindex).group;       
+            if isfield(ALLEEG(realindex), 'task')   
+                STUDY.datasetinfo(realindex).task      = ALLEEG(realindex).task;                 
+            end
         end
     end
 end
@@ -286,9 +290,16 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
             STUDY.datasetinfo(currentind).index     = currentind;    
+            if isfield(ALLEEG(currentind), 'task')   
+                STUDY.datasetinfo(currentind).task      = ALLEEG(currentind).task;                 
+            end
         otherwise
             % running custom command
             cleanname = cleanvarname(g.commands{k});
+            cleanname(cleanname == ' ') = [];
+            cleanname(cleanname == ',') = [];
+            cleanname(cleanname == '.') = [];
+            cleanname(cleanname == '-') = [];
             STUDY.datasetinfo(currentind).(cleanname) = g.commands{k+1};
     end
 end

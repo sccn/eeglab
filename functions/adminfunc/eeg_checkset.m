@@ -184,6 +184,7 @@ if nargin < 1
 end
 
 EEGFINAL = EEG;
+warning backtrace off
 if isempty(EEG), return; end
 if ~isfield(EEG, 'data'), return; end
 
@@ -853,7 +854,7 @@ for inddataset = 1:length(ALLEEG)
     else
         EEG.event = [];
     end
-    if isfield(EEG, 'urevent') && ~isempty(EEG.urevent) && ~isfield(EEG.event, 'urevent')
+    if isfield(EEG, 'urevent') && ~isempty(EEG.urevent) && ~isfield(EEG.event, 'urevent') && ~isempty(EEG.event)
         warning('Inconsistency between urevent (backup) and event structures, removing urevent structure');
         EEG.urevent = [];
     end
@@ -1221,6 +1222,7 @@ for inddataset = 1:length(ALLEEG)
     if ~isfield(EEG, 'comments')   EEG.comments   = ''; res = com; end
     if ~isfield(EEG, 'etc'     )   EEG.etc        = []; res = com; end
     if ~isfield(EEG, 'urevent' )   EEG.urevent    = []; res = com; end
+    if ~isfield(EEG, 'roi' )       EEG.roi        = []; res = com; end
     if ~isfield(EEG, 'ref') || isempty(EEG.ref) EEG.ref = 'common'; res = com; end
     
     % create fields if absent

@@ -321,7 +321,7 @@ end
 % -------------------------
 if ~isempty(chanlocs2)
     TMP   = eeg_emptyset;
-    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chanlocs2);
+    TMP.chanlocs = readlocs(chanlocs2);
     TMP.chaninfo                  = g.chaninfo2;
     TMP.nbchan = length(TMP.chanlocs);
     cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
@@ -350,12 +350,12 @@ elseif ~isempty(elec2)
         
         % autoscale
         % ---------
-        [ electransf transform ] = align_fiducials(electmp, elec2, g.alignfid);
+        [ ~, transform ] = align_fiducials(elec1, elec2, g.alignfid);
         if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end
         
     elseif ~isempty(g.warp)
         if ischar(g.warp)
-            [clist1 clist2] = pop_chancoresp( elec1, elec2, 'autoselect', 'all', 'gui', 'off');
+            [clist1, clist2] = pop_chancoresp( elec1, elec2, 'autoselect', 'all', 'gui', 'off');
             % copy electrode names
             if isempty(clist1)
                 disp('Warning: cannot wrap electrodes (no common channel labels)');

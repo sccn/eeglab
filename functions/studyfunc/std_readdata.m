@@ -86,14 +86,20 @@ STUDY = pop_erspparams(STUDY, 'default');
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
+    'ndim'          'integer' []             [];
     'timerange'     'real'    []             [];
     'freqrange'     'real'    []             [];
     'datatype'      'string'  { 'erp','spec' 'ersp' 'itc' 'erpim' 'custom' } 'erp';
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
+    'customread'    ''        []             [];
+    'customparams'  'cell'    []             {};
     'subject'       'string'  []             '' }, ...
     'std_readdata', 'ignore');
+if ~isempty(moreopts)
+    fprintf(2, 'Warning: std_readdata ignored at least one parameters: "%s"\n', moreopts{1})
+end
 if ischar(opt), error(opt); end
 
 dtype = opt.datatype;
@@ -101,6 +107,9 @@ dtype = opt.datatype;
 % get the file extension
 % ----------------------
 tmpDataType = opt.datatype;
+if ~isempty(opt.customread)
+    opt.datatype = 'custom';
+end
 if strcmpi(opt.datatype, 'ersp') || strcmpi(opt.datatype, 'itc')
     tmpDataType = 'timef'; 
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erspparams.timerange;  end
@@ -138,7 +147,7 @@ fprintf('Reading subjects'' data or looking up measure values in EEGLAB cache\n'
 
 % determining component polarity if necessary
 % -------------------------------------------
-if isempty(opt.channels) && strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
+if isempty(opt.customread) && isempty(opt.channels) && strcmpi(dtype, 'erp') && strcmpi(opt.componentpol, 'on')
     componentPol = ones(1, length(STUDY.cluster(opt.clusters).comps)); % default is all 1
     disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
     STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
@@ -168,6 +177,7 @@ for iSubj = 1:length(subjectList)
     bigstruct.subject      = subjectList{iSubj};
     bigstruct.component    = opt.component;
     bigstruct.options      = opts;
+    bigstruct.moreoptions  = opt;
     if isnan(opt.design)
          bigstruct.design.variable = struct([]);
     else bigstruct.design.variable = STUDY.design(opt.design).variable;
@@ -180,7 +190,7 @@ for iSubj = 1:length(subjectList)
         compList    = [];
         polList     = [];
         if size(STUDY.cluster(opt.clusters).sets,1) ~= length(datasetInds)
-            error('Cannot process components from different ICA decomposition of the same subjects'); % sometimes different sessions
+            error('Cannot process components from different ICA decompositions of the same subjects'); % sometimes different sessions
         end            
         if isempty(opt.component)
             for iDat = datasetInds(:)'
@@ -215,12 +225,16 @@ for iSubj = 1:length(subjectList)
     else
         datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
         
-        fileName = getfilename({STUDY.datasetinfo(datInds).filepath}, STUDY.datasetinfo(datInds(1)).subject, { STUDY.datasetinfo(datInds).session }, fileExt, length(uniqueSessions) == 1);
-        if ~isempty(opt.channels)
-             [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
-        else [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
+        if isempty(opt.customread)
+            fileName = getfilename({STUDY.datasetinfo(datInds).filepath}, STUDY.datasetinfo(datInds(1)).subject, { STUDY.datasetinfo(datInds).session }, fileExt, length(uniqueSessions) == 1);
+            if ~isempty(opt.channels)
+                 [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'channels', opt.channels);
+            else [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj} ] = std_readfile( fileName, 'designvar', struct(bigstruct.design.variable), opts{:}, 'components', compList);
+            end
+        else
+            % read custom data
+            [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj}] = feval(opt.customread, STUDY.datasetinfo(datInds), ALLEEG(datInds), struct(bigstruct.design.variable), opt.customparams{:}, opts{:});
         end
-
         if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') % ERP or spectrum
             % inverting ERP polarity when relevant
             if strcmpi(opt.datatype, 'erp') && ~isempty(opt.clusters) && strcmpi(opt.componentpol, 'on')
@@ -269,9 +283,14 @@ if strcmpi(opt.singletrials, 'on') && length(opt.channels) > 1
 end
 
 % store data for all subjects
-if strcmpi(opt.datatype, 'erp') || strcmpi(opt.datatype, 'spec')
-     if length(opt.channels) > 1, dim = 3; else dim = 2; end
-else if length(opt.channels) > 1, dim = 4; else dim = 3; end
+if isempty(opt.ndim)
+    if strcmpi(opt.datatype, 'erp') || strcmpi(opt.datatype, 'spec')
+        if length(opt.channels) > 1, dim = 3; else dim = 2; end
+    else 
+        if length(opt.channels) > 1, dim = 4; else dim = 3; end
+    end
+else
+    dim = opt.ndim;
 end
 
 % check that all ERPimages have the same number of lines
@@ -289,9 +308,9 @@ if ~isempty(opt.clusters)
     realDim  = dim;
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
     for iDat1 = 1:length(dataTmp)
-        for iDat2 = 1:length(dataTmp{iDat1})
+        for iDat2 = 1:length(dataTmp{iDat1}(:))
             if isempty(dataTmp{iDat1}{iDat2})
-                dataTmp{iDat1}{iDat2} = []; % sometimes empty but all dim not 0
+                dataTmp{iDat1}{iDat2} = double.empty(0,0,0); % sometimes empty but all dim not 0
             end
         end
         compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
@@ -302,7 +321,7 @@ if ~isempty(opt.clusters)
             end
         end
         
-        if any(compNumbers)
+        if any(any(compNumbers))
             for iDat2 = 1:length(dataTmp{iDat1}(:))
                 if compNumbers(iDat2)
                     for iComps = 1:compNumbers(iDat2)
@@ -330,11 +349,16 @@ function datavals = reorganizedata(dataTmp, dim)
         
     % copy data
     for iItem=1:length(dataTmp{1}(:)')
-        numItems    = sum(cellfun(@(x)size(x{iItem},dim)*(size(x{iItem},1) > 1), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
+        if dim > 1
+            numItems    = sum(cellfun(@(x)size(x{iItem},dim)*(size(x{iItem},1) > 1), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
+        else
+            numItems    = sum(cellfun(@(x)size(x{iItem},dim), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
+        end
         ind         = find(~cellfun(@(x)isempty(x{iItem}), dataTmp)); 
         if ~isempty(ind)
             ind = ind(1);
             switch dim
+                case 1, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) numItems], 'single'); 
                 case 2, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) numItems], 'single'); 
                 case 3, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) numItems], 'single'); 
                 case 4, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) size(dataTmp{ind}{iItem},3) numItems], 'single'); 
@@ -345,8 +369,13 @@ function datavals = reorganizedata(dataTmp, dim)
         count = 1;
         for iCase = 1:length(dataTmp)
             if ~isempty(dataTmp{iCase}{iItem})
-                numItems = size(dataTmp{iCase}{iItem},dim) * (size(dataTmp{iCase}{iItem},1) > 1); % the size > 1 allows to detect empty array which have a non-null last dim
+                if dim > 1
+                    numItems = size(dataTmp{iCase}{iItem},dim) * (size(dataTmp{iCase}{iItem},1) > 1); % the size > 1 allows to detect empty array which have a non-null last dim
+                else
+                    numItems = size(dataTmp{iCase}{iItem},dim);
+                end
                 switch dim
+                    case 1, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
                     case 4, datavals{iItem}(:,:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};

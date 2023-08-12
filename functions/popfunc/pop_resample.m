@@ -63,7 +63,7 @@
 % 03-08-02 debug call to function help -ad
 % 04-05-02 recompute event latencies -ad
 
-function [EEG, command] = pop_resample( EEG, freq, fc, df); 
+function [EEG, command] = pop_resample( EEG, freq, fc, df)
 
 command = '';
 if nargin < 1
@@ -142,8 +142,13 @@ eeglab_options;
 if option_donotusetoolboxes
     usesigproc = 0;
 elseif exist('resample') == 2
-     usesigproc = 1;
-else usesigproc = 0;
+    if any(findstr(which('resample.m'), 'fieldtrip'))
+        usesigproc = 0;
+    else
+        usesigproc = 1;
+    end
+else 
+    usesigproc = 0;
     disp('Signal Processing Toolbox absent: using custom interpolation instead of resample() function.');
     disp('This method uses cubic spline interpolation after anti-aliasing (see >> help spline)');    
 end
@@ -205,6 +210,7 @@ if isfield(EEG.event, 'latency')
         
     else % Continuous data
 
+        eeglab_options;
         for iEvt = 1:length(EEG.event)
 
             % From >> help resample: Y is P/Q times the length of X (or the
@@ -216,12 +222,14 @@ if isfield(EEG.event, 'latency')
             % Old version EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
 
             % Recompute event latencies relative to segment onset
-            if eeg_isboundary(EEG.event(iEvt)) && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+            if eeg_isboundary(EEG.event(iEvt), option_boundary99) && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
                 iBnd = sum(EEG.event(iEvt).latency + 0.5 >= bounds);
                 EEG.event(iEvt).latency = indices(iBnd) - 0.5;
             else
                 iBnd = sum(EEG.event(iEvt).latency >= bounds);
-                EEG.event(iEvt).latency = (EEG.event(iEvt).latency - bounds(iBnd)) * p / q + indices(iBnd);
+                if iBnd > 0
+                    EEG.event(iEvt).latency = (EEG.event(iEvt).latency - bounds(iBnd)) * p / q + indices(iBnd);
+                end
             end
             
             % Recompute event duration relative to segment onset
@@ -315,7 +323,7 @@ function tmpeeglab = myresample(data, p, q, usesigproc, fc, df)
         endPad = repmat(data(end, :), [nPad 1]);
 
         % Resampling
-        tmpeeglab = resample([startPad; data; endPad], p, q, b);
+        tmpeeglab = resample([startPad; data; endPad], p, q, b(:));
 
         % Remove padding
         nPad = nPad * p / q; % # datapoints to unpad

@@ -103,7 +103,7 @@ function event = importevent(event, oldevent, srate, varargin)
 if nargin < 1
    help importevent;
    return;
-end;	
+end
 
 I = [];
 
@@ -181,16 +181,16 @@ tmpfields = fieldnames(g);
 event = oldevent;
 
 % check if latency is present in the array
-latencypresent = ~isempty(strmatch('latency', g.fields));
-if ~latencypresent && isfield(oldevent, 'latency')
-    g.append = 'no';
-end
+% latencypresent = ~isempty(strmatch('latency', g.fields));
+% if ~latencypresent && isfield(oldevent, 'latency')
+%     g.append = 'no';
+% end
 
 %% scan all the fields of g
 % ------------------------
 for curfield = tmpfields'
     if ~isempty(event), allfields = fieldnames(event);
-    else                    allfields = {}; end
+    else                allfields = {}; end
     switch lower(curfield{1})
         case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
         case 'event', % load an ascii file
@@ -226,6 +226,10 @@ for curfield = tmpfields'
                       % match existing fields
                       % ---------------------
                       if ischar(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end
+                      if isstruct(g.event)
+                          g.fields = fieldnames(g.event);
+                          latencypresent = ~isempty(strmatch('latency', g.fields));
+                      end
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
                       if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(event); end
                       if length(g.indices) ~= size(tmparray,1)
@@ -240,7 +244,8 @@ for curfield = tmpfields'
                       % ---------------------
                       for eventfield = 1:size(tmparray,2)
                           event = setstruct( event, g.fields{eventfield}, g.indices, { tmparray{:,eventfield} });
-                      end;      
+                      end
+
 					  % generate ori fields
 					  % -------------------
                       offset = length(event)-size(tmparray,1);
@@ -282,13 +287,16 @@ function array = load_file_or_array( varname, skipline, delim );
         array = loadtxt( varname, 'skipline', skipline, 'delim', delim );
         
     else 
-         if ~iscell(varname)
-             array = mattocell(varname);
-         else
+         if iscell(varname)
              array = varname;
+         elseif isstruct(varname)
+             tmparray = struct2table(varname);
+             array = table2cell(tmparray);
+         else
+             array = mattocell(varname);
          end
-    end;     
-return;
+    end
+return
 
 %% update latency values
 % ---------------------
@@ -296,7 +304,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
 
     % update time unit 
     % ----------------
-    if ~isfield(event, 'latency'), 
+    if ~isfield(event, 'latency')
         if isfield(event, 'duration')
             error('A duration field cannot be defined if a latency field has not been defined');
         end

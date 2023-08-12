@@ -115,7 +115,7 @@ if ~isempty(varargin) && isstruct(varargin{1})
 else
     opt = [];
 end
-if ~isempty(varargin) ||isempty(opt);
+if ~isempty(varargin) ||isempty(opt)
     opt = pop_statparams(opt, varargin{:});
 end
 
@@ -223,8 +223,8 @@ else
         % main statistics
         if ng > 1
             [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
-            pinter{1}     = applymask(F, opt.fieldtrip);
-            statsinter{1} = squeeze(F.stat);
+            pinter{2}     = applymask(F, opt.fieldtrip);
+            statsinter{2} = squeeze(F.stat);
         end
     else
         pcond = {};
@@ -252,8 +252,8 @@ else
         % main statistics
         if nc > 1
             [F, df, pval] = statcondfieldtrip(newdata, 'paired', opt.paired{1}, params{:});
-            pinter{2}     = applymask(F, opt.fieldtrip);
-            statsinter{2} = squeeze(F.stat);
+            pinter{1}     = applymask(F, opt.fieldtrip);
+            statsinter{1} = squeeze(F.stat);
         end
     else
         pgroup = {};

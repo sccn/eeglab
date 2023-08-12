@@ -112,6 +112,8 @@ catch lasterr
     return
 end
 
+clear CURRENTSTUDY CURRENTSET ALLEEG EEG STUDY;
 warndlg2( [ 'Script run successfully.' ], 'Compiled version');
+evalin('base', 'eeglab');
 
 end

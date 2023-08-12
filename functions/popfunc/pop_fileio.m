@@ -175,6 +175,7 @@ dataopts = {};
 % In case of FIF files convert EEG channel units to uV in FT options
 [filePath, fileNameNoExt, filext] = fileparts(filename);
 if strcmpi(filext,'.fif')
+    fprintf(2, 'FIF file detected, check if channel locations are rotated properly in the channel editor\n')
     eegchanindx = find(strcmpi(dat.chantype,'eeg'));
     if ~isempty(eegchanindx) && isfield (dat,'chanunit')
         if ~all(strcmpi(dat.chanunit(eegchanindx),'uv'))
@@ -329,17 +330,19 @@ end
 
 % import fiducial in associated coordsystem file if present
 % ---------------------------------------------------------
-coordSystemFile = dir(fullfile(filePath, [ fileNameNoExt(1:4) '*coordsystem.json' ]));
-if length(coordSystemFile) == 1
-    coordSystemFileName = fullfile(coordSystemFile(1).folder, coordSystemFile(1).name);
-    if ~exist('eeg_importcoordsystemfiles', 'file')
-        fprintf(2, 'BIDS coordsystem file %s detected but not imported, install bids-matlab-tools to import it\n', coordSystemFileName);
-    else
-        fprintf('BIDS coordsystem file detected %s and imported (may contain fiducials)\n', coordSystemFileName);
-        EEG = eeg_importcoordsystemfiles(EEG, coordSystemFileName); % require the bids-matlab-tools plugin
+if ~isempty(fileNameNoExt)
+    coordSystemFile = dir(fullfile(filePath, [ fileNameNoExt(1:4) '*coordsystem.json' ]));
+    if length(coordSystemFile) == 1
+        coordSystemFileName = fullfile(coordSystemFile(1).folder, coordSystemFile(1).name);
+        if ~exist('eeg_importcoordsystemfiles', 'file')
+            fprintf(2, 'BIDS coordsystem file %s detected but not imported, install bids-matlab-tools to import it\n', coordSystemFileName);
+        else
+            fprintf('BIDS coordsystem file detected %s and imported (may contain fiducials)\n', coordSystemFileName);
+            EEG = eeg_importcoordsystemfiles(EEG, coordSystemFileName); % require the bids-matlab-tools plugin
+        end
+    elseif length(coordSystemFile) > 1
+        fprintf(2, 'More than one BIDS coordsystem file detected so none imported (may contain fiducials)\n');
     end
-elseif length(coordSystemFile) > 1
-    fprintf(2, 'More than one BIDS coordsystem file detected so none imported (may contain fiducials)\n');
 end
 
 % extract events
@@ -389,7 +392,7 @@ end
 
 % convert data to continuous
 % --------------------------
-if strcmpi(g.makecontinuous, 'on')
+if strcmpi(g.makecontinuous, 'on') && EEG.trials > 1
     EEG = eeg_epoch2continuous(EEG);
 end
 

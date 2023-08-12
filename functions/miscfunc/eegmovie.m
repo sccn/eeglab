@@ -44,6 +44,8 @@
 %
 % Author: Arnaud Delorme, Colin Humphries & Scott Makeig, CNL, Salk Institute, La Jolla, 3/97
 %
+% Example of usage for 3D movie: see https://github.com/amisepa/eegmovie_topo3d
+%
 % See also: SEEMOVIE, EEGPLOTOLD, TOPOPLOT
 
 % Copyright (C)  6/4/97 Colin Humphries & Scott Makeig, CNL / Salk Institute / La Jolla CA

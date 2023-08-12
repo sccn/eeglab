@@ -57,7 +57,7 @@
 %                size of cell array is [nconds x ngroups]. Size of each element
 %                is [times x subjects] for data channels or [times x components]
 %                for component clusters. This array may be gicen as input 
-%                directly to the STATCOND function or std_stats function
+%                directly to the STATCOND function or STD_STAT function
 %                to compute statistics.
 %   erptimes   - [array] ERP time point latencies.
 %   pgroup     - [array or cell] p-values group statistics. Output of the 
@@ -71,7 +71,7 @@
 %            >> [STUDY] = std_erpplot(STUDY,ALLEEG, 'clusters', 2, 'comps', 'all');
 %               % Plot cluster-2 component ERPs plus the mean ERP in bold. 
 %
-%  See also  POP_CLUSTEDIT, POP_PRECLUST, EEG_CREATEDATA, EEG_PRECLUST. STD_PROPPLOT
+%  See also  POP_CLUSTEDIT, POP_PRECLUST, EEG_CREATEDATA, EEG_PRECLUST, STD_PROPPLOT
 %
 % Authors: Arnaud Delorme, CERCO, August, 2006-
 
@@ -339,6 +339,9 @@ if ~isempty(opt.channels)
     % plot
     % ----
     indNonEmpty = find(~cellfun(@isempty, erpdata(:)));
+    if isempty(indNonEmpty)
+        error('All conditions are empty')
+    end
     if ~isreal(erpdata{indNonEmpty(1)}(1)) % for spectrum FFT data
         tmperpdata = cellfun(@(x)x.*conj(x), erpdata, 'uniformoutput', false);
     else

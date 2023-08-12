@@ -612,7 +612,7 @@ function hdl = mysubplot(nr,nc,r,c,subplottype)
 
 % rapid filtering for ERP
 % -----------------------
-function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass); 
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass)
     bscorrect = 1;
     if bscorrect
         % Getting initial baseline

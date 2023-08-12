@@ -41,7 +41,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function logi = eeg_isboundary(tmpevent)
+function logi = eeg_isboundary(tmpevent, option_boundary99)
 
     if nargin < 1
         help eeg_isboundary;
@@ -53,7 +53,9 @@ function logi = eeg_isboundary(tmpevent)
         return;
     else
         % type of boundary event
-        eeglab_options;
+        if nargin < 2
+            eeglab_options;
+        end
         if ischar(tmpevent(1).type)
             if strcmpi('boundary', tmpevent(1).type)
                 logi = true;

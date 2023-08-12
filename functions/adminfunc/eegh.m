@@ -91,7 +91,8 @@ elseif nargin == 1
 	if isempty( command )
 		return;
 	end
-	if ischar( command )
+	if ischar( command ) || ( exist('isstring', 'builtin') && isstring( command ) )
+        command = char(command);
         if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end
 		if isempty(ALLCOM)
 			ALLCOM = { command };

@@ -76,9 +76,9 @@ try
                 tmplocs = tmp;
             end
             allchans = { alllocs.labels tmplocs.labels };
-            [uniquechan ord1 ord2 ]  = unique_bc( allchans );
+            [uniquechan, ord1, ord2 ]  = unique_bc( lower(allchans) );
 
-            [tmp rminds] = intersect_bc( uniquechan, { alllocs.labels });
+            [~, rminds] = intersect_bc( uniquechan, lower({ alllocs.labels }));
             ord1(rminds) = [];
             tmplocsind = ord1-length(alllocs);
 
@@ -87,12 +87,12 @@ try
         end
         alllocs = newlocs;
     end
-catch,
+catch
     % temporary fix for dissimilar structures
     % should check channel structure consistency instead
     % using checkchan function
     disp('Channel merging warning: dissimilar fields in the two structures');
-    [alllocs warn ] = eeg_mergelocs_diffstruct(varargin{:});
+    [alllocs, warn ] = eeg_mergelocs_diffstruct(varargin{:});
 end
 
 % Checking consistency of chanlocs
@@ -125,7 +125,7 @@ function alllocs = myunion(locs1, locs2)
            count1 = count1 + 1;
            count2 = count2 + 1;
            count3 = count3 + 1;
-       elseif isempty(strmatch(labs1{count1}, labs2, 'exact'))
+       elseif isempty(strmatch(lower(labs1{count1}), lower(labs2), 'exact'))
            alllocs(count3) = locs1(count1);
            count1 = count1 + 1;
            count3 = count3 + 1;

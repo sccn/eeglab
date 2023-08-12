@@ -660,21 +660,21 @@ if iscell(X)
 		% preprocess data and run condstat
 		% --------------------------------
 		switch g.type
-		 case 'coher', % take the square of alltfx and alltfy first to speed up
-		  Tfx1 = Tfx1.*conj(Tfx1); Tfx2 = Tfx2.*conj(Tfx2);
-		  Tfy1 = Tfy1.*conj(Tfy1); Tfy2 = Tfy2.*conj(Tfy2);
+		 case 'coher' % take the square of alltfx and alltfy first to speed up
+		  Tfx1_ = Tfx1.*conj(Tfx1); Tfx2_ = Tfx2.*conj(Tfx2);
+		  Tfy1_ = Tfy1.*conj(Tfy1); Tfy2_ = Tfy2.*conj(Tfy2);
 		  formula = 'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X),3)) ./ sqrt(sum(arg3(:,:,X),3))';
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(savecoher1,1)
                   if ind == size(savecoher1,1), indarr = ind; else indarr = [ind:ind+1]; end
                   [Rdiff(indarr,:,:) coherimages(indarr,:,:) coher1(indarr,:,:) coher2(indarr,:,:)] = condstat(formula, g.naccu, g.alpha, ...
                       'both', g.condboot, { savecoher1(indarr,:,:) savecoher2(indarr,:,:) }, ...
-                     { Tfx1(indarr,:,:) Tfx2(indarr,:,:) }, { Tfy1(indarr,:,:) Tfy2(indarr,:,:) });
-              end;     
+                     { Tfx1_(indarr,:,:) Tfx2_(indarr,:,:) }, { Tfy1_(indarr,:,:) Tfy2_(indarr,:,:) });
+              end
           else
               [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
-                 'both', g.condboot, { savecoher1 savecoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
-          end; 
+                 'both', g.condboot, { savecoher1 savecoher2 }, { Tfx1_ Tfx2_ }, { Tfy1_ Tfy2_ });
+          end
           
          case 'amp' % amplitude correlation
 		  error('Cannot compute difference of amplitude correlation images yet');
