@@ -561,10 +561,10 @@ model.defaults.fullfactorial    = 0;                 % all variables
 model.defaults.zscore           = opt.zscore;        % done that already
 model.defaults.bootstrap        = 0 ;                % only for single subject analyses - not included for studies
 model.defaults.tfce             = 0;                 % only for single subject analyses - not included for studies
-model.defaults.method           = opt.method;        % default is OLS - to be updated to 'WLS' once validated
+model.defaults.method           = opt.method;        % default is WLS 
 model.defaults.Level            = 1;                 % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % option can be multivariate (work in progress)
-model.defaults.labels           = pop_listfactors(STUDY, 'gui', 'off', 'level', 'one', 'splitreg', opt.splitreg, 'interaction', opt.interaction);
+model.defaults.labels           = factors;
 
 if ~exist('limocontrast','var')
     [LIMO_files, procstatus] = limo_batch('model specification',model,[],STUDY);
