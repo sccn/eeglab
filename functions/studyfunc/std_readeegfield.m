@@ -80,11 +80,6 @@ for iDes = 1:length(designvar)
     if ~isfield(datasetinfo, designvar(iDes).label)
         error('This function read fields of the EEG structure so it can only handle STUDY designs comparing datasets (not trials within datasets)')
     end
-    for iVar1 = 1:length(designvar(iDes).value)
-        if isnumeric(designvar(iDes).value{iVar1})
-            error('This function cannot handle numerical condition (because not tested; should be easy to fix')
-        end
-    end
 end
 
 if length(designvar) == 1
