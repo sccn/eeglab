@@ -349,11 +349,16 @@ function datavals = reorganizedata(dataTmp, dim)
         
     % copy data
     for iItem=1:length(dataTmp{1}(:)')
-        numItems    = sum(cellfun(@(x)size(x{iItem},dim)*(size(x{iItem},1) > 1), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
+        if dim > 1
+            numItems    = sum(cellfun(@(x)size(x{iItem},dim)*(size(x{iItem},1) > 1), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
+        else
+            numItems    = sum(cellfun(@(x)size(x{iItem},dim), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
+        end
         ind         = find(~cellfun(@(x)isempty(x{iItem}), dataTmp)); 
         if ~isempty(ind)
             ind = ind(1);
             switch dim
+                case 1, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) numItems], 'single'); 
                 case 2, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) numItems], 'single'); 
                 case 3, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) numItems], 'single'); 
                 case 4, datavals{iItem} = zeros([ size(dataTmp{ind}{iItem},1) size(dataTmp{ind}{iItem},2) size(dataTmp{ind}{iItem},3) numItems], 'single'); 
@@ -364,8 +369,13 @@ function datavals = reorganizedata(dataTmp, dim)
         count = 1;
         for iCase = 1:length(dataTmp)
             if ~isempty(dataTmp{iCase}{iItem})
-                numItems = size(dataTmp{iCase}{iItem},dim) * (size(dataTmp{iCase}{iItem},1) > 1); % the size > 1 allows to detect empty array which have a non-null last dim
+                if dim > 1
+                    numItems = size(dataTmp{iCase}{iItem},dim) * (size(dataTmp{iCase}{iItem},1) > 1); % the size > 1 allows to detect empty array which have a non-null last dim
+                else
+                    numItems = size(dataTmp{iCase}{iItem},dim);
+                end
                 switch dim
+                    case 1, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
                     case 4, datavals{iItem}(:,:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};

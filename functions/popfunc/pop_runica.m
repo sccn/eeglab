@@ -322,6 +322,7 @@ elseif length(ALLEEG) > 1 && strcmpi(g.concatcond, 'on')
                      'Subject names must be stored within the datasets. To do so,' 10 ...
                      'use the STUDY > Edit STUDY Info menu and check the box' 10 ...
                      '"Dataset info (condition, group, ...) differs from study info..."' ]);
+        return
     end
     dats = {};
     for index = 1:length(allsubjects)

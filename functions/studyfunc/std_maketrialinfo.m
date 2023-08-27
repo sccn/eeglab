@@ -46,9 +46,13 @@
 function [STUDY,alltrialinfo] = std_maketrialinfo(STUDY, ALLEEG)
 
 %% test if .epoch field exist in ALLEEG structure
-epochfield = cellfun(@isempty, { ALLEEG.epoch });
-if any(epochfield)
-    fprintf('Warning: some datasets are continuous and trial information cannot be created. Please use [ALLEEG.trials] to see which ones.\n');
+noepochfield = cellfun(@isempty, { ALLEEG.epoch });
+if any(noepochfield)
+    if all(noepochfield)
+        fprintf('Datasets are all continuous, so trial information is skipped.\n');
+    else
+        fprintf(2, 'Warning: inconsistent datasets (some are continuous and some are not). Please use [ALLEEG.trials] to see which ones and fix the problem.\n');
+    end
     return;
 end
 

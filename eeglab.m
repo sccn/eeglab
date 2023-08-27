@@ -1459,7 +1459,7 @@ end
 % ---------------------
 MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 if MAX_SET > 200
-    disp('Updating menu, allowing selection of the first 200 datasets only to speed up display...')
+    disp('Updating menu, restricting menu selection to the first 200 datasets to speed up display...')
     MAX_SET = 200;
 end
 

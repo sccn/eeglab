@@ -49,7 +49,7 @@ if nargin <2
 	nonmatlab = 0;
 end
 
-if exist('help2html')
+if exist('help2html') == 2
     if length(funct) > 3 && strcmpi(funct(end-3:end), '.txt')
         %web(funct);
         fid = fopen(funct, 'r');
