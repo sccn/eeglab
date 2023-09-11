@@ -47,7 +47,7 @@
 
 % Copyright (C) Arnaud Delorme, arno@salk.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
+% This file is part of EEGLAB, see https://urldefense.com/v3/__http://www.eeglab.org__;!!Mih3wA!Hn3hFRnhxnzS1csHGMH6q95jPsdmpLu36WaSxZZ0BSw4smbm8RghssmOC-feg7O1JHd0ncZ3ACn-r8229A$ 
 % for the documentation and details.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -255,7 +255,7 @@ for iSubj = 1:length(subjectList)
             end
             nonEmptyCell = find( cellfun(@isempty, dataTmp{iSubj}) == 0);
             if ~isempty(nonEmptyCell)
-                yvals = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
+                yvalsERPim = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
             end
         elseif strcmpi(opt.datatype, 'custom')
             disp('Nothing to do for custom data');
@@ -264,6 +264,9 @@ for iSubj = 1:length(subjectList)
         end
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params });
     end
+end
+if strcmpi(opt.datatype, 'erpim')
+    yvals = yvalsERPim;
 end
 fprintf('\n');
 
