@@ -49,7 +49,7 @@ function [STUDY,alltrialinfo] = std_maketrialinfo(STUDY, ALLEEG)
 noepochfield = cellfun(@isempty, { ALLEEG.epoch });
 if any(noepochfield)
     if all(noepochfield)
-        fprintf(2, 'Datasets are all continuous, so trial information is skipped.\n');
+        fprintf('Datasets are all continuous, so trial information is skipped.\n');
     else
         fprintf(2, 'Warning: inconsistent datasets (some are continuous and some are not). Please use [ALLEEG.trials] to see which ones and fix the problem.\n');
     end
