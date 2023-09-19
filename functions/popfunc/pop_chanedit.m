@@ -194,6 +194,9 @@ if isempty(chans) || all(~ishandle(chans))
             else
                 com = sprintf('EEG = pop_chanedit(EEG, ''%s'', %s);', orichaninfo, vararg2str(varargin));
             end
+            if isequal(com, 'EEG=pop_chanedit(EEG, []);')
+                return
+            end
             
             % Apply to all datasets and resave if necessary
             if isempty(com), return; end

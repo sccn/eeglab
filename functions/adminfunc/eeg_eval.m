@@ -110,9 +110,19 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin)
 %     };
     
     NEWEEG = EEG;
+    parstatus_changed = 0;
+
     if option_parallel
-        disp('Using the parallel toolbox to process multiple datasets (change in File > Preferences)');
-        myPool = gcp;
+        if exist('gcp')
+            disp('Using the parallel toolbox to process multiple datasets (change in File > Preferences)');
+            ps = parallel.Settings;
+            parstatus = ps.Pool.AutoCreate;
+            ps.Pool.AutoCreate = true;
+            parstatus_changed = 1;
+        else
+            disp('Parallel toolbox not found - nothing to worry about (except slower computation in some cases)');
+        end
+        
         tmpoptions_store = option_storedisk;
         parfor i = 1:length(EEG)
             fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
@@ -130,9 +140,20 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin)
                 NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
             end
         end
+
     else
+
+        % check if parallel toolbox active
+        if exist('gcp')
+            delete(gcp('nocreate'));
+            ps = parallel.Settings;
+            parstatus = ps.Pool.AutoCreate;
+            ps.Pool.AutoCreate = false;
+            parstatus_changed = 1;
+        end
+
         for i = 1:length(EEG)
-            fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
+                fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
             TMPEEG    = eeg_retrieve(EEG, i);
             TMPEEG = feval(func, TMPEEG, g.params{:});
             TMPEEG = eeg_checkset(TMPEEG);
@@ -149,6 +170,12 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin)
     end
     EEG = NEWEEG;
     
+    % set back default parallelization
+    % ----------------------
+    if parstatus_changed
+        ps.Pool.AutoCreate = parstatus;
+    end
+
     % history
     % -------
     if nargout > 1

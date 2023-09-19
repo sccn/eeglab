@@ -55,6 +55,9 @@ if isempty(eeglabVersionUpdate)
     warning('off', 'backtrace');
     warning(msg);
     warning(stateWarning.state, 'backtrace');
+    if option_showpendingplugins
+        fprintf(2, 'You have the option enabled to check for pending plugins which could be responsible\nfor the warning above. Please disable that option.\n')
+    end
     return
 end
 if length(eeglabVersionUpdate) > 1

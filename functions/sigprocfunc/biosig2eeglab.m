@@ -100,12 +100,16 @@ if isfield(dat,'T0')
     EEG.etc.T0 = dat.T0; % added sjo
 end
 
+statusChannelPresent = false;
 if isfield(dat, 'Label') && ~isempty(dat.Label)
     if ischar(dat.Label)
         EEG.chanlocs = struct('labels', cellstr(char(dat.Label(dat.InChanSelect)))); % 5/8/2104 insert (dat.InChanSelect) Ramon
     else
         % EEG.chanlocs = struct('labels', dat.Label(1:min(length(dat.Label), size(EEG.data,1))));
         EEG.chanlocs = struct('labels', dat.Label(dat.InChanSelect)); % sjo added 120907 to avoid error below % 5/8/2104 insert (dat.InChanSelect) Ramon
+        if isequal(EEG.chanlocs(end).labels, 'Status')
+            statusChannelPresent = true;
+        end
     end
     if length(EEG.chanlocs) > EEG.nbchan, EEG.chanlocs = EEG.chanlocs(1:EEG.nbchan); end
     
@@ -185,6 +189,8 @@ if importevent
             disp('Warning: event extraction failure, the last channel contains data');
         elseif length(unique(EEG.data(end, :))) > 1000
             disp('Warning: event extraction failure, the last channel contains data');
+        elseif length(unique(EEG.data(end,:))) == 1 && ~statusChannelPresent 
+            fprintf('Empty last channel is likely a data channel not event channel\n');
         else
             thiscode = 0;
             for p = 1:size(EEG.data,2)*size(EEG.data,3)-1

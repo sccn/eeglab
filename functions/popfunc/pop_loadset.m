@@ -237,8 +237,10 @@ end
 
 % load all data or specific data channel
 % --------------------------------------
-if isfield(EEG, 'event') && ~isempty(EEG.event) && isfield(EEG.event, 'sample') && ~isfield(EEG.event, 'latency') 
-    [EEG.event(1:length(EEG.event)).latency] = deal(EEG.event.sample);
+for iEEG = 1:length(EEG)
+    if isfield(EEG(iEEG), 'event') && ~isempty(EEG(iEEG).event) && isfield(EEG(iEEG).event, 'sample') && ~isfield(EEG(iEEG).event, 'latency')
+        [EEG(iEEG).event(1:length(EEG(iEEG).event)).latency] = deal(EEG(iEEG).event.sample);
+    end
 end
 if strcmpi(g.check, 'on')
     EEG = eeg_checkset(EEG);

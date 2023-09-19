@@ -254,7 +254,9 @@ for iSubj = 1:length(subjectList)
                 [dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}] = processerpim(dataTmp{iSubj}{iCond}, eventsTmp{iSubj}{iCond}, xvals, params);
             end
             nonEmptyCell = find( cellfun(@isempty, dataTmp{iSubj}) == 0);
-            yvals = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
+            if ~isempty(nonEmptyCell)
+                yvals = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
+            end
         elseif strcmpi(opt.datatype, 'custom')
             disp('Nothing to do for custom data');
         else
@@ -345,10 +347,11 @@ datavals = reorganizedata(dataTmp, dim);
 % reorganize data
 % ---------------
 function datavals = reorganizedata(dataTmp, dim)
-    datavals = cell(size(dataTmp{1}));
+    nonEmptyCell = find( cellfun(@isempty, dataTmp) == 0);
+    datavals = cell(size(dataTmp{nonEmptyCell(1)}));
         
     % copy data
-    for iItem=1:length(dataTmp{1}(:)')
+    for iItem=1:length(dataTmp{nonEmptyCell(1)}(:)')
         if dim > 1
             numItems    = sum(cellfun(@(x)size(x{iItem},dim)*(size(x{iItem},1) > 1), dataTmp)); % the size > 1 allows to detect empty array which have a non-null last dim
         else
@@ -365,7 +368,7 @@ function datavals = reorganizedata(dataTmp, dim)
             end
         end
     end
-    for iItem=1:length(dataTmp{1}(:)')
+    for iItem=1:length(dataTmp{nonEmptyCell(1)}(:)')
         count = 1;
         for iCase = 1:length(dataTmp)
             if ~isempty(dataTmp{iCase}{iItem})
