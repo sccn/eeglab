@@ -607,9 +607,9 @@ cb_chanedit    = [ check 'disp(''IMPORTANT: After importing/modifying data chann
                    '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); clear TMPINFO TMP; if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize''); end;' ...
                    e_store ];
                    %'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
-cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'                     e_newset];
-cb_rmdat       = [ checkevent '[EEG LASTCOM] = pop_rmdat(EEG);'                      e_newset];
-cb_selectevent = [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ];
+cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'        e_newset];
+cb_rmdat       = [ checkevent '[EEG LASTCOM] = pop_rmdat(EEG);'         e_newset];
+cb_selectevent = [ checkevent '[EEG,~,LASTCOM] = pop_selectevent(EEG);' e_newset ];
 cb_copyset     = [ check      '[ALLEEG EEG CURRENTSET LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_noeegh];
 cb_mergeset    = [ check      '[EEG LASTCOM] = pop_mergeset(ALLEEG);' e_newset];
 
@@ -618,8 +618,8 @@ cb_eegfilt     = [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);'  e_newset];
 cb_interp      = [ check      '[EEG LASTCOM] = pop_interp(EEG); '  e_newset];
 cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
 cb_eegplot     = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'   e_hist];
-cb_epoch       = [ check      '[EEG,~,LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_newset e_check_study ];
-cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_newset];
+cb_epoch       = [ check      '[EEG,~,LASTCOM] = pop_epoch(EEG);'  e_newset e_check_study ];
+cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_newset e_check_study];
 cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store e_check_study];
 cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
 %cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
@@ -806,8 +806,8 @@ if ~strcmpi(onearg, 'nogui')
     eegmenu( false,  edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
     eegmenu( false,  edit_m, 'Label', 'Channel locations'                      , 'userdata', ondatastudy, 'CallBack', cb_chanedit);
     eegmenu( false,  edit_m, 'Label', 'Select data'                            , 'userdata', ondatastudy, 'CallBack', cb_select, 'Separator', 'on');
-    eegmenu( false,  edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
-    eegmenu( false,  edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
+    eegmenu( false,  edit_m, 'Label', 'Select data using events'               , 'userdata', ondatastudy, 'CallBack', cb_rmdat);
+    eegmenu( false,  edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondatastudy, 'CallBack', cb_selectevent);
     eegmenu( false,  edit_m, 'Label', 'Copy current dataset'                   , 'userdata', ondata, 'CallBack', cb_copyset, 'Separator', 'on');
     eegmenu( false,  edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
     eegmenu( false,  edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
@@ -1562,15 +1562,16 @@ if exist_study
                   'if ~isempty(LASTCOM), CURRENTSTUDY = 1; LASTCOM = [ LASTCOM ''CURRENTSTUDY = 1;'' ]; end;' ...
                   'eegh(LASTCOM);' ...
                   'eeglab(''redraw'');' ];
-    tmp_m = findobj('label', 'Select the study set');
-    delete(tmp_m); % in case it is not at the end
-    tmp_m = eegmenu( false,  set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
-    set(tmp_m, 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
+    if length(EEGMENU) > 1 && isequal( EEGMENU(end).Text, 'Select the study set')
+        delete(EEGMENU(end)); % in case it is not at the end
+        EEGMENU(end) = [];
+    end
+    EEGMENU(end+1) = eegmenu( false,  set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
+    set(EEGMENU(end), 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
 else 
-    try
-        delete( findobj('label', 'Select the study set') );
-    catch
-        fprintf(2, 'Note: Issue with updating menu')
+    if length(EEGMENU) > 1 && isequal( EEGMENU(end).Text, 'Select the study set')
+        delete(EEGMENU(end)); % in case it is not at the end
+        EEGMENU(end) = [];
     end
 end
 
