@@ -447,5 +447,7 @@ for i=1:2:length(args)
     end    
 end
 com = [com ');'];
+
+warning('Do you also want to remove the single-trial ERP baseline, make sure to do so in the EEGLAB menu.')
 return; % text command
 
