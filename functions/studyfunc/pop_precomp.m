@@ -426,7 +426,7 @@ STUDY.saved = 'no';
 function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute);
     
     if ~recompute, return; end
-    if warnflag, return; end; % warning has already been issued
+    if warnflag, return; end % warning has already been issued
     
     oneSubject = STUDY.design(STUDY.currentdesign).cases.value{1};
     if comps
@@ -435,6 +435,9 @@ function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute
     end
     allSubjects = { STUDY.datasetinfo.subject };
     inds = strmatch( oneSubject, allSubjects, 'exact');
+    if isempty(inds)
+        error('Your study design is corrupted and contains subjects not present in the study')
+    end
     filepath = STUDY.datasetinfo(inds(1)).filepath;
     
     if exist(fullfile(filepath, dataFilename))
