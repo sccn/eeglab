@@ -163,6 +163,7 @@ opt = finputcheck( options, ...
                                'mode'        'string'  []              ''; % for backward compatibility (now used for statistics)
                                'comps'       { 'string','integer' } [] []; % for backward compatibility
                                'statmode'    'string'  { 'subjects','common','trials' } 'subjects'; % ignored
+                               'avgmode'     'string'  { 'mean','rms','median' } 'mean'; 
                                'plotmode'    'string'  { 'normal','condensed' }  'normal';
                                'unitx'       'string'  { 'ms','Hz' }    'ms';
                                'plotsubjects' 'string' { 'on','off' }  'off';
@@ -208,6 +209,10 @@ end
 if ~isempty(params.topotime) && ~isnan(params.topotime(1)) && length(opt.channels) < 5 && isempty(opt.clusters)
     warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
+end
+
+if ~strcmpi(opt.avgmode, 'mean') && (isempty(opt.channels) || isempty(params.topotime))
+    error('Can only change avgmode when plotting scalp topographies')
 end
 
 plotcurveopt = {};
@@ -349,7 +354,7 @@ if ~isempty(opt.channels)
     end
     if ~isempty(params.topotime) && all(~isnan(params.topotime))
         std_chantopo(tmperpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', params.ylim, ...
-                                      'chanlocs', locs, 'threshold', alpha, 'titles', alltitles, 'topoplotopt', opt.topoplotopt, 'effect', stats.effect);
+                                 'mode', opt.avgmode, 'chanlocs', locs, 'threshold', alpha, 'titles', alltitles, 'topoplotopt', opt.topoplotopt, 'effect', stats.effect);
     else
         std_plotcurve(alltimes, tmperpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'plotstderr', opt.plotstderr, ...

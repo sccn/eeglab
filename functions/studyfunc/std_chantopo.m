@@ -85,6 +85,7 @@ opt = finputcheck( varargin, { 'ylim'        'real'    []              [];
                                'titles'      'cell'    []              cell(20,20);
                                'threshold'   'real'    []              NaN;
                                'chanlocs'    'struct'  []              struct('labels', {});
+                               'mode'        'string'  {'mean' 'rms' 'median'}      'mean';
                                'groupstats'  'cell'    []              {};
                                'condstats'   'cell'    []              {};
                                'interstats'  'cell'    []              {};
@@ -170,7 +171,13 @@ for c = 1:nc
     for g = 1:ng
         hdl(c,g) = mysubplot(nc+addr, ng+addc, c, g, opt.transpose);
         if ~isempty(data{c,g})
-            tmpplot = double(mean(data{c,g},3));
+            if strcmpi(opt.mode, 'mean')
+                tmpplot = double(mean(data{c,g},3));
+            elseif strcmpi(opt.mode, 'rms')
+                tmpplot = sqrt(double(mean(data{c,g}.^2,3)));
+            else
+                tmpplot = double(median(data{c,g},3));
+            end
             if ~isreal(tmpplot(1)), tmpplot = abs(tmpplot); end % comes second for processing single trials
             if ~all(isnan(tmpplot))
                 if ~isreal(tmpplot), error('This function cannot plot complex values'); end
