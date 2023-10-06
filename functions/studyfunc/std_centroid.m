@@ -12,7 +12,7 @@
 %   ALLEEG       - ALLEEG dataset vector (else an EEG dataset) containing the STUDY
 %                  datasets, typically created using LOAD_ALLEEG.
 %   clusters     - [vector] of cluster indices. Computes measure means for the 
-%                  specified clusters. {deffault|[]: compute means for all 
+%                  specified clusters. {default|[]: compute means for all 
 %                  STUDY clusters} 
 %   measure(s)   - ['erp'|'spec'|'scalp'|'dipole'|'itc'|'ersp'].   
 %                  The measures(s) for which to calculate the cluster centroid(s):

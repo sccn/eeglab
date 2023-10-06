@@ -21,7 +21,7 @@
 % Outputs:
 %    STUDY  - studyset structure containing some or all files in ALLEEG
 %             (datasetinfo.session updated)
-%    flags  - Vector of the dimension of the numbre of subjects (Ordered as
+%    flags  - Vector of the dimension of the number of subjects (Ordered as
 %    in STUDY.datasetinfo) with the information if the subject have dataset
 %    from different sessions (1) or not (0)
 %

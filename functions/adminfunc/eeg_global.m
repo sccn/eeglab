@@ -46,7 +46,7 @@
 globalvars = who('global');
 if ~isempty(strmatch('ALLCOM', globalvars, 'exact')) || exist('ALLCOM') ~= 1
     tmpEEG = whos('EEG');
-    % avoid overwritting variable in the current space
+    % avoid overwriting variable in the current space
     % in case it is not global
     if ~isempty(tmpEEG) && ~tmpEEG.global
         TMPEEG = EEG;

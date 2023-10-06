@@ -396,7 +396,7 @@ else
          tmpind  = find( (timevals >= tlimits(1)+2*wintime-0.0001) & (timevals <= tlimits(2)) );
     else tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) );
     end
-    % 0.0001 account for numerical innacuracies on opteron computers
+    % 0.0001 account for numerical inaccuracies on opteron computers
     if isempty(tmpind)
         error('No time points. Reduce time window or minimum frequency.');
     end

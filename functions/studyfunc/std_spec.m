@@ -68,7 +68,7 @@
 %                  epochs with specific epoch limits in seconds (see also
 %                  'epochrecur' below). Default is [0 1].
 %   'epochrecur' - [float] for FFT on continuous data, set the automatic
-%                  epoch extraction recurence interval (default is 0.5 second).
+%                  epoch extraction recurrence interval (default is 0.5 second).
 %   'timerange'  - [min max] use data within a specific time range before 
 %                  computing the data spectrum. For instance, for evoked 
 %                  data trials, it is recommended to use the baseline time 

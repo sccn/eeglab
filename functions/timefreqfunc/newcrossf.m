@@ -268,7 +268,7 @@
 % - by specific functions under Matlab
 %    (Tf) function Tf = tfinit(...) - create object Time Frequency (Tf) associated with some data
 %    (Tf) function [Tf, itcvals] = tfitc(...) - compute itc for the selected data
-%    (Tf) function [Tf, itcvals] = tfitcpost(Tf, trials) - itc normlisation 
+%    (Tf) function [Tf, itcvals] = tfitcpost(Tf, trials) - itc normalisation 
 %    (Tf) function [Tf, tmpX] = tfcomp(Tf, trials, times) - compute time freq. decomposition
 %    (Coher) function Coher = coherinit(...) - initialize coherence object
 %    (Coher) function Coher = cohercomp(Coher, tmpX, tmpY, trial, time) - compute coherence

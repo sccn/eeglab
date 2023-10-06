@@ -83,7 +83,7 @@
 % 03-16-00 added AXCOPY feature -sm & tpj
 % 08-21-00 debugged axheight/axwidth setting -sm
 % 01-25-02 reformated help & license, added links -ad 
-% 03-11-02 change the channel names plotting position and cutomize pop-up -ad 
+% 03-11-02 change the channel names plotting position and customize pop-up -ad 
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-15-02 debugging chanlocs structure -ad & sm 
 

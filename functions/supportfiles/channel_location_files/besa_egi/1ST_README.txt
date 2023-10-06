@@ -4,5 +4,5 @@ be imported in EEGLAB.
 
 See also EGI ftpsite ftp://ftp.egi.com/pub/software/besa/
 
-Both 3-D spherical ".elp" files and 3-D carthesian ".sfp" files 
+Both 3-D spherical ".elp" files and 3-D cartesian ".sfp" files 
 can be imported in EEGLAB.
