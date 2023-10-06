@@ -446,7 +446,7 @@ function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute
                     'precomputed data files. Instead, use a single STUDY and create multiple designs).' ];
         res = questdlg2(textmsg, 'Precomputed datafiles already present on disk', 'No', 'Yes', 'Yes');
         if strcmpi(res, 'No')
-            error('User aborded precomputing measures');
+            error('User aborted precomputing measures');
         end
     end
     warnflag = 1;

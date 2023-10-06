@@ -66,8 +66,8 @@ if nargin < 1
     return;
 end
 
-% reading data from several datasets and concatening it
-% -----------------------------------------------------
+% reading data from several datasets and concatenating it
+% -------------------------------------------------------
 if iscell(EEG) || (~ischar(EEG) && length(EEG) > 1)
     % decode some arguments
     % ---------------------
@@ -258,8 +258,8 @@ else
         
     end
     
-    % subracting components from data
-    % -------------------------------
+    % subtracting components from data
+    % --------------------------------
     if ~isempty(opt.rmcomps)
         if strcmpi(opt.verbose, 'on')
             fprintf('Removing %d artifactual components\n', length(opt.rmcomps));

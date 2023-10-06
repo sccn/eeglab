@@ -25,7 +25,7 @@ cond2 = rand(100,64,10)+0.2;
 
 Bootstrap and permutation take about 5.2 second on a Macbook pro at 2Gz
 (that's 6.4 millions t-test and there is not a single loop). You then may 
-use the included fdr.m function to correct for multiple comparaisons
+use the included fdr.m function to correct for multiple comparisons
 
 p = fdr(p);
 

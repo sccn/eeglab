@@ -235,7 +235,7 @@ if nargin <= 2 || ischar(varargin{1})
 	if ischar(g), error(g); end
     if g.plotproj && strcmp(g.sumenv, 'fill'), g.sumenv = 'on'; end
 
-else % dprecated - old style input args
+else % deprecated - old style input args
 	if nargin > 3,    g.chanlocs = varargin{1};
 	else              g.chanlocs = [];
 	end

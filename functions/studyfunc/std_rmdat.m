@@ -24,7 +24,7 @@
 %                   in the selected range. May also be {'string' 'value'}
 %                   for non-numerical variables.
 %   'subjectind'  - [integer array] keep only specific subject indices in 
-%                   STUDY.subject. To remove or keep specificy subjects, 
+%                   STUDY.subject. To remove or keep specific subjects, 
 %                   use 'rmvarvalues' and 'keepvarvalues'
 %   'checkeventtype' - [cell|array|string] check event type are present.
 %   'numeventrange' - [min max] range for number of event of type above.

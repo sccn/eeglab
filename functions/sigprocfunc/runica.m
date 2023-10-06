@@ -781,7 +781,7 @@ oldsigns = zeros(size(signs));
 signcount = 0;              % counter for same-signs
 signcounts = [];
 urextblocks = extblocks;    % original value, for resets
-old_kk = zeros(1,ncomps);   % for kurtosis momemtum
+old_kk = zeros(1,ncomps);   % for kurtosis momentum
 
 %
 %%%%%%%% ICA training loop using the logistic sigmoid %%%%%%%%%%%%%%%%%%%
