@@ -63,12 +63,12 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function plotcurve( times, R, varargin);
+function plotcurve( times, R, varargin)
 
 	if nargin < 2
         help plotcurve;
         return;
-	end
+    end
 	g = finputcheck( varargin, { 'maskarray' ''        []       [];
                              'val2mask'      'real'    []           R;
                              'highlightmode' 'string'  { 'background','bottom' } 'background';
@@ -79,8 +79,10 @@ function plotcurve( times, R, varargin);
                              'title'         'string'  []                        '';
                              'xlabel'        'string'  []                        '';
                              'plotmode'      'string'  {'single','topo'}         'single';
+                             'plotstderr'    'real'    []                        []; 
                              'ylabel'        'string'  []                        '';
                              'legend'        'cell'    []                        {};
+                             'transparent'   'real'    []                        0.5;
                              'colors'        'cell'    []                        {};
                              'plottopotitle' 'cell'    []                        {};
                              'chanlocs'      'struct'  []                        struct;
@@ -125,12 +127,37 @@ function plotcurve( times, R, varargin);
                              & (g.val2mask < repmat(g.maskarray(:,2),[1 length(times)])))) = 0;
                        end
                case 1, Rregions  (find(g.val2mask < repmat(g.maskarray(:),[1 size(g.val2mask,2)]))) = 0;
-           end; 
+           end
            Rregions = sum(Rregions,1);
        end
    else 
        Rregions = [];
    end
+
+  % plot error in shaded area
+  % -------------------------
+  if ~isempty(g.plotstderr)
+      minR = R-g.plotstderr;
+      maxR = R+g.plotstderr;
+      allpointsx = [times times(end:-1:1)]';
+      allpointsy = [ minR maxR(end:-1:1)]';
+      h = fill(allpointsx, allpointsy, g.colors{1});
+      set(h, 'edgecolor', g.colors{1});
+      xlim([ times(1) times(end) ]);
+      if ~isempty(g.transparent)
+          numfaces = size(get(h, 'Vertices'),1);
+          set(h, 'FaceVertexCData', repmat([1 1 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', g.transparent, 'edgecolor', 'none');
+      end
+      hold on
+      % ordinate limits
+      if isempty(g.ylim)
+          yll = min(reshape(minR, [1 numel(R)]));
+          ylh = max(reshape(maxR, [1 numel(R)]));
+          yll2 = yll - (ylh-yll)/10;
+          ylh2 = ylh + (ylh-yll)/10;
+          if ~isnan(yll), g.ylim = [yll2 ylh2]; end
+      end
+  end
 
   % plotting
   % --------
@@ -170,7 +197,7 @@ function plotcurve( times, R, varargin);
   for ind = 1:size(R,1)
       if ind == size(R,1) && strcmpi(g.plotmean, 'on') && size(R,1) > 1
            plot(times,R(ind,:), 'k', 'linewidth', 2);
-      elseif ~isempty(g.colors),
+      elseif ~isempty(g.colors)
            tmp = plot(times,R(ind,:), 'k'); 
            tmpcol = g.colors{mod(ind-1, length(g.colors))+1};
            if length(tmpcol) > 1, tmpstyle = tmpcol(2:end); tmpcol = tmpcol(1); else tmpstyle = '-'; end
@@ -199,9 +226,9 @@ function plotcurve( times, R, varargin);
   
   % ordinate limits
   % ---------------
-  if isempty(g.ylim), 
-      yll = min(reshape(R, [1 prod(size(R))]));
-      ylh = max(reshape(R, [1 prod(size(R))]));
+  if isempty(g.ylim)
+      yll = min(reshape(R, [1 numel(R)]));
+      ylh = max(reshape(R, [1 numel(R)]));
       yll2 = yll - (ylh-yll)/10;
       ylh2 = ylh + (ylh-yll)/10;
       if ~isnan(yll), g.ylim = [yll2 ylh2]; end
@@ -231,7 +258,7 @@ function plotcurve( times, R, varargin);
       for ind = 1:size(R,1)
           if ind == size(R,1) && strcmpi(g.plotmean, 'on') && size(R,1) > 1
                plot(times,R(ind,:), 'k', 'linewidth', 2);
-          elseif ~isempty(g.colors),             
+          elseif ~isempty(g.colors)          
               tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind-1, length(g.colors))+1} ); hold on;
           else plot(times,R(ind,:));
           end
