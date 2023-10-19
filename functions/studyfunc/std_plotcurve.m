@@ -460,7 +460,7 @@ for c = 1:ncplot
             
             if strcmpi(opt.plottopo, 'on') && length(opt.chanlocs) > 1
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                    'plotargs', { plotopt{:} }, 'axcopycom', 'on', 'datapos', [2 3], 'title', opt.titles{c,g});
+                    'plotargs', { plotopt{:} }, 'axcopycom', 'on', 'datapos', [2], 'title', opt.titles{c,g});
             elseif iscell(tmpdata)
                 if ~all(isnan(tmpdata{1}))
                     plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
