@@ -383,7 +383,6 @@ else % fft mode
     catch
         X = bsxfun(@times, X, hamming2(size(X,2))');
     end
-    disp('Warning: std_spec function computation has changed since version 13 (see help message)');
     %end
     % if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
     tmp   = fft(X, g.nfft, 2);
