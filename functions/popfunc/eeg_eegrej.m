@@ -152,7 +152,7 @@ if isfield(EEG.event, 'latency') && length(EEG.event) < 3000
     if ~isempty(event2)
         otherlatencies = [event2.latency];
         if ~isequal(alllats, otherlatencies)
-            warning([ 'Discrepancy when checking event latencies using legacy method.' 10 'Often the discrepency is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
+            warning([ 'Discrepancy when checking event latencies using legacy method.' 10 'Often the discrepancy is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
             warnflag = true;
         end
     end
@@ -173,7 +173,7 @@ if ~isempty(EEG.event) && length(EEG.event) < 3000 && ischar(EEG.event(1).type) 
         if ~isequal(duration1, duration2)
             duration1(duration1 == 0) = [];
             if ~isequal(duration1, duration2) && ~warnflag
-                warning([ 'Inconsistency in boundary event duration using legacy method.' 10 'Often the discrepency is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
+                warning([ 'Inconsistency in boundary event duration using legacy method.' 10 'Often the discrepancy is minor and the new method (used here) is correct' 10 'still, try to reproduce the problem and send us your dataset' ]);
             end
         end
     catch, warning('Unknown error when checking event latency - please send us your dataset');

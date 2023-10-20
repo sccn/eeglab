@@ -157,7 +157,7 @@ function A=hminired(A)
 %HMINIRED Initial reduction of cost matrix for the Hungarian method.
 %
 %B=assredin(A)
-%A - the unreduced cost matris.
+%A - the unreduced cost matrix.
 %B - the reduced cost matrix with linked zeros in each row.
 
 % v1.0  96-06-13. Niclas Borlin, niclas@cs.umu.se.

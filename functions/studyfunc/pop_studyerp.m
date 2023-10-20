@@ -180,7 +180,7 @@ if exist(fullfile(ALLEEG(1).filepath, [ALLEEG(1).filename(1:end-4) '.daterp' ]))
                 'datasets or set a different ERP baseline using menu item STUDY > Precompute channel measures).' ];
     res = questdlg2(textmsg, 'Precomputed datafiles already present on disk', 'No', 'Yes', 'Yes');
     if strcmpi(res, 'No')
-        error('User aborded precomputing ERPs');
+        error('User aborted precomputing ERPs');
     end;    
 end;    
 

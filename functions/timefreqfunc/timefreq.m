@@ -117,7 +117,7 @@
 %
 % Authors: Arnaud Delorme, Jean Hausser & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
-%          Fix FFT frequency innacuracy, bug 874 by WuQiang
+%          Fix FFT frequency inaccuracy, bug 874 by WuQiang
 %
 % See also: TIMEF, NEWTIMEF, CROSSF, NEWCROSSF
 
@@ -640,7 +640,7 @@ else
          tmpind  = find( (timevals >= tlimits(1)+2*wintime-0.0001) & (timevals <= tlimits(2)) ); 
     else tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) ); 
     end
-    % 0.0001 account for numerical innacuracies on opteron computers
+    % 0.0001 account for numerical inaccuracies on opteron computers
     if isempty(tmpind)
         error('No time points. Reduce time window or minimum frequency.');
     end

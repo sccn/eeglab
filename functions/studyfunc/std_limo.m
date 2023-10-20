@@ -441,7 +441,7 @@ for iSubj = 1:nb_subjects
                 opt.zscore = 0; % regressors are now zscored
             end
 
-            % remplace NaNs if necessary
+            % replace NaNs if necessary
             if strcmpi(opt.contnan, 'off')
                 contMat(isnan(contMat)) = 0;
             end
