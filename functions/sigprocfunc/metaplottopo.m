@@ -61,7 +61,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [Axes, outchannames ]= metaplottopo(data, varargin);
+function [Axes, outchannames ]= metaplottopo(data, varargin)
 
 %
 %%%%%%%%%%%%%%%%%%%%% Graphics Settings - can be customized %%%%%%%%%%%%%%%%%%
@@ -268,7 +268,10 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
 
 Axes = [];
 fprintf('Plotting all channel...');
-for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%%
+if ~iscell(data)
+    data = { data };
+end
+for c=1:length(g.chans) %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%%
 
     xcenter = xvals(c); if isnan(xcenter), xcenter = 0.5; end; 
     ycenter = yvals(c); if isnan(ycenter), ycenter = 0.5; end
@@ -285,8 +288,15 @@ for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%
     if ~isempty( g.plotfunc )
         %figure(curfig);
         eval( [ 'func = @' g.plotfunc ';' ] );
-        if iscell(data), tmp = { g.plotargs{1:g.datapos(1)-1} data{1}(c,:,:,:,:) g.plotargs{g.datapos(1):g.datapos(2)-1} data{2}(c,:) g.plotargs{g.datapos(2):end}};
-        else             tmp = { g.plotargs{1:g.datapos-1}    data(c,:,:,:,:)    g.plotargs{g.datapos:end} };
+        tmp = g.plotargs;
+        if length(g.datapos) >= 1
+            tmp = [ tmp(1:g.datapos(1)-1) { data{1}(c,:,:,:,:) } tmp(g.datapos(1):end) ];
+        end
+        if length(g.datapos) >= 2
+            tmp = [ tmp(1:g.datapos(2)-1) { data{2}(c,:,:,:,:) } tmp(g.datapos(2):end) ];
+        end
+        if length(g.datapos) >= 3
+            tmp = [ tmp(1:g.datapos(3)-1) { data{3}(c,:,:,:,:) } tmp(g.datapos(3):end) ];
         end
         if strcmpi(g.squeeze, 'on') tmp{g.datapos} = squeeze(tmp{g.datapos}); end
         tmp = { tmp{:} 'title' channames(c,:) 'plotmode' 'topo'};

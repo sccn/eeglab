@@ -173,7 +173,7 @@ if nargin < 1
             sprintf('One is at %s', eeglabpath) 10 ...
             sprintf('The other one is at %s', eeglabpath2) 10 ...
             'You must at least remove one version from the Matlab path' 10 ...
-            'before you can install a new version of EEGLAB. Abording installation.' ] );
+            'before you can install a new version of EEGLAB. Aborting installation.' ] );
         return
     end
 end
@@ -238,7 +238,7 @@ if ~exist(res.folder)
         createDir = 0;
     end
     if ~createDir
-        msg = [ 'Parent folder of EEGLAB folder is not writable, select another location. Operation aborded.' ];
+        msg = [ 'Parent folder of EEGLAB folder is not writable, select another location. Operation aborted.' ];
         warndlg2(msg);
         return;
     end

@@ -70,7 +70,7 @@ if isempty(EEG(1).event)
     error( [ 'No event. This function removes data' 10 'based on event latencies' ]);
 end
 if isempty(EEG(1).trials)
-    error( [ 'This function only works with continuous data' ]);
+    error( 'This function only works with continuous data');
 end
 if ~isfield(EEG(1).event, 'latency')
     error( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
@@ -109,7 +109,7 @@ if nargin < 3
               { 'style' 'edit'       'string' '-1 1' } ...
               { 'style' 'popupmenu'  'string' 'Keep selected|Remove selected' } };
               
-   result = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_rmdat'')', 'title', 'Remove data portions around events - pop_rmdat()', 'userdata', EEG);
+   result = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_rmdat'')', 'title', 'Remove data portions around events - pop_rmdat()', 'userdata', EEG(1));
    if isempty(result) return; end
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end
@@ -120,7 +120,8 @@ if nargin < 3
             events = eval( [ '{' result{1} '}' ] );
        else events = parsetxt( result{1});
        end
-   else events = {};
+   else 
+       events = {};
    end
    timelims = eval( [ '[' result{2} ']' ] );
    invertsel = result{3}-1;

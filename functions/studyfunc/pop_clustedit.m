@@ -519,7 +519,7 @@ else
                 set(hdl, 'userdat',userdat); 
 
             case 'dip_opt' % save the list of selected chaners
-                [STUDY com] = pop_dipparams(STUDY);
+                [STUDY, com] = pop_dipparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end
@@ -527,7 +527,7 @@ else
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
             case 'erp_opt' % save the list of selected chaners
-                [STUDY com] = pop_erpparams(STUDY);
+                [STUDY, com] = pop_erpparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end
@@ -535,7 +535,7 @@ else
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
             case 'stat_opt' % save the list of selected chaners
-                [STUDY com] = pop_statparams(STUDY);
+                [STUDY, com] = pop_statparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end
@@ -543,7 +543,7 @@ else
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
             case 'spec_opt' % save the list of selected channels
-                [STUDY com] = pop_specparams(STUDY);
+                [STUDY, com] = pop_specparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end
@@ -551,7 +551,7 @@ else
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
             case 'erpim_opt' % save the list of selected channels
-                [STUDY com] = pop_erpimparams(STUDY);
+                [STUDY, com] = pop_erpimparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end
@@ -559,7 +559,7 @@ else
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
 
             case 'ersp_opt' % save the list of selected channels
-                [STUDY com] = pop_erspparams(STUDY);
+                [STUDY, com] = pop_erspparams(STUDY);
                 if ~isempty(com)
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end
@@ -736,6 +736,7 @@ else
                     set(hdl, 'userdat',userdat); 
                     pop_clustedit('showclust',hdl);
                 end          
+                STUDY.cache = [];
 
             case 'moveoutlier'
                 STUDY.saved = 'no';
@@ -788,6 +789,7 @@ else
                     set(hdl, 'userdat',userdat); 
                     pop_clustedit('showclust',hdl);    
                 end
+                STUDY.cache = [];
 
             case 'rejectoutliers'
                 STUDY.saved = 'no';
@@ -846,6 +848,7 @@ else
                     set(hdl, 'userdat',userdat); 
                     pop_clustedit('showclust',hdl);
                 end
+                STUDY.cache = [];
 
             case 'createclust'
                 STUDY.saved = 'no';
@@ -878,6 +881,7 @@ else
                     userdat{1}{3} = cls;  % update cls, the cluster indices in edit window
                     set(hdl, 'userdat',userdat); %update STUDY, cls and N
                 end
+                STUDY.cache = [];
 
             case 'mergeclusters'
                 STUDY.saved = 'no';
@@ -895,36 +899,36 @@ else
                       {'style' 'text' 'string' 'Optional, enter a name for the merged cluster:' 'FontWeight' 'Bold'} ...
                       {'style' 'edit' 'string' ''} {} }, ...
                       '', 'Merge clusters - from pop_clustedit()' ,[] , 'normal', [1 3 1 1 1] );
-                  if ~isempty(reassign_param)
-                      std_mrg = cls(optionalcls(reassign_param{1})-1);
-                      name = reassign_param{2};
-                      allleaves = 1;
-                      N = userdat{2};
-                      for k = 1: N %check if all leaves
-                          if ~isempty(STUDY.cluster(cls(k)).child) 
-                              allleaves = 0;
-                          end
-                      end                     
-                      [STUDY] = std_mergeclust(STUDY, ALLEEG, std_mrg, name); 
-                      % 
-                      % update Study history
-                      % 
-                      if isempty(name)
-                          a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) ']);'];
-                      else
-                          a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) '], ' name ');'];
-                      end                  
-                      STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
-                      userdat{1}{2} = STUDY;
-                      %
-                      % Replace the merged clusters with the one new merged cluster 
-                      % in the GUI if all clusters are leaves
-                      %
-                      if allleaves                      
+                if ~isempty(reassign_param)
+                    std_mrg = cls(optionalcls(reassign_param{1})-1);
+                    name = reassign_param{2};
+                    allleaves = 1;
+                    N = userdat{2};
+                    for k = 1: N %check if all leaves
+                        if ~isempty(STUDY.cluster(cls(k)).child)
+                            allleaves = 0;
+                        end
+                    end
+                    [STUDY] = std_mergeclust(STUDY, ALLEEG, std_mrg, name);
+                    %
+                    % update Study history
+                    %
+                    if isempty(name)
+                        a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) ']);'];
+                    else
+                        a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) '], ' name ');'];
+                    end
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
+                    userdat{1}{2} = STUDY;
+                    %
+                    % Replace the merged clusters with the one new merged cluster
+                    % in the GUI if all clusters are leaves
+                    %
+                    if allleaves
                         %
                         % Update cluster list
                         %
-                        clus_names{end+1} = [STUDY.cluster(end).name ' (' num2str(length(STUDY.cluster(end).comps))  ' ICs)']; 
+                        clus_names{end+1} = [STUDY.cluster(end).name ' (' num2str(length(STUDY.cluster(end).comps))  ' ICs)'];
                         %
                         % update the cluster list with the new cluster
                         %
@@ -936,19 +940,20 @@ else
                         % update the first option on the GUI list : 'All 10 cluster centroids'
                         % with the new number of cluster centroids
                         %
-                        ti = strfind(clus_names{1},'cluster'); %get the number of clusters centroid 
+                        ti = strfind(clus_names{1},'cluster'); %get the number of clusters centroid
                         cent = num2str(str2num(clus_names{1}(5:ti-2))+1- length(std_mrg)); % new number of centroids
                         clus_names{1} = [clus_names{1}(1:4) cent clus_names{1}(ti-1:end)]; %update list
                         set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_names);
                         %
                         % update Study history
                         %
-                        userdat{2} = N; % update N, the number of cluster options in edit window 
+                        userdat{2} = N; % update N, the number of cluster options in edit window
                         userdat{1}{3} = cls;  % update cls, the cluster indices in edit window
-                      end
-                      set(hdl, 'userdat',userdat); %update information (STUDY)     
-                      pop_clustedit('showclust',hdl);
-                  end
+                    end
+                    set(hdl, 'userdat',userdat); %update information (STUDY)
+                    pop_clustedit('showclust',hdl);
+                end
+                STUDY.cache = [];
         end
     catch
         eeglab_error;

@@ -89,7 +89,7 @@
 %02/12/2002 add getepoch compatibility - ad
 %02/19/2002 add event indices & correct event selection - ad
 
-function [EEG, Ievent, com] = pop_selectevent(EEG, varargin);
+function [EEG, Ievent, com] = pop_selectevent(EEG, varargin)
 
 if nargin < 1
    help pop_selectevent;
@@ -97,19 +97,21 @@ if nargin < 1
 end
 Ievent = [];
 com ='';
-event_indices = [];
 
 % note that this function is also used for epochs
 % -----------------------------------------------
 I = [];
-if isempty(EEG.event)
-    disp('Getevent: cannot deal with empty event structure');
+if isempty(EEG(1).event)
+    disp('pop_selectevent: cannot deal with empty event structure');
     return;
-end;   
+end
+if length(EEG) > 1
+    disp('pop_selectevent: dealing with a group of dataset, assuming they all have a similar structure');
+end
 
 % remove the event field if present
 % ---------------------------------
-allfields = fieldnames(EEG.event);
+allfields = fieldnames(EEG(1).event);
 indexmatch = strmatch('urevent', allfields);
 if ~isempty(indexmatch)
     allfields = { allfields{1:indexmatch-1} allfields{indexmatch+1:end} };
@@ -134,8 +136,8 @@ if nargin<2
     for index = 1:length(allfields)
         % format the description to fit a help box
         % ----------------------------------------
-        if index <= length( EEG.eventdescription )
-             tmptext = EEG.eventdescription{ neworder(index) };
+        if index <= length( EEG(1).eventdescription )
+             tmptext = EEG(1).eventdescription{ neworder(index) };
 			 if ~isempty(tmptext)
 				 if size(tmptext,1) > 15,    stringtext = [ tmptext(1,1:15) '...' ]; 
 				 else                        stringtext = tmptext(1,:); 
@@ -152,7 +154,7 @@ if nargin<2
         % -----------------------------
         textfield = allfields{index};
         if strcmp(textfield, 'latency') || strcmp(textfield, 'duration')
-            if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
+            if EEG(1).trials > 1, textfield = [ textfield ' (ms)' ];
             else textfield = [ textfield ' (s)' ];
             end
             middletxt  = { { 'Style', 'text', 'string', 'min' } { 'Style', 'edit', 'string', '' 'tag' [ 'min' allfields{index} ] } ...
@@ -199,12 +201,12 @@ if nargin<2
     
     % rename/keep events
     % ------------------
-    geometry = { geometry{:} [1] [1] [.1 2 .3 .2] [.1 1.5 0.5 0.5]  [.1 1 0.5 1] [.1 1 0.5 1] };
+    geometry = { geometry{:} 1 1 [.1 2 .3 .2] [.1 1.5 0.5 0.5]  [.1 1 0.5 1] [.1 1 0.5 1] };
     uilist = { uilist{:} { } ...
                 { 'Style', 'text', 'string','Event selection', 'fontweight', 'bold' } ...
                 {} { 'Style', 'checkbox', 'string','Select all events NOT selected above (Set this button and "all BUT" buttons (above) for logical OR)' 'tag' 'invertevent' } { } { } ...
                 {} { 'Style', 'checkbox', 'string','Keep only selected events and remove all other events', ...
-                'value', fastif(EEG.trials>1, 0, 1) 'tag' 'rmevents' } { } { } ...
+                'value', fastif(EEG(1).trials>1, 0, 1) 'tag' 'rmevents' } { } { } ...
                 {} { 'Style', 'text', 'string', 'Rename selected event type(s) as type:' } ...
                    { 'Style', 'edit', 'string', ''  'tag' 'rename' } { } ...
                 {} { 'Style', 'text', 'string', 'Retain old event type name(s) in (new) field named:' } ...
@@ -212,8 +214,8 @@ if nargin<2
     
     % epoch selections
     % ----------------
-    if EEG.trials > 1
-        geometry = { geometry{:} [1] [0.1 2 0.5 0.5] [0.1 2 0.5 0.5]};
+    if EEG(1).trials > 1
+        geometry = { geometry{:} 1 [0.1 2 0.5 0.5] [0.1 2 0.5 0.5]};
         uilist   = { uilist{:} ...
                      { 'Style', 'text', 'string','Epoch selection', 'fontweight', 'bold' } ...
                      { } { 'Style', 'checkbox', 'string','Remove epochs not referenced by any selected event', ...
@@ -222,8 +224,8 @@ if nargin<2
                        'value', 0 'tag' 'invertepoch' } { } { } };
     end
     
-	[results tmp2 tmp3 res] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_selectevent'')', 'title', 'Select events -- pop_selectevent()', 'userdata', EEG);
-    if length(results) == 0, return; end
+	[results, ~, ~, res] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_selectevent'')', 'title', 'Select events -- pop_selectevent()', 'userdata', EEG(1));
+    if isempty(results), return; end
    
     % decode inputs
     % -------------
@@ -243,8 +245,9 @@ if nargin<2
             end
         else
             tmpres  = getfield(res, textfield);
-            try, tmpres2 = eval( [ '[' tmpres ']' ] );
-                if ~isnumeric(tmpres2),
+            try
+                tmpres2 = eval( [ '[' tmpres ']' ] );
+                if ~isnumeric(tmpres2)
                     if tmpres(1) == ''''
                         tmpres = eval( [ '{' tmpres '}' ] );
                     else
@@ -265,12 +268,23 @@ if nargin<2
     if ~isempty(res.rename),       args = { args{:}, 'renametype', res.rename }; end
     if ~isempty(res.retainfield),  args = { args{:}, 'oldtypefield', res.retainfield }; end
     args = { args{:}, 'deleteevents', fastif(res.rmevents,     'on', 'off') };
-    if EEG.trials > 1
+    if EEG(1).trials > 1
         args = { args{:}, 'deleteepochs', fastif(res.rmepochs    , 'on', 'off') };        
         args = { args{:}, 'invertepochs', fastif(res.invertepoch , 'on', 'off') };
     end
 else % no interactive inputs
     args = varargin;
+end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 2
+        [ EEG, com ] = eeg_eval( 'pop_selectevent', EEG, 'warning', 'on', 'params', args);
+    else
+        [ EEG, com ] = eeg_eval( 'pop_selectevent', EEG, 'warning', 'off', 'params',args);
+    end
+    return;
 end
 
 % setting default for the structure

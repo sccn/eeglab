@@ -7,8 +7,8 @@
 %   label     - [string] label of the menu
 %   func      - [string] name of the pop function. The function extract the
 %               callback from the menu, find the function and add the
-%               paramters below before executing the callback.
-%   parameter - [cell] paramter to the function (in addition to existing
+%               parameters below before executing the callback.
+%   parameter - [cell] parameter to the function (in addition to existing
 %               parameters.
 %
 % Output: the command is executed in the global workspace. Usually the 

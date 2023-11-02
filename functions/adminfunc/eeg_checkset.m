@@ -193,7 +193,7 @@ if ~isfield(EEG, 'data'), return; end
 if length(EEG) > 1
 
     if length(EEG) > 5000
-        disp('Too many datasets, abording check')
+        disp('Too many datasets, aborting check')
         return;
     end
     

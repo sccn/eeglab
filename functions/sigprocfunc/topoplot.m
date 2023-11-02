@@ -85,7 +85,7 @@
 %                       helps with controlling over the individual size and color of the electrodes.
 %                       If on, you can use {markerchar color size linewidth} convention for emarker and/or emarker2,
 %                       but you can provide a 1byX vector for size and Xby3 vector for color to change.
-%                       {defualt : 'off'}  
+%                       {default : 'off'}  
 %   'hcolor'          - color of the cartoon head. Use 'hcolor','none' to plot no head. {default: 'k' = black}
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'numcontour'      - number of contour lines {default: 6}. You may also enter a vector to set contours 
@@ -265,7 +265,7 @@ HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 BLANKINGRINGWIDTH = .035;% width of the blanking ring 
 HEADRINGWIDTH    = .007;% width of the cartoon head ring
 SHADING = 'flat';       % default 'shading': flat|interp
-shrinkfactor = [];      % shrink mode (dprecated)
+shrinkfactor = [];      % shrink mode (deprecated)
 intrad       = [];      % default interpolation square is to outermost electrode (<=1.0)
 plotrad      = [];      % plotting radius ([] = auto, based on outermost channel location)
 headrad      = [];      % default plotting radius for cartoon head is 0.5

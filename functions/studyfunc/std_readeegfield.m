@@ -22,7 +22,7 @@
 %  dataOut   - cell array of value
 %  xvals     - x values
 %  note: the output matches the output of std_readfile because this
-%  function can be calle by STD_READDATA
+%  function can be called by STD_READDATA
 %
 % Example:
 %  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');

@@ -68,7 +68,7 @@
 %                  epochs with specific epoch limits in seconds (see also
 %                  'epochrecur' below). Default is [0 1].
 %   'epochrecur' - [float] for FFT on continuous data, set the automatic
-%                  epoch extraction recurence interval (default is 0.5 second).
+%                  epoch extraction recurrence interval (default is 0.5 second).
 %   'timerange'  - [min max] use data within a specific time range before 
 %                  computing the data spectrum. For instance, for evoked 
 %                  data trials, it is recommended to use the baseline time 
@@ -383,7 +383,6 @@ else % fft mode
     catch
         X = bsxfun(@times, X, hamming2(size(X,2))');
     end
-    disp('Warning: std_spec function computation has changed since version 13 (see help message)');
     %end
     % if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
     tmp   = fft(X, g.nfft, 2);

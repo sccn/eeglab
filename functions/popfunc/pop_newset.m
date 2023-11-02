@@ -159,8 +159,9 @@ elseif ~isempty(g.retrieve) % command line call
     %           retrieving another dataset
     % ***************************************************
     if verbose, disp('Case 4'); end
-    if ~(option_storedisk && strcmpi(EEG.saved, 'no'))
-        if strcmpi(EEG.saved, 'yes') && option_storedisk
+    samedat = isequal(EEG, ALLEEG(OLDSET));
+    if ~(option_storedisk && strcmpi(EEG.saved, 'no')) || samedat
+        if strcmpi(EEG.saved, 'yes') && option_storedisk && ~samedat
             fprintf('pop_newset(): Dataset %d has not been modified since last save, so did not resave it.\n', OLDSET);
             EEG = update_datafield(EEG);
         

@@ -64,7 +64,7 @@ if ~isfield(g, 'ersp') && ~isfield(g, 'itc')
     error('You must compute either ERSP or ITC when using the EC2 cluster'); 
 end
 
-% run std_precomp (THIS IS THE PART WE WANT TO PARALELIZE)
+% run std_precomp (THIS IS THE PART WE WANT TO PARALLELIZE)
 % ---------------
 % for index = 1:length(STUDY.design(g.design).cell)
 %     [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, varargin{:}, 'cell', index);

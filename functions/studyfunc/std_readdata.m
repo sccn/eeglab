@@ -3,7 +3,7 @@
 %                  Called by plotting functions
 %                  STD_ENVTOPO, STD_ERPPLOT, STD_ERSPPLOT, ...
 % Usage:
-%         >> [STUDY, datavals, times, setinds, cinds] = ...
+%         >> [STUDY, datavals, xvals, yvals, events, params] = ...
 %                   std_readdata(STUDY, ALLEEG, varargin);
 % Inputs:
 %       STUDY - studyset structure containing some or all files in ALLEEG
@@ -35,9 +35,10 @@
 %  STUDY    - updated studyset structure
 %  datavals  - [cell array] erp data (the cell array size is 
 %             condition x groups)
-%  times    - [float array] array of time values
-%  setinds  - [cell array] datasets indices
-%  cinds    - [cell array] channel or component indices
+%  xvals    - [float array] array of first dim values (for example time)
+%  yvals    - [float array] array of second dim values (for example frequencies)
+%  events   - [cell array] events (corresponding to the data)
+%  params   - [struct] structure containing parameters
 %
 % Example:
 %  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');
@@ -47,7 +48,7 @@
 
 % Copyright (C) Arnaud Delorme, arno@salk.edu
 %
-% This file is part of EEGLAB, see http://www.eeglab.org
+% This file is part of EEGLAB, see https://urldefense.com/v3/__http://www.eeglab.org__;!!Mih3wA!Hn3hFRnhxnzS1csHGMH6q95jPsdmpLu36WaSxZZ0BSw4smbm8RghssmOC-feg7O1JHd0ncZ3ACn-r8229A$ 
 % for the documentation and details.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -72,7 +73,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [STUDY, datavals, xvals, yvals, events, params] = std_readdata(STUDY, ALLEEG, varargin)
+function [STUDY, datavals, xvals, yvals, events, params, setinds] = std_readdata(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_readdata;
@@ -255,7 +256,7 @@ for iSubj = 1:length(subjectList)
             end
             nonEmptyCell = find( cellfun(@isempty, dataTmp{iSubj}) == 0);
             if ~isempty(nonEmptyCell)
-                yvals = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
+                yvalsERPim = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
             end
         elseif strcmpi(opt.datatype, 'custom')
             disp('Nothing to do for custom data');
@@ -264,6 +265,9 @@ for iSubj = 1:length(subjectList)
         end
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params });
     end
+end
+if strcmpi(opt.datatype, 'erpim')
+    yvals = yvalsERPim;
 end
 fprintf('\n');
 
@@ -342,13 +346,14 @@ if ~isempty(opt.clusters)
     end
     dataTmp = dataTmp2;
 end
-datavals = reorganizedata(dataTmp, dim);
+[datavals,setinds] = reorganizedata(dataTmp, dim);
 
 % reorganize data
 % ---------------
-function datavals = reorganizedata(dataTmp, dim)
+function [datavals,setinds] = reorganizedata(dataTmp, dim)
     nonEmptyCell = find( cellfun(@isempty, dataTmp) == 0);
     datavals = cell(size(dataTmp{nonEmptyCell(1)}));
+    setinds  = cell(size(dataTmp{nonEmptyCell(1)}));
         
     % copy data
     for iItem=1:length(dataTmp{nonEmptyCell(1)}(:)')
@@ -377,8 +382,9 @@ function datavals = reorganizedata(dataTmp, dim)
                 else
                     numItems = size(dataTmp{iCase}{iItem},dim);
                 end
+                setinds{iItem}(end+1) = iCase;
                 switch dim
-                    case 1, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
+                    case 1, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem};
                     case 2, datavals{iItem}(:,count:count+numItems-1) = dataTmp{iCase}{iItem}; 
                     case 3, datavals{iItem}(:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};
                     case 4, datavals{iItem}(:,:,:,count:count+numItems-1) = dataTmp{iCase}{iItem};

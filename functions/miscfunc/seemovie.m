@@ -45,7 +45,7 @@
 
 function seemovie(Movie,ntimes,Colormap)
 
-fps = 10;   % projetion speed (requested frames per second)
+fps = 10;   % projection speed (requested frames per second)
 
 if nargin<1
    help seemovie
