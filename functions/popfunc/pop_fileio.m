@@ -334,11 +334,11 @@ if ~isempty(fileNameNoExt)
     coordSystemFile = dir(fullfile(filePath, [ fileNameNoExt(1:4) '*coordsystem.json' ]));
     if length(coordSystemFile) == 1
         coordSystemFileName = fullfile(coordSystemFile(1).folder, coordSystemFile(1).name);
-        if ~exist('eeg_importcoordsystemfiles', 'file')
+        if ~exist('bids_importcoordsystemfile', 'file')
             fprintf(2, 'BIDS coordsystem file %s detected but not imported, install bids-matlab-tools to import it\n', coordSystemFileName);
         else
             fprintf('BIDS coordsystem file detected %s and imported (may contain fiducials)\n', coordSystemFileName);
-            EEG = eeg_importcoordsystemfiles(EEG, coordSystemFileName); % require the bids-matlab-tools plugin
+            EEG = bids_importcoordsystemfile(EEG, coordSystemFileName); % require the bids-matlab-tools plugin
         end
     elseif length(coordSystemFile) > 1
         fprintf(2, 'More than one BIDS coordsystem file detected so none imported (may contain fiducials)\n');
