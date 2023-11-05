@@ -700,12 +700,12 @@ for i = 1:nit
         pathtmp = filepath;
     end
 
-    if strfind(pathtmp(end),filesep) %#ok<STRIFCND>
+    if ~isempty(pathtmp) && contains(pathtmp(end),filesep) %#ok<STRIFCND>
         pathtmp = pathtmp(1:end-1);
     end % Getting rid of filesep at the end
 
-    if ~isempty(strfind(pathtmp(1:2),['.' filesep])) || ...
-            (isunix && pathtmp(1) ~= '/') || (ispc && pathtmp(2) ~= ':') %#ok<STREMP>
+    if ~isempty(pathtmp) && (contains(pathtmp(1:2),['.' filesep]) || ...
+            (isunix && pathtmp(1) ~= '/') || (ispc && pathtmp(2) ~= ':')) %#ok<STREMP>
         if iscell(filepath)
             file_fullpath{i} = fullfile(studypath,pathtmp(1:end));
         else

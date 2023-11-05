@@ -148,15 +148,15 @@ nit = 1; if iscell(filepath), nit = length(filepath);end
 
 for i = 1:nit
     if iscell(filepath),pathtmp = filepath{i}; else pathtmp = filepath; end
-    if strfind(pathtmp(end),filesep), pathtmp = pathtmp(1:end-1); end % Getting rid of filesep at the end
-    if strfind(pathtmp(1:2),['.' filesep])
-        if iscell(filepath),
+    if ~isempty(pathtmp) && contains(pathtmp(end),filesep), pathtmp = pathtmp(1:end-1); end % Getting rid of filesep at the end
+    if ~isempty(pathtmp) && contains(pathtmp(1:2),['.' filesep])
+        if iscell(filepath)
             file_fullpath{i} = fullfile(studypath,pathtmp(3:end));
         else
             file_fullpath = fullfile(studypath,pathtmp(3:end));
         end
     else
-        if iscell(filepath),
+        if iscell(filepath)
             file_fullpath{i} = pathtmp;
         else
             file_fullpath = pathtmp;

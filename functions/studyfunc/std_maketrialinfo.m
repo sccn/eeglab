@@ -71,8 +71,9 @@ for iField = 1:length(ff)
     for index = 1:length(ALLEEG)
         if isfield(ALLEEG(index).event, ff{iField}) 
             if ischar(ALLEEG(index).event(1).(ff{iField}))
-                 fieldChar(index) = 1;
-            else fieldChar(index) = 0;
+                fieldChar(index) = 1;
+            else 
+                fieldChar(index) = 0;
             end
         end
     end
@@ -135,7 +136,11 @@ for index = 1:length(ALLEEG)
                 %eventvals = cellfun(@num2str, eventvals, 'uniformoutput', false);
             %    eventvals = [ eventvals{:} ];
             %end
-            commands = { commands{:} ff{f} eventvals };
+            if isstruct(eventvals{1})
+                fprintf('Warning: Structure detected in event field - skipping\n')
+            else
+                commands = { commands{:} ff{f} eventvals };
+            end
         end
         trialinfo = struct(commands{:});
         STUDY.datasetinfo(index).trialinfo = trialinfo;

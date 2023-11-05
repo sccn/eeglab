@@ -119,6 +119,14 @@ else
     measureflagindx = 1;
 end
 
+% check for empty relative paths
+for iSet = 1:length(STUDY.datasetinfo)
+    if isempty(STUDY.datasetinfo(iSet).filepath)
+        STUDY.datasetinfo(iSet).filepath = STUDY.filepath;
+        ALLEEG(iSet).filepath = STUDY.filepath;        
+    end
+end
+
 % check that channel location are present
 ALLEEG = eeg_checkset(ALLEEG, 'chanloc');
 
