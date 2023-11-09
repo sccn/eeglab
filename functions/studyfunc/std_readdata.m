@@ -40,6 +40,9 @@
 %  events   - [cell array] events (corresponding to the data)
 %  params   - [struct] structure containing parameters
 %
+% Important note: This function does not do baseline correction for ERSP. 
+%                 To get the baseline corrected data use the function STD_ERSPPLOT
+%
 % Example:
 %  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');
 %  [erp times] = std_readdata(STUDY, ALLEEG, 'channels', { ALLEEG(1).chanlocs(1).labels });
