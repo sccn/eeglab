@@ -90,10 +90,10 @@ if nargin < 2
         if length(EEG) == 1
             compStr = sprintf('%d,', find(EEG.reject.gcompreject == 1));
             msg = sprintf('Components [%s] flagged for rejection.', compStr(1:end-1));
-            res = questdlg2(strvcat(msg, 'Do you want to remove these components?', 'Note: we recommend removing components in STUDY instead'), 'Remove components from data', 'Cancel', 'Manual rej.', 'Yes', 'Cancel');
+            res = questdlg2(strvcat(msg, 'Do you want to remove these components?', ' ', 'Note: we recommend removing components in STUDY instead', '(in the STUDY channel pre-computing interface, select', '"Remove ICA artifactual components pre-tagged in each dataset")'), 'Remove components from data', 'Cancel', 'Manual rej.', 'Yes', 'Cancel');
         else
             msg = 'Components flagged for rejection detected in some datasets.';
-            res = questdlg2(strvcat(msg, 'Do you want to remove these components?', 'Note: we recommend removing components in STUDY instead'), 'Remove components from data', 'Cancel', 'Yes', 'Cancel');
+            res = questdlg2(strvcat(msg, 'Do you want to remove these components?', ' ', 'Note: we recommend removing components in STUDY instead', '(in the STUDY channel pre-computing interface, select', '"Remove ICA artifactual components pre-tagged in each dataset")'), 'Remove components from data', 'Cancel', 'Yes', 'Cancel');
         end
         if strcmpi(res, 'Cancel')
             return;
