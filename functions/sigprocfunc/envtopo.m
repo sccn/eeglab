@@ -1,4 +1,3 @@
-%
 % ENVTOPO - Plot the envelope of a multichannel data epoch, plus envelopes and 
 %             scalp maps of specified or largest-contributing components. If a 3-D 
 %             input matrix, operates on the mean of the data epochs. Click on 
