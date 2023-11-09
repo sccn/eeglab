@@ -63,11 +63,13 @@ if nargin < 3
                { 'style' 'edit' 'string' '' 'tag' 'timerange' } ...
                { 'style' 'text' 'string' 'Scalp map latencies (ms, NaN -> max-RMS)' } ...
                { 'style' 'edit' 'string' 'NaN' 'tag' 'topotime' } ...
+               { 'style' 'text' 'string' 'Window size at latencies in ms' } ...
+               { 'style' 'edit' 'string' '0' 'tag' 'winsize' } ...
                { 'style' 'text' 'string' 'Plot title:' } ...
                { 'style' 'edit' 'string' '' 'tag' 'title'  } ...
                { 'style' 'text' 'string' 'Scalp map options (see >> help topoplot):' } ...
                { 'style' 'edit' 'string' '' 'tag' 'options' } };
-    uigeom = { [2 1] [2 1] [2 1] [2 1] };
+    uigeom = { [2 1] [2 1] [2 1] [2 1] [2 1] };
     evalstr = [ 'set(findobj(gcf, ''tag'', ''timerange''), ''string'', ''' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] ''');' ...
                 'set(findobj(gcf, ''tag'', ''title''), ''string'', ''' ['ERP data and scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] ''');' ...
                 ];
@@ -98,8 +100,15 @@ if nargin < 3
 	if size(result,1) == 0 return; end
 	timerange    = eval( [ '[' result{1} ']' ] );
 	topotime     = eval( [ '[' result{2} ']' ] );
-	plottitle    = result{3};
-	options      = [ ',' result{4} ];
+	winsize      = result{3};
+	plottitle    = result{4};
+    options = '';
+    if ~isempty(result{5})
+    	options      = [ ',' result{5} ];
+    end
+    if str2double(winsize) > 0
+    	options      = [  ', ''winsize'',' winsize  options ];
+    end
 	figure;
 else
 	options = [];
@@ -124,12 +133,12 @@ if ~isempty(EEG.chanlocs)
 	posf = round( (timerange(2)/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
 	if length( options ) < 2
     	timtopo( mean(SIGTMP(:,posi:posf,:),3), EEG.chanlocs, 'limits', [timerange(1) timerange(2) 0 0], 'plottimes', topotime, 'chaninfo', EEG.chaninfo);
-        textsc('title', plottitle)
+        textsc('title', plottitle);
         com = sprintf('figure; pop_timtopo(EEG, [%s], [%s], ''%s'');', num2str(timerange), num2str(topotime), plottitle);
 	else
 		com = sprintf('timtopo( mean(SIGTMP(:,posi:posf,:),3), EEG.chanlocs, ''limits'', [timerange(1) timerange(2) 0 0], ''plottimes'', topotime, ''chaninfo'', EEG.chaninfo %s);', options);
-		eval(com)
-        textsc('title', plottitle)
+		eval(com);
+        textsc('title', plottitle);
 	    com = sprintf('figure; pop_timtopo(EEG, [%s], [%s], ''%s'' %s);', num2str(timerange), num2str(topotime), plottitle, options);
     end	
 else
