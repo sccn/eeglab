@@ -55,8 +55,13 @@
 %  times    - [float array] array of time points
 %  freqs    - [float array] array of frequencies. For ERPimage this
 %             contains trial indices.
-%  erspbase - [cell array] baseline values
+%  erspbase - [cell array] baseline values. For backward compatibility. 
+%             This output is always empty. Use the function STD_ERSPPLOT to
+%             dynamically recompute the baseline.
 %  events   - [cell array] events (ERPimage only).
+%
+% Important note: This function returns does not implement baseline correction. 
+%                 To get the baseline corrected data use the function STD_ERSPPLOT
 %
 % Author: Arnaud Delorme, CERCO, 2006-
 

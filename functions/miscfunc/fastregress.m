@@ -58,6 +58,16 @@ function [ypred, alpha, rsq, B, intercept, h] = fastregress(x, y, plotflag, plot
         plotleg = plotflag;
     end
     
+    % take care of NaNs in x and y
+    if any(isnan(x))
+        y(isnan(x)) = [];
+        x(isnan(x)) = [];
+    end
+    if any(isnan(y))
+        x(isnan(y)) = [];
+        y(isnan(y)) = [];
+    end
+
     % this part is useless but still works
     %B=polyfit(x, y, 1);         % B is the slope
     %ypred = polyval(B,x);       % predictions

@@ -40,6 +40,9 @@
 %  events   - [cell array] events (corresponding to the data)
 %  params   - [struct] structure containing parameters
 %
+% Important note: This function does not do baseline correction for ERSP. 
+%                 To get the baseline corrected data use the function STD_ERSPPLOT
+%
 % Example:
 %  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');
 %  [erp times] = std_readdata(STUDY, ALLEEG, 'channels', { ALLEEG(1).chanlocs(1).labels });
@@ -311,6 +314,7 @@ if ~isempty(opt.clusters)
     % Split ICA components from the same subjects need to be made 
     % as if coming from different subjects
     dataTmp2 = {};
+    correspInd = [];
     realDim  = dim;
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
     for iDat1 = 1:length(dataTmp)
@@ -332,6 +336,7 @@ if ~isempty(opt.clusters)
                 if compNumbers(iDat2)
                     for iComps = 1:compNumbers(iDat2)
                         dataTmp2{end+1} = cell(size(dataTmp{iDat1}));
+                        correspInd(end+1) = iDat1;
                         % check dimensions of components
                         if ~isempty(dataTmp{iDat1}{iDat2})
                             if strcmpi(opt.singletrials, 'on') && (strcmpi(tmpDataType, 'timef') || strcmpi(tmpDataType, 'erpim')),    dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
@@ -345,8 +350,28 @@ if ~isempty(opt.clusters)
         end
     end
     dataTmp = dataTmp2;
+else
+    correspInd = 1:length(dataTmp); % identity for channels 
 end
 [datavals,setinds] = reorganizedata(dataTmp, dim);
+
+% fix setinds index
+if nargout > 6
+    allSubjects = { STUDY.datasetinfo.subject };
+    for iCond = 1:length(setinds(:))
+        for iItem = 1:length(setinds{iCond})
+            caseVal = setinds{iCond}(iItem);
+            caseVal = correspInd(caseVal); % for clusters, for channel it is identity
+            subject = STUDY.design(opt.design).cases.value{caseVal};
+            ind = strmatch(subject, allSubjects, 'exact');
+            if length(ind) ~= 1
+                error('More than one dataset per subject, cannot generate setinds')
+            else
+                setinds{iCond}(iItem) = ind;
+            end
+        end
+    end
+end
 
 % reorganize data
 % ---------------
@@ -373,9 +398,9 @@ function [datavals,setinds] = reorganizedata(dataTmp, dim)
             end
         end
     end
-    for iItem=1:length(dataTmp{nonEmptyCell(1)}(:)')
+    for iItem=1:length(dataTmp{nonEmptyCell(1)}(:)') % conditions * group
         count = 1;
-        for iCase = 1:length(dataTmp)
+        for iCase = 1:length(dataTmp) % subjects
             if ~isempty(dataTmp{iCase}{iItem})
                 if dim > 1
                     numItems = size(dataTmp{iCase}{iItem},dim) * (size(dataTmp{iCase}{iItem},1) > 1); % the size > 1 allows to detect empty array which have a non-null last dim

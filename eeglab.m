@@ -252,7 +252,7 @@ if nargin < 1 && ~isdeployed
         eeglabpath2 = mywhich('eeglab.m');
         cd('..');
     else
-        try, rmpath(eeglabpath); catch, end
+        try frmpath(eeglabpath); catch, end
         eeglabpath2 = mywhich('eeglab.m');
     end
     if ~isempty(eeglabpath2)
@@ -276,7 +276,7 @@ if strcmpi(eeglabpath, './') || strcmpi(eeglabpath, '.\'), eeglabpath = [ pwd fi
 % --------------------
 pathtmp = mywhich('wilcoxon_test');
 if ~isempty(pathtmp)
-    try,
+    try
         rmpath(pathtmp(1:end-15));
     catch, end
 end
@@ -1437,7 +1437,7 @@ if isempty(ALLEEG) && ~isempty(EEG) && all(arrayfun(@(eeg) ~isempty(eeg.data), E
     ALLEEG = EEG;
 else
     % check dataset
-    if ~isempty(EEG) && ~isempty(ALLEEG) && ~isequaln(EEG, ALLEEG(CURRENTSET))
+    if ~isempty(EEG) && ~isempty(ALLEEG) && CURRENTSET > 0 && ~isequaln(EEG, ALLEEG(CURRENTSET))
         if length(EEG) > 1
             options =  { 'EEG overwrites ALLEEG', 'ALLEEG overwrites EEG', 'Do nothing' };
             res = questdlg2('In a STUDY, ALLEEG and EEG should be equal and they are not. How do you want EEGLAB to resolve this?', 'ALLEEG and EEG structure do not match', options{:}, options{1});

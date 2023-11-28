@@ -68,6 +68,9 @@
 %   pinter     - [array or cell] groups x conditions statistics. Output of
 %                STATCOND function.
 %
+% Important note: This data implement baseline correction and proper
+%                 scaling.
+%
 % Example:
 %        >> [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', 'all', ...
 %                                       'mode', 'together');

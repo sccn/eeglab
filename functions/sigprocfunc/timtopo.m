@@ -9,12 +9,13 @@
 %               See >> topoplot example for file format.
 %
 % Optional ordered inputs:
-%  'limits'      = [minms maxms minval maxval] data limits for latency (in ms) and y-values
-%                 (assumes uV) {default|0 -> use [0 npts-1 data_min data_max]; 
+% 'limits'       = [minms maxms minval maxval] data limits for latency (in ms) and y-values
+%                  (assumes uV) {default|0 -> use [0 npts-1 data_min data_max]; 
 %                  else [minms maxms] or [minms maxms 0 0] -> use
 %                  [minms maxms data_min data_max]
-%  'plottimes'   = [vector] latencies (in ms) at which to plot scalp maps 
+% 'plottimes'    = [vector] latencies (in ms) at which to plot scalp maps 
 %                  {default|NaN -> latency of maximum variance}
+% 'winsize'      = [float] window size in millisecond. Default is 0.
 % 'title'        = [string] plot title {default|0 -> none}
 % 'plotchans'    = vector of data channel(s) to plot. Note that this does not
 %                  affect scalp topographies {default|0 -> all}
@@ -26,7 +27,7 @@
 % Optional keyword, arg pair inputs (must come after the above):
 % 'topokey','val' = optional TOPOPLOT scalp map plotting arguments. See >> help topoplot 
 %
-% Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1-10-98 
+% Author: Arnaud Delorme and Scott Makeig, SCCN/INC/UCSD, La Jolla, 1-10-98 
 %
 % See also: ENVTOPO, TOPOPLOT
 
@@ -75,18 +76,6 @@ end
 [chans,frames] = size(data);
 icadefs;   
 
-% 
-% if nargin > 2
-%     if ischar(limits)
-%         varargin = { limits,plottimes,titl,plotchans,voffsets varargin{:} };
-%         
-%     else
-%         varargin = { 'limits' limits 'plottimes' plottimes 'title' titl 'plotchans' plotchans 'voffsets' voffsets varargin{:} };        
-%     end
-% end
-
-
-
 if nargin > 2 && ~ischar(varargin{1})
    options = {};
    if length(varargin) > 0, options = { options{:} 'limits' varargin{1} }; end
@@ -103,11 +92,12 @@ fieldlist = { 'limits'        'real'     []                       0;
               'plottimes'     'real'     []                       [];
               'title'         'string'   []                       '';
               'plotchans'     'integer'  [1:size(data,1)]         0;
+              'winsize'       'float'    []                       0;
               'voffsets'      'real'     []                       [];
               'plotenvelope'  'real'     [0 1]                    0};
-[g topoargs] = finputcheck(options, fieldlist, 'timtopo', 'ignore');
-
+[g, topoargs] = finputcheck(options, fieldlist, 'timtopo', 'ignore');
 if ischar(g), error(g); end
+
 %Set Defaults
 if isempty(g.title), g.title = ''; end
 if isempty(g.voffsets) || g.voffsets == 0, g.voffsets = zeros(1,MAX_TOPOS); end
@@ -118,42 +108,12 @@ limitset = 0; %flag variable
 if isempty(g.limits), g.limits = 0; end
 if length(g.limits)>1, limitset = 1; end
 
-
-% if nargin < 7 | voffsets == 0
-%   voffsets = zeros(1,MAX_TOPOS);
-% end
-% 
-% if nargin < 6
-%    plotchans = 0;
-% end
-% 
-% if plotchans==0
-%    plotchans = 1:chans;
-% end
-% 
-% if nargin < 5,
-%    titl = '';     % DEFAULT NO TITLE
-% end
-% 
-% plottimes_set=1;   % flag variable
-% if nargin< 4 | isempty(plottimes) | any(isnan(plottimes))
-%    plottimes_set = 0;
-% end
-% 
-% limitset = 0;
-% if nargin < 3,
-%     limits = 0;
-% elseif length(limits)>1
-%     limitset = 1;
-% end
-
 if nargin < 2 %if first if-statement is changed to 2 should this be 3?
     chan_locs = 'chan.locs';  % DEFAULT CHAN_FILE
 end
 if isnumeric(chan_locs) && chan_locs == 0,
     chan_locs = 'chan.locs';  % DEFAULT CHAN_FILE
 end
-
 
   %
   %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -331,6 +291,7 @@ axes(axdata)
 axcolor = get(gcf,'Color');
 set(axdata,'Color',BACKCOLOR);
 pl=plot(x,data(g.plotchans,:)');    % plot the data
+disableDefaultInteractivity(axdata)
 if length(g.plotchans)==1
   set(pl,'color','k');
   set(pl,'linewidth',2);
@@ -370,11 +331,9 @@ for t=1:ntopos % dfraw vertical lines through the data at topoplot frames
   l1 = plot([g.plottimes(t) g.plottimes(t)],...
        [min(data(g.plotchans,plotframes(t))) ...
        g.voffsets(t) + max(data(g.plotchans,plotframes(t)))],'w'); % white underline behind
-  set(l1,'linewidth',2);
   l1 = plot([g.plottimes(t) g.plottimes(t)],...
        [min(data(g.plotchans,plotframes(t))) ...
        g.voffsets(t) + max(data(g.plotchans,plotframes(t)))],'b'); % blue line
-  set(l1,'linewidth',lwidth);
  end
 end
 %
@@ -416,6 +375,12 @@ end
 topoaxes = zeros(1,ntopos);
 for t=1:ntopos
        % [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
+  if g.winsize > 0
+      axes(axdata);
+      yltmp = ylim;
+      patch('xdata', g.plottimes(t)+[-g.winsize -g.winsize g.winsize g.winsize], 'ydata', yltmp([1 2 2 1]), 'facecolor', 'b', 'facealpha', 0.1, 'edgecolor', 'none', 'tag', 'tmppatch');
+  end
+
   axtp = axes('Units','Normalized','Position',...
        [topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
@@ -429,13 +394,19 @@ for t=1:ntopos
   end
   topoplot( data(:,plotframes(t)),chan_locs, topoargs{:});
 
+
   % Else make a 3-D headplot
   %
   % headplot(data(:,plotframes(t)),'chan.spline'); 
   
-  timetext = [num2str(g.plottimes(t),'%4.0f')];
   % timetext = [num2str(plottimes(t),'%4.0f') ' ms']; % add ' ms'
-  text(0.00,0.80,timetext,'FontSize',axfont-3,'HorizontalAlignment','Center'); % ,'fontweight','bold');
+  if g.winsize == 0
+      timetext = [num2str(g.plottimes(t),'%4.0f')];
+      text(0.00,0.80,timetext,'FontSize',axfont-3,'HorizontalAlignment','Center'); % ,'fontweight','bold');
+  else
+      timetext = sprintf('%0.f to %0.f ms', g.plottimes(t) + [-g.winsize g.winsize]);
+      text(0.00,0.80,timetext,'FontSize',axfont-3,'HorizontalAlignment','Center'); % ,'fontweight','bold');
+  end
 end
 
 %
@@ -495,20 +466,57 @@ dat.options  = topoargs;
 dat.srate    = (size(data,2)-1)/(x(end)-x(1))*1000;
 dat.axes     = axtp;
 dat.line     = l1;
+dat.winsize  = g.winsize;
+dat.buttonpressed = 0;
+winpts       = round(g.winsize/1000*dat.srate);
+winstr       = [ '[' int2str(round( [-g.winsize -g.winsize g.winsize g.winsize] )) ']' ];
 
-cb_code = [ 'tmppos = get(gca, ''currentpoint'');' ...
-            'dattmp = get(gcf, ''userdata'');' ...
-            'set(dattmp.line, ''visible'', ''off'');' ...
-            'axes(dattmp.axes); cla;' ...
-            'latpoint = round((tmppos(1)-dattmp.times(1))/1000*dattmp.srate);' ...
-            'topoplot(dattmp.erp(:,latpoint), dattmp.chanlocs, dattmp.options{:});' ...
-            'title(sprintf(''%.0f ms'', tmppos(1)));' ...
-            'clear latpoint dattmp;' ...
+cb_code = [ 'tmppos = get(gca, ''currentpoint'');' 10 ...
+            'dattmp = get(gcf, ''userdata'');' 10  ...
+            'dattmp.buttonpressed = 1;' 10 ...
+            'set(gcf, ''userdata'', dattmp);' 10 ...
+            'set(dattmp.line, ''visible'', ''off'');' 10  ...
+            'yltmp = ylim;' 10  ...
+            'delete(findall(gcf,''Type'',''hggroup''));' 10  ...
+            'delete(findall(gca,''tag'',''tmppatch''));' 10  ...
+            'tmppath = patch(''xdata'', tmppos(1)+' winstr ', ''ydata'', yltmp([1 2 2 1]), ''facecolor'', ''b'', ''facealpha'', 0.1, ''edgecolor'', ''none'', ''tag'', ''tmppatch'');' 10  ...
+            'set(tmppath, ''ButtonDownFcn'', dattmp.code);' 10 ...
+            'axes(dattmp.axes); cla;' 10  ...
+            'latpoint = round((tmppos(1)-dattmp.times(1))/1000*dattmp.srate);' 10  ...
+            'latpoint = max(1, latpoint-' int2str(winpts) '):min(size(dattmp.erp,2), latpoint+' int2str(winpts) ');' 10  ...
+            'topoplot(mean(dattmp.erp(:,latpoint),2), dattmp.chanlocs, dattmp.options{:});' 10  ...
+            'if dattmp.winsize == 0,'  10  ...
+            '    title(sprintf(''%.0f ms'', tmppos(1)));' 10  ...
+            'else,' 10 ...
+            '    title(sprintf(''%.0f to %.0f ms'', tmppos(1)-dattmp.winsize, tmppos(1)+dattmp.winsize));' 10  ...
+            'end;' 10 ...
+            'clear latpoint dattmp yltmp;' ...
           ];
-axcopy;
+dat.code = cb_code;
+
+% code up and down does not work
+cb_code_up = [ ...
+    'dattmp = get(gcf, ''userdata'');' 10  ...
+    'dattmp.buttonpressed = 1;' ...
+    'set(gcf, ''userdata'', dattmp);' ];
+
+cb_code_move = [ ...
+    'dattmp = get(gcf, ''userdata'');' 10  ...
+    'if dattmp.buttonpressed,' cb_code 'end; clear dattmp;' ];
+
+if ~isempty(topoaxes)
+    for iAx = 1:length(topoaxes)
+        axcopy(topoaxes(iAx));
+    end
+else
+    axcopy;
+end
 
 set(gcf, 'userdata', dat);
-set(axdata, 'ButtonDownFcn', cb_code); %windowbuttondownfcn', cb_code);
+set(gca, 'ButtonDownFcn', cb_code);
 set(pl, 'ButtonDownFcn', cb_code);
+% set(gcf, 'WindowButtonDownFcn', cb_code);
+% set(gcf, 'WindowButtonUpFcn', cb_code_up);
+% set(gcf, 'WindowButtonMotionFcn', cb_code_move)
 
 %axcopy(gcf, cb_code);

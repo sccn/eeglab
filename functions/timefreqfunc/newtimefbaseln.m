@@ -138,7 +138,7 @@ if strcmpi(g.commonbase, 'on')
     end
     for ind = 1:length(PP(:))
         allMbase{ind} = meanBaseln;
-        allMstd{ind}  = meanBaseln;
+        allMstd{ind}  = meanStd;
     end
 end
 

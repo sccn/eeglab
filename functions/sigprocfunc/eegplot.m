@@ -2153,7 +2153,7 @@ function defmotion(varargin)
             lowlim = round(g.time*g.trialstag+1);
         else, lowlim = round(g.time*g.srate+1);
         end
-        if g.incallback
+        if g.incallback % meaning button is pressed
             g.winrej = [g.winrej(1:end-1,:)' [g.winrej(end,1) tmppos(1)+lowlim g.winrej(end,3:end)]']';
             set(fig,'UserData', g);
             if exist('OCTAVE_VERSION', 'builtin') == 0
