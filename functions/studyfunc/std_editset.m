@@ -58,6 +58,8 @@
 %                plus additional information from the optional inputs above. 
 %   ALLEEG     - a vector of EEG datasets included in the STUDY structure 
 %
+% Example: [STUDY, EEG] = std_editset(STUDY, EEG, 'commands',{{'remove',4}},'updatedat','on','rmclust','on');
+%
 %  See also:  POP_CREATESTUDY, STD_LOADALLEEG, POP_CLUST, POP_PRECLUST, 
 %             EEG_PRECLUST, EEG_CREATEDATA
 %
