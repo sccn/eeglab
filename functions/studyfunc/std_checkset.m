@@ -136,17 +136,19 @@ end
 % --------------------------------------------
 for cc = 1:length(sameica)
     idat = [];
-    for tmpi = 1:length(sameica{cc})
-        if isfield(ALLEEG(sameica{cc}(tmpi)).dipfit, 'model')
-            idat = sameica{cc}(tmpi);
-        end
-    end
-    if ~isempty(idat)
+    if length(sameica{cc}) > 1
         for tmpi = 1:length(sameica{cc})
-            if ~isfield(ALLEEG(sameica{cc}(tmpi)).dipfit, 'model')
-                ALLEEG(sameica{cc}(tmpi)).dipfit = ALLEEG(idat).dipfit;
-                ALLEEG(sameica{cc}(tmpi)).saved  = 'no';
-                fprintf('Warning: no ICA dipoles for dataset %d, using dipoles from dataset %d (same ICA)\n', sameica{cc}(tmpi), idat);
+            if isfield(ALLEEG(sameica{cc}(tmpi)).dipfit, 'model')
+                idat = sameica{cc}(tmpi);
+            end
+        end
+        if ~isempty(idat)
+            for tmpi = 1:length(sameica{cc})
+                if ~isfield(ALLEEG(sameica{cc}(tmpi)).dipfit, 'model')
+                    ALLEEG(sameica{cc}(tmpi)).dipfit = ALLEEG(idat).dipfit;
+                    ALLEEG(sameica{cc}(tmpi)).saved  = 'no';
+                    fprintf('Warning: no ICA dipoles for dataset %d, using dipoles from dataset %d (same ICA)\n', sameica{cc}(tmpi), idat);
+                end
             end
         end
     end
