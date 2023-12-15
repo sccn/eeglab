@@ -2080,11 +2080,12 @@ if ~Allampsflag && ~exist('data2') %%%%%%%% Plot ERP image %%%%%%%%%%
     if strcmpi(NoShow, 'no')
         if TIMEX
             h_eim=imagesc(times,outtrials,data',[mindat,maxdat]);% plot time on x-axis
-            set(gca,'Ydir','normal');
+            set(gca,'Ydir','normal', 'tag', 'erpimage');
             axis([timelimits(1) timelimits(2) ...
                 min(outtrials) max(outtrials)]);
         else
             h_eim=imagesc(outtrials,times,data,[mindat,maxdat]); % plot trials on x-axis
+            set(gca, 'tag', 'erpimage');
             axis([min(outtrials) max(outtrials)...
                 timelimits(1) timelimits(2)]);
         end
