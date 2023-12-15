@@ -314,7 +314,7 @@ if lim(1) > 0
    for Z1 = length(alllatencies):-1:1
        % if there is any event in between trigger and epoch onset which are boundary events
        selEvt = find([tmpevents.latency] > alllatencies(Z1) & [tmpevents.latency] < alllatencies(Z1) + lim(1) * EEG.srate);
-       selEvt = selEvt( eeg_findboundaries(tmpevent(selEvt) ) ); % keep only boundary events
+       selEvt = selEvt( eeg_findboundaries(tmpevents(selEvt) ) ); % keep only boundary events
 
       if any(selEvt)
           if sum([tmpevents(selEvt).duration]) > lim(1) * EEG.srate
@@ -331,7 +331,7 @@ if lim(2) < 0
    for Z1 = length(alllatencies):-1:1
       % if there is any event in between trigger and epoch onset which are boundary events
       selEvt = find([tmpevents.latency] < alllatencies(Z1) & [tmpevents.latency] > alllatencies(Z1) + lim(2) * EEG.srate);
-      selEvt = selEvt( eeg_findboundaries(tmpevent(selEvt) ) ); % keep only boundary events
+      selEvt = selEvt( eeg_findboundaries(tmpevents(selEvt) ) ); % keep only boundary events
       if any(selEvt)
           if sum([tmpevents(selEvt).duration]) > -lim(2) * EEG.srate
               alllatencies(Z1) = [];
