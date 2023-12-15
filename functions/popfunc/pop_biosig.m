@@ -203,6 +203,9 @@ if ~iscell(filename) filename = { filename }; end
 for iFile = 1:length(filename)
     % import data
     % -----------
+    if ~exist(filename{iFile})
+        error('File not found %s', filename{iFile})
+    end
     EEG = eeg_emptyset;
     [dat, DAT, interval] = readfile(filename{iFile}, g.channels, g.blockrange, g.memorymapped, g.bdfeventmode, g.overflow, g.uncalibrated);
     
