@@ -367,9 +367,9 @@ elseif isempty(g.plotvals)
             end
         
             % computing ITCs
-            [ypred alpha(freq, time) Rsq slope(freq, time)] = myregress(outvar, 20*log10(phsamp));
+            [ypred alpha(freq, time) Rsq slope(freq, time)] = fastregress(outvar, 20*log10(phsamp));
         end
-    end;    
+    end  
     sigout = slope;
 else 
     g.times = g.plotvals{1};
