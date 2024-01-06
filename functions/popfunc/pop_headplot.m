@@ -78,7 +78,7 @@ com = '';
 if nargin < 1
    help pop_headplot;
    return;
-end;   
+end
 
 if isempty(EEG.chanlocs)
     error('Pop_headplot: this dataset does not contain channel locations. Use menu item: Edit > Dataset info');

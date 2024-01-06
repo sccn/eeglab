@@ -140,10 +140,10 @@ if nargin < 3
     figname = fastif(icacomp == 0, 'Rejection abnormal comp. values -- pop_eegthresh()','Rejection abnormal elec. values -- pop_eegthresh()');
     result = inputgui( geometry,uilist,'pophelp(''pop_eegthresh'');', figname);
     
-size_result = size(result);
-if size_result(1) == 0
-    return;
-end
+    size_result = size(result);
+    if size_result(1) == 0
+        return;
+    end
     elecrange    = result{1};
     negthresh    = result{2};
     posthresh    = result{3};

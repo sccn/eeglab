@@ -80,10 +80,10 @@ if ischar(chanstr)
     chanstr  = [ ' ' chanstr ' ' ];
     try
         chanlist = eval( [ '{' chanstr '}' ] );
-chanlistnum = cellfun(@str2double, chanlist);
-if isnumeric(chanlist{1})
-    chanlist = [chanlist{:}];
-end
+        chanlistnum = cellfun(@str2double, chanlist);
+        if isnumeric(chanlist{1})
+            chanlist = [chanlist{:}];
+        end
     catch
         chanlist = {};
         sp = find(chanstr == ' ');

@@ -57,8 +57,8 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     
     if nargin < 2
         help pop_chancoresp;
-return;
-end
+        return;
+    end
     chanlistout1 = [];
     chanlistout2 = [];
     
@@ -72,8 +72,8 @@ end
        elseif strcmpi(chans1, 'clear')
            [chanlistout1, chanlistout2, thirdout, outfourth] = clearchans(chans2, varargin{:});
        elseif strcmpi(chans1, 'auto')
-[chanlistout1, chanlistout2, thirdout, outfourth] = autoselect(chans2, varargin{:});
-end
+           [chanlistout1, chanlistout2, thirdout, outfourth] = autoselect(chans2, varargin{:});
+       end
        return;
     end
     

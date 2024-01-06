@@ -70,8 +70,8 @@ else
         geometry{index} = [1];
         listui{index} = {'Style', 'text', 'string', Prompt(index,:)};
     end
-    listui{end+1} = {};
 end
+listui{end+1} = {};
 
 geometry = { geometry{:} 1 ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val

@@ -250,14 +250,13 @@ else % no interactive inputs
     % (this is useful to build the string command for the function)
     % --------------------------------------------------------------
     for index=1:2:length(args)
-if iscell(args{index+1})
-    args{index+1} = {args{index+1}};
-end
-if ischar(args{index+1})
-    args{index+1} = args{index+1};
-end
+        if iscell(args{index+1})
+            args{index+1} = {args{index+1}};
         end
-    end;                
+        if ischar(args{index+1})
+            args{index+1} = args{index+1};
+        end
+    end                
 end
 
 % create structure
@@ -341,18 +340,18 @@ for curfield = tmpfields'
                               EEG = eeg_checkset(EEG, 'makeur');
 		                 case 'no' % match existing fields
 		                           % ---------------------
-tmparray = load_file_or_array(getfield(g, curfield{1}), g.skipline, g.delim);
-if isempty(g.indices)
-    g.indices = [1:size(tmparray(:), 1)] + length(EEG.event);
-end
-		                      
+                              tmparray = load_file_or_array(getfield(g, curfield{1}), g.skipline, g.delim);
+                              if isempty(g.indices)
+                                  g.indices = 1:size(tmparray(:), 1) + length(EEG.event);
+                              end
+
 		                      indexmatch = strmatch(curfield{1}, allfields);
 		                      if isempty(indexmatch) % no match
 		                          disp(['pop_editeventfield(): creating new field ''' curfield{1} '''' ]);
 		                      end
                               try
                                   EEG.event = setstruct(EEG.event, curfield{1}, g.indices, tmparray);
-                              catch,
+                              catch
                                   error('Wrong size for input array');
                               end
   							  if strcmp(curfield{1}, 'latency')

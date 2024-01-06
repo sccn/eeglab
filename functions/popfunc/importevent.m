@@ -137,8 +137,8 @@ if ~isempty(g.event)
             eventStr = cellfun(@ischar, event);
             eventNum = cellfun(@isnumeric, event);
             if all(eventStr(1,:)) && ~all(eventStr(:,1))
-event = event';
-end
+                event = event';
+            end
             if all(eventNum(1,:)) && ~all(eventNum(:,1))
                 event = event';
             end
@@ -231,10 +231,10 @@ for curfield = tmpfields'
                           g.fields = fieldnames(g.event);
                           latencypresent = ~isempty(strmatch('latency', g.fields));
                       end
-tmparray = load_file_or_array(g.event, g.skipline, g.delim);
-if isempty(g.indices)
-    g.indices = [1:size(tmparray,1)] + length(event);
-end
+                      tmparray = load_file_or_array(g.event, g.skipline, g.delim);
+                      if isempty(g.indices)
+                          g.indices = [1:size(tmparray,1)] + length(event);
+                      end
                       if length(g.indices) ~= size(tmparray,1)
                           error('Set error: number of row in file does not match the number of event given as input'); 
                       end
