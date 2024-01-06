@@ -47,7 +47,7 @@ function strout = strmultiline( strinori, maxlen, delimiter);
 if nargin < 1
 	help strmultiline;
 	return;
-end;	
+end
 if nargin < 3
     delimiter = [];
 end
@@ -73,14 +73,16 @@ for index = 1:size(strinori,1) % scan lines
     curline = '';
     
     while ~isempty( strin )
-        [tok strin] = strtok(strin);
+        [tok, strin] = strtok(strin);
         if length(curline) + length(tok) +1 > maxlen
             lines{count} = curline;
             curline      = '';
             count = count + 1;
         end
-        if isempty(curline) curline = tok;
-        else                curline = [ curline ' ' tok ];
+        if isempty(curline)
+            curline = tok;
+        else                
+            curline = [ curline ' ' tok ];
         end
     end
     if ~isempty(curline), lines{count} = curline; end

@@ -1173,9 +1173,12 @@ if isempty(g.precomputed)
     % ----------------------------------------------------
     % compute time frequency decompositions, power and ITC
     % ----------------------------------------------------
-    if length(g.timesout) > 1,   tmioutopt = { 'timesout' , g.timesout };
-    elseif ~isempty(g.ntimesout) tmioutopt = { 'ntimesout', g.ntimesout };
-    else                         tmioutopt = { 'ntimesout', g.timesout };
+    if length(g.timesout) > 1
+        tmioutopt = {'timesout', g.timesout};
+    elseif ~isempty(g.ntimesout)
+        tmioutopt = {'ntimesout', g.ntimesout};
+    else                         
+        tmioutopt = { 'ntimesout', g.timesout };
     end
 
     [alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...

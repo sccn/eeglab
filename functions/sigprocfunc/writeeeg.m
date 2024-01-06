@@ -102,40 +102,40 @@ HDR.FLAG.UCAL = 0; % see also https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=102
 % select file format 
 if ~isfield(HDR, 'EVENT'),                     HDR.EVENT = []; end
 if ~isfield(HDR, 'TYPE'),                      HDR.TYPE ='GDF'; end
-if ~isfield(HDR, 'Patient')                    HDR.Patient = []; end
-if ~isfield(HDR.Patient, 'ID')                 HDR.Patient.ID = 'P0000'; end
-if ~isfield(HDR.Patient, 'Sex')                HDR.Patient.Sex = 0; end
-if ~isfield(HDR.Patient, 'Name')               HDR.Patient.Name = 'Anonymous'; end
-if ~isfield(HDR.Patient, 'Handedness')         HDR.Patient.Handedness = 0; end;% 	unknown, 1:left, 2:right, 3: equal
+if ~isfield(HDR, 'Patient'),                   HDR.Patient = []; end
+if ~isfield(HDR.Patient, 'ID'),                HDR.Patient.ID = 'P0000'; end
+if ~isfield(HDR.Patient, 'Sex'),               HDR.Patient.Sex = 0; end
+if ~isfield(HDR.Patient, 'Name'),              HDR.Patient.Name = 'Anonymous'; end
+if ~isfield(HDR.Patient, 'Handedness'),        HDR.Patient.Handedness = 0; end;% 	unknown, 1:left, 2:right, 3: equal
 
 % description of recording device 
-if ~isfield(HDR,'Manufacturer')                HDR.Manufacturer = []; end
+if ~isfield(HDR,'Manufacturer'),               HDR.Manufacturer = []; end
 if ~isfield(HDR.Manufacturer, 'Name'),         HDR.Manufacturer.Name = 'BioSig/EEGLAB'; end
 if ~isfield(HDR.Manufacturer, 'Model'),        HDR.Manufacturer.Model = 'writeeeg.m'; end
 if ~isfield(HDR.Manufacturer, 'Version'),      HDR.Manufacturer.Version = '$Revision'; end
 if ~isfield(HDR.Manufacturer, 'SerialNumber'), HDR.Manufacturer.SerialNumber = '00000000'; end
 
 % recording identification, max 80 char.
-if ~isfield(HDR,'RID')                         HDR.RID = ''; end; %StudyID/Investigation [consecutive number];
-if ~isfield(HDR,'REC')                         HDR.REC = []; end
-if ~isfield(HDR.REC, 'Hospital')               HDR.REC.Hospital = ''; end; 
-if ~isfield(HDR.REC, 'Technician')              HDR.REC.Technician = ''; end
-if ~isfield(HDR.REC, 'Equipment')              HDR.REC.Equipment = ''; end
-if ~isfield(HDR.REC, 'IPaddr')             	   HDR.REC.IPaddr = [127,0,0,1]; end; % IP address of recording system 	
-if ~isfield(HDR.Patient, 'Weight')             HDR.Patient.Weight = 0; end; 	% undefined 
-if ~isfield(HDR.Patient, 'Height')             HDR.Patient.Height = 0; end;	% undefined 
-if ~isfield(HDR.Patient, 'Birthday')           HDR.Patient.Birthday = [1951 05 13 0 0 0]; end; %    undefined 
-if ~isfield(HDR.Patient, 'Impairment')         HDR.Patient.Impairment = []; end; 
-if ~isfield(HDR.Patient.Impairment, 'Heart')   HDR.Patient.Impairment.Heart = 0; end;  %	0: unknown 1: NO 2: YES 3: pacemaker 
-if ~isfield(HDR.Patient.Impairment, 'Visual')  HDR.Patient.Impairment.Visual = 0; end; %	0: unknown 1: NO 2: YES 3: corrected (with visual aid) 
-if ~isfield(HDR.Patient,'Smoking')             HDR.Patient.Smoking = 0; end;           %	0: unknown 1: NO 2: YES 
-if ~isfield(HDR.Patient,'AlcoholAbuse')        HDR.Patient.AlcoholAbuse = 0; end; 	   %	0: unknown 1: NO 2: YES 
-if ~isfield(HDR.Patient,'DrugAbuse')           HDR.Patient.DrugAbuse = 0; end;  	   %	0: unknown 1: NO 2: YES 
+if ~isfield(HDR,'RID'),                        HDR.RID = ''; end; %StudyID/Investigation [consecutive number];
+if ~isfield(HDR,'REC'),                        HDR.REC = []; end
+if ~isfield(HDR.REC, 'Hospital'),              HDR.REC.Hospital = ''; end; 
+if ~isfield(HDR.REC, 'Technician'),            HDR.REC.Technician = ''; end
+if ~isfield(HDR.REC, 'Equipment'),             HDR.REC.Equipment = ''; end
+if ~isfield(HDR.REC, 'IPaddr'),            	   HDR.REC.IPaddr = [127,0,0,1]; end; % IP address of recording system 	
+if ~isfield(HDR.Patient, 'Weight'),            HDR.Patient.Weight = 0; end; 	% undefined 
+if ~isfield(HDR.Patient, 'Height'),            HDR.Patient.Height = 0; end;	% undefined 
+if ~isfield(HDR.Patient, 'Birthday'),          HDR.Patient.Birthday = [1951, 5, 13, 0, 0, 0]; end; %    undefined 
+if ~isfield(HDR.Patient, 'Impairment'),        HDR.Patient.Impairment = []; end; 
+if ~isfield(HDR.Patient.Impairment, 'Heart'),  HDR.Patient.Impairment.Heart = 0; end;  %	0: unknown 1: NO 2: YES 3: pacemaker 
+if ~isfield(HDR.Patient.Impairment, 'Visual'), HDR.Patient.Impairment.Visual = 0; end; %	0: unknown 1: NO 2: YES 3: corrected (with visual aid) 
+if ~isfield(HDR.Patient,'Smoking'),            HDR.Patient.Smoking = 0; end;           %	0: unknown 1: NO 2: YES 
+if ~isfield(HDR.Patient,'AlcoholAbuse'),       HDR.Patient.AlcoholAbuse = 0; end; 	   %	0: unknown 1: NO 2: YES 
+if ~isfield(HDR.Patient,'DrugAbuse'),          HDR.Patient.DrugAbuse = 0; end;  	   %	0: unknown 1: NO 2: YES 
 
 % recording time [YYYY MM DD hh mm ss.ccc]
-if ~isfield(HDR,'T0')                          HDR.T0 = clock; end
-if ~isfield(HDR,'SPR')                         HDR.SPR = size(x,2); end
-if  isfield(HDR,'label')                       HDR.Label = HDR.label; HDR = rmfield(HDR, 'label'); end
+if ~isfield(HDR,'T0'),                         HDR.T0 = clock; end
+if ~isfield(HDR,'SPR'),                        HDR.SPR = size(x,2); end
+if  isfield(HDR,'label'),                      HDR.Label = HDR.label; HDR = rmfield(HDR, 'label'); end
 if HDR.SPR > 1000, HDR.SPR = round(srate); end
    
 % channel identification, max 80 char. per channel

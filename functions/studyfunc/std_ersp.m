@@ -175,8 +175,8 @@ end
                         'powbase'       'real'                  []          [];
                         'trialindices' { 'integer','cell' }     []          [];
                         'savetrials'    'string'      { 'on','off' }        'off';
-                        'plot'          'string'      { 'on','off' }        'off'; % not documented for debugging purpose
-                        'recompute'     'string'      { 'on','off' }        'off';
+'plot'        'string'      { 'on','off' }    'off';
+'recompute'   'string'      { 'on','off' }    'off';
                         'getparams'     'string'      { 'on','off' }        'off';
                         'savefile'      'string'      { 'on','off' }        'on';
                         'parallel'      'string'      { 'on','off' }        'off';

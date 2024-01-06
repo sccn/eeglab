@@ -99,7 +99,7 @@ nrej = []; com = '';
 if nargin < 1
    help pop_rejkurt;
    return;
-end;  
+end
 if nargin < 2
    icacomp = 1;
 end
@@ -110,12 +110,12 @@ if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
-    	switch ButtonName,
+    	switch ButtonName
         	case 'NO', disp('Operation cancelled'); return;   
-        	case 'YES', [ EEG com ] = pop_runica(EEG);
+        	case 'YES', [ EEG, com ] = pop_runica(EEG);
     	end % switch
 	end
-end;	
+end
 
 if nargin < 3
     
@@ -137,7 +137,7 @@ if nargin < 3
     g1  = [1 0.1 0.75];
     g2 = [1 0.26 0.9];
     g3 = [1 0.22 0.85];
-    geometry = {g1 g1 g1 g2 [1] g3 g3};
+    geometry = {g1 g1 g1 g2 1 g3 g3};
     
     uilist = {...
         { 'Style', 'text', 'string', promptstr{1}} {} { 'Style','edit'      , 'string' ,inistr{1} 'tag' 'cpnum'}...
@@ -182,7 +182,7 @@ end
 
 if isempty(elecrange)
 	error('No electrode selectionned');
-end;	
+end
 
 % compute the joint probability
 % -----------------------------
@@ -190,43 +190,45 @@ if icacomp == 1
 	fprintf('Computing kurtosis for channels...\n');
     tmpdata = eeg_getdatact(EEG);
     if isempty(EEG.stats.kurtE )
-		[ EEG.stats.kurtE rejE ] = rejkurt( tmpdata, locthresh, EEG.stats.kurtE, 1); 
+		[ EEG.stats.kurtE, rejE ] = rejkurt( tmpdata, locthresh, EEG.stats.kurtE, 1); 
 	end
-	[ tmp rejEtmp ] = rejkurt( tmpdata(elecrange, :,:), locthresh, EEG.stats.kurtE(elecrange, :), 1); 
+	[ tmp, rejEtmp ] = rejkurt( tmpdata(elecrange, :,:), locthresh, EEG.stats.kurtE(elecrange, :), 1); 
     rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
 	
 	fprintf('Computing all-channel kurtosis...\n');
 	tmpdata2 = permute(tmpdata, [3 1 2]);
 	tmpdata2 = reshape(tmpdata2, size(tmpdata2,1), size(tmpdata2,2)*size(tmpdata2,3));
-	[ EEG.stats.kurt rej ] = rejkurt( tmpdata2, globthresh, EEG.stats.kurt, 1); 
+	[ EEG.stats.kurt, rej ] = rejkurt( tmpdata2, globthresh, EEG.stats.kurt, 1); 
 else
 	fprintf('Computing joint probability for components...\n');
     % test if ICA was computed
     % ------------------------
     icaacttmp = eeg_getica(EEG);
     if isempty(EEG.stats.icakurtE )
-		[ EEG.stats.icakurtE rejE ] = rejkurt( icaacttmp, locthresh, EEG.stats.icakurtE, 1); 
+		[ EEG.stats.icakurtE, rejE ] = rejkurt( icaacttmp, locthresh, EEG.stats.icakurtE, 1); 
 	end
-	[ tmp rejEtmp ] = rejkurt( icaacttmp(elecrange, :,:), locthresh, EEG.stats.icakurtE(elecrange, :), 1); 
+	[ tmp, rejEtmp ] = rejkurt( icaacttmp(elecrange, :,:), locthresh, EEG.stats.icakurtE(elecrange, :), 1); 
 	rejE    = zeros(size(icaacttmp,1), size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
 	
 	fprintf('Computing global joint probability...\n');
 	tmpdata = permute(icaacttmp, [3 1 2]);
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
-	[ EEG.stats.icakurt rej] = rejkurt( tmpdata, globthresh, EEG.stats.icakurt, 1); 
+	[ EEG.stats.icakurt, rej] = rejkurt( tmpdata, globthresh, EEG.stats.icakurt, 1); 
 end
 rej = rej' | max(rejE, [], 1);
 fprintf('%d/%d trials marked for rejection\n', sum(rej), EEG.trials);
 
 if calldisp
-	if vistype == 1 % EEGPLOT -------------------------
-	    if icacomp == 1 macrorej  = 'EEG.reject.rejkurt';
-	        			macrorejE = 'EEG.reject.rejkurtE';
-	    else			macrorej  = 'EEG.reject.icarejkurt';
-	        			macrorejE = 'EEG.reject.icarejkurtE';
-	    end
+    if vistype == 1
+        if icacomp == 1
+            macrorej = 'EEG.reject.rejkurt';
+            macrorejE = 'EEG.reject.rejkurtE';
+        else
+            macrorej  = 'EEG.reject.icarejkurt';
+            macrorejE = 'EEG.reject.icarejkurtE';
+        end
 		
 		colrej = EEG.reject.rejkurtcol;
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
@@ -237,7 +239,7 @@ if calldisp
 	    else
 	        eegplot( icaacttmp(elecrange,:,:), 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
-	    end;	
+        end
     else % REJECTRIALS -------------------------
 	  	if icacomp	== 1 
 			[ rej, rejE, n, locthresh, globthresh] = ... 

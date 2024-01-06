@@ -36,8 +36,7 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 function eeglab_error
-
-    % handling errors
+% handling errors
     % ----------------
     tmplasterr = lasterr;
     [iseeglaberror tmplasterr header] = testeeglaberror(tmplasterr);

@@ -35,14 +35,14 @@
 % THE POSSIBILITY OF SUCH DAMAGE.
 
 
-function varargout = uiputfile2(varargin);
+function varargout = uiputfile2(varargin)
 mlock
 persistent tmp_fld
 
 if nargin < 1
     help uiputfile2;
     return;
-end;
+end
 
 % remember old folder
 %% search for the (mat) file which contains the latest used directory
@@ -56,11 +56,12 @@ try
         end
         cd(tmp_fld);
     end
+catch
 end
 
 %% Show the open dialog and save the latest directory to the file
 % ---------------------------------------------------------------
-[varargout{1} varargout{2}] = uiputfile(varargin{:});
+[varargout{1}, varargout{2}] = uiputfile(varargin{:});
 try
     if option_rememberfolder
         if ischar(varargout{1})
@@ -69,6 +70,7 @@ try
             setpref('eeglab','lastdir',tmp_fld);
         end
     end
+catch
 end
 cd(olddir)
 

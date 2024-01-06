@@ -96,8 +96,10 @@ if nargin < 3
         promptstr = { 'Dataset indices to subtract (Ex: ''1 2''-> 1-2)' promptstr{:} };
         inistr    = { '2 1' inistr{:} };
     end
-    result = inputdlg2( promptstr, 'Plot component and ERP envelopes -- pop_envtopo()', 1, inistr, 'pop_envtopo');
-    if length(result) == 0 return; end
+    result = inputdlg2(promptstr, 'Plot component and ERP envelopes -- pop_envtopo()', 1, inistr, 'pop_envtopo');
+    if isempty(result)
+        return;
+    end
 
     if length(EEG) > 1
         subindices = eval( [ '[' result{1} ']' ] );

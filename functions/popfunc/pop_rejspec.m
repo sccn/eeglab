@@ -158,8 +158,10 @@ if nargin < 3
     
     result = inputgui( geometry,uilist,'pophelp(''pop_rejspec'');', 'Reject by data spectra -- pop_rejspec()');
  
-    size_result  = size( result );
-    if size_result(1) == 0 return; end
+size_result = size(result);
+if size_result(1) == 0
+    return;
+end
     options = {};
     options = { options{:} 'elecrange' eval( [ '[' result{1} ']' ]  ) };
     options = { options{:} 'method'   lower(methodlist{result{2}})};

@@ -231,8 +231,10 @@ for curfield = tmpfields'
                           g.fields = fieldnames(g.event);
                           latencypresent = ~isempty(strmatch('latency', g.fields));
                       end
-                      tmparray = load_file_or_array( g.event, g.skipline, g.delim );
-                      if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(event); end
+tmparray = load_file_or_array(g.event, g.skipline, g.delim);
+if isempty(g.indices)
+    g.indices = [1:size(tmparray,1)] + length(event);
+end
                       if length(g.indices) ~= size(tmparray,1)
                           error('Set error: number of row in file does not match the number of event given as input'); 
                       end

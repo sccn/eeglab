@@ -315,7 +315,10 @@ if exist('wtsin') % specify WeightsInfile from 'weightsin' flag, arg
        fprintf('binica(): weightsin file|variable not found.\n');
        return
      end 
-    try, eval(['!ls -l ' weightsinfile]); catch, end
+    try
+        eval(['!ls -l ' weightsinfile]); 
+    catch
+    end
     fprintf(fid,'%s %s\n','WeightsInFile',weightsinfile);
 end
 fclose(fid);
@@ -361,9 +364,15 @@ if isempty(sph)
    return
 end
 fprintf('\nbinary ica files left in pwd:\n');
-try, eval(['!ls -l ' scriptfile ' ' weightsfile ' ' spherefile]); catch, end
+try
+    eval(['!ls -l ' scriptfile ' ' weightsfile ' ' spherefile]); 
+catch
+end
 if exist('wtsin')
-   try, eval(['!ls -l ' weightsinfile]); catch end
+   try
+       eval(['!ls -l ' weightsinfile]); 
+   catch 
+   end
 end
 fprintf('\n');
 
@@ -378,7 +387,10 @@ end
 % NOTE: doesn't remove the .sc .wts and .fdt files
 
 if ~isempty(tmpdata)
-    try, delete(datafile); catch, end
+    try
+        delete(datafile); 
+    catch
+    end
 end
 
 %

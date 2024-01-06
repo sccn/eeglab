@@ -128,8 +128,8 @@ if isempty(timevect), timevect = [1 2]; end
 % check inputs
 % ------------
 g = finputcheck(varargin, { 'freqs'    'real'   [0 Inf]    [2.5 50 50];
-                            'times'    'real'   []         [100 5]; % see function at the end
-                            'mode'     'string' { 'phase','amp' }  'amp'; 
+'times',    'real',   [],         [100 5];
+'mode',     'string', { 'phase', 'amp' }, 'amp';
                             'vert'     'real'   []         [];
                             'align'    { 'real','cell' }   []         []; 
                             'plotvals' 'cell'   []         {}; 

@@ -88,8 +88,8 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin )
     
     [g, cfgparams] = finputcheck( varargin, { 'naccu'      ''          []             [];
                                              'method'     'string'    { }            'param';
-                                             'mode'       'string'    { }            ''; % deprecated (old method)
-                                             'chanlocs'   'struct'    { }            struct([]);
+                                             'chanlocs'   'struct'    { }    struct([]);
+                                             'mode'       'string'    { }    '';
                                              'chandim'    'integer'   []             0;
                                              'alpha'      'real'      []             NaN;
                                              'neighbours' 'struct'    { }            struct([]);

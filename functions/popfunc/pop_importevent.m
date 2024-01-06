@@ -128,11 +128,11 @@ com ='';
 if nargin < 1
    help pop_importevent;
    return;
-end;	
+end
 
 if isempty(EEG.data)
    disp('pop_importevent(): error: cannot process empty dataset'); return;
-end;    
+end
 
 I = [];
 
@@ -183,14 +183,14 @@ if nargin<2
 					  { 'Style', 'checkbox', 'value' 1 } { },...
                };
         results = inputgui( geometry, uilist, 'pophelp(''pop_importevent'');', 'Import event info -- pop_importevent()' );
-        if length(results) == 0, return; end
+        if isempty(results), return; end
 
 	    % decode top inputs
 	    % -----------------
 	    args = {};
 	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end
 	    if results{2} == 0 && ~isempty(EEG.event), args = { args{:}, 'append', 'no' }; end
-	    if ~isempty( results{3} ), 
+	    if ~isempty( results{3} )
             if ischar( results{3} ) && ~exist(results{3})
                 args = { args{:}, 'event', evalin('base', results{3}) }; 
             else
@@ -219,13 +219,16 @@ else % no interactive inputs
     % files are transformed into string of string
     % (this is useful to build the string command for the function)
     % --------------------------------------------------------------
-    for index=1:2:length(args)
-        if iscell(args{index+1}), if iscell(args{index+1}{1}) args{index+1} = args{index+1}{1}; end; end; % double nested 
+    for index = 1:2:length(args)
+        if iscell(args{index+1})
+            if iscell(args{index+1}{1})
+                args{index+1} = args{index+1}{1};
+            end
+        end
         if ischar(args{index+1}) && length(args{index+1}) > 2 && args{index+1}(1) == '''' && args{index+1}(end) == ''''             
-            args{index+1} = args{index+1}(2:end-1); end
-        %else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end
-        %end
-    end;                
+            args{index+1} = args{index+1}(2:end-1); 
+        end
+    end         
 end
 
 EEG.event = importevent( [], EEG.event, EEG.srate, args{:});

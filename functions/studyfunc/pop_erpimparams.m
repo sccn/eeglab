@@ -98,7 +98,11 @@ if isempty(varargin)
     if ~isequal(res.timerange ,  STUDY.etc.erpimparams.timerange),   options = { options{:} 'timerange'   res.timerange   }; end
     if ~isequal(res.colorlimits, STUDY.etc.erpimparams.colorlimits), options = { options{:} 'colorlimits' res.colorlimits }; end
     if isfield(res, 'multiplechan') 
-        if res.multiplechan == 1 res.multiplechan = 'off'; else res.multiplechan = 'on'; end
+        if res.multiplechan == 1
+            res.multiplechan = 'off';
+        else
+            res.multiplechan = 'on';
+        end
         if ~isequal(res.multiplechan, STUDY.etc.erpimparams.averagechan), options = { options{:} 'averagechan' res.multiplechan }; end
     end
     

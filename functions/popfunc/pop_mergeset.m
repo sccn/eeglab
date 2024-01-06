@@ -74,8 +74,9 @@ if nargin == 1
         { 'style' 'text' 'string' 'Preserve ICA weights of the first dataset ?' } ...
         { 'style' 'checkbox' 'string' '' } };
     res = inputgui( 'uilist', uilist, 'geometry', { [3 1] [3 1] }, 'helpcom', 'pophelp(''pop_mergeset'')');
-
-    if isempty(res) return; end
+if isempty(res)
+    return;
+end
 
     INEEG2  = eval( [ '[' res{1} ']' ] );
     keepall = res{2};

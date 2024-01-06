@@ -106,8 +106,8 @@ allerpimage = [];
     'sortfield'      ''           {}                    'latency';
     'concatenate'   'string'      { 'on'  }             'on';
     'trialinfo'     'struct'      []                    struct([]);
-    'savetrials'    'string'      { 'on','off' }        'on'; % obsolete (never used)
-    'erpimageopt'   'cell'        {}                    {}}, ...
+'savetrials',    'string',   { 'on', 'off' },   'on';
+'erpimageopt',   'cell',     {},                {}}, ...
     'std_erpimage', 'ignore');
 if ischar(opt), error(opt); end
 if length(EEG) == 1 && isempty(opt.trialindices), opt.trialindices = { [1:EEG.trials] }; end

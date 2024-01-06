@@ -250,8 +250,12 @@ else % no interactive inputs
     % (this is useful to build the string command for the function)
     % --------------------------------------------------------------
     for index=1:2:length(args)
-        if iscell(args{index+1}), args{index+1} = { args{index+1} }; end; % double nested 
-        if ischar(args{index+1})   args{index+1} = args{index+1}; % string 
+if iscell(args{index+1})
+    args{index+1} = {args{index+1}};
+end
+if ischar(args{index+1})
+    args{index+1} = args{index+1};
+end
         end
     end;                
 end

@@ -63,8 +63,8 @@ end
     'baseline'      'real'      []          0;
     'commonbase'    'string'    {'on','off'} 'off';
     'singletrials'  'string'    {'on','off'} 'on';
-    'trialbase'     'string'    {'on','off','full'} 'off'; % 'on' skip the baseline
-    'verbose'       'string'    {'on','off'} 'on';
+'trialbase',     'string',    {'on', 'off', 'full'}, 'off';
+'verbose',       'string',    {'on', 'off'}, 'on';
     }, 'newtimefbaseln', 'ignore');
 if ischar(g) error(g); return; end
 PP = PPori; if ~iscell(PP), PP = { PP }; end

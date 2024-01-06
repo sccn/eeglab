@@ -115,6 +115,10 @@ if ischar(g), error(g); end
 if isempty(STUDY.filename) && isempty(g.filename)
     error('File name required to save the study');
 end
+if isempty(g.filepath) 
+    [g.filepath, g.filename, ext] = fileparts(g.filename);
+    g.filename = [ g.filename ext ];
+end
 
 % resave datasets
 % ---------------

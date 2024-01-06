@@ -100,8 +100,8 @@ end
 
 opt = finputcheck( varargin, { 'titles'         'cell'   []              cellfun(@num2str, cell(20,20), 'uniformoutput', false);
                                'caxis'          'real'   []              [];
-                               'ersplim'        'real'   []              []; % same as above
-                               'itclim'         'real'   []              []; % same as above
+'ersplim',        'real',   [],   [];
+'itclim',         'real',   [],   [];
                                'ylim'           'real'   []              [];
                                'tftopoopt'      'cell'   []              {};
                                'threshold'      'real'   []              NaN;

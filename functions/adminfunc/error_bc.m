@@ -1,2 +1,2 @@
-function res = error_bc
+function res = error_bc()
 res = false;

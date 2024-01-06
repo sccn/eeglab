@@ -153,8 +153,8 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
     'trialinfo'        'struct'   {}                 struct([]);
     'designvar'        'struct'   []                 struct([]);
     'singletrials'     'string'   { 'on','off' }  'off';
-    'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
-    'channels'         'cell'     []    {};
+'concatenate'  'string'  { 'on', 'off' }  'off'
+'channels'     'cell'    []               {}
     'cache'            'struct'   []    struct([]);
     'function'         { 'function_handle' 'integer' } []  [];
     'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef' 'topo'} 'erp';

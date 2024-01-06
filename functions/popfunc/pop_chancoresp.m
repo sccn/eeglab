@@ -57,8 +57,8 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     
     if nargin < 2
         help pop_chancoresp;
-        return;
-    end
+return;
+end
     chanlistout1 = [];
     chanlistout2 = [];
     

@@ -268,8 +268,10 @@ if nargin < 2 || selectamica
     % ---
     result       = inputgui( 'geometry', geometry, 'geomvert', geomvert, 'uilist', promptstr, ...
                              'helpcom', 'pophelp(''pop_runica'')', ...
-                             'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes allalgs } );
-    if length(result) == 0 return; end      
+'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes allalgs } );
+if length(result) == 0
+    return;
+end
     options = { 'icatype' allalgs(result{1}).name 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) 'reorder' fastif(result{3}, 'on', 'off') };
     if ~isempty(result{4})
         if ~isempty(str2num(result{4})), options = { options{:} 'chanind' str2num(result{4}) };

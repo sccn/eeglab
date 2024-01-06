@@ -142,8 +142,10 @@ if nargin < 3
     
     figname = fastif(~icacomp, 'Trend rejection in component(s) -- pop_rejtrend()','Data trend rejection -- pop_rejtrend()');
     result = inputgui( geometry,uilist,'pophelp(''pop_rejtrend'');', figname);
-    size_result  = size( result );
-    if size_result(1) == 0 return; end
+size_result = size(result);
+if size_result(1) == 0
+    return;
+end
     elecrange    = result{1};
     winsize      = result{2};
     minslope     = result{3};

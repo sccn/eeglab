@@ -220,10 +220,10 @@ defaultmesh = 'standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       { 'string','cell' }  { {} {} }      {};
                             'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5' 'realignfiducial'} 'traditional';
-                            'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
-                            'chaninfo2'  'struct' {}     struct('no', {}); 
+                            'chaninfo1'  'struct' {}    struct('no', {});
+                            'chaninfo2'  'struct' {}    struct('no', {}); 
                             'transform'  'real'   []      [];
-                            'manual'     'string' { 'on','off','show' } 'on'; % -> pop up window
+                            'manual'     'string' { 'on','off','show' } 'on';
                             'showlabels1'  'string' { 'on','off' } 'off';
                             'showlabels2'  'string' { 'on','off' } 'off';
                             'title'        'string' { } '';
@@ -842,7 +842,8 @@ function s = plotnose(transf, col)
         col = [1 0.75 0.65 ];
     end
         
-    x=[ % cube
+    % cube
+    x=[ 
      NaN -1 1 NaN
       -1 -1 1 1
       -1 -1 1 1
@@ -851,7 +852,7 @@ function s = plotnose(transf, col)
      NaN NaN NaN NaN
      ];
     
-    y=[ % cube
+    y=[ 
      NaN -1 -1   NaN
       -1 -1 -1   -1
        1  1  1    1
@@ -860,7 +861,7 @@ function s = plotnose(transf, col)
      NaN NaN NaN NaN
      ];
     
-    z=[ % cube
+    z=[ 
      NaN 0 0 NaN
        0 1 1 0
        0 1 1 0
@@ -869,7 +870,8 @@ function s = plotnose(transf, col)
      NaN NaN NaN NaN
      ];
 
-    x=[ % noze
+    % noze
+    x=[ 
      NaN -1  1 NaN
       -1  0  0 1
      -.3  0  0 .3
@@ -878,7 +880,7 @@ function s = plotnose(transf, col)
      NaN NaN NaN NaN
      ];
     
-    y=[ % noze
+    y=[ 
      NaN -1 -1   NaN
       -1 -1 -1   -1
        1 -1 -1    1
@@ -887,7 +889,7 @@ function s = plotnose(transf, col)
      NaN NaN NaN NaN
      ];
     
-    z=[ % noze
+    z=[ 
      NaN 0 0 NaN
        0 1 1 0
        0 1 1 0

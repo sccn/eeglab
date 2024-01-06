@@ -59,8 +59,10 @@ if nargin < 1
     % ask user
     [filename, filepath] = uigetfile('*.RAW;*.raw', ...
         'Choose an EGI RAW file -- pop_readegi()');
-    drawnow;
-    if filename == 0 return; end
+drawnow;
+if filename == 0
+    return;
+end
     filename = [filepath filename];
     
     fid = fopen(filename, 'rb', 'b');

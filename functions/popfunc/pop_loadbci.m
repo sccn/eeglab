@@ -49,8 +49,10 @@ function [EEG, command] = pop_loadbci(filename, srate);
     if nargin < 1
         % ask user
         [filename, filepath] = uigetfile('*.*', 'Choose a BCI file -- pop_loadbci'); 
-        drawnow;
-        if filename == 0 return; end
+drawnow;
+if filename == 0 
+    return;
+end
         filename = [filepath filename];
         promptstr    = { 'Sampling rate' };
         inistr       = { '256' };

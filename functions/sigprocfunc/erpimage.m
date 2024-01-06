@@ -505,7 +505,7 @@ if length(times) ~= frames
     return
 end
 
-if decfactor == 0,
+if decfactor == 0
     decfactor = DEFAULT_DECFACTOR;
 elseif decfactor > ntrials
     fprintf('Setting variable decfactor to max %d.\n',ntrials)
@@ -538,7 +538,7 @@ if nargin > 6
         elseif timestretchflag == YES % Added -JH
             timeStretchMarks = Arg{1};
             timeStretchMarks = round(1+(timeStretchMarks-times(1))*srate/1000); % convert from ms to frames -sm
-            [smc smr] = find(diff(timeStretchMarks') < 0);
+            [smc, smr] = find(diff(timeStretchMarks') < 0);
             if ~isempty(smr)
                 fprintf('\nerpimage(): Timewarp event latencies not in ascending order in trial %d.\n',smr)
                 return
@@ -586,7 +586,7 @@ if nargin > 6
             end
             Coherflag = NO;
             Erpflag = YES;  % plot amp, coher below erp time series
-        elseif Topoflag == YES;
+        elseif Topoflag == YES
             if length(Arg) < 2
                 help erpimage
                 fprintf('\nerpimage(): topo arg must be a list of length 2 or 3.\n');
@@ -598,7 +598,7 @@ if nargin > 6
             else                eloc_info = [];
             end
             Topoflag = NO;
-        elseif Specflag == YES;
+        elseif Specflag == YES
             if length(Arg) ~= 2 
                 error('\nerpimage(): ''spec'' flag argument must be a numeric array of length 2.\n');
                 return
@@ -606,7 +606,7 @@ if nargin > 6
             lospecHz = Arg(1);
             hispecHz = Arg(2);
             Specflag = NO;
-        elseif SpecAxisflag == YES;
+        elseif SpecAxisflag == YES
             SpecAxis = Arg;
             if ~strcmpi(SpecAxis,'lin') && ~strcmpi(SpecAxis,'log')
               error('\nerpimage(): spectrum axis type must be ''lin'' or ''log''.\n');
@@ -694,7 +694,7 @@ if nargin > 6
         elseif Cycleflag == YES
             cycles = Arg;
             Cycleflag = NO;
-        elseif Auxvarflag == YES;
+        elseif Auxvarflag == YES
             if isa(Arg,'cell')==YES && length(Arg)==2
                 auxvar = Arg{1};
                 auxcolors = Arg{2};
@@ -851,7 +851,7 @@ if nargin > 6
             % -----------------------------------------------------------------------
             % -----------------------------------------------------------------------
         elseif strcmpi(Arg,'avg_type')
-            if a < nargin,
+            if a < nargin
                 a=a+1;
                 Arg = eval(['arg' int2str(a-6)]);
                 if strcmpi(Arg, 'Gaussian'), mvavg_type='gaussian';
@@ -863,35 +863,42 @@ if nargin > 6
             end
         elseif strcmp(Arg,'nosort')
             Nosort = YES;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     Nosort = YES; a = a+1;
-                elseif strcmpi(Arg, 'off') Nosort = NO;  a = a+1;
+                if strcmpi(Arg, 'on')
+                    Nosort = YES;
+                    a = a + 1;
+                elseif strcmpi(Arg, 'off')
+                    Nosort = NO;
+                    a = a + 1;
                 end
             end
         elseif strcmp(Arg,'showwin')
             Showwin = YES;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     Showwin = YES; a = a+1;
-                elseif strcmpi(Arg, 'off') Showwin = NO;  a = a+1;
+                if strcmpi(Arg, 'on') 
+                    Showwin = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') 
+                    Showwin = NO;  a = a+1;
                 end
             end
         elseif strcmp(Arg,'noplot') % elseif strcmp(Arg,'NoShow') % by Luca && Ramon
             NoShow = YES;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
                 if strcmpi(Arg, 'on'),     NoShow = YES; a = a+1;
                 elseif strcmpi(Arg, 'off'), NoShow = NO;  a = a+1;
                 end
             end
         elseif strcmpi(Arg,'replace_ties')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 temp = eval(['arg' int2str(a-6)]);
-                if strcmpi(temp,'on'),
+                if strcmpi(temp,'on')
                     replace_ties = YES;
-                elseif strcmpi(temp,'off') replace_ties = NO;
+                elseif strcmpi(temp,'off') 
+                    replace_ties = NO;
                 else
                     error('\nerpimage(): Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
                 end
@@ -899,7 +906,7 @@ if nargin > 6
                 error('\nerpimage(): Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
             end
         elseif strcmpi(Arg,'sortvar_limits')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 sortvar_limits = eval(['arg' int2str(a-6)]);
                 if ischar(sortvar_limits) || length(sortvar_limits)~=2
@@ -911,54 +918,64 @@ if nargin > 6
         elseif strcmpi(Arg,'erp')
             Erpflag = YES;
             erp_ptiles=1;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     Erpflag = YES; erp_ptiles=1; a = a+1;
-                elseif strcmpi(Arg, 'off') Erpflag = NO;  a = a+1;
-                elseif strcmpi(Arg,'1') || (Arg(1)==1) Erplag = YES; erp_ptiles=1; a=a+1;
-                elseif strcmpi(Arg,'2') || (Arg(1)==2) Erplag = YES; erp_ptiles=2; a=a+1;
-                elseif strcmpi(Arg,'3') || (Arg(1)==3) Erplag = YES; erp_ptiles=3; a=a+1;
-                elseif strcmpi(Arg,'4') || (Arg(1)==4) Erplag = YES; erp_ptiles=4; a=a+1;
+                if strcmpi(Arg, 'on'),      Erpflag = YES; erp_ptiles=1; a = a+1;
+                elseif strcmpi(Arg, 'off'), Erpflag = NO;  a = a+1;
+                elseif strcmpi(Arg,'1') || (Arg(1)==1), Erplag = YES; erp_ptiles=1; a=a+1;
+                elseif strcmpi(Arg,'2') || (Arg(1)==2), Erplag = YES; erp_ptiles=2; a=a+1;
+                elseif strcmpi(Arg,'3') || (Arg(1)==3), Erplag = YES; erp_ptiles=3; a=a+1;
+                elseif strcmpi(Arg,'4') || (Arg(1)==4), Erplag = YES; erp_ptiles=4; a=a+1;
                 end
             end
         elseif strcmpi(Arg,'rmerp')
             Rmerp = 'yes';
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     Rmerp = 'yes'; a = a+1;
-                elseif strcmpi(Arg, 'off') Rmerp = 'no';  a = a+1;
+                if strcmpi(Arg, 'on')   
+                    Rmerp = 'yes'; a = a+1;
+                elseif strcmpi(Arg, 'off') 
+                    Rmerp = 'no';  a = a+1;
                 end
             end
         elseif strcmp(Arg,'cbar') || strcmp(Arg,'colorbar')
             Colorbar = YES;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     Colorbar = YES; a = a+1;
-                elseif strcmpi(Arg, 'off') Colorbar = NO;  a = a+1;
+                if strcmpi(Arg, 'on')   
+                    Colorbar = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') 
+                    Colorbar = NO;  a = a+1;
                 end
             end
         elseif (strcmp(Arg,'allamps') || strcmp(Arg,'plotamps'))
             Allampsflag = YES;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     Allampsflag = YES; a = a+1;
-                elseif strcmpi(Arg, 'off') Allampsflag = NO;  a = a+1;
+                if strcmpi(Arg, 'on')
+                    Allampsflag = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') 
+                    Allampsflag = NO;  a = a+1;
                 end
             end
         elseif strcmpi(Arg,'erpstd')
             Erpstdflag = YES;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     Erpstdflag = YES; a = a+1;
-                elseif strcmpi(Arg, 'off') Erpstdflag = NO;  a = a+1;
+                if strcmpi(Arg, 'on')
+                    Erpstdflag = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') 
+                    Erpstdflag = NO;  a = a+1;
                 end
             end
         elseif strcmp(Arg,'noxlabel') || strcmp(Arg,'noxlabels') || strcmp(Arg,'nox')
             NoTimeflag = YES;
-            if a < nargin,
+            if a < nargin
                 Arg = eval(['arg' int2str(a+1-6)]);
-                if strcmpi(Arg, 'on'),     NoTimeflag = YES; a = a+1;
-                elseif strcmpi(Arg, 'off') NoTimeflag = NO;  a = a+1;
+                if strcmpi(Arg, 'on')
+                    NoTimeflag = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') 
+                    NoTimeflag = NO;  a = a+1;
                 end
             end
         elseif strcmp(Arg,'plotmode')
@@ -1010,14 +1027,14 @@ if nargin > 6
         elseif strcmpi(Arg,'erp_grid')
             erp_grid = YES;
         elseif strcmpi(Arg,'baseline')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 baseline = eval(['arg' int2str(a-6)]);
             else
                 error('\nerpimage(): Argument ''baseline'' needs to be followed by a two element vector.');
             end
         elseif strcmpi(Arg,'baselinedb')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 baselinedb = eval(['arg' int2str(a-6)]);
                 if length(baselinedb) > 2, error('''baselinedb'' need to be a 2 argument vector'); end
@@ -1025,35 +1042,35 @@ if nargin > 6
                 error('\nerpimage(): Argument ''baselinedb'' needs to be followed by a two element vector.');
             end
         elseif strcmpi(Arg,'filt')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 flt = eval(['arg' int2str(a-6)]);
             else
                 error('\nerpimage(): Argument ''filt'' needs to be followed by a two element vector.');
             end
         elseif strcmpi(Arg,'erp_vltg_ticks')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 erp_vltg_ticks=eval(['arg' int2str(a-6)]);
             else
                 error('\nerpimage(): Argument ''erp_vltg_ticks'' needs to be followed by a vector.');
             end
         elseif strcmpi(Arg,'img_trialax_label')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 img_ylab = eval(['arg' int2str(a-6)]);
             else
                 error('\nerpimage(): Argument ''img_trialax_label'' needs to be followed by a string.');
             end
         elseif strcmpi(Arg,'img_trialax_ticks')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 img_ytick_lab = eval(['arg' int2str(a-6)]);
             else
                 error('\nerpimage(): Argument ''img_trialax_ticks'' needs to be followed by a vector of values at which tick marks will appear.');
             end
         elseif strcmpi(Arg,'cbar_title')
-            if a < nargin,
+            if a < nargin
                 a = a+1;
                 cbar_title = eval(['arg' int2str(a-6)]);
             else

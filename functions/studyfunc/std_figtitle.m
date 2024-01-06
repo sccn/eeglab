@@ -97,9 +97,9 @@ opt = finputcheck( varargin, { 'chanlabels'  {'cell','string'}   []     {};
                                'datatype'    'string'            []     '';
                                'clustname'   'string'            []     '';
                                'compnames'   {'cell','string'}   []     {};
-                               'vals'        {'cell','real'}     []     {}; % just for titles
-                               'valsunit'    {'cell','string'}   []     {}; % just for titles
-                               'subject'     'string'            []              '' }, 'std_figtitle'); %, 'ignore');
+                               'vals'      {'cell','real'}     []     {};
+                               'valsunit'  {'cell','string'}   []     {};
+                               'subject'     'string'            []              '' }, 'std_figtitle'); 
 if ischar(opt), error(opt); end
 
 % convert

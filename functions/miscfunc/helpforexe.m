@@ -56,8 +56,10 @@ for index = 1:length(funct)
     
     fid = fopen( fullfile(fold, [ 'help_' funct{index} ]), 'w');
     for ind2 = 1:length(doc1)
-        if isempty(doc1{ind2}) fprintf(fid, [ 'disp('' '');\n' ]);
-        else                   fprintf(fid, [ 'disp(' vararg2str({ doc1{ind2} }) ');\n' ]);
+        if isempty(doc1{ind2})
+            fprintf(fid, 'disp('' '');\n');
+        else
+            fprintf(fid, [ 'disp(' vararg2str({ doc1{ind2} }) ');\n' ]);
         end
     end
     fclose(fid);

@@ -160,8 +160,8 @@ opt = finputcheck( options, ...
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  {}              'erp';
-                               'mode'        'string'  []              ''; % for backward compatibility (now used for statistics)
-                               'comps'       { 'string','integer' } [] []; % for backward compatibility
+'mode'  'string'  []  '';
+'comps'  { 'string', 'integer' }  []  [];
                                'statmode'    'string'  { 'subjects','common','trials' } 'subjects'; % ignored
                                'avgmode'     'string'  { 'mean','rms','median' } 'mean'; 
                                'plotmode'    'string'  { 'normal','condensed' }  'normal';

@@ -73,8 +73,10 @@ if nargin < 1
                            'Folder', 'File', 'File');
     if strcmpi(ButtonName, 'file')
         [filename, filepath] = uigetfile('*.*', 'Choose a file or header file -- pop_fileio()'); 
-        drawnow;
-        if filename(1) == 0 return; end
+drawnow;
+if filename(1) == 0
+    return;
+end
         filename = fullfile(filepath, filename);
     else
         filename = uigetdir('*.*', 'Choose a folder -- pop_fileio()'); 

@@ -412,8 +412,11 @@ for inddataset = 1:length(ALLEEG)
                             end
                         end
                         
-                        try, tmpevent = EEG.event; alllatencies = [ tmpevent.latency ];
-                        catch, error('Checkset: error empty latency entry for new events added by user');
+                        try
+                            tmpevent = EEG.event;
+                            alllatencies = [tmpevent.latency];
+                        catch
+                            error('Checkset: error empty latency entry for new events added by user');
                         end
                         I1 = find(alllatencies < 0.5);
                         I2 = find(alllatencies > EEG.pnts*EEG.trials+1); % The addition of 1 was included

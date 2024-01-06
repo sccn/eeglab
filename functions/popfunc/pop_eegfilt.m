@@ -130,8 +130,10 @@ if nargin < 2
          causal = 1;
     else causal = 0;
     end
-    plotfreqz = result{7};
-    if locutoff == 0 && hicutoff == 0 return; end
+plotfreqz = result{7};
+if locutoff == 0 && hicutoff == 0 
+    return;
+end
     if result{8}
         firtype = 'fir1';
     else

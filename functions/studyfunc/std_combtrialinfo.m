@@ -80,7 +80,9 @@ if ~isfield(datasetinfo, 'trialinfo')
 else
     % check if duration field is present
     for iDat = inds(:)'
-        if ~isfield(datasetinfo(iDat).trialinfo, 'duration') datasetinfo(iDat).trialinfo(1).duration = []; end
+        if ~isfield(datasetinfo(iDat).trialinfo, 'duration')
+            datasetinfo(iDat).trialinfo(1).duration = [];
+        end
     end
     try
         trialinfo = [ datasetinfo(inds(:)').trialinfo ];

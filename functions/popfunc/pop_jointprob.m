@@ -100,21 +100,21 @@ nrej = []; com = '';
 if nargin < 1
    help pop_jointprob;
    return;
-end;  
+end
 if nargin < 2
    icacomp = 1;
-end;  
+end
 
 if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
-    	switch ButtonName,
+    	switch ButtonName
         	case 'NO', disp('Operation cancelled'); return;   
         	case 'YES', [ EEG com ] = pop_runica(EEG);
     	end % switch
 	end
-end;	
+end
 if exist('reject') ~= 1
     reject = 1;
 end
@@ -195,43 +195,45 @@ if icacomp == 1
 	fprintf('Computing joint probability for channels...\n');
     tmpdata = eeg_getdatact(EEG);
     if isempty(EEG.stats.jpE)
-		[ EEG.stats.jpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.jpE, 1); 
+		[ EEG.stats.jpE, rejE ] = jointprob( tmpdata, locthresh, EEG.stats.jpE, 1); 
 	end
-	[ tmp rejEtmp ] = jointprob( tmpdata(elecrange,:,:), locthresh, EEG.stats.jpE(elecrange,:), 1); 
+	[ tmp, rejEtmp ] = jointprob( tmpdata(elecrange,:,:), locthresh, EEG.stats.jpE(elecrange,:), 1); 
     rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
 	
 	fprintf('Computing all-channel probability...\n');
 	tmpdata2 = permute(tmpdata, [3 1 2]);
 	tmpdata2 = reshape(tmpdata2, size(tmpdata2,1), size(tmpdata2,2)*size(tmpdata2,3));
-	[ EEG.stats.jp rej ] = jointprob( tmpdata2, globthresh, EEG.stats.jp, 1); 
+	[ EEG.stats.jp, rej ] = jointprob( tmpdata2, globthresh, EEG.stats.jp, 1); 
     clear tmpdata2;
 else
     tmpdata = eeg_getica(EEG);
 	fprintf('Computing joint probability for components...\n');
     if isempty(EEG.stats.icajpE)
-		[ EEG.stats.icajpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.icajpE, 1); 
+		[ EEG.stats.icajpE, rejE ] = jointprob( tmpdata, locthresh, EEG.stats.icajpE, 1); 
 	end
-	[ tmp rejEtmp ] = jointprob( tmpdata(elecrange,:), locthresh, EEG.stats.icajpE(elecrange,:), 1); 
+	[ tmp, rejEtmp ] = jointprob( tmpdata(elecrange,:), locthresh, EEG.stats.icajpE(elecrange,:), 1); 
     rejE    = zeros(size(tmpdata,1), size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
 
 	fprintf('Computing global joint probability...\n');
 	tmpdata2 = permute(tmpdata, [3 1 2]);
 	tmpdata2 = reshape(tmpdata2, size(tmpdata2,1), size(tmpdata2,2)*size(tmpdata2,3));
-	[ EEG.stats.icajp  rej] = jointprob( tmpdata2, globthresh, EEG.stats.icajp, 1); 
+	[ EEG.stats.icajp,  rej] = jointprob( tmpdata2, globthresh, EEG.stats.icajp, 1); 
 	clear tmpdata2;
 end
 rej = rej' | max(rejE, [], 1);
 fprintf('%d/%d trials marked for rejection\n', sum(rej), EEG.trials);
 
 if calldisp
-	if vistype == 1 % EEGPLOT -------------------------
-	    if icacomp == 1 macrorej  = 'EEG.reject.rejjp';
-	        			macrorejE = 'EEG.reject.rejjpE';
-	    else			macrorej  = 'EEG.reject.icarejjp';
-	        			macrorejE = 'EEG.reject.icarejjpE';
-	    end
+    if vistype == 1
+        if icacomp == 1
+            macrorej = 'EEG.reject.rejjp';
+            macrorejE = 'EEG.reject.rejjpE';
+        else
+            macrorej  = 'EEG.reject.icarejjp';
+            macrorejE = 'EEG.reject.icarejjpE';
+        end
 		colrej = EEG.reject.rejjpcol;
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
 
@@ -241,7 +243,7 @@ if calldisp
 	    else
 	        eegplot( tmpdata(elecrange,:,:), 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
-	    end;	
+        end
     else % REJECTRIALS -------------------------
 	  	if icacomp	== 1 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
@@ -251,9 +253,9 @@ if calldisp
 			[ rej, rejE, n, locthresh, globthresh] = ... 
 				rejstatepoch( tmpdata(elecrange,:,:), EEG.stats.icajpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.icajp, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off' );
-		end;		
+        end	
 		nrej = n;
-	end;	
+    end
 else
 	% compute rejection locally
 	rejtmp = max(rejE(elecrange,:),[],1);

@@ -63,8 +63,8 @@ if ~isempty(find(Prompt == 10))
     if indlines(end) ~= length(Prompt), indlines = [ indlines length(Prompt)+1 ]; end
     for index = 1:length(indlines)-1
         geometry{index} = [1];
-        listui{index} = { 'Style', 'text', 'string' Prompt(indlines(index)+1:indlines(index+1)-1) };
-    end
+listui{index} = {'Style', 'text', 'string', Prompt(indlines(index)+1:indlines(index+1)-1)};
+end
 else
     for index = 1:size(Prompt,1)
         geometry{index} = [1];

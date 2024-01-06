@@ -114,8 +114,8 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'unitx'         'string' { 'ms','hz','rmsms','rmshz','hzpsd','rmshzpsd' }   'ms';
                                'chanlocs'      'struct' []              struct('labels', {});
                                'plotsubjects'  'string' { 'on','off' }  'off';
-                               'condnames'     'cell'   []              {}; % just for legends
-                               'groupnames'    'cell'   []              {}; % just for legends
+'condnames'   'cell'   []   {};
+'groupnames'  'cell'   []   {};
                                'figtag'        'string' []              'tmp_curvetag';
                                'groupstats'    'cell'   []              {};
                                'condstats'     'cell'   []              {};

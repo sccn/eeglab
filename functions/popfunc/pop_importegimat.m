@@ -51,8 +51,10 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
     if nargin < 4, dataField = 'Session'; end
     if nargin < 1 
         % ask user
-        [filename, filepath] = uigetfile('*.mat', 'Choose a Matlab file from Netstation -- pop_importegimat()'); 
-        if filename == 0 return; end
+[filename, filepath] = uigetfile('*.mat', 'Choose a Matlab file from Netstation -- pop_importegimat()');
+if filename == 0
+    return;
+end
         filename = fullfile(filepath, filename);
         tmpdata = load('-mat', filename);
         fieldValues = fieldnames(tmpdata);

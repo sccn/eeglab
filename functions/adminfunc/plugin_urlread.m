@@ -30,7 +30,7 @@ if ~usejava('jvm')
 end
 
 if exist('OCTAVE_VERSION', 'builtin') == 0
-    import com.mathworks.mlwidgets.io.InterruptibleStreamCopier;
+    import('com.mathworks.mlwidgets.io.InterruptibleStreamCopier');
 
     % Be sure the proxy settings are set.
     com.mathworks.mlwidgets.html.HTMLPrefs.setProxySettings

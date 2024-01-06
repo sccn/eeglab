@@ -34,14 +34,14 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function varargout = uigetfile2(varargin);
+function varargout = uigetfile2(varargin)
 mlock
 persistent tmp_fld
 
 if nargin < 1
     help uigetfile2;
     return;
-end;
+end
 
 % remember old folder
 olddir = pwd;
@@ -53,11 +53,12 @@ try
         end
         cd(tmp_fld);
     end
+catch
 end
 
 %% Show the open dialog and save the latest directory to the file
 % ---------------------------------------------------------------
-[varargout{1} varargout{2}] = uigetfile(varargin{:});
+[varargout{1}, varargout{2}] = uigetfile(varargin{:});
 try
     if option_rememberfolder
         if ischar(varargout{1})
@@ -65,6 +66,7 @@ try
             setpref('eeglab','lastdir',tmp_fld);
         end
     end
+catch
 end
 cd(olddir)
 

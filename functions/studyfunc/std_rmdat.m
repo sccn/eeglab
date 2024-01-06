@@ -157,7 +157,9 @@ end
 % check event type present
 % --------------------------
 if ~isempty(g.checkeventtype)
-    if ischar(g.checkeventtype) g.checkeventtype = { g.checkeventtype }; end
+    if ischar(g.checkeventtype)
+        g.checkeventtype = { g.checkeventtype };
+    end
     rmDatEvents = zeros(1, length(ALLEEG));
     for iDat = 1:length(ALLEEG)
         if isfield(ALLEEG(iDat).event, 'type')

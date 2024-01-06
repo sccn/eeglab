@@ -499,8 +499,11 @@ EEGOUT = eeg_checkset(EEGOUT);
 if nargout > 1
     com = sprintf('EEG = pop_editset(EEG');
     for i=1:2:length(args)
-        if ~isempty( args{i+1} )
-            if ischar( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );
+if ~isempty(args{i+1})
+    if ischar(args{i+1})
+        com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}));
+    end
+end
             else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
             end
         else

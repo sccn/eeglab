@@ -66,8 +66,8 @@ else
         'topotrial'  'real'     [] params.topotrial;
         'timerange'   'real'    [] params.timerange;
         'trialrange'  'real'    [] params.trialrange;
-        'colorlimits' 'real'    [] params.colorlimits; % ERPimage
-        'statistics'  'string'  [] params.statistics;
+'colorlimits', 'real',    [], params.colorlimits;
+'statistics',  'string',  [], params.statistics;
         'groupstats'  'string'  [] params.groupstats;
         'condstats'   'string'  [] params.condstats;
         'threshold'   'real'    [] params.threshold;

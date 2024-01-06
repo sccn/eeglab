@@ -158,8 +158,8 @@ else
     % Match Children handles based on titles provided
     c = 0;
     for i = 1: nplots
-        htemp          = findall(g.handles,'String', g.figtitles{i});
-        if all([~isempty(htemp) ~isempty(g.data(i))])
+        htemp = findall(g.handles, 'String', g.figtitles{i});
+        if all([~isempty(htemp), ~isempty(g.data(i))])
             handlestemp{i} = htemp(1);
             % Getting x label from handles
             if isempty(xlabelval)

@@ -125,8 +125,8 @@ end
 [opt moreopts] = finputcheck(varargin, { 'components' 'integer' []             [];
                                          'channels'   { 'cell','integer' }  { [] [] }     {}
                                          'recompute'  'string'  { 'on','off' } 'off';
-                                         'winsize'    'integer' []             3; % 3 seconds
-                                         'rmcomps'    'integer' []             [];
+'winsize'    'integer'  []  3;
+'rmcomps'    'integer'  []  [];
                                          'interp'     'struct'  { }            struct([]);
                                          'overlap'    'integer' []             0;  
                                          'plot'       'string'  { 'off','on' } 'off';

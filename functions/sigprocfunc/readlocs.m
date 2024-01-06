@@ -458,7 +458,9 @@ if ischar(filename)
        theta  = atan2d([layout{:,2}], [layout{:,3}]);
        for iChan = 1:length(radius)
            eloc(iChan).labels = layout{iChan,1};
-           if isnumeric(eloc(iChan).labels) eloc(iChan).labels = num2str(eloc(iChan).labels); end
+           if isnumeric(eloc(iChan).labels) 
+               eloc(iChan).labels = num2str(eloc(iChan).labels); 
+           end
            eloc(iChan).theta  = theta(iChan);
            eloc(iChan).radius = radius(iChan);
        end
@@ -481,8 +483,12 @@ if ischar(filename)
        elocTmp = readtable(filename, 'filetype', 'text');
        for iChan = 1:size(elocTmp,1)
            eloc(iChan).labels = elocTmp{iChan,1};
-           if isnumeric(eloc(iChan).labels) eloc(iChan).labels = num2str(eloc(iChan).labels); end
-           if iscell(   eloc(iChan).labels) eloc(iChan).labels = eloc(iChan).labels{1}; end
+           if isnumeric(eloc(iChan).labels) 
+               eloc(iChan).labels = num2str(eloc(iChan).labels); 
+           end
+           if iscell(   eloc(iChan).labels) 
+               eloc(iChan).labels = eloc(iChan).labels{1}; 
+           end
            eloc(iChan).sph_theta_besa = elocTmp{iChan,2};
            eloc(iChan).sph_phi_besa  = elocTmp{iChan,3};
        end
@@ -723,15 +729,15 @@ end
 fidnames = { 'nz' 'lpa' 'rpa' 'nasion' 'left' 'right' 'nazion' 'fidnz' 'fidt9' 'fidt10' 'cms' 'drl' 'nas' 'lht' 'rht' 'lhj' 'rhj' };
 for index = 1:length(fidnames)
     ind = strmatch(fidnames{index}, lower(labels), 'exact');
-    if ~isempty(ind), for iInd = 1:length(ind) eloc(ind(iInd)).type = 'FID'; end; end
+    if ~isempty(ind), for iInd = 1:length(ind), eloc(ind(iInd)).type = 'FID'; end; end
 end
 
 return;
 
 % interpret the variable name
 % ---------------------------
-function array = load_file_or_array( varname, skiplines );
-	 if isempty(skiplines),
+function array = load_file_or_array( varname, skiplines )
+	 if isempty(skiplines)
        skiplines = 0;
     end
     if exist( varname ) == 2
@@ -741,8 +747,8 @@ function array = load_file_or_array( varname, skiplines );
          try, array = evalin('base', varname);
 	     catch, error('readlocs(): cannot find the named file or variable, check syntax');
 		 end
-    end;     
-return;
+    end
+return
 
 % check field format
 % ------------------

@@ -102,8 +102,10 @@ function [STUDY, com] = pop_statparams(STUDY, varargin);
 
 com = '';
 if isfield(STUDY, 'etc')
-    if ~isfield(STUDY.etc, 'statistics') STUDY.etc.statistics = default_stats([]);
-    else                                 STUDY.etc.statistics = default_stats(STUDY.etc.statistics);
+    if ~isfield(STUDY.etc, 'statistics') 
+        STUDY.etc.statistics = default_stats([]);
+    else                                 
+        STUDY.etc.statistics = default_stats(STUDY.etc.statistics);
     end
     if length(varargin) == 1 && strcmpi(varargin{1}, 'default')
         return;
@@ -344,8 +346,9 @@ else
     end
     
     if isfield(STUDY, 'etc')
-         STUDY.etc.statistics = paramstruct; 
-    else STUDY = paramstruct;
+        STUDY.etc.statistics = paramstruct; 
+    else 
+        STUDY = paramstruct;
     end
 end
 

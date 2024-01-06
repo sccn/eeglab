@@ -141,8 +141,14 @@ if isempty(varargin)
     % decode input
     % ------------
     if res.subbaseline, res.subbaseline = 'on'; else res.subbaseline = 'off'; end
-    if res.averagemode, res.averagemode = 'ave'; else res.averagemode = 'rms'; end
-    if ~isfield(res, 'multiplechan') res.multiplechan = 0; end
+if res.averagemode
+    res.averagemode = 'ave';
+else
+    res.averagemode = 'rms';
+end
+if ~isfield(res, 'multiplechan')
+    res.multiplechan = 0;
+end
     res.timerange = str2num( res.timerange );
     res.freqrange = str2num( res.freqrange );
     res.ersplim   = str2num( res.ersplim );

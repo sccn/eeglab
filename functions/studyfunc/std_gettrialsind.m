@@ -130,8 +130,11 @@ for iVar = 1 :  length(varnames)
         eventvals(end+1,:) = [ dattrials{:} ];
     else
         % case of categorical variable
-        if ischar(dattrials{1})
-            if ischar(indvarvals) indvarvals = { indvarvals }; end
+if ischar(dattrials{1})
+    if ischar(indvarvals)
+        indvarvals = {indvarvals};
+    end
+end
             if ~iscell(indvarvals)
                 error(sprintf('Type error - excepting numerical values for field %s', varnames{iVar}));
             end
