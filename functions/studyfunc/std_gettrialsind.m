@@ -83,8 +83,10 @@ try
     if ~isempty( varargin )
         for i = 1:2:numel(varsin)
             queryvars.(varsin{i}) = varsin{i+1};
-        end
-    else queryvars = []; end
+    end
+else 
+    queryvars = []; 
+end
 catch
     disp('std_gettrialsind() error: calling convention {''key'', value, ... } error'); return;
 end

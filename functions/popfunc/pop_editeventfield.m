@@ -341,8 +341,10 @@ for curfield = tmpfields'
                               EEG = eeg_checkset(EEG, 'makeur');
 		                 case 'no' % match existing fields
 		                           % ---------------------
-		                      tmparray = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
-		                      if isempty(g.indices) g.indices = [1:size(tmparray(:),1)] + length(EEG.event); end
+tmparray = load_file_or_array(getfield(g, curfield{1}), g.skipline, g.delim);
+if isempty(g.indices)
+    g.indices = [1:size(tmparray(:), 1)] + length(EEG.event);
+end
 		                      
 		                      indexmatch = strmatch(curfield{1}, allfields);
 		                      if isempty(indexmatch) % no match

@@ -130,10 +130,10 @@ if nargin < 2
          causal = 1;
     else causal = 0;
     end
-plotfreqz = result{7};
-if locutoff == 0 && hicutoff == 0 
-    return;
-end
+    plotfreqz = result{7};
+    if locutoff == 0 && hicutoff == 0
+        return;
+    end
     if result{8}
         firtype = 'fir1';
     else
@@ -203,7 +203,8 @@ if EEG.trials == 1
             tmplat = [ tmpevent.latency ];
             boundaries = tmplat(boundaries);
             boundaries = [0 floor(boundaries-0.49) EEG.pnts];
-            try, warning off MATLAB:divideByZero
+            try
+                warning('off','MATLAB:divideByZero');
             catch, end
             for n=1:length(boundaries)-1
                 if boundaries(n)+1 < boundaries(n+1)

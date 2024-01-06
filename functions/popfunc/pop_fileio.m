@@ -80,8 +80,10 @@ end
         filename = fullfile(filepath, filename);
     else
         filename = uigetdir('*.*', 'Choose a folder -- pop_fileio()'); 
-        drawnow;
-        if filename(1) == 0 return; end
+drawnow;
+if filename(1) == 0
+    return;
+end
     end
     
     % open file to get infos

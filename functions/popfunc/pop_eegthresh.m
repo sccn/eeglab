@@ -211,10 +211,12 @@ tmprejectelec(Irej) = 1;
 rej  = tmprejectelec;
 rejE = tmpelecIout;
 if calldisp
-    if icacomp == 1 macrorej  = 'EEG.reject.rejthresh';
-        			macrorejE = 'EEG.reject.rejthreshE';
-    else			macrorej  = 'EEG.reject.icarejthresh';
-        			macrorejE = 'EEG.reject.icarejthreshE';
+    if icacomp == 1
+        macrorej = 'EEG.reject.rejthresh';
+        macrorejE = 'EEG.reject.rejthreshE';
+    else
+        macrorej  = 'EEG.reject.icarejthresh';
+        macrorejE = 'EEG.reject.icarejthreshE';
     end
 	
 	colrej = EEG.reject.rejthreshcol;
@@ -261,8 +263,7 @@ function [Irej, Erej] = thresh( data, elecrange, timerange, negthresh, posthresh
        % perform the rejection
        % ---------------------	
 	   tmpica = (tmpica-mean(tmpica,2)*ones(1,size(tmpica,2)))./ (std(tmpica,0,2)*ones(1,size(tmpica,2)));
-	   [I1 Itmprej NS Etmprej] = eegthresh( tmpica, size(data,2), 1, negthresh, posthresh, ...
-						timerange, starttime, endtime);
+	   [I1, Itmprej, NS, Etmprej] = eegthresh( tmpica, size(data,2), 1, negthresh, posthresh, timerange, starttime, endtime);
  	   Irej = union_bc(Irej, Itmprej);
  	   Erej(elecrange(index),Itmprej) = Etmprej;
 	end

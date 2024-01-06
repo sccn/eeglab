@@ -122,7 +122,7 @@ if ischar(g), error(g); end
 % current filename without the .set
 % ---------------------------------
 if emptyfilename == 1, g.savemode = ''; end
-[g.filepath filenamenoext ext] = fileparts( fullfile(g.filepath, g.filename) ); ext = '.set';
+[g.filepath, filenamenoext, ext] = fileparts( fullfile(g.filepath, g.filename) ); ext = '.set';
 g.filename = [ filenamenoext ext ];
 
 % performing extended syntax check
@@ -265,15 +265,19 @@ try,
                 if strcmpi(b, 'MATLAB:save:sizeTooBigForMATFile')
                     disp('Re-saving file using the 7.3 format that can handle large variables')
                     save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', '-struct', 'EEG');
-end
-elseif strcmpi(g.version, '7')
-    save(fullfile(EEG.filepath, EEG.filename), '-v7', '-mat', '-struct', 'EEG');
-            else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', '-struct', 'EEG');
+                end
+            elseif strcmpi(g.version, '7')
+                save(fullfile(EEG.filepath, EEG.filename), '-v7', '-mat', '-struct', 'EEG');
+            else                       
+                save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', '-struct', 'EEG');
             end
         else
-            if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', 'EEG');
-            elseif strcmpi(g.version, '7') save(fullfile(EEG.filepath, EEG.filename), '-v7', '-mat', 'EEG');
-            else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', 'EEG');
+            if strcmpi(g.version, '6')
+                save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
+            elseif strcmpi(g.version, '7') 
+                save(fullfile(EEG.filepath, EEG.filename), '-v7', '-mat', 'EEG');
+            else                       
+                save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', 'EEG');
             end
         end
     catch

@@ -52,12 +52,16 @@ function boundaryType = eeg_boundarytype(INEEG1, INEEG2)
     if nargin < 2 
         INEEG2 = INEEG1;
     end
-if isfield(INEEG1, 'event') && isfield(INEEG1, 'setname')
-    tmpevent1 = INEEG1.event;
-else
-    tmpevent1 = INEEG1;
-end
-    if isfield(INEEG2, 'event') && isfield(INEEG2, 'setname') tmpevent2 = INEEG2.event; else tmpevent2 = INEEG2; end
+    if isfield(INEEG1, 'event') && isfield(INEEG1, 'setname')
+        tmpevent1 = INEEG1.event;
+    else
+        tmpevent1 = INEEG1;
+    end
+    if isfield(INEEG2, 'event') && isfield(INEEG2, 'setname')
+        tmpevent2 = INEEG2.event;
+    else
+        tmpevent2 = INEEG2;
+    end
 
     % type of boundary event
     eeglab_options;

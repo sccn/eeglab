@@ -158,8 +158,8 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
     'cache'            'struct'   []    struct([]);
     'function'         { 'function_handle' 'integer' } []  [];
     'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef' 'topo'} 'erp';
-    'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
-    'triallimits'      'real'     []    []; % ERPimage only
+'timelimits', 'real', [], [];
+'triallimits', 'real', [], [];
     'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
     'dataindices'      'integer'  []    [] }, 'std_readfile');
 if ischar(opt), error(opt); end

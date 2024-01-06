@@ -171,8 +171,12 @@ end
         if ~isempty(       STUDY.etc.erspparams.topotime),    options = { options{:} 'topotime' [] }; end
         if ~isempty(       STUDY.etc.erspparams.topofreq),    options = { options{:} 'topofreq' [] }; end
     elseif res.multiplechan == 2
-        if ~isequal('off', STUDY.etc.erspparams.averagechan), options = { options{:} 'averagechan' 'off' }; end
-        if ~isequal(res.timerange, STUDY.etc.erspparams.topotime) options = { options{:} 'topotime' res.timerange }; end
+if ~isequal('off', STUDY.etc.erspparams.averagechan)
+    options = { options{:}, 'averagechan', 'off' }; 
+end
+if ~isequal(res.timerange, STUDY.etc.erspparams.topotime)
+    options = { options{:}, 'topotime', res.timerange };
+end
         if ~isequal(res.freqrange, STUDY.etc.erspparams.topofreq) options = { options{:} 'topofreq' res.freqrange }; end
         if ~isequal([], STUDY.etc.erspparams.timerange) options = { options{:} 'timerange' [] }; end
         if ~isequal([], STUDY.etc.erspparams.freqrange) options = { options{:} 'freqrange' [] }; end

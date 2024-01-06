@@ -97,8 +97,8 @@ for iDes = 1:length(des)
 allFactors{count} = sprintf('%s - %s', des(iDes).variable(iVar).label, strVals{iSubVal});
 end
                 allFactorsStruct(count).description = allFactors{count};
-                count = count+1;
-            end
+count = count + 1;
+end
         end
     end
 end

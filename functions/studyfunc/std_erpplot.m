@@ -162,8 +162,8 @@ opt = finputcheck( options, ...
                                'datatype'    'string'  {}              'erp';
 'mode'  'string'  []  '';
 'comps'  { 'string', 'integer' }  []  [];
-                               'statmode'    'string'  { 'subjects','common','trials' } 'subjects'; % ignored
-                               'avgmode'     'string'  { 'mean','rms','median' } 'mean'; 
+'statmode'    'string'  { 'subjects','common','trials' } 'subjects';
+'avgmode'     'string'  { 'mean','rms','median' } 'mean'; 
                                'plotmode'    'string'  { 'normal','condensed' }  'normal';
                                'unitx'       'string'  { 'ms','Hz' }    'ms';
                                'plotsubjects' 'string' { 'on','off' }  'off';

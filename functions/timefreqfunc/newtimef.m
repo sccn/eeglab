@@ -1716,8 +1716,10 @@ switch lower(g.plotitc)
             elseif isempty(maskitc)
                 if size(RR,1) == size(Rboot,1) && size(RR,2) == size(Rboot,2)
                     tmp = gcf;
-                    if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
-                    else                   RR(find(RR < Rboot)) = 0;
+                    if size(Rboot,3) == 2
+                        RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
+                    else                   
+                        RR(find(RR < Rboot)) = 0;
                     end
                     Rboot = mean(Rboot(:,:,end),2);
                 else

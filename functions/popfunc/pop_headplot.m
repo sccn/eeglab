@@ -273,8 +273,14 @@ txt = { {'style', 'text', 'string', ...
     optiongui = { 'uilist', txt, 'title', fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', ...
                        'Component head plot(s) -- pop_headplot()'), 'geometry', geom 'userdata' defaulttransform };
 	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
-    if isempty(result), return; end
-    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; else return; end
+if isempty(result)
+    return;
+end
+if ~isempty(get(0, 'currentfigure'))
+    currentfig = gcf; 
+else 
+    return; 
+end
     
     while test_wrong_parameters(currentfig)
     	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});

@@ -95,8 +95,10 @@ end
        
 %         promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) 'Channel location file (in eeglab/sample_locs)' };
 %         inistr       = { '' fileloc(res{2})};
-%         result       = inputdlg2( promptstr, 'Import EGI file -- POP_READEGI', 1,  inistr, 'pop_readegi');
-        if length(result) == 0 return; end
+result = inputdlg2(promptstr, 'Import EGI file -- POP_READEGI', 1, inistr, 'pop_readegi');
+if length(result) == 0
+    return;
+end
         datachunks   = eval( [ '['  result{1} ']' ] );
         fileloc      = char(fileloc(result{2}));
     else

@@ -75,8 +75,9 @@ end
         result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
                                  'helpcom', 'pophelp(''pop_importegimat'')', ...
                                  'title', 'Import a Matlab file from Netstation -- pop_importegimat()');
-
-        if length(result) == 0 return; end;        
+if length(result) == 0
+    return;
+end
         srate = str2num(result{1});
         latpoint0 = str2num(result{2});
         dataField = fieldValues{result{3}};

@@ -38,7 +38,8 @@ end
 if length(obj.dimensions) == 2
     tmpdimensions = [obj.dimensions(2) obj.dimensions(1)];
 end
-        else                           tmpdimensions = [obj.dimensions(3) obj.dimensions(1:end-1)];
+else
+    tmpdimensions = [obj.dimensions(3) obj.dimensions(1:end-1)];
         end
     else
         tmpdimensions = obj.dimensions;

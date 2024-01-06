@@ -130,8 +130,8 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'legend'        { 'string','cell' } { { 'on','off' } {} }  'off';
                                'datatype'      'string' { 'ersp','itc','erp','spec' }    'erp';
                                'plotgroups'    'string' { 'together','apart' }  'apart';
-                               'plotmode'      'string' { 'test','condensed' }  'test'; % deprecated
-                               'plotconditions'    'string' { 'together','apart' }  'apart' }, 'std_plotcurve');
+'plotmode', 'string', {'test', 'condensed'}, 'test';
+'plotconditions', 'string', {'together', 'apart'}, 'apart'}, 'std_plotcurve';
 
 % opt.figure =  'off'; % test by nima
 if ischar(opt), error(opt); end

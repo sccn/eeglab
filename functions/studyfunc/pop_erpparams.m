@@ -169,8 +169,9 @@ if ~isequal('off', STUDY.etc.erpparams.averagechan)
 end
 if ~isequal(res.timerange, STUDY.etc.erpparams.topotime)
     options = {options{:}, 'topotime', res.timerange};
+if ~isequal([], STUDY.etc.erpparams.timerange) 
+    options = { options{:} 'timerange' [] };
 end
-        if ~isequal([], STUDY.etc.erpparams.timerange) options = { options{:} 'timerange' [] }; end
         if isempty(res.timerange)
             disp('Warning: you must select a time range to plot scalp topographies, plotting individual channels instead');
         end

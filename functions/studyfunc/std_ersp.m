@@ -180,8 +180,8 @@ end
                         'getparams'     'string'      { 'on','off' }        'off';
                         'savefile'      'string'      { 'on','off' }        'on';
                         'parallel'      'string'      { 'on','off' }        'off';
-                        'timewindow'    'real'                  []          [];    % ignored, deprecated
-                        'fileout'       'string'                []          '';
+'timewindow',    'real',    [], [];
+'fileout',       'string',  [], '';
                         'timelimits'    'real'                  []          [EEG(1).xmin EEG(1).xmax]*1000;
                         'cycles'        'real'                  []          [3 .5];
                         'padratio'      'real'                  []          1;

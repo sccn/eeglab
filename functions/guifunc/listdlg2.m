@@ -111,8 +111,8 @@ try,
 	strval = '';
     if iscell(g.liststring)
         for index = vals
-            strval = [ strval ' ' g.liststring{index} ];
-        end
+strval = [strval ' ' g.liststring{index}];
+end
     else
         for index = vals
             strval = [ strval ' ' g.liststring(index,:) ];

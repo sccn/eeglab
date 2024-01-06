@@ -252,9 +252,9 @@ if nargin < 2                 % if several arguments, assign values
 %          { 'Style', 'text', 'string', 'About this dataset', 'horizontalalignment', 'right', ...
 % 		   },   { 'Style', 'pushbutton', 'string', 'Enter comments' 'callback' editcomments }, ...
 
-    [ results newcomments ] = inputgui( geometry, uilist, 'pophelp(''pop_editset'');', 'Edit dataset information - pop_editset()', ...
+    [ results, newcomments ] = inputgui( geometry, uilist, 'pophelp(''pop_editset'');', 'Edit dataset information - pop_editset()', ...
                                          EEG.comments);
-    if length(results) == 0, return; end
+    if isempty(results), return; end
 	args = {};
 
     i = 1;
@@ -499,12 +499,11 @@ EEGOUT = eeg_checkset(EEGOUT);
 if nargout > 1
     com = sprintf('EEG = pop_editset(EEG');
     for i=1:2:length(args)
-if ~isempty(args{i+1})
-    if ischar(args{i+1})
-        com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}));
-    end
-end
-            else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+        if ~isempty(args{i+1})
+            if ischar(args{i+1})
+                com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}));
+            else
+                com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}));
             end
         else
             com = sprintf('%s, ''%s'', []', com, args{i} );

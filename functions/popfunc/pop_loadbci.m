@@ -56,8 +56,10 @@ end
         filename = [filepath filename];
         promptstr    = { 'Sampling rate' };
         inistr       = { '256' };
-        result       = inputdlg2( promptstr, 'Import BCI2000 data -- pop_loadbci()', 1,  inistr, 'pop_loadbci');
-        if length(result) == 0 return; end
+result = inputdlg2(promptstr, 'Import BCI2000 data -- pop_loadbci()', 1, inistr, 'pop_loadbci');
+if length(result) == 0
+    return;
+end
         srate   = eval( result{1} );
     end
     

@@ -142,10 +142,10 @@ if nargin < 3
     
     figname = fastif(~icacomp, 'Trend rejection in component(s) -- pop_rejtrend()','Data trend rejection -- pop_rejtrend()');
     result = inputgui( geometry,uilist,'pophelp(''pop_rejtrend'');', figname);
-size_result = size(result);
-if size_result(1) == 0
-    return;
-end
+    size_result = size(result);
+    if size_result(1) == 0
+        return;
+    end
     elecrange    = result{1};
     winsize      = result{2};
     minslope     = result{3};
@@ -192,10 +192,12 @@ fprintf('The following trials have been marked for rejection\n');
 fprintf([num2str(rejtrials) '\n']);
 
 if calldisp
-    if icacomp == 1 macrorej  = 'EEG.reject.rejconst';
-        			macrorejE = 'EEG.reject.rejconstE';
-    else			macrorej  = 'EEG.reject.icarejconst';
-        			macrorejE = 'EEG.reject.icarejconstE';
+    if icacomp == 1
+        macrorej  = 'EEG.reject.rejconst';
+        macrorejE = 'EEG.reject.rejconstE';
+    else
+        macrorej  = 'EEG.reject.icarejconst';
+        macrorejE = 'EEG.reject.icarejconstE';
     end
 	colrej = EEG.reject.rejconstcol;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays

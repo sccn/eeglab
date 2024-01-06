@@ -229,8 +229,9 @@ rej(Irej) = 1;
 calldisp = 0;
 if nargin < 3 || opt.eegplotplotallrej == 2
     calldisp = 1;
-	nbpnts = EEG.pnts;
-    if icacomp == 1 macrorej  = 'EEG.reject.rejfreq';
+nbpnts = EEG.pnts;
+if icacomp == 1
+    macrorej = 'EEG.reject.rejfreq';
         			macrorejE = 'EEG.reject.rejfreqE';
     else			macrorej  = 'EEG.reject.icarejfreq';
         			macrorejE = 'EEG.reject.icarejfreqE';

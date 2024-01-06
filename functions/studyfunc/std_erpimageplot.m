@@ -77,8 +77,8 @@ else
         'concatenate'  'string' { 'on','off' }  params.concatenate;
         'channels'    'cell'    []              {};
         'clusters'    'integer' []              [];
-        'comps'       {'integer','string'}  []              []; % for backward compatibility
-        'plotsubjects' 'string' { 'on','off' }  'off';
+'comps'       , {'integer','string'},  [], []; 
+'plotsubjects', 'string', { 'on','off' }, 'off';
         'plotmode'    'string' { 'normal','condensed','none' }  'normal';
         'subject'     'string'  []              '' }, 'std_erpimageplot', 'ignore');
     

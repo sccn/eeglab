@@ -167,8 +167,9 @@ if ~isequal('off', STUDY.etc.specparams.averagechan)
 end
 if ~isequal(res.freqrange, STUDY.etc.specparams.topofreq)
     options = {options{:}, 'topofreq', res.freqrange};
+if ~isequal([], STUDY.etc.specparams.freqrange)
+    options = { options{:}, 'freqrange', [] };
 end
-        if ~isequal([], STUDY.etc.specparams.freqrange) options = { options{:} 'freqrange' [] }; end
         if isempty(res.freqrange)
             disp('Warning: you must select a frequency range to plot scalp topographies, plotting individual channels instead');
         end

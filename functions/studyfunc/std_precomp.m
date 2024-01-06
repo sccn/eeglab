@@ -156,8 +156,8 @@ g = finputcheck(varargin, { 'erp'         'string'  { 'on','off' }     'off';
     'cell'        'integer' []                 [];
     'design'      'integer' []                 STUDY.currentdesign;
     'rmclust'     'integer' []                 [];
-    'rmbase'      'integer' []                 []; % deprecated, for backward compatibility purposes, not documented
-    'specparams'        'cell'    {}                 {};
+'rmbase'      'integer' []                 [];
+'specparams'  'cell'    {}                 {};
     'erpparams'         'cell'    {}                 {};
     'customfunc'  {'function_handle' 'integer' } { { } {} }     [];
     'customparams'      'cell'    {}                 {};

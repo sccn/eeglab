@@ -170,8 +170,8 @@ options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward com
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  { 'itc','ersp','pac' 'erpim' } 'ersp';
                                'plottf'      'real'    []              [];
-                               'mode'        'string'  []              ''; % for backward compatibility (now used for statistics)
-                               'comps'       {'integer','string'}  []              []; % for backward compatibility
+'mode',        'string',  [],  '';
+'comps',       {'integer','string'},  [],  [];
                                'plotsubjects' 'string' { 'on','off' }  'off';
                                'noplot'      'string'  { 'on','off' }  'off';
                                'plotmode'    'string'  { 'normal','condensed','none' }  'normal';

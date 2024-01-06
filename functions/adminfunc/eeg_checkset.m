@@ -650,8 +650,8 @@ for inddataset = 1:length(ALLEEG)
                                 [tmpepoch.(['event' fname])] = destdata{:};
                                 EEG.epoch = tmpepoch;
                             end
-                        end
-                    catch, 
+end
+catch
                         errordlg2(['Warning: minor problem encountered when generating' 10 ...
                             'the EEG.epoch structure (used only in user scripts)']); return;
                     end
