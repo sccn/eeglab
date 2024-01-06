@@ -60,8 +60,8 @@ if ischar(g.liststring)
 else
     allstr = '';
     for index = 1:length(g.liststring)
-allstr = [allstr '|' g.liststring{index}];
-end
+        allstr = [allstr '|' g.liststring{index}];
+    end
     allstr = allstr(2:end);
 end
 
