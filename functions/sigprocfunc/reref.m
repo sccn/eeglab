@@ -121,8 +121,8 @@ g = finputcheck(varargin, { 'icaweight'   'real'    []          [];
                             'icachansind' 'integer'    []       [];
                             'interpchan'  {''}      []          [];
                             'method'     'string'  { 'standard','withref' }  'standard';
-'refstate', {'string', 'integer'}, {{'common', 'averef'}, [1 size(data,1)]}, 'common';
-'exclude',  'integer', [1 size(data,1)], [];
+                            'refstate', {'string', 'integer'}, {{'common', 'averef'}, [1 size(data,1)]}, 'common';
+                            'exclude',  'integer', [1 size(data,1)], [];
                             'refloc'     { 'cell','struct' }  { [] [] }   {};
                             'keepref'    'string'  {'on','off' }             'off';
                             'elocs'      {'integer','struct'}  []            [] });
@@ -131,8 +131,8 @@ if ~isempty(g.icaweight)
     g.icaweights = g.icaweight;
 end
 if ~isempty(g.icaweights)
-    if isempty(g.icachansind), 
-        g.icachansind = [1:size(g.icaweights,2)]; 
+    if isempty(g.icachansind)
+        g.icachansind = 1:size(g.icaweights,2); 
         disp('Warning: reref() output has changed slightly since EEGLAB 5.02');
         disp('         the 4th output argument is the indices of channels used for ICA instead');
         disp('         of the mean reference value (which is now output argument 5)');

@@ -165,13 +165,13 @@ options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward com
 [ opt, moreparams ] = finputcheck( options, { ...
                                'design'      'integer' [] STUDY.currentdesign;
                                'caxis'       'real'    [] [];
-'statmode'  , 'string' , [] , ''; 
-'channels'  , 'cell'   , [] , {};
+                               'statmode'  , 'string' , [] , '';
+                               'channels'  , 'cell'   , [] , {};
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  { 'itc','ersp','pac' 'erpim' } 'ersp';
                                'plottf'      'real'    []              [];
-'mode',        'string',  [],  '';
-'comps',       {'integer','string'},  [],  [];
+                               'mode',        'string',  [],  '';
+                               'comps',       {'integer','string'},  [],  [];
                                'plotsubjects' 'string' { 'on','off' }  'off';
                                'noplot'      'string'  { 'on','off' }  'off';
                                'plotmode'    'string'  { 'normal','condensed','none' }  'normal';

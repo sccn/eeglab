@@ -122,17 +122,17 @@ if nargin < 1
     return;
 end
 
-[opt moreopts] = finputcheck(varargin, { 'components' 'integer' []             [];
+[opt, moreopts] = finputcheck(varargin, { 'components' 'integer' []             [];
                                          'channels'   { 'cell','integer' }  { [] [] }     {}
                                          'recompute'  'string'  { 'on','off' } 'off';
-'winsize'    'integer'  []  3;
-'rmcomps'    'integer'  []  [];
+                                         'winsize'    'integer'  []  3;
+                                         'rmcomps'    'integer'  []  [];
                                          'interp'     'struct'  { }            struct([]);
                                          'overlap'    'integer' []             0;  
                                          'plot'       'string'  { 'off','on' } 'off';
                                          'freqrange'  'real'    []             [];
                                          'timerange'  'real'    []             [];
-                                         'filter'     'real'    []             []}, ...    % 11 points
+                                         'filter'     'real'    []             []}, ...  
                                          'eeg_specgram', 'ignore');
 if ischar(opt), error(opt); end
 if isfield(EEG,'icaweights')

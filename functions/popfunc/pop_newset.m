@@ -119,11 +119,11 @@ end
 CURRENTSET = OLDSET;
 com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2str( { OLDSET varargin{:} } ));
 
-[g varargin] = finputcheck(varargin, { ...
-'gui',           'string',   { 'on'; 'off' },                 'on';
-'guistring',     'string',   { },                             'What do you want to do with the new dataset?';
-'retrieve'  'integer'  []         [];
-'study'     'integer'  [0 1]      0;
+[g, varargin] = finputcheck(varargin, { ...
+    'gui',           'string',   { 'on'; 'off' },  'on';
+    'guistring',     'string',   { },              'What do you want to do with the new dataset?';
+    'retrieve'       'integer'  []                 [];
+    'study'          'integer'  [0 1]              0;
                     }, 'pop_newset', 'ignore');
 if ischar(g), error(g); end
 eeglab_options;

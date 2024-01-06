@@ -140,15 +140,19 @@ if isempty(varargin)
     
     % decode input
     % ------------
-    if res.subbaseline, res.subbaseline = 'on'; else res.subbaseline = 'off'; end
-if res.averagemode
-    res.averagemode = 'ave';
-else
-    res.averagemode = 'rms';
-end
-if ~isfield(res, 'multiplechan')
-    res.multiplechan = 0;
-end
+    if res.subbaseline
+        res.subbaseline = 'on'; 
+    else 
+        res.subbaseline = 'off'; 
+    end
+    if res.averagemode
+        res.averagemode = 'ave';
+    else
+        res.averagemode = 'rms';
+    end
+    if ~isfield(res, 'multiplechan')
+        res.multiplechan = 0;
+    end
     res.timerange = str2num( res.timerange );
     res.freqrange = str2num( res.freqrange );
     res.ersplim   = str2num( res.ersplim );
@@ -171,15 +175,11 @@ end
         if ~isempty(       STUDY.etc.erspparams.topotime),    options = { options{:} 'topotime' [] }; end
         if ~isempty(       STUDY.etc.erspparams.topofreq),    options = { options{:} 'topofreq' [] }; end
     elseif res.multiplechan == 2
-if ~isequal('off', STUDY.etc.erspparams.averagechan)
-    options = { options{:}, 'averagechan', 'off' }; 
-end
-if ~isequal(res.timerange, STUDY.etc.erspparams.topotime)
-    options = { options{:}, 'topotime', res.timerange };
-end
-        if ~isequal(res.freqrange, STUDY.etc.erspparams.topofreq) options = { options{:} 'topofreq' res.freqrange }; end
-        if ~isequal([], STUDY.etc.erspparams.timerange) options = { options{:} 'timerange' [] }; end
-        if ~isequal([], STUDY.etc.erspparams.freqrange) options = { options{:} 'freqrange' [] }; end
+        if ~isequal('off', STUDY.etc.erspparams.averagechan), options = { options{:}, 'averagechan', 'off' }; end
+        if ~isequal(res.timerange, STUDY.etc.erspparams.topotime), options = { options{:}, 'topotime', res.timerange }; end
+        if ~isequal(res.freqrange, STUDY.etc.erspparams.topofreq), options = { options{:} 'topofreq' res.freqrange }; end
+        if ~isequal([], STUDY.etc.erspparams.timerange), options = { options{:} 'timerange' [] }; end
+        if ~isequal([], STUDY.etc.erspparams.freqrange), options = { options{:} 'freqrange' [] }; end
     elseif res.multiplechan > 2
         if ~isempty(       STUDY.etc.erspparams.topotime),    options = { options{:} 'topotime' [] }; end
         if ~isempty(       STUDY.etc.erspparams.topofreq),    options = { options{:} 'topofreq' [] }; end

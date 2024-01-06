@@ -94,11 +94,11 @@ for iDes = 1:length(des)
                 if isnumeric(strVals{iSubVal})
                     allFactors{count} = sprintf('%s - %d', des(iDes).variable(iVar).label, strVals{iSubVal});
                 else
-allFactors{count} = sprintf('%s - %s', des(iDes).variable(iVar).label, strVals{iSubVal});
-end
+                    allFactors{count} = sprintf('%s - %s', des(iDes).variable(iVar).label, strVals{iSubVal});
+                end
                 allFactorsStruct(count).description = allFactors{count};
-count = count + 1;
-end
+                count = count + 1;
+            end
         end
     end
 end

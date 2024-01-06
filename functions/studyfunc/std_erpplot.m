@@ -160,10 +160,10 @@ opt = finputcheck( options, ...
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  {}              'erp';
-'mode'  'string'  []  '';
-'comps'  { 'string', 'integer' }  []  [];
-'statmode'    'string'  { 'subjects','common','trials' } 'subjects';
-'avgmode'     'string'  { 'mean','rms','median' } 'mean'; 
+                               'mode'  'string'  []  '';
+                               'comps'  { 'string', 'integer' }  []  [];
+                               'statmode'    'string'  { 'subjects','common','trials' } 'subjects';
+                               'avgmode'     'string'  { 'mean','rms','median' } 'mean';
                                'plotmode'    'string'  { 'normal','condensed' }  'normal';
                                'unitx'       'string'  { 'ms','Hz' }    'ms';
                                'plotsubjects' 'string' { 'on','off' }  'off';

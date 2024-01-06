@@ -215,7 +215,7 @@ if nargin<2
 else % no interactive inputs
     args = varargin;
     % scan args to modify array/file format
-    % array are transformed into string 
+    % array are transformed into string
     % files are transformed into string of string
     % (this is useful to build the string command for the function)
     % --------------------------------------------------------------
@@ -225,10 +225,10 @@ else % no interactive inputs
                 args{index+1} = args{index+1}{1};
             end
         end
-        if ischar(args{index+1}) && length(args{index+1}) > 2 && args{index+1}(1) == '''' && args{index+1}(end) == ''''             
-            args{index+1} = args{index+1}(2:end-1); 
+        if ischar(args{index+1}) && length(args{index+1}) > 2 && args{index+1}(1) == '''' && args{index+1}(end) == ''''
+            args{index+1} = args{index+1}(2:end-1);
         end
-    end         
+    end
 end
 
 EEG.event = importevent( [], EEG.event, EEG.srate, args{:});

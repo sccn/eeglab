@@ -137,10 +137,10 @@ if nargin < 2
                { 'style' 'checkbox' 'string' '' 'value' 1 } ...
                   };
     geom = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] };
-result = inputgui('uilist', uilist, 'geometry', geom, 'title', 'Reject continuous portions of data - pop_rejcont()');
-if length(result) == 0
-    return;
-end
+    result = inputgui('uilist', uilist, 'geometry', geom, 'title', 'Reject continuous portions of data - pop_rejcont()');
+    if isempty(result)
+        return;
+    end
     
     options = { 'elecrange'     str2num(result{1}) ...
                 'freqlimit'     str2num(result{2}) ...

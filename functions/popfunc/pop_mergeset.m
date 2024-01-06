@@ -74,9 +74,9 @@ if nargin == 1
         { 'style' 'text' 'string' 'Preserve ICA weights of the first dataset ?' } ...
         { 'style' 'checkbox' 'string' '' } };
     res = inputgui( 'uilist', uilist, 'geometry', { [3 1] [3 1] }, 'helpcom', 'pophelp(''pop_mergeset'')');
-if isempty(res)
-    return;
-end
+    if isempty(res)
+        return;
+    end
 
     INEEG2  = eval( [ '[' res{1} ']' ] );
     keepall = res{2};
@@ -178,8 +178,8 @@ else % INEEG is an EEG struct
         % ------------------
         if isstruct(INEEGX{1}.epoch) && isstruct(INEEGX{2}.epoch)
             if length(fieldnames(INEEGX{2}.epoch)) > 0
-INEEGX{1}.epoch(end+1:end+INEEGX{2}.trials) = orderfields(INEEGX{2}.epoch, INEEGX{1}.epoch);
-else
+                INEEGX{1}.epoch(end+1:end+INEEGX{2}.trials) = orderfields(INEEGX{2}.epoch, INEEGX{1}.epoch);
+            else
                 INEEGX{1}.epoch(end+1:end+INEEGX{2}.trials) = INEEGX{2}.epoch;
             end
         end

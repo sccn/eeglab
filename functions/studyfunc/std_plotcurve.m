@@ -114,8 +114,8 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'unitx'         'string' { 'ms','hz','rmsms','rmshz','hzpsd','rmshzpsd' }   'ms';
                                'chanlocs'      'struct' []              struct('labels', {});
                                'plotsubjects'  'string' { 'on','off' }  'off';
-'condnames'   'cell'   []   {};
-'groupnames'  'cell'   []   {};
+                               'condnames'   'cell'   []   {};
+                               'groupnames'  'cell'   []   {};
                                'figtag'        'string' []              'tmp_curvetag';
                                'groupstats'    'cell'   []              {};
                                'condstats'     'cell'   []              {};
@@ -130,8 +130,8 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'legend'        { 'string','cell' } { { 'on','off' } {} }  'off';
                                'datatype'      'string' { 'ersp','itc','erp','spec' }    'erp';
                                'plotgroups'    'string' { 'together','apart' }  'apart';
-'plotmode', 'string', {'test', 'condensed'}, 'test';
-'plotconditions', 'string', {'together', 'apart'}, 'apart'}, 'std_plotcurve';
+                               'plotmode', 'string', {'test', 'condensed'}, 'test';
+                               'plotconditions', 'string', {'together', 'apart'}, 'apart'}, 'std_plotcurve');
 
 % opt.figure =  'off'; % test by nima
 if ischar(opt), error(opt); end

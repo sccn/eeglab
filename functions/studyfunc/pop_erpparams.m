@@ -164,14 +164,15 @@ if isempty(varargin)
         if ~isequal('off', STUDY.etc.erpparams.averagechan), options = { options{:} 'averagechan' 'off' }; end
         if ~isempty(       STUDY.etc.erpparams.topotime),    options = { options{:} 'topotime' [] }; end
     elseif res.multiplechan == 2
-if ~isequal('off', STUDY.etc.erpparams.averagechan)
-    options = {options{:}, 'averagechan', 'off'};
-end
-if ~isequal(res.timerange, STUDY.etc.erpparams.topotime)
-    options = {options{:}, 'topotime', res.timerange};
-if ~isequal([], STUDY.etc.erpparams.timerange) 
-    options = { options{:} 'timerange' [] };
-end
+        if ~isequal('off', STUDY.etc.erpparams.averagechan)
+            options = {options{:}, 'averagechan', 'off'};
+        end
+        if ~isequal(res.timerange, STUDY.etc.erpparams.topotime)
+            options = {options{:}, 'topotime', res.timerange};
+        end
+        if ~isequal([], STUDY.etc.erpparams.timerange)
+            options = { options{:} 'timerange' [] };
+        end
         if isempty(res.timerange)
             disp('Warning: you must select a time range to plot scalp topographies, plotting individual channels instead');
         end

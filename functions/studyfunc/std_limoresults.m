@@ -189,14 +189,14 @@ switch opt.plottype
                     else [x,y,z] = size(con); if x~=1; x=2; end
                     end
                     tfce_score = limo_tfce(x,squeeze(con(:,:,2)),handles.LIMO.LIMO.data.neighbouring_matrix);
-cd TFCE;
-filename2 = sprintf('tfce_%s', FileName);
-save(filename2, 'tfce_score');
-clear con tfce_score
-cd ..
-cd H0;
-filename = sprintf('H0_%s', FileName);
-load(filename);
+                    cd TFCE;
+                    filename2 = sprintf('tfce_%s', FileName);
+                    save(filename2, 'tfce_score');
+                    clear con tfce_score
+                    cd('..')
+                    cd('H0')
+                    filename = sprintf('H0_%s', FileName);
+                    load(filename);
                     tfce_H0_score = limo_tfce(x,squeeze(H0_ess(:,:,2,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
                     filename2 = sprintf('tfce_%s',filename); save ([filename2], 'tfce_H0_score'); clear H0_con tfce_score
                 elseif strncmp(FileName,'ess',3)

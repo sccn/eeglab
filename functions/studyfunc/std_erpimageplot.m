@@ -66,8 +66,8 @@ else
         'topotrial'  'real'     [] params.topotrial;
         'timerange'   'real'    [] params.timerange;
         'trialrange'  'real'    [] params.trialrange;
-'colorlimits', 'real',    [], params.colorlimits;
-'statistics',  'string',  [], params.statistics;
+        'colorlimits', 'real',    [], params.colorlimits;
+        'statistics',  'string',  [], params.statistics;
         'groupstats'  'string'  [] params.groupstats;
         'condstats'   'string'  [] params.condstats;
         'threshold'   'real'    [] params.threshold;
@@ -77,8 +77,8 @@ else
         'concatenate'  'string' { 'on','off' }  params.concatenate;
         'channels'    'cell'    []              {};
         'clusters'    'integer' []              [];
-'comps'       , {'integer','string'},  [], []; 
-'plotsubjects', 'string', { 'on','off' }, 'off';
+        'comps'       , {'integer','string'},  [], [];
+        'plotsubjects', 'string', { 'on','off' }, 'off';
         'plotmode'    'string' { 'normal','condensed','none' }  'normal';
         'subject'     'string'  []              '' }, 'std_erpimageplot', 'ignore');
     

@@ -59,10 +59,10 @@ if nargin < 1
     % ask user
     [filename, filepath] = uigetfile('*.RAW;*.raw', ...
         'Choose an EGI RAW file -- pop_readegi()');
-drawnow;
-if filename == 0
-    return;
-end
+    drawnow;
+    if filename == 0
+        return;
+    end
     filename = [filepath filename];
     
     fid = fopen(filename, 'rb', 'b');
@@ -92,13 +92,13 @@ end
         uigeometry = { [2 1] [2 1] [1] [1] };
         uigeomvert = [1 1 1.5 3];
         result = inputgui('uilist', uilist, 'geometry', uigeometry, 'geomvert', uigeomvert);
-       
-%         promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) 'Channel location file (in eeglab/sample_locs)' };
-%         inistr       = { '' fileloc(res{2})};
-result = inputdlg2(promptstr, 'Import EGI file -- POP_READEGI', 1, inistr, 'pop_readegi');
-if length(result) == 0
-    return;
-end
+
+        %         promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) 'Channel location file (in eeglab/sample_locs)' };
+        %         inistr       = { '' fileloc(res{2})};
+        result = inputdlg2(promptstr, 'Import EGI file -- POP_READEGI', 1, inistr, 'pop_readegi');
+        if isempty(result)
+            return;
+        end
         datachunks   = eval( [ '['  result{1} ']' ] );
         fileloc      = char(fileloc(result{2}));
     else

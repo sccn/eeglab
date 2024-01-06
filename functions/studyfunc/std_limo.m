@@ -117,8 +117,8 @@ else
         'freqlim'        'real'    []               [] ;
         'timelim'        'real'    []               [] ;
         'neighboropt'    'cell'    {}               {} ;
-'chanloc'     'struct'  {}  struct('no', {});
-'neighbormat' 'real'    []  [];
+        'chanloc'     'struct'  {}  struct('no', {});
+        'neighbormat' 'real'    []  [];
         'zscore'         'real'    [0,1]            1  ;
         'ow_chanlocfile' 'string'  {'yes','no'}     'no'},...
         'std_limo');

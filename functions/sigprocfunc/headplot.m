@@ -445,8 +445,8 @@ else
    spline_file = arg1;
    
    g = finputcheck( varargin, { ...
-'cbar'     , 'real'  , [0 Inf]           , []; 
-'lighting' , 'string', { 'on', 'off' }   , 'on';
+       'cbar'     , 'real'  , [0 Inf]           , [];
+       'lighting' , 'string', { 'on', 'off' }   , 'on';
        'verbose'    'string' { 'on','off' }  'on';
        'maplimits'  { 'string','real' }  []  'absmax'; 
        'title'      'string' []              '';

@@ -49,17 +49,17 @@ function [EEG, command] = pop_loadbci(filename, srate);
     if nargin < 1
         % ask user
         [filename, filepath] = uigetfile('*.*', 'Choose a BCI file -- pop_loadbci'); 
-drawnow;
-if filename == 0 
-    return;
-end
+        drawnow;
+        if filename == 0
+            return;
+        end
         filename = [filepath filename];
         promptstr    = { 'Sampling rate' };
         inistr       = { '256' };
-result = inputdlg2(promptstr, 'Import BCI2000 data -- pop_loadbci()', 1, inistr, 'pop_loadbci');
-if length(result) == 0
-    return;
-end
+        result = inputdlg2(promptstr, 'Import BCI2000 data -- pop_loadbci()', 1, inistr, 'pop_loadbci');
+        if isempty(result)
+            return;
+        end
         srate   = eval( result{1} );
     end
     

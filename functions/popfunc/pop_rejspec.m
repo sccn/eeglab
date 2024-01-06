@@ -158,10 +158,10 @@ if nargin < 3
     
     result = inputgui( geometry,uilist,'pophelp(''pop_rejspec'');', 'Reject by data spectra -- pop_rejspec()');
  
-size_result = size(result);
-if size_result(1) == 0
-    return;
-end
+    size_result = size(result);
+    if size_result(1) == 0
+        return;
+    end
     options = {};
     options = { options{:} 'elecrange' eval( [ '[' result{1} ']' ]  ) };
     options = { options{:} 'method'   lower(methodlist{result{2}})};
@@ -229,12 +229,13 @@ rej(Irej) = 1;
 calldisp = 0;
 if nargin < 3 || opt.eegplotplotallrej == 2
     calldisp = 1;
-nbpnts = EEG.pnts;
-if icacomp == 1
-    macrorej = 'EEG.reject.rejfreq';
-        			macrorejE = 'EEG.reject.rejfreqE';
-    else			macrorej  = 'EEG.reject.icarejfreq';
-        			macrorejE = 'EEG.reject.icarejfreqE';
+    nbpnts = EEG.pnts;
+    if icacomp == 1
+        macrorej = 'EEG.reject.rejfreq';
+        macrorejE = 'EEG.reject.rejfreqE';
+    else			
+        macrorej  = 'EEG.reject.icarejfreq';
+        macrorejE = 'EEG.reject.icarejfreqE';
     end
 	colrej = EEG.reject.rejfreqcol;
     

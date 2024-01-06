@@ -147,20 +147,21 @@ limomeasures = {'itcbeta1' , 'itcbeta2' ,'itcr2r' ,'itcr2f' ,'itcr2p' ,...
     'erpbeta1' , 'erpbeta2' ,'erpr2r' ,'erpr2f' ,'erpr2p' ,...
     'erspbeta1', 'erspbeta2','erspr2r','erspr2f','erspr2p',...
     'specbeta1', 'specbeta2','specr2r','specr2f','specr2p'};
+
 opt = finputcheck(varargin, { 'components'       'integer'  []    [];
     'getparamonly'     'string'   { 'on','off' }  'off';
     'trialselect'      'cell'     {}                 {};
     'trialinfo'        'struct'   {}                 struct([]);
     'designvar'        'struct'   []                 struct([]);
     'singletrials'     'string'   { 'on','off' }  'off';
-'concatenate'  'string'  { 'on', 'off' }  'off'
-'channels'     'cell'    []               {}
+    'concatenate'      'string'  { 'on', 'off' }  'off'
+    'channels'         'cell'    []               {}
     'cache'            'struct'   []    struct([]);
     'function'         { 'function_handle' 'integer' } []  [];
     'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef' 'topo'} 'erp';
-'timelimits', 'real', [], [];
-'triallimits', 'real', [], [];
-    'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
+    'timelimits',      'real', [], [];
+    'triallimits',     'real', [], [];
+    'freqlimits'       'real'     []    [];
     'dataindices'      'integer'  []    [] }, 'std_readfile');
 if ischar(opt), error(opt); end
 
