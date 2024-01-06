@@ -83,7 +83,9 @@ if nargin < 2
 	promptstr    = {['New sampling rate']};
 	inistr       = { num2str(EEG(1).srate) };
 	result       = inputdlg2( promptstr, 'Resample current dataset -- pop_resample()', 1,  inistr, 'pop_resample');
-	if length(result) == 0 return; end
+	if length(result) == 0 
+        return; 
+    end
 	freq         = eval( result{1} );
 
 end

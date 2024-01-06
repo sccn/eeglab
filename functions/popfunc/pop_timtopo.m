@@ -97,7 +97,9 @@ if nargin < 3
     
 	result       = inputgui( args{:} );
     
-	if size(result,1) == 0 return; end
+	if size(result,1) == 0 
+        return; 
+    end
 	timerange    = eval( [ '[' result{1} ']' ] );
 	topotime     = eval( [ '[' result{2} ']' ] );
 	winsize      = result{3};

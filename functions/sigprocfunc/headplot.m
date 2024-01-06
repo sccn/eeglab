@@ -202,7 +202,7 @@ if ischar(values)
                                        'ica'          'string'  { 'on','off' }             'off';
                                        'transform'    'real'    []                         DEFAULT_TRANSFORM;
                                        'comment'      'string'  []                         '' }, 'headplot', 'ignore');
-    if ischar(g), 
+    if ischar(g)
         error(g);
     end
     

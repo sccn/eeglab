@@ -110,7 +110,9 @@ if nargin < 3
               { 'style' 'popupmenu'  'string' 'Keep selected|Remove selected' } };
               
    result = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_rmdat'')', 'title', 'Remove data portions around events - pop_rmdat()', 'userdata', EEG(1));
-   if isempty(result) return; end
+   if isempty(result) 
+       return; 
+   end
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end
    if ~isempty(result{1})

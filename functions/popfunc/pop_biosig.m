@@ -153,7 +153,9 @@ if nargin < 1
 
     [~,~,~,result] = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
-    if length(result) == 0 return; end
+    if length(result) == 0 
+        return; 
+    end
     
     % decode GUI params
     % -----------------

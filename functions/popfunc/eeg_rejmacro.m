@@ -119,7 +119,7 @@ else
 			'''To actually reject these epochs, use the same menu item to'',' ...
             '''inspect/reject data and select "Reject marked trials" checkbox''), ''Warning'');' ...
 			'[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
-end; 
+end
 if ~exist('topcommand')
 	topcommand = [];
 end
@@ -142,7 +142,7 @@ switch superpose
 		 else rejeegplot = []; end
          rejeegplottmp = trial2eegplot(  rej, rejE, nbpnts, colrej);
          if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end
- case 2, 
+ case 2
   rejeegplot = [];
   for index = 1:length(EEG.reject.disprej)
 	  if ~isempty(EEG.reject.disprej{index})

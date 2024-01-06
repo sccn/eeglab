@@ -229,12 +229,8 @@ if nargin < 3 % Open GUI input window
     else
         splfile     = [fullfile(basefolder, EEG.filename(1:length(EEG.filename)-3)),'spl'];
     end
-txt = { {'style', 'text', 'string', ...
-         'Co-register channel locations with head mesh and compute a mesh spline file (each scalp montage needs a headplot() spline file)', ...
-         'fontweight', 'bold'}, ...
-        {'style', 'checkbox', 'string', ...
-         'Use the following spline file or structure', 'userdata', 'loadfile', ...
-         'tag', 'loadcb', 'callback', cb_load, 'value', ~compute_file} ...
+    txt = { {'style', 'text', 'string', 'Co-register channel locations with head mesh and compute a mesh spline file (each scalp montage needs a headplot() spline file)', 'fontweight', 'bold'}, ...
+            {'style', 'checkbox', 'string', 'Use the following spline file or structure', 'userdata', 'loadfile', 'tag', 'loadcb', 'callback', cb_load, 'value', ~compute_file} ...
             { 'style' 'edit'        'string' char(fastif(typeplot, EEG.splinefile, EEG.icasplinefile))  'userdata' 'load' 'tag' 'load' 'enable' enableload } ...
             { 'style' 'pushbutton'  'string' 'Browse'        'callback' cb_browseload                               'tag' 'load' 'enable' enableload } ... 
             { 'style' 'pushbutton'  'string' 'Help'          'callback' cb_helpload } ...
@@ -273,14 +269,14 @@ txt = { {'style', 'text', 'string', ...
     optiongui = { 'uilist', txt, 'title', fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', ...
                        'Component head plot(s) -- pop_headplot()'), 'geometry', geom 'userdata' defaulttransform };
 	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
-if isempty(result)
-    return;
-end
-if ~isempty(get(0, 'currentfigure'))
-    currentfig = gcf; 
-else 
-    return; 
-end
+    if isempty(result)
+        return;
+    end
+    if ~isempty(get(0, 'currentfigure'))
+        currentfig = gcf;
+    else
+        return;
+    end
     
     while test_wrong_parameters(currentfig)
     	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
@@ -291,16 +287,24 @@ end
     % decode setup parameters
     % -----------------------
     options = {};
-    if result{1},               options = { options{:} 'load'    result{2} };
+    if result{1}              
+        options = { options{:} 'load'    result{2} };
     else
-        if ~ischar(result{5})    result{5} = defaultmat{result{5}}; end
-        if isempty(result{7})   setupopt = { result{4} 'meshfile' result{5} };  % no coreg
-        else                    setupopt = { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) };
-                                fprintf('Transformation matrix: %s\n', result{7});
+        if ~ischar(result{5})    
+            result{5} = defaultmat{result{5}}; 
+        end
+        if isempty(result{7})   
+            setupopt = { result{4} 'meshfile' result{5} };  % no coreg
+        else                    
+            setupopt = { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) };
+            fprintf('Transformation matrix: %s\n', result{7});
         end
         options = { options{:} 'setup' setupopt };
-        if ~strcmpi(result{5}, 'mheadnew.mat'), EEG.headplotmeshfile = result{5}; 
-        else EEG.headplotmeshfile = ''; end
+        if ~strcmpi(result{5}, 'mheadnew.mat')
+            EEG.headplotmeshfile = result{5}; 
+        else 
+            EEG.headplotmeshfile = ''; 
+        end
     end
     
     % decode other parameters

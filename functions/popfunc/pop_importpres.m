@@ -92,7 +92,9 @@ if nargin < 2
 	% ask user
 	[filename, filepath] = uigetfile('*.log;*.LOG', 'Choose a Presentation file -- pop_importpres()'); 
     drawnow;
-	if filename == 0 return; end
+	if filename == 0 
+        return; 
+    end
 	filename = [filepath filename];
 end
 
@@ -108,8 +110,9 @@ if nargin > 1
     indtype  = strmatch(lower(typefield), lower(fields));
     indlat   = strmatch(lower(latfield) , lower(fields));
     if ~isempty(durfield)
-         inddur   = strmatch(lower(durfield) , lower(fields));
-    else inddur = 0;
+        inddur   = strmatch(lower(durfield) , lower(fields));
+    else 
+        inddur = 0;
     end
 else
     indtype1   = strmatch('event type', lower(fields));

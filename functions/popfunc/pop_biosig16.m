@@ -69,7 +69,9 @@ if nargin < 1
 	[filename, filepath] = uigetfile('*.*', 'Choose an BDF file -- pop_biosig()'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
-	if filename == 0 return; end
+	if filename == 0 
+        return; 
+    end
 	filename = [filepath filename];
     
     % open file to get infos
@@ -96,7 +98,9 @@ if nargin < 1
     geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 1] };
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
-    if length(result) == 0 return; end
+    if isempty(result) 
+        return; 
+    end
     
     % decode GUI params
     % -----------------

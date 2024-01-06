@@ -94,9 +94,9 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin )
                                              'alpha'      'real'      []             NaN;
                                              'neighbours' 'struct'    { }            struct([]);
                                              'structoutput' 'string'  { 'on','off' }      'off';
-%                                             'method'    'string'    {  } 'analytic'; % 'montecarlo','analytic','stat','glm'
-                                             'paired'     'string'    { 'on','off' }      'on' }, ... % NOT USED IN THIS FUNCTION
+                                             'paired'     'string'    { 'on','off' }      'on' }, ... 
                                              'statcond', 'ignore');
+%                                             'method'    'string'    {  } 'analytic'; % 'montecarlo','analytic','stat','glm'
     if ischar(g), error(g); end;    
     if ~isempty(g.mode), g.method = g.mode; end
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end

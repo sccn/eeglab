@@ -86,12 +86,15 @@ if nargin < 2
 					'Percent for trimmed statistics:' };
 	inistr       = { 'latency' '' '' '5' };
 	result       = inputdlg2( promptstr, 'Plot event statistics -- pop_eventstat()', 1,  inistr, 'signalstat');
-	if length( result ) == 0 return; end
+	if length( result ) == 0 
+        return; 
+    end
 	eventfield   = deblank(result{1}); % the brackets allow to process matlab arrays
     if ~isempty(result{2})
         if strcmpi(result{2}(1),'''')
-             type = eval( [ '{' result{2} '}' ] );
-        else type = parsetxt( result{2});
+            type = eval( [ '{' result{2} '}' ] );
+        else 
+            type = parsetxt( result{2});
         end
     else
         disp('WARNING: you should select an event type');

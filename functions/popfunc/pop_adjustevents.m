@@ -92,10 +92,10 @@ if nargin < 2
         };
         
     uigeom = { [1 0.7 0.5] [1 0.7 0.5] [1 0.7 0.5]};
-result = inputgui('uilist', uilist, 'geometry', uigeom, 'title', 'Adjust event latencies - pop_adjustevents()');
-if isempty(result)
-    return;
-end
+    result = inputgui('uilist', uilist, 'geometry', uigeom, 'title', 'Adjust event latencies - pop_adjustevents()');
+    if isempty(result)
+        return;
+    end
     
     % Collecting inputs
     options = { };
