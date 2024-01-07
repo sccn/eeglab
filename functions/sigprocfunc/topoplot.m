@@ -1005,15 +1005,10 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   xi = linspace(xmin,xmax,GRID_SCALE);   % x-axis description (row vector)
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
+  [xi,yi] = meshgrid(xi, yi);
+  [Xi,Yi,Zi] = griddata(inty,intx,double(intValues),yi,xi,'v4'); % interpolate data
+  [Xi,Yi,ZiC] = griddata(inty,intx,double(intContourVals),yi,xi,'v4'); % interpolate data
 
-  try
-      [Xi,Yi,Zi] = griddata(inty,intx,double(intValues),yi',xi,'v4'); % interpolate data
-      [Xi,Yi,ZiC] = griddata(inty,intx,double(intContourVals),yi',xi,'v4'); % interpolate data
-  catch,
-      [Xi,Yi] = meshgrid(yi',xi);
-      Zi  = gdatav4(inty,intx,double(intValues), Xi, Yi);
-      ZiC = gdatav4(inty,intx,double(intContourVals), Xi, Yi);
-  end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%%%%%
   %
