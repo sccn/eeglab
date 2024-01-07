@@ -748,7 +748,7 @@ u(22) = uicontrol('Parent',figh, ...
     'string','Stack', 'callback', cb_envelope);
 
 
-  if isempty(g.command) tmpcom = 'fprintf(''Rejections saved in variable TMPREJ\n'');';   
+  if isempty(g.command), tmpcom = 'fprintf(''Rejections saved in variable TMPREJ\n'');';   
   else tmpcom = g.command;
   end
   acceptcommand = [ 'g = get(gcbf, ''userdata'');' ... 
@@ -1701,7 +1701,7 @@ else
     % -------------------------------------
     g = get(gcf,'UserData');
 	result       = inputdlg2( { fastif(g.trialstag==-1,'New window length (s):', 'Number of epoch(s):') }, 'Change window length', 1,  { num2str(g.winlength) });
-	if size(result,1) == 0 return; end
+	if size(result,1) == 0, return; end
 
 	g.winlength = eval(result{1}); 
 	set(gcf, 'UserData', g);
@@ -1715,7 +1715,7 @@ else
    g = get(gcf,'UserData');
    result = inputdlg2( ...
 { 'Number of channels to display:' } , 'Change number of channels to display', 1,  { num2str(g.dispchans) });
-   if size(result,1) == 0 return; end
+   if size(result,1) == 0, return; end
    
    g.dispchans = eval(result{1});
    if g.dispchans<0 || g.dispchans>g.chans
@@ -1732,7 +1732,7 @@ else
       % -------------------------------------
       g = get(gcf,'UserData');
       result = inputdlg2({ 'Max events'' string length:' } , 'Change events'' string length to display', 1,  { num2str(g.maxeventstring) });
-      if size(result,1) == 0 return; end;                  
+      if size(result,1) == 0, return; end;                  
       g.maxeventstring = eval(result{1});
       set(gcf, 'UserData', g);
       eegplotlegacy('drawb');
@@ -1740,7 +1740,7 @@ else
       
   case 'loadelect' % load channels
 	[inputname,inputpath] = uigetfile('*','Channel locations file');
-	if inputname == 0 return; end
+	if inputname == 0, return; end
 	if ~exist([ inputpath inputname ])
 		error('no such file');
 	end
@@ -2076,7 +2076,7 @@ else
                 
             end
             if (tmppos(1) >= 0) && (tmppos(1) <= highlim)
-                if isempty(g.winrej) Allwin=0;
+                if isempty(g.winrej), Allwin=0;
                 else Allwin = (g.winrej(:,1) < lowlim+tmppos(1)) & (g.winrej(:,2) > lowlim+tmppos(1));
                 end
                 if any(Allwin) % remove the mark or select electrode if necessary

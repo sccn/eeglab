@@ -164,7 +164,9 @@ if nargin < 3
               { 'style' 'edit'       'string' '' } { } };
               
    result = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_epoch'')', 'title', 'Extract data epochs - pop_epoch()', 'userdata', EEG);
-   if length(result) == 0 return; end
+   if isempty(result) 
+       return; 
+   end
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end
    if ~isempty(result{1})
@@ -209,7 +211,7 @@ end
 
 % test the presence of variables
 % ------------------------------
-try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end; % obsolete
+try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end % obsolete
 try, g.timeunit; 	 	  catch, g.timeunit = 'points'; end
 try, g.verbose; 	      catch, g.verbose = 'on'; end % obsolete
 try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', [EEG.setname ' epochs' ]); end
@@ -222,7 +224,7 @@ try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [
 eeglab_options;
 tmpevent = EEG.event;
 tmpeventlatency = [ tmpevent(:).latency ];
-[tmpeventlatency Itmp] = sort(tmpeventlatency);
+[tmpeventlatency, Itmp] = sort(tmpeventlatency);
 EEG.event = EEG.event(Itmp);  % sort by ascending time 
 Ievent = g.eventindices;
 if ischar(EEG.data)
@@ -433,16 +435,20 @@ if ischar(types)
 else
     com = sprintf('EEG = pop_epoch( EEG, { ');
     for j=1:length(types)
-        if ischar( types{j} )  com = sprintf('%s ''%s'' ', com, types{j} );
-        else                    com = sprintf('%s [%s] ',   com, num2str(types{j}) );
+        if ischar( types{j} )  
+            com = sprintf('%s ''%s'' ', com, types{j} );
+        else                    
+            com = sprintf('%s [%s] ',   com, num2str(types{j}) );
         end
     end
     com = sprintf('%s }, [%s]', com, num2str(lim)); 
 end
 for i=1:2:length(args)
     if ~isempty( args{i+1} )
-        if ischar( args{i+1} )   com = sprintf('%s, ''%s'', ''%s''', com, args{i}, args{i+1} );
-        else                    com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+        if ischar( args{i+1} )   
+            com = sprintf('%s, ''%s'', ''%s''', com, args{i}, args{i+1} );
+        else                    
+            com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
         end
     end    
 end

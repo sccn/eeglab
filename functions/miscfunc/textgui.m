@@ -77,11 +77,11 @@ if nargin >2
 else
     g = [];
 end
-try, g.title;    catch, g.title = ''; end;    
-try, g.fontname; catch, g.fontname = 'courier'; end;    
-try, g.fontsize; catch, g.fontsize = 12; end;    
-try, g.fontweight; catch, g.fontweight = 'normal'; end;    
-try, g.linesperpage; catch, g.linesperpage = 20; end;    
+try, g.title;    catch, g.title = ''; end
+try, g.fontname; catch, g.fontname = 'courier'; end
+try, g.fontsize; catch, g.fontsize = 12; end
+try, g.fontweight; catch, g.fontweight = 'normal'; end
+try, g.linesperpage; catch, g.linesperpage = 20; end
 
 if isempty( helparray )
 	helparray = cell(1,200);
@@ -92,9 +92,11 @@ end
 
 % number of elements
 % ------------------
-if iscell(textmenu)	nblines = length(textmenu);
-else				nblines = size(textmenu,1);
-end;	
+if iscell(textmenu)	
+    nblines = length(textmenu);
+else				
+    nblines = size(textmenu,1);
+end
 
 % generating the main figure
 % --------------------------
@@ -145,8 +147,10 @@ end
 
 maxlen = size(g.title,2);
 for i=1:nblines
-	if iscell(textmenu)	tmptext = textmenu{i};
-	else			tmptext = textmenu(i,:);
+	if iscell(textmenu)	
+        tmptext = textmenu{i};
+    else			
+        tmptext = textmenu(i,:);
 	end
 	ordinate      = topordi-topordi*(i-1+addlines)/divider;
 	currentheight = topordi/divider;

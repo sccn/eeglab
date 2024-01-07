@@ -206,7 +206,7 @@ switch opt.plottype
                     end
                     tfce_score = limo_tfce(x,squeeze(ess(:,:,2)),handles.LIMO.LIMO.data.neighbouring_matrix);
                     cd TFCE; filename2 = sprintf('tfce_%s',FileName); save ([filename2], 'tfce_score'); clear ess tfce_score
-                    cd ..; cd H0; filename = sprintf('H0_%s',FileName); load(filename);
+                    cd('..'); cd H0; filename = sprintf('H0_%s',FileName); load(filename);
                     tfce_H0_score = limo_tfce(x,squeeze(H0_ess(:,:,2,:)),handles.LIMO.LIMO.data.neighbouring_matrix);
                     filename2 = sprintf('tfce_%s',filename); save ([filename2], 'tfce_H0_score'); clear H0_ess tfce_score
                 end
@@ -214,7 +214,7 @@ switch opt.plottype
             
             % 2nd level
             nboot = 1000;
-            if handles.LIMO.LIMO.Level == 2;
+            if handles.LIMO.LIMO.Level == 2
                 if handles.bootstrap == 1 && ~exist(sprintf('H0%sH0_%s', filesep, FileName), 'file')
                     if strncmp(FileName,'one_sample',10)
                         load Yr; limo_random_robust(1,Yr,eval(FileName(28:end-4)),nboot,handles.tfce); clear Yr;

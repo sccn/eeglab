@@ -202,7 +202,7 @@ if nargin <= 3 || ischar(varargin{1})
                   'blckhn'        'integer'  []                       2 ;
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
-				  'icachansind'   'integer'  []                       [1:size(data,1)] ; % deprecated
+				  'icachansind'   'integer'  []                       [1:size(data,1)] ;
 				  'icamaps'       'integer'  []                       [] ;
                   'rmdc'          'string'   {'on','off'}             'off';
                   'verbose'       'string'   {'on','off'}             'on';
@@ -210,7 +210,7 @@ if nargin <= 3 || ischar(varargin{1})
 				  'mapchans'      'integer'  [1:size(data,1)]         [] 
                   'mapframes'     'integer'  [1:size(data,2)]         []};
 	
-	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
+	[g, varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if ischar(g), error(g); end
 	if ~isempty(g.freqrange), g.limits(1:2) = g.freqrange; end
 	if ~isempty(g.weights)

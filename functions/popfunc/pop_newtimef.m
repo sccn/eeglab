@@ -142,7 +142,7 @@ varargout{1} = '';
 if nargin < 2
 	help pop_newtimef;
 	return;
-end;	
+end
 lastcom = [];
 if nargin < 3
 	popup = 1;
@@ -221,7 +221,9 @@ if popup
 	[ tmp1, tmp2, strhalt, result ] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_newtimef'');', ...
 					   'title', fastif(typeproc, 'Plot channel time frequency -- pop_newtimef()', ...
 							  'Plot component time frequency -- pop_newtimef()'), 'userdata', EEG);
-	if length( tmp1 ) == 0 return; end
+	if isempty( tmp1 ) 
+        return; 
+    end
 
 	if result.fft,      result.cycle = '0'; end
 	if result.nobase,   result.baseline = 'NaN'; end

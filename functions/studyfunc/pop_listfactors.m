@@ -222,6 +222,7 @@ if strcmpi(g.gui, 'on')
         result = get(fig, 'userdata');
         close(fig);
         drawnow;
+    catch
     end
     
 end

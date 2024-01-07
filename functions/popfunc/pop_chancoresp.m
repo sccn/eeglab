@@ -224,7 +224,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
               { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close(gcbf);' }  ...
               { 'Style', 'pushbutton', 'string', 'Ok'    , 'tag', 'ok', 'callback', ['set(gcbo, ''userdata'', ''ok'');'] } };
 
-    [tmp tmp2 allobj] = supergui( fig, geometry, geomvert, listui{:} );
+    [tmp, tmp2, allobj] = supergui( fig, geometry, geomvert, listui{:} );
     set(fig, 'userdata', g);
     
     % decode output
@@ -233,12 +233,13 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     figure(fig);
     drawnow;
     waitfor( okbut, 'userdata');
-    try,
+    try
         tmpdat = get(fig, 'userdata');
         chanlistout1 = tmpdat.chanlist1;
         chanlistout2 = tmpdat.chanlist2;
         close(fig);
         drawnow;
+    catch
     end
 
 % unpair channels

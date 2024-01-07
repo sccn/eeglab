@@ -142,7 +142,7 @@ ng = size(data,2);
 if length(opt.chanlocs) > 1, opt.plottopo = 'on'; end
 if strcmpi(opt.plottopo, 'on') && size(data{1},3) == 1, opt.singlesubject = 'on'; end
 %if size(data{1},2) == 1,                              opt.singlesubject = 'on'; end
-if all(all(cellfun('size', data, 2)==1))               opt.singlesubject = 'on'; end
+if all(all(cellfun('size', data, 2)==1)),              opt.singlesubject = 'on'; end
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = {}; opt.condstats = {}; end
 if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end
 if strcmpi(opt.plotsubjects, 'on')
@@ -157,7 +157,7 @@ if strcmpi(opt.plotconditions, 'together') &&  ~isempty(opt.groupstats), opt.plo
 if strcmpi(opt.plotgroups,     'together') &&  ~isempty(opt.condstats) , opt.plotgroups     = 'apart'; end
 if ischar(opt.legend), opt.legend = {}; end
 if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end
-if length(data(:)) == length(opt.legend(:)), 
+if length(data(:)) == length(opt.legend(:))
     opt.legend = reshape(opt.legend, size(data))'; 
     opt.legend(cellfun(@isempty, data)) = []; 
     opt.legend = (opt.legend)';
@@ -218,8 +218,8 @@ end
 % remove empty entries
 % --------------------
 datapresent = ~cellfun(@isempty, data);
-if size(data,1) > 1, for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; coldata(c,:) = []; if ~strcmpi(opt.plotconditions, 'together') opt.titles(c,:) = []; end; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end; end
-if size(data,2) > 1, for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; coldata(:,g) = []; if ~strcmpi(opt.plotgroups    , 'together') opt.titles(:,g) = []; end; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end; end
+if size(data,1) > 1, for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; coldata(c,:) = []; if ~strcmpi(opt.plotconditions, 'together'), opt.titles(c,:) = []; end; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end; end
+if size(data,2) > 1, for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; coldata(:,g) = []; if ~strcmpi(opt.plotgroups    , 'together'), opt.titles(:,g) = []; end; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end; end
 if strcmpi(opt.plotsubjects, 'off'), tmpcol = coldata'; tmpcol = tmpcol(:)'; end
 nc = size(data,1);
 ng = size(data,2);
@@ -318,11 +318,11 @@ if strcmpi(opt.figure, 'on')
     figure('color', 'w','Tag', opt.figtag);
     pos = get(gcf, 'position');
     basewinsize = 200/max(nc,ng)*3;
-    if strcmpi(opt.plotgroups, 'together') pos(3) = 200*(1+addc);
-    else                                   pos(3) = 200*(ng+addc);
+    if strcmpi(opt.plotgroups, 'together'), pos(3) = 200*(1+addc);
+    else                                    pos(3) = 200*(ng+addc);
     end
-    if strcmpi(opt.plotconditions , 'together') pos(4) = 200*(1+addr);
-    else                                        pos(4) = 200*(nc+addr);
+    if strcmpi(opt.plotconditions , 'together'), pos(4) = 200*(1+addr);
+    else                                         pos(4) = 200*(nc+addr);
     end
     if all(pos(3:4) == 200), pos(3:4) = 400; end % double figure size if 1x1
     if strcmpi(opt.subplot, 'transpose'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);

@@ -39,7 +39,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [vers, versnum, releaseDate] = eeg_getversion
+function [vers, versnum, releaseDate] = eeg_getversion()
 
 vers        = 'dev';
 releaseDate = '10-Aug-23 14:55:42'; % unix date -> date +"%d-%b-%y %T"

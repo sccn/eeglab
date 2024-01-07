@@ -51,7 +51,7 @@ oldpath = []; newpath = [];
 
 try
     options = varargin;
-    if ~isempty( varargin ),
+    if ~isempty( varargin )
         for i = 1:2:numel(options)
             g.(options{i}) = options{i+1};
         end
@@ -126,7 +126,7 @@ rmpath(genpath(pluginfolder));
 
  % required here because path not added yet
 % to the admin folder
-function res = ismatlab;
+function res = ismatlab()
 
 v = version;
 if v(1) > '4'

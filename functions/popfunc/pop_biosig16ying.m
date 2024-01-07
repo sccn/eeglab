@@ -69,7 +69,9 @@ if nargin < 1
 	[filename, filepath] = uigetfile('*.*', 'Choose an BDF file -- pop_biosig()'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
-	if filename == 0 return; end
+	if filename == 0 
+        return; 
+    end
 	filename = [filepath filename];
     
     % open file to get infos
@@ -96,7 +98,9 @@ if nargin < 1
     geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 1] };
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
-    if length(result) == 0 return; end
+    if isempty(result) 
+        return; 
+    end
     
     % decode GUI params
     % -----------------
@@ -145,12 +149,6 @@ EEG.nbchan          = size(DAT,1);
 EEG.srate           = dat.SampleRate(1);
 EEG.data            = DAT; 
 clear DAT;
-% $$$ try  % why would you do the following???????  JO
-% $$$     EEG.data            = EEG.data';
-% $$$ catch,
-% $$$     pack;
-% $$$     EEG.data            = EEG.data';
-% $$$ end;    
 EEG.setname 		= sprintf('%s file', dat.TYPE);
 EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin            = 0; 
@@ -279,4 +277,4 @@ if isempty(options)
     command = sprintf('EEG = my_pop_biosig(''%s'');', filename); 
 else
     command = sprintf('EEG = my_pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
-end;    
+end  

@@ -606,7 +606,7 @@ for inddataset = 1:length(ALLEEG)
                                     EEG.epoch = rmfield(EEG.epoch,fn(strncmp('event',fn,5)));
                                 end
                             end
-                            
+
                             % set event field
                             % ---------------
                             tmpevent   = EEG.event;
@@ -621,7 +621,7 @@ for inddataset = 1:length(ALLEEG)
                             [tmpepoch.event] = epochevent{:};
                             EEG.epoch = tmpepoch;
                             maxlen = max(cellfun(@length,epochevent));
-                            
+
                             % copy event information into the epoch array
                             % -------------------------------------------
                             eventfields = fieldnames(EEG.event)';
@@ -650,8 +650,8 @@ for inddataset = 1:length(ALLEEG)
                                 [tmpepoch.(['event' fname])] = destdata{:};
                                 EEG.epoch = tmpepoch;
                             end
-end
-catch
+                        end
+                    catch
                         errordlg2(['Warning: minor problem encountered when generating' 10 ...
                             'the EEG.epoch structure (used only in user scripts)']); return;
                     end
@@ -1073,7 +1073,7 @@ catch
             end
         end
         charrefs = cellfun('isclass',{EEG.chanlocs.ref},'char');
-        if any(charrefs) ref = ''; end
+        if any(charrefs), ref = ''; end
         for tmpind = find(~charrefs)
             EEG.chanlocs(tmpind).ref = ref;
         end
@@ -1142,46 +1142,44 @@ catch
         
     % DIPFIT structure
     % ----------------
-    if ~isfield(EEG,'dipfit')
-        EEG.dipfit = []; res = com;
-    else
+    if isfield(EEG,'dipfit')
         try
             % check if dipfitdefs is present
             dipfitdefs;
-	        if isfield(EEG.dipfit, 'vol') && ~isfield(EEG.dipfit, 'hdmfile')
-		        if exist('pop_dipfit_settings')
-		            disp('Old DIPFIT structure detected: converting to DIPFIT 2 format');
-		            EEG.dipfit.hdmfile     = template_models(1).hdmfile;
-		            EEG.dipfit.coordformat = template_models(1).coordformat;
-		            EEG.dipfit.mrifile     = template_models(1).mrifile;
-		            EEG.dipfit.chanfile    = template_models(1).chanfile;
-		            EEG.dipfit.coord_transform = [];
-		            EEG.saved = 'no';
-		            res = com;
-		        end
-		    end
-		    if isfield(EEG.dipfit, 'hdmfile')
-		        if length(EEG.dipfit.hdmfile) > 8
-		            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models(1).hdmfile(end-8)), EEG.dipfit.hdmfile = template_models(1).hdmfile; end
-		            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models(2).hdmfile(end-8)), EEG.dipfit.hdmfile = template_models(2).hdmfile; end
-		        end
-		        if length(EEG.dipfit.mrifile) > 8
-		            if strcmpi(EEG.dipfit.mrifile(end-8), template_models(1).mrifile(end-8)), EEG.dipfit.mrifile = template_models(1).mrifile; end
-		            if strcmpi(EEG.dipfit.mrifile(end-8), template_models(2).mrifile(end-8)), EEG.dipfit.mrifile = template_models(2).mrifile; end
-		        end
-		        if length(EEG.dipfit.chanfile) > 8
-		            if strcmpi(EEG.dipfit.chanfile(end-8), template_models(1).chanfile(end-8)), EEG.dipfit.chanfile = template_models(1).chanfile; end
-		            if strcmpi(EEG.dipfit.chanfile(end-8), template_models(2).chanfile(end-8)), EEG.dipfit.chanfile = template_models(2).chanfile; end
-		        end
-		    end
-	        
-		    if isfield(EEG.dipfit, 'coord_transform')
-		        if isempty(EEG.dipfit.coord_transform)
-		            EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
-		        end
-	    	elseif ~isempty(EEG.dipfit)
-	    	    EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
-		    end
+            if isfield(EEG.dipfit, 'vol') && ~isfield(EEG.dipfit, 'hdmfile')
+                if exist('pop_dipfit_settings')
+                    disp('Old DIPFIT structure detected: converting to DIPFIT 2 format');
+                    EEG.dipfit.hdmfile     = template_models(1).hdmfile;
+                    EEG.dipfit.coordformat = template_models(1).coordformat;
+                    EEG.dipfit.mrifile     = template_models(1).mrifile;
+                    EEG.dipfit.chanfile    = template_models(1).chanfile;
+                    EEG.dipfit.coord_transform = [];
+                    EEG.saved = 'no';
+                    res = com;
+                end
+            end
+            if isfield(EEG.dipfit, 'hdmfile')
+                if length(EEG.dipfit.hdmfile) > 8
+                    if strcmpi(EEG.dipfit.hdmfile(end-8), template_models(1).hdmfile(end-8)), EEG.dipfit.hdmfile = template_models(1).hdmfile; end
+                    if strcmpi(EEG.dipfit.hdmfile(end-8), template_models(2).hdmfile(end-8)), EEG.dipfit.hdmfile = template_models(2).hdmfile; end
+                end
+                if length(EEG.dipfit.mrifile) > 8
+                    if strcmpi(EEG.dipfit.mrifile(end-8), template_models(1).mrifile(end-8)), EEG.dipfit.mrifile = template_models(1).mrifile; end
+                    if strcmpi(EEG.dipfit.mrifile(end-8), template_models(2).mrifile(end-8)), EEG.dipfit.mrifile = template_models(2).mrifile; end
+                end
+                if length(EEG.dipfit.chanfile) > 8
+                    if strcmpi(EEG.dipfit.chanfile(end-8), template_models(1).chanfile(end-8)), EEG.dipfit.chanfile = template_models(1).chanfile; end
+                    if strcmpi(EEG.dipfit.chanfile(end-8), template_models(2).chanfile(end-8)), EEG.dipfit.chanfile = template_models(2).chanfile; end
+                end
+            end
+
+            if isfield(EEG.dipfit, 'coord_transform')
+                if isempty(EEG.dipfit.coord_transform)
+                    EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
+                end
+            elseif ~isempty(EEG.dipfit)
+                EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
+            end
         catch
             e = lasterror;
             if ~strcmp(e.identifier,'MATLAB:UndefinedFunction')
@@ -1189,6 +1187,8 @@ catch
                 rethrow(e);
             end
         end
+    else
+        EEG.dipfit = []; res = com;
     end
     
     % check events (fast)
@@ -1210,27 +1210,27 @@ catch
         EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
     end
     
-    if ~isfield(EEG, 'history')    EEG.history    = ''; res = com; end
-    if ~isfield(EEG, 'splinefile') EEG.splinefile = ''; res = com; end
-    if ~isfield(EEG, 'icasplinefile') EEG.icasplinefile = ''; res = com; end
-    if ~isfield(EEG, 'saved')      EEG.saved      = 'no'; res = com; end
-    if ~isfield(EEG, 'subject')    EEG.subject    = ''; res = com; end
-    if ~isfield(EEG, 'condition')  EEG.condition  = ''; res = com; end
-    if ~isfield(EEG, 'group')      EEG.group      = ''; res = com; end
-    if ~isfield(EEG, 'run')        EEG.run        = []; res = com; end
-    if ~isfield(EEG, 'session')    EEG.session    = []; res = com; end
-    if ~isfield(EEG, 'urchanlocs') EEG.urchanlocs = []; res = com; end
-    if ~isfield(EEG, 'specdata')   EEG.specdata   = []; res = com; end
-    if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end
-    if ~isfield(EEG, 'comments')   EEG.comments   = ''; res = com; end
-    if ~isfield(EEG, 'etc'     )   EEG.etc        = []; res = com; end
-    if ~isfield(EEG, 'urevent' )   EEG.urevent    = []; res = com; end
-    if ~isfield(EEG, 'roi' )       EEG.roi        = []; res = com; end
-    if ~isfield(EEG, 'ref') || isempty(EEG.ref) EEG.ref = 'common'; res = com; end
+    if ~isfield(EEG, 'history'),    EEG.history    = ''; res = com; end
+    if ~isfield(EEG, 'splinefile'), EEG.splinefile = ''; res = com; end
+    if ~isfield(EEG, 'icasplinefile'), EEG.icasplinefile = ''; res = com; end
+    if ~isfield(EEG, 'saved'),      EEG.saved      = 'no'; res = com; end
+    if ~isfield(EEG, 'subject'),    EEG.subject    = ''; res = com; end
+    if ~isfield(EEG, 'condition'),  EEG.condition  = ''; res = com; end
+    if ~isfield(EEG, 'group'),      EEG.group      = ''; res = com; end
+    if ~isfield(EEG, 'run'),        EEG.run        = []; res = com; end
+    if ~isfield(EEG, 'session'),    EEG.session    = []; res = com; end
+    if ~isfield(EEG, 'urchanlocs'), EEG.urchanlocs = []; res = com; end
+    if ~isfield(EEG, 'specdata'),   EEG.specdata   = []; res = com; end
+    if ~isfield(EEG, 'specicaact'), EEG.specicaact = []; res = com; end
+    if ~isfield(EEG, 'comments'),   EEG.comments   = ''; res = com; end
+    if ~isfield(EEG, 'etc'     ),   EEG.etc        = []; res = com; end
+    if ~isfield(EEG, 'urevent' ),   EEG.urevent    = []; res = com; end
+    if ~isfield(EEG, 'roi' ),       EEG.roi        = []; res = com; end
+    if ~isfield(EEG, 'ref') || isempty(EEG.ref), EEG.ref = 'common'; res = com; end
     
     % create fields if absent
     % -----------------------
-    if ~isfield(EEG, 'reject')                    EEG.reject.rejjp = []; res = com; end
+    if ~isfield(EEG, 'reject'),                    EEG.reject.rejjp = []; res = com; end
     
     listf = { 'rejjp' 'rejkurt' 'rejmanual' 'rejthresh' 'rejconst', 'rejfreq' ...
         'icarejjp' 'icarejkurt' 'icarejmanual' 'icarejthresh' 'icarejconst', 'icarejfreq'};
@@ -1247,8 +1247,8 @@ catch
             EEG.reject = setfield(EEG.reject, elecfield, zeros(nbchan, length(getfield(EEG.reject, name)))); res = com;
         end
     end
-    if ~isfield(EEG.reject, 'rejglobal')        EEG.reject.rejglobal  = []; res = com; end
-    if ~isfield(EEG.reject, 'rejglobalE')       EEG.reject.rejglobalE = []; res = com; end
+    if ~isfield(EEG.reject, 'rejglobal'),        EEG.reject.rejglobal  = []; res = com; end
+    if ~isfield(EEG.reject, 'rejglobalE'),       EEG.reject.rejglobalE = []; res = com; end
     
     % track version of EEGLAB
     % -----------------------
@@ -1261,36 +1261,36 @@ catch
     
     % default colors for rejection
     % ----------------------------
-    if ~isfield(EEG.reject, 'rejmanualcol')   EEG.reject.rejmanualcol = [1.0000    1     0.783]; res = com; end
-    if ~isfield(EEG.reject, 'rejthreshcol')   EEG.reject.rejthreshcol = [0.8487    1.0000    0.5008]; res = com; end
-    if ~isfield(EEG.reject, 'rejconstcol')    EEG.reject.rejconstcol  = [0.6940    1.0000    0.7008]; res = com; end
-    if ~isfield(EEG.reject, 'rejjpcol')       EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end
-    if ~isfield(EEG.reject, 'rejkurtcol')     EEG.reject.rejkurtcol   = [0.6880    0.7042    1.0000]; res = com; end
-    if ~isfield(EEG.reject, 'rejfreqcol')     EEG.reject.rejfreqcol   = [0.9596    0.7193    1.0000]; res = com; end
-    if ~isfield(EEG.reject, 'disprej')        EEG.reject.disprej      = { }; end
+    if ~isfield(EEG.reject, 'rejmanualcol'),   EEG.reject.rejmanualcol = [1.0000    1     0.783]; res = com; end
+    if ~isfield(EEG.reject, 'rejthreshcol'),   EEG.reject.rejthreshcol = [0.8487    1.0000    0.5008]; res = com; end
+    if ~isfield(EEG.reject, 'rejconstcol'),    EEG.reject.rejconstcol  = [0.6940    1.0000    0.7008]; res = com; end
+    if ~isfield(EEG.reject, 'rejjpcol'),       EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end
+    if ~isfield(EEG.reject, 'rejkurtcol'),     EEG.reject.rejkurtcol   = [0.6880    0.7042    1.0000]; res = com; end
+    if ~isfield(EEG.reject, 'rejfreqcol'),     EEG.reject.rejfreqcol   = [0.9596    0.7193    1.0000]; res = com; end
+    if ~isfield(EEG.reject, 'disprej'),        EEG.reject.disprej      = { }; end
     
-    if ~isfield(EEG, 'stats')           EEG.stats.jp = []; res = com; end
-    if ~isfield(EEG.stats, 'jp')        EEG.stats.jp = []; res = com; end
-    if ~isfield(EEG.stats, 'jpE')       EEG.stats.jpE = []; res = com; end
-    if ~isfield(EEG.stats, 'icajp')     EEG.stats.icajp = []; res = com; end
-    if ~isfield(EEG.stats, 'icajpE')    EEG.stats.icajpE = []; res = com; end
-    if ~isfield(EEG.stats, 'kurt')      EEG.stats.kurt = []; res = com; end
-    if ~isfield(EEG.stats, 'kurtE')     EEG.stats.kurtE = []; res = com; end
-    if ~isfield(EEG.stats, 'icakurt')   EEG.stats.icakurt = []; res = com; end
-    if ~isfield(EEG.stats, 'icakurtE')  EEG.stats.icakurtE = []; res = com; end
+    if ~isfield(EEG, 'stats'),           EEG.stats.jp = []; res = com; end
+    if ~isfield(EEG.stats, 'jp'),        EEG.stats.jp = []; res = com; end
+    if ~isfield(EEG.stats, 'jpE'),       EEG.stats.jpE = []; res = com; end
+    if ~isfield(EEG.stats, 'icajp'),     EEG.stats.icajp = []; res = com; end
+    if ~isfield(EEG.stats, 'icajpE'),    EEG.stats.icajpE = []; res = com; end
+    if ~isfield(EEG.stats, 'kurt'),      EEG.stats.kurt = []; res = com; end
+    if ~isfield(EEG.stats, 'kurtE'),     EEG.stats.kurtE = []; res = com; end
+    if ~isfield(EEG.stats, 'icakurt'),   EEG.stats.icakurt = []; res = com; end
+    if ~isfield(EEG.stats, 'icakurtE'),  EEG.stats.icakurtE = []; res = com; end
     
     % component rejection
     % -------------------
-    if ~isfield(EEG.stats, 'compenta')        EEG.stats.compenta = []; res = com; end
-    if ~isfield(EEG.stats, 'compentr')        EEG.stats.compentr = []; res = com; end
-    if ~isfield(EEG.stats, 'compkurta')       EEG.stats.compkurta = []; res = com; end
-    if ~isfield(EEG.stats, 'compkurtr')       EEG.stats.compkurtr = []; res = com; end
-    if ~isfield(EEG.stats, 'compkurtdist')    EEG.stats.compkurtdist = []; res = com; end
-    if ~isfield(EEG.reject, 'threshold')      EEG.reject.threshold = [0.8 0.8 0.8]; res = com; end
-    if ~isfield(EEG.reject, 'threshentropy')  EEG.reject.threshentropy = 600; res = com; end
-    if ~isfield(EEG.reject, 'threshkurtact')  EEG.reject.threshkurtact = 600; res = com; end
-    if ~isfield(EEG.reject, 'threshkurtdist') EEG.reject.threshkurtdist = 600; res = com; end
-    if ~isfield(EEG.reject, 'gcompreject')    EEG.reject.gcompreject = []; res = com; end
+    if ~isfield(EEG.stats, 'compenta'),        EEG.stats.compenta = []; res = com; end
+    if ~isfield(EEG.stats, 'compentr'),        EEG.stats.compentr = []; res = com; end
+    if ~isfield(EEG.stats, 'compkurta'),       EEG.stats.compkurta = []; res = com; end
+    if ~isfield(EEG.stats, 'compkurtr'),       EEG.stats.compkurtr = []; res = com; end
+    if ~isfield(EEG.stats, 'compkurtdist'),    EEG.stats.compkurtdist = []; res = com; end
+    if ~isfield(EEG.reject, 'threshold'),      EEG.reject.threshold = [0.8 0.8 0.8]; res = com; end
+    if ~isfield(EEG.reject, 'threshentropy'),  EEG.reject.threshentropy = 600; res = com; end
+    if ~isfield(EEG.reject, 'threshkurtact'),  EEG.reject.threshkurtact = 600; res = com; end
+    if ~isfield(EEG.reject, 'threshkurtdist'), EEG.reject.threshkurtdist = 600; res = com; end
+    if ~isfield(EEG.reject, 'gcompreject'),    EEG.reject.gcompreject = []; res = com; end
     if length(EEG.reject.gcompreject) ~= size(EEG.icaweights,1)
         EEG.reject.gcompreject = zeros(1, size(EEG.icaweights,1));
     end

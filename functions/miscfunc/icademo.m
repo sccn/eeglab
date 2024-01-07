@@ -116,7 +116,7 @@ end
 % Load an ascii ERP data matrix 
 %
 fprintf('Loading sample data...\n');
-   load pnas.adt -ascii
+   load('pnas.adt','-ascii');
 fprintf('Reshaping sample data...\n');
    data = [pnas(15:28,:) pnas(1:14,:)]; % lapses (will plot red), hits (blue)
    clear pnas

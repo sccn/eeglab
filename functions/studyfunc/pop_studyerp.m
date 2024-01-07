@@ -38,7 +38,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [STUDY ALLEEG com ] = pop_studyerp;
+function [STUDY, ALLEEG, com ] = pop_studyerp()
 
 % first GUI, get the number of conditions and subjects
 % ----------------------------------------------------

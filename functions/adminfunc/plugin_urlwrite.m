@@ -31,7 +31,7 @@ if ~usejava('jvm')
    error(message('MATLAB:urlwrite:NoJvm'));
 end
 
-import com.mathworks.mlwidgets.io.InterruptibleStreamCopier;
+import('com.mathworks.mlwidgets.io.InterruptibleStreamCopier');
 
 % Be sure the proxy settings are set.
 com.mathworks.mlwidgets.html.HTMLPrefs.setProxySettings

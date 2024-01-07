@@ -299,7 +299,7 @@ end
 
 % compute spectral decomposition
 % ------------------------------
-if strcmpi(g.logtrials, 'notset'), if strcmpi(g.specmode, 'fft') g.logtrials = 'on'; else g.logtrials = 'off'; end; end
+if strcmpi(g.logtrials, 'notset'), if strcmpi(g.specmode, 'fft'), g.logtrials = 'on'; else g.logtrials = 'off'; end; end
 if strcmpi(g.logtrials, 'on'), datatype = 'SPECTRUMLOG'; else datatype = 'SPECTRUMABS'; end
 if strcmpi(g.specmode, 'psd')
     if strcmpi(g.savetrials, 'on') || strcmpi(g.logtrials, 'on')

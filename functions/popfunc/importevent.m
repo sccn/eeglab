@@ -279,6 +279,7 @@ if isfield(event, 'latency') && latencypresent
                      length(res), length(event));
             event( res ) = [];
         end
+    catch
     end
 end
 

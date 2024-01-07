@@ -120,7 +120,7 @@ opt = finputcheck( varargin, { 'titles'         'cell'   []              cellfun
                                'datatype'       'string' { 'ersp','itc' 'erpim' }    'ersp';
                                'plotmode'       'string' { 'normal','condensed' }  'normal' }, 'std_plottf');
 if ischar(opt), error(opt); end
-if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end
+if all(all(cellfun('size', data, 3)==1)), opt.singlesubject = 'on'; end
 
 % remove empty entries
 datapresent = ~cellfun(@isempty, data);

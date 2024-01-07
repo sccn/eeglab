@@ -318,7 +318,7 @@ end
 des.include             = opt.datselect;
 des.cases.label = 'subject';
 des.cases.value = opt.subjselect;
-if isempty(des.cases.value) des.cases.value = STUDY.subject; end
+if isempty(des.cases.value), des.cases.value = STUDY.subject; end
 
 fieldorder = { 'name' 'filepath' 'variable' 'cases' 'include' };
 if ~isfield(des, 'variable'), des.variable = []; end

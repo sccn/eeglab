@@ -1,4 +1,4 @@
-function biosigpathlast
+function biosigpathlast()
 % Add BIOSIG at the end of the path to avoid overloading Matlab functions
 
 str2doublepath  = fileparts( which('str2double') );

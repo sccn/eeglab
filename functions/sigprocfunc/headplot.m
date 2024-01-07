@@ -461,9 +461,11 @@ else
        'material'     'string'            [] 'dull';
        'orilocs'    { 'string','struct' } [] '';            
        'labels'     'integer' [0 1 2]        0 }, 'headplot');
-   if ischar(g) error(g); end
+   if ischar(g) 
+       error(g); 
+   end
    plotelecopt.electrodes3d = g.electrodes3d;
-   if length(g.eleccolor) > 0 && length(g.eleccolor) ~= length(values)
+   if ~isempty(g.eleccolor) && length(g.eleccolor) ~= length(values)
        error('The number of color must be the same as the number of channels to plot');
    end
 
@@ -829,7 +831,7 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
     
 % get mesh information
 % --------------------
-function [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(meshfile);
+function [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(meshfile)
 %#function mheadnew.mat
 meshpath = fileparts(which('mheadnew.mat'));
 if isdeployed
@@ -850,7 +852,7 @@ if ~isstruct(meshfile)
     fprintf('Loaded mesh file %s\n',meshfile);
     try
         meshfile = load(meshfile,'-mat');
-    catch,
+    catch
         meshfile = [];
         meshfile.POS  = load('mheadnewpos.txt', '-ascii');
         meshfile.TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
@@ -858,7 +860,7 @@ if ~isstruct(meshfile)
         %index1 = load('mheadnewindex1.txt', '-ascii');
         meshfile.center = load('mheadnewcenter.txt', '-ascii');
     end
-end;        
+end      
         
 if isfield(meshfile, 'vol')
     if isfield(meshfile.vol, 'r')
@@ -875,8 +877,8 @@ elseif isfield(meshfile, 'bnd')
 elseif isfield(meshfile, 'TRI1')
     POS  = meshfile.POS;
     TRI1 = meshfile.TRI1;
-    try TRI2   = meshfile.TRI2;   end  % NEW
-    try center = meshfile.center; end  % NEW
+    try TRI2   = meshfile.TRI2;   catch, end  % NEW
+    try center = meshfile.center; catch, end  % NEW
 elseif isfield(meshfile, 'vertices')
     POS  = meshfile.vertices;
     TRI1 = meshfile.faces;

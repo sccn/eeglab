@@ -1,4 +1,4 @@
-function val = iseeglabdeployed
+function val = iseeglabdeployed()
 % iseeglabdeployed - true for EEGLAB compile version and false otherwise
 try
      val = isdeployed;
