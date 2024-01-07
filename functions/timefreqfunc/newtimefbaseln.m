@@ -66,7 +66,11 @@ end
     'trialbase',     'string',    {'on', 'off', 'full'}, 'off';
     'verbose',       'string',    {'on', 'off'}, 'on';
     }, 'newtimefbaseln', 'ignore');
-if ischar(g) error(g); return; end
+
+if ischar(g)
+    error(g);
+    return;
+end
 PP = PPori; if ~iscell(PP), PP = { PP }; end
 
 % ---------------
@@ -172,4 +176,6 @@ end
 
 % print
 function verboseprintf(verbose, varargin)
-if strcmpi(verbose, 'on') fprintf(varargin{:}); end
+    if strcmpi(verbose, 'on')
+        fprintf(varargin{:});
+    end

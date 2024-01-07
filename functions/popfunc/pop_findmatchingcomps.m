@@ -138,8 +138,9 @@ if size(EEG.icawinv,1) ~= size(g.matchcomps,1) && size(EEG.icawinv,1) ~= size(g.
     error( [  'The tagged components do not have the same number of' 10 ...
               'channels as those in the current dataset' ]);
 end
-
-if size(g.matchcomps,1) ~= size(EEG.icawinv,1) g.matchcomps = g.matchcomps'; end
+if size(g.matchcomps, 1) ~= size(EEG.icawinv, 1)
+    g.matchcomps = g.matchcomps';
+end
 [corr,indx] = matcorr(EEG.icawinv', g.matchcomps');
 corrSelected  = corr(1:size(g.matchcomps,2)) > g.corrthresh;
 matchic    = indx(corrSelected);

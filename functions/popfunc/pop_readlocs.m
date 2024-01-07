@@ -56,8 +56,11 @@ if nargin < 1
    [filename, filepath] = uigetfile('*.*', 'Importing electrode location file -- pop_readlocs()'); 
    %filename = 'chan32.locs';
    %filepath = 'c:\eeglab\eeglab4.0\';
+   
    drawnow;
-   if filename == 0 return; end
+   if filename == 0
+       return;
+   end
    filename = [filepath filename];
    tmpfile = loadtxt(filename);
    nbcols = cellfun('isempty', tmpfile(end,:));

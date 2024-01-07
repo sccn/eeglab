@@ -46,8 +46,9 @@ if icacomp == 0
 		disp('Error: you must first run ICA on the data'); return;
 	end
 end
-
-if icacomp == 1 	rejtitle = 'Reject trials using data statistics - pop_rejmenu()'; tagmenu = 'rejtrialraw';
+if icacomp == 1
+    rejtitle = 'Reject trials using data statistics - pop_rejmenu()'; 
+    tagmenu = 'rejtrialraw';
 else            	rejtitle = 'Reject trials using component activity statistics - pop_rejmenu()'; tagmenu = 'rejtrialica';
 end;	
 

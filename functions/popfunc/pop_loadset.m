@@ -64,8 +64,11 @@ if nargin < 1
     % pop up window
     % -------------
 	[inputname, inputpath] = uigetfile2('*.SET*;*.set', 'Load dataset(s) -- pop_loadset()', 'multiselect', 'on');
+    
     drawnow;
-	if isequal(inputname, 0) return; end
+    if isequal(inputname, 0)
+        return;
+    end
     options = { 'filename' inputname 'filepath' inputpath };
 else
     % account for old calling format

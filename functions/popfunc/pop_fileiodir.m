@@ -52,8 +52,10 @@ command = '';
 
 if nargin < 1
 	% ask user
-	folder = uigetdir('*.*', 'Choose a directory -- pop_fileiodir()'); 
-	if folder == 0 return; end
+    folder = uigetdir('*.*', 'Choose a directory -- pop_fileiodir()');
+    if folder == 0
+        return;
+    end
     drawnow;
     
     % open file to get infos
@@ -70,8 +72,11 @@ if nargin < 1
         uilist{end+1} = { 'style' 'edit' 'string' '' };
         geom = { geom{:} [3 1] };
     end
-    result = inputgui( geom, uilist, 'pophelp(''pop_fileiodir'')', 'Load data using FILE-IO -- pop_fileiodir()');
-    if length(result) == 0 return; end
+    
+    result = inputgui(geom, uilist, 'pophelp(''pop_fileiodir'')', 'Load data using FILE-IO -- pop_fileiodir()');
+    if length(result) == 0 
+        return; 
+    end
 
     options = {};
     result = { result{:} '' };

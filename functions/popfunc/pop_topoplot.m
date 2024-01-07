@@ -135,8 +135,11 @@ if nargin < 3
     guititle = fastif( typeplot, 'Plot ERP scalp maps in 2-D -- pop_topoplot()', ...
                        'Plot component scalp maps in 2-D -- pop_topoplot()');
     
-    result = inputgui( uigeom, uilist, 'pophelp(''pop_topoplot'')', guititle, [], 'normal');
-	if length(result) == 0 return; end
+    
+    result = inputgui(uigeom, uilist, 'pophelp(''pop_topoplot'')', guititle, [], 'normal');
+    if length(result) == 0 
+        return; 
+    end
 	
     % reading first param
     % -------------------

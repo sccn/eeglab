@@ -137,8 +137,11 @@ opt = finputcheck(varargin, { ...
 
 if ischar(opt), error(opt); end
 channelNotDefined = 0;
-if isempty(opt.channel), opt.channel = [1:EEG.nbchan]; channelNotDefined = 1;
-elseif isequal(opt.channel, [1:EEG.nbchan]) && ~isempty(opt.interp) channelNotDefined = 1;
+if isempty(opt.channel)
+    opt.channel = [1:EEG.nbchan]; 
+    channelNotDefined = 1;
+elseif isequal(opt.channel, [1:EEG.nbchan]) && ~isempty(opt.interp)
+    channelNotDefined = 1;
 end
 if iscell( opt.trialindices), opt.trialindices = opt.trialindices{1}; end
 if isempty(opt.trialindices), opt.trialindices = [1:EEG.trials]; end

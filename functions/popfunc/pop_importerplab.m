@@ -229,7 +229,9 @@ str(find(str == '(')) = '_';
 str(find(str == '/')) = '_';
 str(find(str == '-')) = '_';
 str(find(str == '&')) = '_';
-if ~isempty(str2num(str(1))) str = [ 'f' str ]; end
+if ~isempty(str2num(str(1)))
+    str = ['f' str];
+end
 
 function str = doubledeblank(str)
 

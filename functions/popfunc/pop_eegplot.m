@@ -120,7 +120,7 @@ if nargin < 3 && EEG.trials > 1 && ~isempty(EEG.event)
                        fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
 								'Reject epochs by visual inspection -- pop_eegplot()'));
 	size_result  = size( result );
-	if size_result(1) == 0 return; end
+	if size_result(1) == 0, return; end
    
    if result{1}, superpose=1; end
    if ~result{2}, reject=0; end
@@ -128,10 +128,12 @@ if nargin < 3 && EEG.trials > 1 && ~isempty(EEG.event)
 end
 
 if EEG.trials > 1 && ~isempty(EEG.reject)
-    if icacomp == 1 macrorej  = 'EEG.reject.rejmanual';
-        			macrorejE = 'EEG.reject.rejmanualE';
-    else			macrorej  = 'EEG.reject.icarejmanual';
-        			macrorejE = 'EEG.reject.icarejmanualE';
+    if icacomp == 1 
+        macrorej  = 'EEG.reject.rejmanual';
+        macrorejE = 'EEG.reject.rejmanualE';
+    else			
+        macrorej  = 'EEG.reject.icarejmanual';
+        macrorejE = 'EEG.reject.icarejmanualE';
     end
     if icacomp == 1
          elecrange = [1:EEG.nbchan];

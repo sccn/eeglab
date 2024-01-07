@@ -51,8 +51,9 @@ if ~exist('elecrange')
 	help eeg_rejmacro;
 	error('Error: eeg_rejmacro cannot be called from the command line');
 end;	
-
-if ~exist('nbpnts') nbpnts = EEG.pnts; end
+if ~exist('nbpnts')
+    nbpnts = EEG.pnts;
+end
 
 % mix all type of rejections
 % --------------------------

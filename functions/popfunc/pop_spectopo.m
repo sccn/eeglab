@@ -118,7 +118,7 @@ varargout{1} = '';
 if nargin < 1
 	help pop_spectopo;
 	return;
-end;	
+end
 
 if nargin < 2
 	dataflag = 1;
@@ -157,8 +157,10 @@ if nargin < 3
 			geometry(3) = [];
 			promptstr(7:8) = [];
 		end
-		result       = inputgui( geometry, promptstr, 'pophelp(''pop_spectopo'')', 'Channel spectra and maps -- pop_spectopo()');
-		if size(result,1) == 0 return; end
+        result = inputgui(geometry, promptstr, 'pophelp(''pop_spectopo'')', 'Channel spectra and maps -- pop_spectopo()');
+        if size(result,1) == 0
+            return;
+        end
 		timerange    = eval( [ '[' result{1} ']' ] );
 		options = [];
         if isempty(EEG.chanlocs)
@@ -208,8 +210,10 @@ if nargin < 3
 						 { 'style' 'edit' 'string' '2 25' }, ...
 						 { 'style' 'text' 'string' 'Spectral and scalp map options (see topoplot):' } ...
 						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
-		result       = inputgui( geometry, promptstr, 'pophelp(''spectopo'')', 'Component spectra and maps -- pop_spectopo()');
-		if size(result,1) == 0 return; end
+        result = inputgui(geometry, promptstr, 'pophelp(''spectopo'')', 'Component spectra and maps -- pop_spectopo()');
+        if size(result, 1) == 0
+            return;
+        end
 		timerange    = eval( [ '[' result{1} ']' ] );
 		options = '';
 		if ~isempty(result{2})   , options = [ options ', ''freq'', ['  result{2} ']' ]; end

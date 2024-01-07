@@ -182,25 +182,25 @@ if nargin < 2
     filename    = result{1};
     fieldlist   = parsetxt( result{2} );
     options = {};
-    if ~isempty( result{3}), options = { options{:} 'latencyfields' parsetxt( result{3} ) }; end; 
-    if ~isempty( result{4}), options = { options{:} 'durationfields' parsetxt( result{4} ) }; end; 
-    if ~isempty( result{5}), options = { options{:} 'typefield' result{5} }; end; 
-    if ~isempty( result{6}), options = { options{:} 'timeunit' eval(result{6}) }; end; 
-    if ~isempty( result{7}), options = { options{:} 'headerlines' eval(result{7}) }; end; 
-    if ~result{8}, options = { options{:} 'clearevents' 'off'}; end; 
+    if ~isempty( result{3}), options = { options{:} 'latencyfields' parsetxt( result{3} ) }; end 
+    if ~isempty( result{4}), options = { options{:} 'durationfields' parsetxt( result{4} ) }; end 
+    if ~isempty( result{5}), options = { options{:} 'typefield' result{5} }; end 
+    if ~isempty( result{6}), options = { options{:} 'timeunit' eval(result{6}) }; end 
+    if ~isempty( result{7}), options = { options{:} 'headerlines' eval(result{7}) }; end 
+    if ~result{8}, options = { options{:} 'clearevents' 'off'}; end 
 else 
     if ~isempty(varargin) && ~ischar(varargin{1})
         % old call compatibility
         options = { 'latencyfields' varargin{1} };
         if nargin > 4
             options = { options{:} 'timeunit' varargin{2} }; 
-        end; 
+        end 
         if nargin > 5
             options = { options{:} 'headerlines' varargin{3} }; 
-        end; 
+        end 
         if nargin > 6
             options = { options{:} 'clearevents' fastif(varargin{4}, 'on', 'off') }; 
-        end; 
+        end 
     else
         options = varargin;
     end
@@ -266,7 +266,7 @@ end
 if size(values,1) ~= EEG.trials
     error( [ 'Pop_importepoch() error: the number of rows in the input file/array does' 10 ... 
              'not match the number of trials. Maybe you forgot to specify the file header length?' ]);
-end;    
+end    
 
 % create epoch array info
 % -----------------------
@@ -275,13 +275,13 @@ if iscell( values )
         for index=1:EEG.trials
             eval( ['EEG.epoch(index).' fieldlist{ indexfield } '=values{ index, indexfield };'] );
         end
-    end;    
+    end    
 else
     for indexfield = 1:length(fieldlist)
         for index=1:EEG.trials
             eval( ['EEG.epoch(index).' fieldlist{ indexfield } '=values( index, indexfield);'] );
         end
-    end;    
+    end    
 end
 
 if isempty( EEG.epoch )
@@ -299,7 +299,7 @@ for index = 1:length(otherfieldlist)
     switch otherfieldlist{index}
        case {'type' 'latency'}, tmpfieldname{index} = [ 'epoch' otherfieldlist{index} ];
        otherwise,               tmpfieldname{index} = otherfieldlist{index};
-    end;   
+    end   
 end
 
 if ~isempty(EEG.event)
@@ -403,15 +403,16 @@ function array = load_file_or_array( varname, skipline );
         if exist(varname) ~= 2, error( [ 'Set error: no filename ' varname ] ); end
 
 		fid=fopen(varname,'r','ieee-le');
-		if fid<0, error( ['Set error: file ''' varname ''' found but error while opening file'] ); end;  
-
-		for index=1:skipline	fgetl(fid); end; % skip lines ---------
+		if fid<0, error( ['Set error: file ''' varname ''' found but error while opening file'] ); end  
+        for index = 1:skipline
+            fgetl(fid);
+        end
         inputline = fgetl(fid);
         linenb = 1;
         while inputline~=-1
             colnb = 1;
             while ~isempty(deblank(inputline))
-                [tmp inputline] = strtok(inputline);
+                [tmp, inputline] = strtok(inputline);
                 tmp2 = str2num( tmp );
                 if isempty( tmp2 ), array{linenb, colnb} = tmp;
                 else                array{linenb, colnb} = tmp2;
@@ -420,13 +421,13 @@ function array = load_file_or_array( varname, skipline );
             end
             inputline = fgetl(fid);
             linenb = linenb +1;
-        end;        
+        end        
                 
 		fclose(fid);
 
     else % variable in the global workspace
          % --------------------------
          array = evalin('base', varname);
-    end;     
+    end     
 return;
 

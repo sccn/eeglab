@@ -109,9 +109,10 @@ if popup
 			 };
 
 	result = inputgui( geometry, uilist, 'pophelp(''pop_crossf'');', ...
-					   fastif(typeproc, 'Plot channel cross-coherence -- pop_crossf()', ...
-							  'Plot component cross-coherence -- pop_crossf()'));
-	if length( result ) == 0 return; end
+					   fastif(typeproc, 'Plot channel cross-coherence -- pop_crossf()', 'Plot component cross-coherence -- pop_crossf()'));
+    if isempty(result)
+        return; 
+    end
 
 	num1     = eval( [ '[' result{1} ']' ] ); 
 	num2     = eval( [ '[' result{2} ']' ] ); 

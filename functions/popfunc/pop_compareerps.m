@@ -63,8 +63,10 @@ if nargin < 2
 	                 'Channels subset to consider ([]=all):' ...
 	                 'Plot title ([]=automatic):' };
 	inistr       = { '1' '' '' };
-	result       = inputdlg2( promptstr, 'Compare dataset ERPs -- pop_compareerps()', 1,  inistr, 'pop_compareerps');
-	if length(result) == 0 return; end
+    result = inputdlg2(promptstr, 'Compare dataset ERPs -- pop_compareerps()', 1, inistr, 'pop_compareerps');
+    if isempty(result) 
+        return; 
+    end
 	setlist   	 = eval( [ '[' result{1} ']' ] );
 	chansubset   = eval( [ '[' result{2} ']' ] );
 	if isempty( chansubset ), chansubset = 1:ALLEEG(setlist(1)).nbchan; end

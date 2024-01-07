@@ -72,8 +72,11 @@ if nargin < 2
                   { 'style' 'text' 'string' 'Other plot options (see help)' } ...
                   { 'style' 'edit' 'string' '''ydir'', 1' 'tag' 'opt' } };
     geometry = { [1 1] [1 1] [1 1] [1 1] [1 1] };
-    [result userdata tmphalt restag ] = inputgui( 'uilist', uilist, 'geometry', geometry, 'helpcom', 'pophelp(''pop_plottopo'')', 'title', 'Topographic ERP plot - pop_plottopo()');
-	if length(result) == 0 return; end
+    
+    [result, userdata, tmphalt, restag] = inputgui('uilist', uilist, 'geometry', geometry, 'helpcom', 'pophelp(''pop_plottopo'')', 'title', 'Topographic ERP plot - pop_plottopo()');
+    if length(result) == 0
+        return;
+    end
     
 	channels     = eval( [ '[' restag.chan ']' ] );
 	plottitle    = restag.title;

@@ -246,11 +246,21 @@ g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'notrialcond' 'integer'   []         []; ...
                         'sort'        'integer'   []         []; ...
                         'sorttrial'   'string'    { 'on','off' } 'on' }, 'pop_select');
-if ischar(g), error(g); end
-if ~isempty(g.rmtrial)   g.notrial   = g.rmtrial; end
-if ~isempty(g.rmtime)    g.notime    = g.rmtime; end
-if ~isempty(g.rmpoint)   g.nopoint   = g.rmpoint; end
-if ~isempty(g.rmchannel) g.nochannel = g.rmchannel; end
+if ischar(g)
+    error(g);
+end
+if ~isempty(g.rmtrial)
+    g.notrial = g.rmtrial;
+end
+if ~isempty(g.rmtime)
+    g.notime = g.rmtime; 
+end
+if ~isempty(g.rmpoint)
+    g.nopoint = g.rmpoint;
+end
+if ~isempty(g.rmchannel)
+    g.nochannel = g.rmchannel;
+end
 
 if ~isempty(g.sort)
     if g.sort, g.sorttrial = 'on';

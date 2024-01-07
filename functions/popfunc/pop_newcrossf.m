@@ -112,8 +112,10 @@ if popup
 
 	result = inputgui( geometry, uilist, 'pophelp(''pop_newcrossf'');', ...
 					   fastif(typeproc, 'Plot channel cross-coherence -- pop_newcrossf()', ...
-							  'Plot component cross-coherence -- pop_newcrossf()'));
-	if length( result ) == 0 return; end
+                       'Plot component cross-coherence -- pop_newcrossf()'));
+    if isempty(result)
+        return;
+    end
 
 	num1     = eval( [ '[' result{1} ']' ] ); 
 	num2     = eval( [ '[' result{2} ']' ] ); 
@@ -128,7 +130,7 @@ if popup
     	options = [',''type'', ''coher''' ];
     else
 		options = [',''type'', ''phasecoher''' ];
-    end;	
+    end	
 	
     % add topoplot
     % ------------
@@ -182,7 +184,7 @@ end
 % --------------------
 if isempty(tlimits)
 	tlimits = [EEG.xmin, EEG.xmax];
-end;	
+end
 pointrange1 = round(max((tlimits(1)/1000-EEG.xmin)*EEG.srate, 1));
 pointrange2 = round(min((tlimits(2)/1000-EEG.xmin)*EEG.srate, EEG.pnts));
 pointrange = [pointrange1:pointrange2];
@@ -199,8 +201,8 @@ else
         tmpsig2 = eeg_getdatact(EEG, 'component', num2, 'samples',pointrange);
 	else
 		error('You must run ICA first');
-	end;	
-end;	 
+    end
+end
 tmpsig1 = reshape( tmpsig1, 1, size(tmpsig1,2)*size(tmpsig1,3));
 tmpsig2 = reshape( tmpsig2, 1, size(tmpsig2,2)*size(tmpsig2,3));
 

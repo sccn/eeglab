@@ -227,7 +227,8 @@ if EEG.trials == 1
                     end
                 end
             end
-            try warning on MATLAB:divideByZero
+            try 
+                warning('on', 'MATLAB:divideByZero');
             catch, end
         end
     else

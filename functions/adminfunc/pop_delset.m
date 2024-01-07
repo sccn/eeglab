@@ -50,7 +50,7 @@ if nargin < 1
 	return;
 end
 if length( ALLSET ) < 2
-	error( [ 'Cannot delete dataset when there is only one of them. Restart EEGLAB' 10 'or use the menu item in the File menu to clear all datasets' ]);
+    error( [ 'Cannot delete dataset when there is only one of them. Restart EEGLAB' 10 'or use the menu item in the File menu to clear all datasets' ]);
 end
 
 if nargin < 2 || (length(set_in)==1 && set_in < 0)
@@ -61,11 +61,13 @@ if nargin < 2 || (length(set_in)==1 && set_in < 0)
 		inistr       = { int2str(-set_in) };
 	else
 		inistr       = { '1' };
-	end
-	result       = inputdlg2( promptstr, 'Delete dataset -- pop_delset()', 1,  inistr, 'pop_delset');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end
-	set_in   	 = eval( [ '[' result{1} ']' ] );
+    end
+    result       = inputdlg2( promptstr, 'Delete dataset -- pop_delset()', 1,  inistr, 'pop_delset');
+    size_result = size(result);
+    if size_result(1) == 0
+        return;
+    end
+    set_in   	 = eval( [ '[' result{1} ']' ] );
 end
 
 if isempty(set_in)

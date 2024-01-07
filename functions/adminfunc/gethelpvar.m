@@ -62,6 +62,7 @@ if fid == -1
 end
 
 cont = 1;
+
 % scan file
 % -----------
 str = fgets( fid );
@@ -115,8 +116,8 @@ while (str(1) == '%')
 	  % not a title
 	  % ------------
          % scan lines
-         [tok1 strrm] = strtok( str );
-         [tok2 strrm] = strtok( strrm );
+         [tok1, strrm] = strtok( str );
+         [tok2, strrm] = strtok( strrm );
 
          if ~isempty(tok2) && ( isequal(tok2,'-') || isequal(tok2,'=')) % new variable 
             newvar = 1;
@@ -249,13 +250,13 @@ return;
 % -----------------
 % sub-functions
 % -----------------
-function str = deblank2( str ); % deblank two ways
+function str = deblank2( str )
    str = deblank(str(end:-1:1));    % remove initial blanks
    str = deblank(str(end:-1:1));	% remove tail blanks 
 return;
 
-function strout = formatstr( str, refcall );
-		[tok1 strrm] = strtok( str );
+function strout = formatstr( str, refcall )
+		[tok1, strrm] = strtok( str );
 		strout = [];
 		while ~isempty(tok1)
 			tokout = functionformat( tok1, refcall );
@@ -263,33 +264,39 @@ function strout = formatstr( str, refcall );
 				strout = tokout; 	
 			else
 				strout = [strout ' ' tokout ]; 	
-			end;	
-			[tok1 strrm] = strtok( strrm );
+            end
+			[tok1, strrm] = strtok( strrm );
 		end
 return;	
  
-function tokout = functionformat( tokin, refcall );
+function tokout = functionformat( tokin, refcall )
 	tokout = tokin;	% default
 	[test, realtokin, tail] = testfunc1( tokin );
 	if ~test,  [test, realtokin, tail] = testfunc2( tokin ); end
 	if test
-		i1 = findstr( refcall, '%s');
-		i2 = findstr( refcall(i1(1):end), '''');
-		if isempty(i2) i2 = length( refcall(i1(1):end) )+1; end
+        i1 = findstr( refcall, '%s');
+        i2 = findstr(refcall(i1(1):end), '''');
+        if isempty(i2)
+            i2 = length(refcall(i1(1):end)) + 1;
+        end
 		filename  = [ realtokin refcall(i1+2:i1+i2-2)];
 		if exist( filename ) % do not make link if the file does not exist 
 			tokout =  sprintf( [ '<A HREF="' refcall '">%s</A>' tail ' ' ], realtokin, realtokin );
 		end
-	end;		
+    end
 return;
 
-function [test, realtokin, tail] = testfunc1( tokin ) % test if is string is 'function()[,]'  
-	test = 0; realtokin = ''; tail = '';
-	if ~isempty( findstr( tokin, '()' ) )
-		realtokin = tokin( 1:findstr( tokin, '()' )-1);
-		if length(realtokin) < (length(tokin)-2) tail = tokin(end); else tail = []; end
-		test = 1;
-	end
+function [test, realtokin, tail] = testfunc1( tokin ) % test if is string is 'function()[,]'
+test = 0; realtokin = ''; tail = '';
+if ~isempty( findstr( tokin, '()' ) )
+    realtokin = tokin(1:findstr(tokin, '()') - 1);
+    if length(realtokin) < (length(tokin) - 2)
+        tail = tokin(end);
+    else
+        tail = [];
+    end
+    test = 1;
+end
 return;
 
 function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FUNCTION[,]'  
@@ -306,7 +313,7 @@ function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FU
 		testokin(findstr(testokin, '2')) = 'A';
 		if all(double(testokin) > 64) && all(double(testokin) < 91)
 			test = 1;
-		end;				
+        end
 		realtokin = lower(realtokin);
 	end
 return;	

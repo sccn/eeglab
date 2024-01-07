@@ -110,7 +110,7 @@ if nargin <3
    g = [];
 else
    g = struct( varargin{:});;
-end;	 	
+end	 	
 
 try, g.font; 			catch, g.font		= 'Helvetica'; 	end
 
@@ -129,17 +129,17 @@ g.seefile      = [ '<FONT FACE="'  g.font '">See the matlab file <A HREF="%s" ta
 
 try, g.outputonly; 		catch, g.outputonly	= 'off'; end
 try, g.background; 		catch, g.background	= ''; 	end
-try, g.header; 			catch, g.header		= ''; 	end; 
-try, g.footer; 			catch, g.footer		= ''; 	end; 
-try, g.refcall; 		catch, g.refcall	= '%s.html'; 	end; 
-try, g.outputlink; 		catch, g.outputlink = [ g.normrow g.normcol1 '<FONT FACE="' g.font '"><A HREF="%s.html">%s.html</A></td>' g.normcol2 '%s</FONT></td></tr>' ]; end; 
+try, g.header; 			catch, g.header		= ''; 	end 
+try, g.footer; 			catch, g.footer		= ''; 	end 
+try, g.refcall; 		catch, g.refcall	= '%s.html'; 	end 
+try, g.outputlink; 		catch, g.outputlink = [ g.normrow g.normcol1 '<FONT FACE="' g.font '"><A HREF="%s.html">%s.html</A></td>' g.normcol2 '%s</FONT></td></tr>' ]; end 
 
 g.footer      = [ '<FONT FACE="'  g.font '">' g.footer '</FONT>' ];
 
 if nargin < 1 
 	help help2html;
 	return;
-end;	
+end	
 
 % output file
 % -----------
@@ -173,7 +173,7 @@ cont = 1;
 % -----------
 str = fgets( fid );
 % if first line is the name of the function, reload
-if str(1) ~= '%', str = fgets( fid ); end; 
+if str(1) ~= '%', str = fgets( fid ); end 
 
 % state variables
 % -----------
@@ -205,7 +205,7 @@ while (str(1) == '%')
 	  		case { 'usage:' 'authors:' 'author:' 'notes:' 'note:' 'input:' ...
 	  		'inputs:' 'outputs:' 'output:' 'example:' 'examples:' 'see also:' }, newtitle = 1;
 		 end
-		 if (i2d == length(str)) && (str(1) ~= '%'), newtitle = 1; end;	
+		 if (i2d == length(str)) && (str(1) ~= '%'), newtitle = 1; end	
    	  end
       if newtitle
   			tilehtml = str(1:i2d); 
@@ -215,7 +215,7 @@ while (str(1) == '%')
         	if i2d < length(str)
          			vartext = formatstr(str(i2d+1:end), g.refcall);
          	else	vartext = [];
-         	end;	
+         	end	
          	varname = [];
       else
 	  % not a title
@@ -252,10 +252,10 @@ while (str(1) == '%')
                			vartext = [ deblank2(vartext(1:end-3)) ' ' str]; % space if '...'
                		else
                     	vartext = [ vartext '<BR>' str];    % CR otherwise
-                    end;	
-               end;		
+                    end	
+               end		
             end
-         end;	 
+         end	 
          newtitle = 0;		
       end
 	  % --- END OF DECODING 	
@@ -276,12 +276,12 @@ while (str(1) == '%')
        			if ~isempty(oldvartext)
            			fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], finalformat(oldvartext));	
        			end
-         	end;	 	
+         	end	 	
          	newvar = 1;
          	oldvarname = varname;
          	oldvartext = vartext;
-         end;	
-      end; 
+         end	
+      end 
 
       % test if new input for an array
       % ------------------------------
@@ -292,7 +292,7 @@ while (str(1) == '%')
 
 			   % generate the output command
 			   % ---------------------------
-			   try, g.outputtext; 		catch, g.outputtext	= ''; 	end; 
+			   try, g.outputtext; 		catch, g.outputtext	= ''; 	end 
 			   if isempty(g.outputtext),  g.outputtext	=  filename(1:indexdot(end)-1); end
 			   linktext = sprintf( g.outputlink, g.outputtext,  filename(1:indexdot(end)-1), maintext ); 
 			   if strcmp(g.outputonly, 'on')
@@ -309,8 +309,8 @@ while (str(1) == '%')
                imagename = [];
                imagename1 = [ htmlfile( 1:findstr( htmlfile, functioname )-1) functioname '.jpg' ];
                imagename2 = [ htmlfile( 1:findstr( htmlfile, functioname )-1) functioname '.gif' ];
-			   if exist( imagename2 ), imagename = imagename2; end; 
-			   if exist( imagename1 ), imagename = imagename1; end; 
+			   if exist( imagename2 ), imagename = imagename2; end 
+			   if exist( imagename1 ), imagename = imagename1; end 
                if ~isempty(imagename) % do not make link if the file does not exist 
                    imageinfo = imfinfo(imagename);
                    if imageinfo.Width < 600
@@ -324,7 +324,7 @@ while (str(1) == '%')
                    end
                    
                end
-            end;             
+            end     
    		elseif ~isempty(oldvarname)
 			allvars{indexout} = oldvarname;
 			alltext{indexout} = oldvartext;
@@ -335,8 +335,8 @@ while (str(1) == '%')
    			if ~isempty(oldvartext)
        			fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], finalformat(oldvartext));	
    			end
-         end;      
-      end;	
+         end    
+      end
       
       % print title
       % -----------
@@ -344,7 +344,7 @@ while (str(1) == '%')
 		 fprintf( fo, [ g.normrow g.doublecol '<BR></td></tr>' g.normrow g.normcol1 g.title '</td>\n' ], tilehtml);
       	 if str(1) ~= '%' % last input
          	fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], vartext);
-         end;		
+         end	
          oldvarname = [];
          oldvartext = [];
       end
@@ -361,13 +361,13 @@ return;
 % -----------------
 % sub-functions
 % -----------------
-function str = deblank2( str ); % deblank two ways
+function str = deblank2( str ) % deblank two ways
    str = deblank(str(end:-1:1));    % remove initial blanks
    str = deblank(str(end:-1:1));	% remove tail blanks 
 return;
 
-function strout = formatstr( str, refcall );
-	[tok1 strrm] = strtok( str );
+function strout = formatstr( str, refcall )
+	[tok1, strrm] = strtok( str );
 		strout = [];
 		while ~isempty(tok1)
 			tokout = functionformat( tok1, refcall );
@@ -375,13 +375,13 @@ function strout = formatstr( str, refcall );
 				strout = tokout; 	
 			else
 				strout = [strout ' ' tokout ]; 	
-			end;	
-			[tok1 strrm] = strtok( strrm );
+			end	
+			[tok1, strrm] = strtok( strrm );
 		end
 return;	
 
 % final formatting
-function str = finalformat(str); % bold text in bracket if just in the beginning
+function str = finalformat(str) % bold text in bracket if just in the beginning
     tmploc = sort(union(find(str == '['), find(str == ']')));
     if ~isempty(tmploc) && str(1) == '['
         if mod(length(tmploc),2) ~= 0, str, error('Opening but no closing bracket'); end
@@ -397,30 +397,36 @@ function str = finalformat(str); % bold text in bracket if just in the beginning
     %    end
     %end
     
-function tokout = functionformat( tokin, refcall );
+function tokout = functionformat( tokin, refcall )
 	tokout = tokin;	% default
 	[test, realtokin, tail, beg] = testfunc1( tokin );
 	if ~test,  [test, realtokin, tail] = testfunc2( tokin ); end
-	if test
-		i1 = findstr( refcall, '%s');
-		i2 = findstr( refcall(i1(1):end), '''');
-		if isempty(i2) i2 = length( refcall(i1(1):end) )+1; end
-		filename  = [ realtokin refcall(i1+2:i1+i2-2)]; % concatenate filename and extension
-		%disp(filename)
-		if exist( filename ) % do not make link if the file does not exist 
+    if test
+        i1 = findstr( refcall, '%s');
+        i2 = findstr(refcall(i1(1):end), '''');
+        if isempty(i2)
+            i2 = length(refcall(i1(1):end)) + 1;
+        end
+        filename  = [ realtokin refcall(i1+2:i1+i2-2)]; % concatenate filename and extension
+        %disp(filename)
+        if exist( filename ) % do not make link if the file does not exist
 			tokout =  sprintf( [ beg '<A HREF="' refcall '">%s</A>' tail ' ' ], realtokin, realtokin );
 		end
-	end;		
+    end	
 return;
 
 function [test, realtokin, tail, beg] = testfunc1( tokin ) % test if is string is 'function()[,]'  
 	test = 0; realtokin = ''; tail = ''; beg = '';
 	if ~isempty( findstr( tokin, '()' ) )
-		if length(tokin)<3, return; end
-		realtokin = tokin( 1:findstr( tokin, '()' )-1);
-		if length(realtokin) < (length(tokin)-2) tail = tokin(end); else tail = []; end
-		test = 1;
-		if realtokin(1) == '(', realtokin = realtokin(2:end); beg = '('; end
+        if length(tokin)<3, return; end
+        realtokin = tokin(1:findstr(tokin, '()') - 1);
+        if length(realtokin) < (length(tokin) - 2)
+            tail = tokin(end);
+        else
+            tail = [];
+        end
+        test = 1;
+        if realtokin(1) == '(', realtokin = realtokin(2:end); beg = '('; end
 		if realtokin(1) == ',', realtokin = realtokin(2:end); beg = ','; end
 	end
 return;
@@ -439,17 +445,17 @@ function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FU
 		testokin(findstr(testokin, '2')) = 'A';
 		if all(double(testokin) > 64) && all(double(testokin) < 91)
 			test = 1;
-		end;				
+		end				
 		realtokin = lower(realtokin);
 	end
 return;	
 
 function [tok, str] = mystrtok(str)
     
-    [tok str] = strtok(str);
+    [tok, str] = strtok(str);
     if tok(1) == '"'
         while tok(end) ~= '"'
-            [tok2 str] = strtok(str);
+            [tok2, str] = strtok(str);
             if isempty(tok2), tok, error('can not find closing quote ''"'' in previous text'); end
             tok = [tok ' ' tok2];
         end

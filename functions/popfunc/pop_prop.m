@@ -91,8 +91,10 @@ if nargin == 2
                { 'style' 'edit' 'string' '''freqrange'', [2 50]' } {} };
     uigeom = { [2 1 0.5 ] [2 1 0.5] };
     result = inputgui('geometry', uigeom, 'uilist', uitext, 'helpcom', 'pophelp(''pop_prop'');', ...
-							 'title', fastif( typecomp, 'Channel properties - pop_prop()', 'Component properties - pop_prop()'));
-	if size( result, 1 ) == 0 return; end
+'title', fastif( typecomp, 'Channel properties - pop_prop()', 'Component properties - pop_prop()'));
+if size(result, 1) == 0
+    return;
+end
    
     chanoristr = result{1};
     chanorcomp   = eeg_decodechan(EEG.chanlocs, result{1} );

@@ -87,8 +87,11 @@ function EEG = eeg_timeinterp( EEG, samples, varargin);
             EEG.data(elec,samplesout,index) = spline( samplesin, data(elec, samplesin, index), samplesout);
         end
         if length(opt.epochinds) > 1, 
+            
             fprintf('.'); 
-            if mod(index,40) == 01, fprintf('\n'); end
+            if mod(index, 40) == 1
+                fprintf('\n');
+            end
         end
     end
     if length(opt.epochinds) > 1, fprintf('\n'); end

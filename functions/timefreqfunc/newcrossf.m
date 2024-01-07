@@ -434,8 +434,9 @@ for index = 1:length(allfields)
 end
 
 g.tlimits = tlimits;
-g.frame   = frame;
-if ~iscell(X) g.trials = prod(size(X))/g.frame;
+g.frame = frame;
+if ~iscell(X)
+    g.trials = prod(size(X)) / g.frame;
 else          g.trials = prod(size(X{1}))/g.frame;
 end
 g.srate   = Fs;

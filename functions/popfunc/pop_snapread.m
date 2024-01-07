@@ -65,14 +65,20 @@ EEG = [];
 
 if nargin < 1 
 	% ask user
-	[filename, filepath] = uigetfile('*.SMA', 'Choose a SnapMaster file -- pop_snapread()'); 
-	if filename == 0 return; end
+    [filename, filepath] = uigetfile('*.SMA', 'Choose a SnapMaster file -- pop_snapread()');
+    if filename == 0
+        return;
+    end
 	filename = [filepath filename];
      
     promptstr    = { 'Relative gain (see help)' };
     inistr       = { '400' };
-    result       = inputdlg2( promptstr, 'Import SnapMaster file -- pop_snapread()', 1,  inistr, 'pop_snapread');
-    if length(result) == 0 return; end
+    
+    
+    result = inputdlg2(promptstr, 'Import SnapMaster file -- pop_snapread()', 1, inistr, 'pop_snapread');
+    if isempty(result) 
+        return; 
+    end
     gain   = eval( result{1} );
 
 end
@@ -98,8 +104,8 @@ EEG.xmin            = 0;
 
 A = find(events ~= 0);
 if ~isempty(A)
-    EEG.event = struct( 'type', mattocell(events(A), [1], ones(1,length(events(A)))), ...
-                        'latency', mattocell(A(:)', [1], ones(1,length(A))) );
+    EEG.event = struct( 'type', mattocell(events(A), 1, ones(1,length(events(A)))), ...
+                        'latency', mattocell(A(:)', 1, ones(1,length(A))) );
 end
 
 EEG = eeg_checkset(EEG, 'eventconsistency');

@@ -125,7 +125,7 @@ if nargin < 2
                       };
         geom = { 1 [2 0.7] [2 0.7] };
         result       = inputgui( 'uilist', uilist, 'geometry', geom, 'helpcom', 'pophelp(''pop_subcomp'')', ...
-            title('Remove components from data -- pop_subcomp()');
+            'title', 'Remove components from data -- pop_subcomp()');
         if isempty(result)
             return;
         end

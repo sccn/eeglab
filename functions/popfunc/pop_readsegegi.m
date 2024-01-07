@@ -48,8 +48,11 @@ command = '';
 if nargin < 1 
 	% ask user
 	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose first EGI RAW file -- pop_readsegegi()'); 
+    
     drawnow;
-	if filename == 0 return; end
+    if filename == 0
+        return;
+    end
 	filename = fullfile(filepath, filename);
 end
 

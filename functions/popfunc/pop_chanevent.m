@@ -160,16 +160,17 @@ if nargin < 2
                  '0 0 1 0 2 0 ...  produces event types 1 and 2).' ] } ...
 			   { 'style' 'checkbox' 'value' 0 } { } };
 	result       = inputgui( geometry, strgui, 'pophelp(''pop_chanevent'');', 'Extract event from channel(s) - pop_chanevent()');
-	
-	if length(result) == 0 return; end
+    if isempty(result)
+        return;
+    end
 	chan   = eval( [ '[' result{1} ']' ] );
     options = {};
 	if ~isempty(result{2}), options = { options{:} 'oper' result{2} }; end
-	switch result{3},
+	switch result{3}
 		case 1, options = { options{:} 'edge' 'leading' };
 		case 2, options = { options{:} 'edge' 'both' };
 		case 3, options = { options{:} 'edge' 'trailing' };
-	end; 
+	end 
     options = { options{:} 'edgelen' eval( [ '[' result{4} ']' ] ) };
     if result{5},  options = { options{:} 'duration' 'on' }; end
 	if ~result{6}, options = { options{:} 'delchan'  'off'}; end
@@ -217,7 +218,7 @@ for ci = chan
         try, eval( g.oper );
         catch, error('pop_chanevent: error executing preprocessing string');
         end
-    end;    
+    end    
     
     % extract edges
     % -------------

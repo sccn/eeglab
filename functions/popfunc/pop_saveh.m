@@ -55,8 +55,11 @@ end
 	
 if nargin < 3
 	[curfilename, curfilepath] = uiputfile('eeglabhist.m', 'Save the EEGLAB session command history with .m extension -- pop_saveh()');
+    
     drawnow;
-	if curfilename == 0 return; end
+    if curfilename == 0
+        return;
+    end
 end
 
 

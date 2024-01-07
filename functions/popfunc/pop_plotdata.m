@@ -93,8 +93,10 @@ if nargin <3
                                    'Component ERPs in rect. array -- pop_plotdata()', 1, ...
                                    {   ['1:' int2str(size(EEG.icawinv,2))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] ['0 0'] }, ...
                                    'pop_plotdata' );
-	end;		
-	if length(result) == 0 return; end
+    end
+    if isempty(result)
+        return;
+    end
 
 	indices   	 = eval( [ '[' result{1} ']' ] );
 
@@ -106,16 +108,16 @@ if nargin <3
         if length(ylimits) ~= 2
             ylimits = [0 0]; % use default if 2 values not given
         end
-end;	
+end
 if ~(exist('trials') == 1)
 	trials = 1:EEG.trials;
-end;	
+end
 if exist('plottitle') ~= 1
     plottitle = '';
-end;    
+end    
 if exist('singletrials') ~= 1
     singletrials = 0;
-end;    
+end    
 
 if EEG.trials > 1 && singletrials == 0
     fprintf('Selecting trials and components...\n');
@@ -124,7 +126,7 @@ if EEG.trials > 1 && singletrials == 0
  	else
 	   if isempty(EEG.icasphere)
 	      error('no ICA data for this set, first run ICA');
-	   end;   
+	   end   
        tmpdata = eeg_getdatact(EEG, 'component', indices, 'trialindices', trials);
 	   fprintf('Averaging...\n');
 	   sigtmp = nan_mean(tmpdata,3);
@@ -135,7 +137,7 @@ else
 	else
 	   if isempty(EEG.icasphere)
 	      error('no ICA data for this set, first run ICA');
-	   end;  
+	   end  
        sigtmp = eeg_getdatact(EEG, 'component', indices, 'trialindices', trials);
 	end
 end

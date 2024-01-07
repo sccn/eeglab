@@ -129,7 +129,9 @@ if nargin < 1
     end
 
     [result,~,~,restag] = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
-    if isempty(result) return; end
+    if isempty(result) 
+        return; 
+    end
     if ~isfield(restag, 'trials')
         restag.trials = '';
     end

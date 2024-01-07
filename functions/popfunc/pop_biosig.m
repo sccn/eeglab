@@ -88,7 +88,9 @@ if nargin < 1
 	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()', 'multiselect', 'on'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
-	if isequal(filename,0) return; end
+    if isequal(filename, 0)
+        return;
+    end
     
     if iscell(filename)
         buttonName = questdlg2([ 'Do you want to automatically save imported datasets?' 10 ...
@@ -199,8 +201,9 @@ g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'memorymapped' 'string'  { 'on';'off' } 'off';
                             'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
 if ischar(g), error(g); end
-
-if ~iscell(filename) filename = { filename }; end
+if ~iscell(filename)
+    filename = { filename };
+end
 
 for iFile = 1:length(filename)
     % import data
@@ -318,7 +321,9 @@ if strcmpi(overflow, 'off')
     strmode = 'OVERFLOWDETECTION:OFF';
 end
 if strcmpi(uncalibrated, 'on')
-    if ~isempty(strmode) strmode = [ strmode ';' ]; end
+    if ~isempty(strmode)
+        strmode = [strmode ';'];
+    end
     strmode = [ strmode 'UCAL'];
 end
 if ~isequal(bdfeventmode, 4)
