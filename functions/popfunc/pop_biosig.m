@@ -327,7 +327,9 @@ if strcmpi(uncalibrated, 'on')
     strmode = [ strmode 'UCAL'];
 end
 if ~isequal(bdfeventmode, 4)
-    if ~isempty(strmode) strmode = [ strmode ';' ]; end
+    if ~isempty(strmode)
+        strmode = [strmode ';'];
+    end
     strmode = [ strmode 'BDF:[' num2str(bdfeventmode) ']' ];
 end
 fprintf('sopen mode is "%s"\n', strmode);

@@ -221,7 +221,11 @@ end
 % convert to seconds for sread
 % ----------------------------
 if isfield(dat, 'hdr') && ~isfield(dat, 'Fs')
-    if isfield(dat, 'fsample') EEG.srate = dat.fsample; else EEG.srate = dat.hdr.Fs; end
+    if isfield(dat, 'fsample')
+        EEG.srate = dat.fsample;
+    else
+        EEG.srate = dat.hdr.Fs;
+    end
     EEG.nbchan          = dat.hdr.nChans;
     EEG.data            = alldata;
     if iscell(EEG.data)
