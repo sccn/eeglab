@@ -1,4 +1,4 @@
-% EEGLAB_NEW - script called when a new dataset is created and require 
+  % EEGLAB_NEW - script called when a new dataset is created and require 
 %              input from user. Use workspace variables EEG, ALLEEG,
 %              CURRENTSET, LASTCOM
 %
@@ -39,7 +39,7 @@ functionsEEGLAB = { 'pop_chanedit' 'pop_editset' 'pop_comment' 'pop_headplot' 'p
               'pop_saveset'  'pop_importepoch'    'pop_importevent'   'pop_chanevent' ...
               'pop_importpres' 'pop_importerplab' 'pop_iclabel' 'pop_icflag' 'pop_dipfit_headmodel' ...
               'pop_dipfit_settings' 'pop_dipfit_gridsearch' 'pop_dipfit_nonlinear' 'pop_multifit' 'pop_leadfield' 'topoplot' ';;;' ...
-              'pop_roi_connect' 'pop_roi_activity'};
+              'pop_roi_connect' 'pop_roi_activity' 'pop_eegstats' };
 
 posEqual = find('=' == LASTCOM);
 if ~isempty(LASTCOM) && ~isempty(EEG) ...
