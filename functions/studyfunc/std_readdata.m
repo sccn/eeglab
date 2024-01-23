@@ -24,6 +24,9 @@
 %  'component' - [integer] select a specific component in a cluster.
 %                This is the index of the component in the cluster not the
 %                component number {default:all}
+%  'ndim'       - [integer] number of dimension of output array
+%  'customread' - [func] custom function to read data. See example.
+%  'customparams' - [cell] custom parameters for function above. See example.
 %
 % ERP specific optional inputs:
 %  'timerange' - [min max] time range {default: whole measure range}
@@ -47,6 +50,11 @@
 %  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');
 %  [erp times] = std_readdata(STUDY, ALLEEG, 'channels', { ALLEEG(1).chanlocs(1).labels });
 %
+%  % To read field 'EEG.etc.eegstats.alpha_asymmetry' for each dataset, enter
+%  % (note that you need to use the eegstats plugin to compute this value first)
+%  [STUDY,aa] = std_readdata(STUDY, ALLEEG, 'customread', 'std_readeegfield', ...
+%               'customparams', {{ 'etc', 'eegstats', 'alpha_asymmetry' }}, 'ndim', 1);
+% 
 % Author: Arnaud Delorme, CERCO, 2006-
 
 % Copyright (C) Arnaud Delorme, arno@salk.edu
@@ -262,7 +270,7 @@ for iSubj = 1:length(subjectList)
                 yvalsERPim = 1:size(dataTmp{iSubj}{nonEmptyCell(1)},1);
             end
         elseif strcmpi(opt.datatype, 'custom')
-            disp('Nothing to do for custom data');
+            % Nothing to do for custom data, this is done at reading time
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
         end

@@ -199,7 +199,7 @@ else
             if isempty(dataOut)
                 dataOut = dataTmp{iVar};
             else
-                dataOut =  + dataTmp{iVar};
+                dataOut = dataOut + dataTmp{iVar};
             end
         end
     end
