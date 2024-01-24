@@ -340,7 +340,7 @@ end
 
 % import fiducial in associated coordsystem file if present
 % ---------------------------------------------------------
-if ~isempty(fileNameNoExt)
+if ~isempty(fileNameNoExt) && length(fileNameNoExt) > 3
     coordSystemFile = dir(fullfile(filePath, [ fileNameNoExt(1:4) '*coordsystem.json' ]));
     if length(coordSystemFile) == 1
         coordSystemFileName = fullfile(coordSystemFile(1).folder, coordSystemFile(1).name);
@@ -360,7 +360,18 @@ end
 disp('Reading events...');
 if isempty(event)
     try
-        event = ft_read_event(filename, dataopts{:});
+        if isequal(lower(filext), '.ncs') % special for neuralinx files
+            eventfile = [ strrep(fileNameNoExt, 'Pz', 'Events') '.nev'];
+            if exist(eventfile, 'file')
+                event = ft_read_event(eventfile, dataopts{:});
+                for i=1:length(event)
+                  % the first sample in the datafile is 1
+                  event(i).sample = (event(i).timestamp-double(dat.FirstTimeStamp))./dat.TimeStampPerSample + 1;
+                end            
+            end
+        else
+            event = ft_read_event(filename, dataopts{:});
+        end
     catch
         disp(lasterr); 
         event = []; 
