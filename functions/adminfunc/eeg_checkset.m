@@ -401,6 +401,7 @@ for inddataset = 1:length(ALLEEG)
                     
                     % remove the events which latency are out of boundary
                     % ---------------------------------------------------
+                    if isempty(EEG.event), return; end
                     if isfield(EEG.event, 'latency')
                         if isfield(EEG.event, 'type')
                             if eeg_isboundary(EEG.event(1)) && isfield(EEG.event, 'duration')
