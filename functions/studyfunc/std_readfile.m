@@ -83,7 +83,7 @@
 % dimensions
 % time x freqs x channel_comps x subjects_trials
 
-function [measureData, parameters, measureRange1, measureRange2, events] = std_readfile(fileBaseName, varargin)
+function [measureData, parameters, measureRange1, measureRange2, events, trialInfo] = std_readfile(fileBaseName, varargin)
 
 if nargin < 1
     help std_readfile;
@@ -97,7 +97,7 @@ if iscell(fileBaseName)
     % ------------------------------------------------------------
     if length(fileBaseName) > 1
         for iFile = 1:length(fileBaseName)
-            [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
+            [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}, trialInfo] = std_readfile(fileBaseName{iFile}, varargin{:});
         end
     
         % get the size of each session cond x group and sum 3rd dim (trials) for each cond and group
@@ -278,11 +278,11 @@ end
 
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
 if isempty(opt.designvar)
-    [ measureData, events ] = getfiledata(fileData, NaN, v6Flag, options{:}); % read all data
+    [ measureData, trialInfo, events ] = getfiledata(fileData, NaN, v6Flag, options{:}); % read all data
     measureData = { measureData };
     events      = { events };
 else
-    [ measureData, events ] = globalgetfiledata(fileData, opt.designvar, options, {}, v6Flag);
+    [ measureData, trialInfo, events ] = globalgetfiledata(fileData, opt.designvar, options, {}, v6Flag);
 end
 
 % remove duplicates in the list of parameters
@@ -307,26 +307,29 @@ end
 
 % recursive function to load data
 % -------------------------------
-function [ measureData, eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect, v6Flag)
+function [ measureData, trialInfo, eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect, v6Flag)
 
 if length(designvar) == 0
-    [ measureData, eventVals ] = getfiledata(fileData, trialselect, v6Flag, options{:});
+    [ measureData, trialInfo, eventVals ] = getfiledata(fileData, trialselect, v6Flag, options{:});
     measureData = { measureData };
+    trialInfo = { trialInfo };
     eventVals   = { eventVals   };
 else
     % scan independent variable values
     if isfield(designvar(1), 'vartype') && strcmpi('continuous', designvar(1).vartype)
         if ~ischar(designvar(1).value), designvar(1).value = ''; end
         trialselect = { trialselect{:} designvar(1).label designvar(1).value };
-        [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
+        [ tmpMeasureData, tmpTrialInfo, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
         measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+        trialInfo(  1,:,:,:) = reshape(tmpTrialInfo,   [ 1 size(tmpTrialInfo  ) ]);
         eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
     else
         trialselectOri = trialselect;
         for iField = 1:length(designvar(1).value)
             trialselect = { trialselectOri{:} designvar(1).label designvar(1).value{iField} };
-            [ tmpMeasureData, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
+            [ tmpMeasureData, tmpTrialInfo, tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect, v6Flag);
             measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+            trialInfo(  iField,:,:,:) = reshape(tmpTrialInfo  , [ 1 size(tmpTrialInfo  ) ]);
             eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
         end
     end
@@ -334,7 +337,7 @@ end
 
 % load data from structure or file
 % --------------------------------
-function [ fieldData, events ] = getfiledata(fileData, trialselect, v6Flag, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
+function [ fieldData, trialInfo, events ] = getfiledata(fileData, trialselect, v6Flag, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
 
 persistent tmpcache;
 persistent hashcode;
@@ -345,6 +348,7 @@ end
 
 % get trial indices
 fieldData = [];
+trialInfo = [];
 events    = [];
 subTrials = [];
 trials    = [];
@@ -353,16 +357,19 @@ if ~isempty(trialselect)
         trials = [1:length(fileData.trialinfo)]; % read all trials if NaN
     else
         [trials, events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
-        if length(unique(diff(trials))) > 1 && ~v6Flag
+        if length(unique(diff(trials))) > 1 && ~v6Flag % speed up access when subsets of trials are selected
             temptrials = [trials(1):trials(end)];
             subTrials  = trials-trials(1)+1;
             trials     = temptrials;
         end
     end
 end
-% if ~isempty(subTrials)
-%     trials = subTrials(trials(
-    
+
+% get trial information
+trialInfo = fileData.trialinfo(trials);
+if ~isempty(subTrials), tmpTrialInfo = tmpTrialInfo(subTrials); end
+
+% scan channels
 for index = 1:length(chan)
     allfields   = fieldnames(fileData);
     topoFlag    = ~isempty(findstr(allfields{1}, '_grid'));
@@ -373,6 +380,7 @@ for index = 1:length(chan)
         return;
         % trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); % not sure what this does
     end
+
     
     % load data
     warning('off', 'MATLAB:MatFile:OlderFormat');
@@ -392,8 +400,12 @@ for index = 1:length(chan)
             hashcode = fileData.(fieldToRead);
         end
         tmpFieldData = tmpFieldData(indBegin1:indEnd1,trials);
-        if ~isempty(subTrials), tmpFieldData = tmpFieldData(:, subTrials); end
+        if ~isempty(subTrials)
+            tmpFieldData = tmpFieldData(:, subTrials); 
+            tmpTrialInfo = tmpTrialInfo(subTrials); 
+        end
     else
+        
         if topoFlag
             tmpFieldData = fileData.(fieldToRead);
             if isempty(trials), tmpFieldData = []; end
