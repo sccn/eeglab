@@ -381,7 +381,7 @@ datavals = reorganizedata(dataTmp, dim);
 if nargout > 6
     datainfo = reorganizedatastruct(dataTmpSubj);
     try
-        setinds = cellfun(@(x)[x.dataset], datainfo, 'UniformOutput', false);
+        setinds = cellfun(@(x)[x.index], datainfo, 'UniformOutput', false);
     catch
         error('Error generating dataset indices, recompute your measures')
     end
