@@ -1,4 +1,5 @@
 % STD_READEEGFIELD - read field from ALLEEG structure
+%
 % Usage:
 %   >> [dataOut, ~, xvals] = std_readeegfield(datasetinfo, ALLEEG, ...
 %                                        designvar, fieldName, 'key', val)
@@ -21,12 +22,13 @@
 % Output:
 %  dataOut   - cell array of value
 %  xvals     - x values
+%
 %  note: the output matches the output of std_readfile because this
 %  function can be called by STD_READDATA
 %
 % Example:
-%  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');
-%  [erp times] = std_readdata(STUDY, ALLEEG, 'channels', { ALLEEG(1).chanlocs(1).labels });
+%  [STUDY,aa,~,~,~,~,~,info] = std_readdata(STUDY, ALLEEG, 'customread', ...
+%  'std_readeegfield', 'customparams', {{ 'etc', 'eegstats', 'alpha_asymmetry' }}, 'ndim', 1);
 %
 % Author: Arnaud Delorme, CERCO, 2006-
 
@@ -57,7 +59,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE. 
 
-function [dataOut, params, xvals, yvals, events] = std_readeegfield(datasetinfo, ALLEEG, designvar, fieldName, varargin)
+function [dataOut, params, xvals, yvals, events,dataOutSubj] = std_readeegfield(datasetinfo, ALLEEG, designvar, fieldName, varargin)
 
 dataOut = {};
 params  = [];
@@ -92,15 +94,15 @@ end
 if length(designvar) == 1
     for iVar1 = 1:length(designvar(1).value)
 
-        dataOut{iVar1} = getDataCell( designvar(1).value{iVar1},  { datasetinfo.(designvar(1).label) }, ALLEEG, fieldName);
+        [dataOut{iVar1}, dataOutSubj{iVar1}] = getDataCell( designvar(1).value{iVar1},  { datasetinfo.(designvar(1).label) }, ALLEEG, datasetinfo, fieldName);
 
     end
 else
     for iVar1 = 1:length(designvar(1).value)
         for iVar2 = 1:length(designvar(2).value)
 
-            dataOut{iVar1, iVar2} = getDataCell2( designvar(1).value{iVar1}, { datasetinfo.(designvar(1).label) }, ...
-                                                  designvar(2).value{iVar2}, { datasetinfo.(designvar(2).label) }, ALLEEG, fieldName);
+            [dataOut{iVar1, iVar2},dataOutSubj{iVar1, iVar2}] = getDataCell2( designvar(1).value{iVar1}, { datasetinfo.(designvar(1).label) }, ...
+                                                  designvar(2).value{iVar2}, { datasetinfo.(designvar(2).label) }, ALLEEG, datasetinfo, fieldName);
 
         end
     end
@@ -143,38 +145,6 @@ if strcmpi(opt.xvalaverage, 'on')
     end
 end
 
-% get data from ALLEEG 1
-% ----------------------
-function dataOut = getData1( varValue, varList, ALLEEG, fieldName)
-
-if ischar(varList{1}) && ~ischar(varValue), varValue = num2str(varValue); end
-datInd = find(cellfun(@(x)isequal(x, varValue), varList));
-if isempty(datInd)
-    dataOut = {[]};
-else
-    for iDat = 1:length(datInd)
-        dataOut{iDat} = getfield(ALLEEG(datInd(iDat)), fieldName{:});
-    end
-end
-
-% get data from ALLEEG 2
-% ----------------------
-function dataOut = getData2( varValue1, varList1, varValue2, varList2, ALLEEG, fieldName)
-
-if ischar(varList1{1}) && ~ischar(varValue1), varValue1 = num2str(varValue1); end
-if ischar(varList2{1}) && ~ischar(varValue2), varValue2 = num2str(varValue2); end
-datInd1 = cellfun(@(x)isequal(x, varValue1), varList1);
-datInd2 = cellfun(@(x)isequal(x, varValue2), varList2);
-datInd = find( datInd1 & datInd2 );
-
-if isempty(datInd)
-    dataOut = {[]};
-else
-    for iDat = 1:length(datInd)
-        dataOut{iDat} = getfield(ALLEEG(datInd(iDat)), fieldName{:});
-    end
-end
-
 % combine cell arrays
 % -------------------
 function dataOut = combinecell( dataTmp )
@@ -184,6 +154,8 @@ if isempty(dataTmp)
     dataOut = {};
 elseif all(cellfun(@isempty, dataTmp))
     dataOut = [];
+elseif length(dataTmp) == 1
+    dataOut = dataTmp{1};
 else
     if any(~cellfun(@isempty, dataTmp)) && isempty(warnflag)
         warning('Some condition have no data for at least one subject; check design')
@@ -206,47 +178,88 @@ else
     dataOut = dataOut/count;
 end
 
+% get data from ALLEEG 1
+% ----------------------
+function [dataOut,dataSubjOut] = getData1( varValue, varList, ALLEEG, datasetinfo, fieldName)
+
+if ischar(varList{1}) && ~ischar(varValue), varValue = num2str(varValue); end
+datInd = find(cellfun(@(x)isequal(x, varValue), varList));
+if isempty(datInd)
+    dataOut = {[]};
+    dataSubjOut = {[]};
+else
+    for iDat = 1:length(datInd)
+        dataOut{iDat}     = getfield(ALLEEG(datInd(iDat)), fieldName{:});
+        dataSubjOut{iDat} = datasetinfo(datInd(iDat));
+    end
+end
+
+% get data from ALLEEG 2
+% ----------------------
+function [dataOut,dataSubjOut] = getData2( varValue1, varList1, varValue2, varList2, ALLEEG, datasetinfo, fieldName)
+
+if ischar(varList1{1}) && ~ischar(varValue1), varValue1 = num2str(varValue1); end
+if ischar(varList2{1}) && ~ischar(varValue2), varValue2 = num2str(varValue2); end
+datInd1 = cellfun(@(x)isequal(x, varValue1), varList1);
+datInd2 = cellfun(@(x)isequal(x, varValue2), varList2);
+datInd = find( datInd1 & datInd2 );
+
+if isempty(datInd)
+    dataOut     = {[]};
+    dataSubjOut = {[]};
+else
+    for iDat = 1:length(datInd)
+        dataOut{iDat}     = getfield(ALLEEG(datInd(iDat)), fieldName{:});
+        dataSubjOut{iDat} = datasetinfo(datInd(iDat));
+    end
+end
+
 % get data from cells 1
 % ---------------------
-function dataOut = getDataCell( varValue, varList, ALLEEG, fieldName)
+function [dataOut,dataSubjOut] = getDataCell( varValue, varList, ALLEEG, datasetinfo, fieldName)
 
 if ~iscell(varValue)
-    dataTmp = getData1( varValue, varList, ALLEEG, fieldName);
+    [dataTmp,dataSubjTmp] = getData1( varValue, varList, ALLEEG, datasetinfo, fieldName);
 else
     count = 1;
     for iVar = length(varValue):-1:1
-        dataTmp2 = getData1( varValue{iVar}, varList, ALLEEG, fieldName);
-        dataTmp(count:count+length(dataTmp2)-1) = dataTmp2;
+        [dataTmp2,dataSubjTmp2] = getData1( varValue{iVar}, varList, ALLEEG, datasetinfo, fieldName);
+        dataTmp(    count:count+length(dataTmp2)-1) = dataTmp2;
+        dataSubjTmp(count:count+length(dataTmp2)-1) = dataSubjTmp2;
         count = count+1;
     end
 end
-dataOut = combinecell(dataTmp);
+dataOut     = combinecell(dataTmp);
+dataSubjOut = combinecell(dataSubjTmp);
 
 % get data from cells 2
 % ---------------------
-function dataOut = getDataCell2( varValue1, varList1, varValue2, varList2, ALLEEG, fieldName)
+function [dataOut,dataSubjOut] = getDataCell2( varValue1, varList1, varValue2, varList2, ALLEEG, datasetinfo, fieldName)
 
 if ~iscell(varValue1) && ~iscell(varValue2)
-    dataTmp = getData2( varValue1, varList1, varValue2, varList2, ALLEEG, fieldName);
+    [dataTmp,dataSubjTmp] = getData2( varValue1, varList1, varValue2, varList2, ALLEEG, datasetinfo, fieldName);
 else
     count = 1;
     if iscell(varValue1) && ~iscell(varValue2)
         for iVar = length(varValue1):-1:1
-            dataTmp2 = getData2( varValue1{iVar}, varList1, varValue2, varList2, ALLEEG, fieldName);
-            dataTmp(count:count+length(dataTmp2)-1) = dataTmp2;
+            [dataTmp2,dataSubjTmp2] = getData2( varValue1{iVar}, varList1, varValue2, varList2, ALLEEG, datasetinfo, fieldName);
+            dataTmp(    count:count+length(dataTmp2)-1) = dataTmp2;
+            dataSubjTmp(count:count+length(dataTmp2)-1) = dataSubjTmp2;
             count = count+1;
         end
     elseif ~iscell(varValue1) && iscell(varValue2)
         for iVar = length(varValue2):-1:1
-            dataTmp2 = getData2( varValue1, varList1, varValue2{iVar}, varList2, ALLEEG, fieldName);
-            dataTmp(count:count+length(dataTmp2)-1) = dataTmp2;
+            [dataTmp2,dataSubjTmp2] = getData2( varValue1, varList1, varValue2{iVar}, varList2, ALLEEG, datasetinfo, fieldName);
+            dataTmp(    count:count+length(dataTmp2)-1) = dataTmp2;
+            dataSubjTmp(count:count+length(dataTmp2)-1) = dataSubjTmp2;
             count = count+1;
         end
     elseif iscell(varValue1) && iscell(varValue2)
         for iVar1 = length(varValue1):-1:1
             for iVar2 = length(varValue2):-1:1
-                dataTmp2 = getData2( varValue1{iVar1}, varList1, varValue2{iVar2}, varList2, ALLEEG, fieldName);
-                dataTmp(count:count+length(dataTmp2)-1) = dataTmp2;
+                [dataTmp2,dataSubjTmp2] = getData2( varValue1{iVar1}, varList1, varValue2{iVar2}, varList2, ALLEEG, datasetinfo, fieldName);
+                dataTmp(    count:count+length(dataTmp2)-1) = dataTmp2;
+                dataSubjTmp(count:count+length(dataTmp2)-1) = dataSubjTmp2;
                 count = count+1;
             end
         end
@@ -255,9 +268,11 @@ else
     end
 
 end
-dataOut = combinecell(dataTmp);
+dataOut     = combinecell(dataTmp);
+dataSubjOut = combinecell(dataSubjTmp);
 
 % select range for xvals
+% ----------------------
 function [measureRange, indBegin, indEnd] = indicesselect(measureRange, measureLimits)
 indBegin = 1;
 indEnd   = length(measureRange);
