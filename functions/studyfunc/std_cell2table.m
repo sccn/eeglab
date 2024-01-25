@@ -19,7 +19,8 @@
 %  'design'     - [struct] STUDY design corresponding to the data
 %  'chanlabels  - [cell fo string] labels for each of the channels.
 %  'cellinfofields' - [cell of string] Only use some of the fields of the
-%                 cellinfo input.
+%                 cellinfo input. Use { '' } to not include any field.
+%                 Default, and {} to include all fields.
 %  'csvfile'    - [string] CSV file name to save the table. By default, the
 %                 table is not saved.
 %
@@ -29,11 +30,29 @@
 % Example:
 %  % assumming a STUDY with at least one design and that channel Fz exists
 %  [~,spec,xvals,~,~,~,~,specinfo] = std_readdata(STUDY, ALLEEG, 'design', ...
-%                       1, 'channels', { 'E1' }, 'datatype', 'spec');
+%                       1, 'channels', { 'E1' }, 'datatype', 'spec', 'freqrange', [1 20]);
 %  tab = std_cell2table(xvals, [], spec, specinfo, 'design', STUDY.design(1), ...
 %         'cellinfofields', { 'run' }, 'dimensions', {'frequency', 'power'});
 %
+% % Reading custom field and creating a table out of it
+% % the code below assumes that alpha asymetry has been computed on all the datasets
+% [STUDY,aa,~,~,~,~,~,info] = std_readdata(STUDY, ALLEEG, 'design', 1, 'customread', ...
+%  'std_readeegfield', 'customparams', {{ 'etc', 'eegstats', 'alpha_asymmetry' }}, 'ndim', 1);
+%  tab = std_cell2table([], [], aa, info, 'design', STUDY.design(1), 'dimensions', {'alpha_asymetry'});
+%
 % Author: Arnaud Delorme, CERCO, 2024-
+
+%
+%  [~,spec,xvals,~,~,~,~,specinfo] = std_readdata(STUDY, ALLEEG, 'design', ...
+%                       1, 'channels', { 'E1' 'E2' }, 'datatype', 'spec', 'freqrange', [1 20]);
+%  tab = std_cell2table(xvals, [], spec, specinfo, 'design', STUDY.design(1), ...
+%         'cellinfofields', { 'run' }, 'dimensions', {'frequency', 'chan', 'power'}, 'chanlabels', { 'E1' 'E2' });
+%
+%  [~,spec,xvals,~,~,~,~,specinfo] = std_readdata(STUDY, ALLEEG, 'design', ...
+%                       1, 'channels', { 'E1' 'E2' 'E3' 'E4' 'E5' }, 'datatype', 'spec', 'freqrange', [10]);
+%  tab = std_cell2table(xvals, [], spec, specinfo, 'design', STUDY.design(1), ...
+%         'cellinfofields', { 'run' }, 'dimensions', {'frequency', 'chan', 'power'}, 'chanlabels', { 'E1' 'E2' });
+
 
 % Copyright (C) Arnaud Delorme, arno@ucsd.edu
 %
@@ -75,7 +94,7 @@ g = finputcheck(varargin, { ...
     'chanlabels' 'cell'      {}       {};
     'design'     'struct'    {}       struct([]);
     'csvfile'    'string'    {}       '';
-    'cellinfofields' 'cell'      {}       {}}, 'std_statcond2table');
+    'cellinfofields' 'cell'      {}       {''}}, 'std_statcond2table');
 if ischar(g), error(g); end
 
 if isempty(cellvals)
@@ -86,6 +105,9 @@ end
 ind = find(~cellfun(@isempty, cellinfo(:))); % non-empty info
 allFields = fieldnames(cellinfo{ind(1)});
 if ~isempty(g.cellinfofields)
+    if isempty(g.cellinfofields{1})
+        g.cellinfofields = {};
+    end
     if ~contains(g.cellinfofields, 'subject')
         g.cellinfofields{end+1} = 'subject';
     end
@@ -96,6 +118,7 @@ if ~isempty(g.cellinfofields)
             if ~isempty(tmpinfo)
                 tmpinfo = rmfield(tmpinfo, rmFields);
                 cellinfo{iCell1,iCell2} = tmpinfo;
+                g.cellinfofields = fieldnames(tmpinfo);
             end
             
         end
@@ -152,7 +175,11 @@ if size(cellvals,1) > 1 && size(cellvals,2) > 1
     if ~isempty(g.cellinfofields)
         for iCol = 1:length(g.cellinfofields)
             countCols = countCols + 1;
-            newcols{countCols} = g.cellinfofields{iCol};
+            if ~contains(newcols, g.cellinfofields{iCol})
+                newcols{countCols} = g.cellinfofields{iCol};
+            else
+                newcols{countCols} = [g.cellinfofields{iCol} 'x'];
+            end
         end
     end
     if ~isempty(g.dimensions)
@@ -176,6 +203,7 @@ if ndims(dataArray) > 4
     error('Cannot process 4D array')
 end
 fields = fieldnames(infoData);
+if size(dataArray,1) == 1 && size(dataArray,3) == 1, dataArray = dataArray'; end
 if size(dataArray,1) > 1, totDim = 1; end
 if size(dataArray,2) > 1, totDim = 2; end
 if size(dataArray,3) > 1, totDim = 3; end
