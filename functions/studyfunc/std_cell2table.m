@@ -17,7 +17,7 @@
 %                 trials. By default, the columns will be named 
 %                 { 'var1' 'var2' ... }
 %  'design'     - [struct] STUDY design corresponding to the data
-%  'chanlabels] - [cell fo string] labels for each of the channels.
+%  'chanlabels  - [cell fo string] labels for each of the channels.
 %  'cellinfofields' - [cell of string] Only use some of the fields of the
 %                 cellinfo input.
 %  'csvfile'    - [string] CSV file name to save the table. By default, the
@@ -30,7 +30,8 @@
 %  % assumming a STUDY with at least one design and that channel Fz exists
 %  [~,spec,xvals,~,~,~,~,specinfo] = std_readdata(STUDY, ALLEEG, 'design', ...
 %                       1, 'channels', { 'E1' }, 'datatype', 'spec');
-%  tab = std_cell2table(xvals, [], spec, specinfo);
+%  tab = std_cell2table(xvals, [], spec, specinfo, 'design', STUDY.design(1), ...
+%         'cellinfofields', { 'run' }, 'dimensions', {'frequency', 'power'});
 %
 % Author: Arnaud Delorme, CERCO, 2024-
 
@@ -72,7 +73,7 @@ end
 g = finputcheck(varargin, { ...
     'dimensions' 'cell'      {}       {};
     'chanlabels' 'cell'      {}       {};
-    'design'     'struct'    {}       {};
+    'design'     'struct'    {}       struct([]);
     'csvfile'    'string'    {}       '';
     'cellinfofields' 'cell'      {}       {}}, 'std_statcond2table');
 if ischar(g), error(g); end
@@ -81,48 +82,83 @@ if isempty(cellvals)
     error('Statistical array cannot be empty')
 end
 
-if size(cellvals,1) > 1 && size(cellvals,2) > 1 
-    if length(STUDY.design(g.design).variable) ~= 2
-        error('The STUDY design must contains the same number of variables as the number of dim in the statistical cell array')
-    else
-        if size(cellvals,1) ~= length(STUDY.design(g.design).variable(1).value)
-            error('The STUDY design first variable must contain the same number of values as the number of items in the first dim in the statistical cell array')
-        end
-        if size(cellvals,2) ~= length(STUDY.design(g.design).variable(2).value)
-            error('The STUDY design second variable must contain the same number of values as the number of items in the second dim in the statistical cell array')
+% only keep relevant fields
+ind = find(~cellfun(@isempty, cellinfo(:))); % non-empty info
+allFields = fieldnames(cellinfo{ind(1)});
+if ~isempty(g.cellinfofields)
+    if ~contains(g.cellinfofields, 'subject')
+        g.cellinfofields{end+1} = 'subject';
+    end
+    rmFields = setdiff(allFields, g.cellinfofields);
+    for iCell1 = 1:size(cellinfo,1)
+        for iCell2 = 1:size(cellinfo,2)
+            tmpinfo = cellinfo{iCell1,iCell2};
+            if ~isempty(tmpinfo)
+                tmpinfo = rmfield(tmpinfo, rmFields);
+                cellinfo{iCell1,iCell2} = tmpinfo;
+            end
+            
         end
     end
+else
+    g.cellinfofields = allFields;
+end
 
-    %create table
+% check input size
+% ----------------
+warning('off', 'MATLAB:table:RowsAddedExistingVars')
+if ~isempty(g.design)
+    if size(cellvals,1) > 1 && size(cellvals,2) > 1
+        if length(g.design.variable) ~= 2
+            error('The STUDY design must contains the same number of variables as the number of dim in the statistical cell array')
+        else
+            if size(cellvals,1) ~= length(g.design.variable(1).value)
+                error('The STUDY design first variable must contain the same number of values as the number of items in the first dim in the statistical cell array')
+            end
+            if size(cellvals,2) ~= length(g.design.variable(2).value)
+                error('The STUDY design second variable must contain the same number of values as the number of items in the second dim in the statistical cell array')
+            end
+        end
+    end
+else
+    if length(g.design.variable) ~= 1
+        error('The STUDY design must contains the same number of variables as the number of dim in the statistical cell array')
+    end
+    if length(cellvals) ~= length(g.design.variable(1).value)
+        error('The STUDY design first variable must contain the same number of values as the number of items in the first dim in the statistical cell array')
+    end
+end
+
+% create table
+% ------------
+if size(cellvals,1) > 1 && size(cellvals,2) > 1
     tab = table([]);
     count = 1;
     for iCell1 = 1:size(cellvals,1)
-        for iCell1 = 1:size(cellvals,2)
-            if ~isempty(g.infoField)
-                datInds = g.setinds{iCell1, iCell2};
-                fieldData = STUDY.datasetinfo(datInds);
+        for iCell2 = 1:size(cellvals,2)
+            if ~isempty(g.design)
+                designVals = { g.design.variable(1).value{iCell1}, g.design.variable(2).value{iCell2} };
             else
-                fieldData = [];
+                designVals = { iCell1 iCell2 };
             end
-                
-            [tab, count] = adddata(tab, count, [iCell1 iCell2], fieldData, g.infoField, cellvals{iCell1,iCell2});
+            [tab, count] = adddata(tab, count, designVals, xvals, yvals, g.chanlabels, cellvals{iCell1,iCell2}, cellinfo{iCell1,iCell2});
         end
     end
 
     % update column names
     curcols = tab.Properties.VariableNames;
-    newcols = { STUDY.design(g.deisgn).variable.label };
+    newcols = { g.design.variable.label };
     countCols = length(newcols);
-    if ~isempty(g.infoField)
-        for iCol = 1:length(infoField)
+    if ~isempty(g.cellinfofields)
+        for iCol = 1:length(g.cellinfofields)
             countCols = countCols + 1;
-            newcols{countCols} = infoField{iCol};
+            newcols{countCols} = g.cellinfofields{iCol};
         end
     end
-    if ~isempty(g.dimension)
-        for iCol = 1:length(g.dimension)
+    if ~isempty(g.dimensions)
+        for iCol = 1:length(g.dimensions)
             countCols = countCols + 1;
-            newcols{countCols} = g.dimension{iCol};
+            newcols{countCols} = g.dimensions{iCol};
         end
     end
     for iCol = countCols+1:length(curcols)
@@ -130,48 +166,59 @@ if size(cellvals,1) > 1 && size(cellvals,2) > 1
     end
     tab.Properties.VariableNames = newcols;
 
-else
-    if length(STUDY.design(g.design).variable) ~= 1)
-        error('The STUDY design must contains the same number of variables as the number of dim in the statistical cell array')
-    end
-    if length(cellvals) ~= length(STUDY.design(g.design).variable(1).value)
-        error('The STUDY design first variable must contain the same number of values as the number of items in the first dim in the statistical cell array')
-    end
 end
 
 % add data to the table
 % ---------------------
-function [tab, count] = adddata(tab, count, infoData, infoFields, firstCols, dataArray)
+function [tab, count] = adddata(tab, count, designVals, xvals, yvals, chanlabels, dataArray, infoData)
 
-if ndims(dataArray) > 3
+if ndims(dataArray) > 4
     error('Cannot process 4D array')
 end
-countCols = 1;
+fields = fieldnames(infoData);
+if size(dataArray,1) > 1, totDim = 1; end
+if size(dataArray,2) > 1, totDim = 2; end
+if size(dataArray,3) > 1, totDim = 3; end
+if size(dataArray,4) > 1, totDim = 4; end
 
 for iData1 = 1:size(dataArray,1)
     for iData2 = 1:size(dataArray,2)
         for iData3 = 1:size(dataArray,3)
+            for iData4 = 1:size(dataArray,4)
+                countCols = 1;
 
-            % write cell index information
-            for iCol = 1:length(firstCols)
-                tab(count, countCols) = firstCols(iCol);
-                countCols = countCols+1;
+                % write cell index information
+                for iCol = 1:length(designVals)
+                    if isempty(tab) && ischar(designVals{iCol}), tab = table({}); end
+                    tab(count, countCols) = designVals(iCol);
+                    countCols = countCols+1;
+                end
+
+                % write field information
+                iLastDim = [iData1 iData2 iData3 iData4];
+                iLastDim = iLastDim(totDim);
+                for iField = 1:length(fields)
+                    tab(count, countCols) = { infoData(iLastDim).(fields{iField}) };
+                    countCols = countCols+1;
+                end
+
+                % write data
+                if totDim >= 2, tab(count, countCols) = { xvals(iData1) }; countCols = countCols+1; end % subject is already added above
+                if totDim == 3
+                    if ~isempty(chanlabels), tab(count, countCols) = chanlabels(iData2); 
+                    elseif ~isempty(yvals) , tab(count, countCols) = { yvals(iData2) }; 
+                    else                     tab(count, countCols) = { iData2 }; 
+                    end
+                    countCols = countCols+1; 
+                end
+                if totDim == 4
+                    if ~isempty(yvals),     tab(count, countCols) = { yvals(iData2) };  else tab(count, countCols) = { iData2 }; end
+                    if isempty(chanlabels), tab(count, countCols) = chanlabels(iData3); else tab(count, countCols) = { iData3 }; end
+                    countCols = countCols+2; 
+                end
+                tab(count, countCols) = { dataArray(iData1, iData2, iData3 ) };
+                count = count+1;
             end
-
-            % write field information
-            if size(dataArray,1) > 1, iLastDim = iData1; end
-            if size(dataArray,2) > 1, iLastDim = iData2; end
-            if size(dataArray,3) > 1, iLastDim = iData3; end
-            for iCol = 1:length(infoFields)
-                tab(count, countCols) = infoData(iLastDim).(infoFields{iCol});
-                countCols = countCols+1;
-            end
-
-            % write data
-            if size(dataArray,1) > 1, tab(count, countCols) = iData1; countCols = countCols+1; end
-            if size(dataArray,2) > 1, tab(count, countCols) = iData2; countCols = countCols+1; end
-            if size(dataArray,3) > 1, tab(count, countCols) = iData3; countCols = countCols+1; end
-            tab(count, countCols) = dataArray(iData1, iData2, iData3 );
         end
     end
 end
