@@ -54,7 +54,7 @@
 %
 % Example:
 %  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');
-%  [erp times] = std_readdata(STUDY, ALLEEG, 'channels', { ALLEEG(1).chanlocs(1).labels });
+%  [STUDY,erp,times] = std_readdata(STUDY, ALLEEG, 'channels', { ALLEEG(1).chanlocs(1).labels });
 %
 %  % To read field 'EEG.etc.eegstats.alpha_asymmetry' for each dataset, enter
 %  % (note that you need to use the eegstats plugin to compute this value first)
@@ -382,7 +382,7 @@ if nargout > 6
     try
         setinds = cellfun(@(x)[x.index], datainfo, 'UniformOutput', false);
     catch
-        error('Error generating dataset indices, recompute your measures')
+        error('Error generating dataset indices, either remove the setinds output or recompute your measures')
     end
 end
 
