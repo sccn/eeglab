@@ -280,6 +280,7 @@ options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegi
 if isempty(opt.designvar)
     [ measureData, trialInfo, events ] = getfiledata(fileData, NaN, v6Flag, options{:}); % read all data
     measureData = { measureData };
+    trialInfo   = { trialInfo };
     events      = { events };
 else
     [ measureData, trialInfo, events ] = globalgetfiledata(fileData, opt.designvar, options, {}, v6Flag);
