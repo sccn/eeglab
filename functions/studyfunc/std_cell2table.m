@@ -192,7 +192,42 @@ if size(cellvals,1) > 1 && size(cellvals,2) > 1
         newcols{iCol} = [ 'Var' int2str(iCol) ];
     end
     tab.Properties.VariableNames = newcols;
+else
+    tab = table([]);
+    count = 1;
+    for iCell1 = 1:length(cellvals)
+        if ~isempty(g.design)
+            designVals = { g.design.variable(1).value{iCell1} };
+        else
+            designVals = { iCell1 };
+        end
+        [tab, count] = adddata(tab, count, designVals, xvals, yvals, g.chanlabels, cellvals{iCell1}, cellinfo{iCell1});
+    end
 
+    % update column names
+    curcols = tab.Properties.VariableNames;
+    newcols = { g.design.variable.label };
+    countCols = length(newcols);
+    if ~isempty(g.cellinfofields)
+        for iCol = 1:length(g.cellinfofields)
+            countCols = countCols + 1;
+            if ~contains(newcols, g.cellinfofields{iCol})
+                newcols{countCols} = g.cellinfofields{iCol};
+            else
+                newcols{countCols} = [g.cellinfofields{iCol} 'x'];
+            end
+        end
+    end
+    if ~isempty(g.dimensions)
+        for iCol = 1:length(g.dimensions)
+            countCols = countCols + 1;
+            newcols{countCols} = g.dimensions{iCol};
+        end
+    end
+    for iCol = countCols+1:length(curcols)
+        newcols{iCol} = [ 'Var' int2str(iCol) ];
+    end
+    tab.Properties.VariableNames = newcols;
 end
 
 % add data to the table
@@ -204,11 +239,13 @@ if ndims(dataArray) > 4
 end
 fields = fieldnames(infoData);
 if size(dataArray,1) == 1 && size(dataArray,3) == 1, dataArray = dataArray'; end
-if size(dataArray,1) > 1, totDim = 1; end
+if size(dataArray,1) > 1, totDim = 2; end
 if size(dataArray,2) > 1, totDim = 2; end
 if size(dataArray,3) > 1, totDim = 3; end
 if size(dataArray,4) > 1, totDim = 4; end
-
+if isempty(xvals)
+    xvals = 1:size(dataArray,1);
+end
 for iData1 = 1:size(dataArray,1)
     for iData2 = 1:size(dataArray,2)
         for iData3 = 1:size(dataArray,3)
@@ -231,7 +268,10 @@ for iData1 = 1:size(dataArray,1)
                 end
 
                 % write data
-                if totDim >= 2, tab(count, countCols) = { xvals(iData1) }; countCols = countCols+1; end % subject is already added above
+                if totDim >= 2
+                    tab(count, countCols) = { xvals(iData1) }; 
+                    countCols = countCols+1; 
+                end % subject is already added above
                 if totDim == 3
                     if ~isempty(chanlabels), tab(count, countCols) = chanlabels(iData2); 
                     elseif ~isempty(yvals) , tab(count, countCols) = { yvals(iData2) }; 
