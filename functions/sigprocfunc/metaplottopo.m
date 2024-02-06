@@ -288,16 +288,19 @@ for c=1:length(g.chans) %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%
     if ~isempty( g.plotfunc )
         %figure(curfig);
         eval( [ 'func = @' g.plotfunc ';' ] );
-        tmp = g.plotargs;
-        if length(g.datapos) >= 1
-            tmp = [ tmp(1:g.datapos(1)-1) { data{1}(c,:,:,:,:) } tmp(g.datapos(1):end) ];
+        if length(data) > 1, tmp = { g.plotargs{1:g.datapos(1)-1} data{1}(c,:,:,:,:) g.plotargs{g.datapos(1):g.datapos(2)-1} data{2}(c,:) g.plotargs{g.datapos(2):end}};
+        else                 tmp = { g.plotargs{1:g.datapos(1)-1} data{1}(c,:,:,:,:) g.plotargs{g.datapos(1):end} };
         end
-        if length(g.datapos) >= 2
-            tmp = [ tmp(1:g.datapos(2)-1) { data{2}(c,:,:,:,:) } tmp(g.datapos(2):end) ];
-        end
-        if length(g.datapos) >= 3
-            tmp = [ tmp(1:g.datapos(3)-1) { data{3}(c,:,:,:,:) } tmp(g.datapos(3):end) ];
-        end
+        % tmp = g.plotargs;
+        % if length(g.datapos) >= 1
+        %     tmp = [ tmp(1:g.datapos(1)-1) { data{1}(c,:,:,:,:) } tmp(g.datapos(1):end) ];
+        % end
+        % if length(g.datapos) >= 2 && length(data) > 1
+        %     tmp = [ tmp(1:g.datapos(2)-1) { data{2}(c,:,:,:,:) } tmp(g.datapos(2):end) ];
+        % end
+        % if length(g.datapos) >= 3 length(data) > 2
+        %     tmp = [ tmp(1:g.datapos(3)-1) { data{2}(c,:,:,:,:) } tmp(g.datapos(3):end) ];
+        % end
         if strcmpi(g.squeeze, 'on')
             tmp{g.datapos} = squeeze(tmp{g.datapos});
         end
