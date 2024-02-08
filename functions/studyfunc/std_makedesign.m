@@ -265,9 +265,10 @@ end
 % --------------
 datselect = [1:length(STUDY.datasetinfo)];
 if ~isempty(opt.datselect)
-    fprintf(2, '********************************************************\n')
-    fprintf(2, 'The ''datselect'' option is obsolete and will be ignored\n')
-    fprintf(2, '********************************************************\n')
+    fprintf(2, '**********************************\n')
+    fprintf(2, 'The ''datselect'' option is obsolete\n')
+    fprintf(2, '**********************************\n\n')
+    error('This version of EEGLAB no longer support ''datselect''; please remove it from the list of inputs')
     for ind = 1:2:length(opt.datselect)
         [ dattmp, dattrialstmp ] = std_selectdataset( STUDY, ALLEEG, opt.datselect{ind}, opt.datselect{ind+1});
         datselect      = intersect_bc(datselect, dattmp);
