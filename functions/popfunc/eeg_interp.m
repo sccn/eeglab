@@ -232,19 +232,18 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
         [xbad ,ybad]  = pol2cart([tmpbadlocs.theta],[tmpbadlocs.radius]);
         [xgood,ygood] = pol2cart([tmpgoodlocs.theta],[tmpgoodlocs.radius]);
         pnts = size(EEG.data,2)*size(EEG.data,3);
-        zgood = [1:pnts];
+        zgood = 1:pnts;
         zgood = repmat(zgood, [length(xgood) 1]);    
-        zgood = reshape(zgood,prod(size(zgood)),1);
-        xgood = repmat(xgood, [1 pnts]); xgood = reshape(xgood,prod(size(xgood)),1);
-        ygood = repmat(ygood, [1 pnts]); ygood = reshape(ygood,prod(size(ygood)),1);
-        tmpdata = reshape(EEG.data, prod(size(EEG.data)),1);
+        zgood = reshape(zgood,numel(zgood),1);
+        xgood = repmat(xgood, [1 pnts]); xgood = reshape(xgood,numel(xgood),1);
+        ygood = repmat(ygood, [1 pnts]); ygood = reshape(ygood,numel(ygood),1);
+        tmpdata = reshape(EEG.data(datachans,:,:), numel(EEG.data(datachans,:,:)),1);
         zbad = 1:pnts;
         zbad = repmat(zbad, [length(xbad) 1]);     
-        zbad = reshape(zbad,prod(size(zbad)),1);
-        xbad = repmat(xbad, [1 pnts]); xbad = reshape(xbad,prod(size(xbad)),1);
-        ybad = repmat(ybad, [1 pnts]); ybad = reshape(ybad,prod(size(ybad)),1);
-        badchansdata = griddata3(ygood, xgood, zgood, tmpdata,...
-                                              ybad, xbad, zbad, 'nearest'); % interpolate data                                            
+        zbad = reshape(zbad,numel(zbad),1);
+        xbad = repmat(xbad, [1 pnts]); xbad = reshape(xbad,numel(xbad),1);
+        ybad = repmat(ybad, [1 pnts]); ybad = reshape(ybad,numel(ybad),1);
+        badchansdata = griddatan([ygood, xgood, zgood], tmpdata,[ybad, xbad, zbad], 'nearest'); % interpolate data                                            
     else 
         % get theta, rad of electrodes
         % ----------------------------
