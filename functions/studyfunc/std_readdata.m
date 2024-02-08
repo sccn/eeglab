@@ -254,7 +254,7 @@ for iSubj = 1:length(subjectList)
             % read custom data
             [dataTmp{iSubj}, params, xvals, yvals, eventsTmp{iSubj}, dataTmpSubj{iSubj}] = feval(opt.customread, STUDY.datasetinfo(datInds), ALLEEG(datInds), struct(bigstruct.design.variable), opt.customparams{:}, opts{:});
         end
-        if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') && ~strcmpi(opt.datatype, 'custom') % ERP or spectrum
+        if ~strcmpi(opt.datatype, 'ersp') && ~strcmpi(opt.datatype, 'itc') && ~strcmpi(opt.datatype, 'erpim') % ERP or spectrum or Custom single trials
             % inverting ERP polarity when relevant
             if strcmpi(opt.datatype, 'erp') && ~isempty(opt.clusters) && strcmpi(opt.componentpol, 'on')
                 polList = reshape(polList,[1 1 length(polList)]); % components are in the 3rd dim
