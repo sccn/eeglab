@@ -64,6 +64,7 @@ function [newcomments, com] = pop_comments( comments, plottitle, newcomments, co
 
 com = '';
 structFlag = false;
+firstInput = comments;
 if isstruct(comments)
     EEG = comments;
     comments = EEG.comments;
@@ -81,7 +82,7 @@ end
 comments = strmultiline( comments, 53);
 
 if nargin < 3
-    newcomments = comments;
+    newcomments = firstInput;
 	try
         icadefs;
     catch
