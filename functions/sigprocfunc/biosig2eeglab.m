@@ -76,6 +76,9 @@ EEG = eeg_emptyset;
 
 % convert to seconds for sread
 % ----------------------------
+if ~isempty(channels)
+    dat.InChanSelect = channels;
+end
 if ~isfield(dat, 'InChanSelect') && max(dat.InChanSelect) > size(DAT,1)
     dat.InChanSelect = [1:size(DAT,1)];
 end

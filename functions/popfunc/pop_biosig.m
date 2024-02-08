@@ -212,12 +212,11 @@ for iFile = 1:length(filename)
         error('File not found %s', filename{iFile})
     end
     EEG = eeg_emptyset;
-    [dat, DAT, interval] = readfile(filename{iFile}, g.channels, g.blockrange, g.memorymapped, g.bdfeventmode, g.overflow, g.uncalibrated);
+    [dat, DAT, interval] = readfile(filename{iFile}, [], g.blockrange, g.memorymapped, g.bdfeventmode, g.overflow, g.uncalibrated);
     
     if strcmpi(g.blockepoch, 'off')
         dat.NRec = 1;
     end
-    
     EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'), strcmpi(g.importannot, 'on'));
     
     if strcmpi(g.rmeventchan, 'on') && strcmpi(dat.TYPE, 'BDF') && isfield(dat, 'BDF')
