@@ -49,21 +49,6 @@
 %  'values2'  - {cell array of 'strings'} - variable2 values to include in the 
 %               design {default: all}. Here, 'var[12]' must be field names 
 %               in STUDY.datasetinfo or  STUDY.datasetinfo.trialinfo. 
-%  'datselect'  - {cell array} select specific datasets and/or trials: 'datselect',
-%               {'var1' {'vals'}  'var2' {'vas'}}. Selected datasets must 
-%               meet all the specified conditions. For example, 'datselect',  
-%               { 'condition' { 'a' 'b' } 'group' { 'g1' 'g2' } }  will 
-%               select only datasets from conditions 'a' OR 'b' AND only 
-%               subjects in groups 'g1' OR 'g2'. If 'subjselect' is also 
-%               specified, only datasets meeting both criteria are included. 
-%               'variable1' and 'variable2' will only consider
-%               the values after they have passed through 'datselect' and 
-%               'subjselect'. For instance, if conditions { 'a' 'b' 'c' } 
-%               exist and conditions 'a' is removed by 'datselect', the only 
-%               two conditions that will be considered are 'b' and 'c' 
-%               (which is then equivalent to using 'variable1vals' to specify
-%               values for the 'condition' factor. Calls function 
-%               STD_SELECTDATASET {default: select all datasets}
 %  'subjselect' - {cell array} subject codes of specific subjects to include 
 %               in the STUDY design {default: all subjects in the specified 
 %               conditions, groups, etc.} If 'datselect' is also specified,
@@ -280,7 +265,9 @@ end
 % --------------
 datselect = [1:length(STUDY.datasetinfo)];
 if ~isempty(opt.datselect)
-    myfprintf(opt.verbose, 'Data preselection for STUDY design\n');
+    fprintf(2, '********************************************************\n')
+    fprintf(2, 'The ''datselect'' option is obsolete and will be ignored\n')
+    fprintf(2, '********************************************************\n')
     for ind = 1:2:length(opt.datselect)
         [ dattmp, dattrialstmp ] = std_selectdataset( STUDY, ALLEEG, opt.datselect{ind}, opt.datselect{ind+1});
         datselect      = intersect_bc(datselect, dattmp);
