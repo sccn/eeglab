@@ -13,6 +13,7 @@
 %   index      - (optional), ALLEEG index (or indices) to use to store 
 %                the new dataset(s). If no index is given, EEG_STORE 
 %                uses the lowest empty slot(s) in the ALLEEG array. 
+%                Use index of 0 for just loaded dataset.
 % Outputs:
 %   ALLEEG - array of all current datasets
 %   EEG    - EEG dataset (after syntax checking)
