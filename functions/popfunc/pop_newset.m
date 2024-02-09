@@ -333,7 +333,8 @@ elseif length(varargin) == 0 && length(EEG) == 1 && strcmpi(g.gui, 'on') % if se
     if isempty(cb_saveold)
         uilist(end-3:end) = [];
         geometry(end)     = [];
-    end;        
+    end
+    
     % update GUI for selecting multiple datasets
     % ------------------------------------------
     if length(g.retrieve) > 1 || ( g.study && ~isempty(g.retrieve)) % selecting several datasets or a study is present
