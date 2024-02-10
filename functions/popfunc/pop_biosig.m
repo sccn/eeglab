@@ -119,7 +119,22 @@ if nargin < 1
     % open file to get infos
     % ----------------------
     disp('Reading data file header...');
-    dat = sopen(filename{1}, 'r', [], 'OVERFLOWDETECTION:OFF');
+    try
+        dat = sopen(filename{1}, 'r', [], 'OVERFLOWDETECTION:OFF');
+    catch
+        if nargin < 1
+            lasterror
+            message = [ 'Error loading file... See command line for the exact' 10 ...
+                        'error. Either the file is not supported or it is' 10 ...
+                        'corrupted. Try again loading the file using the same' 10 ...
+                        'menu and check the mexSLOAD checkbox to read the file ' 10 ...
+                        'using a different method.' ];
+            errordlg2(message);
+        else
+            rethrow(rethrow)
+        end
+        return;
+    end
     if ~isfield(dat, 'NRec')
         error('Unsuported data format');
     end

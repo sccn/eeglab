@@ -45,8 +45,8 @@
 % 'logfile'   = [filename] save all message in a log file in addition to showing them
 %               on screen (default -> none)
 % 'interrupt' = ['on'|'off'] draw interrupt figure. Default is off.
-% 'rndreset'  = ['on'|'off'] reset the random seed. Default is off (although it
-%               used to be on prior to 2015. This means that ICA will always return.
+% 'rndreset'  = ['on'|'off'] reset the random seed to 0. Default is off (although it
+%               used to be on prior to 2015). This means that ICA will always return
 %               the same decomposition unless this option is set to 'on'.
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance

@@ -13,14 +13,34 @@
 %     method   - [string] method used for interpolation (default is 'spherical').
 %                'invdist'/'v4' uses inverse distance on the scalp
 %                'spherical' uses superfast spherical interpolation. 
+%                'sphericalKang' uses Kang et al. 2015 parameters 
 %                'spacetime' uses griddata3 to interpolate both in space 
 %                and time (very slow and cannot be interrupted).
 %     t_range  - [integer array with just two elements] time interval of the
 %                badchans which should be interpolated. First element is
 %                the start time and the second element is the end time.
+%     params   - [1x3 array] Parameters [lambda m n]. Defaults are
+%                'spherical'     -> lambda=0, m = 4, n =7 (Perin et al., 1989)
+%                'sphericalKang' -> lambda=1e-8, m = 3 , n = 50 (Kang et al., 2015)
+%                if the 'params' input is used, then a spherical
+%                interpolation is used with these parameters (method is
+%                ignored). See also https://github.com/sccn/eeglab/issues/500
 % Output: 
 %     EEGOUT   - data set with bad electrode data replaced by
 %                interpolated data
+%
+% Note: See also the sphericalSplineInterpolate function of the clean_rawdata
+%       EEGLAB plugin (in the private folder) which approximate Legendre 
+%       polynomials with up to 500 iteration.                  .
+%
+% References:
+% Perrin, F., Pernier, J., Bertrand, O., & Echallier, J. F. (1989). Spherical 
+% splines for scalp potential and current density mapping. Electroencephalography 
+% and clinical neurophysiology, 72(2), 184–187. https://doi.org/10.1016/0013-4694(89)90180-6
+%
+% Kang, S.S., Lano, T.J. & Sponheim, S.R. Distortions in EEG interregional phase 
+% synchrony by spherical spline interpolation: causes and remedies. Neuropsychiatr 
+% Electrophysiol 1, 9 (2015). https://doi.org/10.1186/s40810-015-0009-5
 %
 % Author: Arnaud Delorme, CERCO, CNRS, Mai 2006-
 
@@ -51,7 +71,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
+function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range, params)
 
     if nargin < 2
         help eeg_interp;
@@ -66,6 +86,20 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
     
     if nargin < 4
         t_range = [ORIEEG.xmin ORIEEG.xmax];
+    end
+    if nargin < 5
+        if strcmpi(method, 'spherical')
+            params = [0 4 7];
+        elseif strcmpi(method, 'sphericalKang')
+            params = [1e-8 3 50];
+        elseif strcmpi(method, 'sphericalCRD')
+            params = [1e-5 4 500];
+        end
+    else
+        if length(params) ~=3 
+            error('parameters array must have 3 elements')
+        end
+        method = 'spherical';
     end
 
     % check channel structure
@@ -193,7 +227,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
     
     % scan data points
     % ----------------
-    if strcmpi(method, 'spherical') || strcmpi(method, 'sphericalfast')
+    if strcmpi(method, 'spherical') || strcmpi(method, 'sphericalfast') || strcmpi(method, 'sphericalKang')
         % get theta, rad of electrodes
         % ----------------------------
         tmpgoodlocs = EEG.chanlocs(goodchans);
@@ -220,7 +254,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range)
         %[tmp1 tmp2 tmp3 tmpchans] = spheric_spline_old( xelec, yelec, zelec, EEG.data(goodchans,1));
         %max(tmpchans(:,1)), std(tmpchans(:,1)), 
         %[tmp1 tmp2 tmp3 EEG.data(badchans,:)] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, EEG.data(goodchans,:));
-        [tmp1 tmp2 tmp3 badchansdata] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, EEG.data(datachans,:));
+        [tmp1 tmp2 tmp3 badchansdata] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, EEG.data(datachans,:), params);
         %max(EEG.data(goodchans,1)), std(EEG.data(goodchans,1))
         %max(EEG.data(badchans,1)), std(EEG.data(badchans,1))
         EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
@@ -307,47 +341,47 @@ function datachans = getdatachans(goodchans, badchans);
 % -----------------
 % spherical splines
 % -----------------
-function [x, y, z, Res] = spheric_spline_old( xelec, yelec, zelec, values);
+% function [x, y, z, Res] = spheric_spline_old( xelec, yelec, zelec, values)
+% 
+% SPHERERES = 20;
+% [x,y,z] = sphere(SPHERERES);
+% x(1:(length(x)-1)/2,:) = []; x = [ x(:)' ];
+% y(1:(length(y)-1)/2,:) = []; y = [ y(:)' ];
+% z(1:(length(z)-1)/2,:) = []; z = [ z(:)' ];
+% 
+% Gelec = computeg(xelec,yelec,zelec,xelec,yelec,zelec);
+% Gsph  = computeg(x,y,z,xelec,yelec,zelec);
+% 
+% % equations are 
+% % Gelec*C + C0  = Potential (C unknown)
+% % Sum(c_i) = 0
+% % so 
+% %             [c_1]
+% %      *      [c_2]
+% %             [c_ ]
+% %    xelec    [c_n]
+% % [x x x x x]         [potential_1]
+% % [x x x x x]         [potential_ ]
+% % [x x x x x]       = [potential_ ]
+% % [x x x x x]         [potential_4]
+% % [1 1 1 1 1]         [0]
+% 
+% % compute solution for parameters C
+% % ---------------------------------
+% meanvalues = mean(values); 
+% values = values - meanvalues; % make mean zero
+% C = pinv([Gelec;ones(1,length(Gelec))]) * [values(:);0];
+% 
+% % apply results
+% % -------------
+% Res = zeros(1,size(Gsph,1));
+% for j = 1:size(Gsph,1)
+%     Res(j) = sum(C .* Gsph(j,:)');
+% end
+% Res = Res + meanvalues;
+% Res = reshape(Res, length(x(:)),1);
 
-SPHERERES = 20;
-[x,y,z] = sphere(SPHERERES);
-x(1:(length(x)-1)/2,:) = []; x = [ x(:)' ];
-y(1:(length(y)-1)/2,:) = []; y = [ y(:)' ];
-z(1:(length(z)-1)/2,:) = []; z = [ z(:)' ];
-
-Gelec = computeg(xelec,yelec,zelec,xelec,yelec,zelec);
-Gsph  = computeg(x,y,z,xelec,yelec,zelec);
-
-% equations are 
-% Gelec*C + C0  = Potential (C unknown)
-% Sum(c_i) = 0
-% so 
-%             [c_1]
-%      *      [c_2]
-%             [c_ ]
-%    xelec    [c_n]
-% [x x x x x]         [potential_1]
-% [x x x x x]         [potential_ ]
-% [x x x x x]       = [potential_ ]
-% [x x x x x]         [potential_4]
-% [1 1 1 1 1]         [0]
-
-% compute solution for parameters C
-% ---------------------------------
-meanvalues = mean(values); 
-values = values - meanvalues; % make mean zero
-C = pinv([Gelec;ones(1,length(Gelec))]) * [values(:);0];
-
-% apply results
-% -------------
-Res = zeros(1,size(Gsph,1));
-for j = 1:size(Gsph,1)
-    Res(j) = sum(C .* Gsph(j,:)');
-end
-Res = Res + meanvalues;
-Res = reshape(Res, length(x(:)),1);
-
-function [xbad, ybad, zbad, allres] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, values);
+function [xbad, ybad, zbad, allres] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, values, params)
 
 newchans = length(xbad);
 numpoints = size(values,2);
@@ -358,8 +392,8 @@ numpoints = size(values,2);
 %y(1:(length(x)-1)/2,:) = []; ybad = [ y(:)'];
 %z(1:(length(x)-1)/2,:) = []; zbad = [ z(:)'];
 
-Gelec = computeg(xelec,yelec,zelec,xelec,yelec,zelec);
-Gsph  = computeg(xbad,ybad,zbad,xelec,yelec,zelec);
+Gelec = computeg(xelec,yelec,zelec,xelec,yelec,zelec,params);
+Gsph  = computeg(xbad,ybad,zbad,xelec,yelec,zelec,params);
 
 % compute solution for parameters C
 % ---------------------------------
@@ -367,7 +401,10 @@ meanvalues = mean(values);
 values = values - repmat(meanvalues, [size(values,1) 1]); % make mean zero
 
 values = [values;zeros(1,numpoints)];
-C = pinv([Gelec;ones(1,length(Gelec))]) * values;
+lambda = params(1);
+C = pinv([Gelec+eye(size(Gelec))*lambda;ones(1,length(Gelec))]) * values;
+%C = pinv([Gelec;ones(1,length(Gelec))]) * values;
+
 clear values;
 allres = zeros(newchans, numpoints);
 
@@ -380,7 +417,7 @@ allres = allres + repmat(meanvalues, [size(allres,1) 1]);
 
 % compute G function
 % ------------------
-function g = computeg(x,y,z,xelec,yelec,zelec)
+function g = computeg(x,y,z,xelec,yelec,zelec, params)
 
 unitmat = ones(length(x(:)),length(xelec));
 EI = unitmat - sqrt((repmat(x(:),1,length(xelec)) - repmat(xelec,length(x(:)),1)).^2 +... 
@@ -388,9 +425,10 @@ EI = unitmat - sqrt((repmat(x(:),1,length(xelec)) - repmat(xelec,length(x(:)),1)
                 (repmat(z(:),1,length(xelec)) - repmat(zelec,length(x(:)),1)).^2);
 
 g = zeros(length(x(:)),length(xelec));
-%dsafds
-m = 4; % 3 is linear, 4 is best according to Perrin's curve
-for n = 1:7
+m = params(2);
+maxn = params(3);
+
+for n = 1:maxn % 200
     if ismatlab
         L = legendre(n,EI);
     else % Octave legendre function cannot process 2-D matrices

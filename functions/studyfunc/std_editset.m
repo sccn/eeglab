@@ -386,6 +386,7 @@ end
 % ---------------------------------------
 if strcmpi(g.rmclust, 'on')
     STUDY.cluster = [];
+    STUDY.cache = [];
 end
 
 % save study if necessary

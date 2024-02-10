@@ -1439,10 +1439,17 @@ end
 
 axis equal;
 lim = [-plotrad plotrad];
-set(gca, 'xlim', lim); set(plotax, 'xlim', lim);
-set(gca, 'ylim', lim); set(plotax, 'ylim', lim);
-set(gca, 'xlim', lim); set(plotax, 'xlim', lim);
-set(gca, 'ylim', lim); set(plotax, 'ylim', lim);
+if abs(max(lim)) < 0.55
+    xlimval = [-0.55 0.55];
+    ylimval = [lim(1) 0.58];
+else
+    xlimval = lim;
+    ylimval = lim;
+end
+set(gca, 'xlim', xlimval); set(plotax, 'xlim', xlimval);
+set(gca, 'ylim', ylimval); set(plotax, 'ylim', ylimval);
+set(gca, 'xlim', xlimval); set(plotax, 'xlim', xlimval);
+set(gca, 'ylim', ylimval); set(plotax, 'ylim', ylimval);
  
 %get(textax,'pos')    % test if equal!
 %get(plotax,'pos')
