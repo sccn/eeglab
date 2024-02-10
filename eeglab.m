@@ -168,14 +168,18 @@ if isempty(warningShowed)
     filterPath = fileparts(fileparts(fileparts(which('filter'))));
     eeglabPath = fileparts(fileparts(which('eeglab')));
     if ~isempty(strfind(filterPath, eeglabPath))
-        fprintf(2, 'Warning: EEGLAB is in the MATLAB toolbox folder which is not recommended\n');
-        fprintf(2, '         You may experience errors if a plugin overloads a MATLAB function\n');
+        fprintf(2, 'Warning: Either you added the EEGLAB path with subfolders or the EEGLAB path is in the MATLAB toolbox\n');
+        fprintf(2, '         folder which is not recommended. You may experience errors if a plugin overloads a MATLAB function.\n');
+        fprintf(2, '         If you have added path with subfolders, remove all the EEGLAB path except the root EEGLAB path. \n');
+        fprintf(2, '         If EEGLAB is in the toolbox software, move it somewhere else. Then restart MATLAB and EEGLAB. \n');
+        fprintf(2, '\n');
     end    
     warningShowed = true;
 end
 
 % check Matlab version
 % --------------------
+vers = version;
 vers = version;
 indp = find(vers == '.');
 if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end
