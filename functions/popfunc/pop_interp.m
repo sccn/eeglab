@@ -12,7 +12,9 @@
 %                dataset are interpolated).
 %     method   - [string] method used for interpolation (default is 'spherical').
 %                'invdist'/'v4' uses inverse distance on the scalp
-%                'spherical' uses superfast spherical interpolation. 
+%                'spherical' uses spherical interpolation. 
+%                'sphericalKang' uses Kang et al. 2015 spherical interpolation. 
+%                                (see EEG_INTERP)
 %                'spacetime' uses griddata3 to interpolate both in space 
 %                and time (very slow and cannot be interrupted).
 %     t_range  - [integer array with just two elements] time interval of the
@@ -23,6 +25,8 @@
 %                interpolated data
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2009-
+%
+% See also: EEG_INTERP
 
 % Copyright (C) Arnaud Delorme, CERCO, 2009, arno@salk.edu
 %
@@ -103,7 +107,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
                    { 'style' 'pushbutton' 'string' 'Use all channels from other dataset' 'callback' 'pop_interp(''uselist'',gcbf);'} ...
                    { } ...
                    { 'style' 'text'  'string' 'Interpolation method'} ...
-                   { 'style' 'popupmenu'  'string' 'Spherical|Planar (slow)'  'tag' 'method' } ...
+                   { 'style' 'popupmenu'  'string' 'Spherical|spherical(Kang et al.)|Planar (slow)'  'tag' 'method' } ...
                    {} { 'Style' 'text' 'string' 'Note: for group level analysis, interpolate in STUDY' } ...
                    };
                
@@ -114,8 +118,11 @@ function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
         if isempty(res) || isempty(userdata), return; end
         
         if restag.method == 1
-             method = 'spherical';
-        else method = 'invdist';
+            method = 'spherical';
+        elseif restag.method == 2
+            method = 'sphericalKang';
+        else
+            method = 'invdist';
         end
         bad_elec = userdata.chans;
         if nargin < 4
