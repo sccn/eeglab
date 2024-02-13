@@ -330,6 +330,7 @@ if ~isempty(opt.clusters)
     % Split ICA components from the same subjects need to be made 
     % as if coming from different subjects
     dataTmp2 = {};
+    dataTmpSubj2 = {};
     correspInd = [];
     realDim  = dim;
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
@@ -351,18 +352,22 @@ if ~isempty(opt.clusters)
             for iDat2 = 1:length(dataTmp{iDat1}(:))
                 if compNumbers(iDat2)
                     for iComps = 1:compNumbers(iDat2)
-                        dataTmp2{end+1} = cell(size(dataTmp{iDat1}));
+                        dataTmp2{end+1}     = cell(size(dataTmp{iDat1}));
+                        dataTmpSubj2{end+1} = cell(size(dataTmp{iDat1}));
                         correspInd(end+1) = iDat1;
                         % check dimensions of components
                         if ~isempty(dataTmp{iDat1}{iDat2})
                             if strcmpi(opt.singletrials, 'on') && ...
                                     (strcmpi(tmpDataType, 'timef') || strcmpi(tmpDataType, 'erpim'))
                                 dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
+                                dataTmpSubj2{end}{iDat2} = dataTmpSubj{iDat1}{iDat2}(:,:,:,1);
                             elseif strcmpi(opt.singletrials, 'on') || ...
                                     (strcmpi(tmpDataType, 'timef') || strcmpi(tmpDataType, 'erpim'))
                                 dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                                dataTmpSubj2{end}{iDat2} = dataTmpSubj{iDat1}{iDat2}(:,:,1);
                             else                                                                                                       
                                 dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
+                                dataTmpSubj2{end}{iDat2} = dataTmpSubj{iDat1}{iDat2}(:,1);
                             end
                         end
                     end
@@ -371,6 +376,7 @@ if ~isempty(opt.clusters)
         end
     end
     dataTmp = dataTmp2;
+    dataTmpSubj = dataTmpSubj2;
 else
     correspInd = 1:length(dataTmp); % identity for channels 
 end
