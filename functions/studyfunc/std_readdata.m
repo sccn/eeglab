@@ -281,6 +281,9 @@ for iSubj = 1:length(subjectList)
             % Nothing to do for custom data, this is done at reading time
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
+            if strcmpi(opt.singletrials, 'off')
+                for iCond = 1:length(dataTmpSubj{iSubj}(:)), if ~isempty(dataTmpSubj{iSubj}{iCond}), dataTmpSubj{iSubj}{iCond} = dataTmpSubj{iSubj}{iCond}(1); end; end
+            end
         end
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params dataTmpSubj{iSubj} });
     end
@@ -340,7 +343,7 @@ if ~isempty(opt.clusters)
                 dataTmp{iDat1}{iDat2} = double.empty(0,0,0); % sometimes empty but all dim not 0
             end
         end
-        compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
+        compNumbers = cellfun(@(x)size(x, realDim)*~isempty(x), dataTmp{iDat1});
         uniqComps = unique(compNumbers);
         if length(uniqComps) > 1 
             if ~(uniqComps(1) == 0 && length(uniqComps) == 2)
