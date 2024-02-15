@@ -7,7 +7,7 @@ EEGLAB is an open source signal processing environment for electrophysiological 
 # Installing/cloning
 **Recommended:** Download the official EEGLAB release from https://sccn.ucsd.edu/eeglab/download.php
 
-**Do not download a ZIP file directly from GIT as it will not contain EEGLAB submodules**. Instead clone the reposity while pulling EEGLAB sub-modules.
+**Do not download a ZIP file directly from GIT as it will not contain EEGLAB submodules**. Instead, clone the reposity while pulling EEGLAB sub-modules.
 
 ```
 git clone --recurse-submodules https://github.com/sccn/eeglab.git
