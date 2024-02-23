@@ -453,7 +453,21 @@ function [datavals,setinds] = reorganizedatastruct(dataTmp)
             if ~isempty(dataTmp{iCase}{iItem})
                 numItems = length(dataTmp{iCase}{iItem});
                 setinds{iItem}(end+1) = iCase;
-                datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                if isstruct(dataTmp{iCase}{iItem}) && ~isempty(datavals{iItem})
+
+                    % handle special case of dissimilar structures
+                    fields = fieldnames(dataTmp{iCase}{iItem});
+                    if isequal(fieldnames(datavals{iItem}), fields)
+                        datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                    else
+                        for iField=1:length( fields )
+                			datavals{iItem}(count:count+numItems-1).(fields{iField}) = dataTmp{iCase}{iItem}.(fields{iField});
+                        end
+                    end
+                else
+                    % for data array
+                    datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                end
                 count = count+numItems;
             end
         end
