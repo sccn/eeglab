@@ -569,9 +569,11 @@ if ischar(filename)
            [str, mult] = checkformat(g.format{indexcol});
            for indexrow = 1:size( array, 1)
                if mult ~= 1
-                   eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
+                   % eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
+		   eloc(indexrow).(str)= -array{indexrow, indexcol};
                else
-                   eval ( [ 'eloc(indexrow).'  str '= array{indexrow, indexcol};' ]);
+                   % eval ( [ 'eloc(indexrow).'  str '= array{indexrow, indexcol};' ]);
+		   eloc(indexrow).(str)= array{indexrow, indexcol};
                end
            end
        end
