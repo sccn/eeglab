@@ -61,7 +61,7 @@ plugin = plugin(scoreOrder);
 % ------------------
 eeglab_options;
 if option_htmlingraphics
-    disp('GUI slow to pop up? Try disabling HTML graphics in the Preferences menu (first show advanced options).')
+    warning('GUI slow to pop up or showing <html> tags? Try disabling HTML graphics in the Preferences menu (first show advanced options).')
     search_icon_path = ['<html><img width=17 height=16 src="' 'file://' fullfile(fileparts(which('plugin_menu.m')),'search-icon.png') '"> &nbsp; Search</html>'];          
 else
     search_icon_path = 'Search';          
