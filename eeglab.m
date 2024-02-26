@@ -442,6 +442,13 @@ if nargin == 1
         [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
         eeglab redraw; 
         return
+	elseif strcmp(onearg, 'study')
+        ALLEEG = []; CURRENTSET = 0; CURRENTSTUDY = 0; STUDY = [];
+        disp('Clearing all data and loading tutorial study')
+        [STUDY, ALLEEG] = pop_loadstudy('filename', 'stern3s.study', 'filepath', '/System/Volumes/Data/data/data/STUDIES/STERN_test_1file_per_subject');
+        EEG = ALLEEG; CURRENTSET = 1:length(EEG); CURRENTSTUDY = 1;
+        eeglab redraw; 
+        return
     elseif strcmp(onearg, 'rebuild')
 		W_MAIN = findobj('tag', 'EEGLAB');
         close(W_MAIN);
