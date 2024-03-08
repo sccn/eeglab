@@ -12,7 +12,7 @@ if strcmpi(res, 'No')
 end
 
 % installing plugins
-if ~isdeployed
+if ~isdeployed && ismatlab
     plugin_askinstall('PICARD', 'picard', true);
     plugin_askinstall('Fieldtrip-lite', 'ft_defaults', true);
 end
