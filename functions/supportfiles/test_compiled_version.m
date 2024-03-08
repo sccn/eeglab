@@ -11,6 +11,12 @@ if strcmpi(res, 'No')
     end
 end
 
+% installing plugins
+if ~isdeployed
+    plugin_askinstall('PICARD', 'picard', true);
+    plugin_askinstall('Fieldtrip-lite', 'ft_defaults', true);
+end
+
 try
     % test binary files
     if isdeployed
