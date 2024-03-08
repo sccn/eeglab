@@ -61,7 +61,7 @@
 
 % 01-25-02 reformated help & license -ad 
  
-function [EEG, com] = pop_saveset( EEG, varargin);
+function [EEG, com] = pop_saveset( EEG, varargin)
 
 com = '';
 if nargin < 1
@@ -70,7 +70,8 @@ if nargin < 1
 end
 if isempty(EEG)  , error('Cannot save empty datasets'); end
 if length(EEG) == 1 && isequal(EEG.data, 'in set file')
-    EEG = pop_loadset(fullfile(EEG.filepath, EEG.filename));
+    EEGTMP = pop_loadset(fullfile(EEG.filepath, EEG.filename));
+    EEG.data = EEGTMP.data;
 end
 
 % empty filename (resave file)
