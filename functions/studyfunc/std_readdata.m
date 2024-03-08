@@ -207,9 +207,6 @@ for iSubj = 1:length(subjectList)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
         polList     = [];
-        if size(STUDY.cluster(opt.clusters).sets,1) ~= length(datasetInds)
-            error('Cannot process components from different ICA decompositions of the same subjects'); % sometimes different sessions
-        end            
         if isempty(opt.component)
             for iDat = datasetInds(:)'
                 indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject so we many only consider the first row
