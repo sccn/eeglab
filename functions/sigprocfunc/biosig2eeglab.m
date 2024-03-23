@@ -78,13 +78,20 @@ EEG = eeg_emptyset;
 % ----------------------------
 if ~isempty(channels)
     dat.InChanSelect = channels;
+    if isa(DAT, 'single')
+        error('Cannot select channels when using memory mapping')
+    end
 end
 if ~isfield(dat, 'InChanSelect') && max(dat.InChanSelect) > size(DAT,1)
     dat.InChanSelect = [1:size(DAT,1)];
 end
 EEG.nbchan          = length(dat.InChanSelect); %= size(DAT,1);
 EEG.srate           = dat.SampleRate(1);
-EEG.data            = DAT(dat.InChanSelect,:);  %DAT
+if isa(DAT, 'single')
+    EEG.data            = DAT(dat.InChanSelect,:);  %DAT
+else
+    EEG.data            = DAT;  %DAT
+end
 clear DAT;
 % try  % why would you do the following???????  JO
 %     EEG.data            = EEG.data';
