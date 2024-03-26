@@ -256,7 +256,7 @@ if nargin < 1 && ~isdeployed
         eeglabpath2 = mywhich('eeglab.m');
         cd('..');
     else
-        try frmpath(eeglabpath); catch, end
+        try rmpath(eeglabpath); catch, end
         eeglabpath2 = mywhich('eeglab.m');
     end
     if ~isempty(eeglabpath2)
