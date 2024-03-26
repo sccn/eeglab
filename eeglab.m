@@ -457,8 +457,10 @@ if nargin == 1
     elseif strcmp(onearg, 'full')
         versL = false;
     else
-        fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
-        eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
+        if ~exist(onearg, 'file')
+            fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
+            eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
+        end
 	end
 else 
     onearg = 'rebuild';
@@ -1271,6 +1273,10 @@ end
 % check if update is available
 if ismatlab
     eeglab_update(eeglabVersionStatus);
+end
+
+if isdeployed && ~exist(onearg, 'file')
+    pop_runscript(onearg);
 end
 
 % REMOVED MENUS
