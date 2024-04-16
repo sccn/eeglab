@@ -160,7 +160,7 @@ if nargin < 3 % Open GUI input window
 	else
 		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
 		txt = ['Component numbers to plot (negative numbers invert comp. polarities):' ];
-	end;	
+    end
     if compute_file
         enableload = 'off';
         enablecomp = 'on';
@@ -295,8 +295,10 @@ if nargin < 3 % Open GUI input window
         end
         if isempty(result{7})   
             setupopt = { result{4} 'meshfile' result{5} };  % no coreg
+            options = [ options { 'meshfile' result{5} }];
         else                    
             setupopt = { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) };
+            options = [ options { 'meshfile' result{5} 'transform' str2num(result{7}) }];
             fprintf('Transformation matrix: %s\n', result{7});
         end
         options = { options{:} 'setup' setupopt };
@@ -398,7 +400,7 @@ end
 % ----------------
 if ~exist('topotitle')  
     topotitle = '';
-end;    
+end
 if typeplot
     if isempty(EEG.splinefile)
         error('Pop_headplot: cannot find spline file, aborting...');
@@ -407,13 +409,13 @@ else
     if isempty(EEG.icasplinefile)
         error('Pop_headplot: cannot find spline file, aborting...');
     end
-end;    
+end
 SIZEBOX = 150;
 nbgraph = size(arg2(:),1);
 if ~exist('rowcols') || isempty(rowcols) || rowcols(1) == 0
     rowcols(2) = ceil(sqrt(nbgraph));
     rowcols(1) = ceil(nbgraph/rowcols(2));
-end;    
+end
 
 fprintf('Plotting...\n');
 
@@ -456,7 +458,7 @@ for index = 1:size(arg2(:),1)
 			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
 			set(gcf,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 			try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
-        end;    
+        end    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
 	end
 
@@ -471,7 +473,7 @@ for index = 1:size(arg2(:),1)
                 headplot( -EEG.icawinv(:, -arg2(index)), EEG.icasplinefile, options{:});
             else	
                 headplot( EEG.icawinv(:, arg2(index)), EEG.icasplinefile, options{:});
-            end;    			
+            end
 			if nbgraph == 1, title( topotitle );
 			else title(['' int2str(arg2(index))]);
 			end
