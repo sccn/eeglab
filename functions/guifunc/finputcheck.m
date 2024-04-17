@@ -270,5 +270,5 @@ end
 function b = isstring2(str)
 b = false;
 if exist('isstring', 'builtin')
-    b = isstring(str)
+    b = isstring(str);
 end
