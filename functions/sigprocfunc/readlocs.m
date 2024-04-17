@@ -420,7 +420,7 @@ if ischar(filename)
                eloc(iChan).Z      = elocIn.Channel(iChan).Loc(3);
                eloc(iChan).type   = elocIn.Channel(iChan).Type;
            end
-           if isfield(elocBrainstrom, 'SCS')
+           if isfield(elocIn, 'SCS')
                chans = { 'NAS' 'LPA' 'RPA' };
                for iChan = 1:length(chans)
                    if isfield(elocIn.SCS, chans{iChan})
