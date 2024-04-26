@@ -18,7 +18,6 @@
 %   '.nwb'  - POP_NWBIMPORT (Neurodata Without Borders)
 %   '.mefd' - POP_MEF3 (MEF iEEG data format)
 %   '.ds'   - POP_FILEIO or POP_CTF_READ (see below; CTF MEG data format)
-%   '.gz'   - POP_FILEIO (CTF MEG data format)
 %   '.fif'  - POP_FILEIO (FIF MEG data format)
 %   '.fif.gz' - POP_FILEIO (FIF MEG data format)
 %
