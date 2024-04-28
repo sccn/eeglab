@@ -37,10 +37,11 @@ function std_savedat( tmpfile, structure)
     if ~isfield(structure, 'datafile') && ~isfield(structure, 'datafiles') 
         structure.datafile = [ tmpfile(1:delims(end)-1) '.set' ];
     end
+    structure.date = char(datetime('today'));
     
     % fix reading problem (bug 764)
     tmpfile2  = which(tmpfile);
-    if isempty(tmpfile2), tmpfile2 = tmpfile; end;    
+    if isempty(tmpfile2), tmpfile2 = tmpfile; end  
     tmpfile = tmpfile2;
     
     eeglab_options;
