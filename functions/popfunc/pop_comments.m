@@ -90,7 +90,7 @@ if nargin < 3
 		GUIBUTTONCOLOR   = [.8 .8 .8];    
 	end
 	fig = figure('menubar', 'none', 'tag', 'comment', 'color', BACKCOLOR, 'userdata', 0, ...
-		   'numbertitle', 'off', 'name', 'Read/Enter comments -- pop_comments()');
+		   'numbertitle', 'off', 'name', 'Read/Enter text -- pop_comments()');
 	pos = get(gca,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
