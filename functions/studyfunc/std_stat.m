@@ -120,6 +120,7 @@ if ~isempty(varargin) ||isempty(opt)
 end
 
 if ~isfield(opt, 'paired'), opt.paired = { 'off' 'off' }; end
+if isfield(opt, 'cluster'), error('Unknown parameter ''cluster'''); end
 if ~isnan(opt.eeglab.alpha(1)) && isempty(opt.eeglab.naccu), opt.eeglab.naccu = 1/opt.eeglab.alpha(end)*2; end
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end
 if strcmpi(opt.eeglab.mcorrect, 'fdr'), opt.eeglab.naccu = opt.eeglab.naccu*20; end
