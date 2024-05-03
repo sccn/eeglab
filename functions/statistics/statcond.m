@@ -65,7 +65,10 @@
 %                intervals.
 %   'cluster'  = ['on'|'off'] cluster correction for multiple comparison.
 %                Only functional when alpha is set (if alpha is NaN, it
-%                sets it to 0.05) and for 1-way Anova or t-test.
+%                sets it to 0.05) and for 1-way Anova or t-test. Note that
+%                this type of cluster correction only work for matrices,
+%                not for channels. When correcting in channel space, use
+%                the statcondfieldtrip function instead.
 %
 % Legacy parameters:
 %   'threshold' - now 'alpha'
