@@ -30,7 +30,7 @@
 %            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
 %            >> eeglab versions  % State EEGLAB version number
 %
-%   >> type "eeglablicense.txt" % the EEGLAB open source license
+%   >> type "LICENSE"           % the EEGLAB open source license
 %   >> web http://eeglab.org    % the EEGLAB tutorial
 %   >> help eeg_checkset        % the EEG dataset structure
 %
@@ -466,7 +466,7 @@ else
     onearg = 'rebuild';
 end
 ALLCOM = ALLCOM;
-try, colordef('white'); catch end
+try, colordef('white'); catch end % removed from MATLAB
 if versL
     disp('Some menus items hidden. Use Preference menu to show them all.');
 end
