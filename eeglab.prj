@@ -148,7 +148,7 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/README.md</file>
-      <file>${PROJECT_ROOT}/eeglablicense.txt</file>
+      <file>${PROJECT_ROOT}/LICENSE</file>
       <file>${PROJECT_ROOT}/functions/supportfiles/eeglab_run_this_one_on_osx_or_linux</file>
       <file>${PROJECT_ROOT}/functions/supportfiles/eeglab_run_this_one_on_windows.bat</file>
       <file>${PROJECT_ROOT}/sample_data</file>
