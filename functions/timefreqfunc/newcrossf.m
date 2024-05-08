@@ -1039,8 +1039,8 @@ end
 if g.plot
    fprintf('\nNow plotting...\n');
    set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
-   colormap(jet(256));
-   
+   icadefs;
+   colormap(feval(DEFAULT_COLORMAP, 256));
    pos = get(gca,'position'); % plot relative to current axes
    q = [pos(1) pos(2) 0 0];
    s = [pos(3) pos(4) pos(3) pos(4)];

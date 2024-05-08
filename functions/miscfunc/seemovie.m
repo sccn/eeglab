@@ -66,10 +66,12 @@ axes('Position',[0 0 1 1]);
 if size(Colormap,2) == 3 % if colormap user-defined
 	colormap(Colormap)
 else
-	colormap([jet(64);0 0 0]);    % set up the default topoplot color map
+    icadefs;
+    cmap = feval(DEFAULT_COLORMAP, 64);
+	colormap([cmap;0 0 0]);    % set up the default topoplot color map
 end
 
-if ntimes > 0,
+if ntimes > 0
  fprintf('Movie will play slowly once, then %d times faster.\n',ntimes);
 else 
  fprintf('Movie will play slowly once, then %d times faster forwards and backwards.\n',-ntimes);

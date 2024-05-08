@@ -66,7 +66,11 @@ tmpComputer   = computer;
 tmpScreenSize = get(0, 'ScreenSize');
 
 % Graph Definitions
-DEFAULT_COLORMAP = 'jet';
+if ismatlab
+    DEFAULT_COLORMAP = 'turbo';
+else
+    DEFAULT_COLORMAP = 'jet';
+end
 
 if VERS < 8.04
     PLOT_LINEWIDTH   = 2;

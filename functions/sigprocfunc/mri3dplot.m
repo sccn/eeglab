@@ -94,13 +94,13 @@ function [newprob3dori, mriplanes] = mri3dplot(prob3d, mri, varargin)
     DEFAULT_SPACING = 11;     % default MR slice interval (in mm)
     translucency    = 0.5;    % default alpha value
     mri_lim         = 85;     % +/- axis limits of MNI head image
-    
+    icadefs;
     g = finputcheck( varargin, { 'mriview'   { 'string','cell' 'real' }  { { 'sagital','axial','coronal','top','side','rear' } {} [] }   'top';
                         'mixmode'   'string'   { 'add','overwrite','min' }     'add';
                         'mrislices' 'float'    []                        [];
                         'view'      'float'    []                        [];
                         'geom'      'float'    []                        [];
-                        'cmap'      'float'    []                        jet(64);
+                        'cmap'      'float'    []                        feval(DEFAULT_COLORMAP, 64);
                         'cmax'      'float'    []                        [];
                         'mixfact'   'float'    []                        0.5;
                         'cmin'      'float'    []                        0;

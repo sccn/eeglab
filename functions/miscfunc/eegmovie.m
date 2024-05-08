@@ -191,7 +191,9 @@ end
 axcolor = get(gcf,'Color');
 axtopoplot = axes('Units','Normalized','Position',[0 .1 .72 .8],'Color',axcolor);
 TPAXCOLOR  = get(axtopoplot,'Color');    %%CJH
-Colormap   = [jet(64);TPAXCOLOR];        %%CJH
+icadefs;
+cmap = feval(DEFAULT_COLORMAP, 64);
+Colormap   = [cmap;TPAXCOLOR];       
 fprintf('Warning: do not resize plot window during movie creation ...\n   ');
 h = textsc(opt.title, 'title'); set(h,'FontSize',16)
 
