@@ -167,7 +167,7 @@ elseif ~isempty(g.retrieve) % command line call
         
             tmpsave = EEG.saved;
             EEG = eeg_hist(EEG, com);        
-            [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
+            [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, OLDSET);
             EEG.saved            = tmpsave; % eeg_store automatically set it to 'no'
             ALLEEG(OLDSET).saved = tmpsave;
         end
@@ -562,7 +562,7 @@ else
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
         end
     end
-end;        
+end
 
 com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2str( { OLDSET args{:} 'gui' 'off' } ));
 return;
@@ -570,12 +570,12 @@ return;
 function num = popask( text )
 	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
-	 switch lower(ButtonName),
+	 switch lower(ButtonName)
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end
 
-function EEG = update_datafield(EEG);
+function EEG = update_datafield(EEG)
     if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end
     if ~isempty(EEG.datfile)
         EEG.data = EEG.datfile;
