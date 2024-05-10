@@ -1226,6 +1226,7 @@ for inddataset = 1:length(ALLEEG)
     if ~isfield(EEG, 'comments'),   EEG.comments   = ''; res = com; end
     if ~isfield(EEG, 'etc'     ),   EEG.etc        = []; res = com; end
     if ~isfield(EEG, 'urevent' ),   EEG.urevent    = []; res = com; end
+    if ~isfield(EEG, 'datfile' ),   EEG.datfile    = ''; res = com; end
     if ~isfield(EEG, 'roi' ),       EEG.roi        = []; res = com; end
     if ~isfield(EEG, 'ref') || isempty(EEG.ref), EEG.ref = 'common'; res = com; end
     
