@@ -165,6 +165,7 @@ if ~isempty( ALLEEG )
         if ~isfield(EEG, 'datfile') && isfield(ALLEEG, 'datfile')
             ALLEEG(storeSetIndex).datfile = '';
         end
+        EEG = ALLEEG(storeSetIndex); % ensure equality between the two
 	end
 else	
 	ALLEEG = EEG;
