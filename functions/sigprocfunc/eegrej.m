@@ -123,7 +123,7 @@ end
 % generate boundaries latencies
 % -----------------------------
 boundevents = regions(:,1)-1;
-for iRegion1=1:size(regions,1)
+for iRegion1 = 1:size(regions,1)
     duration(iRegion1)    = regions(iRegion1,2)-regions(iRegion1,1)+1;
     
     % add nested boundary events
@@ -136,7 +136,7 @@ for iRegion1=1:size(regions,1)
 %         end
     end
     
-	for iRegion2=iRegion1+1:size(regions)
+	for iRegion2 = iRegion1+1:size(regions,1)
 		boundevents(iRegion2) = boundevents(iRegion2) - (regions(iRegion1,2)-regions(iRegion1,1)+1);
     end
 end
