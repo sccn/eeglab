@@ -423,7 +423,7 @@ if ischar(filename)
            if isfield(elocIn, 'SCS')
                chans = { 'NAS' 'LPA' 'RPA' };
                for iChan = 1:length(chans)
-                   if isfield(elocIn.SCS, chans{iChan})
+                   if isfield(elocIn.SCS, chans{iChan}) && ~isempty(elocIn.SCS.(chans{iChan}))
                        eloc(end+1).labels = chans{iChan};
                        eloc(end).X      = elocIn.SCS.(chans{iChan})(1);
                        eloc(end).Y      = elocIn.SCS.(chans{iChan})(2);
