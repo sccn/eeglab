@@ -261,14 +261,18 @@ eeglab_options;
 
 % rename fields for backward compatibility in future versions
 if isfield(EEG, 'nchans')
-    EEG.nbchan = EEG.nchans;
+    for iEEG = 1:length(EEG)
+        EEG(iEEG).nbchan = EEG.nchans;
+    end
 end
 if isfield(EEG, 'chanlocs')
-    if isfield(EEG.chanlocs, 'label')
-        for iChan = 1:length(EEG.chanlocs)
-            EEG.chanlocs(iChan).labels = EEG.chanlocs(iChan).label;
+    for iEEG = 1:length(EEG)
+        if isfield(EEG(iEEG).chanlocs, 'label')
+            for iChan = 1:length(EEG(iEEG).chanlocs)
+                EEG(iEEG).chanlocs(iChan).labels = EEG(iEEG).chanlocs(iChan).label;
+            end
+            EEG(iEEG).chanlocs = rmfield(EEG(iEEG).chanlocs, 'label');
         end
-        EEG.chanlocs = rmfield(EEG.chanlocs, 'label');
     end
 end
 
