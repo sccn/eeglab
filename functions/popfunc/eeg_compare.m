@@ -38,8 +38,9 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function eeg_compare(EEG, EEG2)
+function res = eeg_compare(EEG, EEG2)
 
+res = 1;
 %% Assess difference between datasets
 fields = fieldnames(EEG);
 disp('Field analysis:')
@@ -172,3 +173,7 @@ if ~isempty(EEG.epoch)
         fprintf(2, '    Different numbers of epochs\n');
     end
 end
+
+function result = contains(element, cellArray)
+    % Check if the element is in the cell array
+    result = any(cellfun(@(x) isequal(x, element), cellArray));
