@@ -457,7 +457,7 @@ if nargin == 1
     elseif strcmp(onearg, 'full')
         versL = false;
     else
-        if ~exist(onearg, 'file')
+        if ~exist(onearg, 'file') && ~any(onearg == ';')
             fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
             eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
         end
@@ -1296,8 +1296,10 @@ if ismatlab
     eeglab_update(eeglabVersionStatus);
 end
 
-if isdeployed && exist(onearg, 'file')
+if exist(onearg, 'file') % execute script
     pop_runscript(onearg);
+elseif any(onearg == ';') % execute code if there is a semicolumn in the argument
+    evalin('base', onearg);
 end
 
 % REMOVED MENUS
