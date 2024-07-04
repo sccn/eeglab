@@ -1047,7 +1047,9 @@ else
                 
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
-                if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip')) && isempty(findstr(lower(dircontent(index).name), 'rest'))
+                if ~isempty(findstr(lower(dircontent(index).name), 'bids-matlab-tools'))
+                    fprintf(2, 'Warning: The bids-matlab-tools plugin is obsolete, uninstall and install EEG-BIDS instead\n');
+                elseif ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip')) && isempty(findstr(lower(dircontent(index).name), 'rest'))
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'compat') , 'electrodenormalize' );
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'forward'), 'ft_sourcedepth.m');
                     addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'utilities'), 'ft_datatype.m');
