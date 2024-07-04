@@ -40,6 +40,8 @@ FONTSIZE = 0; % set to 4 for high-res screen
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
 plugin = plugin_getweb('plugin_check', pluginlist);
+
+% remove plugins which have been removed
 if isempty(plugin)           
     errordlg2(['Either you are offline, MATLAB is not allowed to access the web,' char(10) ...
         'a firewall is blocking EEGLAB from accessing its plugin server, or there' char(10) ...
@@ -84,6 +86,9 @@ for iRow = 1:length(plugin)
         if ~isnan(plugin(iRow).numrating) && plugin(iRow).numrating
             plugin(iRow).text =  [ plugin(iRow).text '; ' int2str(plugin(iRow).numrating) ' rating' ];
         end
+        if plugin(iRow).removed
+            plugin(iRow).text =  [ plugin(iRow).text '; OBSOLETE, SEE HELP' ];
+        end
         plugin(iRow).text =  [ plugin(iRow).text ')</b></font></font></html>' ];
         plugin(iRow).strsearch = lower([ plugin(iRow).name plugin(iRow).rawtags plugin(iRow).description ]);  
     else
@@ -96,6 +101,9 @@ for iRow = 1:length(plugin)
             plugin(iRow).text =  [ plugin(iRow).text ' update available ' ];
         end
         plugin(iRow).text =  [ plugin(iRow).text ' (' int2str(plugin(iRow).downloads) ' downloads)' ];
+        if plugin(iRow).removed
+            plugin(iRow).text =  [ plugin(iRow).text '; OBSOLETE, SEE HELP' ];
+        end
         if plugin(iRow).installed
             plugin(iRow).text =  [ plugin(iRow).text '****' ];
         end

@@ -116,7 +116,7 @@ for k = 1:length(comps)
         end
     end
     if ~isfield(topo, 'date')
-        fprintf(2, 'Recompute ICA scalp topographies, see https://github.com/sccn/eeglab/issues/767\n')
+        fprintf(2, 'You must recompute ICA scalp topographies, see bug https://github.com/sccn/eeglab/issues/767\n')
     end
 
     try
