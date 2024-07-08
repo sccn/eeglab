@@ -42,6 +42,7 @@
 %   'condition' - [string] dataset condition. 
 %   'session '  - [integer] dataset session number.
 %   'group'     - [string] dataset group.
+%   'task'      - [string] dataset task.
 %   'load'      - [filename] load dataset from specified filename. Can be 
 %                 an EEGLAB dataset or any file supported by File-IO (if 
 %                 it is installed from the plugin manager).
@@ -209,6 +210,8 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'run' 
             STUDY.datasetinfo(currentind).run     = g.commands{k+1};
+        case 'task' 
+            STUDY.datasetinfo(currentind).task    = g.commands{k+1};
         case 'remove'
             % create empty structure
             allfields = fieldnames(ALLEEG);
@@ -290,10 +293,10 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).session   = ALLEEG(currentind).session;
             STUDY.datasetinfo(currentind).run       = ALLEEG(currentind).run;
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
-            STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
+            STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;      
             STUDY.datasetinfo(currentind).index     = currentind;    
             if isfield(ALLEEG(currentind), 'task')   
-                STUDY.datasetinfo(currentind).task      = ALLEEG(currentind).task;                 
+                STUDY.datasetinfo(currentind).task  = ALLEEG(currentind).task;                 
             end
         otherwise
             % running custom command
@@ -342,6 +345,12 @@ if strcmpi(g.updatedat, 'on')
         if ~strcmpi(char(ALLEEG(currentind).group), char(STUDY.datasetinfo(currentind).group))
             ALLEEG(currentind).group            = STUDY.datasetinfo(currentind).group;
             ALLEEG(currentind).saved            = 'no';
+        end
+        if isfield(STUDY.datasetinfo, 'task')
+            if ~isfield(ALLEEG, 'task') || ~strcmpi(char(ALLEEG(currentind).task), char(STUDY.datasetinfo(currentind).task))
+                ALLEEG(currentind).task         = STUDY.datasetinfo(currentind).task;
+                ALLEEG(currentind).saved        = 'no';
+            end
         end
     end
 end
