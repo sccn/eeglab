@@ -291,6 +291,19 @@ elseif nargin > 1 && isa(ALLEEG, 'matlab.ui.Figure')
             userdat{4} = allcom;
             set(hdl, 'userdata', userdat);            
 
+        case 'task'
+            guiindex  = varargin{1};
+            realindex = guiindex+(page-1)*10;
+            datasetinfo(realindex).task   = varargin{2};
+            if get(findobj(hdl, 'tag', 'copy_to_dataset'), 'value')
+                ALLEEG(realindex).task    = varargin{2};
+            end
+            allcom = { allcom{:}, { 'index' realindex 'task' varargin{2} } };
+            userdat{1} = ALLEEG;
+            userdat{2} = datasetinfo;
+            userdat{4} = allcom;
+            set(hdl, 'userdata', userdat);     
+        
         case 'condition'
             guiindex  = varargin{1};
             realindex = guiindex+(page-1)*10;
@@ -349,7 +362,7 @@ elseif nargin > 1 && isa(ALLEEG, 'matlab.ui.Figure')
             else
                 fprintf('Converting file to EEGLAB format...\n')
                 [TMPEEG, modality] = eeg_import(filename);
-                filename = fullfile(pathTmp, [ fileTmp '.set' ]);
+                filename = fullfile(pathTmp, [ fileTmp '_bids_tmp_.set' ]);
                 pop_saveset(TMPEEG, 'filename', filename);
                 TMPEEG = pop_loadset('filename', filename, 'loadmode', 'info');
             end
@@ -448,6 +461,8 @@ function bool = test_wrong_parameters(hdl)
     allcondition = all(~cellfun('isempty', { datasetinfo(nonempty).condition }));
     anygroup     = any(~cellfun('isempty', { datasetinfo(nonempty).group }));
     allgroup     = all(~cellfun('isempty', { datasetinfo(nonempty).group }));
+    anytask      = any(~cellfun('isempty', { datasetinfo(nonempty).task }));
+    alltask      = all(~cellfun('isempty', { datasetinfo(nonempty).task }));
     anydipfit    = any(~cellfun('isempty', { datastrinfo(nonempty).dipfit}));
     alldipfit    = all(~cellfun('isempty', { datastrinfo(nonempty).dipfit}));
 
@@ -462,6 +477,9 @@ function bool = test_wrong_parameters(hdl)
     end
     if anyrun && ~allrun
          bool = 1; warndlg2('If one dataset has a session index, they must all have one', 'Error');
+    end
+    if anytask && ~alltask
+         bool = 1; warndlg2('If one dataset has a task, they must all have one', 'Error');
     end
     if anydipfit && ~alldipfit
          bool = 1; warndlg2('Dipole''s data across datasets is not uniform');
