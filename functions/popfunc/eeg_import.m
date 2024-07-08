@@ -148,4 +148,5 @@ end
 if strcmpi(opt.noevents, 'on')
     EEG.event = [];
 end
+EEG = eeg_checkset(EEG);
 modality = opt.modality;
