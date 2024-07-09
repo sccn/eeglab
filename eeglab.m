@@ -413,11 +413,13 @@ if nargin < 1 || exist('EEG') ~= 1
 end
 if isempty(CURRENTSTUDY) CURRENTSTUDY = 0; end
 
+nouiflag = false;
 versL = ~option_allmenus;
 if nargin == 1
     if strcmp(onearg, 'versions')
         disp( [ 'EEGLAB v' eeg_getversion ] );
 	elseif strcmp(onearg, 'nogui')
+        nouiflag = true;
         if nargout < 1, clear ALLEEG; end % do not return output var
 	elseif strcmp(onearg, 'redraw')
 		W_MAIN = findobj('tag', 'EEGLAB');
@@ -460,6 +462,8 @@ if nargin == 1
         if ~exist(onearg, 'file') && ~any(onearg == ';')
             fprintf(2,['EEGLAB Warning: Invalid argument ''' onearg '''. Restarting EEGLAB interface instead.\n']);
             eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
+        else
+            nouiflag = true;
         end
 	end
 else 
@@ -548,7 +552,7 @@ catchstrs.load_study             = e_load_study;
 
 % create eeglab figure
 % --------------------
-if ~strcmpi(onearg, 'nogui')
+if ~nouiflag
     eeg_mainfig(onearg);
 end
 
@@ -744,7 +748,7 @@ onepochchan       = 'startup:off;continuous:off;chanloc:on';
 onstudy           = 'startup:off;epoch:off;continuous:off;study:on';
 onstudynoroi      = 'startup:off;epoch:off;continuous:off;study:on;roi:off';
 
-if ~strcmpi(onearg, 'nogui')
+if ~nouiflag
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
@@ -1122,7 +1126,7 @@ else
                 pluginlist(plugincount).version    = pluginVersion;
                 vers2  = '';
                 status = 'ok';
-                if ~strcmpi(onearg, 'nogui')
+                if ~nouiflag
                     try
                         %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
                         vers2 = feval(funcname, gcf, trystrs, catchstrs);
@@ -1189,7 +1193,7 @@ else
     
     % add menus for plugins to install
     % --------------------------------
-    if ismatlab && ~strcmpi(onearg, 'nogui')
+    if ismatlab && ~nouiflag
         if ~exist('mff_import', 'file')
             neuro_m = findobj(W_MAIN, 'tag', 'import data');
             cb_mff = [ 'if ~plugin_askinstall(''mffmatlabio'', ''mff_import''), return; end;' ...
@@ -1243,7 +1247,13 @@ if ~strcmp(dipplotpath,dipfitpath)
     addpath(dipfitpath,'-begin');
 end
 
-if strcmpi(onearg, 'nogui')
+if exist(onearg, 'file') % execute script
+    pop_runscript(onearg);
+elseif any(onearg == ';') % execute code if there is a semicolumn in the argument
+    evalin('base', onearg);
+end
+
+if nouiflag
     return;
 end
 
@@ -1296,12 +1306,6 @@ end
 % check if update is available
 if ismatlab
     eeglab_update(eeglabVersionStatus);
-end
-
-if exist(onearg, 'file') % execute script
-    pop_runscript(onearg);
-elseif any(onearg == ';') % execute code if there is a semicolumn in the argument
-    evalin('base', onearg);
 end
 
 % REMOVED MENUS
