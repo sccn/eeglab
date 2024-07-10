@@ -42,7 +42,8 @@
 %  'fieldtripnaccu'   - 'numrandomization' Fieldtrip parameter
 %  'fieldtripalpha'   - 'alpha' Fieldtrip parameter. Default is 0.05.
 %  'fieldtripmethod'  - 'method' Fieldtrip parameter. Default is 'analytic'
-%  'fieldtripmcorrect' - 'mcorrect' Fieldtrip parameter. Default is 'none'.
+%  'fieldtripmcorrect' - ['cluster'|'max'|'fdr'|'holms'|'bonferoni'|'none']. 
+%                        Default is 'none'.
 %  'fieldtripclusterparam' - string or cell array for optional parameters
 %                            for cluster correction method, see function
 %                            ft_statistics_montecarlo for more information.
