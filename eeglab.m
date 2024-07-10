@@ -1108,11 +1108,7 @@ else
                 pluginlist(plugincount).version    = pluginVersion;
                 pluginlist(plugincount).foldername = dircontent(index).name;
                 pluginlist(plugincount).status     = 'ok';
-                if length(indPlugin) == 1
-                    indPlugin = strmatch(lower(pluginlist(plugincount).plugin), lower({ pluginstats.name }), 'exact');
-                else
-                    indPlugin = [];
-                end
+                indPlugin = strmatch(lower(pluginlist(plugincount).plugin), lower({ pluginstats.name }), 'exact');
                 if ~isempty(indPlugin)
                     if ~strcmpi(pluginVersion, pluginstats(indPlugin).version)
                         fprintf(2, ' - new version %s available\n', pluginstats(indPlugin).version);
