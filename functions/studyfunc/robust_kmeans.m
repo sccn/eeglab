@@ -29,7 +29,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function  [IDX,C,sumd,D,outliers] = robust_kmeans(data,N,STD,MAXiter,method)
+function  [IDX,C,sumd,D,outliers] = robust_kmeans(data,clus_num,STD,MAXiter,method)
 % data - pre-clustering data matrix.
 % N - number of wanted clusters.
 
@@ -41,9 +41,11 @@ flag  = 1;
 not_outliers = 1:size(data,1);
 old_outliers = [];
 if strcmpi(method, 'kmeans')
-    [IDX,C,sumd,D] = kmeans(data,N,'replicates',30,'emptyaction','drop'); % Cluster using K-means algorithm
+    [IDX,C,sumd,D] = kmeans(data,clus_num,'replicates',30,'emptyaction','drop'); % Cluster using K-means algorithm
+elseif strcmpi(method,'optimal_kmeans')
+    [IDX,C,sumd,D] = optimal_kmeans(data,clus_num); % Cluster using optimal K-menas
 else
-    [IDX,C,sumd,D] = kmeanscluster(data,N); % Cluster using K-means algorithm
+    [IDX,C,sumd,D] = kmeanscluster(data,clus_num); % Cluster using K-means algorithm
 end;    
 if STD >= 2 % STD for returned outlier
     rSTD = STD -1;
@@ -56,6 +58,7 @@ while flag
      loop =  loop + 1;
 	std_all = [];
     ref_D = 0;
+    N = size(C,1); % Should be dynamically assigned because of "optimal_kmeans"
 	for k = 1:N
         tmp = ['cls' num2str(k) ' = find(IDX=='  num2str(k) ')''; ' ]; %find the component indices belonging to each cluster (cls1 = ...).
         eval(tmp);
@@ -101,6 +104,8 @@ while flag
     
     if strcmpi(method, 'kmeans')
         [IDX,C,sumd,D] = kmeans(data(not_outliers,:),N,'replicates',30,'emptyaction','drop');
+    elseif strcmpi(method,'optimal_kmeans')
+        [IDX,C,sumd,D] = optimal_kmeans(data(not_outliers,:),clus_num);
     else
         [IDX,C,sumd,D] = kmeanscluster(data(not_outliers,:),N);
     end
