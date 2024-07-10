@@ -388,7 +388,7 @@ if ~isempty(opt.channels)
                                      'subject', opt.subject, 'valsunit', { valunit 'ms' }, 'vals', params.plottf, 'datatype', upper(opt.datatype), ...
                                      'effect', stats.effect, 'factor1', condname, 'factor2', groupname);
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
-                                          'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
+                                          'chanlocs', locs, 'threshold', alpha, 'titles', alltitles, 'effect', stats.effect);
         else
             if length(locs) > 1, opt.plottopo = 'on'; else opt.plottopo = 'off'; end
             if length(locs) == 1 && size(allersp{1},3) > 1

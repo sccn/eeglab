@@ -35,11 +35,11 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function com = pop_runscript(filename);
+function com = pop_runscript(filename)
 
 com = [];
 if nargin <1
-    [filename filepath] = uigetfile('*.*', 'Please select input script -- pop_runscript()');
+    [filename, filepath] = uigetfile('*.*', 'Please select input script -- pop_runscript()');
     
     if filename(1) == 0, return; end
 

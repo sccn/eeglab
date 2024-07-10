@@ -78,10 +78,15 @@ function chanlocs = readeetraklocs( filename )
         positions = locs(indpos+1:indlabels-1,1:3);
     end
     labels    = locs(indlabels+1:end,:);
+
+    if size(labels,2) == size(positions,1)
+        % transpose if labels are on one row
+        labels = labels';
+    end
         
     % create structure
     % ----------------
-    for index = 1:length(labels)
+    for index = 1:size(positions,1)
         chanlocs(index).labels = labels{index};
         chanlocs(index).X      = positions{index,1};
         chanlocs(index).Y      = positions{index,2};

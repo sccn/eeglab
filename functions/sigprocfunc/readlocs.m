@@ -420,10 +420,10 @@ if ischar(filename)
                eloc(iChan).Z      = elocIn.Channel(iChan).Loc(3);
                eloc(iChan).type   = elocIn.Channel(iChan).Type;
            end
-           if isfield(elocBrainstrom, 'SCS')
+           if isfield(elocIn, 'SCS')
                chans = { 'NAS' 'LPA' 'RPA' };
                for iChan = 1:length(chans)
-                   if isfield(elocIn.SCS, chans{iChan})
+                   if isfield(elocIn.SCS, chans{iChan}) && ~isempty(elocIn.SCS.(chans{iChan}))
                        eloc(end+1).labels = chans{iChan};
                        eloc(end).X      = elocIn.SCS.(chans{iChan})(1);
                        eloc(end).Y      = elocIn.SCS.(chans{iChan})(2);
@@ -569,9 +569,11 @@ if ischar(filename)
            [str, mult] = checkformat(g.format{indexcol});
            for indexrow = 1:size( array, 1)
                if mult ~= 1
-                   eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
+                   % eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
+		   eloc(indexrow).(str)= -array{indexrow, indexcol};
                else
-                   eval ( [ 'eloc(indexrow).'  str '= array{indexrow, indexcol};' ]);
+                   % eval ( [ 'eloc(indexrow).'  str '= array{indexrow, indexcol};' ]);
+		   eloc(indexrow).(str)= array{indexrow, indexcol};
                end
            end
        end

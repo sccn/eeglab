@@ -48,7 +48,7 @@
 % Hey Arno -- this is a quick fix to make an analysis work for Makoto
 % I think the old version had a bug...
 
-function [chans, chaninfo, chanedit]= eeg_checkchanlocs(chans, chaninfo);
+function [chans, chaninfo, chanedit]= eeg_checkchanlocs(chans, chaninfo)
 
 if nargin < 1 
     help eeg_checkchanlocs;

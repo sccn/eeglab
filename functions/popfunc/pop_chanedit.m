@@ -112,6 +112,8 @@
 %  'rplurchanloc' - [1,0] [1] Replace EEG.urchanlocs.If EEG.urchanlocs is empty this
 %                   option will be ignored and will be set to [1]
 %   'addfiducials' - ['on'|'off'] add fiducials if they are not present.
+%   'cleanlabels'  - ['on'|'off'] remove quotes, space characters and reference 
+%                    from channel labels. Default is 'no'.
 %
 % Outputs:
 %   EEG        - new EEGLAB dataset with updated channel location structures 

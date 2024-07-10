@@ -93,16 +93,19 @@ for k = 1:length(comps)
 
     if length(comps) < 3
         lastwarn('', '');
+        warnStruct = warning;
+        warning('off');
         try
             topo = load( '-mat', filename, ...
                          [ 'comp' int2str(comps(k)) '_grid'], ...
                          [ 'comp' int2str(comps(k)) '_x'], ...
-                         [ 'comp' int2str(comps(k)) '_y'] );
+                         [ 'comp' int2str(comps(k)) '_y'], 'date' );
         catch
             error( [ 'Cannot read file ''' filename '''' ]);
         end
-        [~, warnId] = lastwarn();
-        if ~isempty(warnId)
+        [warnMsg, warnId] = lastwarn();
+        warning(warnStruct);
+        if ~isempty(warnId) && ~findstr(warnMsg, 'date')
             error( 'Cannot find component %d in file %s', comps(k),  filename );
         end
     elseif k == 1
@@ -112,7 +115,10 @@ for k = 1:length(comps)
             error([ 'Missing scalp topography file - also necessary for ERP polarity' 10 'Try recomputing scalp topographies for components' ]);
         end
     end
-    
+    if ~isfield(topo, 'date')
+        fprintf(2, 'You must recompute ICA scalp topographies, see bug https://github.com/sccn/eeglab/issues/767\n')
+    end
+
     try
         tmp =  getfield(topo, [ 'comp' int2str(comps(k)) '_grid' ]);
     catch

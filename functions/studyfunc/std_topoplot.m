@@ -148,30 +148,22 @@ if strcmpi(mode, 'apart')
                 [Xi,Yi] = meshgrid(clusscalp.topoy,clusscalp.topox);                     
                 scalpmap = squeeze(clusscalp.topoall{k}); % already correct polarity
                 if k <= rowcols(2) - 2 %first sbplot row
-                    figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([subject '/' 'IC' num2str(comp)   ], 'interpreter', 'none');
                     colormap(DEFAULT_COLORMAP);
-                    %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
-                    figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([subject '/' 'IC' num2str(comp)], 'interpreter', 'none');
                     colormap(DEFAULT_COLORMAP);
-                    %waitbar(k/(len+1),h_wait)
                 end
             end
-            figure(h_topo)
             sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
             toporeplot(ave_grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
             title([ STUDY.cluster(cls(clus)).name ' (' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(clus)).comps)),' ICs)']);
-            %title([ STUDY.cluster(cls(clus)).name ' average scalp map, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
             set(gcf,'Color', BACKCOLOR);
             colormap(DEFAULT_COLORMAP);
-            %waitbar(1,h_wait)
-            %delete(h_wait)
             orient tall  % fill the figure page for printing
             axcopy
         end % Finished one cluster plot 
@@ -183,12 +175,6 @@ if strcmpi(mode, 'together')
     len = length(cls);
     rowcols(2) = ceil(sqrt(len)); rowcols(1) = ceil((len)/rowcols(2));
     if figureon
-        try 
-            % optional 'CreateCancelBtn', 'delete(gcbf); error(''USER ABORT'');', 
-            h_wait = waitbar(0,'Computing topoplot ...', 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
-        catch % for Matlab 5.3
-            h_wait = waitbar(0,'Computing topoplot ...','position', [300, 200, 300, 48]);
-        end
         figure   
     end
     for k = 1:len 
@@ -200,12 +186,6 @@ if strcmpi(mode, 'together')
         title([ STUDY.cluster(cls(k)).name ' (' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs)']);
         colormap(DEFAULT_COLORMAP);
         %title([ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
-        if figureon
-            waitbar(k/len,h_wait)
-        end
-    end
-    if figureon
-        delete(h_wait)
     end
     if len ~= 1
         maintitle = 'Average scalp map for all clusters';

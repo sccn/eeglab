@@ -219,30 +219,38 @@ if ~studywasempty
         for indDes = 1:length(STUDY.design)
             for indVar = 1:length(STUDY.design(indDes).variable)
                 if isempty(strmatch( STUDY.design(indDes).variable(indVar).label, setFields)) && ...
-                    ~isempty(trialFields) && ~isempty(STUDY.design(indDes).variable(indVar).label) && ...
+                        ~isempty(trialFields) && ~isempty(STUDY.design(indDes).variable(indVar).label) && ...
                         isempty(strmatch( STUDY.design(indDes).variable(indVar).label, trialFields))
-                        % Missing independent variable
-                        
-                        if isempty(rmInd)
-                            textVal1 = sprintf('The variable ''%s'' defined in the STUDY design is not found in ', STUDY.design(indDes).variable(indVar).label);
-                            textVal2 = 'some of the EEG datasets. Some STUDY features will not be functional.';
-                            if nargin > 2 && strcmpi(options, 'popup')
-                                textVal = [ textVal1 10 textVal2 10 10 'Do you want to remove all designs with missing variables?' ];
-                                res = questdlg2(  textVal, 'Issue with studies', 'No', 'Yes', 'Yes');
-                                if strcmpi(res, 'Yes')
-                                    rmInd = [ rmInd indDes ];
-                                end
-                            else
-                                disp([textVal1 textVal2]);
+
+                    % Missing independent variable
+                    if isempty(rmInd)
+                        textVal1 = sprintf('The variable ''%s'' defined in the STUDY design is not found in ', STUDY.design(indDes).variable(indVar).label);
+                        textVal2 = 'some of the EEG datasets. Some STUDY features will not be functional.';
+                        if nargin > 2 && strcmpi(options, 'popup')
+                            textVal = [ textVal1 10 textVal2 10 10 'Do you want to remove all designs with missing variables?' ];
+                            res = questdlg2(  textVal, 'Issue with studies', 'No', 'Yes', 'Yes');
+                            if strcmpi(res, 'Yes')
+                                rmInd = [ rmInd indDes ];
                             end
                         else
-                            rmInd = [ rmInd indDes ];
+                            disp([textVal1 textVal2]);
                         end
+                    else
+                        rmInd = [ rmInd indDes ];
+                    end
                 end
             end
         end
         if ~isempty(rmInd)
             STUDY.design(rmInd) = [];
+        end
+
+        % check cases
+        for indDes = 1:length(STUDY.design)
+            if ~isempty(setdiff(STUDY.design(indDes).cases.value, STUDY.subject))
+                fprintf('Fixing STUDY design to account for removed subjects\n');
+                STUDY.design(indDes).cases.value = intersect( STUDY.design(indDes).cases.value, STUDY.subject );
+            end
         end
         
         % convert combined independent variable values

@@ -2,6 +2,10 @@ This is the license for the core for the eeglab.m function and
 the source code in the "functions" folder. EEGLAB plugins (in the
 "plugins" folder) may be released under different licenses.
 
+BSD 2-Clause License
+
+Copyright (c) 2024, Swartz Center for Computational Neuroscience
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 

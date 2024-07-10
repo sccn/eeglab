@@ -207,9 +207,6 @@ for iSubj = 1:length(subjectList)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
         polList     = [];
-        if size(STUDY.cluster(opt.clusters).sets,1) ~= length(datasetInds)
-            error('Cannot process components from different ICA decompositions of the same subjects'); % sometimes different sessions
-        end            
         if isempty(opt.component)
             for iDat = datasetInds(:)'
                 indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject so we many only consider the first row
@@ -453,7 +450,21 @@ function [datavals,setinds] = reorganizedatastruct(dataTmp)
             if ~isempty(dataTmp{iCase}{iItem})
                 numItems = length(dataTmp{iCase}{iItem});
                 setinds{iItem}(end+1) = iCase;
-                datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                if isstruct(dataTmp{iCase}{iItem}) && ~isempty(datavals{iItem})
+
+                    % handle special case of dissimilar structures
+                    fields = fieldnames(dataTmp{iCase}{iItem});
+                    if isequal(fieldnames(datavals{iItem}), fields)
+                        datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                    else
+                        for iField=1:length( fields )
+                			datavals{iItem}(count:count+numItems-1).(fields{iField}) = dataTmp{iCase}{iItem}.(fields{iField});
+                        end
+                    end
+                else
+                    % for data array
+                    datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                end
                 count = count+numItems;
             end
         end

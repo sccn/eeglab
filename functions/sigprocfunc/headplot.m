@@ -88,7 +88,7 @@
 %   'electrode3d' - ['on'|'off'] plot electrodes in 3-D. Default is 'off'.
 %   'lighting'   - 'off' = show wire frame head {default 'on'} 
 %   'material'   - [see material function] {default 'dull'}
-%   'colormap'   -  3-column colormap matrix {default: jet(64)}
+%   'colormap'   -  3-column colormap matrix {default: turbo(64)}
 %   'verbose'    - 'off' -> no msgs, no rotate3d {default: 'on'}
 %   'orilocs'    - [channel structure or channel file name] Use original 
 %                  channel locations instead of the one extrapolated from 
@@ -452,7 +452,7 @@ else
        'title'      'string' []              '';
        'lights'     'real'   []              DEFAULT_LIGHTS;
        'view'       { 'string','real' }   [] [143 18];
-       'colormap'   'real'   []              jet(256);
+       'colormap'   'real'   []              feval(DEFAULT_COLORMAP, 64);
        'transform'  'real'   []              [];
        'meshfile'   {'string','struct' } []  DEFAULT_MESH;
        'electrodes' 'string' { 'on','off' }  'on';            
