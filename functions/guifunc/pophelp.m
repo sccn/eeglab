@@ -82,7 +82,9 @@ if exist('help2html') == 2
     end
 else
     if exist('OCTAVE_VERSION','builtin') == 0
-        doc(funct);
+        if usejava('jvm') && usejava('awt') % display available
+            doc(funct);
+        end
         return;
     end
 
