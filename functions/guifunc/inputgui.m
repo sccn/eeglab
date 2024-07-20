@@ -128,6 +128,7 @@ g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'title'    'string'              []      ''; ...
                            'eval'     'string'              []      ''; ...
                            'helpbut'  'string'              []      'Help'; ...
+                           'okbut'    'string'              []      'Ok'; ...
                            'skipline' 'string'              { 'on' 'off' } 'on'; ...
                            'addbuttons' 'string'            { 'on' 'off' } 'on'; ...
                            'userdata' ''                    []      []; ...
@@ -188,7 +189,7 @@ if isempty(g.getresult)
                 g.uilist = { g.uilist{:}, {} {} };
             end
             g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', g.cancel, 'tag' 'cancel' 'callback', 'close(gcbf)' } };
-            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', g.okbut, 'string', g.okbut, 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
         end
         
         % add the three buttons (CANCEL HELP OK) at the bottom of the GUI
@@ -204,7 +205,7 @@ if isempty(g.getresult)
         end
     else 
         fig = g.mode;
-        set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
+        set(findobj('parent', fig, 'tag', g.okbut), 'userdata', []);
         allobj = findobj('parent',fig);
         allobj = allobj(end:-1:1);
     end
@@ -221,7 +222,7 @@ if isempty(g.getresult)
            return; % only plot and returns
         end
     else 
-        waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+        waitfor( findobj('parent', fig, 'tag', g.okbut), 'userdata');
     end
 else
     fig = g.getresult;
@@ -238,7 +239,7 @@ if ~(ishandle(fig)), return; end % Check if figure still exist
  
 % output parameters
 % -----------------
-strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
+strhalt = get(findobj('parent', fig, 'tag', g.okbut), 'userdata');
 [resstruct,result] = outstruct(allobj); % Output parameters  
 userdat = get(fig, 'userdata');
 

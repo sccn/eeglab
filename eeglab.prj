@@ -3,7 +3,7 @@
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
-    <param.version>2023.1</param.version>
+    <param.version>2024.1</param.version>
     <param.authnamewatermark>Arnaud Delorme and Scott Makeig</param.authnamewatermark>
     <param.email>eeglab@sccn.ucsd.edu</param.email>
     <param.company />
@@ -78,7 +78,6 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <param.output />
       <param.logdir />
       <param.enable.clean.build />
-      <param.user.defined.mcr.options />
       <param.target.type />
       <param.support.packages />
       <param.web.mcr />
@@ -118,15 +117,15 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/plugins/ANTeepimport1.14/eepv4_version.mexmaci64</file>
       <file>${PROJECT_ROOT}/plugins/ANTeepimport1.14/eepv4_version.mexw32</file>
       <file>${PROJECT_ROOT}/plugins/ANTeepimport1.14/eepv4_version.mexw64</file>
-      <file>${PROJECT_ROOT}/plugins/Fileio220210</file>
+      <file>${PROJECT_ROOT}/plugins/Fileio20240111</file>
       <file>${PROJECT_ROOT}/plugins/ICLabel</file>
-      <file>${PROJECT_ROOT}/plugins/MFFMatlabIO4.1</file>
-      <file>${PROJECT_ROOT}/plugins/MFFMatlabIO4.1/MFF-1.2.2-jar-with-dependencies.jar</file>
+      <file>${PROJECT_ROOT}/plugins/MFFMatlabIO5.0</file>
+      <file>${PROJECT_ROOT}/plugins/MFFMatlabIO5.0/MFF-1.2.2-jar-with-dependencies.jar</file>
       <file>${PROJECT_ROOT}/plugins/PICARD1.0</file>
       <file>${PROJECT_ROOT}/plugins/VisEd1.05</file>
-      <file>${PROJECT_ROOT}/plugins/bids-matlab-tools7.7</file>
-      <file>${PROJECT_ROOT}/plugins/bids-matlab-tools7.7/JSONIO</file>
-      <file>${PROJECT_ROOT}/plugins/bva-io1.72</file>
+      <file>${PROJECT_ROOT}/plugins/EEG-BIDS</file>
+      <file>${PROJECT_ROOT}/plugins/EEG-BIDS/JSONIO</file>
+      <file>${PROJECT_ROOT}/plugins/bva-io1.73</file>
       <file>${PROJECT_ROOT}/plugins/clean_rawdata</file>
       <file>${PROJECT_ROOT}/plugins/dipfit</file>
       <file>${PROJECT_ROOT}/plugins/egilegacy1.0</file>
@@ -141,17 +140,19 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/plugins/iirfilt1.05</file>
       <file>${PROJECT_ROOT}/plugins/musedirect1.2</file>
       <file>${PROJECT_ROOT}/plugins/musemonitor4.0</file>
-      <file>${PROJECT_ROOT}/plugins/neuroscanio1.6</file>
+      <file>${PROJECT_ROOT}/plugins/neuroscanio1.8</file>
       <file>${PROJECT_ROOT}/plugins/scd1.0</file>
       <file>${PROJECT_ROOT}/plugins/snapmaster1.0</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.18</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.18/xdf</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.19</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.19/xdf</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/README.md</file>
-      <file>${PROJECT_ROOT}/eeglablicense.txt</file>
-      <file>${PROJECT_ROOT}/functions/supportfiles/eeglab_run_this_one_on_osx_or_linux</file>
-      <file>${PROJECT_ROOT}/functions/supportfiles/eeglab_run_this_one_on_windows.bat</file>
+      <file>${PROJECT_ROOT}/LICENSE</file>
+      <file>${PROJECT_ROOT}/functions/supportfiles/EEGBIDS</file>
+      <file>${PROJECT_ROOT}/functions/supportfiles/EEGBIDS.bat</file>
+      <file>${PROJECT_ROOT}/functions/supportfiles/EEGLAB_verbose</file>
+      <file>${PROJECT_ROOT}/functions/supportfiles/EEGLAB_verbose.bat</file>
       <file>${PROJECT_ROOT}/sample_data</file>
       <file>${PROJECT_ROOT}/sample_locs</file>
     </fileset.package>
@@ -230,7 +231,7 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>12.3</osver>
+      <osver>14.2.1</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>

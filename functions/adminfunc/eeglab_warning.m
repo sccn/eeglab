@@ -1,18 +1,14 @@
-% EEG_GETVERSION - obtain EEGLAB version number (version is embedded in
-%                    the script, edit the function to see the version).
+% EEGLAB_WARNING - generate warning disabling backtrace
 %
-% Usage:
-%     >> vers = eeg_getversion;
-%     >> [vers vnum] = eeg_getversion;
+% Usage: >>  eeglab_warning(msg);
 %
-% Outputs:
-%    vers = [string] EEGLAB version number
-%    vnum = [float] numerical value for the version. For example 11.3.2.4b
-%           is converted to 11.324
+% Inputs: msg, a string of character.
 %
-% Authors: Arnaud Delorme, SCCN/INC/UCSD, 2010
+% Author: Arnaud Delorme, SCCN, INC, UCSD, 2024-
+%
+% see also: EEGLAB
 
-% Copyright (C) 2010  Arnaud Delorme, SCCN/INC/UCSD
+% Copyright (C) 2024 Arnaud Delorme, UCSD
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
 % for the documentation and details.
@@ -39,15 +35,13 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [vers, versnum, releaseDate] = eeg_getversion()
+function eeglab_warning(msg)
 
-vers        = 'dev'; %'2024.1';
-releaseDate = '10-Jul-24 14:55:42'; % unix date -> date +"%d-%b-%y %T"
+if nargin < 1
+    error('eeglab_warning needs at least one argument');
+end
 
-% get numerical version number
-tmpvers = vers;
-if isnan(str2double(tmpvers(end))), tmpvers(end) = []; end
-indsDot = find(tmpvers == '.' );
-tmpvers(indsDot(2:end)) = [];
-versnum = str2double(tmpvers);
-if isnan(versnum), versnum = []; end
+res = warning('backtrace');
+warning('backtrace', 'off');
+warning(msg)
+warning('backtrace', res.state);

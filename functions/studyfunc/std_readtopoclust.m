@@ -46,7 +46,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function [STUDY, centroid] = std_readtopoclust(STUDY,ALLEEG, clsind);
+function [STUDY, centroid] = std_readtopoclust(STUDY,ALLEEG, clsind)
 
 if nargin < 3
     help readtopoclust;
@@ -62,7 +62,7 @@ if isempty(clsind)
     end
 end
 
- Ncond = length(STUDY.condition);
+Ncond = length(STUDY.condition);
 if Ncond == 0
     Ncond = 1;
 end 
@@ -81,7 +81,7 @@ for clust = 1:length(clsind) %go over all requested clusters
             comp  = STUDY.cluster(clsind(clust)).comps(k);
             abset = STUDY.cluster(clsind(clust)).sets(cond,k);
             if ~isnan(comp) && ~isnan(abset)
-                [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
+                [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp);
                 if ~isfield(centroid{clust}, 'topotmp') || isempty(centroid{clust}.topotmp)
                     centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
                 end
@@ -101,7 +101,7 @@ for clust = 1:length(clsind) %go over all requested clusters
                 if clsind(1) > 0
                     ncomp = length(STUDY.cluster(clsind(clust)).comps);
                 end
-                [ tmp pol ] = std_comppol(centroid{clust}.topotmp);
+                [ ~, pol ] = std_comppol(centroid{clust}.topotmp);
                 fprintf('%d/%d polarities inverted while reading component scalp maps\n', ...
                         length(find(pol == -1)), length(pol));
                 nitems = length(centroid{clust}.topo);

@@ -151,7 +151,8 @@ if (~isempty(opt.rmcomps) || ~isempty(opt.component)) && isempty(EEG.icaweights)
 end
 
 if strcmpi(EEG.data, 'in set file')
-    EEG = pop_loadset('filename', EEG.filename, 'filepath', EEG.filepath, 'verbose', 'off');
+    EEGTMP = pop_loadset('filename', EEG.filename, 'filepath', EEG.filepath, 'verbose', 'off');
+    EEG.data = EEGTMP.data;
 end
 
 % get data boundaries if continuous data

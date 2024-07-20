@@ -81,17 +81,18 @@ if exist('help2html') == 2
         end
     end
 else
-    if exist('OCTAVE_VERSION','builtin') == 0
+    [~,~,fileext] = fileparts(funct);
+    if exist('OCTAVE_VERSION','builtin') == 0 && isequal(fileext, 'm')
         if usejava('jvm') && usejava('awt') % display available
             doc(funct);
-        end
-        return;
+            return;
+	end
     end
 
     if isempty(funct), return; end
     doc1 = readfunc(funct, nonmatlab);
     if length(funct) > 4 && strcmpi(funct(1:4), 'pop_')
-        try,
+        try
             doc2 = readfunc(funct(5:end), nonmatlab);
             doc1 = { doc1{:} ' ' ...
                 ' _________________________________________________________________ ' ...

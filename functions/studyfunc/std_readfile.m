@@ -97,13 +97,14 @@ if iscell(fileBaseName)
     % ------------------------------------------------------------
     if length(fileBaseName) > 1
         for iFile = 1:length(fileBaseName)
-            [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}, trialInfo] = std_readfile(fileBaseName{iFile}, varargin{:});
+            [measureDataTmp{iFile}, parameters, measureRange1, measureRange2, eventsTmp{iFile}, trialInfoTmp{iFile}] = std_readfile(fileBaseName{iFile}, varargin{:});
         end
     
         % get the size of each session cond x group and sum 3rd dim (trials) for each cond and group
         % ignore empty cells; these are always trials, even when processing subjects
         measureData = cell(size(measureDataTmp{1})); % cond x group
         sz          = cell(size(measureDataTmp{1})); % cond x group
+        trialInfo   = cell(size(measureDataTmp{1})); % cond x group
         for iSess = 1:length(measureDataTmp) % scan session
             szTmp = cellfun(@size, measureDataTmp{iSess}, 'uniformoutput', false); 
             for iCond = 1:length(sz(:))
@@ -117,6 +118,7 @@ if iscell(fileBaseName)
             end
         end
         for iCond = 1:length(sz(:))
+            trialInfo{  iCond} = [];
             if isempty(sz{iCond})
                 measureData{iCond} = [];
             else
@@ -132,6 +134,7 @@ if iscell(fileBaseName)
                 if ~isempty(measureDataTmp{iSess}{iCond})
                     % when trials concatenate them
                     measureData{iCond}(:, pointer:pointer+size(measureDataTmp{iSess}{iCond},2)-1,:,:) = measureDataTmp{iSess}{iCond};
+                    trialInfo{iCond} = [ trialInfo{iCond} trialInfoTmp{iSess}{iCond} ];
                     pointer = pointer + size(measureDataTmp{iSess}{iCond},2);
                 end
             end

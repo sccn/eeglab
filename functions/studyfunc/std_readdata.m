@@ -207,9 +207,6 @@ for iSubj = 1:length(subjectList)
         datasetInds = strmatch(subjectList{iSubj}, { STUDY.datasetinfo.subject }, 'exact');
         compList    = [];
         polList     = [];
-        if size(STUDY.cluster(opt.clusters).sets,1) ~= length(datasetInds)
-            error('Cannot process components from different ICA decompositions of the same subjects'); % sometimes different sessions
-        end            
         if isempty(opt.component)
             for iDat = datasetInds(:)'
                 indSet   = find(STUDY.cluster(opt.clusters).sets(1,:) == iDat); % each column contain info about the same subject so we many only consider the first row
@@ -281,6 +278,9 @@ for iSubj = 1:length(subjectList)
             % Nothing to do for custom data, this is done at reading time
         else
             dataTmp{iSubj} = cellfun(@(x)processtf(x, xvals, opt.datatype, opt.singletrials, params), dataTmp{iSubj}, 'uniformoutput', false);
+            if strcmpi(opt.singletrials, 'off')
+                for iCond = 1:length(dataTmpSubj{iSubj}(:)), if ~isempty(dataTmpSubj{iSubj}{iCond}), dataTmpSubj{iSubj}{iCond} = dataTmpSubj{iSubj}{iCond}(1); end; end
+            end
         end
         STUDY.cache = eeg_cache(STUDY.cache, hashcode, { dataTmp{iSubj} xvals yvals eventsTmp{iSubj} params dataTmpSubj{iSubj} });
     end
@@ -330,6 +330,7 @@ if ~isempty(opt.clusters)
     % Split ICA components from the same subjects need to be made 
     % as if coming from different subjects
     dataTmp2 = {};
+    dataTmpSubj2 = {};
     correspInd = [];
     realDim  = dim;
     if strcmpi(opt.singletrials, 'on'), realDim = realDim+1; end
@@ -339,7 +340,7 @@ if ~isempty(opt.clusters)
                 dataTmp{iDat1}{iDat2} = double.empty(0,0,0); % sometimes empty but all dim not 0
             end
         end
-        compNumbers = cellfun(@(x)size(x, realDim), dataTmp{iDat1});
+        compNumbers = cellfun(@(x)size(x, realDim)*~isempty(x), dataTmp{iDat1});
         uniqComps = unique(compNumbers);
         if length(uniqComps) > 1 
             if ~(uniqComps(1) == 0 && length(uniqComps) == 2)
@@ -351,18 +352,22 @@ if ~isempty(opt.clusters)
             for iDat2 = 1:length(dataTmp{iDat1}(:))
                 if compNumbers(iDat2)
                     for iComps = 1:compNumbers(iDat2)
-                        dataTmp2{end+1} = cell(size(dataTmp{iDat1}));
+                        dataTmp2{end+1}     = cell(size(dataTmp{iDat1}));
+                        dataTmpSubj2{end+1} = cell(size(dataTmp{iDat1}));
                         correspInd(end+1) = iDat1;
                         % check dimensions of components
                         if ~isempty(dataTmp{iDat1}{iDat2})
                             if strcmpi(opt.singletrials, 'on') && ...
                                     (strcmpi(tmpDataType, 'timef') || strcmpi(tmpDataType, 'erpim'))
                                 dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,:,iComps);
+                                dataTmpSubj2{end}{iDat2} = dataTmpSubj{iDat1}{iDat2}(:,:,:,1);
                             elseif strcmpi(opt.singletrials, 'on') || ...
                                     (strcmpi(tmpDataType, 'timef') || strcmpi(tmpDataType, 'erpim'))
                                 dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,:,iComps);
+                                dataTmpSubj2{end}{iDat2} = dataTmpSubj{iDat1}{iDat2}(:,:,1);
                             else                                                                                                       
                                 dataTmp2{end}{iDat2} = dataTmp{iDat1}{iDat2}(:,iComps);
+                                dataTmpSubj2{end}{iDat2} = dataTmpSubj{iDat1}{iDat2}(:,1);
                             end
                         end
                     end
@@ -371,6 +376,7 @@ if ~isempty(opt.clusters)
         end
     end
     dataTmp = dataTmp2;
+    dataTmpSubj = dataTmpSubj2;
 else
     correspInd = 1:length(dataTmp); % identity for channels 
 end
@@ -444,7 +450,21 @@ function [datavals,setinds] = reorganizedatastruct(dataTmp)
             if ~isempty(dataTmp{iCase}{iItem})
                 numItems = length(dataTmp{iCase}{iItem});
                 setinds{iItem}(end+1) = iCase;
-                datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                if isstruct(dataTmp{iCase}{iItem}) && ~isempty(datavals{iItem})
+
+                    % handle special case of dissimilar structures
+                    fields = fieldnames(dataTmp{iCase}{iItem});
+                    if isequal(fieldnames(datavals{iItem}), fields)
+                        datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                    else
+                        for iField=1:length( fields )
+                			datavals{iItem}(count:count+numItems-1).(fields{iField}) = dataTmp{iCase}{iItem}.(fields{iField});
+                        end
+                    end
+                else
+                    % for data array
+                    datavals{iItem}(count:count+numItems-1) = dataTmp{iCase}{iItem};
+                end
                 count = count+numItems;
             end
         end

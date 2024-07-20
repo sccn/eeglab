@@ -168,8 +168,6 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-% Coding notes: Useful information on functions and global variables used.
-
 function [STUDY, com] = pop_clustedit(varargin)
 icadefs;
 
@@ -421,7 +419,7 @@ if ~ischar(varargin{1})
    end
    
    [out_param, userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''pop_clustoutput'')', ...
+                                   'helpcom', 'pophelp(''pop_clustedit'')', ...
                                    'title', 'View and edit current component clusters -- pop_clustedit()' , 'userdata', fig_arg, ...
                                    'geomvert', geomvert, 'eval', show_clust_gcf );
 	
@@ -732,11 +730,11 @@ else
                     newname = [STUDY.cluster(cls(old_clus)).name ' (' num2str(length(STUDY.cluster(cls(old_clus)).comps))  ' ICs)'];
                     clus_name_list{old_clus+1} = renameclust( clus_name_list{old_clus+1}, newname);
                     set( findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
+                    STUDY.cache = [];
                     userdat{1}{2} = STUDY;
                     set(hdl, 'userdat',userdat); 
                     pop_clustedit('showclust',hdl);
                 end          
-                STUDY.cache = [];
 
             case 'moveoutlier'
                 STUDY.saved = 'no';
@@ -785,11 +783,11 @@ else
                     % update Study history
                     a = ['STUDY = std_moveoutlier(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', [' num2str(comp_ind - 1) ']);'];
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
+                    STUDY.cache = [];
                     userdat{1}{2} = STUDY;
                     set(hdl, 'userdat',userdat); 
                     pop_clustedit('showclust',hdl);    
                 end
-                STUDY.cache = [];
 
             case 'rejectoutliers'
                 STUDY.saved = 'no';
@@ -844,11 +842,11 @@ else
                         set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                     end
                     % If outlier cluster doesn't exist in the GUI window add it 
+                    STUDY.cache = [];
                     userdat{1}{2} = STUDY;
                     set(hdl, 'userdat',userdat); 
                     pop_clustedit('showclust',hdl);
                 end
-                STUDY.cache = [];
 
             case 'createclust'
                 STUDY.saved = 'no';
@@ -874,14 +872,14 @@ else
                     else
                         a = ['STUDY = std_createclust(STUDY, ALLEEG, ''name'', ' clus_name ');'];
                     end                
-                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
+                    STUDY.cache = [];
                     userdat{1}{2} = STUDY;
                     userdat{2} = userdat{2} + 1; % update N, the number of cluster options in edit window 
                     cls(end +1) = length(STUDY.cluster); % update the GUI clusters list with the new cluster
                     userdat{1}{3} = cls;  % update cls, the cluster indices in edit window
                     set(hdl, 'userdat',userdat); %update STUDY, cls and N
                 end
-                STUDY.cache = [];
 
             case 'mergeclusters'
                 STUDY.saved = 'no';
@@ -919,6 +917,7 @@ else
                         a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) '], ' name ');'];
                     end
                     STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
+                    STUDY.cache = [];
                     userdat{1}{2} = STUDY;
                     %
                     % Replace the merged clusters with the one new merged cluster
@@ -953,14 +952,13 @@ else
                     set(hdl, 'userdat',userdat); %update information (STUDY)
                     pop_clustedit('showclust',hdl);
                 end
-                STUDY.cache = [];
         end
     catch
         eeglab_error;
     end       
 end
 
-function newname = renameclust(oldname, newname);
+function newname = renameclust(oldname, newname)
     
     tmpname = deblank(oldname(end:-1:1));
     strpos  = strfind(oldname, tmpname(end:-1:1));

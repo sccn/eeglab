@@ -38,23 +38,34 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function eeg_compare(EEG, EEG2)
+function res = eeg_compare(EEG, EEG2)
 
+res = 1;
 %% Assess difference between datasets
 fields = fieldnames(EEG);
+disp('Field analysis:')
 for iField = 1:length(fields)
     if ~isfield(EEG2, fields{iField})
-        fprintf(2, 'Field %s missing in second dataset\n', fields{iField});
+        fprintf(2, '    Field %s missing in second dataset\n', fields{iField});
     else
         if ~isequaln(EEG.(fields{iField}), EEG2.(fields{iField}))
-            fprintf(2, 'Field %s differs\n', fields{iField});
+            if contains(fields{iField}, { 'filename' 'datfile'})
+                fprintf('    Field %s differs (ok, supposed to differ)\n', fields{iField});
+            elseif contains(fields{iField}, { 'subject' 'session' 'run' 'task'})
+                fprintf(2, '    Field %s differs ("%s" vs "%s")\n', fields{iField}, num2str(EEG.(fields{iField})), num2str(EEG2.(fields{iField})))
+            elseif contains(fields{iField}, { 'eventdescription' 'event' })
+                fprintf(2, '    Field %s differs (n=%d vs n=%d)\n', fields{iField}, length(EEG.(fields{iField})), length(EEG2.(fields{iField})))
+            else
+                fprintf(2, '    Field %s differs\n', fields{iField});
+            end
         end
     end
 end
-if ~isequal(EEG.xmin, EEG2.xmin), fprintf(2, 'Difference between xmin is %1.6f sec\n', EEG.xmin-EEG2.xmin); end
-if ~isequal(EEG.xmax, EEG2.xmax), fprintf(2, 'Difference between xmax is %1.6f sec\n', EEG.xmax-EEG2.xmax); end
+if ~isequal(EEG.xmin, EEG2.xmin), fprintf(2, '    Difference between xmin is %1.6f sec\n', EEG.xmin-EEG2.xmin); end
+if ~isequal(EEG.xmax, EEG2.xmax), fprintf(2, '    Difference between xmax is %1.6f sec\n', EEG.xmax-EEG2.xmax); end
 
 % check chanlocs
+disp('Chanlocs analysis:')
 [~,~,chanlocs1] = eeg_checkchanlocs( EEG.chanlocs, EEG.chaninfo);
 [~,~,chanlocs2] = eeg_checkchanlocs( EEG2.chanlocs, EEG2.chaninfo);
 if length(chanlocs1) == length(chanlocs2)
@@ -75,31 +86,32 @@ if length(chanlocs1) == length(chanlocs2)
         end
     end
     if differ
-        fprintf(2, '%d channel coordinates differ\n', differ);
+        fprintf(2, '    %d channel coordinates differ\n', differ);
     else
-        disp('All channel coordinates are OK');
+        disp('    All channel coordinates are OK');
     end
     if differLabel
-        fprintf(2, '%d channel label(s) differ\n', differLabel);
+        fprintf(2, '    %d channel label(s) differ\n', differLabel);
     else
-        disp('All channel labels are OK');
+        disp('    All channel labels are OK');
     end
 else
-    fprintf(2, 'Different numbers of channels\n');
+    fprintf(2, '    Different numbers of channels\n');
 end
 
 % check events
+disp('Event analysis:')
 if length(EEG.event) ~= length(EEG2.event)
-    fprintf(2, 'Different numbers of events\n');
+    fprintf(2, '    Different numbers of events\n');
 elseif isempty(EEG.event)
-    disp('All events OK (empty)');
+    disp('    All events OK (empty)');
 else
     fields1 = fieldnames(EEG.event);
     fields2 = fieldnames(EEG2.event);
     allFieldsOK = true;
     
     if ~isequal(sort(fields1), sort(fields2))
-        fprintf(2, 'Not the same number of event fields\n');
+        fprintf(2, '    Not the same number of event fields\n');
         allFieldsOK = false;
     end
     
@@ -117,44 +129,51 @@ else
             end
             if any(diffVal ~= 0)
                 if strcmpi(fields1{iField}, 'latency')
-                    fprintf(2, 'Event latency (%2.1f %%) are not OK (abs diff of these is %1.4f samples)\n', length(find(diffVal))/length(diffVal)*100, mean( abs(diffVal(diffVal ~=0 ))) );
-                    fprintf(2, ' ******** (see plot)\n');
+                    fprintf(2, '    Event latency (%2.1f %%) are not OK (abs diff of these is %1.4f samples)\n', length(find(diffVal))/length(diffVal)*100, mean( abs(diffVal(diffVal ~=0 ))) );
+                    fprintf(2, '    ******** (see plot)\n');
                     figure; plot(diffVal);
                 else
-                    fprintf(2, 'Event fields "%s" are NOT OK (%2.1f %% of them)\n', fields1{iField}, length(find(diffVal))/length(diffVal)*100);
+                    fprintf(2, '    Event fields "%s" are NOT OK (%2.1f %% of them)\n', fields1{iField}, length(find(diffVal))/length(diffVal)*100);
                 end
                 allFieldsOK = false;
             end
         end
     end
-    disp('All other events OK (unless warning above)');
+    disp('    All other events OK');
 end
 
 % check epochs
-if length(EEG.epoch) == length(EEG2.epoch)
-    if ~isempty(EEG.epoch)
-        fields1 = fieldnames(EEG.epoch);
-        fields2 = fieldnames(EEG2.epoch);
-        allFieldsOK = true;
-        if ~isequal(sort(fields1), sort(fields2))
-            fprintf(2, 'Not the same number of event fields\n');
-            allFieldsOK = false;
-        else
-            diffVal = [];
-            for iField = 1:length(fields1)
-                for iEpoch = 1:length(EEG.epoch)
-                    diffVal(iEpoch) = ~isequaln(EEG.epoch(iEpoch).(fields1{iField}), EEG2.epoch(iEpoch).(fields1{iField}));
-                end
-                if any(diffVal ~= 0)
-                    fprintf(2, 'Epoch fields "%s" are NOT OK (%2.1f %% of them)\n', fields1{iField}, length(find(diffVal))/length(diffVal)*100);
-                    allFieldsOK = false;
+if ~isempty(EEG.epoch)
+    disp('Epoch analysis:')
+    if length(EEG.epoch) == length(EEG2.epoch)
+        if ~isempty(EEG.epoch)
+            fields1 = fieldnames(EEG.epoch);
+            fields2 = fieldnames(EEG2.epoch);
+            allFieldsOK = true;
+            if ~isequal(sort(fields1), sort(fields2))
+                fprintf(2, '    Not the same number of event fields\n');
+                allFieldsOK = false;
+            else
+                diffVal = [];
+                for iField = 1:length(fields1)
+                    for iEpoch = 1:length(EEG.epoch)
+                        diffVal(iEpoch) = ~isequaln(EEG.epoch(iEpoch).(fields1{iField}), EEG2.epoch(iEpoch).(fields1{iField}));
+                    end
+                    if any(diffVal ~= 0)
+                        fprintf(2, '    Epoch fields "%s" are NOT OK (%2.1f %% of them)\n', fields1{iField}, length(find(diffVal))/length(diffVal)*100);
+                        allFieldsOK = false;
+                    end
                 end
             end
+            if allFieldsOK
+                disp('    All epoch and all epoch fields are OK');
+            end
         end
-        if allFieldsOK
-            disp('All epoch and all epoch fields are OK');
-        end        
+    else
+        fprintf(2, '    Different numbers of epochs\n');
     end
-elseif ~isempty(EEG.epoch)
-    fprintf(2, 'Different numbers of epochs\n');
 end
+
+function result = contains(element, cellArray)
+    % Check if the element is in the cell array
+    result = any(cellfun(@(x) isequal(x, element), cellArray));

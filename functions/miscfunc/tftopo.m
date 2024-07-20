@@ -321,7 +321,7 @@ end
 % Zero out non-significant image features
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 range = g.limits(6)-g.limits(5);
-cc = jet(256);
+cc = feval(DEFAULT_COLORMAP, 256);
 if ~isempty(g.signifs)
     if strcmpi(g.verbose, 'on')
         fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');

@@ -64,7 +64,7 @@ end
 com = '';
 if nargin < 4
     invertsel = 1;
-    warning('This function behavior has been fixed and data is removed by default')
+    warning('In EEGLAB < 2023.0, the function kept instead of removed the selected segments (now fixed)')
 end
 if isempty(EEG(1).event)
     error( [ 'No event. This function removes data' 10 'based on event latencies' ]);

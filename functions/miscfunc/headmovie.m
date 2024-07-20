@@ -206,7 +206,9 @@ axcolorbar = axes('Units','Normalized','Position',[.05 .05 .055 .18]);
 
 axheadplot = axes('Units','Normalized','Position',[0 .1 .72 .8],'Color',axcolor);
 TPAXCOLOR  = get(axheadplot,'Color');    
-Colormap   = [jet(64);TPAXCOLOR];       
+icadefs;
+cmap = feval(DEFAULT_COLORMAP, 64);
+Colormap   = [cmap;TPAXCOLOR];       
 
 fprintf('Warning: do not resize plot window during movie creation ...\n   ');
 

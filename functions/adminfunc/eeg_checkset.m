@@ -259,6 +259,23 @@ end
 % --------------
 eeglab_options;
 
+% rename fields for backward compatibility in future versions
+if isfield(EEG, 'nchans')
+    for iEEG = 1:length(EEG)
+        EEG(iEEG).nbchan = EEG.nchans;
+    end
+end
+if isfield(EEG, 'chanlocs')
+    for iEEG = 1:length(EEG)
+        if isfield(EEG(iEEG).chanlocs, 'label')
+            for iChan = 1:length(EEG(iEEG).chanlocs)
+                EEG(iEEG).chanlocs(iChan).labels = EEG(iEEG).chanlocs(iChan).label;
+            end
+            EEG(iEEG).chanlocs = rmfield(EEG(iEEG).chanlocs, 'label');
+        end
+    end
+end
+
 % standard checking
 % -----------------
 ALLEEG = EEG;
@@ -571,7 +588,7 @@ for inddataset = 1:length(ALLEEG)
                             end
                             if ~isequal(TMPEEG.event, EEG.event)
                                 EEG = TMPEEG;
-                                disp('Event resorted by increasing latencies.');
+                                disp('eeg_checkset note: events'' order (re)sorted by time');
                             end
                         catch
                             disp('eeg_checkset: problem when attempting to resort event latencies.');
@@ -1226,6 +1243,7 @@ for inddataset = 1:length(ALLEEG)
     if ~isfield(EEG, 'comments'),   EEG.comments   = ''; res = com; end
     if ~isfield(EEG, 'etc'     ),   EEG.etc        = []; res = com; end
     if ~isfield(EEG, 'urevent' ),   EEG.urevent    = []; res = com; end
+    if ~isfield(EEG, 'datfile' ),   EEG.datfile    = ''; res = com; end
     if ~isfield(EEG, 'roi' ),       EEG.roi        = []; res = com; end
     if ~isfield(EEG, 'ref') || isempty(EEG.ref), EEG.ref = 'common'; res = com; end
     
