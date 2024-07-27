@@ -119,7 +119,7 @@ if isempty(varargin) %GUI call
         if strcmpi(resp, 'cancel'), return; end
     end
     
-	alg_options = {'Kmeans (stat. toolbox)' 'Neural Network (stat. toolbox)' 'Kmeanscluster (no toolbox)' 'Affinity Propagation' }; %'Hierarchical tree' 
+	alg_options = {'Kmeans (stat. toolbox)' 'Neural Network (stat. toolbox)' 'Kmeanscluster (no toolbox)' 'Affinity Propagation' 'Optimal Kmeans' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
                             'set(findobj(''parent'', gcbf, ''tag'', ''std_txt''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));']; 
                         
@@ -153,8 +153,8 @@ if isempty(varargin) %GUI call
       {'style' 'popupmenu'  'string' alg_options  'value' valalg 'tag' 'clust_algorithm'  'Callback' algoptions } ...
       {'style' 'text'       'string' 'Number of clusters to compute:' 'userdata' 'clust_num' } ...
       {'style' 'edit'       'string' numClustStr 'tag' 'clust_num' 'userdata' 'clust_num' } {} ...
-      {'style' 'checkbox'   'string' 'Separate outliers (enter std.)' 'tag' 'outliers_on' 'value' 0 'Callback' set_outliers 'userdata' 'kmeans' 'enable' 'on' } ...
-      {'style' 'edit'       'string' '3' 'tag' 'outliers_std' 'userdata' 'kmeans' 'enable' 'off' } {} },...
+      {'style' 'checkbox'   'string' 'Separate outliers (enter std.)' 'tag' 'outliers_on' 'value' 0 'Callback' set_outliers 'enable' 'on' } ...
+      {'style' 'edit'       'string' '3' 'tag' 'outliers_std' 'enable' 'off' } {} },...
                             'pophelp(''pop_clust'')', 'Set clustering algorithm -- pop_clust()' , [] , 'normal', [ 1 .5 1 1 1]);
 	
 	if ~isempty(clust_param)
@@ -186,14 +186,15 @@ if isempty(varargin) %GUI call
         if ~isempty(findstr(clus_alg, 'Kmeanscluster')), clus_alg = 'kmeanscluster'; end
         if ~isempty(findstr(clus_alg, 'Kmeans ')), clus_alg = 'kmeans'; end
         if ~isempty(findstr(clus_alg, 'Neural ')), clus_alg = 'neural network'; end
-        
+        if ~isempty(findstr(clus_alg, 'Optimal ')), clus_alg = 'optimal_kmeans'; end
+
         % Cleaning cache
         STUDY.cache = [];
         
         disp('Clustering ...');
         
         switch clus_alg
-            case { 'kmeans' 'kmeanscluster' }
+            case { 'kmeans' 'kmeanscluster' 'optimal_kmeans'}
                 command = sprintf('%s %s%s%s %d %s', command, '''algorithm'',''', clus_alg, ''',''clus_num'', ', clus_num, ',');
                 if outliers_on
                     command = sprintf('%s %s %s %s', command, '''outliers'', ', stdval, ',');
@@ -202,6 +203,8 @@ if isempty(varargin) %GUI call
                 else
                     if strcmpi(clus_alg, 'kmeans')
                         [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
+                    elseif strcmpi(clus_alg, 'optimal_kmeans')
+                        [IDX,C] = optimal_kmeans(clustdata,clus_num);
                     else
                         %[IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
                         [C,IDX,sumd] =kmeans_st(real(clustdata),clus_num,150);
@@ -329,6 +332,9 @@ else %command line call
         case 'affinity propagation'           
              [IDX,C,sumd] = std_apcluster(clustdata,'maxits',maxiter);
              [STUDY]      = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Affinity Propagation',size(C,1)});
+        case 'optimal_kmeans'
+             [IDX,C] = optimal_kmeans(clustdata,clus_num);
+             [STUDY]      = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Optimal Kmeans',size(C,1)});
         otherwise
             disp('pop_clust: unknown algorithm return');
             return

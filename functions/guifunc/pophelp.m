@@ -83,8 +83,10 @@ if exist('help2html') == 2
 else
     [~,~,fileext] = fileparts(funct);
     if exist('OCTAVE_VERSION','builtin') == 0 && isequal(fileext, 'm')
-        doc(funct);
-        return;
+        if usejava('jvm') && usejava('awt') % display available
+            doc(funct);
+            return;
+	end
     end
 
     if isempty(funct), return; end
