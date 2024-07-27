@@ -30,6 +30,8 @@
 %   'numeventrange' - [min max] range for number of event of type above.
 %                    Default is [1 Inf].
 %
+% Note: to remove some tasks, use the 'rmvarvalues' option.
+%
 % Inputs:
 %   STUDY      - EEGLAB STUDY set updated. The fields which is created or
 %                updated is STUDY.datasetinfo.trialinfo
