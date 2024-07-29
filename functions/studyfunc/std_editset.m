@@ -184,6 +184,8 @@ if ~isfield(STUDY, 'datasetinfo')
             if isfield(ALLEEG(realindex), 'task')   
                 STUDY.datasetinfo(realindex).task      = ALLEEG(realindex).task;                 
             end
+        else
+            error('Dataset %d has no data, remove dataset and try again\n', realindex)
         end
     end
 end
