@@ -95,7 +95,7 @@ else
     options = varargin;
 end
 g = finputcheck(options, { 'recurrence'    'real'  []  1;
-                            'limits'        'real'  []  [0 1];
+                            'limits'        'real'  []  NaN;
                             'rmbase'        'real'  []  0;
                             'eventtype'     'string' {} 'X';
                             'eventdata'     {'cell' 'struct'} [] {};
@@ -108,8 +108,12 @@ end
 if iscell(g.eventdata)
     g.eventdata = struct(g.eventdata{:});
 end
-if nargin < 3
+if nargin < 3 || all(isnan(g.limits))
     g.limits = [0 g.recurrence];
+end
+
+if isnan(g.limits)
+    g.limits = [0 1];
 end
 
 if length(g.limits) ~= 2 || g.limits(2) <= g.limits(1) 
