@@ -37,7 +37,8 @@
 %                    'Update Marks' to store the data portions marked for rejection 
 %                    (stretches of continuous data or whole data epochs). No 'Reject' button 
 %                    is present, so data marked for rejection cannot be actually rejected 
-%                    from this EEGPLOT window. 
+%                    from this EEGPLOT window. This is only for data
+%                    epochs (not compatible with continuous data).
 %                1 = Reject marked trials. After inspecting/selecting data portions for
 %                    rejection, press button 'Reject' to reject (remove) them from the EEG 
 %                    dataset (i.e., those portions plottted on a colored background. 

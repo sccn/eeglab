@@ -590,8 +590,11 @@ if nargin<2
     % ---------------
     fig = gcf;
     waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
-    try, userdata = get(fig, 'userdata'); close(fig); % figure still exist ?
-    catch, return; end
+    try
+        userdata = get(fig, 'userdata'); close(fig); % figure still exist ?
+    catch
+        return; 
+    end
     
     % transfer events
     % ---------------

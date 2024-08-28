@@ -45,6 +45,6 @@ if ~option_storedisk
                    'NOTE that this is a REQUIRED step to load the tutorial study since it does not', ...
                    'contain the EEG data.', ' ');
     
-    res = questdlg2(vartext, 'Study warning', 'Cancel', 'Ok', 'Ok');
+    res = questdlg2(vartext, 'Study warning', 'Cancel', 'OK', 'OK');
     if strcmpi(res, 'Cancel'),return; end
 end
