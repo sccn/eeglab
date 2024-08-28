@@ -223,7 +223,7 @@ if isempty(g.getresult)
            return; % only plot and returns
         end
     else 
-        waitfor( findobj('parent', fig, 'tag', g.okbut), 'userdata');
+        waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
     end
 else
     fig = g.getresult;
