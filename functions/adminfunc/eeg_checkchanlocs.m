@@ -204,10 +204,10 @@ end
 if isfield(chanedit, 'labels')
     % prefix (EDF format specification)?
     if strfind([chanedit.labels], 'EEG') % `contains() is not back compatible
-        chanprefixes = {'EEG-', 'EEG ', 'EEG', 'RDA_' }; % order matters
+        chanprefixes = {'EEG-', 'EEG ', 'EEG' }; % order matters
         tmp = {chanedit.labels};
         if sum(~isnan(str2double( strrep(tmp, 'EEG', '')))) < 30 % more than 30 numerical channels, i.e., EEG001, do nothing
-            disp('Detected/removing prefix from channel labels')
+            disp('Detected/removing ''EEG'' prefix from channel labels')
             for idx = 1:length(chanprefixes)
                 tmp = strrep(tmp, chanprefixes(idx), '');
             end
