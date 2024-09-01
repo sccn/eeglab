@@ -66,7 +66,7 @@ tmpComputer   = computer;
 tmpScreenSize = get(0, 'ScreenSize');
 
 % Graph Definitions
-if ismatlab
+if ismatlab && VERS > 20.01
     DEFAULT_COLORMAP = 'turbo';
 else
     DEFAULT_COLORMAP = 'jet';
