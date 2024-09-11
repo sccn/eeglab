@@ -108,7 +108,7 @@ if ~isempty(g.omitchans)
 end
 
 progressive = 0; % by default, progressive mode is off
-if nargin < 2 || isempty(comps)
+if nargin < 2 || isempty(comps) || comps(1) == 0
   comps = [];
   progressive = 1;  % turn progressive mode on
 end
