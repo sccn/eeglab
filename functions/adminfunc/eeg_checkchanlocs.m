@@ -224,6 +224,18 @@ if isfield(chanedit, 'labels')
         [chanedit.labels] = deal(tmp{:});
     end
         
+    % remove simple quotes or double quotes from channel labels
+    if sum(chanedit(1).labels == '''') == 2
+        tmp = {chanedit.labels};
+        tmp = strrep(tmp, '''', '');
+        [chanedit.labels] = deal(tmp{:});
+    end
+    if sum(chanedit(1).labels == '"') == 2
+        tmp = {chanedit.labels};
+        tmp = strrep(tmp, '"', '');
+        [chanedit.labels] = deal(tmp{:});
+    end
+
     % duplicate labels?
     tmp = sort({chanedit.labels});
     if any(strcmp(tmp(1:end-1),tmp(2:end)))
