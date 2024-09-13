@@ -214,7 +214,28 @@ if isfield(chanedit, 'labels')
             [chanedit.labels] = deal(tmp{:});
         end
     end
+    if strfind([chanedit.labels], 'RDA_')  % `contains() is not back compatible
+        chanprefixes = { 'BrainVision RDA_' 'RDA_' }; % order matters
+        tmp = {chanedit.labels};
+        disp('Detected/removing prefix from channel labels')
+        for idx = 1:length(chanprefixes)
+            tmp = strrep(tmp, chanprefixes(idx), '');
+        end
+        [chanedit.labels] = deal(tmp{:});
+    end
         
+    % remove simple quotes or double quotes from channel labels
+    if sum(chanedit(1).labels == '''') == 2
+        tmp = {chanedit.labels};
+        tmp = strrep(tmp, '''', '');
+        [chanedit.labels] = deal(tmp{:});
+    end
+    if sum(chanedit(1).labels == '"') == 2
+        tmp = {chanedit.labels};
+        tmp = strrep(tmp, '"', '');
+        [chanedit.labels] = deal(tmp{:});
+    end
+
     % duplicate labels?
     tmp = sort({chanedit.labels});
     if any(strcmp(tmp(1:end-1),tmp(2:end)))
