@@ -76,7 +76,7 @@
 %   'logtrials'  - ['on'|'off'] compute single-trial log transform before
 %                  averaging them. Default is 'off' for 'psd' specmode and
 %                  'on' for 'fft' specmode. Ignored when output is set to
-%                  'fft'.
+%                  other options.
 %   'continuous' - ['on'|'off'] force epoch data to be treated as
 %                  continuous so small data epochs can be extracted for the
 %                  'fft' specmode option. Default is 'off'.

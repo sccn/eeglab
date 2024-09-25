@@ -114,7 +114,7 @@
 %            >> [Xersp, times, logfreqs] = std_ersp(EEG, ...
 %                       'type', 'ersp', 'freqs', [3 50], 'cycles', [3 0.5]);
 %
-% See also: TIMEF, STD_ITC, STD_ERP, STD_SPEC, STD_TOPO, STD_PRECLUST
+% See also: NEWTIMEF, STD_ERP, STD_SPEC, STD_TOPO, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, January, 2005-
 

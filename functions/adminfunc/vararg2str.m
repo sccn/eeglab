@@ -47,7 +47,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function strout = vararg2str(allargs, inputnam, inputnum, int2str );
+function strout = vararg2str(allargs, inputnam, inputnum, int2str )
 
 if nargin < 1
 	help vararg2str;
@@ -165,7 +165,17 @@ function str = struct2str( structure )
 	for index = 1:length( allfields )
 		strtmp = '';
 		eval( [ 'allcontent = { structure.' allfields{index} ' };' ] ); % getfield generates a bug
-		str = [ str, '''' allfields{index} ''',{' vararg2str( allcontent ) '},' ];
+        if length(allcontent) == 1 && isnumeric(allcontent{1}) 
+            if length(allcontent{1}) == 1
+    		    str = [ str, '''' allfields{index} ''',' vararg2str( allcontent{1} ) ',' ];
+            else
+    		    str = [ str, '''' allfields{index} ''',' vararg2str( allcontent{1} ) ',' ];
+            end
+        elseif length(allcontent) == 1 && ischar(allcontent{1}) 
+  		    str = [ str, '''' allfields{index} ''',''' allcontent{1} ''',' ];
+        else
+    		str = [ str, '''' allfields{index} ''',{' vararg2str( allcontent ) '},' ];
+        end
 	end
 	str = [ 'struct(' str(1:end-1) ')' ];
 return;
