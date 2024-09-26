@@ -408,7 +408,11 @@ else
 
         case 'editspec'     
             str = get(findobj('parent', hdl, 'tag', 'spec_params'), 'string');
-            tmpstr = cb_choices(str, 'spectral decomposition', 'std_spec', {'specmode' {'Spectral method' {'fft' 'spectopo' 'pburg' 'pmtm' }} 'logtrials' {'Compute log of trials' {'off' 'on'}}} );
+            tmpstr = cb_choices(str, 'spectral decomposition', 'std_spec', { ...
+                'specmode'  {'Spectral method' {'fft' 'spectopo' 'pburg' 'pmtm' 'ft_freqanalysis'}} ...
+                'logtrials' {'Trial log power for ''fft'' and ''psd''' {'off' 'on'}} ...
+                'ft_output' {'Output for ft_freqanalysis' {'pow','fractal','fooof','fooof_aperiodic','fooof_peaks','fooof_aperiodic-pow', 'fooof_aperiodic/pow'} }} );
+%                'ft_method' {'Method for ft_freqanalysis' {'mtmfft', 'wavelet', 'mvar', 'superlet', 'irasa', 'hilbert'} } ...
             set(findobj('parent', hdl, 'tag', 'spec_params'), 'string', tmpstr);
 
         case 'editerpim'     
@@ -418,7 +422,8 @@ else
 
         case 'editersp'     
             str = get(findobj('parent', hdl,'tag', 'ersp_params'), 'string');
-            tmpstr = cb_choices(str, 'ERSP/ITC', 'std_ersp', { 'cycles' {'Wavelet cycles & factor (0 is FFT)' [3 0.8] } 'nfreqs' { 'Number of frequencies' 100 } 'ntimesout' { 'Number of time points' 200 } });
+            tmpstr = cb_choices(str, 'ERSP/ITC', 'std_ersp', { 'cycles' {'Wavelet cycles & factor (0 is FFT)' [3 0.8] } ...
+                                         'nfreqs' { 'Number of frequencies' 100 } 'ntimesout' { 'Number of time points' 200 } });
             set(findobj('parent', hdl, 'tag', 'ersp_params'), 'string', tmpstr);    
 
         case 'testspec'
@@ -550,10 +555,24 @@ for iField = 1:length(fieldOptions)
                   { 'style' 'edit' 'string' str.(fieldOptions{iField}) 'tag' fieldOptions{iField} } };
     else
         geom = [ geom { [1 0.5]  } ];
-        valInd = strmatch(str.(fieldOptions{iField}), options(2).(fieldOptions{iField}));
-        if isempty(valInd), valInd = []; end
+        valInd = strmatch(str.(fieldOptions{iField}), options(2).(fieldOptions{iField}), 'exact');
+        if isempty(valInd), valInd = 1; end
+        cb_tmp = '';
+        enable = 'on';
+        if isequal(func, 'std_spec') 
+            if iField == 1
+                cb_tmp = [ 'set(findobj(gcbf, ''tag'', ''logtrials''), ''enable'', fastif(any(get(gcbo, ''value'') == [1 2]), ''on'', ''off''));' ... 
+                           'set(findobj(gcbf, ''tag'', ''ft_output''), ''enable'', fastif(any(get(gcbo, ''value'') == 5    ), ''on'', ''off''));' ...
+                           'set(findobj(gcbf, ''tag'', ''ft_method''), ''enable'', fastif(any(get(gcbo, ''value'') == 5    ), ''on'', ''off''));' ];
+                valIndMethod = valInd;
+            else
+                if any(valIndMethod == [1 2]) && strcmpi(fieldOptions{iField}, 'ft_output'), enable = 'off'; end
+                if any(valIndMethod == [1 2]) && strcmpi(fieldOptions{iField}, 'ft_method'), enable = 'off'; end
+                if any(valIndMethod == [  5]) && strcmpi(fieldOptions{iField}, 'logtrials'), enable = 'off'; end
+            end
+        end
         uiList = { uiList{:} { 'style' 'text' 'string' [ options(1).(fieldOptions{iField}) ' ("' fieldOptions{iField} '")' ] } ...
-                  { 'style' 'popupmenu' 'string' options(2).(fieldOptions{iField}) 'tag' fieldOptions{iField} 'value' valInd } };
+                  { 'style' 'popupmenu' 'string' options(2).(fieldOptions{iField}) 'tag' fieldOptions{iField} 'value' valInd 'callback' cb_tmp 'enable' enable } };
     end
 end
 

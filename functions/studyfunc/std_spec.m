@@ -108,7 +108,7 @@
 % Files output or overwritten for data: 
 %               [dataset_filename].datspec, 
 % 
-% See also  SPECTOPO, STD_ERP, STD_ERSP, STD_MAP, STD_PRECLUST
+% See also: FT_FREQANALYSIS, SPECTOPO, STD_ERP, STD_ERSP, STD_MAP, STD_PRECLUST
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -167,10 +167,13 @@ else
     options = varargin;
 end
 
-[g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
+[g, spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
                                       'channels'   'cell'    {}         {};
                                       'timerange'  'float'   []         [];
-                                      'specmode'   'string'  {'fft','psd','pmtm','pburg'} 'psd';
+                                      'specmode'   'string'  {'fft','psd','pmtm','pburg','fft','psd','pmtm','pburg' 'ft_freqanalysis'} 'psd';
+                                      'ft_method'  'string'  {'mtmfft', 'mtmconvol', 'wavelet', 'mvar', 'superlet', 'irasa', 'hilbert'} 'mtmfft';
+                                      'ft_output'  'string'  {'pow','fractal','original','fooof','fooof_aperiodic','fooof_aperiodic-pow', 'fooof_aperiodic/pow', 'fooof_peaks'} 'pow';
+                                      'ft_freqanalysis_opt' 'cell'      {}    {};
                                       'recompute'  'string'  { 'on','off' } 'off';
                                       'savetrials' 'string'  { 'on','off' } 'off';
                                       'continuous' 'string'  { 'on','off' } 'off';
@@ -217,12 +220,11 @@ end
 % SPEC information found in datasets
 % ---------------------------------
 if exist(filename) && strcmpi(g.recompute, 'off')
-
     fprintf('File "%s" found on disk, no need to recompute\n', filename);
     if strcmpi(prefix, 'comp')
-        [X,tmp,f] = std_readfile(filename, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
+        [X,~,f] = std_readfile(filename, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
     else
-        [X,tmp,f] = std_readfile(filename, 'channels', g.channels, 'freqlimits', g.freqrange, 'measure', 'spec');
+        [X,~,f] = std_readfile(filename, 'channels', g.channels, 'freqlimits', g.freqrange, 'measure', 'spec');
     end
     if ~isempty(X), return; end
 end
@@ -230,8 +232,9 @@ end
 % No SPEC information found
 % -------------------------
 if isempty(g.channels)
-     [X,boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
-else [X,boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
+    [X,boundaries]  = eeg_getdatact(EEG, 'component', 1:size(EEG(1).icaweights,1), 'trialindices', g.trialindices );
+else 
+    [X,boundaries]  = eeg_getdatact(EEG, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end
 if ~isempty(boundaries) && boundaries(end) ~= size(X,2), boundaries = [boundaries size(X,2)]; end
  
@@ -284,7 +287,7 @@ if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
         end
         TMP = eeg_regepochs(TMP, g.epochrecur, g.epochlim);
         disp('Warning: continuous data, extracting 1-second epochs');
-        if iEEG == 1,
+        if iEEG == 1
             XX = TMP.data;
             newTrialInfo = g.trialinfo(iEEG);
             newTrialInfo(1:size(TMP.data,3)) = g.trialinfo(iEEG);
@@ -301,7 +304,65 @@ end
 % ------------------------------
 if strcmpi(g.logtrials, 'notset'), if strcmpi(g.specmode, 'fft'), g.logtrials = 'on'; else g.logtrials = 'off'; end; end
 if strcmpi(g.logtrials, 'on'), datatype = 'SPECTRUMLOG'; else datatype = 'SPECTRUMABS'; end
-if strcmpi(g.specmode, 'psd')
+if strcmpi(g.specmode, 'ft_freqanalysis')
+    % convert data to Fieldtrip
+    EEG      = EEG(1);
+    EEG.data = X;
+    EEG.trials = size(X,3);
+    EEG.epoch = [];
+    EEG.event = [];
+    EEG      = eeg_checkset(EEG);
+    data     = eeglab2fieldtrip(EEG(1), 'raw');
+    
+    cfg               = [];
+    cfg               = struct(g.ft_freqanalysis_opt{:});
+    %cfg.keeptrials = 'yes';
+    if ~isfield(cfg, 'foilim'),    cfg.foilim = [1 data.fsample/2]; end
+    if ~isfield(cfg, 'pad'),       cfg.pad = 4; end
+    if ~isfield(cfg, 'tapsmofrq'), cfg.tapsmofrq = 2; end
+    if ~isfield(cfg, 'method'),    cfg.method = g.ft_method; end
+
+    if isequal(g.ft_output, 'pow')
+        cfg.keeptrials = 'yes';
+        cfg.output = 'pow';
+        spec = ft_freqanalysis(cfg, data);
+        X = permute(spec.powspctrm, [2 3 1]);
+    else
+        % forcing single trial decomposition
+        cfg.output = g.ft_output;
+        data.trialinfo = [];
+        data = rmfield(data, 'trialinfo');
+        data.sampleinfo = [1 size(X,2) 1];
+        datatmp = data;
+        datatmp.time = datatmp.time(1);
+        for iTrial = 1:length(data.trial)
+            datatmp.trial = data.trial(iTrial);
+
+            if isequal(g.ft_output, 'fooof_aperiodic-pow') || isequal(g.ft_output, 'fooof_aperiodic/pow')
+                cfg.output        = 'fooof_aperiodic';
+                fractal = ft_freqanalysis(cfg, datatmp);
+                cfg.output        = 'pow';
+                original = ft_freqanalysis(cfg, datatmp);
+    
+                cfg2 = [];
+                cfg2.parameter  = 'powspctrm';
+                cfg2.operation  = fastif(isequal(g.ft_output, 'fooof_aperiodic-pow'), 'x2-x1', 'x2./x1');
+                spec = ft_math(cfg2, fractal, original);
+            else
+                spec = ft_freqanalysis(cfg, datatmp);
+            end
+
+            if iTrial == 1
+                X = spec.powspctrm;
+                X(:,:,length(data.trial)) = 0;
+            else
+                X(:,:,iTrial) = spec.powspctrm;
+            end
+        end
+    end
+    f = spec.freq;
+
+elseif strcmpi(g.specmode, 'psd')
     if strcmpi(g.savetrials, 'on') || strcmpi(g.logtrials, 'on')
         if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
             if isequal(g.epochlim, [0 1])
@@ -320,8 +381,9 @@ if strcmpi(g.specmode, 'psd')
         end
         fprintf('\n');
         if strcmpi(g.logtrials, 'off')
-             X = 10.^(XX/10);
-        else X = XX;
+            X = 10.^(XX/10);
+        else 
+            X = XX;
         end
         if strcmpi(g.savetrials, 'off')
             X = mean(X,3);
@@ -396,7 +458,7 @@ else % fft mode
     
     if strcmpi(g.output, 'power')
         X     = tmp.*conj(tmp);
-        if strcmpi(g.logtrials, 'on'),  X = 10*log10(X); end
+        if strcmpi(g.logtrials, 'on'), X = 10*log10(X); end
     else
         X = tmp;
         datatype = 'SPECTRUMFFT';
