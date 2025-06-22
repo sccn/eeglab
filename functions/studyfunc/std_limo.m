@@ -249,7 +249,6 @@ if chanloc_created
     else
         limoChanlocsFile = fullfile(STUDY.filepath, chanlocname);
     end
-    % this sometimes happen to be nested in expected_chanlocs, fixing it here
     if all(arrayfun(@(x) any(strcmp(x,{'expected_chanlocs','channeighbstructmat'})), fieldnames(limoChanlocs.expected_chanlocs)))
         limoChanlocs = limoChanlocs.expected_chanlocs;
     end
@@ -325,7 +324,7 @@ for iSubj = 1:nb_subjects
         inds  = intersect(inds1, inds2);
         if ~isempty(inds)
             if length(inds) ~= 1
-                error([ 'Cannot calculate contrast because more than 1 dataset per session' 10 ...
+                error([ 'Cannot estimate the model because there is more than 1 dataset per session' 10 ...
                     'per subject. Merge datasets for each subject and try again.' ]);
             end
             
@@ -472,20 +471,21 @@ for iSubj = 1:nb_subjects
 end % exit subject
 
 % then we add contrasts for conditions that were merged during design selection
-% i.e. multiple categorical variables (factors) and yet not matching the number
-% of variables (contrasts are then a weighted sum of the crossed factors)
-if ~isempty(factors) && isfield(factors, 'value') && ...
-        sum(arrayfun(@(x) ~strcmpi(x.label,'group'),STUDY.design(opt.design).variable)) == 1 % only one non-continuous variable other than group
-    if length(STUDY.design(opt.design).variable(1).value) ~= length(factors) % and this var has more values than the number of factors
-        limocontrast = zeros(length(STUDY.design(opt.design).variable(1).value),length(factors)+1); % length(factors)+1 to add the constant
-        for n=length(factors):-1:1
+% note thatif multiple 'categorial' variable are selected, we cannot figure
+% it out automatically, and thus no constrast is computed
+n_cat_var   = arrayfun(@(x) strcmpi(x.vartype,'categorical'),STUDY.design(opt.design).variable);
+categorical = sum(arrayfun(@(x) strcmp(x.vartype,'categorical'), factors));
+continuous  = sum(arrayfun(@(x) strcmp(x.vartype,'continuous'), factors));
+if sum(n_cat_var) == 1 && categorical > 0 % if one categorical factor and many conditions 
+    if length(STUDY.design(opt.design).variable(n_cat_var).value) < categorical % and this factor has less values than the number of conditions 
+        limocontrast = zeros(length(STUDY.design(opt.design).variable(n_cat_var).value),length(factors)+1); % length(factors)+1 to add the constant
+        for n=length(factors)-continuous:-1:1
             factor_names{n} = factors(n).value;
         end
 
-        index = find(arrayfun(@(x) ~strcmpi(x.label,'group'),STUDY.design(opt.design).variable)); % which one is not group
-        for c=1:length(STUDY.design(opt.design).variable(index).value)
-            limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable(index).value{c}));
-            limocontrast(c,1:length(factors)) = limocontrast(c,1:length(factors)) ./ sum(limocontrast(c,1:length(factors))); % scale by the number of variables
+        for c=1:length(STUDY.design(opt.design).variable(n_cat_var).value)
+            limocontrast(c,1:length(factors)-continuous) = single(ismember(factor_names,STUDY.design(opt.design).variable(n_cat_var).value{c}));
+            limocontrast(c,1:length(factors)-continuous) = limocontrast(c,1:length(factors)-continuous) ./ sum(limocontrast(c,1:length(factors)-continuous)); % scale by the number of variables
         end
     end
 end
