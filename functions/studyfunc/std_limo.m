@@ -676,7 +676,7 @@ keep_files = 'no';
 if all(procstatus)
     disp('All subjects have been successfully processed.')
 else
-    if sctrmpi(model.defaults.verbose,'noGUI')
+    if strcmpi(model.defaults.verbose,'noGUI')
         if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
             warning('all subjects failed to process, check limo batch report')
         else
