@@ -35,6 +35,9 @@
 %                   ignore 'neighboropt' if used.
 %   'freqlim'     - Frequency trimming in Hz
 %   'timelim'     - Time trimming in millisecond
+%   'verbose'     - '' default or 'noGUI' allowing messages to be printed
+%                   instead of pop up, and thus to run quietly in pipelines
+%                   (errors are captured in the psom report anyway)
 %
 % Outputs:
 %  STUDY     - modified STUDY structure (the STUDY.design now contains a list
@@ -120,7 +123,8 @@ else
         'chanloc'     'struct'  {}  struct('no', {});
         'neighbormat' 'real'    []  [];
         'zscore'         'real'    [0,1]            1  ;
-        'ow_chanlocfile' 'string'  {'yes','no'}     'no'},...
+        'ow_chanlocfile' 'string'  {'yes','no'}     'no'; ...
+        'verbose'   'string'  {'','noGUI'}  ''},...
         'std_limo');
     if ischar(opt), error(opt); end
 end
@@ -570,6 +574,11 @@ model.defaults.method           = opt.method;        % default is WLS
 model.defaults.Level            = 1;                 % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % option can be multivariate (work in progress)
 model.defaults.labels           = factors;
+if isfield(opt,'verbose')
+    model.defaults.verbose      = opt.verbose;       
+else
+    model.defaults.verbose      = '';                % default is '' ie GUI error reports
+end
 
 if ~exist('limocontrast','var')
     [LIMO_files, procstatus] = limo_batch('model specification',model,[],STUDY);
@@ -667,15 +676,24 @@ keep_files = 'no';
 if all(procstatus)
     disp('All subjects have been successfully processed.')
 else
-    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
-        errordlg2('all subjects failed to process, check limo batch report')
+    if sctrmpi(model.defaults.verbose,'noGUI')
+        if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
+            warning('all subjects failed to process, check limo batch report')
+        else
+            warning('some subjects failed to process, check limo batch report')
+        end
+        keep_files = 'yes';
     else
-        warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
-    end
-    % cleanup temp files - except for subjects without errors
-    db = dbstack;
-    if length(db) <= 2
-        keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
+        if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
+            errordlg2('all subjects failed to process, check limo batch report')
+        else
+            warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
+        end
+        % cleanup temp files - except for subjects without errors
+        db = dbstack;
+        if length(db) <= 2
+            keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
+        end
     end
 end
 
