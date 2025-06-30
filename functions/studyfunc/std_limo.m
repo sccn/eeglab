@@ -35,6 +35,9 @@
 %                   ignore 'neighboropt' if used.
 %   'freqlim'     - Frequency trimming in Hz
 %   'timelim'     - Time trimming in millisecond
+%   'verbose'     - '' default or 'noGUI' allowing messages to be printed
+%                   instead of pop up, and thus to run quietly in pipelines
+%                   (errors are captured in the psom report anyway)
 %
 % Outputs:
 %  STUDY     - modified STUDY structure (the STUDY.design now contains a list
@@ -120,7 +123,8 @@ else
         'chanloc'     'struct'  {}  struct('no', {});
         'neighbormat' 'real'    []  [];
         'zscore'         'real'    [0,1]            1  ;
-        'ow_chanlocfile' 'string'  {'yes','no'}     'no'},...
+        'ow_chanlocfile' 'string'  {'yes','no'}     'no'; ...
+        'verbose'   'string'  {'','noGUI'}  ''},...
         'std_limo');
     if ischar(opt), error(opt); end
 end
@@ -249,7 +253,6 @@ if chanloc_created
     else
         limoChanlocsFile = fullfile(STUDY.filepath, chanlocname);
     end
-    % this sometimes happen to be nested in expected_chanlocs, fixing it here
     if all(arrayfun(@(x) any(strcmp(x,{'expected_chanlocs','channeighbstructmat'})), fieldnames(limoChanlocs.expected_chanlocs)))
         limoChanlocs = limoChanlocs.expected_chanlocs;
     end
@@ -325,7 +328,7 @@ for iSubj = 1:nb_subjects
         inds  = intersect(inds1, inds2);
         if ~isempty(inds)
             if length(inds) ~= 1
-                error([ 'Cannot calculate contrast because more than 1 dataset per session' 10 ...
+                error([ 'Cannot estimate the model because there is more than 1 dataset per session' 10 ...
                     'per subject. Merge datasets for each subject and try again.' ]);
             end
             
@@ -472,20 +475,21 @@ for iSubj = 1:nb_subjects
 end % exit subject
 
 % then we add contrasts for conditions that were merged during design selection
-% i.e. multiple categorical variables (factors) and yet not matching the number
-% of variables (contrasts are then a weighted sum of the crossed factors)
-if ~isempty(factors) && isfield(factors, 'value') && ...
-        sum(arrayfun(@(x) ~strcmpi(x.label,'group'),STUDY.design(opt.design).variable)) == 1 % only one non-continuous variable other than group
-    if length(STUDY.design(opt.design).variable(1).value) ~= length(factors) % and this var has more values than the number of factors
-        limocontrast = zeros(length(STUDY.design(opt.design).variable(1).value),length(factors)+1); % length(factors)+1 to add the constant
-        for n=length(factors):-1:1
+% note thatif multiple 'categorial' variable are selected, we cannot figure
+% it out automatically, and thus no constrast is computed
+n_cat_var   = arrayfun(@(x) strcmpi(x.vartype,'categorical'),STUDY.design(opt.design).variable);
+categorical = sum(arrayfun(@(x) strcmp(x.vartype,'categorical'), factors));
+continuous  = sum(arrayfun(@(x) strcmp(x.vartype,'continuous'), factors));
+if sum(n_cat_var) == 1 && categorical > 0 % if one categorical factor and many conditions 
+    if length(STUDY.design(opt.design).variable(n_cat_var).value) < categorical % and this factor has less values than the number of conditions 
+        limocontrast = zeros(length(STUDY.design(opt.design).variable(n_cat_var).value),length(factors)+1); % length(factors)+1 to add the constant
+        for n=length(factors)-continuous:-1:1
             factor_names{n} = factors(n).value;
         end
 
-        index = find(arrayfun(@(x) ~strcmpi(x.label,'group'),STUDY.design(opt.design).variable)); % which one is not group
-        for c=1:length(STUDY.design(opt.design).variable(index).value)
-            limocontrast(c,1:length(factors)) = single(ismember(factor_names,STUDY.design(opt.design).variable(index).value{c}));
-            limocontrast(c,1:length(factors)) = limocontrast(c,1:length(factors)) ./ sum(limocontrast(c,1:length(factors))); % scale by the number of variables
+        for c=1:length(STUDY.design(opt.design).variable(n_cat_var).value)
+            limocontrast(c,1:length(factors)-continuous) = single(ismember(factor_names,STUDY.design(opt.design).variable(n_cat_var).value{c}));
+            limocontrast(c,1:length(factors)-continuous) = limocontrast(c,1:length(factors)-continuous) ./ sum(limocontrast(c,1:length(factors)-continuous)); % scale by the number of variables
         end
     end
 end
@@ -570,6 +574,11 @@ model.defaults.method           = opt.method;        % default is WLS
 model.defaults.Level            = 1;                 % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % option can be multivariate (work in progress)
 model.defaults.labels           = factors;
+if isfield(opt,'verbose')
+    model.defaults.verbose      = opt.verbose;       
+else
+    model.defaults.verbose      = '';                % default is '' ie GUI error reports
+end
 
 if ~exist('limocontrast','var')
     [LIMO_files, procstatus] = limo_batch('model specification',model,[],STUDY);
@@ -667,15 +676,24 @@ keep_files = 'no';
 if all(procstatus)
     disp('All subjects have been successfully processed.')
 else
-    if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
-        errordlg2('all subjects failed to process, check limo batch report')
+    if strcmpi(model.defaults.verbose,'noGUI')
+        if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
+            warning('all subjects failed to process, check limo batch report')
+        else
+            warning('some subjects failed to process, check limo batch report')
+        end
+        keep_files = 'yes';
     else
-        warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
-    end
-    % cleanup temp files - except for subjects without errors
-    db = dbstack;
-    if length(db) <= 2
-        keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
+        if sum(procstatus)==0 % not a WLS issue - limo_batch errors for that and tells the user
+            errordlg2('all subjects failed to process, check limo batch report')
+        else
+            warndlg2('some subjects failed to process, check limo batch report','', 'non-modal')
+        end
+        % cleanup temp files - except for subjects without errors
+        db = dbstack;
+        if length(db) <= 2
+            keep_files = questdlg('Do you want to keep temp files of unsuccessulfully processed subjects','option for manual debugging','yes','no','no');
+        end
     end
 end
 
