@@ -124,6 +124,9 @@ if size(EEG(1).data,3) > 1
 else
     epochlim = '-1 2';
 end
+if ischar(types)
+    types = { types };
+end
 OLDEEG = EEG;
 
 if nargin < 3
