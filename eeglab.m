@@ -20,12 +20,12 @@
 %   Matlab scripts.  A single data structure ('EEG') containing all dataset 
 %   parameters may be accessed and modified directly from the Matlab commandline. 
 %   EEGLAB now recognizes "plugins," sets of EEGLAB functions linked to the EEGLAB
-%   main menu through an "eegplugin_[name].m" function (Ex. >> help eeplugin_besa.m). 
+%   main menu through an "eegplugin_[name].m" function (Ex. >> help eegplugin_besa.m).
 %
 % Usage: 1) To (re)start EEGLAB, type
 %            >> eeglab           % Ignores any loaded datasets
 %            >> eeglab nogui     % Do not pop up GUI
-%        2) To redaw and update the EEGLAB interface, type
+%        2) To redraw and update the EEGLAB interface, type
 %            >> eeglab redraw    % Scans for non-empty datasets
 %            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
 %            >> eeglab versions  % State EEGLAB version number
