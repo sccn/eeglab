@@ -1103,6 +1103,13 @@ else
 
         % execute function
         % ----------------
+        if isempty(pluginVersion)
+            if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip')) || ~isempty(findstr(lower(dircontent(index).name), 'fileio'))
+                if isempty(pluginVersion)
+                    pluginVersion = 'ersion unknowned';
+                end
+            end
+        end
         if ~isempty(pluginVersion) || ~isempty(funcname)
             if isempty(funcname)
                 fprintf([ 'EEGLAB: adding "' pluginName '" v' pluginVersion ' to the path' ]);
