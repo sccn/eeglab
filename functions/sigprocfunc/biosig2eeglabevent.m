@@ -67,10 +67,7 @@ if isempty(interval)
             % use file in
             % https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1387 to test
             % for boundary events
-            if eType < 256 && importEDFplus && isfield(EVENT,'CodeDesc') && eType < length(EVENT.CodeDesc)
-                event(index).type = EVENT.CodeDesc{eType};
-                event(index).edftype = eType;
-            elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
+            if isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus && (eType > 255)
                 try
                     event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
                     event(index).edftype = eType;
@@ -117,10 +114,7 @@ elseif isfield(EVENT,'POS')
                 eType = EVENT.TYP(index);
 
                 if isfield(EVENT, 'CodeDesc')
-                    if eType < 256 && importEDFplus && eType < length(EVENT.CodeDesc)
-                        event(index).type = EVENT.CodeDesc{eType};
-                        event(index).edftype = eType;
-                    elseif isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus
+                    if isfield(EVT, 'EVENT') && isfield(EVT.EVENT,'CodeIndex') && isfield(EVT.EVENT,'CodeDesc') && importEDFplus && (eType > 255)
                         try
                             event(index).type = EVT.EVENT.CodeDesc{EVT.EVENT.CodeIndex==eType};
                             event(index).edftype = eType;
