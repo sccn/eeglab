@@ -49,7 +49,7 @@ command = '';
 if ~plugin_askinstall('Biosig', 'sopen'), return; end
 biosigpathfirst
 
-if nargin < 2
+if nargin < 2 || isempty(filename)
     if EEG.trials > 1
         res = questdlg2( [ 'This dataset contains data epochs.' 10 'Do you want to export the concatenated' 10 'data epochs?' ], '', 'No', 'Yes', 'Yes');
         if strcmpi(res, 'No')
@@ -64,19 +64,23 @@ if nargin < 2
     
     % file format
     % -----------
-    fileformats = { 'EDF' 'GDF' 'BDF' };
-    uilist = { { 'style' 'text' 'String' 'File format' } ...
-               { 'style' 'listbox' 'string' strvcat(fileformats) 'value' 1 } };
-    geom = [1 1];
-    result = inputgui( 'geometry', geom, 'uilist', uilist, 'helpcom', 'pophelp(''pop_writeeeg'')', ...
-                     'title', 'Write data using BIOSIG -- pop_writeeeg()', 'geomvert', [1 2.5]);
-    if isempty(result), return; end
-
-    if result{1} == 3
-        disp('WARNING: there is a potential issue BDF file header, see https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1020');
-    end
+    if nargin < 2
+        fileformats = { 'EDF' 'GDF' 'BDF' };
+        uilist = { { 'style' 'text' 'String' 'File format' } ...
+                   { 'style' 'listbox' 'string' strvcat(fileformats) 'value' 1 } };
+        geom = [1 1];
+        result = inputgui( 'geometry', geom, 'uilist', uilist, 'helpcom', 'pophelp(''pop_writeeeg'')', ...
+                         'title', 'Write data using BIOSIG -- pop_writeeeg()', 'geomvert', [1 2.5]);
+        if isempty(result), return; end
     
-    options = { 'TYPE' fileformats{result{1}} };
+        if result{1} == 3
+            disp('WARNING: there is a potential issue BDF file header, see https://sccn.ucsd.edu/bugzilla/show_bug.cgi?id=1020');
+        end
+        
+        options = { 'TYPE' fileformats{result{1}} };
+    else
+        options = varargin;
+    end
 else
     options = varargin;
 end
