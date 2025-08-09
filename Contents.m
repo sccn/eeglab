@@ -22,5 +22,5 @@
 %   Matlab scripts.  A single data structure ('EEG') containing all dataset 
 %   parameters may be accessed and modified directly from the Matlab commandline. 
 %   EEGLAB now recognizes "plugins," sets of EEGLAB functions linked to the EEGLAB
-%   main menu through an "eegplugin_[name].m" function (Ex. >> help eeplugin_besa.m). 
+%   main menu through an "eegplugin_[name].m" function (Ex. >> help eegplugin_besa.m).
 %
