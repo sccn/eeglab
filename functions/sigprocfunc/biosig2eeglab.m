@@ -235,7 +235,7 @@ if importevent
                 dat.EVENT = dat.out.EVENT;
             end
         end
-        EEG.event = biosig2eeglabevent(dat.EVENT, interval, importannot); % Toby's fix
+        EEG.event = biosig2eeglabevent(dat.EVENT, interval, importannot);
 
         % recreate the epoch field if necessary
         % -------------------------------------
@@ -249,6 +249,24 @@ if importevent
     elseif isempty(EEG.event) 
         disp('Warning: no event found. Events might be embedded in a data channel.');
         disp('         To extract events, use menu File > Import Event Info > From data channel');
+    end
+
+    % import annotations
+    if importannot && isfield(dat, 'EDFplus') && isfield(dat.EDFplus, 'ANNONS')
+        eventStr = dat.EDFplus.ANNONS';
+        for iRow = 1:size(eventStr,1)
+            curEvent = eventStr(iRow, :);
+            parts = split(curEvent, char([20 0]));
+            for iPart = 2:length(parts)
+                eventParts = split(parts{iPart}, {char(21), char(20)});
+                if length(eventParts) == 3
+                    EEG.event(end+1).latency = str2double(eventParts{1})*EEG.srate;
+                    EEG.event(end).duration = str2double(eventParts{2})*EEG.srate;
+                    EEG.event(end).type = eventParts{3}; 
+                end
+            end
+        end
+        EEG = eeg_checkset(EEG, 'eventconsistency');
     end
 end
 
