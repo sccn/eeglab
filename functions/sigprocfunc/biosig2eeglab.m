@@ -256,9 +256,9 @@ if importevent
         eventStr = dat.EDFplus.ANNONS';
         for iRow = 1:size(eventStr,1)
             curEvent = eventStr(iRow, :);
-            parts = split(curEvent, char([20 0]));
+            parts = strsplit(curEvent, char([20 0]));
             for iPart = 2:length(parts)
-                eventParts = split(parts{iPart}, {char(21), char(20)});
+                eventParts = strsplit(parts{iPart}, {char(21), char(20)});
                 if length(eventParts) == 3
                     EEG.event(end+1).latency = str2double(eventParts{1})*EEG.srate;
                     EEG.event(end).duration = str2double(eventParts{2})*EEG.srate;
