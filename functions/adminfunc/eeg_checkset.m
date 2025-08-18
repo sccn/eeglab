@@ -959,6 +959,8 @@ for inddataset = 1:length(ALLEEG)
         if ~isempty(EEG.icaweights)
             EEG.icachansind = [1:EEG.nbchan]; res = com;
         end
+    elseif ~isa(EEG.icachansind, 'double')
+        EEG.icachansind = double(EEG.icachansind); res = com;
     end
     if ~isempty(EEG.icasphere)
         if ~isempty(EEG.icaweights)
