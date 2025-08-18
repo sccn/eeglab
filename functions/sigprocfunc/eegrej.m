@@ -14,8 +14,7 @@
 %                (2, number of regions).
 %   timelength - length in time (s) of the input data. Only used to compute 
 %                new total data length after rejections (newt).
-%   eventlatencies - vector of event latencies in data points. 
-%                    Default []=none.
+%   eventlatencies - vector of events containing boundaries. Default []=none.
 %
 % Outputs:
 %   outdata    - output dataset
