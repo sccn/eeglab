@@ -1477,7 +1477,15 @@ set(titleh, 'fontsize', TEXT_FONTSIZE_L, 'fontweight', 'bold');
 set(alltexth, 'fontname', FONTNAME, 'fontsize', FONTSIZE);
 
 set(W_MAIN, 'visible', 'on');
-    
+if str2double(vers(1:2)) >= 22 && isequal(computer, 'PCWIN64')
+    F = getframe(W_MAIN);
+    if F.cdata(1) < 100
+        set(gcf, 'renderer', 'painters');
+        set(0, 'defaultfigurerenderer', 'painters')
+        fprintf(2, 'MATLAB renderer switched to painter to prevent darkening of figures\n')
+    end
+end
+
 return;
 
 % Update EEGLAB GUI (list of datasets)
