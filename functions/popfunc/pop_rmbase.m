@@ -187,7 +187,8 @@ if EEG.trials == 1 && ~isempty(EEG.event) ...
         for index=1:length(boundaries)-1
             tmprange = [boundaries(index)+1:boundaries(index+1)];
             if length(tmprange) > 1
-                EEG.data(chanlist,tmprange) = rmbase( EEG.data(:,tmprange), length(tmprange), ...
+                % Bug fix: rmbase should only process chanlist channels, not all channels
+                EEG.data(chanlist,tmprange) = rmbase( EEG.data(chanlist,tmprange), length(tmprange), ...
                                                    [1:length(tmprange)]);
             elseif length(tmprange) == 1
                 EEG.data(chanlist,tmprange) = 0;
