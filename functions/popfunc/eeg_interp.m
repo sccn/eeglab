@@ -202,6 +202,9 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range, params)
 
     else
         badchans  = bad_elec;
+        if iscell(badchans)
+            badchans = eeg_chaninds(EEG, badchans);
+        end
         goodchans = setdiff_bc(1:EEG.nbchan, badchans);
         if strcmpi(method, 'sphericalfast')
             EEG.data(badchans,:) = [];
