@@ -230,7 +230,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range, params)
     
     % scan data points
     % ----------------
-    if strcmpi(method, 'spherical') || strcmpi(method, 'sphericalfast') || strcmpi(method, 'sphericalKang')
+    if strcmpi(method, 'spherical') || strcmpi(method, 'sphericalfast') || strcmpi(method, 'sphericalKang') || strcmpi(method, 'sphericalCRD')
         % get theta, rad of electrodes
         % ----------------------------
         tmpgoodlocs = EEG.chanlocs(goodchans);
