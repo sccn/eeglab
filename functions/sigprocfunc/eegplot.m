@@ -1237,11 +1237,20 @@ u(22) = uicontrol('Parent',figh, ...
   set(h, 'backgroundcolor', BUTTON_COLOR);
   h = findobj(gcf, 'tag', 'eegslider');
   set(h, 'backgroundcolor', BUTTON_COLOR);
+
+  if ismatlab
+      ver = version;
+      if str2double(ver(1:2)) > 24
+          set(findall(figh, '-property', 'FontSize'), 'FontSize', 10)
+      end
+  end
+  
   set(figh, 'visible', 'on');
   
   if strcmpi(g.noui, 'on')
       eegplot('noui');
   end
+  
   
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function

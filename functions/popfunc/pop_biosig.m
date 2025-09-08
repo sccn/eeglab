@@ -274,8 +274,8 @@ for iFile = 1:length(filename)
         
         %Get correct event names contained in CodeDesc
         num_ev_type = unique(HDR.EVENT.TYP);
-        num_ev_name = unique(HDR.EVENT.CodeDesc);
-        if ~isempty(HDR.EVENT.CodeDesc) && length(num_ev_type) == length(num_ev_name)
+        if isfield(HDR.EVENT,'CodeDesc') && ~isempty(HDR.EVENT.CodeDesc) && length(num_ev_type) == length(num_ev_name)
+            num_ev_name = unique(HDR.EVENT.CodeDesc);
             for iEvent = 1:length(HDR.EVENT.TYP)
                 EEG.event(iEvent).type = char(HDR.EVENT.CodeDesc(HDR.EVENT.TYP(iEvent)));
                 EEG.event(iEvent).latency = HDR.EVENT.POS(iEvent);
