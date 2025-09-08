@@ -301,8 +301,21 @@ if ~isempty(opt.channels)
         end
     end
     
-    % select specific time and freq
-    % -----------------------------
+    % Average channels
+    if ~strcmpi(params.averagechan, 'off') && length(opt.channels) > 1
+        for index = 1:length(allersp(:))
+            if strcmpi(params.averagemode, 'ave')
+                allersp{index} = squeeze(mean(allersp{index},3));
+            else
+                disp('Computing RMS while preserving sign');
+                tfsign  = sign(squeeze(mean(allersp{index},3)));
+                allersp{index} = squeeze(sqrt(mean(allersp{index}.^2,3))).*tfsign;
+            end
+        end
+    end
+
+    % select specific time and freq and run stats
+    % -------------------------------------------
     if ~isempty(params.plottf)
         if length(params.plottf) < 3
             params.plottf(3:4) = params.plottf(2);
@@ -346,19 +359,6 @@ if ~isempty(opt.channels)
             for iDat = 1:length(allersp(:))
                 allersp{iDat} = newtimefitc(allersp{iDat}, params.itctype);
                 allersp{iDat} = abs(allersp{iDat});
-            end
-        end
-    end
-    
-    % Average channels
-    if ~strcmpi(params.averagechan, 'off') && length(opt.channels) > 1
-        for index = 1:length(allersp(:))
-            if strcmpi(params.averagemode, 'ave')
-                allersp{index} = squeeze(mean(allersp{index},3));
-            else
-                disp('Computing RMS while preserving sign');
-                tfsign  = sign(squeeze(mean(allersp{index},3)));
-                allersp{index} = squeeze(sqrt(mean(allersp{index}.^2,3))).*tfsign;
             end
         end
     end
