@@ -37,7 +37,7 @@
 %                                      'duration', '0<100', 'rt', '')
 % Authors: Arnaud Delorme
 %          Ramon Martinez-Cancino
-%          
+        
 % Copyright (C) 2015  Ramon Martinez-Cancino, UCSD, INC, SCCN
 %
 % This file is part of EEGLAB, see http://www.eeglab.org
