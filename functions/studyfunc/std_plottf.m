@@ -242,7 +242,7 @@ end
 % options
 % -------
 options = { 'limits' [NaN NaN NaN NaN opt.caxis] 'verbose' 'off' 'mode' opt.averagemode options{:} };
-
+tmpc = [inf -inf];
 for c = 1:nc
     for g = 1:ng
         %hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
@@ -263,6 +263,9 @@ for c = 1:nc
             if ~isempty(opt.events) && ~isempty(opt.events{c,g})
                  tmpevents = mean(opt.events{c,g},2);
             else tmpevents = [];
+            end
+            if isempty(opt.caxis)
+                tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
             end
             if strcmpi(opt.plottopo, 'on') && length(opt.chanlocs) > 1
                 metaplottopo(tmpplot, 'chanlocs', opt.chanlocs, 'plotfunc', 'tftopo', 'squeeze', 'on', ...
@@ -326,6 +329,15 @@ end
 
 % color bars
 % ----------
+if isempty(opt.caxis)
+    tmpc = max(abs(tmpc));
+    for c = 1:nc
+        for g = 1:ng
+            axes(hdl(c,g));
+            caxis([-tmpc tmpc]);
+        end
+    end
+end
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng, opt.unitcolor); 
 if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
@@ -373,7 +385,6 @@ function cbar_standard(datatype, ng, unitcolor);
         cbar(tmp, 0, tmpc, 5);
         title(unitcolor);
     end
-    
 
 % colorbar for significance
 % -------------------------
