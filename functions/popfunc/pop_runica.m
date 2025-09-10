@@ -110,7 +110,7 @@ end
 % -------------------------
 allalgs(1).name = 'runica';
 allalgs(1).description = 'Extended Infomax (runica.m; default)';
-allalgs(1).options     = '''extended'', 1, ''rndreset'', ''yes''';
+allalgs(1).options     = '''extended'', 1';
 allalgs(end+1).name = 'runica';
 allalgs(end).description = 'Robust Extended Infomax (runica.m; slow)';
 allalgs(end).options     = '''extended'', 1, ''lrate'', 1e-5, ''maxstep'', 2000';
