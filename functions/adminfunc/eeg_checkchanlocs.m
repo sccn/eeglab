@@ -107,6 +107,10 @@ if isfield(chans, 'data')
     end
     chanedit = chans;
     complicated = true;
+
+    if isfield(tmpEEG, 'urchanlocs') && isempty(tmpEEG.urchanlocs) && isfield(chans, 'urchan')
+        chanedit = rmfield(chanedit, 'urchan')
+    end
 else
     if ~isfield(chans, 'datachan')
         [chanedit,dummy,complicated] = insertchans(chans, chaninfo);
@@ -147,13 +151,15 @@ check_newfields = true; %length(fieldnames(chanedit)) < length(fields);
 if ~isempty(chanedit)
     for index = 1:length(fields)
         if check_newfields && ~isfield(chanedit, fields{index})
-            % new field
-            % ---------
-            if strcmpi(fieldtype{index}, 'num')
-                chanedit = setfield(chanedit, {1}, fields{index}, []);
-            else
-                for indchan = 1:length(chanedit)
-                    chanedit = setfield(chanedit, {indchan}, fields{index}, '');
+            if ~isequal(fields{index}, 'urchan')
+                % new field
+                % ---------
+                if strcmpi(fieldtype{index}, 'num')
+                    chanedit = setfield(chanedit, {1}, fields{index}, []);
+                else
+                    for indchan = 1:length(chanedit)
+                        chanedit = setfield(chanedit, {indchan}, fields{index}, '');
+                    end
                 end
             end
         else
