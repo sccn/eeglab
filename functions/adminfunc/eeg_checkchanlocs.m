@@ -109,7 +109,7 @@ if isfield(chans, 'data')
     complicated = true;
 
     if isfield(tmpEEG, 'urchanlocs') && isempty(tmpEEG.urchanlocs) && isfield(chans, 'urchan')
-        chanedit = rmfield(chanedit, 'urchan')
+        chanedit = rmfield(chanedit, 'urchan');
     end
 else
     if ~isfield(chans, 'datachan')
