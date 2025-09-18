@@ -3,7 +3,7 @@
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
-    <param.version>2025.0.0</param.version>
+    <param.version>2025.1.0</param.version>
     <param.authnamewatermark>Arnaud Delorme and Scott Makeig</param.authnamewatermark>
     <param.email>eeglab@sccn.ucsd.edu</param.email>
     <param.company />
@@ -131,23 +131,23 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/plugins/ANTeepimport1.14/eepv4_version.mexw64</file>
       <file>${PROJECT_ROOT}/plugins/EEG-BIDS</file>
       <file>${PROJECT_ROOT}/plugins/EEG-BIDS/JSONIO</file>
-      <file>${PROJECT_ROOT}/plugins/Fileio20240111</file>
+      <file>${PROJECT_ROOT}/plugins/Fileio250523</file>
       <file>${PROJECT_ROOT}/plugins/ICLabel</file>
       <file>${PROJECT_ROOT}/plugins/MFFMatlabIO5.0</file>
       <file>${PROJECT_ROOT}/plugins/MFFMatlabIO5.0/MFF-1.2.2-jar-with-dependencies.jar</file>
-      <file>${PROJECT_ROOT}/plugins/PICARD1.0</file>
+      <file>${PROJECT_ROOT}/plugins/PICARD2.0</file>
       <file>${PROJECT_ROOT}/plugins/VisEd1.05</file>
       <file>${PROJECT_ROOT}/plugins/bva-io1.73</file>
       <file>${PROJECT_ROOT}/plugins/clean_rawdata</file>
       <file>${PROJECT_ROOT}/plugins/dipfit</file>
       <file>${PROJECT_ROOT}/plugins/egilegacy1.0</file>
-      <file>${PROJECT_ROOT}/plugins/fieldtrip</file>
-      <file>${PROJECT_ROOT}/plugins/fieldtrip/external/biosig</file>
-      <file>${PROJECT_ROOT}/plugins/fieldtrip/forward</file>
-      <file>${PROJECT_ROOT}/plugins/fieldtrip/inverse</file>
-      <file>${PROJECT_ROOT}/plugins/fieldtrip/preproc</file>
-      <file>${PROJECT_ROOT}/plugins/fieldtrip/statfun</file>
-      <file>${PROJECT_ROOT}/plugins/fieldtrip/trialfun</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/external/biosig</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/forward</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/inverse</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/preproc</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/statfun</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/trialfun</file>
       <file>${PROJECT_ROOT}/plugins/firfilt</file>
       <file>${PROJECT_ROOT}/plugins/iirfilt1.05</file>
       <file>${PROJECT_ROOT}/plugins/musedirect1.2</file>
@@ -155,8 +155,8 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/plugins/neuroscanio1.8</file>
       <file>${PROJECT_ROOT}/plugins/scd1.0</file>
       <file>${PROJECT_ROOT}/plugins/snapmaster1.0</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.19</file>
-      <file>${PROJECT_ROOT}/plugins/xdfimport1.19/xdf</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.2</file>
+      <file>${PROJECT_ROOT}/plugins/xdfimport1.2/xdf</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/LICENSE</file>
