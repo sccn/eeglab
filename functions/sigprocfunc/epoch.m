@@ -33,8 +33,8 @@
 %
 % Outputs:
 %   epocheddata - output (chan, frames, epochs)
-%   indices     - indices of accepted events
 %   newtime     - new time limits. See notes.
+%   indices     - indices of accepted events
 %   rerefevent  - re-referenced event cell array (size nbepochs) of array 
 %                 indices for each epochs (note that the number of events 
 %                 per trial may vary).
