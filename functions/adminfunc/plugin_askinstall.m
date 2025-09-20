@@ -65,6 +65,8 @@ if nargin < 2 || ~exist(char(pluginFunc))
                 installRes = 1;
                 return;
             end
+            fprintf(['Plugin "' pluginName '" already installed\n']);
+            return;
         end
 
         % check for installing
