@@ -260,6 +260,7 @@ catch
         'be down or too slow. Alternatively, your version of Matlab might not support HTTPS.' 10 ...
         'Try again just in case. Otherwise, download the new zip file from the Internet.' ];
     warndlg2(msg);
+    try, rmdir(res.folder); catch, end
     return;
 end
 
