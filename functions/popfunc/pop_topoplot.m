@@ -334,7 +334,7 @@ for index = 1:size(arg2(:),1)
                             end
                         end
                             
-                        curpos = curpos / 85;
+                        curpos = curpos / mean([EEG.chanlocs.sph_radius]);
                         if size(curpos,1) > 1 && length(select) == 2
                             dipole_index = find(strcmpi('dipole',options),1);
                             if  ~isempty(dipole_index) % if 'dipoles' is already defined in options{:}
