@@ -185,7 +185,7 @@ if popup
                { 'Style', 'text', 'string', 'Wavelet cycles [min max/fact] or sequence', 'fontweight', 'bold' } ...
                { 'Style', 'edit', 'string', getkeyval(lastcom,5,[],'3 0.8') 'tag' 'cycle' } ...
                { 'Style', 'checkbox', 'string' 'Use FFT' 'value' 0 'tag' 'fft' } ...
-               { } ...
+               { 'Style', 'pushbutton', 'String', 'tf cycle calc', 'Tag', 'calcpush', 'Callback', {@comcalc, EEG.srate, EEG.xmin} } ...
 			   ...
 			   { 'Style', 'text', 'string', 'ERSP color limits [max] (min=-max)', 'fontweight', 'bold' } ...
                { 'Style', 'edit', 'string', '' 'tag' 'erspmax'} ...
@@ -355,3 +355,25 @@ function txt = context(var, allvars, alltext);
 		disp([ 'warning: variable ''' var ''' not found']);
 		txt = '';
 	end
+
+function comcalc(obj, evt, srate, xmin) %#ok<INUSD>
+
+% Read freqs from UI
+freqs = str2num(get(findobj(gcbf, 'Tag', 'freqs'), 'String'));
+
+% TF cycle calc cannot be combined with FFT flag
+if get(findobj(gcbf, 'Tag', 'fft'), 'Value')
+    error('Use constant wavelet width rather than FFT flag for STFT analysis with TF cycle calc.')
+end
+
+% Call TF cycle calc UI
+[cycles, widths_table] = tf_cycle_calc('freqs', freqs);
+
+if length(cycles) > 1 && cycles(2) <= 1
+    error('cycles(2) <= 1. This will give incorrect results in pop_newtimef. Use vector of frequencies.');
+end
+
+% Write frequencies and cycles vectors to UI
+freqs = widths_table(:, 1)';
+set(findobj(gcbf, 'Tag', 'freqs'), 'String', num2str(freqs(:)'));
+set(findobj(gcbf, 'Tag', 'cycle'), 'String', num2str(cycles(:)'));
