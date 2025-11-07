@@ -374,6 +374,8 @@ if length(cycles) > 1 && cycles(2) <= 1
 end
 
 % Write frequencies and cycles vectors to UI
-freqs = widths_table(:, 1)';
-set(findobj(gcbf, 'Tag', 'freqs'), 'String', num2str(freqs(:)'));
-set(findobj(gcbf, 'Tag', 'cycle'), 'String', num2str(cycles(:)'));
+if ~isempty(widths_table)
+    freqs = widths_table(:, 1)';
+    set(findobj(gcbf, 'Tag', 'freqs'), 'String', num2str(freqs(:)'));
+    set(findobj(gcbf, 'Tag', 'cycle'), 'String', num2str(cycles(:)'));
+end
