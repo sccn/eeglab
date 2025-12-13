@@ -48,6 +48,8 @@
 % 'rndreset'  = ['on'|'off'] reset the random seed based on time of day. Default is 
 %               'off' (although it used to be 'on' prior to 2015). This means that ICA 
 %               will always return the SAME decomposition unless this option is set to 'on'.
+% 'pythoncompat' = ['on'|'off'] use random sequence compatible with Python.
+%               Default is 'off'.
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance
 %                    unless starting weight matrix passed ('weights' above)]
@@ -239,6 +241,7 @@ nsub       = DEFAULT_NSUB;
 wts_blowup = 0;                      % flag =1 when weights too large
 wts_passed = 0;                      % flag weights passed as argument
 reset_randomseed = DEFAULT_RESETRANDOMSEED;
+pythoncompat = 0;
 
 %
 %%%%%%%%%% Collect keywords and values from argument list %%%%%%%%%%%%%%%
@@ -476,11 +479,21 @@ for i = 1:2:length(varargin) % for each Keyword
         else
             error('runica(): verbose flag value must be on or off')
         end
+    elseif strcmp(Keyword,'pythoncompat')
+        if ~ischar(Value)
+            error('runica(): verbose flag value must be on or off')
+        elseif strcmpi(Value,'yes') || strcmpi(Value,'on')
+            pythoncompat = 1;
+        elseif strcmpi(Value,'no') || strcmpi(Value,'off')
+            pythoncompat = 0;
+        else
+            error('runica(): pythoncompat flag value must be on or off')
+        end
     elseif strcmp(Keyword,'rndreset')
         if ischar(Value)
-            if strcmp(Value,'yes')
+            if strcmpi(Value,'yes') || strcmpi(Value,'on')
                 reset_randomseed = true;
-            elseif strcmp(Value,'no')
+            elseif strcmpi(Value,'no') || strcmpi(Value,'off')
                 reset_randomseed = false;
             else
                 error('runica(): not using the reset_randomseed flag, it should be ''yes'',''no'',0, or 1');
@@ -797,10 +810,14 @@ laststep=0;
 blockno = 1;  % running block counter for kurtosis interrupts
 
 warning('off', 'MATLAB:RandStream:ActivatingLegacyGenerators')
-if reset_randomseed
-    rand('state',sum(100*clock));  % set the random number generator state to
+if pythoncompat
+    rng(5489, 'twister');  % Use MT19937 with seed 5489 to match Python
 else
-    rand('state', 0);
+    if reset_randomseed
+        rand('state',sum(100*clock));  % set the random number generator state to
+    else
+        rand('state', 0);
+    end
 end                                % a position dependent on the system clock
 warning('on', 'MATLAB:RandStream:ActivatingLegacyGenerators')
 
@@ -826,7 +843,11 @@ end
 %% Compute ICA Weights
 if biasflag && extended
     while step < maxsteps, %%% ICA step = pass through all the data %%%%%%%%%
-        timeperm=randperm(datalength); % shuffle data order at each step
+        if ~pythoncompat
+            timeperm=randperm(datalength);
+        else
+            timeperm=rand_permutation(datalength); % shuffle data order at each step (parity with Python)
+        end
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
@@ -1002,7 +1023,11 @@ end
 %% Compute ICA Weights
 if biasflag && ~extended
     while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        timeperm=randperm(datalength); % shuffle data order at each step
+        if ~pythoncompat
+            timeperm=randperm(datalength);
+        else
+            timeperm=rand_permutation(datalength); % shuffle data order at each step (parity with Python)
+        end
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
@@ -1126,7 +1151,11 @@ end
 %% Compute ICA Weights
 if ~biasflag && extended
     while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        timeperm=randperm(datalength); % shuffle data order at each step through data
+        if ~pythoncompat
+            timeperm=randperm(datalength);
+        else
+            timeperm=rand_permutation(datalength); % shuffle data order at each step (parity with Python)
+        end
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
@@ -1297,7 +1326,11 @@ end
 %% Compute ICA Weights
 if ~biasflag && ~extended
     while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        timeperm=randperm(datalength); % shuffle data order at each step
+        if ~pythoncompat
+            timeperm=randperm(datalength);
+        else
+            timeperm=rand_permutation(datalength); % shuffle data order at each step (parity with Python)
+        end
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             if strcmpi(interrupt, 'on')
