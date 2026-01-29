@@ -69,7 +69,10 @@ function chanlocs = readeetraklocs( filename )
     if isempty(indpos) || isempty(indlabels)
         error('Could not find ''Labels'' or ''Position'' tag in electrode file');
     end
-    
+    if indpos > indlabels
+        error('The position keyword must be before the electrode labels to import the file with this function, edit the file and swap them')
+    end
+
     % get positions
     % -------------
     if strcmp(locs(indpos+1,2),':')
@@ -77,7 +80,7 @@ function chanlocs = readeetraklocs( filename )
     else
         positions = locs(indpos+1:indlabels-1,1:3);
     end
-    labels    = locs(indlabels+1:end,:);
+    labels    = locs(indlabels+1,:);
 
     if size(labels,2) == size(positions,1)
         % transpose if labels are on one row
