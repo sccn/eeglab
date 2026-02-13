@@ -102,6 +102,7 @@ g = finputcheck( options, ...
                    'eeg'        'struct'               []   struct('data',{}) }, 'pop_loadset');
 if ischar(g), error(g); end
 if ischar(g.filename), g.filename = { g.filename }; end
+if isempty(g.loadmode), g.loadmode = 'all'; end
 
 % reloading EEG structure from disk
 % ---------------------------------
