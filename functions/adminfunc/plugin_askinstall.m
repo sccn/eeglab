@@ -54,7 +54,11 @@ if nargin < 2 || ~exist(char(pluginFunc))
         installRes = 0;
 
         % check is deactivated
-        try, PLUGINLIST = evalin('base', 'PLUGINLIST'); catch, PLUGINLIST = []; end
+        try
+            PLUGINLIST = evalin('base', 'PLUGINLIST');
+        catch
+            PLUGINLIST = []; 
+        end
         if ~isempty(PLUGINLIST) && isfield(PLUGINLIST, 'plugin')
             indPlugin = strmatch(lower(pluginName), lower({ PLUGINLIST.plugin }), 'exact');
             if ~isempty(indPlugin) && strcmpi(PLUGINLIST(indPlugin(1)).status, 'deactivated')
@@ -65,8 +69,6 @@ if nargin < 2 || ~exist(char(pluginFunc))
                 installRes = 1;
                 return;
             end
-            fprintf(['Plugin "' pluginName '" already installed\n']);
-            return;
         end
 
         % check for installing
