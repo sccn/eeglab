@@ -618,7 +618,25 @@ if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3)
             EEG.data(:, :, diff2) = [];
         end
     else
-        EEG.data  = EEG.data(g.channel, :, g.trial);
+        % Check if data is on disk ('in set file' string from STUDY mode)
+        if ischar(EEG.data)
+            % Data is on disk, load it first
+            EEG = eeg_checkset(EEG, 'loaddata');
+        end
+
+        % Ensure g.channel indices are valid for actual data size
+        actual_nchans = size(EEG.data, 1);
+        valid_channels = g.channel(g.channel <= actual_nchans);
+        if length(valid_channels) ~= length(g.channel)
+            warning('pop_select: %d requested channel indices exceed data size (%d channels)', ...
+                    length(g.channel) - length(valid_channels), actual_nchans);
+            warning('Keeping only %d valid channels', length(valid_channels));
+            % Clear icaact since ICA matrices will be modified
+            EEG.icaact = [];
+        end
+        EEG.data  = EEG.data(valid_channels, :, g.trial);
+        % Update g.channel to match actual channels used (needed for line 652)
+        g.channel = valid_channels;
     end
 end
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end

@@ -77,7 +77,11 @@ function chanlocs = readeetraklocs( filename )
     else
         positions = locs(indpos+1:indlabels-1,1:3);
     end
-    labels    = locs(indlabels+1:end,:);
+    if (length(locs(indlabels+1,:)) == 1 || isempty(locs{indlabels+1,2})) && size(positions,1) > 1
+        labels    = locs(indlabels+1:end,:);
+    else
+        labels    = locs(indlabels+1,:);
+    end
 
     if size(labels,2) == size(positions,1)
         % transpose if labels are on one row

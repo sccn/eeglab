@@ -187,13 +187,24 @@ listcheck = { 'edge'      'string'     { 'both';'leading';'trailing'}     'both'
               'duration'  'string'     { 'on';'off' }                     'off';
               'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
               'nbtype'    'integer'    [1 NaN]                             NaN };
-g = finputcheck( options, listcheck, 'pop_chanedit');
+g = finputcheck( options, listcheck, 'pop_chanevent');
 if ischar(g), error(g); end
 
 % check input consistency
 % ----------------------
 if strcmpi(g.duration, 'on') && ~strcmpi(g.edge, 'leading')
     error('Must detect leading edge to extract event duration');
+end
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    if nargin < 2
+        [ EEG, command ] = eeg_eval( 'pop_chanevent', EEG, 'warning', 'on', 'params', [ {chan} options ] );
+    else
+        [ EEG, command ] = eeg_eval( 'pop_chanevent', EEG, 'params', [ {chan} options ] );
+    end
+    return;
 end
 
 % process events
