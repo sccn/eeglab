@@ -3,7 +3,7 @@
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
-    <param.version>2025.1.0</param.version>
+    <param.version>2026.0.0</param.version>
     <param.authnamewatermark>Arnaud Delorme and Scott Makeig</param.authnamewatermark>
     <param.email>eeglab@sccn.ucsd.edu</param.email>
     <param.company />
