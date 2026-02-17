@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="2101694100" file="/System/Volumes/Data/data/matlab/eeglab_versions/eeglabcompile/eeglab.prj" location="/System/Volumes/Data/data/matlab/eeglab_versions/eeglabcompile" name="eeglab" preferred-package-location="/System/Volumes/Data/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_redistribution" preferred-package-type="package.type.app" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="3050292042" file="/Users/arno/GitHub/core_eeg/eeglab_compiled/eeglab.prj" location="/Users/arno/GitHub/core_eeg/eeglab_compiled" name="eeglab" preferred-package-location="/Users/arno/GitHub/core_eeg/eeglab_compiled/eeglab/for_redistribution" preferred-package-type="package.type.app" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>EEGLAB</param.appname>
     <param.icon />
     <param.icons />
@@ -51,7 +51,7 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
     <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
     <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
     <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
-    <param.windows.command.prompt>true</param.windows.command.prompt>
+    <param.windows.command.prompt>false</param.windows.command.prompt>
     <param.create.log>false</param.create.log>
     <param.log.file>eeglab_log.txt</param.log.file>
     <param.native.matlab>false</param.native.matlab>
@@ -96,17 +96,6 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/eeglab.m</file>
     </fileset.main>
     <fileset.resources>
-      <file>${PROJECT_ROOT}/sample_data/eeglab_chan32.locs</file>
-      <file>${PROJECT_ROOT}/sample_data/eeglab_data.fdt</file>
-      <file>${PROJECT_ROOT}/sample_data/eeglab_data.set</file>
-      <file>${PROJECT_ROOT}/sample_data/eeglab_data_epochs_ica.fdt</file>
-      <file>${PROJECT_ROOT}/sample_data/eeglab_data_epochs_ica.set</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BEM/standard_vol.mat</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BEM/standard_mri.mat</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BEM/elec/standard_1005.elc</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BESA/standard_BESA.mat</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BESA/avg152t1.mat</file>
-      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BESA/standard-10-5-cap385.elp</file>
       <file>${PROJECT_ROOT}/functions/adminfunc</file>
       <file>${PROJECT_ROOT}/functions/guifunc</file>
       <file>${PROJECT_ROOT}/functions/miscfunc</file>
@@ -131,6 +120,13 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/plugins/ANTeepimport1.14/eepv4_version.mexw64</file>
       <file>${PROJECT_ROOT}/plugins/EEG-BIDS</file>
       <file>${PROJECT_ROOT}/plugins/EEG-BIDS/JSONIO</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/external/biosig</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/forward</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/inverse</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/preproc</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/statfun</file>
+      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/trialfun</file>
       <file>${PROJECT_ROOT}/plugins/Fileio250523</file>
       <file>${PROJECT_ROOT}/plugins/ICLabel</file>
       <file>${PROJECT_ROOT}/plugins/MFFMatlabIO5.0</file>
@@ -140,14 +136,13 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/plugins/bva-io1.73</file>
       <file>${PROJECT_ROOT}/plugins/clean_rawdata</file>
       <file>${PROJECT_ROOT}/plugins/dipfit</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BEM/elec/standard_1005.elc</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BEM/standard_mri.mat</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BEM/standard_vol.mat</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BESA/avg152t1.mat</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BESA/standard-10-5-cap385.elp</file>
+      <file>${PROJECT_ROOT}/plugins/dipfit/standard_BESA/standard_BESA.mat</file>
       <file>${PROJECT_ROOT}/plugins/egilegacy1.0</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/external/biosig</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/forward</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/inverse</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/preproc</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/statfun</file>
-      <file>${PROJECT_ROOT}/plugins/Fieldtrip-lite250523/trialfun</file>
       <file>${PROJECT_ROOT}/plugins/firfilt</file>
       <file>${PROJECT_ROOT}/plugins/iirfilt1.05</file>
       <file>${PROJECT_ROOT}/plugins/musedirect1.2</file>
@@ -157,6 +152,11 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${PROJECT_ROOT}/plugins/snapmaster1.0</file>
       <file>${PROJECT_ROOT}/plugins/xdfimport1.2</file>
       <file>${PROJECT_ROOT}/plugins/xdfimport1.2/xdf</file>
+      <file>${PROJECT_ROOT}/sample_data/eeglab_chan32.locs</file>
+      <file>${PROJECT_ROOT}/sample_data/eeglab_data.fdt</file>
+      <file>${PROJECT_ROOT}/sample_data/eeglab_data.set</file>
+      <file>${PROJECT_ROOT}/sample_data/eeglab_data_epochs_ica.fdt</file>
+      <file>${PROJECT_ROOT}/sample_data/eeglab_data_epochs_ica.set</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}/LICENSE</file>
@@ -171,29 +171,24 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <file>${MATLAB_ROOT}/toolbox/local/userpath.m</file>
       <file>${MATLAB_ROOT}/toolbox/matlab/demos/watchoff.m</file>
       <file>${MATLAB_ROOT}/toolbox/matlab/demos/watchon.m</file>
+      <file>${PROJECT_ROOT}/sample_data/pnas.adt</file>
     </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/System/Volumes/Data/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/readme.txt</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/System/Volumes/Data/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/run_EEGLAB.sh</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/System/Volumes/Data/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/splash.png</file>
-      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/System/Volumes/Data/data/matlab/eeglab_versions/eeglabcompile/eeglab/for_testing/EEGLAB.app</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="splash.png" optional="false">/Users/arno/GitHub/core_eeg/eeglab_compiled/eeglab/for_testing/splash.png</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="EEGLAB.app" optional="false">/Users/arno/GitHub/core_eeg/eeglab_compiled/eeglab/for_testing/EEGLAB.app</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="readme.txt" optional="true">/Users/arno/GitHub/core_eeg/eeglab_compiled/eeglab/for_testing/readme.txt</file>
+      <file location="${PROJECT_ROOT}/eeglab/for_testing" name="run_EEGLAB.sh" optional="false">/Users/arno/GitHub/core_eeg/eeglab_compiled/eeglab/for_testing/run_EEGLAB.sh</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/Applications/MATLAB_R2022b.app</root>
+      <root>/Applications/MATLAB_R2022b.app_for_compiling.app</root>
       <toolboxes>
         <toolbox name="matlabcoder" />
-        <toolbox name="neuralnetwork" />
       </toolboxes>
       <toolbox>
         <matlabcoder>
           <enabled>true</enabled>
         </matlabcoder>
-      </toolbox>
-      <toolbox>
-        <neuralnetwork>
-          <enabled>true</enabled>
-        </neuralnetwork>
       </toolbox>
     </matlab>
     <platform>
@@ -205,7 +200,7 @@ ${DYLD_LIBRARY_PATH}:MR/R2022b/runtime/maci64:MR/R2022b/sys/os/maci64:MR/R2022b/
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>14.2.1</osver>
+      <osver>14.6.1</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>
