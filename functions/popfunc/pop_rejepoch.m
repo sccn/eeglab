@@ -8,8 +8,8 @@
 %   INEEG      - Input dataset
 %   trialrej   - Array of 0s and 1s (depicting rejected trials) (size is 
 %                number of trials)
-%   confirm    - Display rejections and ask for confirmation. (0=no. 1=yes;
-%                default is 1).
+%   confirm    - Display rejections and ask for confirmation. (-1= no and do 
+%                error if no epochs are left. 0=no. 1=yes; default is 1).
 % Outputs:
 %   OUTEEG     - output dataset
 %
@@ -75,7 +75,7 @@ else
     fprintf('%d/%d trials rejected\n', length(tmprej), EEG.trials);
 end
 
-if confirm ~= 0
+if confirm > 0
     ButtonName=questdlg2('Are you sure, you want to reject the labeled trials ?', ...
                          'Reject pre-labelled epochs -- pop_rejepoch()', 'NO', 'YES', 'YES');
     switch ButtonName,
@@ -93,7 +93,10 @@ end
 if format0_1 || length(tmprej) == EEG.trials
     tmprej = find(tmprej);
 end
-EEG = pop_select( EEG, 'notrial', tmprej);
-
+if confirm == -1
+    EEG = pop_select( EEG, 'notrial', tmprej, 'erroronempty', 'off');
+else
+    EEG = pop_select( EEG, 'notrial', tmprej);
+end
 com = sprintf( 'EEG = pop_rejepoch( EEG, %s);', vararg2str({ tmprej 0 }));		
 return;

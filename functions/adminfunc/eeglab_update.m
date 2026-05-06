@@ -341,6 +341,7 @@ if res.copyplugins
                 isempty(strfind(lower(pluginOriList(iPlugin).name), 'iclabel')) && ...
                 isempty(strfind(lower(pluginOriList(iPlugin).name), 'eeg-bids')) && ...
                 isempty(strfind(lower(pluginOriList(iPlugin).name), 'clean_rawdata'))
+                isempty(strfind(lower(pluginOriList(iPlugin).name), 'eeg-bids'))
             destPath = fullfile(pluginDest, pluginOriList(iPlugin).name);
             try
                 mkdir(destPath);

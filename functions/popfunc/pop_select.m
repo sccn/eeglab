@@ -216,9 +216,9 @@ end
 % -------------------------
 if length(EEG) > 1
     if nargin < 2
-        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
+        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', [ { 'erroronempty', 'off' } args]);
     else
-        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'off', 'params',args);
+        [ EEG, com ] = eeg_eval( 'pop_select', EEG, 'warning', 'off', 'params',[ { 'erroronempty', 'off' } args]);
     end
     return;
 end
@@ -250,6 +250,7 @@ g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'trialcond'   'integer'   []         []; ...
                         'notrialcond' 'integer'   []         []; ...
                         'sort'        'integer'   []         []; ...
+                        'erroronempty' 'string'    { 'on','off' } 'on'; ...
                         'sorttrial'   'string'    { 'on','off' } 'on' }, 'pop_select');
 if ischar(g)
     error(g);
@@ -274,7 +275,7 @@ if ~isempty(g.sort)
 end
 if strcmpi(g.sorttrial, 'on')
     g.trial = sort(setdiff( g.trial, g.notrial ));
-    if isempty(g.trial), error('Error: dataset %s is empty',EEG.filename); end
+    if isempty(g.trial) && strcmpi(g.erroronempty, 'on'), error('Error: dataset %s is empty',EEG.filename); end
 else
     g.trial(ismember(g.trial,g.notrial)) = [];
     % still warn about & remove duplicate trials (may be removed in the future)
@@ -327,7 +328,7 @@ g.channel = find(chanFlag);
 if ~isempty(g.time) && (g.time(1) < EEG.xmin*1000) && (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
 end
-if min(g.trial) < 1 || max( g.trial ) > EEG.trials  
+if ~isempty(g.trial) && (min(g.trial) < 1 || max( g.trial ) > EEG.trials) 
    error('Wrong trial range');
 end
 if size(g.point,2) > 2
@@ -409,7 +410,7 @@ if ~isempty(g.trialcond)
    end
 end
 
-if isempty(g.trial)
+if isempty(g.trial) && strcmpi(g.erroronempty, 'on')
    error('Empty dataset, no trial');
 end
 if length(g.trial) ~= EEG.trials

@@ -41,8 +41,9 @@
 %   superpose  - [0|1] 0=do not superpose rejection markings on previous
 %              rejection marks stored in the dataset: 1=show both current and
 %              previously marked rejections using different colors. {Default: 0}.
-%   reject     - [1|0] 0=do not actually reject the marked trials (but store the 
-%              marks: 1=immediately reject marked trials. {Default: 1}.
+%   reject     - [1|0|-1] 0=do not actually reject the marked trials (but store the 
+%              marks: 1=immediately reject marked trials. -1=reject and do not
+%              error if no epochs are left {Default: 1}.
 % Outputs:
 %   Indexes    - index of rejected trials
 %     When EEGPLOT is called, modifications are applied to the current 
@@ -230,6 +231,8 @@ if calldisp
 else 
     if reject == 1
         EEG = pop_rejepoch(EEG, rej, 0);
+    elseif reject == -1
+        EEG = pop_rejepoch(EEG, rej, -1);
     end
 end
 if ~isempty(rej)

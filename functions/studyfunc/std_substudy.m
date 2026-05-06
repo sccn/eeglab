@@ -11,7 +11,7 @@
 %   'dataset'   - [integer array] indices of dataset to include in sub-STUDY
 %                 Default is all datasets.
 %   'subject'   - [cell array] name of subjects to include in sub-STUDY.
-%                 Default is all subjects.%
+%                 Default is all subjects.
 %   'condition' - [cell array] name of conditions to include in sub-STUDY
 %                 Default is all conditions.
 %   'group'     - [cell array] name of gourps to include in sub-STUDY
@@ -124,13 +124,15 @@ end
 % check channel consistency
 % -------------------------
 for i = 1:length(STUDY.changrp)
-    for c = 1:size(STUDY.changrp(i).setinds,1)
-       for g = 1:size(STUDY.changrp(i).setinds,2)
-           newinds = datcoresp(STUDY.changrp(i).setinds{c,g});
-           nonnans = find(~isnan(newinds));
-           STUDY.changrp(i).setinds{c,g} = newinds(nonnans);
-           STUDY.changrp(i).allinds{c,g} = STUDY.changrp(i).allinds{c,g}(nonnans);
-       end
+    if isfield(STUDY.changrp, 'setinds')
+        for c = 1:size(STUDY.changrp(i).setinds,1)
+           for g = 1:size(STUDY.changrp(i).setinds,2)
+               newinds = datcoresp(STUDY.changrp(i).setinds{c,g});
+               nonnans = find(~isnan(newinds));
+               STUDY.changrp(i).setinds{c,g} = newinds(nonnans);
+               STUDY.changrp(i).allinds{c,g} = STUDY.changrp(i).allinds{c,g}(nonnans);
+           end
+        end
     end
 end
 
@@ -144,7 +146,7 @@ for index = 1:length(STUDY.cluster)
             STUDY.cluster(index).comps(:,i) = [];
         end
     end
-    [tmp STUDY.cluster(index).setinds STUDY.cluster(index).allinds] = std_setcomps2cell(STUDY, STUDY.cluster(index).sets, STUDY.cluster(index).comps);
+    % [tmp STUDY.cluster(index).setinds STUDY.cluster(index).allinds] = std_setcomps2cell(STUDY, STUDY.cluster(index).sets, STUDY.cluster(index).comps);
 end
 
 STUDY = std_reset(STUDY);

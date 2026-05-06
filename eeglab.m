@@ -1113,7 +1113,7 @@ else
                 end
             end
         end
-        if ~isempty(pluginVersion) || ~isempty(funcname)
+        if (~isempty(pluginVersion) && ~isempty(pluginlist) && ~isempty(pluginstats)) || ~isempty(funcname)
             if isempty(funcname)
                 fprintf([ 'EEGLAB: adding "' pluginName '" v' pluginVersion ' to the path' ]);
                 pluginlist(plugincount).plugin     = pluginName;

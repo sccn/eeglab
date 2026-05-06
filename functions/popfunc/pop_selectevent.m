@@ -280,9 +280,9 @@ end
 % -------------------------
 if length(EEG) > 1
     if nargin < 2
-        [ EEG, com ] = eeg_eval( 'pop_selectevent', EEG, 'warning', 'on', 'params', args);
+        [ EEG, com ] = eeg_eval( 'pop_selectevent', EEG, 'warning', 'on',  'params', [ { 'erroronempty', 'off' } args]);
     else
-        [ EEG, com ] = eeg_eval( 'pop_selectevent', EEG, 'warning', 'off', 'params',args);
+        [ EEG, com ] = eeg_eval( 'pop_selectevent', EEG, 'warning', 'off', 'params', [ { 'erroronempty', 'off' } args]);
     end
     return;
 end
@@ -296,6 +296,7 @@ fieldlist = { 'event'         'integer'     []                                  
 			  'deleteevents'  'string'      { 'yes','no','on','off' }                'off';
 			  'renametype'    'string'      []                                       '';
 			  'oldtypefield'  'string'      []                                       '';
+              'erroronempty'  'string'      { 'on','off' }                           'on';
 			  'select'        'string'      { 'normal','inverse','remove','keep' }   'normal' };
 for index = 1:length(allfields) 
 	fieldlist{end+1, 1} = allfields{index};
@@ -525,9 +526,9 @@ if strcmp( lower(g.deleteepochs), 'on') && EEG.trials > 1
         Iepoch = ~Iepoch;
     end
 	Iepoch = find(Iepoch == 0);
-	if length(Iepoch) == 0,
-		error('Empty dataset: all epochs have been removed');
-	end
+    if strcmpi(g.erroronempty, 'on')
+        error('All epochs have been removed, empty dataset')
+    end
 	if nargin < 2 
 		ButtonName=questdlg2(strvcat([ 'Warning: keep ' num2str(length(Iepoch)) ' epochs (delete ' num2str(EEG.trials-length(Iepoch)) ...
                             ' unreferenced epochs)' ]), ...
@@ -541,7 +542,7 @@ if strcmp( lower(g.deleteepochs), 'on') && EEG.trials > 1
 	  if strcmpi(g.deleteevents, 'on')
           EEG.event = EEG.event(Ievent);
       end
-      EEG = pop_select(EEG, 'trial', Iepoch);
+      EEG = pop_select(EEG, 'trial', Iepoch, 'erroronempty', g.erroronempty);
 	end % switch
 else 
     % delete events if necessary
