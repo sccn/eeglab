@@ -1,237 +1,397 @@
-# Agent Guidelines for EEGLAB
+# CLAUDE.md
 
-EEGLAB is a MATLAB/Octave toolbox for EEG/MEG/time-series analysis with both GUI
-and command-line workflows. Favor small MATLAB-native patches that reuse current
-EEGLAB structure and helpers; avoid new architecture, Python/Node tooling, or
-repo-wide cleanup unless explicitly requested.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Start Here
+## What is EEGLAB?
 
-- Use `.agents/skills/eeglab-matlab-development/SKILL.md` for MATLAB source
-  work, `fix-issue` for GitHub issues, `github-pr-review` for reviews, and
-  `pull-request` for PR text.
-- Read the touched function and nearby analogs first. Search with `rg` before
-  adding helpers.
-- Key references: `CONTRIBUTING.md`, `eeglab.m`, `functions/adminfunc/eeg_checkset.m`.
-- Default branch is `develop`; `CONTRIBUTING.md` says bug fixes target `master`
-  and enhancements target `develop`.
-- Submodules: `plugins/dipfit`, `plugins/clean_rawdata`, `plugins/ICLabel`,
-  `plugins/firfilt`, `plugins/EEG-BIDS`, `tutorial_scripts`. Clone/update with
-  `--recurse-submodules` and `git submodule update --init --recursive --remote`.
-  Do not edit submodule contents or move submodule pointers casually.
+EEGLAB is an open-source MATLAB toolbox for processing electrophysiological signals (EEG, MEG, and other time series data). It provides a GUI and command-line functions for continuous and event-related data analysis, including independent component analysis (ICA).
 
-## Run And Validate
-
-Startup modes: `eeglab` GUI, `eeglab nogui` headless, `eeglab redraw`,
-`eeglab rebuild`, `eeglab versions`.
+## Running MATLAB
 
 ```bash
-matlab -batch "cd('/path/to/eeglab'); eeglab('nogui'); <commands>"
-octave --quiet --eval "cd('/path/to/eeglab'); eeglab('nogui'); <commands>"
+# Non-interactive batch mode (preferred for automation)
+/Applications/MATLAB_R2025a.app/bin/matlab -batch "command_here"
+
+# Example: run EEGLAB without GUI and process data
+/Applications/MATLAB_R2025a.app/bin/matlab -batch "cd('/Users/arno/GitHub/core_eeg/eeglab'); eeglab nogui; your_script"
 ```
 
-Smoke check:
+Startup options: `eeglab` (full GUI), `eeglab nogui` (headless), `eeglab redraw` (refresh GUI), `eeglab rebuild` (close and rebuild).
 
-```bash
-matlab -batch "cd('/path/to/eeglab'); eeglab('nogui'); EEG = pop_loadset('filename','eeglab_data.set','filepath','sample_data/'); EEG = eeg_checkset(EEG);"
-```
+## Git Workflow
 
-If MATLAB/Octave, display, license, or data are unavailable, say exactly what was
-not run. Do not claim validation from code reading alone.
+- **`develop`** - Main and default branch
+- Submodules: `dipfit`, `clean_rawdata`, `ICLabel`, `firfilt`, `EEG-BIDS`, `tutorial_scripts`
+- Clone with `--recurse-submodules`; update with `git submodule update --init --recursive --remote`
 
-## Repo Map
+## Code Architecture
 
-- `eeglab.m`: startup, menus, global GUI state, plugin discovery/loading.
-- `functions/popfunc/`: `pop_*` GUI/script wrappers and many `eeg_*` functions.
-- `functions/adminfunc/`: validation, options, history, dataset store/retrieve,
-  plugin admin (`eeg_checkset`, `eeg_eval`, `eeg_store`, `vararg2str`).
-- `functions/guifunc/`: `inputgui`, `supergui`, dialogs, channel selection.
-- `functions/sigprocfunc/`, `timefreqfunc/`, `statistics/`: core processing.
-- `functions/miscfunc/`: import/export, channel/event/ICA/numerical utilities.
-- `functions/studyfunc/`: `STUDY`/`ALLEEG` multi-subject analysis.
-- `functions/@eegobj`, `@memmapdata`, `@mmo`: MATLAB class folders.
-- `plugins/*/eegplugin_*.m`: plugin menu registration.
-- `sample_data/`, `sample_data/test_data/`, `sample_locs/`: validation data.
+### The EEG Structure
 
-Function categories:
-- `pop_*`: user/menu wrappers; no args usually opens GUI; key/value args must
-  stay scriptable; return `[EEG, com]` or `[EEG, LASTCOM]` for history.
-- `eeg_*`: EEG structure/admin functions (`eeg_checkset`, `eeg_epoch`,
-  `eeg_store`, etc.).
-- Processing functions: no dialogs; direct algorithms (`runica`, `topoplot`,
-  `spectopo`, `eegfilt`, time-frequency functions).
+All processing revolves around the `EEG` struct:
 
-## EEG Structure Invariants
+| Field | Type | Description |
+|-------|------|-------------|
+| `data` | `[chan x pts]` or `[chan x pts x epochs]` | Raw data matrix |
+| `nbchan`, `pnts`, `trials` | int | Dimensions (trials=1 for continuous) |
+| `srate` | float | Sampling rate in Hz |
+| `xmin`, `xmax` | float | Epoch time bounds in seconds |
+| `times` | vector | Latency vector in milliseconds |
+| `chanlocs` | struct array | Channel names/locations |
+| `event` | struct array | Events with `.type`, `.latency`, `.duration` |
+| `urevent` | struct array | Original events before any rejection |
+| `epoch` | struct array | Epoch metadata (only when epoched) |
+| `ref` | string/int | Reference type (`'common'`, `'averef'`, channel index) |
+| `icaweights` | matrix | ICA unmixing weights |
+| `icasphere` | matrix | ICA sphering matrix |
+| `icawinv` | matrix | ICA inverse (mixing) matrix |
+| `icaact` | matrix | Component activations (may be empty; recomputed on demand) |
+| `dipfit` | struct | Dipole model for ICA components |
+| `reject` | struct | Rejection marks (`.gcompreject` = flagged components) |
+| `etc` | struct | Miscellaneous (ICLabel results stored here) |
+| `history` | cell | Command history for reproducibility |
 
-Data is channel-major: continuous `[nbchan x pnts]`, epoched
-`[nbchan x pnts x trials]`; `EEG.data` can also reference disk/memmap data.
-Event latencies are 1-based sample points, not seconds. Call the relevant
-`eeg_checkset` mode after changing data, dimensions, events, epochs, channels,
-or ICA fields; use `eeg_checkset(EEG, 'eventconsistency')` after event edits.
+Always call `eeg_checkset(EEG)` after modifying the structure to validate and recompute derived fields.
 
-| Field group | Key fields |
-| --- | --- |
-| Dimensions/time | `data`, `nbchan`, `pnts`, `trials`, `srate`, `xmin`, `xmax`, `times` |
-| Channels/ref | `chanlocs`, `urchanlocs`, `chaninfo`, `ref`, `splinefile` |
-| Events/epochs | `event`, `urevent`, `epoch`, `eventdescription`, `epochdescription` |
-| ICA/components | `icaweights`, `icasphere`, `icawinv`, `icaact`, `icachansind`, `dipfit` |
-| Rejection/stats | `reject`, `stats`, `specdata`, `specica` |
-| STUDY metadata | `subject`, `group`, `condition`, `run`, `session` |
-| Misc/save | `etc`, `comments`, `history`, `saved`, `filename`, `filepath` |
+### Three Function Categories
 
-When selecting/removing channels, epochs, time ranges, or components, update all
-coupled fields. Watch first/last samples, boundary events, empty `icaact`, ICA
-rank, `icachansind`, `urevent` links, `EEG.saved`, and on-disk data references.
+1. **`pop_*` functions** (`functions/popfunc/`): GUI wrappers that show dialogs, call processing functions, return `[EEG, LASTCOM]`. Entry points from menus.
+2. **`eeg_*` functions** (`functions/adminfunc/`, `functions/popfunc/`): Structure manipulation and validation (`eeg_checkset`, `eeg_epoch`, `eeg_store`).
+3. **Processing functions** (`functions/sigprocfunc/`, `functions/timefreqfunc/`): Direct signal processing (`runica`, `topoplot`, `spectopo`, `eegfilt`).
 
-## MATLAB Patterns To Preserve
+### Plugin Architecture
 
-- Prefer existing helpers: `finputcheck`, `vararg2str`, `eeg_checkset`,
-  `eeg_eval`, `eeg_store`, `eeg_retrieve`, `eeg_decodechan`, `eeg_mergelocs`,
-  `fastif`, `inputgui`, `supergui`, `questdlg2`, `pophelp`.
-- `pop_*` changes must preserve GUI cancel behavior (`com = ''`), scripted
-  behavior, history strings, and multi-dataset paths via `eeg_eval` when present.
-- Use `inputgui`/`supergui` for EEGLAB-style dialogs unless the touched file has
-  a clear different precedent.
-- Keep old compatibility code unless removal is the task. EEGLAB supports old
-  datasets, old MATLAB releases, Octave command-line use, and plugins.
-- MATLAB style: 2-space indents, spaces not tabs, no space before `(` in calls,
-  one space after commas, preserve help/license/history blocks.
-- Do not add defensive clutter for states already guaranteed by `finputcheck`,
-  callers, or `eeg_checkset`.
+Plugins live in `plugins/` and register via `eegplugin_[name].m`.
 
-## Menu To Function Map
+Browse all available plugins: https://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_list_all.php
 
-| Menu | Functions |
-| --- | --- |
-| File | `pop_loadset`, `pop_saveset`, `pop_fileio`, `pop_biosig`, `pop_importdata`, `pop_importevent`, `pop_importepoch`, `pop_export`, `pop_editoptions`, `pop_importbids` |
-| Edit | `pop_editset`, `pop_chanedit`, `pop_editeventfield`, `pop_editeventvals`, `pop_select`, `pop_rmdat`, `pop_selectevent`, `pop_mergeset` |
-| Tools/preprocess | `pop_resample`, `pop_eegfilt`, `pop_eegfiltnew`, `pop_reref`, `pop_interp`, `pop_eegplot`, `pop_rejchan`, `pop_rejcont`, `pop_autorej`, `pop_runica`, `pop_subcomp`, `pop_epoch`, `pop_rmbase`, `pop_clean_rawdata`, `pop_iclabel`, `pop_icflag` |
-| Epoch rejection | `pop_eegthresh`, `pop_rejtrend`, `pop_jointprob`, `pop_rejkurt`, `pop_rejspec` |
-| Plot | `pop_eegplot`, `pop_spectopo`, `pop_prop`, `pop_erpimage`, `pop_timtopo`, `pop_topoplot`, `pop_headplot`, `pop_envtopo`, `pop_newtimef` |
-| STUDY | `pop_study`, `pop_studywizard`, `pop_studyerp`, `pop_loadstudy`, `pop_savestudy`, `pop_studydesign`, `pop_precomp`, `pop_preclust`, `pop_clust` |
-
-## Plugin Notes
-
-Plugins live under `plugins/` and register through `eegplugin_<name>.m`.
-Programmatic install form:
-
+Install plugins programmatically:
 ```matlab
-plugin_askinstall('ICLabel', 'iclabel', 0);
+% plugin_askinstall(plugin_name, plugin_function, interactive)
+% interactive: 0 = install silently, 1 = prompt user
+plugin_askinstall('ICLabel', 'iclabel', 0);        % install ICLabel
 plugin_askinstall('clean_rawdata', 'clean_artifacts', 0);
 plugin_askinstall('firfilt', 'pop_eegfiltnew', 0);
 plugin_askinstall('picard', 'picard', 0);
 plugin_askinstall('dipfit', 'pop_dipfit_settings', 0);
 ```
 
-`clean_rawdata` order: flatlines -> high-pass -> bad channels -> ASR bursts ->
-bad windows. Any criterion can be `'off'`. Results: `EEG.etc.clean_channel_mask`
-and `EEG.etc.clean_sample_mask`.
+## EEGLAB Menu-to-Function Reference
 
-| clean_rawdata key | Default / note |
-| --- | --- |
-| `FlatlineCriterion` | `5` seconds |
-| `ChannelCriterion` | `0.8`, needs channel locations |
-| `LineNoiseCriterion` | `4` SD |
-| `Highpass` | `[0.25 0.75]`, use `'off'` if already filtered |
-| `BurstCriterion` | `20` GUI conservative; `5` aggressive; `40` mild first pass |
-| `BurstRejection` | `'on'` rejects periods; `'off'` corrects via ASR |
-| `WindowCriterion` | `0.25` contaminated-channel fraction |
-| `WindowCriterionTolerances` | `[-Inf 7]` |
-| `Distance` | `'Euclidian'` or `'Riemannian'` |
-| `channels_ignore` | labels such as `{'ECG'}` |
+### File Menu
+| Menu Item | Function |
+|-----------|----------|
+| Load existing dataset | `pop_loadset` |
+| Save current dataset(s) | `pop_saveset` |
+| Import data from file | `pop_fileio`, `pop_biosig`, `pop_importdata` |
+| Import events | `pop_importevent` |
+| Import epoch info | `pop_importepoch` |
+| Export data to text | `pop_export` |
+| Preferences | `pop_editoptions` |
+| Import BIDS dataset | `pop_importbids` (EEG-BIDS plugin) |
 
-`ICLabel`: `pop_iclabel(EEG, 'default')` stores
-`EEG.etc.ic_classification.ICLabel.classifications` as `[nComponents x 7]`
-probabilities `[Brain Muscle Eye Heart LineNoise ChannelNoise Other]`.
-Versions: `'default'`, `'lite'`, `'beta'`. `pop_icflag` uses a `[7 x 2]`
-threshold matrix; `NaN NaN` skips a class, for example:
+### Edit Menu
+| Menu Item | Function |
+|-----------|----------|
+| Dataset info | `pop_editset` |
+| Channel locations | `pop_chanedit` |
+| Event fields | `pop_editeventfield` |
+| Event values | `pop_editeventvals` |
+| Select data (channels/time) | `pop_select` |
+| Select data using events | `pop_rmdat` |
+| Select epochs or events | `pop_selectevent` |
+| Append datasets | `pop_mergeset` |
+
+### Tools Menu (Preprocessing)
+| Menu Item | Function |
+|-----------|----------|
+| Change sampling rate | `pop_resample` |
+| Basic FIR filter (legacy) | `pop_eegfilt` |
+| FIR filter (firfilt plugin) | `pop_eegfiltnew` |
+| Re-reference | `pop_reref` |
+| Interpolate electrodes | `pop_interp` |
+| Inspect/reject by eye | `pop_eegplot` |
+| Automatic channel rejection | `pop_rejchan` |
+| Automatic continuous rejection | `pop_rejcont` |
+| Automatic epoch rejection | `pop_autorej` |
+| Decompose data by ICA | `pop_runica` |
+| Remove components from data | `pop_subcomp` |
+| Extract epochs | `pop_epoch` |
+| Remove epoch baseline | `pop_rmbase` |
+| Clean Rawdata and ASR | `pop_clean_rawdata` (plugin) |
+| Classify components ICLabel | `pop_iclabel` (plugin) |
+| Flag components as artifacts | `pop_icflag` (plugin) |
+
+### Epoch Rejection Tools
+| Menu Item | Function |
+|-----------|----------|
+| Reject extreme values | `pop_eegthresh` |
+| Reject by linear trend/variance | `pop_rejtrend` |
+| Reject by probability | `pop_jointprob` |
+| Reject by kurtosis | `pop_rejkurt` |
+| Reject by spectra | `pop_rejspec` |
+
+### Plot Menu
+| Menu Item | Function |
+|-----------|----------|
+| Channel data (scroll) | `pop_eegplot` |
+| Channel spectra and maps | `pop_spectopo` |
+| Channel properties | `pop_prop` |
+| Channel ERP image | `pop_erpimage` |
+| Channel ERPs with scalp maps | `pop_timtopo` |
+| ERP map series (2-D) | `pop_topoplot` |
+| ERP map series (3-D) | `pop_headplot` |
+| Component activations (scroll) | `pop_eegplot` (with ICA data) |
+| Component spectra and maps | `pop_spectopo` (with ICA) |
+| Component maps (2-D) | `pop_topoplot` (with ICA) |
+| Component properties | `pop_prop` (with ICA) |
+| Component ERPs | `pop_envtopo` |
+| Time-frequency | `pop_newtimef` |
+
+### STUDY Menu (Multi-Subject)
+| Menu Item | Function |
+|-----------|----------|
+| Create STUDY (loaded datasets) | `pop_study` |
+| Browse for datasets | `pop_studywizard` |
+| Simple ERP STUDY | `pop_studyerp` |
+| Load/Save STUDY | `pop_loadstudy` / `pop_savestudy` |
+| Edit STUDY design | `pop_studydesign` |
+| Pre-compute statistics | `pop_precomp` |
+| Pre-cluster components | `pop_preclust` |
+| Cluster components | `pop_clust` |
+
+## Standard Preprocessing Pipeline
+
+Recommended order for ERP analysis:
 
 ```matlab
-EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
-EEG = pop_subcomp(EEG, find(EEG.reject.gcompreject), 0);
-```
-
-## Workflow References
-
-Typical ERP pipeline: load/import data -> channel locations -> remove non-EEG
-channels -> average reference -> `pop_clean_rawdata` -> re-reference -> ICA
-with rank handling -> ICLabel/ICFlag -> remove components -> epoch -> baseline
--> save.
-
-```matlab
+% 1. Load data
 EEG = pop_loadset('filename', 'data.set', 'filepath', '/path/');
+% or: EEG = pop_fileio('/path/to/data.edf');
+% or: [STUDY, ALLEEG] = pop_importbids(bidspath, 'studyName', 'MyStudy');
+
+% 2. Import channel locations (if not already present)
 EEG = pop_chanedit(EEG, 'lookup', 'standard-10-5-cap385.elp');
+
+% 3. Remove non-EEG channels (EMG, EOG, ECG, GSR, etc.)
 EEG = pop_select(EEG, 'nochannel', {'EXG1','EXG2','EXG3','ECG','EMG'});
+
+% 4. Average reference (before artifact cleaning)
 EEG = pop_reref(EEG, []);
-EEG = pop_clean_rawdata(EEG, 'FlatlineCriterion', 5, 'ChannelCriterion', 0.8, ...
-  'LineNoiseCriterion', 4, 'Highpass', [0.25 0.75], 'BurstCriterion', 20, ...
-  'WindowCriterion', 0.25, 'BurstRejection', 'on', 'Distance', 'Euclidian', ...
-  'WindowCriterionTolerances', [-Inf 7]);
+
+% 5. Clean data: remove bad channels, reject bad segments (clean_rawdata)
+EEG = pop_clean_rawdata(EEG, ...
+    'FlatlineCriterion', 5, ...
+    'ChannelCriterion', 0.8, ...
+    'LineNoiseCriterion', 4, ...
+    'Highpass', [0.25 0.75], ...
+    'BurstCriterion', 20, ...
+    'WindowCriterion', 0.25, ...
+    'BurstRejection', 'on', ...
+    'Distance', 'Euclidian', ...
+    'WindowCriterionTolerances', [-Inf 7]);
+
+% 6. Re-reference again (after bad channel removal)
 EEG = pop_reref(EEG, []);
+
+% 7. Run ICA (pca -1 = auto-reduce for rank-deficient data)
+% 'pca', -1 indicate to reduce the dimension by 1 to account for rank decrease by average reference in 6
 EEG = pop_runica(EEG, 'icatype', 'runica', 'options', {'pca', -1});
+
+% 8. Classify and flag artifact components (ICLabel)
 EEG = pop_iclabel(EEG, 'default');
 EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+%                       Brain   Muscle  Eye    Heart  LineNoise ChanNoise Other
+
+% 9. Remove flagged components
 EEG = pop_subcomp(EEG, find(EEG.reject.gcompreject), 0);
+
+% 10. Extract epochs
 EEG = pop_epoch(EEG, {'xxx','yyy'}, [-1 2], 'epochinfo', 'yes');
+EEG = eeg_checkset(EEG);
+
+% 11. Remove baseline
 EEG = pop_rmbase(EEG, [-1000 0]);
+
+% 12. Save
 EEG = pop_saveset(EEG, 'filename', 'processed.set', 'filepath', '/path/');
 ```
 
-ICA: `pop_runica` supports `'runica'` (default Infomax), `'picard'` (plugin,
-same objective, faster), `'binica'`, `'jader'`, `'sobi'`. Best practice:
-high-pass continuous data at 1-2 Hz before ICA, do not baseline-correct before
-ICA, use rank reduction after average reference (`'pca', -1` or
-`EEG.nbchan - 1`), and train on continuous data when possible.
+## Key Plugin Reference: clean_rawdata
 
-Filtering: prefer firfilt `pop_eegfiltnew(EEG, 'locutoff', 1)` /
-`'hicutoff', 40`; legacy `pop_eegfilt(EEG, 1, 0)` or `(EEG, 0, 40)` still
-exists. Filter continuous data before epoching.
+Automated artifact rejection on continuous data via Artifact Subspace Reconstruction (ASR).
 
-Reference/interpolation: `pop_reref(EEG, [])` average reference,
-`pop_reref(EEG, [1 2])` indices, `pop_reref(EEG, 'Cz')` label. Average reference
-reduces rank by 1. Interpolate removed channels after ICA/component removal:
-`pop_interp(EEG, EEG.urchanlocs, 'spherical')`, channel indices, or another
-dataset's `chanlocs`.
+### Parameters
 
-Events: add/edit events in samples, then `eeg_checkset(EEG, 'eventconsistency')`.
-For 100 ms before an event: `EEG.event(end).latency = oldLatency - 0.1*EEG.srate`.
-Import events with `pop_importevent(EEG, 'event', file, 'fields', {'latency','type'})`.
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `FlatlineCriterion` | 5 | Max flatline duration (seconds) before channel removal |
+| `ChannelCriterion` | 0.8 | Min correlation with neighbors (0-1); requires channel locations |
+| `LineNoiseCriterion` | 4 | Max line noise relative to population (std devs) |
+| `Highpass` | [0.25 0.75] | Transition band for ~0.5 Hz high-pass. Use `'off'` if already filtered |
+| `BurstCriterion` | 20 (GUI) | ASR threshold (std devs). 5=aggressive, 20=conservative |
+| `BurstRejection` | `'on'` | `'on'`=reject segments, `'off'`=correct via ASR (preserves data length) |
+| `WindowCriterion` | 0.25 | Max fraction of contaminated channels per window |
+| `WindowCriterionTolerances` | [-Inf 7] | Power tolerance bounds for window criterion |
+| `Distance` | `'Euclidian'` | `'Euclidian'` or `'Riemannian'` distance metric |
+| `channels_ignore` | [] | Cell array of channel labels to exclude (e.g., `{'ECG'}`) |
 
-STUDY/BIDS outline:
+Any parameter can be set to `'off'` to skip that step. Internal processing order: flatlines -> highpass -> bad channels -> ASR bursts -> bad windows.
+
+Results stored in `EEG.etc.clean_channel_mask` and `EEG.etc.clean_sample_mask`.
+
+### Two-Pass Strategy if data very noisy
+
+For best ICA quality, use two passes:
+1. **Pass 1 (mild):** `'BurstCriterion', 40` - remove only bad channels and extreme artifacts
+2. **Run ICA + ICLabel** on mildly cleaned data
+3. **Pass 2 (aggressive):** `'BurstCriterion', 20` - clean remaining artifacts
+
+## Key Plugin Reference: ICLabel
+
+Deep-learning classifier for ICA component labeling. Trained on >500,000 crowd-sourced labeled components.
+
+### Classification
 
 ```matlab
+EEG = pop_iclabel(EEG, 'default');
+% Results in: EEG.etc.ic_classification.ICLabel.classifications  (N_components x 7 matrix)
+% Columns:    [Brain, Muscle, Eye, Heart, LineNoise, ChannelNoise, Other]
+% Each row sums to 1.0
+```
+
+Versions: `'default'` (recommended), `'lite'` (faster, no autocorrelation), `'beta'` (legacy).
+
+### Flagging and Removal
+
+`pop_icflag` threshold matrix is `[7x2]`: each row = `[min max]` probability for `[Brain, Muscle, Eye, Heart, LineNoise, ChannelNoise, Other]`. Use `NaN NaN` to skip a category:
+
+```matlab
+% Flag Muscle (>90%) and Eye (>90%) artifacts
+EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+
+% Flag anything with <20% Brain probability
+EEG = pop_icflag(EEG, [0 0.2; NaN NaN; NaN NaN; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+
+% Remove flagged components
+EEG = pop_subcomp(EEG, find(EEG.reject.gcompreject), 0);
+```
+
+## ICA Reference
+
+### Algorithms Available via pop_runica
+
+| Algorithm | `'icatype'` value | Notes |
+|-----------|-------------------|-------|
+| Infomax | `'runica'` | Default MATLAB implementation |
+| Picard | `'picard'` | Faster convergence, same objective as runica. Requires separate plugin. Recommended. |
+| Binary Infomax | `'binica'` | Compiled C, faster than runica |
+| JADE | `'jader'` | |
+| SOBI | `'sobi'` | Second-order blind identification |
+
+### ICA Best Practices
+
+- **High-pass filter at 1-2 Hz** before ICA (critical for decomposition quality)
+- Clean_rawdata's 0.5 Hz default is a compromise; use `pop_eegfiltnew(EEG, 'locutoff', 1)` for tighter
+- Average referencing reduces rank by 1: use `'pca', -1` (auto) or `'pca', EEG.nbchan - 1`
+- Run on continuous data (not epoched) for maximum training samples
+- Do NOT baseline-correct before ICA
+- Data requirement: roughly >30*N^2 samples where N = number of channels
+
+## Re-Referencing
+
+```matlab
+EEG = pop_reref(EEG, []);              % Average reference
+EEG = pop_reref(EEG, [1 2]);           % Reference to channels 1 and 2
+EEG = pop_reref(EEG, 'Cz');            % Reference to named channel
+```
+
+Average reference reduces data rank by 1 (important for ICA dimensionality). Re-reference BEFORE ICA. Multiple average references cancel earlier ones.
+
+## Channel Interpolation
+
+Interpolate removed or bad channels using spherical spline (default) or other methods. Best done **after ICA component removal** -- interpolating before ICA introduces artificial data that degrades decomposition quality.
+
+```matlab
+% Interpolate missing channels from a full-montage reference
+% (urchanlocs preserves the original channel list before any were removed)
+EEG = pop_interp(EEG, EEG.urchanlocs, 'spherical');
+
+% Interpolate specific channels by index
+EEG = pop_interp(EEG, [12 48], 'spherical');
+
+% Interpolate using a different dataset's channel locations as template
+EEG = pop_interp(EEG, ALLEEG(1).chanlocs, 'spherical');
+```
+
+Typical pipeline position: clean_rawdata (removes bad channels) -> re-reference -> ICA -> ICLabel -> remove components -> **interpolate** -> re-reference (again, optional) -> epoch.
+
+## Filtering
+
+```matlab
+% FIR filter (firfilt plugin - preferred)
+EEG = pop_eegfiltnew(EEG, 'locutoff', 1);           % 1 Hz high-pass
+EEG = pop_eegfiltnew(EEG, 'hicutoff', 40);          % 40 Hz low-pass
+EEG = pop_eegfiltnew(EEG, 'locutoff', 1, 'hicutoff', 40);  % Bandpass
+
+% Legacy FIR filter
+EEG = pop_eegfilt(EEG, 1, 0);    % 1 Hz high-pass
+EEG = pop_eegfilt(EEG, 0, 40);   % 40 Hz low-pass
+```
+
+Always filter continuous data before epoching.
+
+## Event Manipulation
+
+```matlab
+% Add new events programmatically
+for i = 1:length(EEG.event)
+    if strcmpi(EEG.event(i).type, 'stimulus')
+        EEG.event(end+1) = EEG.event(i);
+        EEG.event(end).latency = EEG.event(i).latency - 0.1*EEG.srate;  % 100ms before
+        EEG.event(end).type = 'cue';
+    end
+end
+EEG = eeg_checkset(EEG, 'eventconsistency');
+
+% Import events from file
+EEG = pop_importevent(EEG, 'event', 'events.txt', 'fields', {'latency','type'});
+```
+
+Event latencies are in sample points (1-indexed). Convert to seconds: `latency_sec = EEG.event(i).latency / EEG.srate`.
+
+## STUDY-Level Analysis (Multi-Subject)
+
+```matlab
+% Create STUDY from BIDS
 [STUDY, ALLEEG] = pop_importbids(filepath, 'eventtype', 'trial_type', ...
-  'bidsevent', 'on', 'bidschanloc', 'on', 'studyName', 'MyStudy');
+    'bidsevent', 'on', 'bidschanloc', 'on', 'studyName', 'MyStudy');
+
+% Create STUDY design
 STUDY = std_makedesign(STUDY, ALLEEG, 1, 'name', 'Design1', ...
-  'variable1', 'type', 'values1', {'target','standard'}, ...
-  'vartype1', 'categorical', 'subjselect', STUDY.subject);
+    'variable1', 'type', 'values1', {'target','standard'}, ...
+    'vartype1', 'categorical', 'subjselect', STUDY.subject);
+
+% Precompute measures
 [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', ...
-  'rmicacomps', 'on', 'interp', 'on', 'recompute', 'on', 'erp', 'on');
+    'rmicacomps', 'on', 'interp', 'on', 'recompute', 'on', 'erp', 'on');
+
+% Plot
 STUDY = pop_erpparams(STUDY, 'topotime', 350);
 STUDY = std_erpplot(STUDY, ALLEEG, 'channels', {ALLEEG(1).chanlocs.labels}, 'design', 1);
 ```
 
-## Testing Expectations
+## MATLAB Code Style (EEGLAB conventions)
 
-No central suite exists. Prefer the narrowest reproducible MATLAB/Octave command
-using `sample_data/` or `sample_data/test_data/`; plugin-local tests include
-`plugins/ICLabel/run_tests.m`.
+- 2-space indentation (spaces, not tabs)
+- No space between function name and parenthesis: `eeg_checkset(EEG)` not `eeg_checkset (EEG)`
+- One space after commas in argument lists
+- `pop_*` functions return `[EEG, LASTCOM]` where LASTCOM is the command string for history
 
-Validation checklist by change type:
-- `pop_*`: GUI path if display is available, scripted path always, returned
-  `com`, cancel path, multi-dataset path if present.
-- Events/channels/ICA: boundary samples, first/last event, `urevent`, `epoch`,
-  channel labels, `nbchan`, `chanlocs`, `icachansind`, empty `icaact`, matrix
-  sizes, and `eeg_checkset`.
-- GUI: labels/order/tags/callbacks/help match the menu workflow; no GUI-only
-  behavior should break command-line use.
+## Testing
 
-## GitHub And Commits
-
-- Never credit yourself or AI tools in commits, comments, or PR text.
-- Stage only intended files; this repo may contain unrelated untracked local
-  checkouts or tools.
-- Use concise commits and terse GitHub comments that state exactly what was
-  tested.
-- Add `agent-generated` only for repository automation-created issues/PRs, not
-  human-directed interactive work.
+No centralized test suite. Testing is per-plugin (`plugins/ICLabel/run_tests.m`, etc.) and manual:
+1. `eeglab nogui` loads without errors
+2. Load sample data: `EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', 'sample_data/')`
+3. Run the modified function
+4. Validate with `EEG = eeg_checkset(EEG)`
