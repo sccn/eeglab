@@ -1,210 +1,237 @@
 # Agent Guidelines for EEGLAB
 
-EEGLAB is a MATLAB-native toolbox for electrophysiological signal processing.
-Most users interact with it through MATLAB, Octave command-line mode, the EEGLAB
-GUI, and EEGLAB plugin conventions. Agent work in this repository should favor
-small, direct MATLAB changes that fit the existing structure over new
-abstractions, broad rewrites, or cross-language tooling.
+EEGLAB is a MATLAB/Octave toolbox for EEG/MEG/time-series analysis with both GUI
+and command-line workflows. Favor small MATLAB-native patches that reuse current
+EEGLAB structure and helpers; avoid new architecture, Python/Node tooling, or
+repo-wide cleanup unless explicitly requested.
 
-Primary references in this repository:
-- `README.md` for installation and submodule expectations.
-- `CONTRIBUTING.md` for branch, commit, and MATLAB style guidance.
-- `eeglab.m` for startup, menus, plugin loading, and user-facing workflow.
-- `functions/adminfunc/eeg_checkset.m` for the canonical EEG structure fields.
-- `.agents/skills/` for task-specific agent workflows.
+## Start Here
+
+- Use `.agents/skills/eeglab-matlab-development/SKILL.md` for MATLAB source
+  work, `fix-issue` for GitHub issues, `github-pr-review` for reviews, and
+  `pull-request` for PR text.
+- Read the touched function and nearby analogs first. Search with `rg` before
+  adding helpers.
+- Key references: `CONTRIBUTING.md`, `eeglab.m`, `functions/adminfunc/eeg_checkset.m`.
+- Default branch is `develop`; `CONTRIBUTING.md` says bug fixes target `master`
+  and enhancements target `develop`.
+- Submodules: `plugins/dipfit`, `plugins/clean_rawdata`, `plugins/ICLabel`,
+  `plugins/firfilt`, `plugins/EEG-BIDS`, `tutorial_scripts`. Clone/update with
+  `--recurse-submodules` and `git submodule update --init --recursive --remote`.
+  Do not edit submodule contents or move submodule pointers casually.
+
+## Run And Validate
+
+Startup modes: `eeglab` GUI, `eeglab nogui` headless, `eeglab redraw`,
+`eeglab rebuild`, `eeglab versions`.
+
+```bash
+matlab -batch "cd('/path/to/eeglab'); eeglab('nogui'); <commands>"
+octave --quiet --eval "cd('/path/to/eeglab'); eeglab('nogui'); <commands>"
+```
+
+Smoke check:
+
+```bash
+matlab -batch "cd('/path/to/eeglab'); eeglab('nogui'); EEG = pop_loadset('filename','eeglab_data.set','filepath','sample_data/'); EEG = eeg_checkset(EEG);"
+```
+
+If MATLAB/Octave, display, license, or data are unavailable, say exactly what was
+not run. Do not claim validation from code reading alone.
 
 ## Repo Map
 
-- `eeglab.m`: main EEGLAB entry point, menu construction, startup modes, plugin
-  loading, and GUI redraw behavior.
-- `functions/popfunc/`: user-facing `pop_*` wrappers. These usually support a
-  GUI path when called with only `EEG`, parse key/value arguments for scripted
-  use, call lower-level processing functions, and return a command string.
-- `functions/adminfunc/`: EEG structure validation, history, options, dataset
-  storage, plugin management, and administrative helpers such as
-  `eeg_checkset`, `eeg_store`, `eeg_retrieve`, `eeg_eval`, and `vararg2str`.
-- `functions/guifunc/`: EEGLAB GUI helpers such as `inputgui`, `supergui`, and
-  channel-selection dialogs. Keep GUI construction in these existing patterns.
-- `functions/sigprocfunc/`: core signal-processing functions such as ICA,
-  filtering, plotting, spectrum, rejection, and interpolation helpers.
-- `functions/timefreqfunc/`: time-frequency analysis and plotting functions.
-- `functions/miscfunc/`: import/export, channel, event, ICA, and numerical
-  utility functions used across the toolbox.
-- `functions/statistics/`: statistical helpers and older test scripts.
-- `functions/studyfunc/`: STUDY-level functions operating on `STUDY` and
-  `ALLEEG` across subjects, conditions, and designs.
-- `functions/@eegobj/`, `functions/@memmapdata/`, `functions/@mmo/`: MATLAB
-  class-style folders. Preserve MATLAB method dispatch conventions here.
-- `plugins/`: bundled submodules. Each plugin registers through
-  `eegplugin_<name>.m`. Treat plugin changes as work inside a submodule unless
-  the task explicitly targets the superproject pointer or plugin integration.
-- `sample_data/` and `sample_data/test_data/`: checked-in data for smoke tests,
-  import tests, examples, and reproducibility checks.
-- `sample_locs/`: standard channel location files.
-- `tutorial_scripts/`: tutorial script submodule.
-- `.github/workflows/`: CI and agent automation.
+- `eeglab.m`: startup, menus, global GUI state, plugin discovery/loading.
+- `functions/popfunc/`: `pop_*` GUI/script wrappers and many `eeg_*` functions.
+- `functions/adminfunc/`: validation, options, history, dataset store/retrieve,
+  plugin admin (`eeg_checkset`, `eeg_eval`, `eeg_store`, `vararg2str`).
+- `functions/guifunc/`: `inputgui`, `supergui`, dialogs, channel selection.
+- `functions/sigprocfunc/`, `timefreqfunc/`, `statistics/`: core processing.
+- `functions/miscfunc/`: import/export, channel/event/ICA/numerical utilities.
+- `functions/studyfunc/`: `STUDY`/`ALLEEG` multi-subject analysis.
+- `functions/@eegobj`, `@memmapdata`, `@mmo`: MATLAB class folders.
+- `plugins/*/eegplugin_*.m`: plugin menu registration.
+- `sample_data/`, `sample_data/test_data/`, `sample_locs/`: validation data.
 
-## Before Coding
+Function categories:
+- `pop_*`: user/menu wrappers; no args usually opens GUI; key/value args must
+  stay scriptable; return `[EEG, com]` or `[EEG, LASTCOM]` for history.
+- `eeg_*`: EEG structure/admin functions (`eeg_checkset`, `eeg_epoch`,
+  `eeg_store`, etc.).
+- Processing functions: no dialogs; direct algorithms (`runica`, `topoplot`,
+  `spectopo`, `eegfilt`, time-frequency functions).
 
-- Check whether a matching skill exists in `.agents/skills/`. Use
-  `.agents/skills/eeglab-matlab-development/SKILL.md` for MATLAB source changes,
-  `fix-issue` for GitHub issues, `github-pr-review` for PR review, and
-  `pull-request` when preparing PR text.
-- Read the existing function, nearby related functions, and the called helper
-  chain before editing. EEGLAB has many established helper APIs; prefer them.
-- Search before adding code. Look for existing implementations with `rg`, and
-  check whether the pattern already exists in a nearby `pop_*`, `eeg_*`, plugin,
-  GUI, or STUDY function.
-- State assumptions before implementation when a request can mean more than one
-  thing. Ask only when a reasonable local assumption would be risky.
-- Define the smallest verifiable result. For a bug, reproduce it with a focused
-  MATLAB or Octave command if possible, then fix it. For a feature, identify the
-  function, menu path, command-line call, and minimal data path to validate.
-- Do not introduce Python, Node, package managers, or generated build systems
-  for ordinary EEGLAB development. This is a MATLAB and Octave repository.
+## EEG Structure Invariants
 
-## Development Principles
+Data is channel-major: continuous `[nbchan x pnts]`, epoched
+`[nbchan x pnts x trials]`; `EEG.data` can also reference disk/memmap data.
+Event latencies are 1-based sample points, not seconds. Call the relevant
+`eeg_checkset` mode after changing data, dimensions, events, epochs, channels,
+or ICA fields; use `eeg_checkset(EEG, 'eventconsistency')` after event edits.
 
-- Make the smallest change that solves the request. Avoid broad formatting
-  diffs, speculative refactors, compatibility layers, or rewrites of old code
-  unless the user explicitly asks for them.
-- Prefer existing EEGLAB helpers over new utilities. Common helpers include
-  `finputcheck`, `vararg2str`, `eeg_checkset`, `eeg_store`, `eeg_retrieve`,
-  `eeg_eval`, `eeg_decodechan`, `eeg_mergelocs`, `fastif`, `inputgui`,
-  `supergui`, `questdlg2`, and `pophelp`.
-- Keep command-line behavior and GUI behavior aligned. A `pop_*` function should
-  remain scriptable without opening a dialog when arguments are supplied.
-- Preserve history behavior. `pop_*` functions normally return `com` or
-  `LASTCOM` strings built from the actual options used, often via
-  `vararg2str`.
-- Prefer direct procedural MATLAB code over new classes or deep helper layers.
-  Many EEGLAB files are old and long; fit the local style instead of imposing a
-  new architecture.
-- Avoid hidden global state. When existing EEGLAB globals or options are used,
-  keep the use narrow and consistent with nearby code.
-- Keep old compatibility code unless the task is specifically to remove it.
-  EEGLAB supports old datasets, old MATLAB releases, Octave command-line use,
-  and many plugin workflows.
-- Do not edit submodules casually. If work is inside `plugins/ICLabel`,
-  `plugins/clean_rawdata`, `plugins/dipfit`, `plugins/firfilt`,
-  `plugins/EEG-BIDS`, or `tutorial_scripts`, check submodule status and keep the
-  superproject pointer changes intentional.
+| Field group | Key fields |
+| --- | --- |
+| Dimensions/time | `data`, `nbchan`, `pnts`, `trials`, `srate`, `xmin`, `xmax`, `times` |
+| Channels/ref | `chanlocs`, `urchanlocs`, `chaninfo`, `ref`, `splinefile` |
+| Events/epochs | `event`, `urevent`, `epoch`, `eventdescription`, `epochdescription` |
+| ICA/components | `icaweights`, `icasphere`, `icawinv`, `icaact`, `icachansind`, `dipfit` |
+| Rejection/stats | `reject`, `stats`, `specdata`, `specica` |
+| STUDY metadata | `subject`, `group`, `condition`, `run`, `session` |
+| Misc/save | `etc`, `comments`, `history`, `saved`, `filename`, `filepath` |
 
-## EEG Structure
+When selecting/removing channels, epochs, time ranges, or components, update all
+coupled fields. Watch first/last samples, boundary events, empty `icaact`, ICA
+rank, `icachansind`, `urevent` links, `EEG.saved`, and on-disk data references.
 
-Most processing revolves around the `EEG` struct:
+## MATLAB Patterns To Preserve
 
-- `data`: channel-major numeric data, usually `[nbchan x pnts]` for continuous
-  data or `[nbchan x pnts x trials]` for epoched data. It may also be a filename
-  or memory-mapped reference when data are stored on disk.
-- `nbchan`, `pnts`, `trials`, `srate`, `xmin`, `xmax`, `times`: core dimension
-  and timing fields.
-- `chanlocs`, `urchanlocs`, `chaninfo`, `ref`: channel labels, locations,
-  original channels, and reference metadata.
-- `event`, `urevent`, `epoch`, `eventdescription`, `epochdescription`: event
-  and epoch metadata. Event latencies are in 1-based sample points.
-- `icaweights`, `icasphere`, `icawinv`, `icaact`, `icachansind`, `dipfit`: ICA
-  and component metadata. `icaact` may be empty and computed on demand.
-- `reject`, `stats`, `specdata`, `specica`: rejection and statistics fields.
-- `etc`, `comments`, `history`, `saved`, `filename`, `filepath`: miscellaneous,
-  history, save-state, and file location metadata.
+- Prefer existing helpers: `finputcheck`, `vararg2str`, `eeg_checkset`,
+  `eeg_eval`, `eeg_store`, `eeg_retrieve`, `eeg_decodechan`, `eeg_mergelocs`,
+  `fastif`, `inputgui`, `supergui`, `questdlg2`, `pophelp`.
+- `pop_*` changes must preserve GUI cancel behavior (`com = ''`), scripted
+  behavior, history strings, and multi-dataset paths via `eeg_eval` when present.
+- Use `inputgui`/`supergui` for EEGLAB-style dialogs unless the touched file has
+  a clear different precedent.
+- Keep old compatibility code unless removal is the task. EEGLAB supports old
+  datasets, old MATLAB releases, Octave command-line use, and plugins.
+- MATLAB style: 2-space indents, spaces not tabs, no space before `(` in calls,
+  one space after commas, preserve help/license/history blocks.
+- Do not add defensive clutter for states already guaranteed by `finputcheck`,
+  callers, or `eeg_checkset`.
 
-After modifying data, dimensions, events, epochs, channel locations, or ICA
-fields, call the relevant `eeg_checkset` mode. Use `eeg_checkset(EEG)` for broad
-validation, `eeg_checkset(EEG, 'eventconsistency')` after event edits, and
-specialized modes only when the existing code path already uses them.
+## Menu To Function Map
 
-## Function Patterns
+| Menu | Functions |
+| --- | --- |
+| File | `pop_loadset`, `pop_saveset`, `pop_fileio`, `pop_biosig`, `pop_importdata`, `pop_importevent`, `pop_importepoch`, `pop_export`, `pop_editoptions`, `pop_importbids` |
+| Edit | `pop_editset`, `pop_chanedit`, `pop_editeventfield`, `pop_editeventvals`, `pop_select`, `pop_rmdat`, `pop_selectevent`, `pop_mergeset` |
+| Tools/preprocess | `pop_resample`, `pop_eegfilt`, `pop_eegfiltnew`, `pop_reref`, `pop_interp`, `pop_eegplot`, `pop_rejchan`, `pop_rejcont`, `pop_autorej`, `pop_runica`, `pop_subcomp`, `pop_epoch`, `pop_rmbase`, `pop_clean_rawdata`, `pop_iclabel`, `pop_icflag` |
+| Epoch rejection | `pop_eegthresh`, `pop_rejtrend`, `pop_jointprob`, `pop_rejkurt`, `pop_rejspec` |
+| Plot | `pop_eegplot`, `pop_spectopo`, `pop_prop`, `pop_erpimage`, `pop_timtopo`, `pop_topoplot`, `pop_headplot`, `pop_envtopo`, `pop_newtimef` |
+| STUDY | `pop_study`, `pop_studywizard`, `pop_studyerp`, `pop_loadstudy`, `pop_savestudy`, `pop_studydesign`, `pop_precomp`, `pop_preclust`, `pop_clust` |
 
-- `pop_*` functions usually start with a help block, initialize `com = ''`, show
-  help and return when required input is missing, open a GUI only when arguments
-  are absent, parse key/value options with `finputcheck`, process multiple
-  datasets with `eeg_eval`, update `EEG`, then return a command string.
-- Lower-level processing functions should not open dialogs. Keep GUI-specific
-  code in `pop_*` wrappers or `functions/guifunc/`.
-- GUI code should use `inputgui` or existing EEGLAB GUI helpers unless there is
-  a clear local precedent for raw `uicontrol` or figure construction.
-- Plugin registration belongs in `eegplugin_<name>.m`. Menu labels, callbacks,
-  and version checks should follow existing plugin files.
-- STUDY changes should preserve `STUDY`, `ALLEEG`, current design, and saved
-  precompute conventions. Inspect nearby `std_*` and `pop_*study*` functions
-  before touching STUDY logic.
-- Import/export changes should be tested with `sample_data/test_data/` where
-  possible and should avoid breaking BIDS or plugin import paths.
+## Plugin Notes
 
-## MATLAB Style
+Plugins live under `plugins/` and register through `eegplugin_<name>.m`.
+Programmatic install form:
 
-- Follow `CONTRIBUTING.md`: 2-space indentation with spaces, no space between a
-  function name and `(`, one space after commas, and vertical alignment when it
-  genuinely improves readability.
-- Preserve existing help-block style, author/history notes, and license header
-  conventions in edited files.
-- Use `fprintf`, `disp`, `warning`, and `error` consistently with nearby code.
-  Avoid noisy output on normal successful paths unless the function already
-  reports progress.
-- Keep comments useful and sparse. Add comments for non-obvious EEG semantics,
-  MATLAB/Octave compatibility, or historical compatibility constraints.
-- Avoid new `eval` usage unless it matches an established EEGLAB GUI/history
-  pattern and there is no simple safer alternative.
-- Avoid vectorization that makes the code harder to audit. Simple loops are
-  acceptable when they match the surrounding code and preserve behavior.
-
-## Testing And Validation
-
-There is no single repository-wide test suite. Use the narrowest relevant
-MATLAB or Octave validation and broaden when risk requires.
-
-Useful smoke checks:
-
-```bash
-matlab -batch "cd('/path/to/eeglab'); eeglab('nogui'); EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', 'sample_data/'); EEG = eeg_checkset(EEG);"
+```matlab
+plugin_askinstall('ICLabel', 'iclabel', 0);
+plugin_askinstall('clean_rawdata', 'clean_artifacts', 0);
+plugin_askinstall('firfilt', 'pop_eegfiltnew', 0);
+plugin_askinstall('picard', 'picard', 0);
+plugin_askinstall('dipfit', 'pop_dipfit_settings', 0);
 ```
 
-```bash
-octave --quiet --eval "cd('/path/to/eeglab'); eeglab('nogui'); EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', 'sample_data/'); EEG = eeg_checkset(EEG);"
+`clean_rawdata` order: flatlines -> high-pass -> bad channels -> ASR bursts ->
+bad windows. Any criterion can be `'off'`. Results: `EEG.etc.clean_channel_mask`
+and `EEG.etc.clean_sample_mask`.
+
+| clean_rawdata key | Default / note |
+| --- | --- |
+| `FlatlineCriterion` | `5` seconds |
+| `ChannelCriterion` | `0.8`, needs channel locations |
+| `LineNoiseCriterion` | `4` SD |
+| `Highpass` | `[0.25 0.75]`, use `'off'` if already filtered |
+| `BurstCriterion` | `20` GUI conservative; `5` aggressive; `40` mild first pass |
+| `BurstRejection` | `'on'` rejects periods; `'off'` corrects via ASR |
+| `WindowCriterion` | `0.25` contaminated-channel fraction |
+| `WindowCriterionTolerances` | `[-Inf 7]` |
+| `Distance` | `'Euclidian'` or `'Riemannian'` |
+| `channels_ignore` | labels such as `{'ECG'}` |
+
+`ICLabel`: `pop_iclabel(EEG, 'default')` stores
+`EEG.etc.ic_classification.ICLabel.classifications` as `[nComponents x 7]`
+probabilities `[Brain Muscle Eye Heart LineNoise ChannelNoise Other]`.
+Versions: `'default'`, `'lite'`, `'beta'`. `pop_icflag` uses a `[7 x 2]`
+threshold matrix; `NaN NaN` skips a class, for example:
+
+```matlab
+EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+EEG = pop_subcomp(EEG, find(EEG.reject.gcompreject), 0);
 ```
 
-Focused validation examples:
+## Workflow References
 
-- Changed a `pop_*` wrapper: run the command-line call with `sample_data`, check
-  returned `EEG`, `com`, and `eeg_checkset`.
-- Changed event logic: validate first and last event latencies, boundary events,
-  `urevent` links when relevant, and `eeg_checkset(EEG, 'eventconsistency')`.
-- Changed channel logic: validate channel labels, `nbchan`, `chanlocs`,
-  `urchanlocs`, ICA channel indices, and rejection masks.
-- Changed ICA/component logic: validate ICA matrix dimensions, empty `icaact`,
-  component removal, and ICLabel or dipfit metadata when relevant.
-- Changed GUI code: verify the no-argument GUI path manually in MATLAB when a
-  display is available, and separately verify the non-GUI command path.
-- Changed a plugin: run that plugin's local tests if present, such as
-  `plugins/ICLabel/run_tests.m`, and validate the plugin registration path.
+Typical ERP pipeline: load/import data -> channel locations -> remove non-EEG
+channels -> average reference -> `pop_clean_rawdata` -> re-reference -> ICA
+with rank handling -> ICLabel/ICFlag -> remove components -> epoch -> baseline
+-> save.
 
-If MATLAB or Octave is unavailable, state that explicitly and run whatever
-static or code-reading checks are still meaningful. Do not claim validation that
-was not run.
+```matlab
+EEG = pop_loadset('filename', 'data.set', 'filepath', '/path/');
+EEG = pop_chanedit(EEG, 'lookup', 'standard-10-5-cap385.elp');
+EEG = pop_select(EEG, 'nochannel', {'EXG1','EXG2','EXG3','ECG','EMG'});
+EEG = pop_reref(EEG, []);
+EEG = pop_clean_rawdata(EEG, 'FlatlineCriterion', 5, 'ChannelCriterion', 0.8, ...
+  'LineNoiseCriterion', 4, 'Highpass', [0.25 0.75], 'BurstCriterion', 20, ...
+  'WindowCriterion', 0.25, 'BurstRejection', 'on', 'Distance', 'Euclidian', ...
+  'WindowCriterionTolerances', [-Inf 7]);
+EEG = pop_reref(EEG, []);
+EEG = pop_runica(EEG, 'icatype', 'runica', 'options', {'pca', -1});
+EEG = pop_iclabel(EEG, 'default');
+EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+EEG = pop_subcomp(EEG, find(EEG.reject.gcompreject), 0);
+EEG = pop_epoch(EEG, {'xxx','yyy'}, [-1 2], 'epochinfo', 'yes');
+EEG = pop_rmbase(EEG, [-1000 0]);
+EEG = pop_saveset(EEG, 'filename', 'processed.set', 'filepath', '/path/');
+```
 
-## GitHub, Commits, And Communication
+ICA: `pop_runica` supports `'runica'` (default Infomax), `'picard'` (plugin,
+same objective, faster), `'binica'`, `'jader'`, `'sobi'`. Best practice:
+high-pass continuous data at 1-2 Hz before ICA, do not baseline-correct before
+ICA, use rank reduction after average reference (`'pca', -1` or
+`EEG.nbchan - 1`), and train on continuous data when possible.
 
-- Never credit yourself or AI tools in commits, comments, or PR descriptions.
-- Keep commits scoped to one logical change with a concise message.
-- Do not stage unrelated user changes. This repository may contain untracked
-  local checkouts or tool directories.
-- Use `gh` with narrow JSON fields or explicit flags when inspecting issues and
-  PRs. Avoid noisy generic views when a targeted query is enough.
-- Agent comments on GitHub issues or PRs should be terse and should state
-  exactly what was tested.
-- Add the `agent-generated` label only when repository automation creates the PR
-  or issue. Do not add it when a human asks an interactive agent to work.
+Filtering: prefer firfilt `pop_eegfiltnew(EEG, 'locutoff', 1)` /
+`'hicutoff', 40`; legacy `pop_eegfilt(EEG, 1, 0)` or `(EEG, 0, 40)` still
+exists. Filter continuous data before epoching.
 
-## Failure Patterns To Avoid
+Reference/interpolation: `pop_reref(EEG, [])` average reference,
+`pop_reref(EEG, [1 2])` indices, `pop_reref(EEG, 'Cz')` label. Average reference
+reduces rank by 1. Interpolate removed channels after ICA/component removal:
+`pop_interp(EEG, EEG.urchanlocs, 'spherical')`, channel indices, or another
+dataset's `chanlocs`.
 
-- Rewriting a mature MATLAB function instead of patching the relevant branch.
-- Introducing a new helper for one call site.
-- Adding defensive checks for states that `finputcheck`, `eeg_checkset`, or an
-  existing caller already guarantees.
-- Breaking the command-line path while changing a GUI dialog.
-- Forgetting 1-based event latency semantics.
-- Updating data dimensions without keeping `nbchan`, `pnts`, `trials`, `times`,
-  events, epochs, ICA fields, or `saved` consistent.
-- Editing a plugin submodule without noticing that the superproject pointer will
-  need an intentional update.
+Events: add/edit events in samples, then `eeg_checkset(EEG, 'eventconsistency')`.
+For 100 ms before an event: `EEG.event(end).latency = oldLatency - 0.1*EEG.srate`.
+Import events with `pop_importevent(EEG, 'event', file, 'fields', {'latency','type'})`.
+
+STUDY/BIDS outline:
+
+```matlab
+[STUDY, ALLEEG] = pop_importbids(filepath, 'eventtype', 'trial_type', ...
+  'bidsevent', 'on', 'bidschanloc', 'on', 'studyName', 'MyStudy');
+STUDY = std_makedesign(STUDY, ALLEEG, 1, 'name', 'Design1', ...
+  'variable1', 'type', 'values1', {'target','standard'}, ...
+  'vartype1', 'categorical', 'subjselect', STUDY.subject);
+[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', ...
+  'rmicacomps', 'on', 'interp', 'on', 'recompute', 'on', 'erp', 'on');
+STUDY = pop_erpparams(STUDY, 'topotime', 350);
+STUDY = std_erpplot(STUDY, ALLEEG, 'channels', {ALLEEG(1).chanlocs.labels}, 'design', 1);
+```
+
+## Testing Expectations
+
+No central suite exists. Prefer the narrowest reproducible MATLAB/Octave command
+using `sample_data/` or `sample_data/test_data/`; plugin-local tests include
+`plugins/ICLabel/run_tests.m`.
+
+Validation checklist by change type:
+- `pop_*`: GUI path if display is available, scripted path always, returned
+  `com`, cancel path, multi-dataset path if present.
+- Events/channels/ICA: boundary samples, first/last event, `urevent`, `epoch`,
+  channel labels, `nbchan`, `chanlocs`, `icachansind`, empty `icaact`, matrix
+  sizes, and `eeg_checkset`.
+- GUI: labels/order/tags/callbacks/help match the menu workflow; no GUI-only
+  behavior should break command-line use.
+
+## GitHub And Commits
+
+- Never credit yourself or AI tools in commits, comments, or PR text.
+- Stage only intended files; this repo may contain unrelated untracked local
+  checkouts or tools.
+- Use concise commits and terse GitHub comments that state exactly what was
+  tested.
+- Add `agent-generated` only for repository automation-created issues/PRs, not
+  human-directed interactive work.
