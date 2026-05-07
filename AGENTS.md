@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI Agents when working with code in this repository.
 
 ## What is EEGLAB?
 
@@ -23,6 +23,14 @@ Startup options: `eeglab` (full GUI), `eeglab nogui` (headless), `eeglab redraw`
 - **`develop`** - Main and default branch
 - Submodules: `dipfit`, `clean_rawdata`, `ICLabel`, `firfilt`, `EEG-BIDS`, `tutorial_scripts`
 - Clone with `--recurse-submodules`; update with `git submodule update --init --recursive --remote`
+
+## Before Coding
+- Check whether a matching skill exists. Skills are task-focused playbooks in `.agents/skills/` and are also accessible as `.claude/skills/`. Before starting any non-trivial task, scan the skill descriptions in your system prompt; if one matches, invoke it via the Skill tool instead of using ad-hoc commands.
+- State assumptions before implementing. If the request has multiple plausible interpretations, present them.
+- If something is unclear, stop and ask. Do not hide confusion in code.
+- If a simpler approach exists, say so. Push back on speculative features, compatibility shims, or unnecessary abstractions.
+- For multi-step work, state a short plan with verification for each step. Include code snippets when they clarify the intended change.
+- Define verifiable success criteria. For example: bug fix means reproduce with a failing test, implement, then pass the test; feature means update behavior, tests, docs, and pre-commit.
 
 ## Code Architecture
 
@@ -387,6 +395,12 @@ STUDY = std_erpplot(STUDY, ALLEEG, 'channels', {ALLEEG(1).chanlocs.labels}, 'des
 - No space between function name and parenthesis: `eeg_checkset(EEG)` not `eeg_checkset (EEG)`
 - One space after commas in argument lists
 - `pop_*` functions return `[EEG, LASTCOM]` where LASTCOM is the command string for history
+- Make the smallest change that solves the request. Every changed line should trace to the task.
+- Do not add features beyond what was asked. No speculative configurability, future-proofing, or error handling for impossible states.
+- If a solution is 200 lines and could be 50, rewrite it.
+- Touch only files you must. Do not refactor adjacent code, reformat unrelated blocks, or delete pre-existing dead code unless asked.
+- Remove imports, variables, functions, and files that your change made unused. Do not clean up pre-existing dead code unless asked.
+- Match existing local style, even where it is imperfect.
 
 ## Testing
 
