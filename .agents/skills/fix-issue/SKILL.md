@@ -10,7 +10,6 @@ You are to fix the GitHub issue indicated by the user.
 Read first:
 
 @AGENTS.md
-@.agents/skills/eeglab-matlab-development/SKILL.md
 
 ## Writing Style For GitHub Comments
 
