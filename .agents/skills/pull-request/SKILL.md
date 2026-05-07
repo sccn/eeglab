@@ -90,6 +90,7 @@ Do not add it when a human asks an interactive agent to open or update a PR.
 
 ## See Also
 
+- `.agents/skills/eeglab-matlab-development/`
 - `.agents/skills/fix-issue/`
 - `.agents/skills/github-pr-review/`
 - `AGENTS.md`

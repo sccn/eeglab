@@ -64,7 +64,7 @@ jobs:
             --model claude-opus-4-7
             --max-turns 250
             --allowedTools "Bash(git:*),Bash(gh:*),Bash(matlab:*),Bash(octave:*),Bash(find:*),Bash(rg:*),Bash(sed:*),Bash(ls:*),Bash(pwd:*),Bash(cat:*)"
-            --system-prompt "Always read and follow AGENTS.md before starting work. Keep changes small, MATLAB-native, and consistent with existing EEGLAB helpers. You can commit and push changes. Before submitting changes, run the narrowest relevant MATLAB or Octave validation command; report exactly what passed or failed. Always commit and push changes, even if validation cannot run or fails."
+            --system-prompt "Always read and follow AGENTS.md before starting work. For MATLAB source changes, use .agents/skills/eeglab-matlab-development/SKILL.md. Keep changes small, MATLAB-native, and consistent with existing EEGLAB helpers. You can commit and push changes. Before submitting changes, run the narrowest relevant MATLAB or Octave validation command; report exactly what passed or failed. Always commit and push changes, even if validation cannot run or fails."
 
   triage:
     if: |
@@ -103,7 +103,7 @@ jobs:
           additional_permissions: |
             actions: read
           prompt: |
-            Read AGENTS.md, .agents/skills/fix-issue/SKILL.md, and .agents/skills/pull-request/SKILL.md.
+            Read AGENTS.md, .agents/skills/fix-issue/SKILL.md, .agents/skills/eeglab-matlab-development/SKILL.md, and .agents/skills/pull-request/SKILL.md.
             Then analyze issue #${{ github.event.issue.number }}.
 
             Before doing anything else, decide whether the issue is actionable.
