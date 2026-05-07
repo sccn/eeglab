@@ -1,0 +1,4 @@
+interface:
+  display_name: "EEGLAB MATLAB Development"
+  short_description: "Implement EEGLAB MATLAB changes using existing toolbox patterns."
+  default_prompt: "Use this skill for focused EEGLAB MATLAB source changes. Read AGENTS.md, inspect the closest existing function, keep the patch small, preserve GUI and command-line behavior, and validate with MATLAB or Octave when possible."
