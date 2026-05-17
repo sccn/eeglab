@@ -892,20 +892,7 @@ else
                         end
                         % finding template location files
                         % -------------------------------
-                        dipfitdefs;
-
-                        [~,fileNameBESA] = fileparts(template_models(1).chanfile); 
-                        [~,fileNameBEM ] = fileparts(template_models(2).chanfile); 
-                        eeglabp          = fileparts(which('eeglab.m'));
-                        chantemplate(1).name        = fileNameBESA;
-                        chantemplate(1).filename    = template_models(1).chanfile;
-                        chantemplate(1).description = 'use BESA file for 4-shell dipfit spherical model';
-                        chantemplate(2).name        = fileNameBEM;
-                        chantemplate(2).filename    = template_models(2).chanfile;
-                        chantemplate(2).description = 'use MNI coordinate file for BEM dipfit model';
-                        chantemplate(3).name        = 'Standard-10-5-Cap385_witheog.elp';
-                        chantemplate(3).filename    = fullfile(eeglabp,'functions','supportfiles', 'Standard-10-5-Cap385_witheog.elp');
-                        chantemplate(3).description = 'use BESA file and look up EOG channels';
+                        [chantemplate, defaulttemplate] = get_chan_templates;
                         
                         try
                             chantemplate = add_locfiles(chantemplate, 'eeglab', 'eeglab', 'EEGLAB ');
@@ -948,9 +935,9 @@ else
                         end
                         uilist = { { 'style' 'text' 'string' textcomment } ...
                             { 'style' 'popupmenu'  'string' { chantemplate.description } ...
-                            'callback' setmodel 'value' 2 } ...
+                            'callback' setmodel 'value' defaulttemplate } ...
                             { } ...
-                            { 'style' 'edit'       'string' chantemplate(2).filename 'tag' 'elec' } ...
+                            { 'style' 'edit'       'string' chantemplate(defaulttemplate).filename 'tag' 'elec' } ...
                             { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
                             { } ...
                             { 'style' 'checkbox'   'string' 'Import file instead and erase all channels' } ...
@@ -978,16 +965,7 @@ else
                     end
              case 'lookup'
                 chaninfo.filename = args{ curfield+1 };
-                if strcmpi(chaninfo.filename, 'standard-10-5-cap385.elp')
-                    dipfitdefs;
-                    chaninfo.filename = template_models(1).chanfile;
-                elseif strcmpi(chaninfo.filename, 'standard_1005.elc')
-                    dipfitdefs;
-                    chaninfo.filename = template_models(2).chanfile;
-                elseif strcmpi(chaninfo.filename, 'standard_1005.ced')
-                    dipfitdefs;
-                    chaninfo.filename = template_models(2).chanfile;
-                end
+                chaninfo.filename = get_chan_template_filename(chaninfo.filename);
                 tmplocs = readlocs( char(chaninfo.filename), 'defaultelp', 'BESA' );                
                 for indexchan = 1:length(chans)
                     if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end
@@ -1142,6 +1120,71 @@ function EEG = update_datafield(EEG)
         EEG.data = 'in set file';
     end
     EEG.icaact = [];
+
+% get channel template files
+% --------------------------
+function [chantemplate, defaulttemplate] = get_chan_templates
+    template_models = get_dipfit_template_models;
+    chantemplate = [];
+    if length(template_models) >= 2
+        [~, fileNameBESA] = fileparts(template_models(1).chanfile);
+        [~, fileNameBEM ] = fileparts(template_models(2).chanfile);
+        chantemplate(1).name        = fileNameBESA;
+        chantemplate(1).filename    = template_models(1).chanfile;
+        chantemplate(1).description = 'use BESA file for 4-shell dipfit spherical model';
+        chantemplate(2).name        = fileNameBEM;
+        chantemplate(2).filename    = template_models(2).chanfile;
+        chantemplate(2).description = 'use MNI coordinate file for BEM dipfit model';
+    end
+
+    eeglabp = fileparts(which('eeglab.m'));
+    chantemplate(end+1).name        = 'Standard-10-5-Cap385_witheog.elp';
+    chantemplate(end).filename      = fullfile(eeglabp, 'functions', 'supportfiles', 'Standard-10-5-Cap385_witheog.elp');
+    chantemplate(end).description   = 'use BESA file and look up EOG channels';
+
+    defaulttemplate = min(2, length(chantemplate));
+
+% get channel template filename
+% -----------------------------
+function filename = get_chan_template_filename(filename)
+    template_models = get_dipfit_template_models;
+    if strcmpi(filename, 'standard-10-5-cap385.elp')
+        if ~isempty(template_models)
+            filename = template_models(1).chanfile;
+        else
+            eeglabp  = fileparts(which('eeglab.m'));
+            filename = fullfile(eeglabp, 'functions', 'supportfiles', 'Standard-10-5-Cap385_witheog.elp');
+        end
+    elseif strcmpi(filename, 'standard_1005.elc') || strcmpi(filename, 'standard_1005.ced')
+        if length(template_models) >= 2
+            filename = template_models(2).chanfile;
+        end
+    end
+
+% get DIPFIT channel templates
+% ----------------------------
+function template_models = get_dipfit_template_models
+    template_models = [];
+    if exist('dipfitdefs', 'file')
+        try
+            dipfitdefs;
+        catch
+            template_models = [];
+        end
+    end
+    if length(template_models) < 2
+        eeglabp = fileparts(which('eeglab.m'));
+        if ~isempty(eeglabp)
+            dipfitp = fullfile(eeglabp, 'plugins', 'dipfit');
+            besafile = fullfile(dipfitp, 'standard_BESA', 'standard-10-5-cap385.elp');
+            bemfile  = fullfile(dipfitp, 'standard_BEM', 'elec', 'standard_1005.elc');
+            if exist(besafile, 'file') && exist(bemfile, 'file')
+                template_models = [];
+                template_models(1).chanfile = besafile;
+                template_models(2).chanfile = bemfile;
+            end
+        end
+    end
 
 % adding channel location file
 % ----------------------------
