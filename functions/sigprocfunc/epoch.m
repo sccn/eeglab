@@ -123,7 +123,7 @@ indexes = zeros(length(events),1);
 alleventout = {};
 alllatencyout = {};
 for index = 1:length(events)
-	pos0 = floor(events(index)*g.srate); % offset of time locking event
+	pos0 = floor(double(events(index))*g.srate); % offset of time locking event (double cast prevents int64 arithmetic bugs)
 	posinit = pos0+reallim(1); % compute offset
 	posend  = pos0+reallim(2); % compute offset
    
