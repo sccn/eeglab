@@ -150,9 +150,10 @@ for index = 1:length(events)
    if ~isempty(g.allevents)
         posinit = pos0 + g.alleventrange(1)*g.srate; % compute offset
         posend  = pos0 + g.alleventrange(2)*g.srate; % compute offset
-        eventtrial = intersect_bc( find(g.allevents*g.srate >= posinit),  find(g.allevents*g.srate < posend) );
+        ae_pts = double(g.allevents)*g.srate; % double cast prevents int64 rounding of .5 latencies
+        eventtrial = intersect_bc( find(ae_pts >= posinit),  find(ae_pts < posend) );
         alleventout{index} = eventtrial;
-        alllatencyout{index} = g.allevents(eventtrial)*g.srate-pos0; 
+        alllatencyout{index} = ae_pts(eventtrial)-pos0;
    end
 end
 newtime(1) = reallim(1)/g.srate;

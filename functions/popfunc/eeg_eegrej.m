@@ -136,6 +136,11 @@ end
 % add boundary events
 % -------------------
 [ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
+% Normalize all latencies to double so that .5 boundary positions survive
+% [struct.field] concatenation (which would otherwise coerce to int64).
+for iEvt = 1:length(EEG.event)
+    EEG.event(iEvt).latency = double(EEG.event(iEvt).latency);
+end
 EEG = eeg_checkset(EEG, 'eventconsistency');
 if ~isempty(EEG.event) && EEG.trials == 1 && EEG.event(end).latency-0.5 > EEG.pnts
     EEG.event(end) = []; % remove last event if necessary
