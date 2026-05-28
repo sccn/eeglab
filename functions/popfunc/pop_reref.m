@@ -363,32 +363,32 @@ nchans = EEG.nbchan; % retrieve number of channels for ICA bussines
 % deal with reference
 % -------------------
 if ~isempty(refchan)
-    if ~isfield(EEG.chaninfo, 'removedchans')
-        EEG.chaninfo.removedchans = refchan;
-    elseif isempty(EEG.chaninfo.removedchans)
-        EEG.chaninfo.removedchans = refchan;
+    if ~isfield(EEG.chaninfo, 'nodatchans')
+        EEG.chaninfo.nodatchans = refchan;
+    elseif isempty(EEG.chaninfo.nodatchans)
+        EEG.chaninfo.nodatchans = refchan;
     else
         allf = fieldnames(refchan);
-        n    = length(EEG.chaninfo.removedchans);
+        n    = length(EEG.chaninfo.nodatchans);
         for iRef = 1:length(refchan)
             for ind = 1:length(allf)
-                EEG.chaninfo.removedchans = setfield(EEG.chaninfo.removedchans, { n+iRef }, ...
+                EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n+iRef }, ...
                     allf{ind}, getfield(refchan(iRef), allf{ind}));
             end
         end
     end
 end
-if ~isempty(g.refloc) 
-    if isfield(EEG.chaninfo, 'removedchans') && ~isempty(EEG.chaninfo.removedchans)
+if ~isempty(g.refloc)
+    if isfield(EEG.chaninfo, 'nodatchans') && ~isempty(EEG.chaninfo.nodatchans)
         allinds = [];
         tmpchaninfo = EEG.chaninfo;
         for iElec = 1:length(g.refloc)
-            if isempty(tmpchaninfo) || isempty(tmpchaninfo.removedchans)
+            if isempty(tmpchaninfo) || isempty(tmpchaninfo.nodatchans)
                 error('Missing reference channel information. Edit channels and add reference first.');
             end
-            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.removedchans.labels }) ];
+            allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
         end
-        EEG.chaninfo.removedchans(allinds) = [];
+        EEG.chaninfo.nodatchans(allinds) = [];
     else
         error('Missing reference channel information. Edit channels and add reference first.');
     end
