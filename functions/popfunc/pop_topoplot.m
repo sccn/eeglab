@@ -255,7 +255,8 @@ if typeplot
     if isempty(nonEmptyChans)
         nonEmptyChans = 1:EEG.nbchan;
     end
-    SIGTMPAVG = mean(SIGTMP(nonEmptyChans,pos,:),3);
+    SIGTMPAVG = nan(EEG.nbchan, length(pos));
+    SIGTMPAVG(nonEmptyChans,:) = mean(SIGTMP(nonEmptyChans,pos,:),3);
     SIGTMPAVG(nonEmptyChans, nanpos) = NaN;
 
     if isempty(maplimits)
