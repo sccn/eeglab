@@ -70,6 +70,15 @@ jobs:
             assert(EEG.nbchan == size(EEG.data, 1));
             assert(EEG.pnts == size(EEG.data, 2));
 
+      - name: Run MATLAB regression tests
+        if: steps.matlab.outputs.available == 'true'
+        uses: matlab-actions/run-command@v2
+        with:
+          command: |
+            cd(getenv('GITHUB_WORKSPACE'));
+            results = runtests('tests');
+            assertSuccess(results);
+
       - name: Skip MATLAB smoke
         if: steps.matlab.outputs.available != 'true'
         run: |
