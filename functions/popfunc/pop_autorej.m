@@ -212,11 +212,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                 fprintf('Decreasing probability limits for final pruning...######\n');
                 opt.startprob = opt.startprob - 0.5; numrej = 1; maxiter = maxiter+1; % repeat process back to 5 stds
             else
-                if maxiter > 8
-                    opt.maxrej = 15; % go through last round with a high threshold
-                else
-                    repeat = 0;
-                end
+                repeat = 0; % threshold back to 5 s.d. or 8 decrements done: stop
             end
         end
     end
