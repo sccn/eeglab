@@ -238,6 +238,9 @@ else
         % reading data file
         % -----------------
         eeglab_options;
+        % read directly in single precision when requested; reading as double first
+        % needs twice the memory and is much slower for large files
+        if option_single, precision = 'float32=>single'; else, precision = 'float32'; end
         if length(opt.channel) == EEG.nbchan && option_memmapdata
             fclose(fid);
             data = mmo(filename, [EEG.nbchan EEG.pnts EEG.trials], false);
@@ -245,17 +248,17 @@ else
         else
             if datformat
                 if length(opt.channel) == EEG.nbchan || ~isempty(opt.interp)
-                    data = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
+                    data = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], precision)';
                 else
                     data = repmat(single(0), [ length(opt.channel) EEG.pnts EEG.trials ]);
                     for ind = 1:length(opt.channel)
                         fseek(fid, (opt.channel(ind)-1)*EEG.pnts*EEG.trials*4, -1);
-                        data(ind,:) = fread(fid, [EEG.trials*EEG.pnts 1], 'float32')';
+                        data(ind,:) = fread(fid, [EEG.trials*EEG.pnts 1], precision)';
                     end
                     opt.channel = [1:size(data,1)];
                 end
             else
-                data = fread(fid, [EEG.nbchan Inf], 'float32');
+                data = fread(fid, [EEG.nbchan Inf], precision);
             end
             fclose(fid);
         end
