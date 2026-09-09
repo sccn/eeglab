@@ -56,6 +56,9 @@ function result = plugin_install(zipfilelink, name, version, pluginsize, forceIn
     %version(find(version == '.'))  = '_';
     generalPluginPath = fullfile(fileparts(which('eeglab.m')), 'plugins');
     newPluginPath     = fullfile(generalPluginPath, [ name version ]);
+    if ~exist(generalPluginPath, 'dir') % fresh installs may not ship the plugins folder
+        mkdir(generalPluginPath);
+    end
 
     % check plugin size
     % -----------------
