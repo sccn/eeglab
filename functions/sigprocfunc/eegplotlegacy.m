@@ -1513,8 +1513,8 @@ else
         event2plot    = find ( g.eventlatencies >=lowlim & g.eventlatencies <= highlim );
         if ~isempty(g.eventlatencyend)            
             event2plot2 = find ( g.eventlatencyend >= lowlim & g.eventlatencyend <= highlim );
-            event2plot3 = find ( g.eventlatencies  <  lowlim & g.eventlatencyend >  highlim );
-            event2plot  = setdiff(union(event2plot, event2plot2), event2plot3);
+            event2plot3 = find ( g.eventlatencies  <  lowlim & g.eventlatencyend >  highlim ); % events spanning the whole window
+            event2plot  = union(union(event2plot, event2plot2), event2plot3);
         end
         for index = 1:length(event2plot)
             %Just repeat for the first one
@@ -1522,28 +1522,30 @@ else
                 EVENTFONT = ' \fontsize{10} ';
                 ylims=ylim;
             end
-            
-            % draw latency line
+
+            % draw latency line (only when the event onset is inside the window)
             % -----------------
             tmplat = g.eventlatencies(event2plot(index))-lowlim-1;
+            if tmplat >= 0
             tmph   = plot([ tmplat tmplat ], ylims, 'color', g.eventcolors{ event2plot(index) }, ...
                           'linestyle', g.eventstyle { event2plot(index) }, ...
                           'linewidth', g.eventwidths( event2plot(index) ) );
-    
+
             % schtefan: add Event types text above event latency line
             % -------------------------------------------------------
 %             EVENTFONT = ' \fontsize{10} ';
 %             ylims=ylim;
             evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
             if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end; % truncate
-            try, 
+            try,
                 tmph2 = text([tmplat], ylims(2)-0.005, [EVENTFONT evntxt], ...
                                     'color', g.eventcolors{ event2plot(index) }, ...
                                     'horizontalalignment', 'left',...
                                     'rotation',90);
             catch, end
-            
-            % draw duration is not 0
+            end
+
+            % draw duration is not 0 (clipped to the window start for events that began earlier)
             % ----------------------
             if g.ploteventdur && ~isempty(g.eventlatencyend) ...
                     && g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
@@ -1551,6 +1553,7 @@ else
                 if tmplatend ~= 0
                     tmplim = ylims;
                     tmpcol = g.eventcolors{ event2plot(index) };
+                    tmplat = max(tmplat, 0);
                     h = patch([ tmplat tmplatend tmplatend tmplat ], ...
                               [ tmplim(1) tmplim(1) tmplim(2) tmplim(2) ], ...
                               tmpcol );  % this argument is color
