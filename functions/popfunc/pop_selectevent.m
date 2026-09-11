@@ -526,7 +526,7 @@ if strcmp( lower(g.deleteepochs), 'on') && EEG.trials > 1
         Iepoch = ~Iepoch;
     end
 	Iepoch = find(Iepoch == 0);
-    if strcmpi(g.erroronempty, 'on')
+    if isempty(Iepoch) && strcmpi(g.erroronempty, 'on')
         error('All epochs have been removed, empty dataset')
     end
 	if nargin < 2 
@@ -596,4 +596,3 @@ catch
   tmpvarvalue = cell2mat(tmpvarvalue);
 end
 % ======== JRI BUGFIX 3/6/14
-

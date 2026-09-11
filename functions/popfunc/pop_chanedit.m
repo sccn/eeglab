@@ -892,20 +892,23 @@ else
                         end
                         % finding template location files
                         % -------------------------------
-                        dipfitdefs;
-
-                        [~,fileNameBESA] = fileparts(template_models(1).chanfile); 
-                        [~,fileNameBEM ] = fileparts(template_models(2).chanfile); 
-                        eeglabp          = fileparts(which('eeglab.m'));
-                        chantemplate(1).name        = fileNameBESA;
-                        chantemplate(1).filename    = template_models(1).chanfile;
-                        chantemplate(1).description = 'use BESA file for 4-shell dipfit spherical model';
-                        chantemplate(2).name        = fileNameBEM;
-                        chantemplate(2).filename    = template_models(2).chanfile;
-                        chantemplate(2).description = 'use MNI coordinate file for BEM dipfit model';
-                        chantemplate(3).name        = 'Standard-10-5-Cap385_witheog.elp';
-                        chantemplate(3).filename    = fullfile(eeglabp,'functions','supportfiles', 'Standard-10-5-Cap385_witheog.elp');
-                        chantemplate(3).description = 'use BESA file and look up EOG channels';
+                        eeglabp      = fileparts(which('eeglab.m'));
+                        chantemplate = struct('name', {}, 'filename', {}, 'description', {});
+                        if exist('dipfitdefs', 'file') % DIPFIT templates are only available with the plugin
+                            dipfitdefs;
+                            [~,fileNameBESA] = fileparts(template_models(1).chanfile);
+                            [~,fileNameBEM ] = fileparts(template_models(2).chanfile);
+                            chantemplate(1).name        = fileNameBESA;
+                            chantemplate(1).filename    = template_models(1).chanfile;
+                            chantemplate(1).description = 'use BESA file for 4-shell dipfit spherical model';
+                            chantemplate(2).name        = fileNameBEM;
+                            chantemplate(2).filename    = template_models(2).chanfile;
+                            chantemplate(2).description = 'use MNI coordinate file for BEM dipfit model';
+                        end
+                        chantemplate(end+1).name      = 'Standard-10-5-Cap385_witheog.elp';
+                        chantemplate(end).filename    = fullfile(eeglabp,'functions','supportfiles', 'Standard-10-5-Cap385_witheog.elp');
+                        chantemplate(end).description = 'use BESA file and look up EOG channels';
+                        defaulttemplate = min(2, length(chantemplate)); % BEM model when DIPFIT is available
                         
                         try
                             chantemplate = add_locfiles(chantemplate, 'eeglab', 'eeglab', 'EEGLAB ');
@@ -948,9 +951,9 @@ else
                         end
                         uilist = { { 'style' 'text' 'string' textcomment } ...
                             { 'style' 'popupmenu'  'string' { chantemplate.description } ...
-                            'callback' setmodel 'value' 2 } ...
+                            'callback' setmodel 'value' defaulttemplate } ...
                             { } ...
-                            { 'style' 'edit'       'string' chantemplate(2).filename 'tag' 'elec' } ...
+                            { 'style' 'edit'       'string' chantemplate(defaulttemplate).filename 'tag' 'elec' } ...
                             { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
                             { } ...
                             { 'style' 'checkbox'   'string' 'Import file instead and erase all channels' } ...
@@ -978,6 +981,11 @@ else
                     end
              case 'lookup'
                 chaninfo.filename = args{ curfield+1 };
+                if any(strcmpi(chaninfo.filename, { 'standard-10-5-cap385.elp' 'standard_1005.elc' 'standard_1005.ced' })) ...
+                        && ~exist('dipfitdefs', 'file')
+                    error([ 'pop_chanedit: template ''%s'' requires the DIPFIT plugin.' 10 ...
+                            'Install DIPFIT or provide the full path to a channel location file.' ], chaninfo.filename);
+                end
                 if strcmpi(chaninfo.filename, 'standard-10-5-cap385.elp')
                     dipfitdefs;
                     chaninfo.filename = template_models(1).chanfile;

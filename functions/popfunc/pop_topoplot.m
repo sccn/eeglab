@@ -255,7 +255,8 @@ if typeplot
     if isempty(nonEmptyChans)
         nonEmptyChans = 1:EEG.nbchan;
     end
-    SIGTMPAVG = mean(SIGTMP(nonEmptyChans,pos,:),3);
+    SIGTMPAVG = nan(EEG.nbchan, length(pos));
+    SIGTMPAVG(nonEmptyChans,:) = mean(SIGTMP(nonEmptyChans,pos,:),3);
     SIGTMPAVG(nonEmptyChans, nanpos) = NaN;
 
     if isempty(maplimits)
@@ -430,22 +431,24 @@ end
 
 % Draw colorbar
 if colorbar_switch
+    colorbarLimits = maplimits;
+    if ischar(colorbarLimits)
+        colorbarLimits = get(gca, 'clim');
+    end
     if nbgraph == 1
-        if ~ischar(maplimits)
-            ColorbarHandle = cbar(0,0,[maplimits(1) maplimits(2)]);
-        else
-            ColorbarHandle = cbar(0,0,get(gca, 'clim'));
-        end
+        ColorbarHandle = cbar(0,0,colorbarLimits);
         pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
         set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
-    elseif ~ischar(maplimits)
-         cbar('vert',0,[maplimits(1) maplimits(2)]);
-    else cbar('vert',0,get(gca, 'clim'));
+    else
+        ColorbarHandle = cbar('vert',0,colorbarLimits);
     end
-    if ~typeplot    % Draw '+' and '-' instead of numbers for colorbar tick labels
-        tmp = get(gca, 'ytick');
-        set(gca, 'ytickmode', 'manual', 'yticklabelmode', 'manual', 'ytick', [tmp(1) 0 tmp(end)], 'yticklabel', { '-' '0' '+' });
-        try, icadefs; set(gca,'FontSize',AXES_FONTSIZE_L+2); catch, end
+    % Signed component labels require a scale spanning negative and positive values.
+    if ~typeplot && colorbarLimits(1) < 0 && colorbarLimits(2) > 0
+        tickLimits = get(ColorbarHandle, 'ylim');
+        zeroTick = tickLimits(1) - colorbarLimits(1)*diff(tickLimits)/diff(colorbarLimits);
+        set(ColorbarHandle, 'ytickmode', 'manual', 'yticklabelmode', 'manual', ...
+            'ytick', [tickLimits(1) zeroTick tickLimits(2)], 'yticklabel', { '-' '0' '+' });
+        try, icadefs; set(ColorbarHandle,'FontSize',AXES_FONTSIZE_L+2); catch, end
     end
 end
 
