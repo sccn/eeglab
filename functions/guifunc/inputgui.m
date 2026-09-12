@@ -204,6 +204,13 @@ if isempty(g.getresult)
             if strcmpi(g.addbuttons, 'on'),g.geomvert = [g.geomvert(:)' 1]; end
             [~, ~, allobj, alltags] = supergui( 'fig', fig, 'minwidth', g.minwidth, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
         end
+
+        % resize the bottom buttons (supergui scales them with the figure, so
+        % their labels get truncated in narrow GUIs)
+        % -------------------------------------------------------------------
+        if strcmpi(g.addbuttons, 'on')
+            adjustbuttons(fig, allobj(end-3:end));
+        end
     else 
         fig = g.mode;
         set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
@@ -262,6 +269,66 @@ drawnow; % for windows
 %                 end
 % 			catch, end
 % 		end
+
+% resize the Help/Cancel/OK buttons so they fit their label. supergui
+% positions them in normalized units, so their pixel width depends on the
+% figure scaling factor (and therefore on the screen resolution).
+% -----------------------------------------------------------------------
+function adjustbuttons(fig, butobj)
+
+margin   = 10; % minimum pixels between the buttons and the figure border
+gap      = 8;  % pixels between two buttons
+minwidth = 80; % minimum button width in pixels
+
+alignleft = [ true true false false ]; % first two slots are the help buttons
+isbutton  = cellfun(@(x)length(x) == 1 && ishandle(x), butobj);
+butobj    = [ butobj{isbutton} ];
+alignleft = alignleft(isbutton);
+if isempty(butobj), return; end
+
+set(butobj, 'units', 'pixels');
+butwidth = zeros(1, length(butobj));
+for index = 1:length(butobj)
+    curext = get(butobj(index), 'extent');
+    butwidth(index) = max(minwidth, curext(3)+20);
+end
+
+% keep the borders supergui used, so the row stays aligned with the rows above
+figpos      = get(fig, 'position');
+lastpos     = get(butobj(end), 'position');
+marginright = max(margin, figpos(3)-lastpos(1)-lastpos(3));
+if any(alignleft)
+    firstpos   = get(butobj(find(alignleft, 1)), 'position');
+    marginleft = max(margin, firstpos(1));
+else
+    marginleft = marginright;
+end
+
+% widen the figure when the button row does not fit
+rowwidth = sum(butwidth)+(length(butobj)-1)*gap+marginleft+marginright;
+if figpos(3) < rowwidth
+    figpos(1) = max(0, figpos(1)-(rowwidth-figpos(3))/2);
+    figpos(3) = rowwidth;
+    set(fig, 'position', figpos);
+end
+
+posleft  = marginleft;
+posright = figpos(3)-marginright;
+for index = 1:length(butobj)
+    curpos = get(butobj(index), 'position');
+    if alignleft(index)
+        set(butobj(index), 'position', [posleft curpos(2) butwidth(index) curpos(4)]);
+        posleft = posleft+butwidth(index)+gap;
+    end
+end
+for index = length(butobj):-1:1
+    curpos = get(butobj(index), 'position');
+    if ~alignleft(index)
+        set(butobj(index), 'position', [posright-butwidth(index) curpos(2) butwidth(index) curpos(4)]);
+        posright = posright-butwidth(index)-gap;
+    end
+end
+set(butobj, 'units', 'normalized');
 
 function [resstructout, resultout] = outstruct(allobj)
 counter   = 1;
