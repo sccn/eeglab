@@ -276,7 +276,7 @@ drawnow; % for windows
 % -----------------------------------------------------------------------
 function adjustbuttons(fig, butobj)
 
-margin   = 10; % pixels between the buttons and the figure border
+margin   = 10; % minimum pixels between the buttons and the figure border
 gap      = 8;  % pixels between two buttons
 minwidth = 80; % minimum button width in pixels
 
@@ -293,17 +293,27 @@ for index = 1:length(butobj)
     butwidth(index) = max(minwidth, curext(3)+20);
 end
 
+% keep the borders supergui used, so the row stays aligned with the rows above
+figpos      = get(fig, 'position');
+lastpos     = get(butobj(end), 'position');
+marginright = max(margin, figpos(3)-lastpos(1)-lastpos(3));
+if any(alignleft)
+    firstpos   = get(butobj(find(alignleft, 1)), 'position');
+    marginleft = max(margin, firstpos(1));
+else
+    marginleft = marginright;
+end
+
 % widen the figure when the button row does not fit
-figpos = get(fig, 'position');
-rowwidth = sum(butwidth)+(length(butobj)-1)*gap+2*margin;
+rowwidth = sum(butwidth)+(length(butobj)-1)*gap+marginleft+marginright;
 if figpos(3) < rowwidth
     figpos(1) = max(0, figpos(1)-(rowwidth-figpos(3))/2);
     figpos(3) = rowwidth;
     set(fig, 'position', figpos);
 end
 
-posleft  = margin;
-posright = figpos(3)-margin;
+posleft  = marginleft;
+posright = figpos(3)-marginright;
 for index = 1:length(butobj)
     curpos = get(butobj(index), 'position');
     if alignleft(index)
