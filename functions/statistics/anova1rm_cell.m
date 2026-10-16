@@ -64,8 +64,8 @@ a = length(data);
 nd = myndims( data{1} );
 sz = size( data{1} );
 n  = size( data{1} ,nd);
-AS = zeros([ sz(1:nd-1) a n ], 'single');
-sq = zeros([ sz(1:nd-1) 1], 'single');
+AS = zeros([ sz(1:nd-1) a n ], 'double');
+sq = zeros([ sz(1:nd-1) 1], 'double');
 
 % only for paired stats
 % ---------------------

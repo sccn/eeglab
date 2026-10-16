@@ -95,8 +95,8 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
         end
     end
     
-    VE = zeros( [ sz(1:end-1) 1], 'single' );
-    m  = zeros( [ sz(1:end-1) size(data) ], 'single' );
+    VE = zeros( [ sz(1:end-1) 1], 'double' );
+    m  = zeros( [ sz(1:end-1) size(data) ], 'double' );
     for i = 1:a
         for ii = 1:b
             tmpm = mymean(data{i,ii}, nd);

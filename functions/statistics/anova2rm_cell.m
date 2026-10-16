@@ -80,10 +80,10 @@ n  = size( data{1} ,nd);
 % only for paired stats
 % ---------------------
 if nd == 1
-    AB = zeros(a,b,'single');
-    AS = zeros(a,n,'single');
-    BS = zeros(b,n,'single');
-    sq = single(0);
+    AB = zeros(a,b,'double');
+    AS = zeros(a,n,'double');
+    BS = zeros(b,n,'double');
+    sq = double(0);
     for ind1 = 1:a
         for ind2 = 1:b
             AB(ind1,ind2) = sum(data{ind1,ind2});
@@ -95,10 +95,10 @@ if nd == 1
     dimA = 2;
     dimB = 1;
 elseif nd == 2
-    AB = zeros(size(data{1},1),a,b,'single');
-    AS = zeros(size(data{1},1),a,n,'single');
-    BS = zeros(size(data{1},1),b,n,'single');
-    sq = zeros(size(data{1},1),1,'single');
+    AB = zeros(size(data{1},1),a,b,'double');
+    AS = zeros(size(data{1},1),a,n,'double');
+    BS = zeros(size(data{1},1),b,n,'double');
+    sq = zeros(size(data{1},1),1,'double');
     for ind1 = 1:a
         for ind2 = 1:b
             AB(:,ind1,ind2) = sum(data{ind1,ind2},nd);
@@ -110,10 +110,10 @@ elseif nd == 2
     dimA = 3;
     dimB = 2;
 elseif nd == 3
-    AB = zeros(size(data{1},1),size(data{1},2),a,b,'single');
-    AS = zeros(size(data{1},1),size(data{1},2),a,n,'single');
-    BS = zeros(size(data{1},1),size(data{1},2),b,n,'single');
-    sq = zeros(size(data{1},1),size(data{1},2),'single');
+    AB = zeros(size(data{1},1),size(data{1},2),a,b,'double');
+    AS = zeros(size(data{1},1),size(data{1},2),a,n,'double');
+    BS = zeros(size(data{1},1),size(data{1},2),b,n,'double');
+    sq = zeros(size(data{1},1),size(data{1},2),'double');
     for ind1 = 1:a
         for ind2 = 1:b
             AB(:,:,ind1,ind2) = sum(data{ind1,ind2},nd);
@@ -125,10 +125,10 @@ elseif nd == 3
     dimA = 4;
     dimB = 3;
 elseif nd == 4
-    AB = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,b,'single');
-    AS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,n,'single');
-    BS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),b,n,'single');
-    sq = zeros(size(data{1},1),size(data{1},2),size(data{1},3),'single');
+    AB = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,b,'double');
+    AS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,n,'double');
+    BS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),b,n,'double');
+    sq = zeros(size(data{1},1),size(data{1},2),size(data{1},3),'double');
     for ind1 = 1:a
         for ind2 = 1:b
             AB(:,:,:,ind1,ind2) = sum(data{ind1,ind2},nd);
