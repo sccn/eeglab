@@ -51,12 +51,7 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function varargout = teststat(varargin)
-
-if nargin > 0
-    varargout{1} = rm_anova2(varargin{:});
-    return
-end
+function teststat()
 
 % testing paired t-test
 % ---------------------
@@ -424,9 +419,9 @@ fB = msB / msBS;
 fAB = msAB / msABS;
 
 % p values
-pA = betainc(dfAS./(dfAS+dfA.*fA), dfAS/2, dfA/2);
-pB = betainc(dfBS./(dfBS+dfB.*fB), dfBS/2, dfB/2);
-pAB = betainc(dfABS./(dfABS+dfAB.*fAB), dfABS/2, dfAB/2);
+pA = myfpval(fA, dfA, dfAS);
+pB = myfpval(fB, dfB, dfBS);
+pAB = myfpval(fAB, dfAB, dfABS);
 
 % return values
 stats = {'Source','SS','df','MS','F','p';...
@@ -438,4 +433,27 @@ stats = {'Source','SS','df','MS','F','p';...
          [FACTNAMES{1} ' x ' FACTNAMES{2} ' x Subj'], ssABS, dfABS, msABS, [], []};
  
  return
+
+% parametric F tail
+% -----------------
+function p = myfpval(F, df1, df2)
+
+p = ones(size(F), class(F));
+p(isnan(F)) = NaN;
+use = (F > 0);
+if ~any(use(:))
+    return
+end
+Fv = F(use);
+lo = Fv < (df2 ./ df1);
+pv = zeros(size(Fv), class(F));
+if any(~lo(:))
+    Ft = Fv(~lo);
+    pv(~lo) = betainc(df2 ./ (df2 + df1 .* Ft), df2/2, df1/2);
+end
+if any(lo(:))
+    Ft = Fv(lo);
+    pv(lo) = betainc((df1 .* Ft) ./ (df2 + df1 .* Ft), df1/2, df2/2, 'upper');
+end
+p(use) = pv;
 

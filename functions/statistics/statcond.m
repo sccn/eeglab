@@ -1,7 +1,7 @@
 % STATCOND  - compare two or more data conditions statistically using 
 %               standard parametric or nonparametric permutation-based ANOVA 
-%               (1-way or 2-way) or t-test methods. Parametric testing uses 
-%               FCDF from the Matlab Statistical Toolbox.
+%               (1-way or 2-way) or t-test methods. Parametric ANOVA uses
+%               the F upper tail. Two-condition tests use tcdf, or mytcdf.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 %
@@ -210,12 +210,6 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end
     if strcmpi(g.method, 'permutation'), g.method = 'perm'; end
     if strcmpi(g.verbose, 'on'), verb = 1; else verb = 0; end
-    if strcmp(g.method, 'param' ) && exist('fcdf') ~= 2
-      myfprintf('on',['statcond(): parametric testing requires fcdf() \n' ...
-               '            from the Matlab StatsticaL Toolbox.\n' ...
-               '            Running nonparametric permutation tests\n.']);
-      g.method = 'perm';
-    end
     g.naccu = round(g.naccu);
     
     % pairing
@@ -380,7 +374,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 tail = 'one';
                 [ori_vals, df] = anova1_cell_select( data, g.paired );
                 if strcmpi(g.method, 'param')
-                    pvals = betainc(df(2)./(df(2)+df(1).*ori_vals), df(2)/2, df(1)/2);
+                    pvals = myfpval(ori_vals, df(1), df(2));
                 else
                     if strcmpi(g.arraycomp, 'on')
                         try
@@ -413,9 +407,9 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             tail = 'one';
             [ ori_vals{1}, ori_vals{2}, ori_vals{3}, df{1}, df{2}, df{3} ] = anova2_cell_select( data, g.paired );
             if strcmpi(g.method, 'param')
-                pvals{1} = betainc(df{1}(2)./(df{1}(2)+df{1}(1).*ori_vals{1}), df{1}(2)/2, df{1}(1)/2);
-                pvals{2} = betainc(df{2}(2)./(df{2}(2)+df{2}(1).*ori_vals{2}), df{2}(2)/2, df{2}(1)/2);
-                pvals{3} = betainc(df{3}(2)./(df{3}(2)+df{3}(1).*ori_vals{3}), df{3}(2)/2, df{3}(1)/2);
+                pvals{1} = myfpval(ori_vals{1}, df{1}(1), df{1}(2));
+                pvals{2} = myfpval(ori_vals{2}, df{2}(1), df{2}(2));
+                pvals{3} = myfpval(ori_vals{3}, df{3}(1), df{3}(2));
             else
                 surrogval = { surrogval surrogval surrogval };
                 dataori   = data;
@@ -590,6 +584,29 @@ function myfprintf(verb, varargin)
     if verb
         fprintf(varargin{:});
     end
+
+% parametric F tail
+% -----------------
+function p = myfpval(F, df1, df2)
+
+p = ones(size(F), class(F));
+p(isnan(F)) = NaN;
+use = (F > 0);
+if ~any(use(:))
+    return
+end
+Fv = F(use);
+lo = Fv < (df2 ./ df1);
+pv = zeros(size(Fv), class(F));
+if any(~lo(:))
+    Ft = Fv(~lo);
+    pv(~lo) = betainc(df2 ./ (df2 + df1 .* Ft), df2/2, df1/2);
+end
+if any(lo(:))
+    Ft = Fv(lo);
+    pv(lo) = betainc((df1 .* Ft) ./ (df2 + df1 .* Ft), df1/2, df2/2, 'upper');
+end
+p(use) = pv;
 
 % function to replace tcdf
 % ------------------------
