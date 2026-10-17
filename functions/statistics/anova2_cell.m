@@ -84,22 +84,12 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
     c  = size(data{1}, nd);
     sz = size(data{1});
     
-    % dataabs if for complex data only
-    % --------------------------------
-    dataabs = data;
-    if ~isreal(data{1})
-        for i = 1:a
-            for ii = 1:b
-                dataabs{i,ii} = abs(data{i,ii});
-            end
-        end
-    end
-    
     VE = zeros( [ sz(1:end-1) 1], 'double' );
     m  = zeros( [ sz(1:end-1) size(data) ], 'double' );
     for i = 1:a
         for ii = 1:b
-            tmpm = mymean(data{i,ii}, nd);
+            vals = double(data{i,ii});
+            tmpm = mymean(vals, nd);
             switch nd
                 case 1, m(i,ii) = tmpm;
                 case 2, m(:,i,ii) = tmpm;
@@ -110,7 +100,10 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
                 case 7, m(:,:,:,:,:,:,i,ii) = tmpm;
                 otherwise error('Dimension not supported');
             end
-            VE = VE+sum( bsxfun(@minus, dataabs{i,ii}, tmpm).^2, nd);
+            if ~isreal(vals)
+                vals = abs(vals);
+            end
+            VE = VE+sum( bsxfun(@minus, vals, tmpm).^2, nd);
         end
     end
     X  = mean(mean(m,nd+1),nd);
@@ -240,7 +233,7 @@ function val = myndims(a)
     end; 
   
 function res = mymean( data, varargin) % deal with complex numbers
-    res = mean( data, varargin{:});
+    res = mean( double(data), varargin{:});
     if ~isreal(data)
         res = abs( res );
     end

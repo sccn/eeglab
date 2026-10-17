@@ -86,10 +86,11 @@ if nd == 1
     sq = double(0);
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(ind1,ind2) = sum(data{ind1,ind2});
-            AS(ind1,:)    = AS(ind1,:) + data{ind1,ind2}';
-            BS(ind2,:)    = BS(ind2,:) + data{ind1,ind2}';
-            sq            = sq + sum(data{ind1,ind2}.^2);
+            vals          = double(data{ind1,ind2});
+            AB(ind1,ind2) = sum(vals);
+            AS(ind1,:)    = AS(ind1,:) + vals';
+            BS(ind2,:)    = BS(ind2,:) + vals';
+            sq            = sq + sum(vals.^2);
         end
     end
     dimA = 2;
@@ -101,10 +102,11 @@ elseif nd == 2
     sq = zeros(size(data{1},1),1,'double');
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(:,ind1,ind2) = sum(data{ind1,ind2},nd);
-            AS(:,ind1,:)    = AS(:,ind1,:) + reshape(data{ind1,ind2},size(data{1},1),1,n);
-            BS(:,ind2,:)    = BS(:,ind2,:) + reshape(data{ind1,ind2},size(data{1},1),1,n);
-            sq              = sq + sum(data{ind1,ind2}.^2,nd);
+            vals            = double(data{ind1,ind2});
+            AB(:,ind1,ind2) = sum(vals,nd);
+            AS(:,ind1,:)    = AS(:,ind1,:) + reshape(vals,size(data{1},1),1,n);
+            BS(:,ind2,:)    = BS(:,ind2,:) + reshape(vals,size(data{1},1),1,n);
+            sq              = sq + sum(vals.^2,nd);
         end
     end
     dimA = 3;
@@ -116,10 +118,11 @@ elseif nd == 3
     sq = zeros(size(data{1},1),size(data{1},2),'double');
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(:,:,ind1,ind2) = sum(data{ind1,ind2},nd);
-            AS(:,:,ind1,:)    = AS(:,:,ind1,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),1,n);
-            BS(:,:,ind2,:)    = BS(:,:,ind2,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),1,n);
-            sq                = sq + sum(data{ind1,ind2}.^2,nd);
+            vals              = double(data{ind1,ind2});
+            AB(:,:,ind1,ind2) = sum(vals,nd);
+            AS(:,:,ind1,:)    = AS(:,:,ind1,:) + reshape(vals,size(data{1},1),size(data{1},2),1,n);
+            BS(:,:,ind2,:)    = BS(:,:,ind2,:) + reshape(vals,size(data{1},1),size(data{1},2),1,n);
+            sq                = sq + sum(vals.^2,nd);
         end
     end
     dimA = 4;
@@ -131,10 +134,11 @@ elseif nd == 4
     sq = zeros(size(data{1},1),size(data{1},2),size(data{1},3),'double');
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(:,:,:,ind1,ind2) = sum(data{ind1,ind2},nd);
-            AS(:,:,:,ind1,:)    = AS(:,:,:,ind1,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),size(data{1},3),1,n);
-            BS(:,:,:,ind2,:)    = BS(:,:,:,ind2,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),size(data{1},3),1,n);
-            sq                = sq + sum(data{ind1,ind2}.^2,nd);
+            vals                = double(data{ind1,ind2});
+            AB(:,:,:,ind1,ind2) = sum(vals,nd);
+            AS(:,:,:,ind1,:)    = AS(:,:,:,ind1,:) + reshape(vals,size(data{1},1),size(data{1},2),size(data{1},3),1,n);
+            BS(:,:,:,ind2,:)    = BS(:,:,:,ind2,:) + reshape(vals,size(data{1},1),size(data{1},2),size(data{1},3),1,n);
+            sq                  = sq + sum(vals.^2,nd);
         end
     end
     dimA = 5;

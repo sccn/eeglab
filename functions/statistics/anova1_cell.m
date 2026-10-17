@@ -143,10 +143,10 @@ function val = myndims(a)
     end
 
 function res = mymean( data, varargin) % deal with complex numbers
-    res = mean( data, varargin{:});
+    res = mean( double(data), varargin{:});
     if ~isreal(data)
         res = abs( res );
     end
 
 function res = mystd( data, varargin) % deal with complex numbers
-    res = std( abs(data), varargin{:});
+    res = std( abs(double(data)), varargin{:});

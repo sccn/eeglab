@@ -70,17 +70,18 @@ sq = zeros([ sz(1:nd-1) 1], 'double');
 % only for paired stats
 % ---------------------
 for ind1 = 1:a
+    vals = double(data{ind1});
     switch nd
-        case 1, AS(ind1,:)             = AS(ind1,:)             + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 2, AS(:,ind1,:)           = AS(:,ind1,:)           + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 3, AS(:,:,ind1,:)         = AS(:,:,ind1,:)         + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 4, AS(:,:,:,ind1,:)       = AS(:,:,:,ind1,:)       + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 5, AS(:,:,:,:,ind1,:)     = AS(:,:,:,:,ind1,:)     + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 6, AS(:,:,:,:,:,ind1,:)   = AS(:,:,:,:,:,ind1,:)   + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 7, AS(:,:,:,:,:,:,ind1,:) = AS(:,:,:,:,:,:,ind1,:) + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 1, AS(ind1,:)             = AS(ind1,:)             + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 2, AS(:,ind1,:)           = AS(:,ind1,:)           + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 3, AS(:,:,ind1,:)         = AS(:,:,ind1,:)         + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 4, AS(:,:,:,ind1,:)       = AS(:,:,:,ind1,:)       + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 5, AS(:,:,:,:,ind1,:)     = AS(:,:,:,:,ind1,:)     + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 6, AS(:,:,:,:,:,ind1,:)   = AS(:,:,:,:,:,ind1,:)   + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 7, AS(:,:,:,:,:,:,ind1,:) = AS(:,:,:,:,:,:,ind1,:) + reshape(vals,[sz(1:nd-1) 1 n]);
         otherwise     error('Dimension not supported');
     end
-    sq = sq + sum(data{ind1}.^2,nd);
+    sq = sq + sum(vals.^2,nd);
 end
 dimA = nd+1;
 dimB = nd;
