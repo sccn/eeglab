@@ -51,7 +51,12 @@
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 % THE POSSIBILITY OF SUCH DAMAGE.
 
-function teststat()
+function varargout = teststat(varargin)
+
+if nargin > 0
+    varargout{1} = rm_anova2(varargin{:});
+    return
+end
 
 % testing paired t-test
 % ---------------------
@@ -419,9 +424,9 @@ fB = msB / msBS;
 fAB = msAB / msABS;
 
 % p values
-pA = 1-fcdf(fA,dfA,dfAS);
-pB = 1-fcdf(fB,dfB,dfBS);
-pAB = 1-fcdf(fAB,dfAB,dfABS);
+pA = betainc(dfAS./(dfAS+dfA.*fA), dfAS/2, dfA/2);
+pB = betainc(dfBS./(dfBS+dfB.*fB), dfBS/2, dfB/2);
+pAB = betainc(dfABS./(dfABS+dfAB.*fAB), dfABS/2, dfAB/2);
 
 % return values
 stats = {'Source','SS','df','MS','F','p';...
