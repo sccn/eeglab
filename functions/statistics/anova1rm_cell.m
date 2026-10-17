@@ -18,7 +18,7 @@
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10) }
 %   [FC dfc] = anova1rm_cell(a)
-%   signifC = 1-fcdf(FC, dfc(1), dfc(2))
+%   signifC = betainc(dfc(2)./(dfc(2)+dfc(1).*FC), dfc(2)/2, dfc(1)/2)
 %
 %   % for comparison 
 %   [F1 F2 FI df1 df2 dfi] = anova1rm_cell(a);
@@ -64,23 +64,24 @@ a = length(data);
 nd = myndims( data{1} );
 sz = size( data{1} );
 n  = size( data{1} ,nd);
-AS = zeros([ sz(1:nd-1) a n ], 'single');
-sq = zeros([ sz(1:nd-1) 1], 'single');
+AS = zeros([ sz(1:nd-1) a n ], 'double');
+sq = zeros([ sz(1:nd-1) 1], 'double');
 
 % only for paired stats
 % ---------------------
 for ind1 = 1:a
+    vals = double(data{ind1});
     switch nd
-        case 1, AS(ind1,:)             = AS(ind1,:)             + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 2, AS(:,ind1,:)           = AS(:,ind1,:)           + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 3, AS(:,:,ind1,:)         = AS(:,:,ind1,:)         + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 4, AS(:,:,:,ind1,:)       = AS(:,:,:,ind1,:)       + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 5, AS(:,:,:,:,ind1,:)     = AS(:,:,:,:,ind1,:)     + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 6, AS(:,:,:,:,:,ind1,:)   = AS(:,:,:,:,:,ind1,:)   + reshape(data{ind1},[sz(1:nd-1) 1 n]);
-        case 7, AS(:,:,:,:,:,:,ind1,:) = AS(:,:,:,:,:,:,ind1,:) + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 1, AS(ind1,:)             = AS(ind1,:)             + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 2, AS(:,ind1,:)           = AS(:,ind1,:)           + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 3, AS(:,:,ind1,:)         = AS(:,:,ind1,:)         + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 4, AS(:,:,:,ind1,:)       = AS(:,:,:,ind1,:)       + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 5, AS(:,:,:,:,ind1,:)     = AS(:,:,:,:,ind1,:)     + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 6, AS(:,:,:,:,:,ind1,:)   = AS(:,:,:,:,:,ind1,:)   + reshape(vals,[sz(1:nd-1) 1 n]);
+        case 7, AS(:,:,:,:,:,:,ind1,:) = AS(:,:,:,:,:,:,ind1,:) + reshape(vals,[sz(1:nd-1) 1 n]);
         otherwise     error('Dimension not supported');
     end
-    sq = sq + sum(data{ind1}.^2,nd);
+    sq = sq + sum(vals.^2,nd);
 end
 dimA = nd+1;
 dimB = nd;

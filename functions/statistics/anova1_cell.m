@@ -19,7 +19,7 @@
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10) }
 %   [F df] = anova1_cell(a)
-%   signif = 1-fcdf(F, df(1), df(2))
+%   signif = betainc(df(2)./(df(2)+df(1).*F), df(2)/2, df(1)/2)
 %
 %   % for comparison 
 %   anova1( [ a{1,1}' a{1,2}' a{1,3}' ]) % look in the graph for the F value
@@ -95,7 +95,7 @@ function [F, df] = anova1_cell(data)
     elseif nd == 2  
 
         for i = 1:length(data)
-            n( :,i) = ones(size(data{i},1) * size(data{i},2), 'single');
+            n( :,i) = ones(size(data{i},1) * size(data{i},2), 'double');
             m( :,i) = mymean(  data{i},2);
             sd(:,i) = mystd(   data{i},[],2);
         end
@@ -104,7 +104,7 @@ function [F, df] = anova1_cell(data)
     elseif nd == 3        
         
         for i = 1:length(data)
-            n( :,:,i) = ones(size(data{i},1),size(data{i},2) * size(data{i},3), 'single');
+            n( :,:,i) = ones(size(data{i},1),size(data{i},2) * size(data{i},3), 'double');
             m( :,:,i) = mymean(  data{i},3);
             sd(:,:,i) = mystd(   data{i},[],3);
         end
@@ -113,7 +113,7 @@ function [F, df] = anova1_cell(data)
     elseif nd == 4
 
         for i = 1:length(data)
-            n( :,:,:,i) = ones(size(data{i},1),size(data{i},2), size(data{i},3) * size(data{i},4), 'single');
+            n( :,:,:,i) = ones(size(data{i},1),size(data{i},2), size(data{i},3) * size(data{i},4), 'double');
             m( :,:,:,i) = mymean(  data{i},4);
             sd(:,:,:,i) = mystd(   data{i},[],4);
         end
@@ -143,10 +143,10 @@ function val = myndims(a)
     end
 
 function res = mymean( data, varargin) % deal with complex numbers
-    res = mean( data, varargin{:});
+    res = mean( double(data), varargin{:});
     if ~isreal(data)
         res = abs( res );
     end
 
 function res = mystd( data, varargin) % deal with complex numbers
-    res = std( abs(data), varargin{:});
+    res = std( abs(double(data)), varargin{:});
