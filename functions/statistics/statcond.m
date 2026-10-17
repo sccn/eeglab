@@ -1,7 +1,8 @@
 % STATCOND  - compare two or more data conditions statistically using 
 %               standard parametric or nonparametric permutation-based ANOVA 
 %               (1-way or 2-way) or t-test methods. Parametric ANOVA uses
-%               the F upper tail. Two-condition tests use tcdf, or mytcdf.
+%               the F upper tail. Two-condition tests use tcdf when the
+%               Statistics Toolbox is available, otherwise the built-in mytcdf.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 %
@@ -121,7 +122,7 @@
 %         With thanks to Robert Oostenveld for fruitful discussions 
 %         and advices on this function.
 %
-% See also: ANOVA1_CELL, ANOVA2_CELL, ANOVA2RM_CELL, FCDF
+% See also: ANOVA1_CELL, ANOVA2_CELL, ANOVA2RM_CELL, BETAINC
 
 % perform a paired t-test
 % -----------------------
@@ -584,29 +585,6 @@ function myfprintf(verb, varargin)
     if verb
         fprintf(varargin{:});
     end
-
-% parametric F tail
-% -----------------
-function p = myfpval(F, df1, df2)
-
-p = ones(size(F), class(F));
-p(isnan(F)) = NaN;
-use = (F > 0);
-if ~any(use(:))
-    return
-end
-Fv = F(use);
-lo = Fv < (df2 ./ df1);
-pv = zeros(size(Fv), class(F));
-if any(~lo(:))
-    Ft = Fv(~lo);
-    pv(~lo) = betainc(df2 ./ (df2 + df1 .* Ft), df2/2, df1/2);
-end
-if any(lo(:))
-    Ft = Fv(lo);
-    pv(lo) = betainc((df1 .* Ft) ./ (df2 + df1 .* Ft), df1/2, df2/2, 'upper');
-end
-p(use) = pv;
 
 % function to replace tcdf
 % ------------------------
