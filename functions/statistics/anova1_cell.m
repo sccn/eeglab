@@ -19,7 +19,7 @@
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10) }
 %   [F df] = anova1_cell(a)
-%   signif = 1-fcdf(F, df(1), df(2))
+%   signif = betainc(df(2)./(df(2)+df(1).*F), df(2)/2, df(1)/2)
 %
 %   % for comparison 
 %   anova1( [ a{1,1}' a{1,2}' a{1,3}' ]) % look in the graph for the F value

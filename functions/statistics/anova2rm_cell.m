@@ -26,9 +26,9 @@
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10); rand(1,10) rand(1,10) rand(1,10) }
 %   [FC FR FI dfc dfr dfi] = anova2rm_cell(a)
-%   signifC = 1-fcdf(FC, dfc(1), dfc(2))
-%   signifR = 1-fcdf(FR, dfr(1), dfr(2))
-%   signifI = 1-fcdf(FI, dfi(1), dfi(2))
+%   signifC = betainc(dfc(2)./(dfc(2)+dfc(1).*FC), dfc(2)/2, dfc(1)/2)
+%   signifR = betainc(dfr(2)./(dfr(2)+dfr(1).*FR), dfr(2)/2, dfr(1)/2)
+%   signifI = betainc(dfi(2)./(dfi(2)+dfi(1).*FI), dfi(2)/2, dfi(1)/2)
 %
 %   % for comparison 
 %   z = zeros(10,1); o = ones(10,1); t = ones(10,1)*2;

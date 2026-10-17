@@ -18,7 +18,7 @@
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10) }
 %   [FC dfc] = anova1rm_cell(a)
-%   signifC = 1-fcdf(FC, dfc(1), dfc(2))
+%   signifC = betainc(dfc(2)./(dfc(2)+dfc(1).*FC), dfc(2)/2, dfc(1)/2)
 %
 %   % for comparison 
 %   [F1 F2 FI df1 df2 dfi] = anova1rm_cell(a);

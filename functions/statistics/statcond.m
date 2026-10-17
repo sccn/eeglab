@@ -380,7 +380,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 tail = 'one';
                 [ori_vals, df] = anova1_cell_select( data, g.paired );
                 if strcmpi(g.method, 'param')
-                    pvals = 1-fcdf(ori_vals, df(1), df(2));
+                    pvals = betainc(df(2)./(df(2)+df(1).*ori_vals), df(2)/2, df(1)/2);
                 else
                     if strcmpi(g.arraycomp, 'on')
                         try
@@ -413,9 +413,9 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             tail = 'one';
             [ ori_vals{1}, ori_vals{2}, ori_vals{3}, df{1}, df{2}, df{3} ] = anova2_cell_select( data, g.paired );
             if strcmpi(g.method, 'param')
-                pvals{1} = 1-fcdf(ori_vals{1}, df{1}(1), df{1}(2));
-                pvals{2} = 1-fcdf(ori_vals{2}, df{2}(1), df{2}(2));
-                pvals{3} = 1-fcdf(ori_vals{3}, df{3}(1), df{3}(2));
+                pvals{1} = betainc(df{1}(2)./(df{1}(2)+df{1}(1).*ori_vals{1}), df{1}(2)/2, df{1}(1)/2);
+                pvals{2} = betainc(df{2}(2)./(df{2}(2)+df{2}(1).*ori_vals{2}), df{2}(2)/2, df{2}(1)/2);
+                pvals{3} = betainc(df{3}(2)./(df{3}(2)+df{3}(1).*ori_vals{3}), df{3}(2)/2, df{3}(1)/2);
             else
                 surrogval = { surrogval surrogval surrogval };
                 dataori   = data;
