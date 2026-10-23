@@ -379,7 +379,20 @@ for inddataset = 1:length(ALLEEG)
                 case 'eventconsistency',
                     %[EEG res] = eeg_checkset(EEG);
                     if ~isempty(EEG.event)
-                        
+                        if isnumeric(EEG.data) && ~isempty(EEG.data) && ...
+                                (isempty(EEG.trials) || EEG.trials < 1 || ...
+                                (ndims(EEG.data) > 2 && size(EEG.data,3) ~= EEG.trials))
+                            if ndims(EEG.data) < 3 && EEG.pnts > 1 && mod(size(EEG.data,2), EEG.pnts) == 0
+                                datatrials = size(EEG.data,2)/EEG.pnts;
+                            else
+                                datatrials = size(EEG.data,3);
+                            end
+                            disp( ['eeg_checkset warning: 3rd dimension size of data (' int2str(datatrials) ...
+                                ') does not match the number of epochs (' int2str(EEG.trials) '), corrected' ]);
+                            res = com;
+                            EEG.trials = datatrials;
+                        end
+
                         % check events (slow)
                         % ------------
                         if isfield(EEG.event, 'type')
