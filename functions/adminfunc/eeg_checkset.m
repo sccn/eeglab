@@ -379,7 +379,25 @@ for inddataset = 1:length(ALLEEG)
                 case 'eventconsistency',
                     %[EEG res] = eeg_checkset(EEG);
                     if ~isempty(EEG.event)
-                        
+                        % The latency bound below uses EEG.trials, but that
+                        % count is reconciled with the data only after this
+                        % event pass. A stored 0 (struct-built datasets) would
+                        % drop in-range events. 2-D data with trials > 1 is
+                        % reshaped later and keeps its stored count.
+                        if isnumeric(EEG.data) && ~isempty(EEG.data) && (EEG.trials < 1 || (ndims(EEG.data) > 2 && size(EEG.data,3) ~= EEG.trials))
+                            if ndims(EEG.data) < 3 && EEG.pnts > 1 && mod(size(EEG.data,2), EEG.pnts) == 0
+                                datatrials = size(EEG.data,2)/EEG.pnts;
+                            else
+                                datatrials = size(EEG.data,3);
+                            end
+                            if size(EEG.data,3) ~= EEG.trials && datatrials == size(EEG.data,3)
+                                disp( ['eeg_checkset warning: 3rd dimension size of data (' int2str(size(EEG.data,3)) ...
+                                    ') does not match the number of epochs (' int2str(EEG.trials) '), corrected' ]);
+                            end
+                            res = com;
+                            EEG.trials = datatrials;
+                        end
+
                         % check events (slow)
                         % ------------
                         if isfield(EEG.event, 'type')
