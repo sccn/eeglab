@@ -314,13 +314,23 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method, t_range, params)
         badchansdata = reshape(badchansdata,length(badchans),size(tmpdata,2),size(tmpdata,3));
     end
 
-    if ~isempty(t_range)
+    if ~isempty(t_range) && ~isstruct(bad_elec)
         t_start = t_range(1);
         t_end   = t_range(2);
         if t_start~=ORIEEG.xmin || t_end~=ORIEEG.xmax
-            if length(size(tmpdata))==2
-                times_2b_ignored = [1:floor(t_start*ORIEEG.srate), floor(t_end*ORIEEG.srate):floor(ORIEEG.xmax*ORIEEG.srate)];
-                badchansdata(:, times_2b_ignored) = ORIEEG.data(badchans, times_2b_ignored);
+            if ~isfield(ORIEEG, 'times') || length(ORIEEG.times) ~= ORIEEG.pnts
+                sample_ms = linspace(ORIEEG.xmin*1000, ORIEEG.xmax*1000, ORIEEG.pnts);
+            else
+                sample_ms = ORIEEG.times;
+            end
+            outside = sample_ms < t_start*1000 | sample_ms > t_end*1000;
+            if any(outside(:))
+                if size(badchansdata,3) > 1
+                    badchansdata(:, outside, :) = ORIEEG.data(badchans, outside, :);
+                else
+                    src = ORIEEG.data(badchans, outside, :);
+                    badchansdata(:, outside) = reshape(src, size(badchansdata,1), []);
+                end
             end
         end
     end
