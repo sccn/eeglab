@@ -202,7 +202,7 @@ DEFAULT_PCAFLAG      = 'off';     % don't use PCA reduction
 DEFAULT_POSACTFLAG   = 'off';     % don't use posact(), to save space -sm 7/05
 DEFAULT_VERBOSE      = 1;         % write ascii info to calling screen
 DEFAULT_BIASFLAG     = 1;         % default to using bias in the ICA update rule
-DEFAULT_RESETRANDOMSEED = true;   % default to reset the random number generator to a 'random state'
+DEFAULT_RESETRANDOMSEED = false;  % default to deterministic random number generator state (0)
 
 %                                 
 %%%%%%%%%%%%%%%%%%%%%%% Set up keyword default values %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -815,11 +815,11 @@ if pythoncompat
     rng(5489, 'twister');  % Use MT19937 with seed 5489 to match Python
 else
     if reset_randomseed
-        rand('state',sum(100*clock));  % set the random number generator state to
+        rand('state',sum(100*clock));  % set the random number generator state from the system clock
     else
         rand('state', 0);
     end
-end                                % a position dependent on the system clock
+end
 warning('on', 'MATLAB:RandStream:ActivatingLegacyGenerators')
 
 % interrupt figure
