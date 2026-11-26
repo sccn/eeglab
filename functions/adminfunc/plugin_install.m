@@ -1,3 +1,4 @@
+eeglab
 % PLUGIN_INSTALL - install EEGLAB plugin. Called by PLUGIN_ASKINSTALL.
 %
 % Usage:
