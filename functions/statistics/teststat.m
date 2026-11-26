@@ -419,9 +419,9 @@ fB = msB / msBS;
 fAB = msAB / msABS;
 
 % p values
-pA = 1-fcdf(fA,dfA,dfAS);
-pB = 1-fcdf(fB,dfB,dfBS);
-pAB = 1-fcdf(fAB,dfAB,dfABS);
+pA = myfpval(fA, dfA, dfAS);
+pB = myfpval(fB, dfB, dfBS);
+pAB = myfpval(fAB, dfAB, dfABS);
 
 % return values
 stats = {'Source','SS','df','MS','F','p';...

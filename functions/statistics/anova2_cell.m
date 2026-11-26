@@ -23,9 +23,9 @@
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10); rand(1,10) rand(1,10) rand(1,10) }
 %   [FC FR FI dfc dfr dfi] = anova2_cell(a)
-%   signifC = 1-fcdf(FC, dfc(1), dfc(2))
-%   signifR = 1-fcdf(FR, dfr(1), dfr(2))
-%   signifI = 1-fcdf(FI, dfi(1), dfi(2))
+%   signifC = betainc(dfc(2)./(dfc(2)+dfc(1).*FC), dfc(2)/2, dfc(1)/2)
+%   signifR = betainc(dfr(2)./(dfr(2)+dfr(1).*FR), dfr(2)/2, dfr(1)/2)
+%   signifI = betainc(dfi(2)./(dfi(2)+dfi(1).*FI), dfi(2)/2, dfi(1)/2)
 %
 %   % for comparison 
 %   anova2(  [ a{1,1}' a{1,2}' a{1,3}'; a{2,1}' a{2,2}' a{2,3}' ], 10) 
@@ -84,22 +84,12 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
     c  = size(data{1}, nd);
     sz = size(data{1});
     
-    % dataabs if for complex data only
-    % --------------------------------
-    dataabs = data;
-    if ~isreal(data{1})
-        for i = 1:a
-            for ii = 1:b
-                dataabs{i,ii} = abs(data{i,ii});
-            end
-        end
-    end
-    
-    VE = zeros( [ sz(1:end-1) 1], 'single' );
-    m  = zeros( [ sz(1:end-1) size(data) ], 'single' );
+    VE = zeros( [ sz(1:end-1) 1], 'double' );
+    m  = zeros( [ sz(1:end-1) size(data) ], 'double' );
     for i = 1:a
         for ii = 1:b
-            tmpm = mymean(data{i,ii}, nd);
+            vals = double(data{i,ii});
+            tmpm = mymean(vals, nd);
             switch nd
                 case 1, m(i,ii) = tmpm;
                 case 2, m(:,i,ii) = tmpm;
@@ -110,7 +100,10 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
                 case 7, m(:,:,:,:,:,:,i,ii) = tmpm;
                 otherwise error('Dimension not supported');
             end
-            VE = VE+sum( bsxfun(@minus, dataabs{i,ii}, tmpm).^2, nd);
+            if ~isreal(vals)
+                vals = abs(vals);
+            end
+            VE = VE+sum( bsxfun(@minus, vals, tmpm).^2, nd);
         end
     end
     X  = mean(mean(m,nd+1),nd);
@@ -240,7 +233,7 @@ function val = myndims(a)
     end; 
   
 function res = mymean( data, varargin) % deal with complex numbers
-    res = mean( data, varargin{:});
+    res = mean( double(data), varargin{:});
     if ~isreal(data)
         res = abs( res );
     end

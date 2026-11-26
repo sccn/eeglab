@@ -26,9 +26,9 @@
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10); rand(1,10) rand(1,10) rand(1,10) }
 %   [FC FR FI dfc dfr dfi] = anova2rm_cell(a)
-%   signifC = 1-fcdf(FC, dfc(1), dfc(2))
-%   signifR = 1-fcdf(FR, dfr(1), dfr(2))
-%   signifI = 1-fcdf(FI, dfi(1), dfi(2))
+%   signifC = betainc(dfc(2)./(dfc(2)+dfc(1).*FC), dfc(2)/2, dfc(1)/2)
+%   signifR = betainc(dfr(2)./(dfr(2)+dfr(1).*FR), dfr(2)/2, dfr(1)/2)
+%   signifI = betainc(dfi(2)./(dfi(2)+dfi(1).*FI), dfi(2)/2, dfi(1)/2)
 %
 %   % for comparison 
 %   z = zeros(10,1); o = ones(10,1); t = ones(10,1)*2;
@@ -80,61 +80,65 @@ n  = size( data{1} ,nd);
 % only for paired stats
 % ---------------------
 if nd == 1
-    AB = zeros(a,b,'single');
-    AS = zeros(a,n,'single');
-    BS = zeros(b,n,'single');
-    sq = single(0);
+    AB = zeros(a,b,'double');
+    AS = zeros(a,n,'double');
+    BS = zeros(b,n,'double');
+    sq = double(0);
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(ind1,ind2) = sum(data{ind1,ind2});
-            AS(ind1,:)    = AS(ind1,:) + data{ind1,ind2}';
-            BS(ind2,:)    = BS(ind2,:) + data{ind1,ind2}';
-            sq            = sq + sum(data{ind1,ind2}.^2);
+            vals          = double(data{ind1,ind2});
+            AB(ind1,ind2) = sum(vals);
+            AS(ind1,:)    = AS(ind1,:) + vals';
+            BS(ind2,:)    = BS(ind2,:) + vals';
+            sq            = sq + sum(vals.^2);
         end
     end
     dimA = 2;
     dimB = 1;
 elseif nd == 2
-    AB = zeros(size(data{1},1),a,b,'single');
-    AS = zeros(size(data{1},1),a,n,'single');
-    BS = zeros(size(data{1},1),b,n,'single');
-    sq = zeros(size(data{1},1),1,'single');
+    AB = zeros(size(data{1},1),a,b,'double');
+    AS = zeros(size(data{1},1),a,n,'double');
+    BS = zeros(size(data{1},1),b,n,'double');
+    sq = zeros(size(data{1},1),1,'double');
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(:,ind1,ind2) = sum(data{ind1,ind2},nd);
-            AS(:,ind1,:)    = AS(:,ind1,:) + reshape(data{ind1,ind2},size(data{1},1),1,n);
-            BS(:,ind2,:)    = BS(:,ind2,:) + reshape(data{ind1,ind2},size(data{1},1),1,n);
-            sq              = sq + sum(data{ind1,ind2}.^2,nd);
+            vals            = double(data{ind1,ind2});
+            AB(:,ind1,ind2) = sum(vals,nd);
+            AS(:,ind1,:)    = AS(:,ind1,:) + reshape(vals,size(data{1},1),1,n);
+            BS(:,ind2,:)    = BS(:,ind2,:) + reshape(vals,size(data{1},1),1,n);
+            sq              = sq + sum(vals.^2,nd);
         end
     end
     dimA = 3;
     dimB = 2;
 elseif nd == 3
-    AB = zeros(size(data{1},1),size(data{1},2),a,b,'single');
-    AS = zeros(size(data{1},1),size(data{1},2),a,n,'single');
-    BS = zeros(size(data{1},1),size(data{1},2),b,n,'single');
-    sq = zeros(size(data{1},1),size(data{1},2),'single');
+    AB = zeros(size(data{1},1),size(data{1},2),a,b,'double');
+    AS = zeros(size(data{1},1),size(data{1},2),a,n,'double');
+    BS = zeros(size(data{1},1),size(data{1},2),b,n,'double');
+    sq = zeros(size(data{1},1),size(data{1},2),'double');
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(:,:,ind1,ind2) = sum(data{ind1,ind2},nd);
-            AS(:,:,ind1,:)    = AS(:,:,ind1,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),1,n);
-            BS(:,:,ind2,:)    = BS(:,:,ind2,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),1,n);
-            sq                = sq + sum(data{ind1,ind2}.^2,nd);
+            vals              = double(data{ind1,ind2});
+            AB(:,:,ind1,ind2) = sum(vals,nd);
+            AS(:,:,ind1,:)    = AS(:,:,ind1,:) + reshape(vals,size(data{1},1),size(data{1},2),1,n);
+            BS(:,:,ind2,:)    = BS(:,:,ind2,:) + reshape(vals,size(data{1},1),size(data{1},2),1,n);
+            sq                = sq + sum(vals.^2,nd);
         end
     end
     dimA = 4;
     dimB = 3;
 elseif nd == 4
-    AB = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,b,'single');
-    AS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,n,'single');
-    BS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),b,n,'single');
-    sq = zeros(size(data{1},1),size(data{1},2),size(data{1},3),'single');
+    AB = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,b,'double');
+    AS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,n,'double');
+    BS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),b,n,'double');
+    sq = zeros(size(data{1},1),size(data{1},2),size(data{1},3),'double');
     for ind1 = 1:a
         for ind2 = 1:b
-            AB(:,:,:,ind1,ind2) = sum(data{ind1,ind2},nd);
-            AS(:,:,:,ind1,:)    = AS(:,:,:,ind1,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),size(data{1},3),1,n);
-            BS(:,:,:,ind2,:)    = BS(:,:,:,ind2,:) + reshape(data{ind1,ind2},size(data{1},1),size(data{1},2),size(data{1},3),1,n);
-            sq                = sq + sum(data{ind1,ind2}.^2,nd);
+            vals                = double(data{ind1,ind2});
+            AB(:,:,:,ind1,ind2) = sum(vals,nd);
+            AS(:,:,:,ind1,:)    = AS(:,:,:,ind1,:) + reshape(vals,size(data{1},1),size(data{1},2),size(data{1},3),1,n);
+            BS(:,:,:,ind2,:)    = BS(:,:,:,ind2,:) + reshape(vals,size(data{1},1),size(data{1},2),size(data{1},3),1,n);
+            sq                  = sq + sum(vals.^2,nd);
         end
     end
     dimA = 5;
