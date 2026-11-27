@@ -307,7 +307,7 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
                     [ tmpspec(index,:,indextrials), freqs] = pmtm( data(index,:,indextrials) , [],[],srate);
                 end
             end
-            tmpspec  = 10*log(tmpspec);
+            tmpspec  = 10*log10(tmpspec);
             tmpspec  = tmpspec - repmat( mean(tmpspec,3), [1 1 size(data,3)]);
             specdata = tmpspec;
         end
