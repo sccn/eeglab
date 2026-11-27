@@ -219,7 +219,9 @@ end
 
 % SPEC information found in datasets
 % ---------------------------------
-if exist(filename) && strcmpi(g.recompute, 'off')
+if exist(filename) && strcmpi(g.recompute, 'off') && ~std_fixfftfreqs(filename, EEG) % also corrects legacy FFT frequency labels
+    fprintf('Cannot identify the frequencies of FFT spectrum file "%s", recomputing it\n', filename);
+elseif exist(filename) && strcmpi(g.recompute, 'off')
     fprintf('File "%s" found on disk, no need to recompute\n', filename);
     if strcmpi(prefix, 'comp')
         [X,~,f] = std_readfile(filename, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
@@ -448,8 +450,7 @@ else % fft mode
     %end
     % if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
     tmp   = fft(X, g.nfft, 2);
-    f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
-    f     = f(2:end); % remove DC (match the output of PSD)
+    f     = (1:floor(size(tmp,2)/2)-1) * EEG(1).srate / size(tmp,2); % frequencies of the kept bins, DC removed (match the output of PSD)
     tmp   = tmp(:,2:floor(size(tmp,2)/2),:);
 
     % To compute spectral density (but still need FFT correction
