@@ -208,7 +208,7 @@ if isempty(opt.precompstruct)
         tmpdata = bsxfun(@times, tmpdata, hamming(size(TMPNEWEEG.data,2))');
     end
     tmp   = fft(tmpdata, [], 2);
-    freqs = linspace(0, TMPNEWEEG.srate/2, size(tmp,2)/2);
+    freqs = (0:size(tmp,2)/2-1)*TMPNEWEEG.srate/size(tmp,2);
     freqspectrum = freqs(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:size(tmp,2)/2,:);
     warning('off', 'MATLAB:log:logOfZero');
