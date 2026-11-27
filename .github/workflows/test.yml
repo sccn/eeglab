@@ -28,7 +28,7 @@ jobs:
 
       - name: Load EEGLAB sample data
         run: |
-          octave --quiet --eval "cd('$GITHUB_WORKSPACE'); eeglab('nogui'); EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', 'sample_data/'); EEG = eeg_checkset(EEG); assert(EEG.nbchan == size(EEG.data, 1)); assert(EEG.pnts == size(EEG.data, 2));"
+          octave --quiet --eval "cd('$GITHUB_WORKSPACE'); eeglab('nogui'); EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', 'sample_data/'); EEG = eeg_checkset(EEG); assert(EEG.nbchan == size(EEG.data, 1)); assert(EEG.pnts == size(EEG.data, 2)); nEvent = length(EEG.event); baseLat = [EEG.event.latency]; EEGok = eeg_checkset(EEG, 'eventconsistency'); assert(isequal(baseLat, [EEGok.event.latency])); EEGout = EEG; EEGout.event(end+1) = EEGout.event(1); EEGout.event(end).latency = EEG.pnts + 10; EEGout = eeg_checkset(EEGout, 'eventconsistency'); assert(length(EEGout.event) == nEvent); EEGzero = EEG; EEGzero.trials = 0; EEGzero = eeg_checkset(EEGzero, 'eventconsistency'); assert(length(EEGzero.event) == nEvent); assert(EEGzero.trials == 1); EEGstale = EEG; EEGstale.trials = 0; EEGstale = eeg_eegrej(EEGstale, [223 572; 1 140]); EEGref = eeg_eegrej(EEG, [223 572; 1 140]); assert(EEGstale.trials == 1); assert(isequal([EEGstale.event.latency], [EEGref.event.latency]));"
 
   matlab-smoke:
     name: MATLAB smoke test
@@ -69,6 +69,26 @@ jobs:
             EEG = eeg_checkset(EEG);
             assert(EEG.nbchan == size(EEG.data, 1));
             assert(EEG.pnts == size(EEG.data, 2));
+            nEvent = length(EEG.event);
+            baseLat = [EEG.event.latency];
+            EEGok = eeg_checkset(EEG, 'eventconsistency');
+            assert(isequal(baseLat, [EEGok.event.latency]));
+            EEGout = EEG;
+            EEGout.event(end+1) = EEGout.event(1);
+            EEGout.event(end).latency = EEG.pnts + 10;
+            EEGout = eeg_checkset(EEGout, 'eventconsistency');
+            assert(length(EEGout.event) == nEvent);
+            EEGzero = EEG;
+            EEGzero.trials = 0;
+            EEGzero = eeg_checkset(EEGzero, 'eventconsistency');
+            assert(length(EEGzero.event) == nEvent);
+            assert(EEGzero.trials == 1);
+            EEGstale = EEG;
+            EEGstale.trials = 0;
+            EEGstale = eeg_eegrej(EEGstale, [223 572; 1 140]);
+            EEGref = eeg_eegrej(EEG, [223 572; 1 140]);
+            assert(EEGstale.trials == 1);
+            assert(isequal([EEGstale.event.latency], [EEGref.event.latency]));
 
       - name: Skip MATLAB smoke
         if: steps.matlab.outputs.available != 'true'
