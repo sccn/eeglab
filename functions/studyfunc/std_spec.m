@@ -448,8 +448,7 @@ else % fft mode
     %end
     % if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data (use ''psd'' method instead)'); end
     tmp   = fft(X, g.nfft, 2);
-    f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
-    f     = f(2:end); % remove DC (match the output of PSD)
+    f     = (1:floor(size(tmp,2)/2)-1) * EEG(1).srate / size(tmp,2); % frequencies of the kept bins, DC removed (match the output of PSD)
     tmp   = tmp(:,2:floor(size(tmp,2)/2),:);
 
     % To compute spectral density (but still need FFT correction
