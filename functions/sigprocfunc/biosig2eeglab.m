@@ -111,6 +111,7 @@ if isfield(dat,'T0')
 end
 
 statusChannelPresent = false;
+lastChannelIsEEG     = false;
 if isfield(dat, 'Label') && ~isempty(dat.Label)
     if ischar(dat.Label)
         EEG.chanlocs = struct('labels', cellstr(char(dat.Label(dat.InChanSelect)))); % 5/8/2104 insert (dat.InChanSelect) Ramon
@@ -122,6 +123,8 @@ if isfield(dat, 'Label') && ~isempty(dat.Label)
         end
     end
     if length(EEG.chanlocs) > EEG.nbchan, EEG.chanlocs = EEG.chanlocs(1:EEG.nbchan); end
+    % EDF labels an EEG signal 'EEG <electrode>': such a last channel holds data, not events
+    lastChannelIsEEG = ~isempty(EEG.chanlocs) && strncmp(EEG.chanlocs(end).labels, 'EEG ', 4);
     
     % check BIOSEMI channel types
     if strcmpi(dat.TYPE, 'BDF')
@@ -195,7 +198,9 @@ if importevent
     elseif isempty(dat.EVENT.POS)
         disp('Extracting events from last EEG channel...');
         %Modifieded by Andrey (Aug.5,2008) to detect all non-zero codes: 
-        if length(unique(EEG.data(end, 1:100))) > 20
+        if lastChannelIsEEG
+            disp('The last channel is labeled as an EEG signal: no event extracted from it');
+        elseif length(unique(EEG.data(end, 1:100))) > 20
             disp('Warning: event extraction failure, the last channel contains data');
         elseif length(unique(EEG.data(end, :))) > 1000
             disp('Warning: event extraction failure, the last channel contains data');
