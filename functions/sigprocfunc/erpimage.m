@@ -3733,7 +3733,7 @@ if nargin>1
     fprintf('Performing a permuration test using %d permutations to determine ERP significance thresholds... ',NPERM);
     permerps = zeros(NPERM,inframes);
     for n=1:NPERM
-        signs = sign(randn(1,intrials)'-0.5);
+        signs = 2*(rand(intrials,1) > 0.5) - 1;
         permerps(n,:) = sum(repmat(signs,1,inframes).*in)./nonnans;
         if ~rem(n,50)
             fprintf('%d ',n);
