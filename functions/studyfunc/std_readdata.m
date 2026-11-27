@@ -182,6 +182,23 @@ allSessions(cellfun(@isempty, allSessions)) = { 1 };
 allSessions = cellfun(@num2str, allSessions, 'uniformoutput', false);
 uniqueSessions = unique(allSessions);
 
+% correct the frequency labels of FFT spectrum files saved before issue 994
+% was fixed, for all subjects before reading any of them or the cache
+% -------------------------------------------------------------------------
+if strcmpi(opt.datatype, 'spec')
+    corrected = false;
+    for iSubj = 1:length(subjectList)
+        datInds  = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+        fileName = getfilename({STUDY.datasetinfo(datInds).filepath}, STUDY.datasetinfo(datInds(1)).subject, { STUDY.datasetinfo(datInds).session }, fileExt, length(uniqueSessions) == 1);
+        [okFile, corrFile] = std_fixfftfreqs(fileName, ALLEEG(datInds));
+        if ~okFile
+            error('std_readdata: cannot identify the frequencies of the FFT spectrum file(s) of subject %s, recompute them using std_precomp with ''recompute'', ''on''', subjectList{iSubj});
+        end
+        corrected = corrected || corrFile;
+    end
+    if corrected, STUDY.cache = []; end
+end
+
 for iSubj = 1:length(subjectList)
     fprintf('.');
     

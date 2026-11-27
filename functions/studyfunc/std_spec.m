@@ -219,7 +219,9 @@ end
 
 % SPEC information found in datasets
 % ---------------------------------
-if exist(filename) && strcmpi(g.recompute, 'off')
+if exist(filename) && strcmpi(g.recompute, 'off') && ~std_fixfftfreqs(filename, EEG) % also corrects legacy FFT frequency labels
+    fprintf('Cannot identify the frequencies of FFT spectrum file "%s", recomputing it\n', filename);
+elseif exist(filename) && strcmpi(g.recompute, 'off')
     fprintf('File "%s" found on disk, no need to recompute\n', filename);
     if strcmpi(prefix, 'comp')
         [X,~,f] = std_readfile(filename, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
