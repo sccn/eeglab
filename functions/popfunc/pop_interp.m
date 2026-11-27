@@ -58,7 +58,9 @@
 function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
 
     com = '';
-    t_range = '';
+    if nargin < 4
+        t_range = '';
+    end
     if nargin < 1
         help pop_interp;
         return;
@@ -147,7 +149,11 @@ function [EEG com] = pop_interp(EEG, bad_elec, method, t_range)
             error('Time/point range exceed lower data limits');
         end
         
-        com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
+        if numel(res) > 1 && ~isempty(res{2})
+            com = sprintf('EEG = pop_interp(EEG, %s, ''%s'', [%g %g]);', userdata.chanstr, method, t_range(1), t_range(2));
+        else
+            com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
+        end
         if ~isempty(findstr('removedchans', userdata.chanstr))
             eval( [ userdata.chanstr '=[];' ] );
         end
